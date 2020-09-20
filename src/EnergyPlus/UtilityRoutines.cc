@@ -54,7 +54,6 @@ extern "C" {
 #include <cstdlib>
 #include <exception>
 #include <iostream>
-#include <sys/stat.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -83,12 +82,13 @@ extern "C" {
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/ExternalInterface.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
@@ -431,7 +431,7 @@ namespace UtilityRoutines {
         return SameString(a, b);
     }
 
-    void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn)
+    void appendPerfLog(IOFiles &ioFiles, std::string const &colHeader, std::string const &colValue, bool finalColumn)
     // Add column to the performance log file (comma separated) which is appended to existing log.
     // The finalColumn (an optional argument) being true triggers the actual file to be written or appended.
     // J.Glazer February 2020
@@ -449,15 +449,21 @@ namespace UtilityRoutines {
 
         if (finalColumn) {
             std::fstream fsPerfLog;
-            if (!exists(DataStringGlobals::outputPerfLogFileName)) {
-                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); // open file normally
-                if (!fsPerfLog.fail()) {
+            if (!FileSystem::fileExists(DataStringGlobals::outputPerfLogFileName)) {
+                if (ioFiles.outputControl.perflog) {
+                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
+                    if (!fsPerfLog) {
+                        ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (write).");
+                    }
                     fsPerfLog << appendPerfLog_headerRow << std::endl;
                     fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
             } else {
-                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); // append to already existing file
-                if (!fsPerfLog.fail()) {
+                if (ioFiles.outputControl.perflog) {
+                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
+                    if (!fsPerfLog) {
+                        ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (append).");
+                    }
                     fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
             }
@@ -465,16 +471,10 @@ namespace UtilityRoutines {
         }
     }
 
-    inline bool exists(const std::string &filename)
-    {
-        // https://stackoverflow.com/questions/25225948/how-to-check-if-a-file-exists-in-c-with-fstreamopen/51300933
-        struct stat buffer;
-        return (stat(filename.c_str(), &buffer) == 0);
-    }
-
     bool ValidateFuelType(std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,
-                          bool &FuelTypeErrorsFound)
+                          bool &FuelTypeErrorsFound,
+                          bool const &AllowSteamAndDistrict)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dareum Nam
@@ -483,13 +483,13 @@ namespace UtilityRoutines {
         // PURPOSE OF THIS FUNCTION:
         // Validates fuel types and sets output strings
 
-        auto const SELECT_CASE_var(FuelTypeInput);
+        auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelTypeInput));
 
         if (SELECT_CASE_var == "ELECTRICITY") {
-            FuelTypeOutput = "Electric";
+            FuelTypeOutput = "Electricity";
 
         } else if (SELECT_CASE_var == "NATURALGAS") {
-            FuelTypeOutput = "Gas";
+            FuelTypeOutput = "NaturalGas";
 
         } else if (SELECT_CASE_var == "DIESEL") {
             FuelTypeOutput = "Diesel";
@@ -501,10 +501,10 @@ namespace UtilityRoutines {
             FuelTypeOutput = "Coal";
 
         } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeOutput = "FuelOil#1";
+            FuelTypeOutput = "FuelOilNo1";
 
         } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeOutput = "FuelOil#2";
+            FuelTypeOutput = "FuelOilNo2";
 
         } else if (SELECT_CASE_var == "PROPANE") {
             FuelTypeOutput = "Propane";
@@ -516,43 +516,19 @@ namespace UtilityRoutines {
             FuelTypeOutput = "OtherFuel2";
 
         } else {
-            FuelTypeErrorsFound = true;
-        }
-
-        return FuelTypeErrorsFound;
-    }
-
-    bool ValidateFuelTypeWithFuelTypeNum(std::string const &FuelTypeInput,
-                                         int &FuelTypeNum,
-                                         bool &FuelTypeErrorsFound)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Dareum Nam
-        //       DATE WRITTEN   May 2020
-
-        // PURPOSE OF THIS FUNCTION:
-        // Validates fuel types and sets output strings with fuel type number (DXCoils.cc and HVACVariableRefrigerantFlow.cc)
-
-        if (SameString(FuelTypeInput, "Electricity")) {
-            FuelTypeNum = 1; // FuelTypeElectricity
-        } else if (SameString(FuelTypeInput, "NaturalGas")) {
-            FuelTypeNum = 2; // FuelTypeNaturalGas
-        } else if (SameString(FuelTypeInput, "Propane")) {
-            FuelTypeNum = 3; // FuelTypePropaneGas
-        } else if (SameString(FuelTypeInput, "Diesel")) {
-            FuelTypeNum = 4; // FuelTypeDiesel
-        } else if (SameString(FuelTypeInput, "Gasoline")) {
-            FuelTypeNum = 5; // FuelTypeGasoline
-        } else if (SameString(FuelTypeInput, "FuelOilNo1")) {
-            FuelTypeNum = 6; // FuelTypeFuelOil1
-        } else if (SameString(FuelTypeInput, "FuelOilNo2")) {
-            FuelTypeNum = 7; // FuelTypeFuelOil2
-        } else if (SameString(FuelTypeInput, "OtherFuel1")) {
-            FuelTypeNum = 8; // FuelTypeOtherFuel1
-        } else if (SameString(FuelTypeInput, "OtherFuel2")) {
-            FuelTypeNum = 9; // FuelTypeOtherFuel2
-        } else {
-            FuelTypeErrorsFound = true;
+            if (AllowSteamAndDistrict) {
+                if (SELECT_CASE_var == "STEAM") {
+                    FuelTypeOutput = "Steam";
+                } else if (SELECT_CASE_var == "DISTRICTHEATING") {
+                    FuelTypeOutput = "DistrictHeating";
+                } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
+                    FuelTypeOutput = "DistrictCooling";
+                } else {
+                    FuelTypeErrorsFound = true;
+                }
+            } else {
+                FuelTypeErrorsFound = true;
+            }
         }
 
         return FuelTypeErrorsFound;
@@ -573,11 +549,11 @@ namespace UtilityRoutines {
         auto const SELECT_CASE_var(FuelTypeInput);
 
         if (SELECT_CASE_var == "ELECTRICITY") {
-            FuelTypeOutput = "Electric";
+            FuelTypeOutput = "Electricity";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
 
         } else if (SELECT_CASE_var == "NATURALGAS") {
-            FuelTypeOutput = "Gas";
+            FuelTypeOutput = "NaturalGas";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
 
         } else if (SELECT_CASE_var == "DIESEL") {
@@ -593,12 +569,12 @@ namespace UtilityRoutines {
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("COAL");
 
         } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeOutput = "FuelOil#1";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
+            FuelTypeOutput = "FuelOilNo1";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOILNO1");
 
         } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeOutput = "FuelOil#2";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
+            FuelTypeOutput = "FuelOilNo2";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOILNO2");
 
         } else if (SELECT_CASE_var == "PROPANE") {
             FuelTypeOutput = "Propane";
@@ -696,7 +672,7 @@ namespace UtilityRoutines {
 
             ErrFound = false;
             TerminalError = false;
-            TestBranchIntegrity(state.dataBranchInputManager, state.files, ErrFound);
+            TestBranchIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
@@ -708,8 +684,8 @@ namespace UtilityRoutines {
             if (ErrFound) TerminalError = true;
 
             if (!TerminalError) {
-                ReportAirLoopConnections(state.files);
-                ReportLoopConnections(state.files);
+                ReportAirLoopConnections(state, state.files);
+                ReportLoopConnections(state, state.files);
             }
 
         } else if (!ExitDuringSimulations) {
@@ -749,10 +725,10 @@ namespace UtilityRoutines {
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
-        ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+        ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
         ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                     " Severe Errors.");
@@ -763,7 +739,7 @@ namespace UtilityRoutines {
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
-            auto tempfl = state.files.endFile.try_open();
+            auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
 
             if (!tempfl.good()) {
                 DisplayString("AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
@@ -778,13 +754,7 @@ namespace UtilityRoutines {
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles(state.files.json);
 
-        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports(state.files.json);
-        }
-
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport(state.files.json);
-        }
+        ResultsFramework::resultsFramework->writeOutputs(state.files);
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(state.files.audit, Time_Finish - Time_Start);
@@ -840,7 +810,7 @@ namespace UtilityRoutines {
         CloseReportIllumMaps(ioFiles);
         CloseDFSFile(ioFiles);
 
-        if (DebugOutput || ioFiles.debug.position() > 0) {
+        if (DebugOutput || (ioFiles.debug.good() && ioFiles.debug.position() > 0)) {
             ioFiles.debug.close();
         } else {
             ioFiles.debug.del();
@@ -925,7 +895,7 @@ namespace UtilityRoutines {
         if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
         Elapsed_Time = Time_Finish - Time_Start;
         if (DataGlobals::createPerfLog) {
-            UtilityRoutines::appendPerfLog("Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
+            UtilityRoutines::appendPerfLog(ioFiles, "Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
         }
 #ifdef EP_Detailed_Timings
         epStopTime("EntireRun=");
@@ -938,15 +908,15 @@ namespace UtilityRoutines {
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
-        ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+        ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
         if (DataGlobals::createPerfLog) {
-            UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed);
-            UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
-            UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); // last item so write the perfLog file
+            UtilityRoutines::appendPerfLog(ioFiles, "Run Time [string]", Elapsed);
+            UtilityRoutines::appendPerfLog(ioFiles, "Number of Warnings", NumWarnings);
+            UtilityRoutines::appendPerfLog(ioFiles, "Number of Severe", NumSevere, true); // last item so write the perfLog file
         }
         ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                     " Severe Errors.");
@@ -956,7 +926,7 @@ namespace UtilityRoutines {
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
-            auto tempfl = ioFiles.endFile.try_open();
+            auto tempfl = ioFiles.endFile.try_open(ioFiles.outputControl.end);
             if (!tempfl.good()) {
                 DisplayString("EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
             }
@@ -966,13 +936,7 @@ namespace UtilityRoutines {
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles(ioFiles.json);
 
-        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports(ioFiles.json);
-        }
-
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport(ioFiles.json);
-        }
+        ResultsFramework::resultsFramework->writeOutputs(ioFiles);
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(Time_Finish - Time_Start);
@@ -1188,6 +1152,9 @@ namespace UtilityRoutines {
             sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
             if (sqlite->sqliteWithinTransaction()) sqlite->sqliteCommit();
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Fatal, ErrorMessage);
+        }
         throw FatalError(ErrorMessage);
     }
 
@@ -1246,6 +1213,9 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 1);
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Severe, ErrorMessage);
+        }
     }
 
     void ShowSevereMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
@@ -1299,6 +1269,9 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 0);
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Severe, ErrorMessage);
+        }
     }
 
     void ShowContinueError(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
@@ -1338,6 +1311,9 @@ namespace UtilityRoutines {
         ShowErrorMessage(" **   ~~~   ** " + Message, OutUnit1, OutUnit2);
         if (sqlite) {
             sqlite->updateSQLiteErrorRecord(Message);
+        }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Continue, Message);
         }
     }
 
@@ -1395,23 +1371,31 @@ namespace UtilityRoutines {
         }
 
         if (len(Message) < 50) {
-            ShowErrorMessage(" **   ~~~   ** " + Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                 CreateSysTimeIntervalString(),
+            const auto m = Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
+                                 CreateSysTimeIntervalString();
+            ShowErrorMessage(" **   ~~~   ** " + m,
                              OutUnit1,
                              OutUnit2);
             if (sqlite) {
-                sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                                CreateSysTimeIntervalString());
+                sqlite->updateSQLiteErrorRecord(m);
+            }
+            if (DataGlobals::errorCallback) {
+                DataGlobals::errorCallback(Error::Continue, m);
             }
         } else {
-            ShowErrorMessage(" **   ~~~   ** " + Message);
-            ShowErrorMessage(" **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                 CreateSysTimeIntervalString(),
+            const auto m = " **   ~~~   ** " + Message;
+            const auto postfix = " **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
+                CreateSysTimeIntervalString();
+            ShowErrorMessage(m);
+            ShowErrorMessage(postfix,
                              OutUnit1,
                              OutUnit2);
             if (sqlite) {
-                sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                                CreateSysTimeIntervalString());
+                sqlite->updateSQLiteErrorRecord(m);
+            }
+            if (DataGlobals::errorCallback) {
+                DataGlobals::errorCallback(Error::Continue, m);
+                DataGlobals::errorCallback(Error::Continue, postfix);
             }
         }
     }
@@ -1456,6 +1440,9 @@ namespace UtilityRoutines {
             ShowErrorMessage(" ************* " + Message, OutUnit1, OutUnit2);
             if (sqlite) {
                 sqlite->createSQLiteErrorRecord(1, -1, Message, 0);
+            }
+            if (DataGlobals::errorCallback) {
+                DataGlobals::errorCallback(Error::Info, Message);
             }
         }
     }
@@ -1512,6 +1499,9 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 1);
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Warning, ErrorMessage);
+        }
     }
 
     void ShowWarningMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
@@ -1541,6 +1531,9 @@ namespace UtilityRoutines {
         ShowErrorMessage(" ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 0);
+        }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Warning, ErrorMessage);
         }
     }
 
@@ -1844,12 +1837,12 @@ namespace UtilityRoutines {
 
 
         if (UtilityRoutines::outputErrorHeader && err_stream) {
-            *err_stream << "Program Version," + VerString + ',' + IDDVerString + DataStringGlobals::NL;
+            *err_stream << "Program Version," << VerString << ',' << IDDVerString << '\n';
             UtilityRoutines::outputErrorHeader = false;
         }
 
         if (!DoingInputProcessing) {
-           if (err_stream) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
+           if (err_stream) *err_stream << "  " << ErrorMessage << '\n';
         } else {
             // CacheIPErrorFile is never opened or closed
             // so this output would just go to stdout
@@ -1862,8 +1855,8 @@ namespace UtilityRoutines {
         if (present(OutUnit2)) {
             print(OutUnit2(), "  {}", ErrorMessage);
         }
-        std::string tmp = "  " + ErrorMessage + DataStringGlobals::NL;
-        if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
+        // std::string tmp = "  " + ErrorMessage + '\n';
+        // if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
     }
 
     void SummarizeErrors()
@@ -1985,18 +1978,32 @@ namespace UtilityRoutines {
                     if (sqlite) {
                         sqlite->updateSQLiteErrorRecord(error.Message);
                     }
+                    if (DataGlobals::errorCallback) {
+                        DataGlobals::errorCallback(Error::Continue, error.Message);
+                    }
                 } else {
+                    const auto warning = has_prefix(error.Message, " ** Warning ** ");
+                    const auto severe = has_prefix(error.Message, " ** Severe  ** ");
+
                     ShowMessage("");
                     ShowMessage(error.Message);
                     ShowMessage(StatMessageStart + "  This error occurred " + RoundSigDigits(error.Count) + " total times;");
                     ShowMessage(StatMessageStart + "  during Warmup " + RoundSigDigits(error.WarmupCount) + " times;");
                     ShowMessage(StatMessageStart + "  during Sizing " + RoundSigDigits(error.SizingCount) + " times.");
                     if (sqlite) {
-                        if (has_prefix(error.Message, " ** Warning ** ")) {
+                        if (warning) {
                             sqlite->createSQLiteErrorRecord(1, 0, error.Message.substr(15), error.Count);
-                        } else if (has_prefix(error.Message, " ** Severe  ** ")) {
+                        } else if (severe) {
                             sqlite->createSQLiteErrorRecord(1, 1, error.Message.substr(15), error.Count);
                         }
+                    }
+                    if (DataGlobals::errorCallback) {
+                        Error level = Error::Warning;
+                        if (severe) {
+                            level = Error::Severe;
+                        }
+                        DataGlobals::errorCallback(level, error.Message);
+                        DataGlobals::errorCallback(Error::Continue, "");
                     }
                 }
                 StatMessage = "";

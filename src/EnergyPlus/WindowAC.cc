@@ -456,9 +456,9 @@ namespace WindowAC {
                         GetDXHXAsstdCoilOutletNode(state, state.dataWindowAC.WindAC(WindACNum).DXCoilType, state.dataWindowAC.WindAC(WindACNum).DXCoilName, CoilNodeErrFlag);
                 } else if (UtilityRoutines::SameString(Alphas(9), "Coil:Cooling:DX:VariableSpeed")) {
                     state.dataWindowAC.WindAC(WindACNum).DXCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
-                    state.dataWindowAC.WindAC(WindACNum).CoilOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(
+                    state.dataWindowAC.WindAC(WindACNum).CoilOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(state,
                     state.dataWindowAC.WindAC(WindACNum).DXCoilType, state.dataWindowAC.WindAC(WindACNum).DXCoilName, CoilNodeErrFlag);
-                    state.dataWindowAC.WindAC(WindACNum).DXCoilNumOfSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds(state.dataWindowAC.WindAC(WindACNum).DXCoilName, ErrorsFound);
+                    state.dataWindowAC.WindAC(WindACNum).DXCoilNumOfSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds(state, state.dataWindowAC.WindAC(WindACNum).DXCoilName, ErrorsFound);
                 }
                 if (CoilNodeErrFlag) {
                     ShowContinueError(" that was specified in " + CurrentModuleObject + " = \"" + state.dataWindowAC.WindAC(WindACNum).Name + "\".");
@@ -667,13 +667,13 @@ namespace WindowAC {
                                 "System",
                                 "Sum",
                                 state.dataWindowAC.WindAC(WindACNum).Name);
-            SetupOutputVariable("Zone Window Air Conditioner Electric Power",
+            SetupOutputVariable("Zone Window Air Conditioner Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWindowAC.WindAC(WindACNum).ElecPower,
                                 "System",
                                 "Average",
                                 state.dataWindowAC.WindAC(WindACNum).Name);
-            SetupOutputVariable("Zone Window Air Conditioner Electric Energy",
+            SetupOutputVariable("Zone Window Air Conditioner Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWindowAC.WindAC(WindACNum).ElecConsumption,
                                 "System",

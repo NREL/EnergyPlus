@@ -83,7 +83,7 @@ namespace SimulationManager {
 
     void GetProjectData(EnergyPlusData &state);
 
-    void writeIntialPerfLogValues(std::string const &currentOverrideModeValue);
+    void writeIntialPerfLogValues(IOFiles &ioFiles, std::string const &currentOverrideModeValue);
 
     std::string bool_to_string(bool logical);
 
@@ -103,7 +103,7 @@ namespace SimulationManager {
 
     void ReportNodeConnections(IOFiles &ioFiles);
 
-    void ReportLoopConnections(IOFiles &ioFiles);
+    void ReportLoopConnections(EnergyPlusData &state, IOFiles &ioFiles);
 
     void ReportParentChildren(IOFiles &ioFiles);
 

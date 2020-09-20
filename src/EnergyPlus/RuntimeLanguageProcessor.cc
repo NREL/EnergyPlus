@@ -74,6 +74,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -150,6 +151,8 @@ namespace RuntimeLanguageProcessor {
     int DayOfWeekVariableNum(0);
     int DayOfYearVariableNum(0);
     int HourVariableNum(0);
+    int TimeStepsPerHourVariableNum(0);
+    int TimeStepNumVariableNum(0);
     int MinuteVariableNum(0);
     int HolidayVariableNum(0);
     int DSTVariableNum(0);
@@ -195,6 +198,8 @@ namespace RuntimeLanguageProcessor {
         DayOfWeekVariableNum = 0;
         DayOfYearVariableNum = 0;
         HourVariableNum = 0;
+        TimeStepsPerHourVariableNum = 0;
+        TimeStepNumVariableNum = 0;
         MinuteVariableNum = 0;
         HolidayVariableNum = 0;
         DSTVariableNum = 0;
@@ -212,7 +217,7 @@ namespace RuntimeLanguageProcessor {
         WriteTraceMyOneTimeFlag = false;
     }
 
-    void InitializeRuntimeLanguage(IOFiles &ioFiles)
+    void InitializeRuntimeLanguage(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -278,6 +283,7 @@ namespace RuntimeLanguageProcessor {
             OffVariableNum = NewEMSVariable("OFF", 0, False);
             OnVariableNum = NewEMSVariable("ON", 0, True);
             PiVariableNum = NewEMSVariable("PI", 0, SetErlValueNumber(Pi));
+            TimeStepsPerHourVariableNum = NewEMSVariable("TIMESTEPSPERHOUR", 0, SetErlValueNumber(double(DataGlobals::NumOfTimeStepInHour)));
 
             // Create dynamic built-in variables
             YearVariableNum = NewEMSVariable("YEAR", 0);
@@ -286,6 +292,7 @@ namespace RuntimeLanguageProcessor {
             DayOfWeekVariableNum = NewEMSVariable("DAYOFWEEK", 0);
             DayOfYearVariableNum = NewEMSVariable("DAYOFYEAR", 0);
             HourVariableNum = NewEMSVariable("HOUR", 0);
+            TimeStepNumVariableNum = NewEMSVariable("TIMESTEPNUM", 0);
             MinuteVariableNum = NewEMSVariable("MINUTE", 0);
             HolidayVariableNum = NewEMSVariable("HOLIDAY", 0);
             DSTVariableNum = NewEMSVariable("DAYLIGHTSAVINGS", 0);
@@ -300,7 +307,7 @@ namespace RuntimeLanguageProcessor {
             ActualTimeNum = NewEMSVariable("ACTUALTIME", 0);
             WarmUpFlagNum = NewEMSVariable("WARMUPFLAG", 0);
 
-            GetRuntimeLanguageUserInput(ioFiles); // Load and parse all runtime language objects
+            GetRuntimeLanguageUserInput(state,ioFiles); // Load and parse all runtime language objects
 
             date_and_time(datestring, _, _, datevalues);
             if (datestring != "") {
@@ -323,6 +330,7 @@ namespace RuntimeLanguageProcessor {
         ErlVariable(DayOfMonthVariableNum).Value = SetErlValueNumber(double(DayOfMonth));
         ErlVariable(DayOfWeekVariableNum).Value = SetErlValueNumber(double(DayOfWeek));
         ErlVariable(DayOfYearVariableNum).Value = SetErlValueNumber(double(DayOfYear));
+        ErlVariable(TimeStepNumVariableNum).Value = SetErlValueNumber(double(DataGlobals::TimeStep));
 
         ErlVariable(DSTVariableNum).Value = SetErlValueNumber(double(DSTIndicator));
         // DSTadjust = REAL(DSTIndicator, r64)
@@ -880,7 +888,7 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    ErlValueType EvaluateStack(IOFiles &ioFiles, int const StackNum)
+    ErlValueType EvaluateStack(EnergyPlusData &state, IOFiles &ioFiles, int const StackNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -922,14 +930,14 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == KeywordReturn) {
                     if (ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
-                        ReturnValue = EvaluateExpression(ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
+                        ReturnValue = EvaluateExpression(state, ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
 
                     WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     break; // RETURN always terminates an instruction stack
 
                 } else if (SELECT_CASE_var == KeywordSet) {
 
-                    ReturnValue = EvaluateExpression(ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
+                    ReturnValue = EvaluateExpression(state, ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
                     VariableNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     if ((!ErlVariable(VariableNum).ReadOnly) && (!ErlVariable(VariableNum).Value.TrendVariable)) {
                         ErlVariable(VariableNum).Value = ReturnValue;
@@ -944,14 +952,14 @@ namespace RuntimeLanguageProcessor {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
                     WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                    ReturnValue = EvaluateStack(ioFiles, ErlStack(StackNum).Instruction(InstructionNum).Argument1);
+                    ReturnValue = EvaluateStack(state,ioFiles, ErlStack(StackNum).Instruction(InstructionNum).Argument1);
 
                 } else if ((SELECT_CASE_var == KeywordIf) || (SELECT_CASE_var == KeywordElse)) { // same???
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
 
                     if (ExpressionNum > 0) { // could be 0 if this was an ELSE
-                        ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
+                        ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
                         WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                         if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                             // Eventually should handle strings and arrays too
@@ -984,7 +992,7 @@ namespace RuntimeLanguageProcessor {
                     // evaluate expression at while, skip to past endwhile if not true
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
-                    ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
+                    ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
                     WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                         // Eventually should handle strings and arrays too
@@ -996,7 +1004,7 @@ namespace RuntimeLanguageProcessor {
                     // reevaluate expression at While and goto there if true, otherwise continue
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
-                    ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
+                    ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
                     if ((ReturnValue.Number != 0.0) && (WhileLoopExitCounter <= MaxWhileLoopIterations)) { //  This is the True case
                         // Eventually should handle strings and arrays too
                         WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
@@ -1395,30 +1403,40 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (String[Pos] == '@') { // next check for builtin functions signaled by "@"
 
-                    if (i_parse("@Round", FuncRound) || i_parse("@Mod", FuncMod) || i_parse("@Sin", FuncSin) ||
-                        i_parse("@Cos", FuncCos) || i_parse("@ArcCos", FuncArcCos) || i_parse("@ArcSin", FuncArcSin) ||
-                        i_parse("@DegToRad", FuncDegToRad) || i_parse("@RadToDeg", FuncRadToDeg) || i_parse("@Exp", FuncExp) ||
-                        i_parse("@Ln", FuncLn) || i_parse("@Max", FuncMax) || i_parse("@Min", FuncMin) || i_parse("@Abs", FuncABS) ||
-                        i_parse("@RANDOMUNIFORM", FuncRandU) || i_parse("@RANDOMNORMAL", FuncRandG) ||
-                        i_parse("@SEEDRANDOM", FuncRandSeed) || i_parse("@RhoAirFnPbTdbW", FuncRhoAirFnPbTdbW) ||
-                        i_parse("@CpAirFnW", FuncCpAirFnW) || i_parse("@HfgAirFnWTdb", FuncHfgAirFnWTdb) ||
-                        i_parse("@HgAirFnWTdb", FuncHgAirFnWTdb) || i_parse("@TdpFnTdbTwbPb", FuncTdpFnTdbTwbPb) ||
-                        i_parse("@TdpFnWPb", FuncTdpFnWPb) || i_parse("@HFnTdbW", FuncHFnTdbW) ||
+                    if (i_parse("@Round", FuncRound) || i_parse("@Mod", FuncMod) || i_parse("@Sin", FuncSin) || i_parse("@Cos", FuncCos) ||
+                        i_parse("@ArcCos", FuncArcCos) || i_parse("@ArcSin", FuncArcSin) || i_parse("@DegToRad", FuncDegToRad) ||
+                        i_parse("@RadToDeg", FuncRadToDeg) || i_parse("@Exp", FuncExp) || i_parse("@Ln", FuncLn) || i_parse("@Max", FuncMax) ||
+                        i_parse("@Min", FuncMin) || i_parse("@Abs", FuncABS) || i_parse("@RANDOMUNIFORM", FuncRandU) ||
+                        i_parse("@RANDOMNORMAL", FuncRandG) || i_parse("@SEEDRANDOM", FuncRandSeed) ||
+                        i_parse("@RhoAirFnPbTdbW", FuncRhoAirFnPbTdbW) || i_parse("@CpAirFnW", FuncCpAirFnW) ||
+                        i_parse("@HfgAirFnWTdb", FuncHfgAirFnWTdb) || i_parse("@HgAirFnWTdb", FuncHgAirFnWTdb) ||
+                        i_parse("@TdpFnTdbTwbPb", FuncTdpFnTdbTwbPb) || i_parse("@TdpFnWPb", FuncTdpFnWPb) || i_parse("@HFnTdbW", FuncHFnTdbW) ||
                         i_parse("@HFnTdbRhPb", FuncHFnTdbRhPb) || i_parse("@TdbFnHW", FuncTdbFnHW) ||
                         i_parse("@RhovFnTdbRhLBnd0C", FuncRhovFnTdbRhLBnd0C) || i_parse("@RhovFnTdbRh", FuncRhovFnTdbRh) ||
                         i_parse("@RhovFnTdbWPb", FuncRhovFnTdbWPb) || i_parse("@RhFnTdbRhovLBnd0C", FuncRhFnTdbRhovLBnd0C) ||
                         i_parse("@RhFnTdbRhov", FuncRhFnTdbRhov) || i_parse("@RhFnTdbWPb", FuncRhFnTdbWPb) ||
-                        i_parse("@TwbFnTdbWPb", FuncTwbFnTdbWPb) || i_parse("@VFnTdbWPb", FuncVFnTdbWPb) ||
-                        i_parse("@WFnTdpPb", FuncWFnTdpPb) || i_parse("@WFnTdbH", FuncWFnTdbH) ||
-                        i_parse("@WFnTdbTwbPb", FuncWFnTdbTwbPb) || i_parse("@WFnTdbRhPb", FuncWFnTdbRhPb) ||
-                        i_parse("@PsatFnTemp", FuncPsatFnTemp) || i_parse("@TsatFnHPb", FuncTsatFnHPb) ||
-                        i_parse("@TsatFnPb", FuncTsatFnPb) || i_parse("@CpCW", FuncCpCW) || i_parse("@CpHW", FuncCpHW) ||
-                        i_parse("@RhoH2O", FuncRhoH2O) || i_parse("@FATALHALTEP", FuncFatalHaltEp) ||
-                        i_parse("@SEVEREWARNEP", FuncSevereWarnEp) || i_parse("@WARNEP", FuncWarnEp) ||
-                        i_parse("@TRENDVALUE", FuncTrendValue) || i_parse("@TRENDAVERAGE", FuncTrendAverage) ||
-                        i_parse("@TRENDMAX", FuncTrendMax) || i_parse("@TRENDMIN", FuncTrendMin) ||
-                        i_parse("@TRENDDIRECTION", FuncTrendDirection) || i_parse("@TRENDSUM", FuncTrendSum) ||
-                        i_parse("@CURVEVALUE", FuncCurveValue)) {
+                        i_parse("@TwbFnTdbWPb", FuncTwbFnTdbWPb) || i_parse("@VFnTdbWPb", FuncVFnTdbWPb) || i_parse("@WFnTdpPb", FuncWFnTdpPb) ||
+                        i_parse("@WFnTdbH", FuncWFnTdbH) || i_parse("@WFnTdbTwbPb", FuncWFnTdbTwbPb) || i_parse("@WFnTdbRhPb", FuncWFnTdbRhPb) ||
+                        i_parse("@PsatFnTemp", FuncPsatFnTemp) || i_parse("@TsatFnHPb", FuncTsatFnHPb) || i_parse("@TsatFnPb", FuncTsatFnPb) ||
+                        i_parse("@CpCW", FuncCpCW) || i_parse("@CpHW", FuncCpHW) || i_parse("@RhoH2O", FuncRhoH2O) ||
+                        i_parse("@FATALHALTEP", FuncFatalHaltEp) || i_parse("@SEVEREWARNEP", FuncSevereWarnEp) || i_parse("@WARNEP", FuncWarnEp) ||
+                        i_parse("@TRENDVALUE", FuncTrendValue) || i_parse("@TRENDAVERAGE", FuncTrendAverage) || i_parse("@TRENDMAX", FuncTrendMax) ||
+                        i_parse("@TRENDMIN", FuncTrendMin) || i_parse("@TRENDDIRECTION", FuncTrendDirection) || i_parse("@TRENDSUM", FuncTrendSum) ||
+                        i_parse("@CURVEVALUE", FuncCurveValue) || i_parse("@TODAYISRAIN", FuncTodayIsRain) ||
+                        i_parse("@TODAYISSNOW", FuncTodayIsSnow) || i_parse("@TODAYOUTDRYBULBTEMP", FuncTodayOutDryBulbTemp) ||
+                        i_parse("@TODAYOUTDEWPOINTTEMP", FuncTodayOutDewPointTemp) || i_parse("@TODAYOUTBAROPRESS", FuncTodayOutBaroPress) ||
+                        i_parse("@TODAYOUTRELHUM", FuncTodayOutRelHum) || i_parse("@TODAYWINDSPEED", FuncTodayWindSpeed) ||
+                        i_parse("@TODAYWINDDIR", FuncTodayWindDir) || i_parse("@TODAYSKYTEMP", FuncTodaySkyTemp) ||
+                        i_parse("@TODAYHORIZIRSKY", FuncTodayHorizIRSky) || i_parse("@TODAYBEAMSOLARRAD", FuncTodayBeamSolarRad) ||
+                        i_parse("@TODAYDIFSOLARRAD", FuncTodayDifSolarRad) || i_parse("@TODAYALBEDO", FuncTodayAlbedo) ||
+                        i_parse("@TODAYLIQUIDPRECIP", FuncTodayLiquidPrecip) || i_parse("@TOMORROWISRAIN", FuncTomorrowIsRain) ||
+                        i_parse("@TOMORROWISSNOW", FuncTomorrowIsSnow) || i_parse("@TOMORROWOUTDRYBULBTEMP", FuncTomorrowOutDryBulbTemp) ||
+                        i_parse("@TOMORROWOUTDEWPOINTTEMP", FuncTomorrowOutDewPointTemp) ||
+                        i_parse("@TOMORROWOUTBAROPRESS", FuncTomorrowOutBaroPress) || i_parse("@TOMORROWOUTRELHUM", FuncTomorrowOutRelHum) ||
+                        i_parse("@TOMORROWWINDSPEED", FuncTomorrowWindSpeed) || i_parse("@TOMORROWWINDDIR", FuncTomorrowWindDir) ||
+                        i_parse("@TOMORROWSKYTEMP", FuncTomorrowSkyTemp) || i_parse("@TOMORROWHORIZIRSKY", FuncTomorrowHorizIRSky) ||
+                        i_parse("@TOMORROWBEAMSOLARRAD", FuncTomorrowBeamSolarRad) || i_parse("@TOMORROWDIFSOLARRAD", FuncTomorrowDifSolarRad) ||
+                        i_parse("@TOMORROWALBEDO", FuncTomorrowAlbedo) || i_parse("@TOMORROWLIQUIDPRECIP", FuncTomorrowLiquidPrecip)) {
                         // was a built in function operator
                     } else { // throw error
                         if (DeveloperFlag) print(ioFiles.debug, "ERROR \"{}\"\n", String);
@@ -1795,7 +1813,7 @@ namespace RuntimeLanguageProcessor {
         return NumExpressions;
     }
 
-    ErlValueType EvaluateExpression(int const ExpressionNum, bool &seriousErrorFound)
+    ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, bool &seriousErrorFound)
     {
 
         // FUNCTION INFORMATION:
@@ -1857,7 +1875,7 @@ namespace RuntimeLanguageProcessor {
             for (OperandNum = 1; OperandNum <= ErlExpression(ExpressionNum).NumOperands; ++OperandNum) {
                 Operand(OperandNum) = ErlExpression(ExpressionNum).Operand(OperandNum);
                 if (Operand(OperandNum).Type == ValueExpression) {
-                    Operand(OperandNum) = EvaluateExpression(Operand(OperandNum).Expression, seriousErrorFound); // recursive call
+                    Operand(OperandNum) = EvaluateExpression(state, Operand(OperandNum).Expression, seriousErrorFound); // recursive call
                     // check if recursive call found an error in nested expression, want to preserve error message from that
                     if (seriousErrorFound) {
                         ReturnValue.Type = ValueError;
@@ -2402,18 +2420,18 @@ namespace RuntimeLanguageProcessor {
                     } else if (SELECT_CASE_var == FuncCurveValue) {
                         if (Operand(3).Type == 0 && Operand(4).Type == 0 && Operand(5).Type == 0 && Operand(6).Type == 0) {
                             ReturnValue =
-                                SetErlValueNumber(CurveValue(std::floor(Operand(1).Number), Operand(2).Number)); // curve index | X value | Y value,
+                                SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number)); // curve index | X value | Y value,
                                                                                                                  // 2nd independent | Z Value, 3rd
                                                                                                                  // independent | 4th independent |
                                                                                                                  // 5th independent
                         } else if (Operand(4).Type == 0 && Operand(5).Type == 0 && Operand(6).Type == 0) {
-                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                            ReturnValue = SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                                        Operand(2).Number,
                                                                        Operand(3).Number)); // curve index | X value | Y value, 2nd independent | Z
                                                                                             // Value, 3rd independent | 4th independent | 5th
                                                                                             // independent
                         } else if (Operand(5).Type == 0 && Operand(6).Type == 0) {
-                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                            ReturnValue = SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                                        Operand(2).Number,
                                                                        Operand(3).Number,
                                                                        Operand(4).Number)); // curve index | X value | Y value, 2nd independent | Z
@@ -2421,14 +2439,14 @@ namespace RuntimeLanguageProcessor {
                                                                                             // independent
                         } else if (Operand(6).Type == 0) {
                             ReturnValue =
-                                SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                                SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                              Operand(2).Number,
                                                              Operand(3).Number,
                                                              Operand(4).Number,
                                                              Operand(5).Number)); // curve index | X value | Y value, 2nd independent | Z Value, 3rd
                                                                                   // independent | 4th independent | 5th independent
                         } else {
-                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                            ReturnValue = SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                                        Operand(2).Number,
                                                                        Operand(3).Number,
                                                                        Operand(4).Number,
@@ -2438,6 +2456,90 @@ namespace RuntimeLanguageProcessor {
                                                                                             // independent | 5th independent
                         }
 
+                    } else if (SELECT_CASE_var == FuncTodayIsRain) {
+                        TodayTomorrowWeather(
+                            FuncTodayIsRain, Operand(1).Number, Operand(2).Number, WeatherManager::TodayIsRain, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayIsSnow) {
+                        TodayTomorrowWeather(
+                            FuncTodayIsSnow, Operand(1).Number, Operand(2).Number, WeatherManager::TodayIsSnow, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutDryBulbTemp) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutDryBulbTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutDryBulbTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutDewPointTemp) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutDewPointTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutDewPointTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutBaroPress) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutBaroPress, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutBaroPress, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutRelHum) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutRelHum, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutRelHum, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayWindSpeed) {
+                        TodayTomorrowWeather(
+                            FuncTodayWindSpeed, Operand(1).Number, Operand(2).Number, WeatherManager::TodayWindSpeed, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayWindDir) {
+                        TodayTomorrowWeather(
+                            FuncTodayWindDir, Operand(1).Number, Operand(2).Number, WeatherManager::TodayWindDir, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodaySkyTemp) {
+                        TodayTomorrowWeather(
+                            FuncTodaySkyTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TodaySkyTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayHorizIRSky) {
+                        TodayTomorrowWeather(
+                            FuncTodayHorizIRSky, Operand(1).Number, Operand(2).Number, WeatherManager::TodayHorizIRSky, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayBeamSolarRad) {
+                        TodayTomorrowWeather(
+                            FuncTodayBeamSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TodayBeamSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayDifSolarRad) {
+                        TodayTomorrowWeather(
+                            FuncTodayDifSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TodayDifSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayAlbedo) {
+                        TodayTomorrowWeather(
+                            FuncTodayAlbedo, Operand(1).Number, Operand(2).Number, WeatherManager::TodayAlbedo, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayLiquidPrecip) {
+                        TodayTomorrowWeather(
+                            FuncTodayLiquidPrecip, Operand(1).Number, Operand(2).Number, WeatherManager::TodayLiquidPrecip, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowIsRain) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowIsRain, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowIsRain, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowIsSnow) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowIsSnow, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowIsSnow, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutDryBulbTemp) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutDryBulbTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutDryBulbTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutDewPointTemp) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutDewPointTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutDewPointTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutBaroPress) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutBaroPress, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutBaroPress, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutRelHum) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutRelHum, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutRelHum, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowWindSpeed) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowWindSpeed, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowWindSpeed, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowWindDir) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowWindDir, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowWindDir, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowSkyTemp) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowSkyTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowSkyTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowHorizIRSky) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowHorizIRSky, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowHorizIRSky, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowBeamSolarRad) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowBeamSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowBeamSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowDifSolarRad) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowDifSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowDifSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowAlbedo) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowAlbedo, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowAlbedo, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowLiquidPrecip) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowLiquidPrecip, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowLiquidPrecip, ReturnValue);
                     } else {
                         // throw Error!
                         ShowFatalError("caught unexpected Expression(ExpressionNum)%Operator in EvaluateExpression");
@@ -2450,7 +2552,66 @@ namespace RuntimeLanguageProcessor {
         return ReturnValue;
     }
 
-    void GetRuntimeLanguageUserInput(IOFiles &ioFiles)
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal)
+    {
+        int iHour = (Operand1 + 1); // Operand 1 is hour from 0:23
+        int iTimeStep = Operand2;
+        if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= DataGlobals::NumOfTimeStepInHour)) {
+            ReturnVal = SetErlValueNumber(TodayTomorrowWeatherSource(iTimeStep, iHour));
+        } else {
+            ReturnVal.Type = DataRuntimeLanguage::ValueError;
+            ReturnVal.Error = DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol +
+                              " function called with invalid arguments: Hour=" + General::RoundSigDigits(Operand1, 1) +
+                              ", Timestep=" + General::RoundSigDigits(Operand2, 1);
+        }
+    }
+
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal)
+    {
+        int iHour = (Operand1 + 1); // Operand 1 is hour from 0:23
+        int iTimeStep = Operand2;
+        if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= DataGlobals::NumOfTimeStepInHour)) {
+            // For logicals return 1 or 0
+            if (TodayTomorrowWeatherSource(iTimeStep, iHour)) {
+                ReturnVal = SetErlValueNumber(1.0);
+            } else {
+                ReturnVal = SetErlValueNumber(0.0);
+            }
+        } else {
+            ReturnVal.Type = DataRuntimeLanguage::ValueError;
+            ReturnVal.Error = DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol +
+                              " function called with invalid arguments: Hour=" + General::RoundSigDigits(Operand1, 1) +
+                              ", Timestep=" + General::RoundSigDigits(Operand2, 1);
+        }
+    }
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value) {
+        int iHour = hour + 1;
+        if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= DataGlobals::NumOfTimeStepInHour)) {
+            value = TodayTomorrowWeatherSource(timestep, iHour);
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value) {
+        int iHour = hour + 1;
+        if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= DataGlobals::NumOfTimeStepInHour)) {
+            if (TodayTomorrowWeatherSource(timestep, iHour)) {
+                value = 1.0;
+            } else {
+                value = 0.0;
+            }
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
+    void GetRuntimeLanguageUserInput(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2752,7 +2913,7 @@ namespace RuntimeLanguageProcessor {
                         }
                     }
 
-                    CurveIndexNum = GetCurveIndex(cAlphaArgs(2)); // curve name
+                    CurveIndexNum = GetCurveIndex(state, cAlphaArgs(2)); // curve name
                     if (CurveIndexNum == 0) {
                         if (lAlphaFieldBlanks(2)) {
                             ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field.");
@@ -3303,9 +3464,9 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "COAL") {
                             ResourceTypeString = "Coal";
                         } else if (SELECT_CASE_var == "FUELOILNO1") {
-                            ResourceTypeString = "FuelOil#1";
+                            ResourceTypeString = "FuelOilNo1";
                         } else if (SELECT_CASE_var == "FUELOILNO2") {
-                            ResourceTypeString = "FuelOil#2";
+                            ResourceTypeString = "FuelOilNo2";
                         } else if (SELECT_CASE_var == "OTHERFUEL1") {
                             ResourceTypeString = "OtherFuel1";
                         } else if (SELECT_CASE_var == "OTHERFUEL2") {
@@ -4053,6 +4214,118 @@ namespace RuntimeLanguageProcessor {
         PossibleOperators(FuncCurveValue).Symbol = "@CURVEVALUE";
         PossibleOperators(FuncCurveValue).NumOperands = 6;
         PossibleOperators(FuncCurveValue).Code = FuncCurveValue;
+
+        PossibleOperators(FuncTodayIsRain).Symbol = "@TODAYISRAIN";
+        PossibleOperators(FuncTodayIsRain).NumOperands = 2;
+        PossibleOperators(FuncTodayIsRain).Code = FuncTodayIsRain;
+
+        PossibleOperators(FuncTodayIsSnow).Symbol = "@TODAYISSNOW";
+        PossibleOperators(FuncTodayIsSnow).NumOperands = 2;
+        PossibleOperators(FuncTodayIsSnow).Code = FuncTodayIsSnow;
+
+        PossibleOperators(FuncTodayOutDryBulbTemp).Symbol = "@TODAYOUTDRYBULBTEMP";
+        PossibleOperators(FuncTodayOutDryBulbTemp).NumOperands = 2;
+        PossibleOperators(FuncTodayOutDryBulbTemp).Code = FuncTodayOutDryBulbTemp;
+
+        PossibleOperators(FuncTodayOutDewPointTemp).Symbol = "@TODAYOUTDEWPOINTTEMP";
+        PossibleOperators(FuncTodayOutDewPointTemp).NumOperands = 2;
+        PossibleOperators(FuncTodayOutDewPointTemp).Code = FuncTodayOutDewPointTemp;
+
+        PossibleOperators(FuncTodayOutBaroPress).Symbol = "@TODAYOUTBAROPRESS";
+        PossibleOperators(FuncTodayOutBaroPress).NumOperands = 2;
+        PossibleOperators(FuncTodayOutBaroPress).Code = FuncTodayOutBaroPress;
+
+        PossibleOperators(FuncTodayOutRelHum).Symbol = "@TODAYOUTRELHUM";
+        PossibleOperators(FuncTodayOutRelHum).NumOperands = 2;
+        PossibleOperators(FuncTodayOutRelHum).Code = FuncTodayOutRelHum;
+
+        PossibleOperators(FuncTodayWindSpeed).Symbol = "@TODAYWINDSPEED";
+        PossibleOperators(FuncTodayWindSpeed).NumOperands = 2;
+        PossibleOperators(FuncTodayWindSpeed).Code = FuncTodayWindSpeed;
+
+        PossibleOperators(FuncTodayWindDir).Symbol = "@TODAYWINDDIR";
+        PossibleOperators(FuncTodayWindDir).NumOperands = 2;
+        PossibleOperators(FuncTodayWindDir).Code = FuncTodayWindDir;
+
+        PossibleOperators(FuncTodaySkyTemp).Symbol = "@TODAYSKYTEMP";
+        PossibleOperators(FuncTodaySkyTemp).NumOperands = 2;
+        PossibleOperators(FuncTodaySkyTemp).Code = FuncTodaySkyTemp;
+
+        PossibleOperators(FuncTodayHorizIRSky).Symbol = "@TODAYHORIZIRSKY";
+        PossibleOperators(FuncTodayHorizIRSky).NumOperands = 2;
+        PossibleOperators(FuncTodayHorizIRSky).Code = FuncTodayHorizIRSky;
+
+        PossibleOperators(FuncTodayBeamSolarRad).Symbol = "@TODAYBEAMSOLARRAD";
+        PossibleOperators(FuncTodayBeamSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTodayBeamSolarRad).Code = FuncTodayBeamSolarRad;
+
+        PossibleOperators(FuncTodayDifSolarRad).Symbol = "@TODAYDIFSOLARRAD";
+        PossibleOperators(FuncTodayDifSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTodayDifSolarRad).Code = FuncTodayDifSolarRad;
+
+        PossibleOperators(FuncTodayAlbedo).Symbol = "@TODAYALBEDO";
+        PossibleOperators(FuncTodayAlbedo).NumOperands = 2;
+        PossibleOperators(FuncTodayAlbedo).Code = FuncTodayAlbedo;
+
+        PossibleOperators(FuncTodayLiquidPrecip).Symbol = "@TODAYLIQUIDPRECIP";
+        PossibleOperators(FuncTodayLiquidPrecip).NumOperands = 2;
+        PossibleOperators(FuncTodayLiquidPrecip).Code = FuncTodayLiquidPrecip;
+
+        PossibleOperators(FuncTomorrowIsRain).Symbol = "@TOMORROWISRAIN";
+        PossibleOperators(FuncTomorrowIsRain).NumOperands = 2;
+        PossibleOperators(FuncTomorrowIsRain).Code = FuncTomorrowIsRain;
+
+        PossibleOperators(FuncTomorrowIsSnow).Symbol = "@TOMORROWISSNOW";
+        PossibleOperators(FuncTomorrowIsSnow).NumOperands = 2;
+        PossibleOperators(FuncTomorrowIsSnow).Code = FuncTomorrowIsSnow;
+
+        PossibleOperators(FuncTomorrowOutDryBulbTemp).Symbol = "@TOMORROWOUTDRYBULBTEMP";
+        PossibleOperators(FuncTomorrowOutDryBulbTemp).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutDryBulbTemp).Code = FuncTomorrowOutDryBulbTemp;
+
+        PossibleOperators(FuncTomorrowOutDewPointTemp).Symbol = "@TOMORROWOUTDEWPOINTTEMP";
+        PossibleOperators(FuncTomorrowOutDewPointTemp).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutDewPointTemp).Code = FuncTomorrowOutDewPointTemp;
+
+        PossibleOperators(FuncTomorrowOutBaroPress).Symbol = "@TOMORROWOUTBAROPRESS";
+        PossibleOperators(FuncTomorrowOutBaroPress).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutBaroPress).Code = FuncTomorrowOutBaroPress;
+
+        PossibleOperators(FuncTomorrowOutRelHum).Symbol = "@TOMORROWOUTRELHUM";
+        PossibleOperators(FuncTomorrowOutRelHum).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutRelHum).Code = FuncTomorrowOutRelHum;
+
+        PossibleOperators(FuncTomorrowWindSpeed).Symbol = "@TOMORROWWINDSPEED";
+        PossibleOperators(FuncTomorrowWindSpeed).NumOperands = 2;
+        PossibleOperators(FuncTomorrowWindSpeed).Code = FuncTomorrowWindSpeed;
+
+        PossibleOperators(FuncTomorrowWindDir).Symbol = "@TOMORROWWINDDIR";
+        PossibleOperators(FuncTomorrowWindDir).NumOperands = 2;
+        PossibleOperators(FuncTomorrowWindDir).Code = FuncTomorrowWindDir;
+
+        PossibleOperators(FuncTomorrowSkyTemp).Symbol = "@TOMORROWSKYTEMP";
+        PossibleOperators(FuncTomorrowSkyTemp).NumOperands = 2;
+        PossibleOperators(FuncTomorrowSkyTemp).Code = FuncTomorrowSkyTemp;
+
+        PossibleOperators(FuncTomorrowHorizIRSky).Symbol = "@TOMORROWHORIZIRSKY";
+        PossibleOperators(FuncTomorrowHorizIRSky).NumOperands = 2;
+        PossibleOperators(FuncTomorrowHorizIRSky).Code = FuncTomorrowHorizIRSky;
+
+        PossibleOperators(FuncTomorrowBeamSolarRad).Symbol = "@TOMORROWBEAMSOLARRAD";
+        PossibleOperators(FuncTomorrowBeamSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTomorrowBeamSolarRad).Code = FuncTomorrowBeamSolarRad;
+
+        PossibleOperators(FuncTomorrowDifSolarRad).Symbol = "@TOMORROWDIFSOLARRAD";
+        PossibleOperators(FuncTomorrowDifSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTomorrowDifSolarRad).Code = FuncTomorrowDifSolarRad;
+
+        PossibleOperators(FuncTomorrowAlbedo).Symbol = "@TOMORROWALBEDO";
+        PossibleOperators(FuncTomorrowAlbedo).NumOperands = 2;
+        PossibleOperators(FuncTomorrowAlbedo).Code = FuncTomorrowAlbedo;
+
+        PossibleOperators(FuncTomorrowLiquidPrecip).Symbol = "@TOMORROWLIQUIDPRECIP";
+        PossibleOperators(FuncTomorrowLiquidPrecip).NumOperands = 2;
+        PossibleOperators(FuncTomorrowLiquidPrecip).Code = FuncTomorrowLiquidPrecip;
 
         AlreadyDidOnce = true;
     }

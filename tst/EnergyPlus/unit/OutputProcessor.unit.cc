@@ -1208,17 +1208,13 @@ namespace OutputProcessor {
     TEST_F(SQLiteFixture, OutputProcessor_getStandardMeterResourceType)
     {
         std::map<std::string, std::string> const resource_map = {{"ELECTRICITY", "Electricity"},
-                                                                 {"ELECTRIC", "Electricity"},
-                                                                 {"ELEC", "Electricity"},
-                                                                 {"GAS", "Gas"},
-                                                                 {"NATURALGAS", "Gas"},
+                                                                 {"NATURALGAS", "NaturalGas"},
                                                                  {"GASOLINE", "Gasoline"},
                                                                  {"DIESEL", "Diesel"},
                                                                  {"COAL", "Coal"},
-                                                                 {"FUELOIL#1", "FuelOil#1"},
-                                                                 {"FUELOIL#2", "FuelOil#2"},
+                                                                 {"FUELOILNO1", "FuelOilNo1"},
+                                                                 {"FUELOILNO2", "FuelOilNo2"},
                                                                  {"PROPANE", "Propane"},
-                                                                 {"PROPANEGAS", "Propane"},
                                                                  {"WATER", "Water"},
                                                                  {"H2O", "Water"},
                                                                  {"ONSITEWATER", "OnSiteWater"},
@@ -1297,12 +1293,12 @@ namespace OutputProcessor {
     TEST_F(SQLiteFixture, OutputProcessor_determineIndexGroupKeyFromMeterName)
     {
         std::map<std::string, int> const resource_map = {{"Electricity:Facility", 100},
-                                                         {"Gas:Facility", 101},
+                                                         {"NaturalGas:Facility", 101},
                                                          {"DistricHeating:Facility", 102},
                                                          {"DistricCooling:Facility", 103},
                                                          {"ElectricityNet:Facility", 104},
                                                          {"Electricity:Building", 201},
-                                                         {"Gas:Building", 202},
+                                                         {"NaturalGas:Building", 202},
                                                          {"Electricity:HVAC", 301},
                                                          {"InteriorLights:Electricity", 401},
                                                          {"InteriorLights:Electricity:Zone", 501},
@@ -2852,103 +2848,103 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_validateNStandardizeMeterTitles)
     {
-        std::vector<std::vector<std::string>> input_map = {{"J", "ELEC", "INTERIOR LIGHTS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "INTERIOR LIGHTS", "endUseSub", "SYSTEM"},
-                                                           {"J", "ELEC", "INTERIOR LIGHTS", "endUseSub", "PLANT"},
-                                                           {"J", "ELEC", "INTERIOR LIGHTS", "endUseSub", "BUILDING", "zoneName"},
-                                                           {"J", "ELEC", "INTERIORLIGHTS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "EXTERIOR LIGHTS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "EXTERIORLIGHTS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEATING", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HTG", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEATPRODUCED", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "COOLING", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "CLG", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "DOMESTICHOTWATER", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "DHW", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "DOMESTIC HOT WATER", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "COGEN", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "COGENERATION", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "INTERIOREQUIPMENT", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "INTERIOR EQUIPMENT", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "EXTERIOREQUIPMENT", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "EXTERIOR EQUIPMENT", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "EXT EQ", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "EXTERIOREQ", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "EXTERIOR:WATEREQUIPMENT", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "PURCHASEDHOTWATER", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "DISTRICTHOTWATER", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "PURCHASED HEATING", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "PURCHASEDCOLDWATER", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "DISTRICTCHILLEDWATER", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "PURCHASEDCHILLEDWATER", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "PURCHASED COLD WATER", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "PURCHASED COOLING", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "FANS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "FAN", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEATINGCOILS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEATINGCOIL", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEATING COILS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEATING COIL", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "COOLINGCOILS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "COOLINGCOIL", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "COOLING COILS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "COOLING COIL", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "PUMPS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "PUMP", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "FREECOOLING", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "FREE COOLING", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "LOOPTOLOOP", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "CHILLERS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "CHILLER", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "BOILERS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "BOILER", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "BASEBOARD", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "BASEBOARDS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEATREJECTION", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEAT REJECTION", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HUMIDIFIER", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HUMIDIFIERS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEATRECOVERY", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEAT RECOVERY", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "PHOTOVOLTAICS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "PV", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "PHOTOVOLTAIC", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "WINDTURBINES", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "WT", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "WINDTURBINE", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "ELECTRICSTORAGE", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEAT RECOVERY FOR COOLING", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEATRECOVERYFORCOOLING", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEATRECOVERYCOOLING", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEAT RECOVERY FOR HEATING", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEATRECOVERYFORHEATING", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "HEATRECOVERYHEATING", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "ELECTRICEMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "PURCHASEDELECTRICEMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "SOLDELECTRICEMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "NATURALGASEMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "FUELOIL#1EMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "FUELOIL#2EMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "COALEMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "GASOLINEEMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "PROPANEEMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "DIESELEMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "OTHERFUEL1EMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "OTHERFUEL2EMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "CARBONEQUIVALENTEMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "REFRIGERATION", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "COLDSTORAGECHARGE", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "COLDSTORAGEDISCHARGE", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "WATERSYSTEMS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "WATERSYSTEM", "endUseSub", "HVAC"},
-                                                           // { "J", "ELEC", "Water System", "endUseSub", "HVAC" },  // This one fails because Water
+        std::vector<std::vector<std::string>> input_map = {{"J", "ELECTRICITY", "INTERIOR LIGHTS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "INTERIOR LIGHTS", "endUseSub", "SYSTEM"},
+                                                           {"J", "ELECTRICITY", "INTERIOR LIGHTS", "endUseSub", "PLANT"},
+                                                           {"J", "ELECTRICITY", "INTERIOR LIGHTS", "endUseSub", "BUILDING", "zoneName"},
+                                                           {"J", "ELECTRICITY", "INTERIORLIGHTS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "EXTERIOR LIGHTS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "EXTERIORLIGHTS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEATING", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HTG", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEATPRODUCED", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "COOLING", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "CLG", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "DOMESTICHOTWATER", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "DHW", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "DOMESTIC HOT WATER", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "COGEN", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "COGENERATION", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "INTERIOREQUIPMENT", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "INTERIOR EQUIPMENT", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "EXTERIOREQUIPMENT", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "EXTERIOR EQUIPMENT", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "EXT EQ", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "EXTERIOREQ", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "EXTERIOR:WATEREQUIPMENT", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PURCHASEDHOTWATER", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "DISTRICTHOTWATER", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PURCHASED HEATING", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PURCHASEDCOLDWATER", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "DISTRICTCHILLEDWATER", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PURCHASEDCHILLEDWATER", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PURCHASED COLD WATER", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PURCHASED COOLING", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "FANS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "FAN", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEATINGCOILS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEATINGCOIL", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEATING COILS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEATING COIL", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "COOLINGCOILS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "COOLINGCOIL", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "COOLING COILS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "COOLING COIL", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PUMPS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PUMP", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "FREECOOLING", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "FREE COOLING", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "LOOPTOLOOP", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "CHILLERS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "CHILLER", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "BOILERS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "BOILER", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "BASEBOARD", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "BASEBOARDS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEATREJECTION", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEAT REJECTION", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HUMIDIFIER", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HUMIDIFIERS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEATRECOVERY", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEAT RECOVERY", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PHOTOVOLTAICS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PV", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PHOTOVOLTAIC", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "WINDTURBINES", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "WT", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "WINDTURBINE", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "ELECTRICSTORAGE", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEAT RECOVERY FOR COOLING", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEATRECOVERYFORCOOLING", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEATRECOVERYCOOLING", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEAT RECOVERY FOR HEATING", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEATRECOVERYFORHEATING", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "HEATRECOVERYHEATING", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "ELECTRICEMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PURCHASEDELECTRICEMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "SOLDELECTRICEMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "NATURALGASEMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "FUELOILNO1EMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "FUELOILNO2EMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "COALEMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "GASOLINEEMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PROPANEEMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "DIESELEMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "OTHERFUEL1EMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "OTHERFUEL2EMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "CARBONEQUIVALENTEMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "REFRIGERATION", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "COLDSTORAGECHARGE", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "COLDSTORAGEDISCHARGE", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "WATERSYSTEMS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "WATERSYSTEM", "endUseSub", "HVAC"},
+                                                           // { "J", "ELECTRICITY", "Water System", "endUseSub", "HVAC" },  // This one fails because Water
                                                            // System isn't a proper choice (needs to be upper cased in code...)
-                                                           {"J", "ELEC", "RAINWATER", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "CONDENSATE", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "WELLWATER", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "MAINSWATER", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "PURCHASEDWATER", "endUseSub", "HVAC"}};
+                                                           {"J", "ELECTRICITY", "RAINWATER", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "CONDENSATE", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "WELLWATER", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "MAINSWATER", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PURCHASEDWATER", "endUseSub", "HVAC"}};
 
         std::vector<std::string> const result_map = {"Electricity:Facility",
                                                      "Electricity:HVAC",
@@ -3020,10 +3016,10 @@ namespace OutputProcessor {
                                                      "endUseSub:SoldElectricEmissions:Electricity",
                                                      "NaturalGasEmissions:Electricity",
                                                      "endUseSub:NaturalGasEmissions:Electricity",
-                                                     "FuelOil#1Emissions:Electricity",
-                                                     "endUseSub:FuelOil#1Emissions:Electricity",
-                                                     "FuelOil#2Emissions:Electricity",
-                                                     "endUseSub:FuelOil#2Emissions:Electricity",
+                                                     "FuelOilNo1Emissions:Electricity",
+                                                     "endUseSub:FuelOilNo1Emissions:Electricity",
+                                                     "FuelOilNo2Emissions:Electricity",
+                                                     "endUseSub:FuelOilNo2Emissions:Electricity",
                                                      "CoalEmissions:Electricity",
                                                      "endUseSub:CoalEmissions:Electricity",
                                                      "GasolineEmissions:Electricity",
@@ -3085,7 +3081,7 @@ namespace OutputProcessor {
         EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
         OutputProcessor::Unit units = OutputProcessor::Unit::J;
-        std::string resourceType = "ELEC";
+        std::string resourceType = "ELECTRICITY";
         std::string endUse = "INTERIOR LIGHTS";
         std::string endUseSub = "endUseSub";
         std::string group = "BAD INPUT";
@@ -3095,7 +3091,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(errorFound);
 
         units = OutputProcessor::Unit::J;
-        resourceType = "ELEC";
+        resourceType = "ELECTRICITY";
         endUse = "BAD INPUT";
         endUseSub = "endUseSub";
         group = "HVAC";
@@ -3284,7 +3280,7 @@ namespace OutputProcessor {
         DataGlobals::DoWeathSim = true;
         DataGlobals::TimeStepZone = 0.25;
 
-        OutputReportTabular::GetInputTabularMonthly();
+        OutputReportTabular::GetInputTabularMonthly(state.files);
         EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
         OutputReportTabular::InitializeTabularMonthly();
 
@@ -3341,7 +3337,7 @@ namespace OutputProcessor {
         DataGlobals::DoWeathSim = true;
         DataGlobals::TimeStepZone = 0.25;
 
-        OutputReportTabular::GetInputTabularMonthly();
+        OutputReportTabular::GetInputTabularMonthly(state.files);
         EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
         OutputReportTabular::InitializeTabularMonthly();
 
@@ -3541,9 +3537,9 @@ namespace OutputProcessor {
     TEST_F(EnergyPlusFixture, OutputProcessor_setupOutputVariable_endUseSubKey)
     {
         std::string const idf_objects = delimited_string({
-            "Output:Variable,*,Chiller Electric Energy,runperiod;",
-            "Output:Variable,*,Lights Electric Energy,runperiod;",
-            "Output:Variable,*,Environmental Impact Fuel Oil #2 CO2 Emissions Mass,runperiod;",
+            "Output:Variable,*,Chiller Electricity Energy,runperiod;",
+            "Output:Variable,*,Lights Electricity Energy,runperiod;",
+            "Output:Variable,*,Environmental Impact Fuel Oil No 2 CO2 Emissions Mass,runperiod;",
         });
 
         ASSERT_TRUE(process_idf(idf_objects));
@@ -3551,7 +3547,7 @@ namespace OutputProcessor {
         GetReportVariableInput(state.files);
 
         Real64 cooling_consumption = 0.;
-        SetupOutputVariable("Chiller Electric Energy",
+        SetupOutputVariable("Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
                             cooling_consumption,
                             "System",
@@ -3565,7 +3561,7 @@ namespace OutputProcessor {
 
 
         Real64 light_consumption = 0.;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -3581,7 +3577,7 @@ namespace OutputProcessor {
                             1);
 
         Real64 fuel_oil_co2 = 0.;
-        SetupOutputVariable("Environmental Impact Fuel Oil #2 CO2 Emissions Mass",
+        SetupOutputVariable("Environmental Impact Fuel Oil No 2 CO2 Emissions Mass",
                             OutputProcessor::Unit::kg,
                             fuel_oil_co2,
                             "System",
@@ -3589,7 +3585,7 @@ namespace OutputProcessor {
                             "Site",
                             _,
                             "CO2",
-                            "FuelOil#2Emissions",
+                            "FuelOilNo2Emissions",
                             _,                    // EndUseSubKey
                             "");     
 
@@ -3634,10 +3630,10 @@ namespace OutputProcessor {
 
         // fuel oil CO2 emissions
         // testing a non-ABUPS end use with no sub end use specified
-        found = UtilityRoutines::FindItem("FuelOil#2Emissions:CO2", EnergyMeters);
+        found = UtilityRoutines::FindItem("FuelOilNo2Emissions:CO2", EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("CO2", EnergyMeters(found).ResourceType);
-        EXPECT_EQ("FuelOil#2Emissions", EnergyMeters(found).EndUse);
+        EXPECT_EQ("FuelOilNo2Emissions", EnergyMeters(found).EndUse);
         EXPECT_EQ("", EnergyMeters(found).EndUseSub);
     }
 
@@ -3645,22 +3641,22 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_setupOutputVariable_star)
     {
-        std::string const idf_objects = delimited_string({"Output:Variable,*,Boiler Gas Rate,runperiod;"});
+        std::string const idf_objects = delimited_string({"Output:Variable,*,Boiler NaturalGas Rate,runperiod;"});
 
         ASSERT_TRUE(process_idf(idf_objects));
 
         GetReportVariableInput(state.files);
         Real64 fuel_used = 999;
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
         std::vector<std::vector<std::string>> reportDataDictionary({
-            {"1", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Gas Rate", "Run Period", "", "W"},
-            {"2", "0", "Avg", "System", "HVAC System", "Boiler2", "Boiler Gas Rate", "Run Period", "", "W"},
-            {"3", "0", "Avg", "System", "HVAC System", "Boiler3", "Boiler Gas Rate", "Run Period", "", "W"},
+            {"1", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"2", "0", "Avg", "System", "HVAC System", "Boiler2", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"3", "0", "Avg", "System", "HVAC System", "Boiler3", "Boiler NaturalGas Rate", "Run Period", "", "W"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -3669,28 +3665,28 @@ namespace OutputProcessor {
         auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
         compare_eso_stream(
-            delimited_string({"1,11,Boiler1,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-                              "2,11,Boiler2,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-                              "3,11,Boiler3,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n"));
+            delimited_string({"1,11,Boiler1,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+                              "2,11,Boiler2,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+                              "3,11,Boiler3,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n"));
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_setupOutputVariable_regex)
     {
-        std::string const idf_objects = delimited_string({"Output:Variable,Boiler[13],Boiler Gas Rate,runperiod;"});
+        std::string const idf_objects = delimited_string({"Output:Variable,Boiler[13],Boiler NaturalGas Rate,runperiod;"});
 
         ASSERT_TRUE(process_idf(idf_objects));
 
         GetReportVariableInput(state.files);
         Real64 fuel_used = 999;
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
         std::vector<std::vector<std::string>> reportDataDictionary({
-            {"1", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Gas Rate", "Run Period", "", "W"},
-            {"2", "0", "Avg", "System", "HVAC System", "Boiler3", "Boiler Gas Rate", "Run Period", "", "W"},
+            {"1", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"2", "0", "Avg", "System", "HVAC System", "Boiler3", "Boiler NaturalGas Rate", "Run Period", "", "W"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -3699,28 +3695,28 @@ namespace OutputProcessor {
         auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
         compare_eso_stream(
-            delimited_string({"1,11,Boiler1,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-                              "2,11,Boiler3,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n"));
+            delimited_string({"1,11,Boiler1,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+                              "2,11,Boiler3,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n"));
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_setupOutputVariable_regex_2)
     {
-        std::string const idf_objects = delimited_string({"Output:Variable,Boiler.*,Boiler Gas Rate,runperiod;"});
+        std::string const idf_objects = delimited_string({"Output:Variable,Boiler.*,Boiler NaturalGas Rate,runperiod;"});
 
         ASSERT_TRUE(process_idf(idf_objects));
 
         GetReportVariableInput(state.files);
         Real64 fuel_used = 999;
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
         std::vector<std::vector<std::string>> reportDataDictionary({
-            {"1", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Gas Rate", "Run Period", "", "W"},
-            {"2", "0", "Avg", "System", "HVAC System", "Boiler2", "Boiler Gas Rate", "Run Period", "", "W"},
-            {"3", "0", "Avg", "System", "HVAC System", "Boiler3", "Boiler Gas Rate", "Run Period", "", "W"},
+            {"1", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"2", "0", "Avg", "System", "HVAC System", "Boiler2", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"3", "0", "Avg", "System", "HVAC System", "Boiler3", "Boiler NaturalGas Rate", "Run Period", "", "W"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -3729,9 +3725,9 @@ namespace OutputProcessor {
         auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
         compare_eso_stream(
-            delimited_string({"1,11,Boiler1,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-                              "2,11,Boiler2,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-                              "3,11,Boiler3,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n"));
+            delimited_string({"1,11,Boiler1,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+                              "2,11,Boiler2,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+                              "3,11,Boiler3,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n"));
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_setupOutputVariable_regex_3)
@@ -3903,15 +3899,15 @@ namespace OutputProcessor {
             "    MyGeneralLights,         !- Name",
             "    Electricity,             !- Fuel Type",
             "    SPACE1-1 Lights 1,       !- Key Name 1",
-            "    Lights Electric Energy,  !- Output Variable or Meter Name 1",
+            "    Lights Electricity Energy,  !- Output Variable or Meter Name 1",
             "    SPACE2-1 Lights 1,       !- Key Name 2",
-            "    Lights Electric Energy,  !- Output Variable or Meter Name 2",
+            "    Lights Electricity Energy,  !- Output Variable or Meter Name 2",
             "    SPACE3-1 Lights 1,       !- Key Name 3",
-            "    Lights Electric Energy,  !- Output Variable or Meter Name 3",
+            "    Lights Electricity Energy,  !- Output Variable or Meter Name 3",
             "    SPACE4-1 Lights 1,       !- Key Name 4",
-            "    Lights Electric Energy,  !- Output Variable or Meter Name 4",
+            "    Lights Electricity Energy,  !- Output Variable or Meter Name 4",
             "    SPACE5-1 Lights 1,       !- Key Name 5",
-            "    Lights Electric Energy;  !- Output Variable or Meter Name 5",
+            "    Lights Electricity Energy;  !- Output Variable or Meter Name 5",
             "  Meter:Custom,",
             "    Building Infiltration Heat Loss,  !- Name",
             "    Generic,                 !- Fuel Type",
@@ -3927,7 +3923,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
         Real64 light_consumption = 0;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -3941,7 +3937,7 @@ namespace OutputProcessor {
                             "SPACE1-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -3955,7 +3951,7 @@ namespace OutputProcessor {
                             "SPACE2-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -3969,7 +3965,7 @@ namespace OutputProcessor {
                             "SPACE3-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -3983,7 +3979,7 @@ namespace OutputProcessor {
                             "SPACE4-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4149,7 +4145,7 @@ namespace OutputProcessor {
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4163,7 +4159,7 @@ namespace OutputProcessor {
                             "SPACE1-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4177,7 +4173,7 @@ namespace OutputProcessor {
                             "SPACE2-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4191,7 +4187,7 @@ namespace OutputProcessor {
                             "SPACE3-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4205,7 +4201,7 @@ namespace OutputProcessor {
                             "SPACE4-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4342,7 +4338,7 @@ namespace OutputProcessor {
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,daily;",
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;",
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
-            "Output:Variable,*,Boiler Gas Rate,detailed;",
+            "Output:Variable,*,Boiler NaturalGas Rate,detailed;",
             "Output:Variable,*,Boiler Heating Rate,detailed;",
             "Output:Meter,Electricity:Facility,detailed;",
             "Output:Meter,Electricity:Facility,timestep;",
@@ -4393,7 +4389,7 @@ namespace OutputProcessor {
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4407,7 +4403,7 @@ namespace OutputProcessor {
                             "SPACE1-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4421,7 +4417,7 @@ namespace OutputProcessor {
                             "SPACE2-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4435,7 +4431,7 @@ namespace OutputProcessor {
                             "SPACE3-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4449,7 +4445,7 @@ namespace OutputProcessor {
                             "SPACE4-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4472,7 +4468,7 @@ namespace OutputProcessor {
         Real64 fuel_used = 999;
         Real64 boiler_load = 999;
         SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, boiler_load, "System", "Average", "Boiler1");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
 
         UpdateMeterReporting(state.files);
 
@@ -4505,7 +4501,7 @@ namespace OutputProcessor {
             {"11", "1", "Sum", "Facility:Electricity", "Zone", "", "Electricity:Facility", "Monthly", "", "J"},
             {"13", "1", "Sum", "Facility:Electricity", "Zone", "", "Electricity:Facility", "Run Period", "", "J"},
             {"180", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Heating Rate", "HVAC System Timestep", "", "W"},
-            {"181", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Gas Rate", "HVAC System Timestep", "", "W"},
+            {"181", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "HVAC System Timestep", "", "W"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -4547,7 +4543,7 @@ namespace OutputProcessor {
             "5,9,Environment,Site Outdoor Air Drybulb Temperature [C] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
             "6,11,Environment,Site Outdoor Air Drybulb Temperature [C] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
             "180,1,Boiler1,Boiler Heating Rate [W] !Each Call",
-            "181,1,Boiler1,Boiler Gas Rate [W] !Each Call",
+            "181,1,Boiler1,Boiler NaturalGas Rate [W] !Each Call",
             "8,1,Electricity:Facility [J] !Each Call",
             "9,1,Electricity:Facility [J] !Hourly",
             "10,7,Electricity:Facility [J] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
@@ -4599,7 +4595,7 @@ namespace OutputProcessor {
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,daily;",
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;",
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
-            "Output:Variable,*,Boiler Gas Rate,detailed;",
+            "Output:Variable,*,Boiler NaturalGas Rate,detailed;",
             "Output:Variable,*,Boiler Heating Rate,detailed;",
             "Output:Meter,Electricity:Facility,detailed;",
             "Output:Meter,Electricity:Facility,timestep;",
@@ -4650,7 +4646,7 @@ namespace OutputProcessor {
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4664,7 +4660,7 @@ namespace OutputProcessor {
                             "SPACE1-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4678,7 +4674,7 @@ namespace OutputProcessor {
                             "SPACE2-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4692,7 +4688,7 @@ namespace OutputProcessor {
                             "SPACE3-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4706,7 +4702,7 @@ namespace OutputProcessor {
                             "SPACE4-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4729,7 +4725,7 @@ namespace OutputProcessor {
         Real64 fuel_used = 999;
         Real64 boiler_load = 999;
         SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, boiler_load, "System", "Average", "Boiler1");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
 
         UpdateMeterReporting(state.files);
 
@@ -4758,7 +4754,7 @@ namespace OutputProcessor {
             {"11", "1", "Sum", "Facility:Electricity", "Zone", "", "Electricity:Facility", "Monthly", "", "J"},
             {"13", "1", "Sum", "Facility:Electricity", "Zone", "", "Electricity:Facility", "Run Period", "", "J"},
             {"180", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Heating Rate", "HVAC System Timestep", "", "W"},
-            {"181", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Gas Rate", "HVAC System Timestep", "", "W"},
+            {"181", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "HVAC System Timestep", "", "W"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -4784,7 +4780,7 @@ namespace OutputProcessor {
             "5,9,Environment,Site Outdoor Air Drybulb Temperature [C] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
             "6,11,Environment,Site Outdoor Air Drybulb Temperature [C] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
             "180,1,Boiler1,Boiler Heating Rate [W] !Each Call",
-            "181,1,Boiler1,Boiler Gas Rate [W] !Each Call",
+            "181,1,Boiler1,Boiler NaturalGas Rate [W] !Each Call",
             "8,1,Electricity:Facility [J] !Each Call",
             "9,1,Electricity:Facility [J] !Hourly",
             "10,7,Electricity:Facility [J] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
@@ -4949,7 +4945,7 @@ namespace OutputProcessor {
     {
         std::string const idf_objects = delimited_string({
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
-            "Output:Variable,*,Boiler Gas Rate,detailed;",
+            "Output:Variable,*,Boiler NaturalGas Rate,detailed;",
             "Output:Variable,*,Boiler Heating Rate,detailed;",
             "Output:Meter,Electricity:Facility,timestep;",
         });
@@ -4995,7 +4991,7 @@ namespace OutputProcessor {
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -5018,7 +5014,7 @@ namespace OutputProcessor {
             "   ** Warning ** The following Report Variables were requested but not generated -- check.rdd file",
             "   **   ~~~   ** Either the IDF did not contain these elements, the variable name is misspelled,",
             "   **   ~~~   ** or the requested variable is an advanced output which requires Output : Diagnostics, DisplayAdvancedReportVariables;",
-            "   ************* Key=*, VarName=BOILER GAS RATE, Frequency=Detailed",
+            "   ************* Key=*, VarName=BOILER NATURALGAS RATE, Frequency=Detailed",
             "   ************* Key=*, VarName=BOILER HEATING RATE, Frequency=Detailed",
         });
 
@@ -5069,14 +5065,14 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
-        OutputReportTabular::GetInputTabularMonthly();
+        OutputReportTabular::GetInputTabularMonthly(state.files);
         OutputReportTabular::InitializeTabularMonthly();
 
         GetReportVariableInput(state.files);
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -5376,6 +5372,37 @@ namespace OutputProcessor {
         EXPECT_EQ(" [ergs/century]", unitStringFromDDitem(8));
 
         EXPECT_EQ(" [swamps/county]", unitStringFromDDitem(9));
+    }
+
+    TEST_F(EnergyPlusFixture, OutputProcessor_GetCustomMeterInput)
+    {
+        std::string const idf_objects = delimited_string({
+            "Meter:Custom,",
+            "FuelOilNo1CustomMeter,      !- Name",
+            "FuelOilNo1,                 !- Fuel Type",
+            ",                           !- Key Name 1",
+            "FuelOilNo1:Facility;        !- Variable or Meter 1 Name",
+            
+            "Meter:Custom,",
+            "FuelOilNo2CustomMeter,      !- Name",
+            "FuelOilNo2,                 !- Fuel Type",
+            ",                           !- Key Name 1",
+            "FuelOilNo2:Facility;        !- Variable or Meter 1 Name",
+
+            "Meter:Custom,",
+            "NaturalGasCustomMeter,      !- Name",
+            "NaturalGas,                 !- Fuel Type",
+            ",                           !- Key Name 1",
+            "NaturalGas:Facility;        !- Variable or Meter 1 Name",
+            });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+
+        bool errors_found = false;
+
+        GetCustomMeterInput(errors_found);
+
+        EXPECT_FALSE(errors_found);
     }
 } // namespace OutputProcessor
 

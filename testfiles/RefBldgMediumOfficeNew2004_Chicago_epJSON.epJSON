@@ -6774,19 +6774,19 @@
             "reporting_frequency": "Hourly"
         },
         "Output:Meter 7": {
-            "key_name": "Gas:Facility",
+            "key_name": "NaturalGas:Facility",
             "reporting_frequency": "Hourly"
         },
         "Output:Meter 8": {
-            "key_name": "Heating:Gas",
+            "key_name": "Heating:NaturalGas",
             "reporting_frequency": "Hourly"
         },
         "Output:Meter 9": {
-            "key_name": "InteriorEquipment:Gas",
+            "key_name": "InteriorEquipment:NaturalGas",
             "reporting_frequency": "Hourly"
         },
         "Output:Meter 10": {
-            "key_name": "Water Heater:WaterSystems:Gas",
+            "key_name": "Water Heater:WaterSystems:NaturalGas",
             "reporting_frequency": "Hourly"
         }
     },
@@ -6956,11 +6956,11 @@
             "variable_details": [
                 {
                     "aggregation_type_for_variable_or_meter": "SumOrAverage",
-                    "variable_or_meter_name": "Heating Coil Gas Rate"
+                    "variable_or_meter_name": "Heating Coil NaturalGas Rate"
                 },
                 {
                     "aggregation_type_for_variable_or_meter": "Maximum",
-                    "variable_or_meter_name": "Heating Coil Gas Rate"
+                    "variable_or_meter_name": "Heating Coil NaturalGas Rate"
                 }
             ]
         }
@@ -7047,7 +7047,7 @@
         "Output:Variable 6": {
             "key_value": "*",
             "reporting_frequency": "Hourly",
-            "variable_name": "Boiler Gas Energy"
+            "variable_name": "Boiler NaturalGas Energy"
         },
         "Output:Variable 7": {
             "key_value": "*",
@@ -7127,7 +7127,7 @@
         "Output:Variable 22": {
             "key_value": "*",
             "reporting_frequency": "Hourly",
-            "variable_name": "Air System Fan Electric Energy"
+            "variable_name": "Air System Fan Electricity Energy"
         },
         "Output:Variable 23": {
             "key_value": "*",
@@ -9763,7 +9763,7 @@
             "conversion_factor_choice": "MCF",
             "group_name": "Comm Gas",
             "monthly_charge_or_variable_name": 0.0,
-            "output_meter_name": "Gas:Facility"
+            "output_meter_name": "NaturalGas:Facility"
         },
         "PSI_CS_CommercialElectricService": {
             "conversion_factor_choice": "kWh",

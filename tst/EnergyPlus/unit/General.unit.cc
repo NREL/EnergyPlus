@@ -309,7 +309,7 @@ TEST_F(EnergyPlusFixture, General_SolveRootTest)
     Par.allocate(2);
     Par(1) = 1.0;
     Par(2) = 1.0;
-    
+
     General::SolveRoot(ErrorToler, 40, SolFla, Frac, ResidualTest, 0.0, small, Par);
     EXPECT_EQ(-1, SolFla);
 
@@ -317,11 +317,9 @@ TEST_F(EnergyPlusFixture, General_SolveRootTest)
 
 }
 
-TEST(General, nthDayOfWeekOfMonth_test)
+TEST_F(EnergyPlusFixture, nthDayOfWeekOfMonth_test)
 {
     // J.Glazer - August 2017
-    ShowMessage("Begin Test: General, nthDayOfWeekOfMonth_test");
-
     //		nthDayOfWeekOfMonth(
     //			int const & dayOfWeek, // day of week (Sunday=1, Monday=2, ...)
     //			int const & nthTime,   // nth time the day of the week occurs (first monday, third tuesday, ..)
@@ -373,25 +371,43 @@ TEST_F(EnergyPlusFixture, General_EpexpTest)
 {
     //Global exp function test
     Real64 x;
+    Real64 d(1.0);
     Real64 y;
 
-    // Negative value
+    // Underflow and near zero tests
     x = -69.0;
-    y = epexp(x);
+    y = epexp(x,d);
     EXPECT_NEAR(0.0, y, 1.0E-20);
 
     x = -700.0;
-    y = epexp(x);
+    y = epexp(x,d);
     EXPECT_NEAR(0.0, y, 1.0E-20);
 
-    // Positive values
+    x = -1000.0; // Will cause underflow
+    y = epexp(x,d);
+    EXPECT_EQ(0.0, y);
+
+    // Divide by zero tests
+    d = 0.0;
+    x = -1000.0;
+    y = epexp(x,d);
+    EXPECT_EQ(0.0, y);
+
+    d = 0.0;
+    x = 1000.0;
+    y = epexp(x,d);
+    EXPECT_EQ(0.0, y);
+
+    /*// Overflow and near-overflow tests (Not currently used in code)
     x = 10.0;
-    y = epexp(x, 700.0);
+    d = 1.0;
+    y = epexpOverflow(x, d);
     EXPECT_NEAR(22026.46579480, y, 0.00001);
 
     x = 800.0;
-    y = epexp(x, 700.0);
+    d = 1.0;
+    y = epexpOverflow(x, d);
     EXPECT_NEAR(1.0142320547350045e+304, y, 1.0E2);
+    */
 }
-
 } // namespace EnergyPlus

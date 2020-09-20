@@ -642,31 +642,31 @@ namespace HighTempRadiantSystem {
                                 _,
                                 "System");
             if (HighTempRadSys(Item).HeaterType == Gas) {
-                SetupOutputVariable("Zone Radiant HVAC Gas Rate",
+                SetupOutputVariable("Zone Radiant HVAC NaturalGas Rate",
                                     OutputProcessor::Unit::W,
                                     HighTempRadSys(Item).GasPower,
                                     "System",
                                     "Average",
                                     HighTempRadSys(Item).Name);
-                SetupOutputVariable("Zone Radiant HVAC Gas Energy",
+                SetupOutputVariable("Zone Radiant HVAC NaturalGas Energy",
                                     OutputProcessor::Unit::J,
                                     HighTempRadSys(Item).GasEnergy,
                                     "System",
                                     "Sum",
                                     HighTempRadSys(Item).Name,
                                     _,
-                                    "Gas",
+                                    "NaturalGas",
                                     "Heating",
                                     _,
                                     "System");
             } else if (HighTempRadSys(Item).HeaterType == Electric) {
-                SetupOutputVariable("Zone Radiant HVAC Electric Power",
+                SetupOutputVariable("Zone Radiant HVAC Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     HighTempRadSys(Item).ElecPower,
                                     "System",
                                     "Average",
                                     HighTempRadSys(Item).Name);
-                SetupOutputVariable("Zone Radiant HVAC Electric Energy",
+                SetupOutputVariable("Zone Radiant HVAC Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     HighTempRadSys(Item).ElecEnergy,
                                     "System",
@@ -1062,7 +1062,7 @@ namespace HighTempRadiantSystem {
             DistributeHTRadGains();
 
             // Now "simulate" the system by recalculating the heat balances
-            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
             HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
             // First determine whether or not the unit should be on
@@ -1105,7 +1105,7 @@ namespace HighTempRadiantSystem {
                     DistributeHTRadGains();
 
                     // Now "simulate" the system by recalculating the heat balances
-                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                     // Redetermine the current value of the controlling temperature
@@ -1224,7 +1224,7 @@ namespace HighTempRadiantSystem {
 
                 // Now "simulate" the system by recalculating the heat balances
                 ZoneNum = HighTempRadSys(RadSysNum).ZonePtr;
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
             }
         }
@@ -1511,22 +1511,22 @@ namespace HighTempRadiantSystem {
             Area = Surface(SurfNum).Area;
 
             if (Surface(SurfNum).Class == SurfaceClass_Window) {
-                if (SurfaceWindow(SurfNum).ShadingFlag == IntShadeOn || SurfaceWindow(SurfNum).ShadingFlag == IntBlindOn) {
+                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += SurfaceWindow(SurfNum).DividerArea;
+                    Area += SurfWinDividerArea(SurfNum);
                 }
 
-                if (SurfaceWindow(SurfNum).FrameArea > 0.0) {
+                if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfaceWindow(SurfNum).FrameArea * (1.0 + SurfaceWindow(SurfNum).ProjCorrFrIn) *
-                                  SurfaceWindow(SurfNum).FrameTempSurfIn;
+                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
+                                  SurfWinFrameTempSurfIn(SurfNum);
                 }
 
-                if (SurfaceWindow(SurfNum).DividerArea > 0.0 && SurfaceWindow(SurfNum).ShadingFlag != IntShadeOn &&
-                    SurfaceWindow(SurfNum).ShadingFlag != IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
+                    SurfWinShadingFlag(SurfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += HConvIn(SurfNum) * SurfaceWindow(SurfNum).DividerArea * (1.0 + 2.0 * SurfaceWindow(SurfNum).ProjCorrDivIn) *
-                                  SurfaceWindow(SurfNum).DividerTempSurfIn;
+                    SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
+                                  SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 

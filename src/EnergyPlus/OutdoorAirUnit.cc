@@ -1055,13 +1055,13 @@ namespace OutdoorAirUnit {
                                 "System",
                                 "Average",
                                 OutAirUnit(OAUnitNum).Name);
-            SetupOutputVariable("Zone Outdoor Air Unit Fan Electric Power",
+            SetupOutputVariable("Zone Outdoor Air Unit Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 OutAirUnit(OAUnitNum).ElecFanRate,
                                 "System",
                                 "Average",
                                 OutAirUnit(OAUnitNum).Name);
-            SetupOutputVariable("Zone Outdoor Air Unit Fan Electric Energy",
+            SetupOutputVariable("Zone Outdoor Air Unit Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 OutAirUnit(OAUnitNum).ElecFanEnergy,
                                 "System",
@@ -1193,7 +1193,7 @@ namespace OutdoorAirUnit {
                     (OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum == TypeOf_CoilSteamAirHeating)) {
 
                     errFlag = false;
-                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                    ScanPlantLoopsForObject(state,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum,

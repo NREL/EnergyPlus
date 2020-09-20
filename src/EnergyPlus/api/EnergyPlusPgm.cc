@@ -200,13 +200,12 @@
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/InputProcessing/DataStorage.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
@@ -227,6 +226,12 @@ int EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath
 
 void commonInitialize(EnergyPlus::EnergyPlusData &state) {
     using namespace EnergyPlus;
+
+    // Windows: ensure that EnergyPlusAPI.dll's notion of the "static singleton IOFiles" matches
+    // the exe's notion.
+    // TODO: Remove this after we have eliminated all remaining calls to IOFiles::getSingleton
+    EnergyPlus::IOFiles::setSingleton(&state.files);
+
     // Disable C++ i/o synching with C methods for speed
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
@@ -234,8 +239,14 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 // Enable floating point exceptions
 #ifndef NDEBUG
 #ifdef __unix__
-    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW); // These exceptions are enabled (FE_INEXACT and FE_UNDERFLOW will not throw)
 #endif
+#endif
+
+#ifdef MSVC_DEBUG
+    // the following line enables NaN detection in Visual Studio debug builds. See
+    // https://github.com/NREL/EnergyPlus/wiki/Debugging-Tips
+    int fp_control_state = _controlfp(_EM_INEXACT | _EM_UNDERFLOW, _MCW_EM); // These exceptions are disabled (_EM_INEXACT and _EM_UNDERFLOW will not throw)
 #endif
 
 #ifdef _MSC_VER
@@ -254,8 +265,8 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 
     DataStringGlobals::CurrentDateTime = CreateCurrentDateTimeString();
 
-    ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
-    ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
+    ResultsFramework::resultsFramework->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
+    ResultsFramework::resultsFramework->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
 
     DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
 
@@ -265,6 +276,7 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 
 int commonRun(EnergyPlus::EnergyPlusData &state) {
     using namespace EnergyPlus;
+
     int errStatus = initErrorFile(state.files);
     if (errStatus) {
         return errStatus;
@@ -282,7 +294,6 @@ int commonRun(EnergyPlus::EnergyPlusData &state) {
             DisplayString("Converted input file format. Exiting.");
             return EndEnergyPlus(state.files);
         }
-        ResultsFramework::OutputSchema->setupOutputOptions();
     } catch (const FatalError &e) {
         return AbortEnergyPlus(state);
     } catch (const std::exception &e) {
@@ -347,10 +358,14 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         }
 
         if (DataGlobals::runReadVars) {
-            int status = CommandLineInterface::runReadVarsESO(state.files);
-            if (status) {
-                return status;
-            }
+//            state.files.outputControl.csv = true;
+             if (state.files.outputControl.csv) {
+                 ShowWarningMessage("Native CSV output requested in input file, but running ReadVarsESO due to command line argument.");
+             }
+             int status = CommandLineInterface::runReadVarsESO(state.files);
+             if (status) {
+                 return status;
+             }
         }
     } catch (const FatalError &e) {
         return AbortEnergyPlus(state);

@@ -318,7 +318,7 @@ namespace ScheduleManager {
         int WkCount;
         int DyCount;
         int NumField;
-        int PDateType;
+        WeatherManager::DateType PDateType;
         int PWeekDay;
         int ThruField;
         std::string ExtraField;
@@ -709,7 +709,7 @@ namespace ScheduleManager {
         Schedule(0).ScheduleTypePtr = 0;
         Schedule(0).WeekSchedulePointer = 0;
 
-        print(ioFiles.audit.ensure_open("ProcessScheduleInput"), "{}\n", "  Processing Schedule Input -- Start");
+        print(ioFiles.audit.ensure_open("ProcessScheduleInput", ioFiles.outputControl.audit), "{}\n", "  Processing Schedule Input -- Start");
 
         //!! Get Schedule Types
 
@@ -1361,7 +1361,7 @@ namespace ScheduleManager {
                 CurrentThrough = Alphas(NumField);
                 ErrorHere = false;
                 ProcessDateString(Alphas(NumField), EndMonth, EndDay, PWeekDay, PDateType, ErrorHere);
-                if (PDateType > 1) {
+                if (PDateType == WeatherManager::DateType::NthDayInMonth || PDateType == WeatherManager::DateType::LastDayInMonth) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + "\", Invalid \"Through:\" date");
                     ShowContinueError("Found entry=" + Alphas(NumField));
                     ErrorsFound = true;

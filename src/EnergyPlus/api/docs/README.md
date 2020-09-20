@@ -13,7 +13,7 @@ Browse the build docs at: `.../api/docs/c/_build/html/index.html`
 ## Building the Python Documentation
 Make sure that your currently active Python version has Sphinx installed (pip install sphinx).
 Move into the Python API doc folder: `cd eplusrepo/src/EnergyPlus/api/docs/python`.
-Run the Sphinx built Makefile: `make`.
+Run the Sphinx built Makefile: `make html`.
 Browse the built docs at: `.../api/docs/python/_build/html/index.html`
 
 ## Updating gh-pages

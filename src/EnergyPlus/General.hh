@@ -72,6 +72,10 @@ namespace OutputProcessor {
     enum class TimeStepType;
 }
 
+namespace WeatherManager {
+    enum class DateType;
+}
+
 namespace General {
 
     // Data
@@ -238,7 +242,7 @@ namespace General {
                            int &PMonth,
                            int &PDay,
                            int &PWeekDay,
-                           int &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                           WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                            bool &ErrorsFound,
                            Optional_int PYear = _);
 
@@ -247,7 +251,7 @@ namespace General {
                              int &TokenDay,             // Value of numeric field found
                              int &TokenMonth,           // Value of Month field found (1=Jan, 2=Feb, etc)
                              int &TokenWeekday,         // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
-                             int &DateType,             // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                             WeatherManager::DateType &DateType,             // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                              bool &ErrorsFound,         // Set to true if cannot process this string as a date
                              Optional_int TokenYear = _ // Value of Year if one appears to be present and this argument is present
     );
@@ -395,9 +399,30 @@ namespace General {
 
     std::vector<std::string> splitString(const std::string &string, char delimiter);
 
-    Real64 epexp(Real64 x);
+    inline Real64 epexp(const Real64 numerator, const Real64 denominator)
+    {
+        if (denominator == 0.0) {
+            return 0.0;
+        } else {
+            return std::exp(numerator/denominator);
+        }
+    }
 
-    Real64 epexp(Real64 x, Real64 defaultHigh);
+    /* Not currently used
+    inline Real64 epexpOverflow(const Real64 numerator, const Real64 denominator, const Real64 maxInput=700.0)
+    {
+        if (denominator == 0.0) {
+            return 0.0;
+        } else {
+            Real64 x = numerator/denominator;
+            if (x > maxInput) {
+                return std::exp(maxInput);
+            }
+            return std::exp(x);
+        }
+    }
+    */
+
 } // namespace General
 
 } // namespace EnergyPlus

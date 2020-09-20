@@ -75,7 +75,7 @@ namespace InternalHeatGains {
 
     void CheckReturnAirHeatGain();
 
-    void CalcZoneITEq();
+    void CalcZoneITEq(EnergyPlusData &state);
 
     void ReportInternalHeatGains();
 

@@ -116,11 +116,11 @@ namespace FuelCellElectricGenerator {
         MyEnvrnFlag = true;
     }
 
-    PlantComponent *FCDataStruct::factory(IOFiles &ioFiles, std::string const &objectName)
+    PlantComponent *FCDataStruct::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data
         if (getFuelCellInputFlag) {
-            getFuelCellInput(ioFiles);
+            getFuelCellInput(state, state.files);
             getFuelCellInputFlag = false;
         }
 
@@ -136,11 +136,11 @@ namespace FuelCellElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    PlantComponent *FCDataStruct::factory_exhaust(IOFiles &ioFiles, std::string const &objectName)
+    PlantComponent *FCDataStruct::factory_exhaust(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data
         if (getFuelCellInputFlag) {
-            getFuelCellInput(ioFiles);
+            getFuelCellInput(state, state.files);
             getFuelCellInputFlag = false;
         }
 
@@ -156,7 +156,7 @@ namespace FuelCellElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void FCDataStruct::SimFuelCellGenerator(BranchInputManagerData &dataBranchInputManager,
+    void FCDataStruct::SimFuelCellGenerator(EnergyPlusData &state,
                                             bool const RunFlag,  // simulate Generator when TRUE
                                             Real64 const MyLoad, // demand on electric generator
                                             bool const FirstHVACIteration)
@@ -170,13 +170,13 @@ namespace FuelCellElectricGenerator {
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
 
-        this->initialize(dataBranchInputManager);
-        this->CalcFuelCellGeneratorModel(RunFlag, MyLoad, FirstHVACIteration);
+        this->initialize(state);
+        this->CalcFuelCellGeneratorModel(state, RunFlag, MyLoad, FirstHVACIteration);
         this->CalcUpdateHeatRecovery(FirstHVACIteration);
         this->UpdateFuelCellGeneratorRecords();
     }
 
-    void getFuelCellInput(IOFiles &ioFiles)
+    void getFuelCellInput(EnergyPlusData &state, IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brent Griffith
@@ -272,7 +272,7 @@ namespace FuelCellElectricGenerator {
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
-                FuelCell(thisFuelCell).FCPM.EffCurveID = CurveManager::GetCurveIndex(AlphArray(3));
+                FuelCell(thisFuelCell).FCPM.EffCurveID = CurveManager::GetCurveIndex(state, AlphArray(3));
                 if (FuelCell(thisFuelCell).FCPM.EffCurveID == 0) {
                     ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
@@ -322,7 +322,7 @@ namespace FuelCellElectricGenerator {
                 FuelCell(thisFuelCell).FCPM.QdotSkin = NumArray(20);
                 FuelCell(thisFuelCell).FCPM.UAskin = NumArray(21);
 
-                FuelCell(thisFuelCell).FCPM.SkinLossCurveID = CurveManager::GetCurveIndex(AlphArray(6));
+                FuelCell(thisFuelCell).FCPM.SkinLossCurveID = CurveManager::GetCurveIndex(state, AlphArray(6));
                 if (FuelCell(thisFuelCell).FCPM.SkinLossCurveID == 0) {
                     if (FuelCell(thisFuelCell).FCPM.SkinLossMode == DataGenerators::QuadraticFuelNdotSkin) {
                         ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + AlphArray(6));
@@ -368,7 +368,7 @@ namespace FuelCellElectricGenerator {
             }
         } // loop over NumFuelCellPMs
 
-        GeneratorFuelSupply::GetGeneratorFuelSupplyInput(ioFiles);
+        GeneratorFuelSupply::GetGeneratorFuelSupplyInput(state, ioFiles);
 
         for (int FuelSupNum = 1; FuelSupNum <= DataGenerators::NumGeneratorFuelSups; ++FuelSupNum) {
             GeneratorFuelSupply::SetupFuelConstituentData(ioFiles, FuelSupNum, ErrorsFound);
@@ -423,7 +423,7 @@ namespace FuelCellElectricGenerator {
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
 
-                FuelCell(thisFuelCell).AirSup.BlowerPowerCurveID = CurveManager::GetCurveIndex(AlphArray(3));
+                FuelCell(thisFuelCell).AirSup.BlowerPowerCurveID = CurveManager::GetCurveIndex(state, AlphArray(3));
                 if (FuelCell(thisFuelCell).AirSup.BlowerPowerCurveID == 0) {
                     ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
@@ -446,7 +446,7 @@ namespace FuelCellElectricGenerator {
 
                 FuelCell(thisFuelCell).AirSup.Stoics = NumArray(2) + 1.0;
 
-                FuelCell(thisFuelCell).AirSup.AirFuncPelCurveID = CurveManager::GetCurveIndex(AlphArray(5));
+                FuelCell(thisFuelCell).AirSup.AirFuncPelCurveID = CurveManager::GetCurveIndex(state, AlphArray(5));
                 if ((FuelCell(thisFuelCell).AirSup.AirFuncPelCurveID == 0) &&
                     (FuelCell(thisFuelCell).AirSup.AirSupRateMode == DataGenerators::QuadraticFuncofPel)) {
                     ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + AlphArray(5));
@@ -457,7 +457,7 @@ namespace FuelCellElectricGenerator {
 
                 FuelCell(thisFuelCell).AirSup.AirTempCoeff = NumArray(3);
 
-                FuelCell(thisFuelCell).AirSup.AirFuncNdotCurveID = CurveManager::GetCurveIndex(AlphArray(6));
+                FuelCell(thisFuelCell).AirSup.AirFuncNdotCurveID = CurveManager::GetCurveIndex(state, AlphArray(6));
                 if ((FuelCell(thisFuelCell).AirSup.AirFuncNdotCurveID == 0) &&
                     (FuelCell(thisFuelCell).AirSup.AirSupRateMode == DataGenerators::QuadraticFuncofNdot)) {
                     ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + AlphArray(6));
@@ -607,14 +607,14 @@ namespace FuelCellElectricGenerator {
             if (thisFuelCell > 0) {
                 //  this is only the first instance of a FuelCell generator using this type of Water supply module
                 FuelCell(thisFuelCell).WaterSup.Name = AlphArray(1);
-                FuelCell(thisFuelCell).WaterSup.WaterSupRateCurveID = CurveManager::GetCurveIndex(AlphArray(2));
+                FuelCell(thisFuelCell).WaterSup.WaterSupRateCurveID = CurveManager::GetCurveIndex(state, AlphArray(2));
                 if (FuelCell(thisFuelCell).WaterSup.WaterSupRateCurveID == 0) {
                     ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + AlphArray(2));
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError("Curve name was not found ");
                     ErrorsFound = true;
                 }
-                FuelCell(thisFuelCell).WaterSup.PmpPowerCurveID = CurveManager::GetCurveIndex(AlphArray(3));
+                FuelCell(thisFuelCell).WaterSup.PmpPowerCurveID = CurveManager::GetCurveIndex(state, AlphArray(3));
                 if (FuelCell(thisFuelCell).WaterSup.PmpPowerCurveID == 0) {
                     ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
@@ -952,7 +952,7 @@ namespace FuelCellElectricGenerator {
 
                 FuelCell(thisFuelCell).Inverter.ConstEff = NumArray(1);
 
-                FuelCell(thisFuelCell).Inverter.EffQuadraticCurveID = CurveManager::GetCurveIndex(AlphArray(3));
+                FuelCell(thisFuelCell).Inverter.EffQuadraticCurveID = CurveManager::GetCurveIndex(state, AlphArray(3));
                 if ((FuelCell(thisFuelCell).Inverter.EffQuadraticCurveID == 0) &&
                     (FuelCell(thisFuelCell).Inverter.EffMode == DataGenerators::InverterEffQuadratic)) {
                     ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
@@ -1061,9 +1061,9 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::setupOutputVars()
     {
-        SetupOutputVariable("Generator Produced Electric Power", OutputProcessor::Unit::W, this->Report.ACPowerGen, "System", "Average", this->Name);
+        SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->Report.ACPowerGen, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Produced Electric Energy",
+        SetupOutputVariable("Generator Produced AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Report.ACEnergyGen,
                             "System",
@@ -1096,7 +1096,7 @@ namespace FuelCellElectricGenerator {
                             "Sum",
                             this->Name,
                             _,
-                            "Gas",
+                            "NaturalGas",
                             "COGENERATION",
                             _,
                             "Plant");
@@ -1147,9 +1147,9 @@ namespace FuelCellElectricGenerator {
                                 this->Name);
 
             SetupOutputVariable(
-                "Generator Blower Electric Power", OutputProcessor::Unit::W, this->Report.BlowerPower, "System", "Average", this->Name);
+                "Generator Blower Electricity Rate", OutputProcessor::Unit::W, this->Report.BlowerPower, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Blower Electric Energy", OutputProcessor::Unit::J, this->Report.BlowerEnergy, "System", "Sum", this->Name);
+            SetupOutputVariable("Generator Blower Electricity Energy", OutputProcessor::Unit::J, this->Report.BlowerEnergy, "System", "Sum", this->Name);
 
             SetupOutputVariable(
                 "Generator Blower Skin Heat Loss Rate", OutputProcessor::Unit::W, this->Report.BlowerSkinLoss, "System", "Average", this->Name);
@@ -1184,7 +1184,7 @@ namespace FuelCellElectricGenerator {
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Fuel Compressor Electric Power",
+            SetupOutputVariable("Generator Fuel Compressor Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 this->Report.FuelCompressPower,
                                 "System",
@@ -1192,7 +1192,7 @@ namespace FuelCellElectricGenerator {
                                 this->Name);
 
             SetupOutputVariable(
-                "Generator Fuel Compressor Electric Energy", OutputProcessor::Unit::J, this->Report.FuelCompressEnergy, "System", "Sum", this->Name);
+                "Generator Fuel Compressor Electricity Energy", OutputProcessor::Unit::J, this->Report.FuelCompressEnergy, "System", "Sum", this->Name);
 
             SetupOutputVariable("Generator Fuel Compressor Skin Heat Loss Rate",
                                 OutputProcessor::Unit::W,
@@ -1222,14 +1222,14 @@ namespace FuelCellElectricGenerator {
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Fuel Reformer Water Pump Electric Power",
+            SetupOutputVariable("Generator Fuel Reformer Water Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 this->Report.WaterPumpPower,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Fuel Reformer Water Pump Electric Energy",
+            SetupOutputVariable("Generator Fuel Reformer Water Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.WaterPumpEnergy,
                                 "System",
@@ -1295,7 +1295,7 @@ namespace FuelCellElectricGenerator {
             SetupOutputVariable("Generator Inverter Loss Power", OutputProcessor::Unit::W, this->Report.PCUlosses, "System", "Average", this->Name);
 
             SetupOutputVariable(
-                "Generator Produced DC Electric Power", OutputProcessor::Unit::W, this->Report.DCPowerGen, "System", "Average", this->Name);
+                "Generator Produced DC Electricity Rate", OutputProcessor::Unit::W, this->Report.DCPowerGen, "System", "Average", this->Name);
 
             SetupOutputVariable(
                 "Generator DC Power Efficiency", OutputProcessor::Unit::None, this->Report.DCPowerEff, "System", "Average", this->Name);
@@ -1320,10 +1320,10 @@ namespace FuelCellElectricGenerator {
                 "Generator DC Storage Discharging Energy", OutputProcessor::Unit::J, this->Report.DrawnEnergy, "System", "Sum", this->Name);
 
             SetupOutputVariable(
-                "Generator Ancillary AC Electric Power", OutputProcessor::Unit::W, this->Report.ACancillariesPower, "System", "Average", this->Name);
+                "Generator Ancillary AC Electricity Rate", OutputProcessor::Unit::W, this->Report.ACancillariesPower, "System", "Average", this->Name);
 
             SetupOutputVariable(
-                "Generator Ancillary AC Electric Energy", OutputProcessor::Unit::J, this->Report.ACancillariesEnergy, "System", "Sum", this->Name);
+                "Generator Ancillary AC Electricity Energy", OutputProcessor::Unit::J, this->Report.ACancillariesEnergy, "System", "Sum", this->Name);
 
             SetupOutputVariable("Generator Fuel Cell Model Iteration Count",
                                 OutputProcessor::Unit::None,
@@ -1341,7 +1341,7 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    void FCDataStruct::CalcFuelCellGeneratorModel(bool const RunFlag, Real64 const MyLoad, bool const EP_UNUSED(FirstHVACIteration))
+    void FCDataStruct::CalcFuelCellGeneratorModel(EnergyPlusData &state, bool const RunFlag, Real64 const MyLoad, bool const EP_UNUSED(FirstHVACIteration))
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -1419,15 +1419,15 @@ namespace FuelCellElectricGenerator {
         // BEGIN SEQUENTIAL SUBSTITUTION to handle a lot of inter-related calcs
         for (iter = 1; iter <= 20; ++iter) {
             if (iter > 1) {
-                this->FigurePowerConditioningLosses(PoutofInverter, PpcuLosses);
-                this->FigureACAncillaries(PacAncillariesTotal);
+                this->FigurePowerConditioningLosses(state, PoutofInverter, PpcuLosses);
+                this->FigureACAncillaries(state, PacAncillariesTotal);
                 Pdemand = MyLoad + PacAncillariesTotal + PpcuLosses;
             } else {
                 // control Step 1a: Figure ancillary AC power draws
-                this->FigureACAncillaries(PacAncillariesTotal);
+                this->FigureACAncillaries(state, PacAncillariesTotal);
                 Pdemand = MyLoad + PacAncillariesTotal;
                 // Control Step 1b: Calculate losses associated with Power conditioning
-                this->FigurePowerConditioningLosses(Pdemand, PpcuLosses);
+                this->FigurePowerConditioningLosses(state, Pdemand, PpcuLosses);
                 Pdemand += PpcuLosses;
                 Pel = Pdemand;
             }
@@ -1465,13 +1465,13 @@ namespace FuelCellElectricGenerator {
             if (this->FCPM.EffMode == DataGenerators::NormalizedCurveMode) {
                 // Equation (8) in FuelCell Spec modified for normalized curve
 
-                Eel = CurveManager::CurveValue(this->FCPM.EffCurveID, Pel / this->FCPM.NomPel) * this->FCPM.NomEff *
+                Eel = CurveManager::CurveValue(state, this->FCPM.EffCurveID, Pel / this->FCPM.NomPel) * this->FCPM.NomEff *
                       (1.0 - this->FCPM.NumCycles * this->FCPM.CyclingDegradRat) *
                       (1.0 - max((this->FCPM.NumRunHours - this->FCPM.ThreshRunHours), 0.0) * this->FCPM.OperateDegradRat);
 
             } else if (this->FCPM.EffMode == DataGenerators::DirectCurveMode) {
                 // Equation (8) in FuelCell Spec
-                Eel = CurveManager::CurveValue(this->FCPM.EffCurveID, Pel) * (1.0 - this->FCPM.NumCycles * this->FCPM.CyclingDegradRat) *
+                Eel = CurveManager::CurveValue(state, this->FCPM.EffCurveID, Pel) * (1.0 - this->FCPM.NumCycles * this->FCPM.CyclingDegradRat) *
                       (1.0 - max((this->FCPM.NumRunHours - this->FCPM.ThreshRunHours), 0.0) * this->FCPM.OperateDegradRat);
             }
 
@@ -1503,17 +1503,17 @@ namespace FuelCellElectricGenerator {
             } else if (this->AirSup.AirSupRateMode == DataGenerators::QuadraticFuncofPel) { // MEthod 2
 
                 this->FCPM.NdotAir =
-                    CurveManager::CurveValue(this->AirSup.AirFuncPelCurveID, Pel) * (1 + this->AirSup.AirTempCoeff * this->AirSup.TairIntoFCPM);
+                    CurveManager::CurveValue(state, this->AirSup.AirFuncPelCurveID, Pel) * (1 + this->AirSup.AirTempCoeff * this->AirSup.TairIntoFCPM);
 
             } else if (this->AirSup.AirSupRateMode == DataGenerators::QuadraticFuncofNdot) { // method 3
-                this->FCPM.NdotAir = CurveManager::CurveValue(this->AirSup.AirFuncNdotCurveID, this->FCPM.NdotFuel) *
+                this->FCPM.NdotAir = CurveManager::CurveValue(state, this->AirSup.AirFuncNdotCurveID, this->FCPM.NdotFuel) *
                                      (1 + this->AirSup.AirTempCoeff * this->AirSup.TairIntoFCPM);
             }
 
             // Calculation Step 4. fuel compressor power
 
             DataGenerators::FuelSupply(this->FuelSupNum).PfuelCompEl =
-                CurveManager::CurveValue(DataGenerators::FuelSupply(this->FuelSupNum).CompPowerCurveID, this->FCPM.NdotFuel);
+                CurveManager::CurveValue(state, DataGenerators::FuelSupply(this->FuelSupNum).CompPowerCurveID, this->FCPM.NdotFuel);
 
             // calculation Step 5, Fuel Compressor (need outlet temperature)
 
@@ -1568,7 +1568,7 @@ namespace FuelCellElectricGenerator {
 
             // calculate water consumption
 
-            this->FCPM.NdotLiqwater = CurveManager::CurveValue(this->WaterSup.WaterSupRateCurveID, this->FCPM.NdotFuel);
+            this->FCPM.NdotLiqwater = CurveManager::CurveValue(state, this->WaterSup.WaterSupRateCurveID, this->FCPM.NdotFuel);
 
             // set inlet temp.  (could move to init)
 
@@ -1589,7 +1589,7 @@ namespace FuelCellElectricGenerator {
                 }
             }
 
-            this->WaterSup.PwaterCompEl = CurveManager::CurveValue(this->WaterSup.PmpPowerCurveID, this->FCPM.NdotLiqwater);
+            this->WaterSup.PwaterCompEl = CurveManager::CurveValue(state, this->WaterSup.PmpPowerCurveID, this->FCPM.NdotLiqwater);
 
             // 75.325  J/mol K Water at 0.1 MPa and 298 K, reference NIST WEBBOOK
             Real64 CpWater; // heat capacity of water in molar units
@@ -1619,7 +1619,7 @@ namespace FuelCellElectricGenerator {
 
             this->AirSup.TairIntoBlower = DataLoopNode::Node(this->AirSup.SupNodeNum).Temp;
 
-            this->AirSup.PairCompEl = CurveManager::CurveValue(this->AirSup.BlowerPowerCurveID, this->FCPM.NdotAir);
+            this->AirSup.PairCompEl = CurveManager::CurveValue(state, this->AirSup.BlowerPowerCurveID, this->FCPM.NdotAir);
 
             Tavg = (this->AirSup.TairIntoBlower + this->AirSup.TairIntoFCPM) / 2.0;
 
@@ -1784,7 +1784,7 @@ namespace FuelCellElectricGenerator {
 
             } else if (this->FCPM.SkinLossMode == DataGenerators::QuadraticFuelNdotSkin) {
 
-                this->FCPM.QdotSkin = CurveManager::CurveValue(this->FCPM.SkinLossCurveID, this->FCPM.NdotFuel);
+                this->FCPM.QdotSkin = CurveManager::CurveValue(state, this->FCPM.SkinLossCurveID, this->FCPM.NdotFuel);
             }
 
             // calculation Step 10, AC FCPM power ancillaries
@@ -1858,7 +1858,7 @@ namespace FuelCellElectricGenerator {
 
             if (this->Inverter.EffMode == DataGenerators::InverterEffQuadratic) {
 
-                PpcuLosses = (1.0 - CurveManager::CurveValue(this->Inverter.EffQuadraticCurveID, PintoInverter)) * PintoInverter;
+                PpcuLosses = (1.0 - CurveManager::CurveValue(state, this->Inverter.EffQuadraticCurveID, PintoInverter)) * PintoInverter;
             }
 
             PoutofInverter = PintoInverter - PpcuLosses;
@@ -2683,7 +2683,7 @@ namespace FuelCellElectricGenerator {
         Cp = A + B * Tsho + C * pow_2(Tsho) + D * pow_3(Tsho) + E / pow_2(Tsho);
     }
 
-    void FCDataStruct::FigureACAncillaries(Real64 &PacAncill)
+    void FCDataStruct::FigureACAncillaries(EnergyPlusData &state, Real64 &PacAncill)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2701,19 +2701,19 @@ namespace FuelCellElectricGenerator {
         this->FCPM.PelancillariesAC = this->FCPM.ANC0 + this->FCPM.ANC1 * this->FCPM.NdotFuel;
 
         // sect 6.0
-        this->AirSup.PairCompEl = CurveManager::CurveValue(this->AirSup.BlowerPowerCurveID, this->FCPM.NdotAir);
+        this->AirSup.PairCompEl = CurveManager::CurveValue(state, this->AirSup.BlowerPowerCurveID, this->FCPM.NdotAir);
         // sect 7.0
         DataGenerators::FuelSupply(this->FuelSupNum).PfuelCompEl =
-            CurveManager::CurveValue(DataGenerators::FuelSupply(this->FuelSupNum).CompPowerCurveID, this->FCPM.NdotFuel);
+            CurveManager::CurveValue(state, DataGenerators::FuelSupply(this->FuelSupNum).CompPowerCurveID, this->FCPM.NdotFuel);
 
         // sect. 8.0
-        this->WaterSup.PwaterCompEl = CurveManager::CurveValue(this->WaterSup.PmpPowerCurveID, this->FCPM.NdotLiqwater);
+        this->WaterSup.PwaterCompEl = CurveManager::CurveValue(state, this->WaterSup.PmpPowerCurveID, this->FCPM.NdotLiqwater);
 
         PacAncill = this->FCPM.PelancillariesAC + this->AirSup.PairCompEl + DataGenerators::FuelSupply(this->FuelSupNum).PfuelCompEl +
                     this->WaterSup.PwaterCompEl;
     }
 
-    void FCDataStruct::FigurePowerConditioningLosses(Real64 const Pdemand, Real64 &PpcuLosses)
+    void FCDataStruct::FigurePowerConditioningLosses(EnergyPlusData &state, Real64 const Pdemand, Real64 &PpcuLosses)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2732,14 +2732,14 @@ namespace FuelCellElectricGenerator {
         if (this->Inverter.EffMode == DataGenerators::InverterEffQuadratic) {
 
             // first use Pdemand instead of Pel to get initial estimate
-            Real64 lastPpcuLosses = Pdemand * (1.0 - CurveManager::CurveValue(this->Inverter.EffQuadraticCurveID, Pdemand)) /
-                                    CurveManager::CurveValue(this->Inverter.EffQuadraticCurveID, Pdemand);
+            Real64 lastPpcuLosses = Pdemand * (1.0 - CurveManager::CurveValue(state, this->Inverter.EffQuadraticCurveID, Pdemand)) /
+                                    CurveManager::CurveValue(state, this->Inverter.EffQuadraticCurveID, Pdemand);
 
             for (int iter = 1; iter <= 20; ++iter) { // seems like need to iterate (??) Need to investigate number and convergence success here
 
                 Real64 Pel = Pdemand + lastPpcuLosses;
 
-                lastPpcuLosses = (1.0 - CurveManager::CurveValue(this->Inverter.EffQuadraticCurveID, Pel)) * Pel;
+                lastPpcuLosses = (1.0 - CurveManager::CurveValue(state, this->Inverter.EffQuadraticCurveID, Pel)) * Pel;
             }
 
             PpcuLosses = lastPpcuLosses;
@@ -3137,7 +3137,7 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    void FCDataStruct::initialize(BranchInputManagerData &dataBranchInputManager) // index to specific fuel cell generator
+    void FCDataStruct::initialize(EnergyPlusData &state) // index to specific fuel cell generator
     {
 
         // SUBROUTINE INFORMATION:
@@ -3157,7 +3157,7 @@ namespace FuelCellElectricGenerator {
         if (this->MyPlantScanFlag_Init && allocated(DataPlant::PlantLoop)) {
             bool errFlag = false;
 
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->NameExhaustHX,
                                                     DataPlant::TypeOf_Generator_FCExhaust,
                                                     this->CWLoopNum,

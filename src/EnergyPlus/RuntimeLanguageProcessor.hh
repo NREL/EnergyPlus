@@ -119,6 +119,8 @@ namespace RuntimeLanguageProcessor {
     extern int DayOfWeekVariableNum;
     extern int DayOfYearVariableNum;
     extern int HourVariableNum;
+    extern int TimeStepsPerHourVariableNum;
+    extern int TimeStepNumVariableNum;
     extern int MinuteVariableNum;
     extern int HolidayVariableNum;
     extern int DSTVariableNum;
@@ -174,7 +176,7 @@ namespace RuntimeLanguageProcessor {
     // Functions
     void clear_state();
 
-    void InitializeRuntimeLanguage(IOFiles &ioFiles);
+    void InitializeRuntimeLanguage(EnergyPlusData &state, IOFiles &ioFiles);
 
     void BeginEnvrnInitializeRuntimeLanguage();
 
@@ -191,7 +193,7 @@ namespace RuntimeLanguageProcessor {
                   std::string const &Error // error message to be added to ErlStack
     );
 
-    ErlValueType EvaluateStack(IOFiles &ioFiles, int const StackNum);
+    ErlValueType EvaluateStack(EnergyPlusData &state, IOFiles &ioFiles, int const StackNum);
 
     void
     WriteTrace(IOFiles &ioFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound);
@@ -213,9 +215,19 @@ namespace RuntimeLanguageProcessor {
 
     int NewExpression();
 
-    ErlValueType EvaluateExpression(int const ExpressionNum, bool &seriousErrorFound);
+    ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, bool &seriousErrorFound);
 
-    void GetRuntimeLanguageUserInput(IOFiles &ioFiles);
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value);
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value);
+
+    void GetRuntimeLanguageUserInput(EnergyPlusData &state, IOFiles &ioFiles);
 
     void ReportRuntimeLanguage();
 

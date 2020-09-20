@@ -50,16 +50,19 @@
 #include "DataStringGlobals.hh"
 #include "FileSystem.hh"
 #include "UtilityRoutines.hh"
+#include "InputProcessing/InputProcessor.hh"
+#include "InputProcessing/EmbeddedEpJSONSchema.hh"
 
+#include "nlohmann/json.hpp"
 #include <fmt/format.h>
 #include <stdexcept>
 
 namespace EnergyPlus {
 
-InputFile &InputFile::ensure_open(const std::string &caller)
+InputFile &InputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
     if (!good()) {
-        open();
+        open(false, output_to_file);
     }
     if (!good()) {
         ShowFatalError(fmt::format("{}: Could not open file {} for input (read).", caller, fileName));
@@ -104,7 +107,7 @@ std::ostream::pos_type InputFile::position() const noexcept
     return is->tellg();
 }
 
-void InputFile::open()
+void InputFile::open(bool, bool)
 {
     is = std::unique_ptr<std::istream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::binary));
     is->imbue(std::locale("C"));
@@ -171,10 +174,10 @@ void InputFile::backspace() noexcept
     }
 }
 
-InputOutputFile &InputOutputFile::ensure_open(const std::string &caller)
+InputOutputFile &InputOutputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
     if (!good()) {
-        open();
+        open(false, output_to_file);
     }
     if (!good()) {
         ShowFatalError(fmt::format("{}: Could not open file {} for output (write).", caller, fileName));
@@ -184,7 +187,9 @@ InputOutputFile &InputOutputFile::ensure_open(const std::string &caller)
 
 bool InputOutputFile::good() const
 {
-    if (os) {
+    if (os && print_to_dev_null && os->bad()) { // badbit is set
+        return true;
+    } else if (os) {
         return os->good();
     } else {
         return false;
@@ -226,7 +231,9 @@ std::string InputOutputFile::get_output()
     }
 }
 
-InputOutputFile::InputOutputFile(std::string FileName) : fileName(std::move(FileName))
+InputOutputFile::InputOutputFile(std::string FileName, const bool DefaultToStdout)
+  : fileName{std::move(FileName)},
+    defaultToStdOut{DefaultToStdout}
 {
 }
 
@@ -235,7 +242,7 @@ std::ostream::pos_type InputOutputFile::position() const noexcept
     return os->tellg();
 }
 
-void InputOutputFile::open(const bool forAppend)
+void InputOutputFile::open(const bool forAppend, bool output_to_file)
 {
     auto appendMode = [=]() {
         if (forAppend) {
@@ -244,9 +251,15 @@ void InputOutputFile::open(const bool forAppend)
             return std::ios_base::trunc;
         }
     }();
-
-    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
-    os->imbue(std::locale("C"));
+    if (!output_to_file) {
+        os = std::unique_ptr<std::iostream>(new std::iostream(nullptr));
+        os->imbue(std::locale("C"));
+        print_to_dev_null = true;
+    } else {
+        os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
+        os->imbue(std::locale("C"));
+        print_to_dev_null = false;
+    }
 }
 
 std::vector<std::string> InputOutputFile::getLines()
@@ -271,10 +284,137 @@ std::vector<std::string> InputOutputFile::getLines()
     return std::vector<std::string>();
 }
 
+void IOFiles::OutputControl::getInput()
+{
+    auto const instances = inputProcessor->epJSON.find("OutputControl:Files");
+    if (instances != inputProcessor->epJSON.end()) {
+
+        auto find_input = [](nlohmann::json const & fields, std::string const & field_name) -> std::string {
+            std::string input;
+            auto found = fields.find(field_name);
+            if (found != fields.end()) {
+                input = found.value().get<std::string>();
+                input = UtilityRoutines::MakeUPPERCase(input);
+            } else {
+                inputProcessor->getDefaultValue("OutputControl:Files", field_name, input);
+            }
+            return input;
+        };
+
+        auto boolean_choice = [](std::string const & input) -> bool {
+            if (input == "YES") {
+                return true;
+            } else if (input == "NO") {
+                return false;
+            }
+            ShowFatalError("Invalid boolean Yes/No choice input");
+            return true;
+        };
+
+        auto &instancesValue = instances.value();
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            auto const &fields = instance.value();
+
+            { // "output_csv"
+                csv = boolean_choice(find_input(fields, "output_csv"));
+            }
+            { // "output_mtr"
+                mtr = boolean_choice(find_input(fields, "output_mtr"));
+            }
+            { // "output_eso"
+                eso = boolean_choice(find_input(fields, "output_eso"));
+            }
+            { // "output_eio"
+                eio = boolean_choice(find_input(fields, "output_eio"));
+            }
+            { // "output_audit"
+                audit = boolean_choice(find_input(fields, "output_audit"));
+            }
+            { // "output_zone_sizing"
+                zsz = boolean_choice(find_input(fields, "output_zone_sizing"));
+            }
+            { // "output_system_sizing"
+                ssz = boolean_choice(find_input(fields, "output_system_sizing"));
+            }
+            { // "output_dxf"
+                dxf = boolean_choice(find_input(fields, "output_dxf"));
+            }
+            { // "output_bnd"
+                bnd = boolean_choice(find_input(fields, "output_bnd"));
+            }
+            { // "output_rdd"
+                rdd = boolean_choice(find_input(fields, "output_rdd"));
+            }
+            { // "output_mdd"
+                mdd = boolean_choice(find_input(fields, "output_mdd"));
+            }
+            { // "output_mtd"
+                mtd = boolean_choice(find_input(fields, "output_mtd"));
+            }
+            { // "output_end"
+                end = boolean_choice(find_input(fields, "output_end"));
+            }
+            { // "output_shd"
+                shd = boolean_choice(find_input(fields, "output_shd"));
+            }
+            { // "output_dfs"
+                dfs = boolean_choice(find_input(fields, "output_dfs"));
+            }
+            { // "output_glhe"
+                glhe = boolean_choice(find_input(fields, "output_glhe"));
+            }
+            { // "output_delightin"
+                delightin = boolean_choice(find_input(fields, "output_delightin"));
+            }
+            { // "output_delighteldmp"
+                delighteldmp = boolean_choice(find_input(fields, "output_delighteldmp"));
+            }
+            { // "output_delightdfdmp"
+                delightdfdmp = boolean_choice(find_input(fields, "output_delightdfdmp"));
+            }
+            { // "output_edd"
+                edd = boolean_choice(find_input(fields, "output_edd"));
+            }
+            { // "output_dbg"
+                dbg = boolean_choice(find_input(fields, "output_dbg"));
+            }
+            { // "output_perflog"
+                perflog = boolean_choice(find_input(fields, "output_perflog"));
+            }
+            { // "output_sln"
+                sln = boolean_choice(find_input(fields, "output_sln"));
+            }
+            { // "output_sci"
+                sci = boolean_choice(find_input(fields, "output_sci"));
+            }
+            { // "output_wrl"
+                wrl = boolean_choice(find_input(fields, "output_wrl"));
+            }
+            { // "output_screen"
+                screen = boolean_choice(find_input(fields, "output_screen"));
+            }
+            { // "output_tarcog"
+                tarcog = boolean_choice(find_input(fields, "output_tarcog"));
+            }
+            { // "output_extshd"
+                extshd = boolean_choice(find_input(fields, "output_extshd"));
+            }
+            { // "json"
+                json = boolean_choice(find_input(fields, "output_json"));
+            }
+            { // "tabular"
+                tabular = boolean_choice(find_input(fields, "output_tabular"));
+            }
+            { // "sqlite"
+                sqlite = boolean_choice(find_input(fields, "output_sqlite"));
+            }
+        }
+    }
+}
+
 IOFiles &IOFiles::getSingleton()
 {
     assert(getSingletonInternal() != nullptr);
-
     if (getSingletonInternal() == nullptr) {
         throw std::runtime_error("Invalid impossible state of no outputfiles!?!?!");
     }
@@ -531,7 +671,7 @@ public:
 
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count)
 {
-    assert(os.good());
+//    assert(os.good());
     fmt::memory_buffer buffer;
     try {
         // Pass custom argument formatter as a template arg to vformat_to.

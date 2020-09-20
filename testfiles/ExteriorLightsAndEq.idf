@@ -28,7 +28,7 @@
 ! People:                         None
 ! Lights(Exterior only):          Exterior Lights and Equipment, always "on".
 !                                 Lights configured in two ways: by schedule and by astronomical clock.
-! Exterior Equipment              Lights (2000W), Fuel (1 of each kind, NaturalGas, FuelOil#1, FuelOil#2, Coal,
+! Exterior Equipment              Lights (2000W), Fuel (1 of each kind, NaturalGas, FuelOilNo1, FuelOilNo2, Coal,
 !                                                 LPG, Water, always "on", 1000 units).
 !                                 Also Water Eq 10000 units, always "on"
 ! Windows:                        None
@@ -199,6 +199,12 @@
     AstronomicalClock;       !- Control Option
 
   Exterior:FuelEquipment,
+    OutsideElecEq,           !- Name
+    Electricity,             !- Fuel Use Type
+    ON,                      !- Schedule Name
+    1000;                    !- Design Level {W}
+
+  Exterior:FuelEquipment,
     OutsideGasEq,            !- Name
     NaturalGas,              !- Fuel Use Type
     ON,                      !- Schedule Name
@@ -229,6 +235,48 @@
     1000;                    !- Design Level {W}
 
   Exterior:FuelEquipment,
+    OutsideGasolineEq,       !- Name
+    Gasoline,                !- Fuel Use Type
+    ON,                      !- Schedule Name
+    1000;                    !- Design Level {W}
+
+  Exterior:FuelEquipment,
+    OutsideDieselEq,         !- Name
+    Diesel,                  !- Fuel Use Type
+    ON,                      !- Schedule Name
+    1000;                    !- Design Level {W}
+
+  Exterior:FuelEquipment,
+    OutsideOtherFuel1Eq,     !- Name
+    OtherFuel1,              !- Fuel Use Type
+    ON,                      !- Schedule Name
+    1000;                    !- Design Level {W}
+
+  Exterior:FuelEquipment,
+    OutsideOtherFuel2Eq,     !- Name
+    OtherFuel2,              !- Fuel Use Type
+    ON,                      !- Schedule Name
+    1000;                    !- Design Level {W}
+
+  Exterior:FuelEquipment,
+    OutsideSteamEq,          !- Name
+    Steam,                   !- Fuel Use Type
+    ON,                      !- Schedule Name
+    1000;                    !- Design Level {W}
+
+  Exterior:FuelEquipment,
+    OutsideDistrictHeatingEq,  !- Name
+    DistrictHeating,         !- Fuel Use Type
+    ON,                      !- Schedule Name
+    1000;                    !- Design Level {W}
+
+  Exterior:FuelEquipment,
+    OutsideDistrictCoolingEq,  !- Name
+    DistrictCooling,         !- Fuel Use Type
+    ON,                      !- Schedule Name
+    1000;                    !- Design Level {W}
+
+  Exterior:FuelEquipment,
     OutsideWater1Eq,         !- Name
     Water,                   !- Fuel Use Type
     ON,                      !- Schedule Name
@@ -240,15 +288,129 @@
     ON,                      !- Schedule Name
     10000;                   !- Design Level {m3/s}
 
-  Output:Variable,*,Exterior Lights Electric Energy,timestep;
+  Meter:Custom,
+    MyExteriorElectric,      !- Name
+    Electricity,             !- Resource Type
+    ,                        !- Key Name 1
+    ExteriorLights:Electricity,  !- Output Variable or Meter Name 1
+    ,                        !- Key Name 2
+    ExteriorEquipment:Electricity;  !- Output Variable or Meter Name 2
+    
+  Output:Meter:MeterFileOnly, MyExteriorElectric, monthly;
 
-  Output:Variable,*,Exterior Equipment Gas Energy,timestep;
+  Meter:Custom,
+    MyExteriorNaturalGas,    !- Name
+    NaturalGas,              !- Resource Type
+    ,                        !- Key Name 1
+    ExteriorEquipment:NaturalGas;   !- Output Variable or Meter Name 1
+    
+  Output:Meter:MeterFileOnly, MyExteriorNaturalGas, monthly;
+
+  Meter:Custom,
+    MyExteriorCoal,          !- Name
+    Coal,                    !- Resource Type
+    ,                        !- Key Name 1
+    ExteriorEquipment:Coal;  !- Output Variable or Meter Name 1
+    
+  Output:Meter:MeterFileOnly, MyExteriorCoal, monthly;
+
+  Meter:Custom,
+    MyExteriorFuelOilNo1,    !- Name
+    FuelOilNo1,              !- Resource Type
+    ,                        !- Key Name 1
+    ExteriorEquipment:FuelOilNo1;  !- Output Variable or Meter Name 1
+    
+  Output:Meter:MeterFileOnly, MyExteriorFuelOilNo1, monthly;
+
+  Meter:Custom,
+    MyExteriorFuelOilNo2,    !- Name
+    FuelOilNo2,              !- Resource Type
+    ,                        !- Key Name 1
+    ExteriorEquipment:FuelOilNo2;  !- Output Variable or Meter Name 1
+    
+  Output:Meter:MeterFileOnly, MyExteriorFuelOilNo2, monthly;
+
+  Meter:Custom,
+    MyExteriorPropane,       !- Name
+    Propane,                 !- Resource Type
+    ,                        !- Key Name 1
+    ExteriorEquipment:Propane;  !- Output Variable or Meter Name 1
+    
+  Output:Meter:MeterFileOnly, MyExteriorPropane, monthly;
+
+  Meter:Custom,
+    MyExteriorGasoline,      !- Name
+    Gasoline,                !- Resource Type
+    ,                        !- Key Name 1
+    ExteriorEquipment:Gasoline;  !- Output Variable or Meter Name 1
+    
+  Output:Meter:MeterFileOnly, MyExteriorGasoline, monthly;
+
+  Meter:Custom,
+    MyExteriorDiesel,        !- Name
+    Diesel,                  !- Resource Type
+    ,                        !- Key Name 1
+    ExteriorEquipment:Diesel;  !- Output Variable or Meter Name 1
+    
+  Output:Meter:MeterFileOnly, MyExteriorDiesel, monthly;
+
+  Meter:Custom,
+    MyExteriorOtherFuel1,    !- Name
+    OtherFuel1,              !- Resource Type
+    ,                        !- Key Name 1
+    ExteriorEquipment:OtherFuel1;  !- Output Variable or Meter Name 1
+    
+  Output:Meter:MeterFileOnly, MyExteriorOtherFuel1, monthly;
+
+  Meter:Custom,
+    MyExteriorOtherFuel2,    !- Name
+    OtherFuel2,              !- Resource Type
+    ,                        !- Key Name 1
+    ExteriorEquipment:OtherFuel2;  !- Output Variable or Meter Name 1
+    
+  Output:Meter:MeterFileOnly, MyExteriorOtherFuel2, monthly;
+
+  Meter:Custom,
+    MyExteriorSteam,         !- Name
+    Steam,                   !- Resource Type
+    ,                        !- Key Name 1
+    ExteriorEquipment:Steam;  !- Output Variable or Meter Name 1
+    
+  Output:Meter:MeterFileOnly, MyExteriorSteam, monthly;
+
+  Meter:Custom,
+    MyExteriorDistrictHeating,  !- Name
+    DistrictHeating,         !- Resource Type
+    ,                        !- Key Name 1
+    ExteriorEquipment:DistrictHeating;  !- Output Variable or Meter Name 1
+    
+  Output:Meter:MeterFileOnly, MyExteriorDistrictHeating, monthly;
+
+  Meter:Custom,
+    MyExteriorDistrictCooling,  !- Name
+    DistrictCooling,         !- Resource Type
+    ,                        !- Key Name 1
+    ExteriorEquipment:DistrictCooling;  !- Output Variable or Meter Name 1
+    
+  Output:Meter:MeterFileOnly, MyExteriorDistrictCooling, monthly;
+
+  Meter:Custom,
+    MyExteriorWater,         !- Name
+    Water,                   !- Resource Type
+    ,                        !- Key Name 1
+    ExteriorEquipment:Water;  !- Output Variable or Meter Name 1
+    
+  Output:Meter:MeterFileOnly, MyExteriorWater, monthly;
+
+  Output:Variable,*,Exterior Lights Electricity Energy,timestep;
+
+  Output:Variable,*,Exterior Equipment NaturalGas Energy,timestep;
 
   Output:Variable,*,Exterior Equipment Coal Energy,timestep;
 
-  Output:Variable,*,Exterior Equipment FuelOil#1 Energy,timestep;
+  Output:Variable,*,Exterior Equipment FuelOilNo1 Energy,timestep;
 
-  Output:Variable,*,Exterior Equipment FuelOil#2 Energy,timestep;
+  Output:Variable,*,Exterior Equipment FuelOilNo2 Energy,timestep;
 
   Output:Variable,*,Exterior Equipment Propane Energy,timestep;
 
@@ -262,7 +424,7 @@
 
   Output:Meter,ExteriorEquipment*,Environment;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
   Output:VariableDictionary,Regular;
 

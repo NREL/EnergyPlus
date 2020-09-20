@@ -55,18 +55,15 @@
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -75,7 +72,6 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -90,7 +86,6 @@
 #include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -130,7 +125,6 @@ namespace HVACMultiSpeedHeatPump {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using DataEnvironment::CurMnDy;
@@ -307,7 +301,7 @@ namespace HVACMultiSpeedHeatPump {
         SimMSHP(state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnLoad, OnOffAirFlowRatio);
 
         // Update the unit outlet nodes
-        UpdateMSHeatPump(MSHeatPumpNum);
+        UpdateMSHeatPump(state, MSHeatPumpNum);
 
         // Report the result of the simulation
         ReportMSHeatPump(MSHeatPumpNum);
@@ -342,7 +336,6 @@ namespace HVACMultiSpeedHeatPump {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using DataAirLoop::AirLoopControlInfo;
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
 
@@ -405,7 +398,7 @@ namespace HVACMultiSpeedHeatPump {
         OnOffFanPartLoadFraction = 1.0;
 
         SaveMassFlowRate = Node(InletNode).MassFlowRate;
-        if (!FirstHVACIteration && MSHeatPump(MSHeatPumpNum).OpMode == CycFanCycCoil && QZnReq < 0.0 && AirLoopControlInfo(AirLoopNum).EconoActive) {
+        if (!FirstHVACIteration && MSHeatPump(MSHeatPumpNum).OpMode == CycFanCycCoil && QZnReq < 0.0 && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive) {
             // for cycling fan, cooling load, check whether furnace can meet load with compressor off
             CompOp = Off;
             ControlMSHPOutput(state, MSHeatPumpNum,
@@ -546,7 +539,6 @@ namespace HVACMultiSpeedHeatPump {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using CurveManager::CurveValue;
         using DataAirSystems::PrimaryAirSystem;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::FanType_SimpleConstVolume;
@@ -564,11 +556,8 @@ namespace HVACMultiSpeedHeatPump {
         using Fans::GetFanVolFlow;
         using FluidProperties::FindGlycol;
         using General::RoundSigDigits;
-        using GlobalNames::VerifyUniqueChillerName;
         using NodeInputManager::GetOnlySingleNode;
-
         using BranchNodeConnections::SetUpCompSets;
-        using CurveManager::GetCurveIndex;
         using DXCoils::GetDXCoilIndex;
         auto &GetDXCoilInletNode(DXCoils::GetCoilInletNode);
         auto &GetDXCoilOutletNode(DXCoils::GetCoilOutletNode);
@@ -1616,31 +1605,31 @@ namespace HVACMultiSpeedHeatPump {
 
         for (MSHPNum = 1; MSHPNum <= NumMSHeatPumps; ++MSHPNum) {
             // Setup Report Variables for MSHP Equipment
-            SetupOutputVariable("Unitary System Ancillary Electric Power",
+            SetupOutputVariable("Unitary System Ancillary Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 MSHeatPump(MSHPNum).AuxElecPower,
                                 "System",
                                 "Average",
                                 MSHeatPump(MSHPNum).Name);
-            SetupOutputVariable("Unitary System Cooling Ancillary Electric Energy",
+            SetupOutputVariable("Unitary System Cooling Ancillary Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 MSHeatPumpReport(MSHPNum).AuxElecCoolConsumption,
                                 "System",
                                 "Sum",
                                 MSHeatPump(MSHPNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Cooling",
                                 _,
                                 "System");
-            SetupOutputVariable("Unitary System Heating Ancillary Electric Energy",
+            SetupOutputVariable("Unitary System Heating Ancillary Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 MSHeatPumpReport(MSHPNum).AuxElecHeatConsumption,
                                 "System",
                                 "Sum",
                                 MSHeatPump(MSHPNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Heating",
                                 _,
                                 "System");
@@ -1656,13 +1645,13 @@ namespace HVACMultiSpeedHeatPump {
                                 "System",
                                 "Average",
                                 MSHeatPump(MSHPNum).Name);
-            SetupOutputVariable("Unitary System Electric Power",
+            SetupOutputVariable("Unitary System Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 MSHeatPump(MSHPNum).ElecPower,
                                 "System",
                                 "Average",
                                 MSHeatPump(MSHPNum).Name);
-            SetupOutputVariable("Unitary System Electric Energy",
+            SetupOutputVariable("Unitary System Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 MSHeatPumpReport(MSHPNum).ElecPowerConsumption,
                                 "System",
@@ -1785,8 +1774,6 @@ namespace HVACMultiSpeedHeatPump {
         // temperatures float in the deadband, additional iterations are required to converge on mass flow rate.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopControlInfo;
-        using DataAirLoop::AirToZoneNodeInfo;
         using DataGlobals::AnyPlantInModel;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
@@ -1864,7 +1851,7 @@ namespace HVACMultiSpeedHeatPump {
         if (MSHeatPump(MSHeatPumpNum).MyPlantScantFlag && allocated(PlantLoop)) {
             if (MSHeatPump(MSHeatPumpNum).HeatRecActive) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).Name,
                                         TypeOf_MultiSpeedHeatPumpRecovery,
                                         MSHeatPump(MSHeatPumpNum).HRLoopNum,
@@ -1887,7 +1874,7 @@ namespace HVACMultiSpeedHeatPump {
             }
             if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingWater) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                         TypeOf_CoilWaterSimpleHeating,
                                         MSHeatPump(MSHeatPumpNum).LoopNum,
@@ -1924,7 +1911,7 @@ namespace HVACMultiSpeedHeatPump {
 
             } else if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingSteam) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                         TypeOf_CoilSteamAirHeating,
                                         MSHeatPump(MSHeatPumpNum).LoopNum,
@@ -1957,7 +1944,7 @@ namespace HVACMultiSpeedHeatPump {
             }
             if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilType == Coil_HeatingWater) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
                                         TypeOf_CoilWaterSimpleHeating,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopNum,
@@ -1994,7 +1981,7 @@ namespace HVACMultiSpeedHeatPump {
 
             } else if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilType == Coil_HeatingSteam) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
                                         TypeOf_CoilSteamAirHeating,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopNum,
@@ -2035,11 +2022,11 @@ namespace HVACMultiSpeedHeatPump {
             MSHeatPump(MSHeatPumpNum).FlowFraction = 1.0;
             MSHeatPump(MSHeatPumpNum).MySizeFlag = false;
             // Pass the fan cycling schedule index up to the air loop. Set the air loop unitary system flag.
-            AirLoopControlInfo(AirLoopNum).CycFanSchedPtr = MSHeatPump(MSHeatPumpNum).FanSchedPtr;
-            AirLoopControlInfo(AirLoopNum).UnitarySys = true;
-            AirLoopControlInfo(AirLoopNum).UnitarySysSimulating =
+            state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr = MSHeatPump(MSHeatPumpNum).FanSchedPtr;
+            state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySys = true;
+            state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating =
                 false; // affects child coil sizing by allowing coil to size itself instead of parent telling coil what size to use
-            AirLoopControlInfo(AirLoopNum).FanOpMode = MSHeatPump(MSHeatPumpNum).OpMode;
+            state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = MSHeatPump(MSHeatPumpNum).OpMode;
         }
 
         if (allocated(ZoneEquipConfig) && MSHeatPump(MSHeatPumpNum).MyCheckFlag) {
@@ -2064,32 +2051,32 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         // Find the number of zones (zone Inlet Nodes) attached to an air loop from the air loop number
-        NumAirLoopZones = AirToZoneNodeInfo(AirLoopNum).NumZonesCooled + AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
-        if (allocated(AirToZoneNodeInfo) && MSHeatPump(MSHeatPumpNum).MyFlowFracFlag) {
+        NumAirLoopZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled + state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+        if (allocated(state.dataAirLoop->AirToZoneNodeInfo) && MSHeatPump(MSHeatPumpNum).MyFlowFracFlag) {
             FlowFracFlagReady = true;
             for (ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
                 // zone inlet nodes for cooling
-                if (AirToZoneNodeInfo(AirLoopNum).NumZonesCooled > 0) {
-                    if (AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex) == -999) {
+                if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled > 0) {
+                    if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex) == -999) {
                         // the data structure for the zones inlet nodes has not been filled
                         FlowFracFlagReady = false;
                     }
                 }
                 // zone inlet nodes for heating
-                if (AirToZoneNodeInfo(AirLoopNum).NumZonesHeated > 0) {
-                    if (AirToZoneNodeInfo(AirLoopNum).TermUnitHeatInletNodes(ZoneInSysIndex) == -999) {
+                if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated > 0) {
+                    if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatInletNodes(ZoneInSysIndex) == -999) {
                         // the data structure for the zones inlet nodes has not been filled
                         FlowFracFlagReady = false;
                     }
                 }
             }
         }
-        if (allocated(AirToZoneNodeInfo) && FlowFracFlagReady) {
+        if (allocated(state.dataAirLoop->AirToZoneNodeInfo) && FlowFracFlagReady) {
             SumOfMassFlowRateMax = 0.0; // initialize the sum of the maximum flows
             for (ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
-                ZoneInletNodeNum = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex);
+                ZoneInletNodeNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex);
                 SumOfMassFlowRateMax += Node(ZoneInletNodeNum).MassFlowRateMax;
-                if (AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZoneInSysIndex) == MSHeatPump(MSHeatPumpNum).ControlZoneNum) {
+                if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZoneInSysIndex) == MSHeatPump(MSHeatPumpNum).ControlZoneNum) {
                     CntrlZoneTerminalUnitMassFlowRateMax = Node(ZoneInletNodeNum).MassFlowRateMax;
                 }
             }
@@ -3849,7 +3836,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void UpdateMSHeatPump(int const MSHeatPumpNum) // Engine driven heat pump number
+    void UpdateMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum) // Engine driven heat pump number
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
@@ -3863,11 +3850,6 @@ namespace HVACMultiSpeedHeatPump {
         // METHODOLOGY EMPLOYED:
         // na
 
-        // REFERENCES: na
-
-        // Using/Aliasing
-        using DataAirLoop::AirLoopAFNInfo;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -3878,11 +3860,11 @@ namespace HVACMultiSpeedHeatPump {
 
         if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
             AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
-            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOnMassFlowrate = CompOnMassFlow;
-            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOffMassFlowrate = CompOffMassFlow;
-            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopFanOperationMode = MSHeatPump(MSHeatPumpNum).OpMode;
-            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopOnOffFanPartLoadRatio = MSHeatPump(MSHeatPumpNum).FanPartLoadRatio;
-            AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopCompCycRatio = MSHeatPumpReport(MSHeatPumpNum).CycRatio;
+            state.dataAirLoop->AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOnMassFlowrate = CompOnMassFlow;
+            state.dataAirLoop->AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOffMassFlowrate = CompOffMassFlow;
+            state.dataAirLoop->AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopFanOperationMode = MSHeatPump(MSHeatPumpNum).OpMode;
+            state.dataAirLoop->AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopOnOffFanPartLoadRatio = MSHeatPump(MSHeatPumpNum).FanPartLoadRatio;
+            state.dataAirLoop->AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopCompCycRatio = MSHeatPumpReport(MSHeatPumpNum).CycRatio;
         }
     }
 

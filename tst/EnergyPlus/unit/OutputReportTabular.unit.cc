@@ -64,6 +64,7 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -84,11 +85,13 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -108,9 +111,8 @@ using namespace EnergyPlus::OutputProcessor;
 using namespace SimulationManager;
 using namespace ObjexxFCL;
 
-TEST(OutputReportTabularTest, ConfirmSetUnitsStyleFromString)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmSetUnitsStyleFromString)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, ConfirmSetUnitsStyleFromString");
 
     EXPECT_EQ(unitsStyleNone, SetUnitsStyleFromString("None"));
     EXPECT_EQ(unitsStyleJtoKWH, SetUnitsStyleFromString("JTOKWH"));
@@ -122,16 +124,13 @@ TEST(OutputReportTabularTest, ConfirmSetUnitsStyleFromString)
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_Basic)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, Basic");
-
     OutputTableBinned.allocate(10);
     EXPECT_TRUE(warningAboutKeyNotFound(0, 1, "moduleName"));
     EXPECT_FALSE(warningAboutKeyNotFound(100, 1, "moduleName"));
 }
 
-TEST(OutputReportTabularTest, RealToStr)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_RealToStr)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, RealToStr");
     EXPECT_EQ("       0.001", RealToStr(0.0011, 3));
     EXPECT_NE("       0.001", RealToStr(0.0019, 3));
 
@@ -158,9 +157,8 @@ TEST(OutputReportTabularTest, RealToStr)
     EXPECT_EQ("0.123457E+06", RealToStr(123456.789, 5));
 }
 
-TEST(OutputReportTabularTest, isNumber)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_isNumber)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, isNumber");
     EXPECT_TRUE(isNumber("0"));
     EXPECT_TRUE(isNumber("0.12"));
     EXPECT_TRUE(isNumber("0.12E01"));
@@ -178,9 +176,8 @@ TEST(OutputReportTabularTest, isNumber)
     EXPECT_TRUE(isNumber(" 0.12E01 "));
 }
 
-TEST(OutputReportTabularTest, digitsAferDecimal)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_digitsAferDecimal)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, digitsAferDecimal");
     EXPECT_EQ(0, digitsAferDecimal("0"));
     EXPECT_EQ(0, digitsAferDecimal("1."));
     EXPECT_EQ(2, digitsAferDecimal("0.12"));
@@ -193,9 +190,8 @@ TEST(OutputReportTabularTest, digitsAferDecimal)
     EXPECT_EQ(2, digitsAferDecimal("-6.12E-09"));
 }
 
-TEST(OutputReportTabularTest, splitCommaString)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_splitCommaString)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, splitCommaString");
     std::vector<std::string> actual;
     actual.push_back("part1");
     EXPECT_EQ(actual, splitCommaString("part1"));
@@ -208,10 +204,8 @@ TEST(OutputReportTabularTest, splitCommaString)
     EXPECT_EQ(actual, splitCommaString(" part1 , part2 , part3 "));
 }
 
-TEST(OutputReportTabularTest, unitsFromHeading)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_unitsFromHeading)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, unitsFromHeading");
-
     std::string unitString;
     int indexUnitConv;
     std::string curUnits;
@@ -251,10 +245,8 @@ TEST(OutputReportTabularTest, unitsFromHeading)
     EXPECT_EQ(0.0, curConversionOffset);
 }
 
-TEST(OutputReportTabularTest, ConfirmResourceWarning)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmResourceWarning)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, ConfirmResourceWarning");
-
     EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: Electricity [kWh]",
               ResourceWarningMessage("Electricity [kWh]"));
     EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: Natural Gas [kWh]",
@@ -276,10 +268,8 @@ TEST(OutputReportTabularTest, ConfirmResourceWarning)
               ResourceWarningMessage("Electricity [kWh]"));
 }
 
-TEST(OutputReportTabularTest, ConfirmWaterConversion)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmWaterConversion)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, ConfirmWaterConversion");
-
     EXPECT_EQ(15, WaterConversionFunct(75, 5));
     EXPECT_EQ(1, WaterConversionFunct(1, 1));
     EXPECT_EQ(13.756, WaterConversionFunct(481.46, 35));
@@ -289,8 +279,6 @@ TEST(OutputReportTabularTest, ConfirmWaterConversion)
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, GetUnitConversion");
-
     int indexUnitConv;
     std::string curUnits;
     Real64 curConversionFactor;
@@ -315,7 +303,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     EXPECT_EQ(1.8, curConversionFactor);
     EXPECT_EQ(32., curConversionOffset);
 
-    varNameWithUnits = "ZONE ELECTRIC EQUIPMENT ELECTRIC ENERGY[J]";
+    varNameWithUnits = "ZONE ELECTRIC EQUIPMENT ELECTRICITY ENERGY[J]";
     LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(20, indexUnitConv);
@@ -413,8 +401,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_LookupJtokWH)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, OutputReportTabularTest_LookupJtokWH");
-
     int indexUnitConv;
     std::string curUnits;
     std::string varNameWithUnits;
@@ -426,10 +412,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LookupJtokWH)
     EXPECT_EQ(0, indexUnitConv);
     EXPECT_EQ("ZONE AIR SYSTEM SENSIBLE COOLING RATE[W]", curUnits);
 
-    varNameWithUnits = "Electric Energy Use [GJ]";
+    varNameWithUnits = "Electricity Energy Use [GJ]";
     LookupJtokWH(varNameWithUnits, indexUnitConv, curUnits);
     EXPECT_EQ(86, indexUnitConv);
-    EXPECT_EQ("Electric Energy Use [kWh]", curUnits);
+    EXPECT_EQ("Electricity Energy Use [kWh]", curUnits);
 
     varNameWithUnits = "Electricty [MJ/m2]";
     LookupJtokWH(varNameWithUnits, indexUnitConv, curUnits);
@@ -437,9 +423,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LookupJtokWH)
     EXPECT_EQ("Electricty [kWh/m2]", curUnits);
 }
 
-TEST(OutputReportTabularTest, GetColumnUsingTabs)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetColumnUsingTabs)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, GetColumnUsingTabs");
     {
         std::string inString = " Col1 \t Col2 \t Col3 ";
         EXPECT_EQ(" Col1 ", GetColumnUsingTabs(inString, 1));
@@ -513,8 +498,6 @@ TEST(OutputReportTabularTest, GetColumnUsingTabs)
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest)
 {
-    ShowMessage("Begin Test: EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest");
-
     TotDesDays = 2;
     TotRunDesPersDays = 3;
     NumOfZones = 4;
@@ -653,9 +636,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
     // EXPECT_EQ( surfDelaySeq.size(), 3360u );
 }
 
-TEST(OutputReportTabularTest, ConfirmConvertToEscaped)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConvertToEscaped)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, ConfirmConvertToEscaped");
     EXPECT_EQ("", ConvertToEscaped(""));
     EXPECT_EQ(" ", ConvertToEscaped(" "));
     EXPECT_EQ("String with &gt; in it", ConvertToEscaped("String with > in it"));
@@ -677,10 +659,8 @@ TEST(OutputReportTabularTest, ConfirmConvertToEscaped)
     EXPECT_ANY_THROW(ConvertToEscaped(R"(String with \x in it)"));
 }
 
-TEST(OutputReportTabularTest, ConvertUnicodeToUTF8)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConvertUnicodeToUTF8)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, ConvertUnicodeToUTF8");
-
     {
         std::string test;
         test += static_cast<char>(0);
@@ -695,9 +675,8 @@ TEST(OutputReportTabularTest, ConvertUnicodeToUTF8)
     EXPECT_EQ("", ConvertUnicodeToUTF8(std::stoul("0x1FFFFF", nullptr, 16)));
 }
 
-TEST(OutputReportTabularTest, GetUnitSubStringTest)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitSubStringTest)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, GetUnitSubStringTest");
     EXPECT_EQ("", GetUnitSubString(""));
     EXPECT_EQ("", GetUnitSubString(" "));
     EXPECT_EQ("J/KG", GetUnitSubString("[J/KG]"));
@@ -1521,7 +1500,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
     // expect energy to report according to multipliers
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).MechVentVolTotal / DataHeatBalance::ZonePreDefRep(1).MechVentVolTotal), 0.00001);
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).MechVentVolMin / DataHeatBalance::ZonePreDefRep(1).MechVentVolMin), 0.00001);
-    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnHvacCl / DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacCl), 0.00001);
+    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnZoneEqCl / DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl), 0.00001);
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnPeoplAdd / DataHeatBalance::ZonePreDefRep(1).SHGSAnPeoplAdd), 0.00001);
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnLiteAdd / DataHeatBalance::ZonePreDefRep(1).SHGSAnLiteAdd), 0.00001);
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnEquipAdd / DataHeatBalance::ZonePreDefRep(1).SHGSAnEquipAdd), 0.00001);
@@ -3485,11 +3464,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
         "Output:Table:Monthly,",
         "Space Gains Annual Report, !- Name",
         "2, !-  Digits After Decimal",
-        "Exterior Lights Electric Energy, !- Variable or Meter 1 Name",
+        "Exterior Lights Electricity Energy, !- Variable or Meter 1 Name",
         "SumOrAverage, !- Aggregation Type for Variable or Meter 1",
-        "Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+        "Exterior Lights Electricity Rate, !- Variable or Meter 2 Name",
         "Maximum, !- Aggregation Type for Variable or Meter 2",
-        "Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+        "Exterior Lights Electricity Rate, !- Variable or Meter 2 Name",
         "Minimum; !- Aggregation Type for Variable or Meter 2",
     });
 
@@ -3497,7 +3476,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
 
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3507,7 +3486,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3517,7 +3496,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3532,7 +3511,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
 
-    GetInputTabularMonthly();
+    GetInputTabularMonthly(state.files);
     EXPECT_EQ(MonthlyInputCount, 1);
     InitializeTabularMonthly();
 
@@ -3562,7 +3541,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3572,7 +3551,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3582,7 +3561,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3607,7 +3586,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
 
-    GetInputOutputTableSummaryReports();
+    GetInputOutputTableSummaryReports(state.files);
 
     extLitUse = 1.01;
 
@@ -3775,7 +3754,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     DXCoils::DXCoil.allocate(2);
     DXCoils::DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     DXCoils::DXCoil(1).CondenserType(1) = DataHVACGlobals::AirCooled;
-    DXCoils::DXCoil(1).FuelType = DXCoils::FuelTypeNaturalGas;
+    DXCoils::DXCoil(1).FuelType = "NaturalGas";
     DXCoils::DXCoil(1).ElecCoolingConsumption = 100.0;
     DXCoils::DXCoil(1).TotalCoolingEnergy = 100.0;
     DXCoils::DXCoil(1).MSFuelWasteHeat = 1.0;
@@ -3809,7 +3788,7 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 
     DataGlobals::DoWeathSim = true;
 
-    GetInputTabularTimeBins();
+    GetInputTabularTimeBins(state.files);
 
     EXPECT_EQ(OutputReportTabular::OutputTableBinned.size(), 1u);
     EXPECT_EQ(OutputTableBinned(1).keyValue, "SYSTEM1");
@@ -6060,9 +6039,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTableRowMatchingTest
     EXPECT_EQ("2000.00", RetrievePreDefTableEntry(pdchLeedPerfElEneUse, "EXTERIOR LIGHTING"));
 }
 
-TEST(OutputReportTabularTest, GetUnitSubstring_Test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitSubstring_Test)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, GetUnitSubstring_Test");
     EXPECT_EQ("", GetUnitSubString(""));
     EXPECT_EQ("", GetUnitSubString(" "));
     EXPECT_EQ("", GetUnitSubString("String with no units"));
@@ -6421,11 +6399,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
         "Output:Table:Monthly,",
         "Space Gains Annual Report, !- Name",
         "2, !-  Digits After Decimal",
-        "Exterior Lights Electric Energy, !- Variable or Meter 1 Name",
+        "Exterior Lights Electricity Energy, !- Variable or Meter 1 Name",
         "SumOrAverageDuringHoursShown, !- Aggregation Type for Variable or Meter 1",
-        "Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+        "Exterior Lights Electricity Rate, !- Variable or Meter 2 Name",
         "Maximum, !- Aggregation Type for Variable or Meter 2",
-        "Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+        "Exterior Lights Electricity Rate, !- Variable or Meter 2 Name",
         "Minimum; !- Aggregation Type for Variable or Meter 2",
 
     });
@@ -6434,7 +6412,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
 
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -6444,7 +6422,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -6454,7 +6432,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -6469,17 +6447,15 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
 
-    GetInputTabularMonthly();
+    GetInputTabularMonthly(state.files);
     EXPECT_EQ(MonthlyInputCount, 1);
     InitializeTabularMonthly();
 
     EXPECT_TRUE(isInvalidAggregationOrder());
 }
 
-TEST(OutputReportTabularTest, CollectPeakZoneConditions_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, CollectPeakZoneConditions_test");
-
     Psychrometrics::InitializePsychRoutines();
     createCoilSelectionReportObj();
 
@@ -6536,10 +6512,8 @@ TEST(OutputReportTabularTest, CollectPeakZoneConditions_test)
     EXPECT_NEAR(compLoad.areaPerTotCap, 12. / 600., 0.0001);
 }
 
-TEST(OutputReportTabularTest, ComputeEngineeringChecks_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_ComputeEngineeringChecks_test)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, ComputeEngineeringChecks_test");
-
     CompLoadTablesType compLoad;
 
     compLoad.outsideAirFlow = 0.12;
@@ -6556,10 +6530,8 @@ TEST(OutputReportTabularTest, ComputeEngineeringChecks_test)
     EXPECT_EQ(compLoad.areaPerTotCap, 13. / 800.);
 }
 
-TEST(OutputReportTabularTest, GetZoneComponentAreas_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetZoneComponentAreas_test)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, GetZoneComponentAreas_test");
-
     Array1D<ZompComponentAreasType> areas;
     areas.allocate(1);
 
@@ -6662,10 +6634,8 @@ TEST(OutputReportTabularTest, GetZoneComponentAreas_test)
     EXPECT_EQ(29., areas(1).door);
 }
 
-TEST(OutputReportTabularTest, CombineLoadCompResults_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_CombineLoadCompResults_test)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, CombineLoadCompResults_test");
-
     CompLoadTablesType compLoadTotal;
     compLoadTotal.cells.allocate(10, 30);
     compLoadTotal.cells = 0.;
@@ -6695,10 +6665,8 @@ TEST(OutputReportTabularTest, CombineLoadCompResults_test)
     EXPECT_EQ(33., compLoadTotal.diffDesignPeak);
 }
 
-TEST(OutputReportTabularTest, AddTotalRowsForLoadSummary_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_AddTotalRowsForLoadSummary_test)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, AddTotalRowsForLoadSummary_test");
-
     CompLoadTablesType compLoad;
     compLoad.cells.allocate(cPerArea, rGrdTot);
     compLoad.cells = 0.;
@@ -6729,10 +6697,8 @@ TEST(OutputReportTabularTest, AddTotalRowsForLoadSummary_test)
     EXPECT_EQ(24. / 5., compLoad.cells(cPerArea, rRefrig));
 }
 
-TEST(OutputReportTabularTest, LoadSummaryUnitConversion_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_LoadSummaryUnitConversion_test)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, LoadSummaryUnitConversion_test");
-
     CompLoadTablesType compLoad;
     compLoad.cells.allocate(cPerArea, rGrdTot);
     compLoad.cells = 0.;
@@ -6769,10 +6735,8 @@ TEST(OutputReportTabularTest, LoadSummaryUnitConversion_test)
     EXPECT_EQ(0.15 * powerConversion / areaConversion, compLoad.totCapPerArea);
 }
 
-TEST(OutputReportTabularTest, CreateListOfZonesForAirLoop_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_CreateListOfZonesForAirLoop_test)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, CreateListOfZonesForAirLoop_test");
-
     CompLoadTablesType compLoad;
     Array1D_int zoneToAirLoop;
 
@@ -6824,7 +6788,7 @@ TEST(OutputReportTabularTest, CreateListOfZonesForAirLoop_test)
     EXPECT_EQ(0, compLoad.zoneIndices(5));
 }
 
-TEST(OutputReportTabularTest, GetDelaySequencesTwice_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
 {
 
     int coolDesSelected = 1;
@@ -6930,7 +6894,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
     DataSizing::CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
     int numDesDays = 2;
-    DataAirLoop::AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state.dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
     DataGlobals::NumOfZones = 0;
     displayAirLoopComponentLoadSummary = true;
     CompLoadReportIsReq = true;
@@ -6939,7 +6903,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
     SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = 0;    // set to zero to indicate no design day chosen
 
-    WriteLoadComponentSummaryTables(state.dataCostEstimateManager);
+    WriteLoadComponentSummaryTables(state, state.dataCostEstimateManager);
 
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
@@ -7063,13 +7027,13 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
     DataSizing::CalcZoneSizing(2, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
 
-    DataAirLoop::AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataAirLoop::AirToZoneNodeInfo(1).NumZonesCooled = 1;
-    DataAirLoop::AirToZoneNodeInfo(1).CoolCtrlZoneNums.allocate(1);
-    DataAirLoop::AirToZoneNodeInfo(1).CoolCtrlZoneNums(1) = 1;
-    DataAirLoop::AirToZoneNodeInfo(1).NumZonesHeated = 1;
-    DataAirLoop::AirToZoneNodeInfo(1).HeatCtrlZoneNums.allocate(1);
-    DataAirLoop::AirToZoneNodeInfo(1).HeatCtrlZoneNums(1) = 1;
+    state.dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state.dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled = 1;
+    state.dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums.allocate(1);
+    state.dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums(1) = 1;
+    state.dataAirLoop->AirToZoneNodeInfo(1).NumZonesHeated = 1;
+    state.dataAirLoop->AirToZoneNodeInfo(1).HeatCtrlZoneNums.allocate(1);
+    state.dataAirLoop->AirToZoneNodeInfo(1).HeatCtrlZoneNums(1) = 1;
 
 
     // same Design Days peak and timestep peak as the zone it serves. This is the critical part of the test
@@ -7091,7 +7055,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
 
     AllocateLoadComponentArrays();
-    WriteLoadComponentSummaryTables(state.dataCostEstimateManager);
+    WriteLoadComponentSummaryTables(state, state.dataCostEstimateManager);
 
     // TableName, ReportName, value
     std::vector<std::tuple<std::string, std::string, std::string>> results_strings({
@@ -7254,7 +7218,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     DataGlobals::DoWeathSim = true; // flag to trick tabular reports to scan meters
 
     OutputProcessor::GetReportVariableInput(state.files);
-    OutputReportTabular::GetInputOutputTableSummaryReports();
+    OutputReportTabular::GetInputOutputTableSummaryReports(state.files);
     OutputReportTabular::InitializeTabularMonthly();
 
     // We check that the Predefined Table is actually set to show
@@ -7432,6 +7396,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     DataSurfaces::TotSurfaces = 2 * nTests ;
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
+    SurfaceGeometry::AllocateSurfaceWindows(DataSurfaces::TotSurfaces);
 
     for (int i = 1; i <= nTests * 2; ++i) {
 
@@ -7528,6 +7493,134 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
 
         // Increment twice
         i = i + 2;
+    }
+}
+
+
+// Test for interior surface report
+TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
+{
+    // Allocate some needed arrays
+    DataHeatBalance::Zone.allocate(2);
+    DataHeatBalance::Zone(1).ListMultiplier = 1;
+    DataHeatBalance::Zone(2).ListMultiplier = 1;
+    dataConstruction.Construct.allocate(1);
+    dataConstruction.Construct(1).Name = "A Construction";
+    dataConstruction.Construct(1).OutsideAbsorpSolar = 0.4;
+
+    DataHeatBalance::NominalU.allocate(1);
+    DataHeatBalance::NominalU(1) = 0.2;
+
+    DataSurfaces::TotSurfaces = 4 ;
+    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+
+    // first surface, interzonal walls and doors
+    for (int i = 1; i <= TotSurfaces; i++){
+        DataSurfaces::Surface(i).HeatTransSurf = true;
+        DataSurfaces::Surface(i).Azimuth = 180.;
+        DataSurfaces::Surface(i).Tilt = 90.;
+        DataSurfaces::Surface(i).Construction = 1;
+        // odd number - wall, even number - door
+        if (i % 2 == 1) {
+            DataSurfaces::Surface(i).Name = "Interzonal_Wall_" + std::to_string((i + 1) / 2);
+            DataSurfaces::Surface(i).GrossArea = 200.;
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Wall;
+            DataSurfaces::AllSurfaceListReportOrder.push_back(i);
+        }else{
+            DataSurfaces::Surface(i).Name = "Interzonal_Door_" + std::to_string((i + 1) / 2);
+            DataSurfaces::Surface(i).BaseSurfName = DataSurfaces::Surface(i - 1).Name;
+            DataSurfaces::Surface(i).BaseSurf = i - 1;
+            DataSurfaces::Surface(i).GrossArea = 50.;
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Door;
+            DataSurfaces::AllSurfaceListReportOrder.push_back(i);
+        }
+        if ((i + 1) / 2 == 1) {
+            // first pair of wall and door
+            DataSurfaces::Surface(i).Zone = 1;
+            DataSurfaces::Surface(i).ExtBoundCond = i + 2;
+        }else{
+            // second pair of wall and door
+            DataSurfaces::Surface(i).Zone = 2;
+            DataSurfaces::Surface(i).ExtBoundCond = i - 2;
+        }
+    }
+    DataSurfaces::Surface(1).ExtBoundCondName = "Interzonal_Wall_2";
+    DataSurfaces::Surface(2).ExtBoundCondName = "Interzonal_Door_2";
+    DataSurfaces::Surface(3).ExtBoundCondName = "Interzonal_Wall_1";
+    DataSurfaces::Surface(4).ExtBoundCondName = "Interzonal_Door_1";
+
+    // Setup pre def tables
+    OutputReportPredefined::SetPredefinedTables();
+
+    // Call the routine that fills up the table we care about
+    HeatBalanceSurfaceManager::GatherForPredefinedReport(state.dataWindowManager);
+
+
+    // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
+    // SubTable 'Opaque Interior' (pdstIntOpaque)
+
+    for (int i = 1; i <= TotSurfaces; i++){
+        if (i % 2 == 1){
+
+            /****************************************************************************
+            *                            Wall (odd entries)                             *
+            *****************************************************************************/
+
+            // Check the wall gross area
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpGrArea,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "200.00");
+            // Check the wall net area
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpNetArea,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "150.00");
+            // Check the wall u value
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpUfactNoFilm,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "0.200");
+            // Check the wall construction
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpCons,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "A Construction");
+            // Check the wall reflectance
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpRefl,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "0.60");
+            // Check the tilt
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpTilt,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "90.00");
+            // Check the azimuth
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpAzimuth,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "180.00");
+            // Check cardinal direction
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpDir,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "S");
+        }else{
+
+            /****************************************************************************
+            *                           door (even entries)                           *
+            *****************************************************************************/
+
+            // Check the door gross area
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntDrGrArea,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "50.00");
+            // Check the wall u value
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntDrUfactNoFilm,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "0.200");
+            // Check the door construction
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntDrCons,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "A Construction");
+            // Check the door parant surface name
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntDrParent,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       DataSurfaces::Surface(i-1).Name);
+        }
     }
 }
 
@@ -7737,7 +7830,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     Real64 GasolineHeating = 3e8;
     Real64 PropaneHeating = 4e8;
 
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -7747,7 +7840,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -7757,7 +7850,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Electricity",
                         "Exterior Lights",
                         "AnotherEndUseSubCat");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -7811,7 +7904,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
 
-    GetInputOutputTableSummaryReports();
+    GetInputOutputTableSummaryReports(state.files);
 
     DataEnvironment::Month = 12;
 
@@ -7845,7 +7938,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     // AnotherEndUseSubCat
     EXPECT_NEAR(extLitUse * 3, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1), 1.);
 
-    OutputReportTabular::WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector);
+    OutputReportTabular::WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector, state.files);
     OutputReportTabular::WriteDemandEndUseSummary(state.dataCostEstimateManager);
 
     EnergyPlus::sqlite->sqliteCommit();
@@ -8026,7 +8119,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     EXPECT_EQ((int)StatLineType::KoppenLine, (int)lineTypeReturn);
 }
 
-TEST(OutputReportTabularTest, GetDelaySequencesSurfaceOrder_test)
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_test)
 {
 
     int coolDesSelected = 1;
@@ -8186,4 +8279,58 @@ TEST(OutputReportTabularTest, GetDelaySequencesSurfaceOrder_test)
     EXPECT_EQ(powerGenDelaySeqCool1, powerGenDelaySeqCool2);
     EXPECT_EQ(lightDelaySeqCool1, lightDelaySeqCool2);
     EXPECT_EQ(feneSolarDelaySeqCool1, feneSolarDelaySeqCool2);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
+{
+
+    Real64 curSourceFactor;
+    bool fuelFactorUsed;
+    bool fFScheduleUsed;
+    int ffScheduleIndex;
+
+    PollutionModule::GetFuelFactorInfo("Steam", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+
+    EXPECT_EQ(curSourceFactor, 1.2);
+
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
+{
+    EnergyPlus::OutputReportTabular::clear_state();
+    EnergyPlus::DataGlobals::DoWeathSim = true;
+    
+    EnergyPlus::OutputReportPredefined::pdrSensibleGain = 1;
+    EnergyPlus::OutputReportPredefined::reportName.allocate(1);
+    EnergyPlus::OutputReportPredefined::reportName(pdrSensibleGain).show = true; 
+
+    EnergyPlus::DataHVACGlobals::TimeStepSys = 10.0;
+    EnergyPlus::DataGlobals::TimeStepZone = 20.0;
+    EnergyPlus::DataDefineEquip::NumAirDistUnits = 1;
+
+    EnergyPlus::DataHeatBalance::ZonePreDefRep.allocate(1);
+    EnergyPlus::DataDefineEquip::AirDistUnit.allocate(1);
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).ZoneNum = 1;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).HeatGain = 1000.0;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).CoolGain = 2000.0;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).HeatRate = 3.0;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).CoolRate = 4.0;
+
+    EnergyPlus::DataGlobals::NumOfZones = 1;
+    EnergyPlus::DataHeatBalance::Zone.allocate(NumOfZones);
+    EnergyPlus::DataHeatBalance::Zone(1).Multiplier = 1;
+    EnergyPlus::DataHeatBalance::Zone(1).ListMultiplier = 1;
+
+    EnergyPlus::DataHeatBalance::ZnRpt.allocate(1);
+    EnergyPlus::DataHeatBalance::ZnAirRpt.allocate(1);
+
+    EnergyPlus::DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
+    EnergyPlus::DataHeatBalance::ZoneWinHeatLossRepEnergy.allocate(1);
+    
+    GatherHeatGainReport(OutputProcessor::TimeStepType::TimeStepSystem);
+
+    EXPECT_EQ(1.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*SecInHour, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqHt);
+    EXPECT_EQ(0.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*SecInHour, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl);
+    EXPECT_EQ(1000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUHt);
+    EXPECT_EQ(-2000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUCl);
 }

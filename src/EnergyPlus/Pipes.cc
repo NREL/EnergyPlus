@@ -148,7 +148,7 @@ namespace Pipes {
         if (this->OneTimeInit) {
             int FoundOnLoop = 0;
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                 this->Name, this->TypeOf, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, errFlag, _, _, FoundOnLoop, _, _);
             if (FoundOnLoop == 0) {
                 ShowFatalError("SimPipes: Pipe=\"" + this->Name + "\" not found on a Plant Loop."); // LCOV_EXCL_LINE
