@@ -1023,3 +1023,100 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
     Real64 expected_IRHorizSky = 345.73838855245953;
     EXPECT_NEAR(state.dataWeatherManager->TomorrowHorizIRSky(1, 1), expected_IRHorizSky, 0.001);
 }
+
+// Test for Issue 7957: add new sky cover weather output values;
+// and test for Issue 8030: interpolate some weather input first before output values.
+TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
+{
+    std::string const idf_objects = delimited_string({
+        "Timestep,4;"
+
+        "SimulationControl,",
+        "  Yes,                     !- Do Zone Sizing Calculation",
+        "  Yes,                     !- Do System Sizing Calculation",
+        "  No,                      !- Do Plant Sizing Calculation",
+        "  Yes,                     !- Run Simulation for Sizing Periods",
+        "  No;                      !- Run Simulation for Weather File Run Periods",
+
+        "RunPeriod,",
+        "  January,                 !- Name",
+        "  1,                       !- Begin Month",
+        "  1,                       !- Begin Day of Month",
+        "  ,                        !- Begin Year",
+        "  1,                       !- End Month",
+        "  31,                      !- End Day of Month",
+        "  ,                        !- End Year",
+        "  Tuesday,                 !- Day of Week for Start Day",
+        "  Yes,                     !- Use Weather File Holidays and Special Days",
+        "  Yes,                     !- Use Weather File Daylight Saving Period",
+        "  No,                      !- Apply Weekend Holiday Rule",
+        "  Yes,                     !- Use Weather File Rain Indicators",
+        "  Yes;                     !- Use Weather File Snow Indicators",
+
+        "Site:Location,",
+        "  CHICAGO_IL_USA TMY2-94846,  !- Name",
+        "  41.78,                   !- Latitude {deg}",
+        "  -87.75,                  !- Longitude {deg}",
+        "  -6.00,                   !- Time Zone {hr}",
+        "  190.00;                  !- Elevation {m}",
+
+        "Output:Variable,",
+        "*,",
+        "Site Outdoor Air Drybulb Temperature,",
+        "Timestep;",
+        "Output:Variable,*,Site Wind Speed,Timestep;",
+        "Output:Variable,*,Site Total Sky Cover,Timestep;",
+        "Output:Variable,*,Site Opaque Sky Cover,Timestep;",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::PostIPProcessing();
+    bool ErrorsFound(false);
+    ErrorsFound = false;
+
+    state.dataWeatherManager->WeatherFileExists = true;
+    state.files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
+
+    DataGlobals::BeginSimFlag = true;
+    SimulationManager::GetProjectData(state);
+
+    bool Available(true);
+    Available = true;
+
+    EnergyPlus::DataGlobals::BeginSimFlag = true;
+    WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
+
+    // Test get output variables for Total Sky Cover and Opaque Sky Cover
+    EXPECT_EQ("Site Outdoor Air Drybulb Temperature", OutputProcessor::RVariableTypes(1).VarNameOnly);
+    EXPECT_EQ("Environment:Site Outdoor Air Drybulb Temperature", OutputProcessor::RVariableTypes(1).VarName);
+    EXPECT_EQ("Site Wind Speed", OutputProcessor::RVariableTypes(2).VarNameOnly);
+    EXPECT_EQ("Environment:Site Wind Speed", OutputProcessor::RVariableTypes(2).VarName);
+    EXPECT_EQ("Site Total Sky Cover", OutputProcessor::RVariableTypes(3).VarNameOnly);
+    EXPECT_EQ("Environment:Site Total Sky Cover", OutputProcessor::RVariableTypes(3).VarName);
+    EXPECT_EQ("Site Opaque Sky Cover", OutputProcessor::RVariableTypes(4).VarNameOnly);
+    EXPECT_EQ("Environment:Site Opaque Sky Cover", OutputProcessor::RVariableTypes(4).VarName);
+
+    EXPECT_EQ(7, OutputProcessor::RVariableTypes(1).ReportID);
+    EXPECT_EQ(8, OutputProcessor::RVariableTypes(2).ReportID);
+    EXPECT_EQ(9, OutputProcessor::RVariableTypes(3).ReportID);
+    EXPECT_EQ(10, OutputProcessor::RVariableTypes(4).ReportID);
+
+    state.dataWeatherManager->Envrn = 1;
+
+    DataGlobals::NumOfTimeStepInHour =4;
+    state.dataWeatherManager->Environment.allocate(1);
+    state.dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    state.dataWeatherManager->Environment(1).StartMonth = 1;
+    state.dataWeatherManager->Environment(1).StartDay = 1;
+
+    state.dataWeatherManager->Environment(1).UseWeatherFileHorizontalIR = false;
+
+    AllocateWeatherData(state);
+    OpenWeatherFile(state, ErrorsFound);
+    ReadWeatherForDay(state, state.files, 1, 1, true);
+
+    // Test the feature of interpolating some weather inputs to calc sky temp
+    Real64 expected_SkyTemp = -20.8188538296;
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowSkyTemp(2, 1), expected_SkyTemp, 1e-6);
+}
