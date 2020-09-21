@@ -4193,19 +4193,12 @@ namespace AirflowNetworkBalanceManager {
                         ShowContinueError("10 deg of being horizontal. Airflows through large horizontal openings are poorly");
                         ShowContinueError("modeled in the AirflowNetwork model resulting in only one-way airflow.");
                     }
-<<<<<<< HEAD
                     if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::SurfaceClass_Window ||
                           SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::SurfaceClass_GlassDoor ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::SurfaceClass_Door)) {
-                        ShowSevereError(RoutineName + "AirflowNetworkComponent: The opening must be assigned to a window, door or glassdoor at " +
-=======
-                    if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Window ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door ||
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::SurfaceClass_Door ||
                           Surface(MultizoneSurfaceData(count).SurfNum).IsAirBoundarySurf)) {
                         ShowSevereError(RoutineName +
                                         "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
->>>>>>> 172e6ffba540a0bcea7ae878fb90d33920937e51
                                         AirflowNetworkLinkageData(count).Name);
                         ErrorsFound = true;
                     }
@@ -4230,19 +4223,13 @@ namespace AirflowNetworkBalanceManager {
                         ShowContinueError("AirflowNetwork:Multizone:Component:SimpleOpening = " + AirflowNetworkCompData(compnum).Name);
                         ErrorsFound = true;
                     }
-<<<<<<< HEAD
+
                     if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::SurfaceClass_Window ||
                           SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::SurfaceClass_GlassDoor ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::SurfaceClass_Door)) {
-                        ShowSevereError(RoutineName + "AirflowNetworkComponent: The opening must be assigned to a window, door or glassdoor at " +
-=======
-                    if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Window ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door ||
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::SurfaceClass_Door ||
                           Surface(MultizoneSurfaceData(count).SurfNum).IsAirBoundarySurf)) {
                         ShowSevereError(RoutineName +
                                         "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
->>>>>>> 172e6ffba540a0bcea7ae878fb90d33920937e51
                                         AirflowNetworkLinkageData(count).Name);
                         ErrorsFound = true;
                     }
@@ -4286,7 +4273,7 @@ namespace AirflowNetworkBalanceManager {
                     }
                     if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::SurfaceClass_Window ||
                           SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::SurfaceClass_GlassDoor ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::SurfaceClass_Door)) ||
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::SurfaceClass_Door ||
                           Surface(MultizoneSurfaceData(count).SurfNum).IsAirBoundarySurf)) {
                         ShowSevereError(RoutineName + "AirflowNetworkComponent: The opening must be assigned to a window, door or glassdoor at " +
                                         AirflowNetworkLinkageData(count).Name);
@@ -5794,13 +5781,8 @@ namespace AirflowNetworkBalanceManager {
             if (i > AirflowNetworkNumOfSurfaces - NumOfLinksIntraZone) continue;
             if (MultizoneSurfaceData(i).OccupantVentilationControlNum == 0) MultizoneSurfaceData(i).OpenFactor = 0.0;
             j = MultizoneSurfaceData(i).SurfNum;
-<<<<<<< HEAD
             if (SurfWinOriginalClass(j) == SurfaceClass::SurfaceClass_Window || SurfWinOriginalClass(j) == SurfaceClass::SurfaceClass_Door ||
-                SurfWinOriginalClass(j) == SurfaceClass::SurfaceClass_GlassDoor) {
-=======
-            if (SurfWinOriginalClass(j) == SurfaceClass_Window || SurfWinOriginalClass(j) == SurfaceClass_Door ||
-                SurfWinOriginalClass(j) == SurfaceClass_GlassDoor || Surface(j).IsAirBoundarySurf) {
->>>>>>> 172e6ffba540a0bcea7ae878fb90d33920937e51
+                SurfWinOriginalClass(j) == SurfaceClass::SurfaceClass_GlassDoor || Surface(j).IsAirBoundarySurf) {
                 if (MultizoneSurfaceData(i).OccupantVentilationControlNum > 0) {
                     if (MultizoneSurfaceData(i).OpeningStatus == OpenStatus::FreeOperation) {
                         if (MultizoneSurfaceData(i).OpeningProbStatus == ProbabilityCheck::ForceChange) {

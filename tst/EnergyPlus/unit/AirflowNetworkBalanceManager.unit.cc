@@ -20050,8 +20050,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
     Surface(3).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = 11;
-    SurfWinOriginalClass(2) = 11;
+    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::SurfaceClass_Window;
+    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::SurfaceClass_Window;
     NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
