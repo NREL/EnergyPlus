@@ -11538,6 +11538,7 @@ namespace SurfaceGeometry {
 
         if (ConstrNewSh > 0) {
             SurfaceTmp(SurfNum).shadedConstructionList[shadeControlIndex] = ConstrNewSh;
+            SurfaceTmp(SurfNum).activeShadedConstruction = ConstrNewSh; //set the active to the current for now
         } else {
 
             // Create new construction
