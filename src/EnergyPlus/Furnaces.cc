@@ -8010,7 +8010,6 @@ namespace Furnaces {
         OnOffAirFlowRatio = 1.0;
         FurnaceOutletNode = Furnace(FurnaceNum).FurnaceOutletNodeNum;
         FurnaceInletNode = Furnace(FurnaceNum).FurnaceInletNodeNum;
-        int ControlZoneNode = Furnace(FurnaceNum).NodeNumOfControlledZone;
         if (state.dataAirLoop->AirToOANodeInfo(AirLoopNum).OASysExists) {
             OASysOutletNode = state.dataAirLoop->AirToOANodeInfo(AirLoopNum).OASysOutletNodeNum;
             OASysInletNode = state.dataAirLoop->AirToOANodeInfo(AirLoopNum).OASysInletNodeNum;
