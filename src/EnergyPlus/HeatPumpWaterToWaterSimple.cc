@@ -162,7 +162,7 @@ namespace HeatPumpWaterToWaterSimple {
     {
         if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
-                this->InitWatertoWaterHP(state.dataBranchInputManager, this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
+                this->InitWatertoWaterHP(state, this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
                 this->CalcWatertoWaterHPCooling(CurLoad);
                 this->UpdateGSHPRecords();
             } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
@@ -181,7 +181,7 @@ namespace HeatPumpWaterToWaterSimple {
             }
         } else if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFHeating) {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
-                this->InitWatertoWaterHP(state.dataBranchInputManager, this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
+                this->InitWatertoWaterHP(state, this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
                 this->CalcWatertoWaterHPHeating(CurLoad);
                 this->UpdateGSHPRecords();
             } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
@@ -208,7 +208,7 @@ namespace HeatPumpWaterToWaterSimple {
         bool initFirstHVAC = true;
         Real64 initCurLoad = 0.0;
 
-        this->InitWatertoWaterHP(state.dataBranchInputManager, this->WWHPPlantTypeOfNum, this->Name, initFirstHVAC, initCurLoad);
+        this->InitWatertoWaterHP(state, this->WWHPPlantTypeOfNum, this->Name, initFirstHVAC, initCurLoad);
         if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
             this->sizeCoolingWaterToWaterHP();
         } else if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFHeating) {
@@ -653,7 +653,7 @@ namespace HeatPumpWaterToWaterSimple {
         }
     }
 
-    void GshpSpecs::InitWatertoWaterHP(BranchInputManagerData &dataBranchInputManager,
+    void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                                        int const GSHPTypeNum,                  // Type of GSHP
                                        std::string const &EP_UNUSED(GSHPName), // User Specified Name of GSHP
                                        bool const EP_UNUSED(FirstHVACIteration),
@@ -714,7 +714,7 @@ namespace HeatPumpWaterToWaterSimple {
 
         if (this->MyPlantScanFlag) {
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     this->WWHPPlantTypeOfNum,
                                                     this->SourceLoopNum,
@@ -727,7 +727,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                     _,
                                                     this->SourceSideInletNodeNum,
                                                     _);
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     this->WWHPPlantTypeOfNum,
                                                     this->LoadLoopNum,

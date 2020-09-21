@@ -59,7 +59,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace PoweredInductionUnits {
 
@@ -105,6 +104,7 @@ namespace PoweredInductionUnits {
         Real64 MaxPriAirMassFlow; // kg/s
         Real64 MinPriAirFlowFrac; // minimum primary air flow fraction
         Real64 MinPriAirMassFlow; // kg/s
+        Real64 PriDamperPosition; // primary air damper position
         Real64 MaxSecAirVolFlow;  // m3/s (parallel)
         Real64 MaxSecAirMassFlow; // kg/s (parallel)
         Real64 FanOnFlowFrac;     // frac of primary air flow at which fan turns on (parallel)
@@ -157,7 +157,7 @@ namespace PoweredInductionUnits {
         // Default Constructor
         PowIndUnitData()
             : UnitType_Num(0), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0), MaxPriAirVolFlow(0.0), MaxPriAirMassFlow(0.0),
-              MinPriAirFlowFrac(0.0), MinPriAirMassFlow(0.0), MaxSecAirVolFlow(0.0), MaxSecAirMassFlow(0.0), FanOnFlowFrac(0.0),
+              MinPriAirFlowFrac(0.0), MinPriAirMassFlow(0.0), PriDamperPosition(0.0), MaxSecAirVolFlow(0.0), MaxSecAirMassFlow(0.0), FanOnFlowFrac(0.0),
               FanOnAirMassFlow(0.0), PriAirInNode(0), SecAirInNode(0), OutAirNode(0), HCoilInAirNode(0), ControlCompTypeNum(0), CompErrIndex(0),
               Mixer_Num(0), Fan_Num(0), Fan_Index(0), FanAvailSchedPtr(0), HCoilType_Num(0), HCoil_PlantTypeNum(0), HCoil_Index(0),
               HCoil_FluidIndex(0), MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0),
@@ -167,7 +167,7 @@ namespace PoweredInductionUnits {
         {
         }
 
-        void CalcOutdoorAirVolumeFlowRate();
+        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
     };
 
     // Object Data
@@ -186,7 +186,7 @@ namespace PoweredInductionUnits {
 
     void GetPIUs(EnergyPlusData &state);
 
-    void InitPIU(BranchInputManagerData &dataBranchInputManager,
+    void InitPIU(EnergyPlusData &state,
                  int const PIUNum,             // number of the current fan coil unit being simulated
                  bool const FirstHVACIteration // TRUE if first zone equip this HVAC step
     );
@@ -205,7 +205,7 @@ namespace PoweredInductionUnits {
                          bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void ReportPIU(int const PIUNum); // number of the current fan coil unit being simulated
+    void ReportPIU(EnergyPlusData &state, int const PIUNum); // number of the current fan coil unit being simulated
 
     // ===================== Utilities =====================================
 

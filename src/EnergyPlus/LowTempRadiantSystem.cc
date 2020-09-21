@@ -1825,7 +1825,7 @@ namespace LowTempRadiantSystem {
             if (MyPlantScanFlagHydr(RadSysNum) && allocated(PlantLoop)) {
                 errFlag = false;
                 if (HydrRadSys(RadSysNum).HotWaterInNode > 0) {
-                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                    ScanPlantLoopsForObject(state,
                                             HydrRadSys(RadSysNum).Name,
                                             TypeOf_LowTempRadiant_VarFlow,
                                             HydrRadSys(RadSysNum).HWLoopNum,
@@ -1843,7 +1843,7 @@ namespace LowTempRadiantSystem {
                     }
                 }
                 if (HydrRadSys(RadSysNum).ColdWaterInNode > 0) {
-                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                    ScanPlantLoopsForObject(state,
                                             HydrRadSys(RadSysNum).Name,
                                             TypeOf_LowTempRadiant_VarFlow,
                                             HydrRadSys(RadSysNum).CWLoopNum,
@@ -1870,7 +1870,7 @@ namespace LowTempRadiantSystem {
             if (MyPlantScanFlagCFlo(RadSysNum) && allocated(PlantLoop)) {
                 errFlag = false;
                 if (CFloRadSys(RadSysNum).HotWaterInNode > 0) {
-                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                    ScanPlantLoopsForObject(state,
                                             CFloRadSys(RadSysNum).Name,
                                             TypeOf_LowTempRadiant_ConstFlow,
                                             CFloRadSys(RadSysNum).HWLoopNum,
@@ -1888,7 +1888,7 @@ namespace LowTempRadiantSystem {
                     }
                 }
                 if (CFloRadSys(RadSysNum).ColdWaterInNode > 0) {
-                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                    ScanPlantLoopsForObject(state,
                                             CFloRadSys(RadSysNum).Name,
                                             TypeOf_LowTempRadiant_ConstFlow,
                                             CFloRadSys(RadSysNum).CWLoopNum,
@@ -2318,6 +2318,7 @@ namespace LowTempRadiantSystem {
             } else if (SELECT_CASE_var == ElectricSystem) {
 
                 ElecRadSys(RadSysNum).OperatingMode = NotOperating;
+
             }
         }
     }
@@ -2369,18 +2370,17 @@ namespace LowTempRadiantSystem {
 
     void HydronicSystemBaseData::setOperatingModeBasedOnChangeoverDelay()
     {
-        if (this->lastOperatingMode == NotOperating)
-            return; // this should only happen at the beginning of a simulation (at the start of warmup and the actual simulation)
-                    // so let things proceed with whatever the system wants to do
+        if (this->lastOperatingMode == NotOperating) return; // this should only happen at the beginning of a simulation (at the start of warmup and the actual simulation)
+                                                             // so let things proceed with whatever the system wants to do
 
-        if (this->OperatingMode == NotOperating) return; // always let it turn off
+        if (this->OperatingMode == NotOperating) return;  // always let it turn off
 
         if (this->OperatingMode == this->lastOperatingMode) return; // always let it continue to operating in the same mode
 
         if (this->schedPtrChangeoverDelay == 0) return; // user not requesting any delays (no schedule entered) so let it do whatever is requested
 
         Real64 currentChangeoverDelay = ScheduleManager::GetCurrentScheduleValue(this->schedPtrChangeoverDelay);
-        if (currentChangeoverDelay <= 0.0) return; // delay is zero so let it do whatever it requested
+        if (currentChangeoverDelay <= 0.0) return;  // delay is zero so let it do whatever it requested
 
         // At this point, the radiant system is trying to switch modes from the previous time step, the user is requesting a delay in the changeover,
         // and the requested delay is greater than zero.  Calculate what the current time is in hours from the start of the simulation
@@ -3697,7 +3697,7 @@ namespace LowTempRadiantSystem {
                             QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                     }
                     // Redo the heat balances since we have changed the heat source (set it to zero)
-                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     // Now check all of the surface temperatures.  If any potentially have condensation, leave the system off.
                     for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
@@ -3757,7 +3757,7 @@ namespace LowTempRadiantSystem {
                         }
 
                         // Redo the heat balances since we have changed the heat source
-                        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
                         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                         // Check for condensation one more time.  If no condensation, we are done.  If there is
@@ -3822,7 +3822,7 @@ namespace LowTempRadiantSystem {
         // the new SumHATsurf value for the zone.  Note that the difference between the new
         // SumHATsurf and the value originally calculated by the heat balance with a zero
         // source for all radiant systems in the zone is the load met by the system (approximately).
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
         LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
@@ -4842,7 +4842,7 @@ namespace LowTempRadiantSystem {
         // the new SumHATsurf value for the zone.  Note that the difference between the new
         // SumHATsurf and the value originally calculated by the heat balance with a zero
         // source for all radiant systems in the zone is the load met by the system (approximately).
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
         LoadMet = SumHATsurf(this->ZonePtr) - ZeroSourceSumHATsurf(this->ZonePtr);
@@ -4960,7 +4960,6 @@ namespace LowTempRadiantSystem {
                 this->OperatingMode = HeatingMode;
 
                 HeatFrac = this->calculateOperationalFraction(OffTemp, ControlTemp, this->ThrottlRange);
-                if (HeatFrac > 1.0) HeatFrac = 1.0;
 
                 // Set the heat source for the low temperature electric radiant system
                 for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
@@ -4971,7 +4970,7 @@ namespace LowTempRadiantSystem {
                 }
 
                 // Now "simulate" the system by recalculating the heat balances
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                 LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
@@ -5277,8 +5276,8 @@ namespace LowTempRadiantSystem {
         } else if (throttlingRange < 0.001) {
             return 1.0; // Throttling range is essentially zero and there is a temperature difference--turn it full on
         } else {
-            return temperatureDifference /
-                   throttlingRange; // Temperature difference is non-zero and less than the throttling range--calculate the operation fraction
+            // Temperature difference is non-zero and less than the throttling range--calculate the operation fraction, but limit to a maximum of 1.0
+            return min(temperatureDifference/throttlingRange, 1.0);
         }
     }
 
@@ -5425,8 +5424,7 @@ namespace LowTempRadiantSystem {
             // where: U = h (convection coefficient) and h = (k)(Nu)/D
             //        A = Pi*D*TubeLength
             NTU = U * Pi * this->TubeDiameterOuter * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
-
-        } else { // (this->FluidToSlabHeatTransfer == FluidToSlabHeatTransferTypes::ConvectionOnly)
+        } else {    // (this->FluidToSlabHeatTransfer == FluidToSlabHeatTransferTypes::ConvectionOnly)
 
             // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
             ReD = 4.0 * WaterMassFlow * FlowFraction / (Pi * MUactual * this->TubeDiameterInner * NumCircs);
@@ -5478,11 +5476,10 @@ namespace LowTempRadiantSystem {
         // Fluid resistance to heat transfer, assumes turbulent flow (Equation B5, p. 38 of ISO Standard 11855-2)
         Real64 distanceBetweenPipes = 2.0 * dataConstruction.Construct(constructionNumber).ThicknessPerpend;
         Real64 ratioDiameterToMassFlowLength = this->TubeDiameterInner / WaterMassFlow / this->TubeLength;
-        Real64 rFluid = 0.125 / DataGlobals::Pi * std::pow(distanceBetweenPipes, 0.13) * std::pow(ratioDiameterToMassFlowLength, 0.87);
+        Real64 rFluid = 0.125 / DataGlobals::Pi * std::pow(distanceBetweenPipes, 0.13) * std::pow(ratioDiameterToMassFlowLength,0.87);
 
         // Resistance to heat transfer (conduction through the piping material, Equation B6, p. 38 of ISO Standard 11855-2)
-        Real64 rTube =
-            0.5 * distanceBetweenPipes * std::log(this->TubeDiameterOuter / this->TubeDiameterInner) / DataGlobals::Pi / this->TubeConductivity;
+        Real64 rTube = 0.5 * distanceBetweenPipes * std::log(this->TubeDiameterOuter/this->TubeDiameterInner) / DataGlobals::Pi / this->TubeConductivity;
 
         calculateUFromISOStandard = 1.0 / (rFluid + rTube);
 
@@ -5571,22 +5568,22 @@ namespace LowTempRadiantSystem {
             Real64 Area = Surface(surfNum).Area;
 
             if (Surface(surfNum).Class == SurfaceClass_Window) {
-                if (SurfaceWindow(surfNum).ShadingFlag == IntShadeOn || SurfaceWindow(surfNum).ShadingFlag == IntBlindOn) {
+                if (SurfWinShadingFlag(surfNum) == IntShadeOn || SurfWinShadingFlag(surfNum) == IntBlindOn) {
                     // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += SurfaceWindow(surfNum).DividerArea;
+                    Area += SurfWinDividerArea(surfNum);
                 }
 
-                if (SurfaceWindow(surfNum).FrameArea > 0.0) {
+                if (SurfWinFrameArea(surfNum) > 0.0) {
                     // Window frame contribution
-                    sumHATsurf += HConvIn(surfNum) * SurfaceWindow(surfNum).FrameArea * (1.0 + SurfaceWindow(surfNum).ProjCorrFrIn) *
-                                  SurfaceWindow(surfNum).FrameTempSurfIn;
+                    sumHATsurf += HConvIn(surfNum) * SurfWinFrameArea(surfNum) * (1.0 + SurfWinProjCorrFrIn(surfNum)) *
+                                  SurfWinFrameTempSurfIn(surfNum);
                 }
 
-                if (SurfaceWindow(surfNum).DividerArea > 0.0 && SurfaceWindow(surfNum).ShadingFlag != IntShadeOn &&
-                    SurfaceWindow(surfNum).ShadingFlag != IntBlindOn) {
+                if (SurfWinDividerArea(surfNum) > 0.0 && SurfWinShadingFlag(surfNum) != IntShadeOn &&
+                    SurfWinShadingFlag(surfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    sumHATsurf += HConvIn(surfNum) * SurfaceWindow(surfNum).DividerArea * (1.0 + 2.0 * SurfaceWindow(surfNum).ProjCorrDivIn) *
-                                  SurfaceWindow(surfNum).DividerTempSurfIn;
+                    sumHATsurf += HConvIn(surfNum) * SurfWinDividerArea(surfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(surfNum)) *
+                                  SurfWinDividerTempSurfIn(surfNum);
                 }
             }
 

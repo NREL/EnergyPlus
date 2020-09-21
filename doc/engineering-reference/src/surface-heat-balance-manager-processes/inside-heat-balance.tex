@@ -884,7 +884,7 @@ The correlation for walls is illustrated in Figure~\ref{fig:ceiling-diffuser-cor
 \caption{Ceiling Diffuser Correlation for Walls \protect \label{fig:ceiling-diffuser-correlation-for-walls}}
 \end{figure}
 
-It should be noted that the conditions under which the correlations were developed included ACH values down to around 3.0.  However, extrapolation of the data down to ACH=1.0 is reasonable and so within EnergyPlus, for ACH values of 1.0 or greater, the ceiling diffuser correlations as shown above are used.  Below ACH values of 0.5, the natural convection algorithm is used.  Between ACH values of 0.5 and 1.0, there is a linear interpolation between the two models to avoid any discontinuities in the convection coefficient calculated.
+It should be noted that the conditions under which the correlations were developed included ACH values down to around 3.0.  So, within EnergyPlus, for ACH values of 3.0 or greater, the ceiling diffuser correlations as shown above are used.  Below ACH values of 0.5, the natural convection is determined using the TARP Algorithm (see above).  Between ACH values of 0.5 and 3.0, convection is assumed to be a mix between natural and forced convection.  Thus, between these two ACH values, EnergyPlus will use a linear interpolation between the natural convection algorithm value and the forced convection value at ACH=3.0 to avoid any discontinuities in the convection coefficient calculated and also maintain stability within the solution.
 
 \subsubsection{Trombe Wall Algorithm}\label{trombe-wall-algorithm}
 

@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -156,7 +157,8 @@ namespace Humidifiers {
         GetInputFlag = true;
     }
 
-    void SimHumidifier(std::string const &CompName,              // name of the humidifier unit
+    void SimHumidifier(EnergyPlusData &state,
+                       std::string const &CompName,              // name of the humidifier unit
                        bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep
                        int &CompIndex                            // Pointer to Humidifier Unit
     )
@@ -179,7 +181,7 @@ namespace Humidifiers {
         Real64 WaterAddNeeded; // output in kg/s needed from humidifier to meet humidity setpoint
 
         if (GetInputFlag) {
-            GetHumidifierInput();
+            GetHumidifierInput(state);
             GetInputFlag = false;
         }
 
@@ -224,7 +226,7 @@ namespace Humidifiers {
 
             } else if (SELECT_CASE_var == Humidifier_Steam_Gas) { // 'HUMIDIFIER:STEAM:GAS'
 
-                thisHum.CalcGasSteamHumidifier(WaterAddNeeded);
+                thisHum.CalcGasSteamHumidifier(state, WaterAddNeeded);
 
             } else {
                 ShowSevereError("SimHumidifier: Invalid Humidifier Type Code=" + TrimSigDigits(thisHum.HumType_Code));
@@ -240,7 +242,7 @@ namespace Humidifiers {
         thisHum.ReportHumidifier();
     }
 
-    void GetHumidifierInput()
+    void GetHumidifierInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -399,9 +401,10 @@ namespace Humidifiers {
                 Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Air Nodes");
 
-            Humidifier(HumNum).EfficiencyCurvePtr = GetCurveIndex(Alphas(3));
+            Humidifier(HumNum).EfficiencyCurvePtr = GetCurveIndex(state, Alphas(3));
             if (Humidifier(HumNum).EfficiencyCurvePtr > 0) {
-                ErrorsFound |= CurveManager::CheckCurveDims(Humidifier(HumNum).EfficiencyCurvePtr, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            Humidifier(HumNum).EfficiencyCurvePtr, // Curve index
                                                             {1},                                   // Valid dimensions
                                                             RoutineName,                           // Routine name
                                                             CurrentModuleObject,                   // Object Type
@@ -1139,7 +1142,7 @@ namespace Humidifiers {
         AirOutMassFlowRate = AirInMassFlowRate;
     }
 
-    void HumidifierData::CalcGasSteamHumidifier(Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
+    void HumidifierData::CalcGasSteamHumidifier(EnergyPlusData &state, Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
     )
     {
 
@@ -1263,7 +1266,7 @@ namespace Humidifiers {
             }
             PartLoadRatio = GasUseRateAtRatedEff / NomPower;
             if (EfficiencyCurvePtr > 0) { // calculate normalized thermal efficiency based on curve object type
-                ThermEffCurveOutput = CurveValue(EfficiencyCurvePtr, PartLoadRatio);
+                ThermEffCurveOutput = CurveValue(state, EfficiencyCurvePtr, PartLoadRatio);
             } else {
                 ThermEffCurveOutput = 1.0;
             }
@@ -1441,7 +1444,10 @@ namespace Humidifiers {
         AuxElecUseEnergy = AuxElecUseRate * TimeStepSys * SecInHour;
     }
 
-    int GetAirInletNodeNum(std::string const &HumidifierName, bool &ErrorsFound)
+    int GetAirInletNodeNum(EnergyPlusData &state,
+                           std::string const &HumidifierName,
+                           bool &ErrorsFound
+    )
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -1461,7 +1467,7 @@ namespace Humidifiers {
 
         // Obtains and Allocates heat exchanger related parameters from input file
         if (GetInputFlag) {
-            GetHumidifierInput();
+            GetHumidifierInput(state);
             GetInputFlag = false;
         }
 
@@ -1477,14 +1483,16 @@ namespace Humidifiers {
         return NodeNum;
     }
 
-    int GetAirOutletNodeNum(std::string const &HumidifierName, bool &ErrorsFound)
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &HumidifierName,
+        bool &ErrorsFound
+    )
     {
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the given humidifier and returns the air outlet node number.
         // If incorrect humidifier name is given, ErrorsFound is returned as true and node number as zero.
 
         if (GetInputFlag) {
-            GetHumidifierInput();
+            GetHumidifierInput(state);
             GetInputFlag = false;
         }
 

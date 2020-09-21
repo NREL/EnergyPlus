@@ -243,10 +243,9 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     // A to Z order
     autosizing_clear_state();
     CoilCoolingDX::clear_state();
-    CurveManager::clear_state();
     AirflowNetwork::clear_state();
     dataAirflowNetworkBalanceManager.clear_state();
-    DataAirLoop::clear_state();
+    state.dataAirLoop->clear_state();
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
     DataBranchNodeConnections::clear_state();

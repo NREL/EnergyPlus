@@ -153,7 +153,7 @@ namespace SwimmingPool {
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool EP_UNUSED(RunFlag))
     {
-        this->initialize(state.dataBranchInputManager, FirstHVACIteration);
+        this->initialize(state, FirstHVACIteration);
 
         this->calculate();
 
@@ -463,7 +463,7 @@ namespace SwimmingPool {
         }
     }
 
-    void SwimmingPoolData::initialize(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // true during the first HVAC iteration
+    void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIteration // true during the first HVAC iteration
     )
     {
         // SUBROUTINE INFORMATION:
@@ -501,7 +501,7 @@ namespace SwimmingPool {
             this->MyOneTimeFlag = false;
         }
 
-        SwimmingPoolData::initSwimmingPoolPlantLoopIndex(dataBranchInputManager);
+        SwimmingPoolData::initSwimmingPoolPlantLoopIndex(state);
 
         if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlagGeneral) {
             this->ZeroSourceSumHATsurf = 0.0;
@@ -706,7 +706,7 @@ namespace SwimmingPool {
             "Indoor Pool Current Cover LW Radiation Factor", OutputProcessor::Unit::None, this->CurCoverLWRadFac, "System", "Average", this->Name);
     }
 
-    void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(BranchInputManagerData &dataBranchInputManager)
+    void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -718,7 +718,7 @@ namespace SwimmingPool {
         if (MyPlantScanFlagPool && allocated(DataPlant::PlantLoop)) {
             errFlag = false;
             if (this->WaterInletNode > 0) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_SwimmingPool_Indoor,
                                                         this->HWLoopNum,
@@ -1038,25 +1038,25 @@ namespace SwimmingPool {
             Real64 Area = DataSurfaces::Surface(SurfNum).Area; // Effective surface area
 
             if (DataSurfaces::Surface(SurfNum).Class == DataSurfaces::SurfaceClass_Window) {
-                if (DataSurfaces::SurfaceWindow(SurfNum).ShadingFlag == DataSurfaces::IntShadeOn ||
-                    DataSurfaces::SurfaceWindow(SurfNum).ShadingFlag == DataSurfaces::IntBlindOn) {
+                if (DataSurfaces::SurfWinShadingFlag(SurfNum) == DataSurfaces::IntShadeOn ||
+                    DataSurfaces::SurfWinShadingFlag(SurfNum) == DataSurfaces::IntBlindOn) {
                     // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += DataSurfaces::SurfaceWindow(SurfNum).DividerArea;
+                    Area += DataSurfaces::SurfWinDividerArea(SurfNum);
                 }
 
-                if (DataSurfaces::SurfaceWindow(SurfNum).FrameArea > 0.0) {
+                if (DataSurfaces::SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += DataHeatBalance::HConvIn(SurfNum) * DataSurfaces::SurfaceWindow(SurfNum).FrameArea *
-                                  (1.0 + DataSurfaces::SurfaceWindow(SurfNum).ProjCorrFrIn) * DataSurfaces::SurfaceWindow(SurfNum).FrameTempSurfIn;
+                    SumHATsurf += DataHeatBalance::HConvIn(SurfNum) * DataSurfaces::SurfWinFrameArea(SurfNum) *
+                                  (1.0 + DataSurfaces::SurfWinProjCorrFrIn(SurfNum)) * DataSurfaces::SurfWinFrameTempSurfIn(SurfNum);
                 }
 
-                if (DataSurfaces::SurfaceWindow(SurfNum).DividerArea > 0.0 &&
-                    DataSurfaces::SurfaceWindow(SurfNum).ShadingFlag != DataSurfaces::IntShadeOn &&
-                    DataSurfaces::SurfaceWindow(SurfNum).ShadingFlag != DataSurfaces::IntBlindOn) {
+                if (DataSurfaces::SurfWinDividerArea(SurfNum) > 0.0 &&
+                    DataSurfaces::SurfWinShadingFlag(SurfNum) != DataSurfaces::IntShadeOn &&
+                    DataSurfaces::SurfWinShadingFlag(SurfNum) != DataSurfaces::IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += DataHeatBalance::HConvIn(SurfNum) * DataSurfaces::SurfaceWindow(SurfNum).DividerArea *
-                                  (1.0 + 2.0 * DataSurfaces::SurfaceWindow(SurfNum).ProjCorrDivIn) *
-                                  DataSurfaces::SurfaceWindow(SurfNum).DividerTempSurfIn;
+                    SumHATsurf += DataHeatBalance::HConvIn(SurfNum) * DataSurfaces::SurfWinDividerArea(SurfNum) *
+                                  (1.0 + 2.0 * DataSurfaces::SurfWinProjCorrDivIn(SurfNum)) *
+                                  DataSurfaces::SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 

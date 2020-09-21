@@ -60,7 +60,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace SwimmingPool {
 
@@ -171,12 +170,12 @@ namespace SwimmingPool {
                                         bool &ErrorsFound
         );
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, bool FirstHVACIteration // true during the first HVAC iteration
+        void initialize(EnergyPlusData &state, bool FirstHVACIteration // true during the first HVAC iteration
         );
 
         void setupOutputVars();
 
-        void initSwimmingPoolPlantLoopIndex(BranchInputManagerData &dataBranchInputManager);
+        void initSwimmingPoolPlantLoopIndex(EnergyPlusData &state);
 
         void initSwimmingPoolPlantNodeFlow(bool MyPlantScanFlagPool // logical flag true when plant index has not yet been set
         );

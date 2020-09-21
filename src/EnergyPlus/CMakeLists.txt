@@ -137,7 +137,6 @@ SET( SRC
   Data/CommonIncludes.hh
   Data/EnergyPlusData.cc
   Data/EnergyPlusData.hh
-  DataAirLoop.cc
   DataAirLoop.hh
   DataAirSystems.cc
   DataAirSystems.hh

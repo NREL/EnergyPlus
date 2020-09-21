@@ -70,6 +70,7 @@
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -199,7 +200,7 @@ TEST_F(EnergyPlusFixture, CheckActuatorInit)
 
     ASSERT_TRUE(process_idf(idf_objects));
     OutAirNodeManager::SetOutAirNodes();
-    EMSManager::GetEMSInput(state.files);
+    EMSManager::GetEMSInput(state, state.files);
 
     // now check that Erl variable is Null
     EXPECT_EQ(DataRuntimeLanguage::ErlVariable(1).Value.Type, DataRuntimeLanguage::ValueNull);
@@ -913,7 +914,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
     ErlValueType ReturnValue;
     bool seriousErrorFound = false;
     EMSManager::FinishProcessingUserInput = false;
-    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(
+    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(state,
         ErlStack(UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", ErlStack)).Instruction(1).Argument2,
         seriousErrorFound); // we just check the logic and don't throw the fatal errors.
     EXPECT_TRUE(seriousErrorFound);
@@ -922,7 +923,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
     EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
     // now check that it worked, should stay false
     seriousErrorFound = false;
-    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(
+    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(state,
         ErlStack(UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", ErlStack)).Instruction(1).Argument2, seriousErrorFound);
     EXPECT_FALSE(seriousErrorFound);
 }
@@ -1086,7 +1087,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EMSManager::CheckIfAnyEMS(state.files); // get EMS input
     EMSManager::FinishProcessingUserInput = true;
     bool ErrorsFound(false);
-    CurveManager::GetCurveInputData(ErrorsFound); // process curve for use with EMS
+    CurveManager::GetCurveInputData(state, ErrorsFound); // process curve for use with EMS
     EXPECT_FALSE(ErrorsFound);
 
     bool anyRan;
@@ -1586,7 +1587,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
 {
     // #7586
     DataSurfaces::Surface.allocate(2);
-    DataSurfaces::SurfaceWindow.allocate(2);
+    EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(2);
     dataConstruction.Construct.allocate(1);
     DataSurfaces::WindowShadingControl.allocate(2);
     DataDaylighting::ZoneDaylight.allocate(1);
@@ -1598,15 +1599,15 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass_Window;
     DataSurfaces::Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
     DataSurfaces::Surface(2).ExtBoundCond = DataSurfaces::ExternalEnvironment;
-    DataSurfaces::Surface(1).WindowShadingControlPtr = 1;
-    DataSurfaces::Surface(2).WindowShadingControlPtr = 2;
+    DataSurfaces::Surface(1).windowShadingControlList.push_back(1);
+    DataSurfaces::Surface(2).windowShadingControlList.push_back(2);
     DataSurfaces::Surface(1).HasShadeControl = true;
     DataSurfaces::Surface(2).HasShadeControl = true;
 
-    DataSurfaces::SurfaceWindow(1).HasShadeOrBlindLayer = false;
-    DataSurfaces::SurfaceWindow(2).HasShadeOrBlindLayer = false;
-    DataSurfaces::SurfaceWindow(1).ShadedConstruction = 1;
-    DataSurfaces::SurfaceWindow(2).ShadedConstruction = 1;
+    DataSurfaces::SurfWinHasShadeOrBlindLayer(1) = false;
+    DataSurfaces::SurfWinHasShadeOrBlindLayer(2) = false;
+    DataSurfaces::Surface(1).activeShadedConstruction = 1;
+    DataSurfaces::Surface(2).activeShadedConstruction = 1;
 
     dataConstruction.Construct(1).Name = "Construction1";
 
@@ -1615,15 +1616,22 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
 
     DataSurfaces::TotSurfaces = 2;
 
+    DataSurfaces::Surface(1).activeWindowShadingControl = DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(1)];
+    DataSurfaces::Surface(2).activeWindowShadingControl = DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(2)];
+
     SetupWindowShadingControlActuators();
 
-    EXPECT_FALSE(DataSurfaces::SurfaceWindow(2).ShadingFlagEMSOn);
-    EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue, 0);
+    EXPECT_FALSE(DataSurfaces::SurfWinShadingFlagEMSOn(2));
+    EXPECT_EQ(DataSurfaces::SurfWinShadingFlagEMSValue(2), 0);
 
-    DataSurfaces::SurfaceWindow(2).ShadingFlagEMSOn = true;
-    DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue = 1.0;
+    DataHeatBalance::Zone.allocate(1);
+    DataHeatBalance::Zone(1).WindowSurfaceFirst = 1;
+    DataHeatBalance::Zone(1).WindowSurfaceLast = 2;
+    DataGlobals::NumOfZones = 1;
+    DataSurfaces::SurfWinShadingFlagEMSOn(2) = true;
+    DataSurfaces::SurfWinShadingFlagEMSValue(2) = 1.0;
     SolarShading::WindowShadingManager(state.dataWindowEquivalentLayer);
-    EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlag, DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue);
+    EXPECT_EQ(DataSurfaces::SurfWinShadingFlag(2), DataSurfaces::SurfWinShadingFlagEMSValue(2));
 
 }
 TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)

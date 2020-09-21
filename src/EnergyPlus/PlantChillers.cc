@@ -130,7 +130,7 @@ namespace PlantChillers {
 
     void BaseChillerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
-        this->initialize(state.dataBranchInputManager, false, 0.0);
+        this->initialize(state, false, 0.0);
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->size();
         }
@@ -679,7 +679,7 @@ namespace PlantChillers {
         EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
-            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
+            this->initialize(state, RunFlag, CurLoad);
             auto &sim_component(DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
             this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(CurLoad, RunFlag);
@@ -708,7 +708,7 @@ namespace PlantChillers {
         }
     }
 
-    void ElectricChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
+    void ElectricChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -730,7 +730,7 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables();
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     this->plantTypeOfNum,
                                                     this->CWLoopNum,
@@ -744,7 +744,7 @@ namespace PlantChillers {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED && this->CondenserType != DataPlant::CondenserType::EVAPCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         this->plantTypeOfNum,
                                                         this->CDLoopNum,
@@ -761,7 +761,7 @@ namespace PlantChillers {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         this->plantTypeOfNum,
                                                         this->HRLoopNum,
@@ -814,6 +814,7 @@ namespace PlantChillers {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
                         EMSManager::CheckIfNodeSetPointManagedByEMS(this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                        DataLoopNode::NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
                                 ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
@@ -936,6 +937,7 @@ namespace PlantChillers {
                             // need call to EMS to check node
                             bool FatalError = false; // but not really fatal yet, but should be.
                             EMSManager::CheckIfNodeSetPointManagedByEMS(this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                            DataLoopNode::NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                             if (FatalError) {
                                 if (!this->HRSPErrDone) {
                                     ShowWarningError("Missing heat recovery temperature setpoint for chiller named " + this->Name);
@@ -2011,13 +2013,13 @@ namespace PlantChillers {
         }
     }
 
-    EngineDrivenChillerSpecs *EngineDrivenChillerSpecs::factory(PlantChillersData &chillers, std::string const &chillerName)
+    EngineDrivenChillerSpecs *EngineDrivenChillerSpecs::factory(EnergyPlusData &state, std::string const &chillerName)
     {
-        if (chillers.GetEngineDrivenInput) {
-            EngineDrivenChillerSpecs::getInput(chillers);
-            chillers.GetEngineDrivenInput = false;
+        if (state.dataPlantChillers.GetEngineDrivenInput) {
+            EngineDrivenChillerSpecs::getInput(state, state.dataPlantChillers);
+            state.dataPlantChillers.GetEngineDrivenInput = false;
         }
-        for (auto &thisChiller : chillers.EngineDrivenChiller) {
+        for (auto &thisChiller : state.dataPlantChillers.EngineDrivenChiller) {
             if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
@@ -2030,9 +2032,9 @@ namespace PlantChillers {
         EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
-            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
+            this->initialize(state, RunFlag, CurLoad);
             auto &sim_component(DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
-            this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
+            this->calculate(state, CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(CurLoad, RunFlag);
         } else if (calledFromLocation.loopNum == this->CDLoopNum) { // condenser loop
             PlantUtilities::UpdateChillerComponentCondenserSide(this->CDLoopNum,
@@ -2059,7 +2061,7 @@ namespace PlantChillers {
         }
     }
 
-    void EngineDrivenChillerSpecs::getInput(PlantChillersData &chillers)
+    void EngineDrivenChillerSpecs::getInput(EnergyPlusData &state, PlantChillersData &chillers)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher / Brandon Anderson
@@ -2312,35 +2314,35 @@ namespace PlantChillers {
             thisChiller.TempLowLimitEvapOut = DataIPShortCuts::rNumericArgs(20);
 
             // Load Special EngineDriven Chiller Curve Fit Inputs
-            thisChiller.ClngLoadtoFuelCurve = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(7)); // convert curve name to number
+            thisChiller.ClngLoadtoFuelCurve = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(7)); // convert curve name to number
             if (thisChiller.ClngLoadtoFuelCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + DataIPShortCuts::cAlphaArgs(7));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            thisChiller.RecJacHeattoFuelCurve = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(8)); // convert curve name to number
+            thisChiller.RecJacHeattoFuelCurve = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(8)); // convert curve name to number
             if (thisChiller.RecJacHeattoFuelCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + DataIPShortCuts::cAlphaArgs(8));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            thisChiller.RecLubeHeattoFuelCurve = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(9)); // convert curve name to number
+            thisChiller.RecLubeHeattoFuelCurve = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(9)); // convert curve name to number
             if (thisChiller.RecLubeHeattoFuelCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + '=' + DataIPShortCuts::cAlphaArgs(9));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            thisChiller.TotExhausttoFuelCurve = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(10)); // convert curve name to number
+            thisChiller.TotExhausttoFuelCurve = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(10)); // convert curve name to number
             if (thisChiller.TotExhausttoFuelCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + DataIPShortCuts::cAlphaArgs(10));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
-            thisChiller.ExhaustTempCurve = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(11)); // convert curve name to number
+            thisChiller.ExhaustTempCurve = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(11)); // convert curve name to number
             if (thisChiller.ExhaustTempCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + '=' + DataIPShortCuts::cAlphaArgs(11));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
@@ -2643,7 +2645,7 @@ namespace PlantChillers {
         }
     }
 
-    void EngineDrivenChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
+    void EngineDrivenChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2665,7 +2667,7 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables();
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     this->plantTypeOfNum,
                                                     this->CWLoopNum,
@@ -2679,7 +2681,7 @@ namespace PlantChillers {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED && this->CondenserType != DataPlant::CondenserType::EVAPCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         this->plantTypeOfNum,
                                                         this->CDLoopNum,
@@ -2696,7 +2698,7 @@ namespace PlantChillers {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         this->plantTypeOfNum,
                                                         this->HRLoopNum,
@@ -2747,6 +2749,7 @@ namespace PlantChillers {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
                         EMSManager::CheckIfNodeSetPointManagedByEMS(this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                        DataLoopNode::NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
                                 ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
@@ -3178,7 +3181,7 @@ namespace PlantChillers {
         }
     }
 
-    void EngineDrivenChillerSpecs::calculate(Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
+    void EngineDrivenChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher / Brandon Anderson
@@ -3719,7 +3722,7 @@ namespace PlantChillers {
         } else {
             PartLoadRat = max(this->MinPartLoadRat, PartLoadRat);
             // (RELDC) Ratio of Shaft Power to Fuel Energy Input
-            Real64 ClngLoadFuelRat = CurveManager::CurveValue(this->ClngLoadtoFuelCurve, PartLoadRat);
+            Real64 ClngLoadFuelRat = CurveManager::CurveValue(state, this->ClngLoadtoFuelCurve, PartLoadRat);
             EngineDrivenFuelEnergy = this->QEvaporator / ClngLoadFuelRat;
         }
         // Use Curve fit to determine energy recovered in the water jacket.  This curve calculates the water jacket energy recovered (J/s) by
@@ -3727,26 +3730,26 @@ namespace PlantChillers {
         // particular part load.
 
         // (RJACDC) Ratio of Recoverable Jacket Heat to Fuel Energy Input
-        Real64 RecJacHeattoFuelRat = CurveManager::CurveValue(this->RecJacHeattoFuelCurve, PartLoadRat);
+        Real64 RecJacHeattoFuelRat = CurveManager::CurveValue(state, this->RecJacHeattoFuelCurve, PartLoadRat);
         this->QJacketRecovered = EngineDrivenFuelEnergy * RecJacHeattoFuelRat;
 
         // Use Curve fit to determine Heat Recovered Lubricant Energy.  This curve calculates the lube energy recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the lube oil at that
         // particular part load.
         // (RLUBDC) Ratio of Recoverable Lube Oil Heat to Fuel Energy Input
-        Real64 RecLubeHeattoFuelRat = CurveManager::CurveValue(this->RecLubeHeattoFuelCurve, PartLoadRat);
+        Real64 RecLubeHeattoFuelRat = CurveManager::CurveValue(state, this->RecLubeHeattoFuelCurve, PartLoadRat);
         this->QLubeOilRecovered = EngineDrivenFuelEnergy * RecLubeHeattoFuelRat;
 
         // Use Curve fit to determine Heat Recovered from the exhaust.  This curve calculates the  energy recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the exhaust at that
         // particular part load.
-        Real64 TotExhausttoFuelRat = CurveManager::CurveValue(this->TotExhausttoFuelCurve, PartLoadRat);
+        Real64 TotExhausttoFuelRat = CurveManager::CurveValue(state, this->TotExhausttoFuelCurve, PartLoadRat);
         Real64 TotalExhaustEnergy = EngineDrivenFuelEnergy * TotExhausttoFuelRat;
 
         // Use Curve fit to determine Exhaust Temperature in C.  The temperature is simply a curve fit
         // of the exhaust temperature in C to the part load ratio.
         if (PartLoadRat != 0) {
-            Real64 exhaustTemp = CurveManager::CurveValue(this->ExhaustTempCurve, PartLoadRat);
+            Real64 exhaustTemp = CurveManager::CurveValue(state, this->ExhaustTempCurve, PartLoadRat);
             Real64 ExhaustGasFlow = TotalExhaustEnergy / (ExhaustCP * (exhaustTemp - ReferenceTemp));
 
             // Use Curve fit to determine stack temp after heat recovery
@@ -3952,7 +3955,7 @@ namespace PlantChillers {
     GTChillerSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
-            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
+            this->initialize(state, RunFlag, CurLoad);
             auto &sim_component(DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
             this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(CurLoad, RunFlag);
@@ -4500,7 +4503,7 @@ namespace PlantChillers {
         }
     }
 
-    void GTChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
+    void GTChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4523,7 +4526,7 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables();
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     this->plantTypeOfNum,
                                                     this->CWLoopNum,
@@ -4537,7 +4540,7 @@ namespace PlantChillers {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED && this->CondenserType != DataPlant::CondenserType::EVAPCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         this->plantTypeOfNum,
                                                         this->CDLoopNum,
@@ -4554,7 +4557,7 @@ namespace PlantChillers {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, this->plantTypeOfNum, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         this->plantTypeOfNum,
                                                         this->HRLoopNum,
@@ -4606,6 +4609,7 @@ namespace PlantChillers {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
                         EMSManager::CheckIfNodeSetPointManagedByEMS(this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                        DataLoopNode::NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
                                 ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
@@ -5809,7 +5813,7 @@ namespace PlantChillers {
         EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) {
-            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
+            this->initialize(state, RunFlag, CurLoad);
             auto &sim_component(DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
             this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(CurLoad, RunFlag);
@@ -6191,7 +6195,7 @@ namespace PlantChillers {
         }
     }
 
-    void ConstCOPChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
+    void ConstCOPChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6218,7 +6222,7 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables();
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     this->plantTypeOfNum,
                                                     this->CWLoopNum,
@@ -6232,7 +6236,7 @@ namespace PlantChillers {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED && this->CondenserType != DataPlant::CondenserType::EVAPCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         this->plantTypeOfNum,
                                                         this->CDLoopNum,
@@ -6278,6 +6282,7 @@ namespace PlantChillers {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
                         EMSManager::CheckIfNodeSetPointManagedByEMS(this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                        DataLoopNode::NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
                                 ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);

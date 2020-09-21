@@ -256,7 +256,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     GetWaterCoilInput();
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;
@@ -494,7 +494,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     GetWaterCoilInput();
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;
@@ -731,7 +731,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     GetWaterCoilInput();
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;
@@ -968,7 +968,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     GetWaterCoilInput();
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;
@@ -1144,7 +1144,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     FinalSysSizing.allocate(1);
     UnitarySysEqSizing.allocate(1);
     PrimaryAirSystem.allocate(1);
-    AirLoopControlInfo.allocate(1);
+    state.dataAirLoop->AirLoopControlInfo.allocate(1);
     TotNumLoops = 1;
     PlantLoop.allocate(TotNumLoops);
     PlantSizData.allocate(1);
@@ -1216,7 +1216,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     FinalSysSizing.deallocate();
     UnitarySysEqSizing.deallocate();
     PrimaryAirSystem.deallocate();
-    AirLoopControlInfo.deallocate();
+    state.dataAirLoop->AirLoopControlInfo.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
@@ -1379,7 +1379,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     GetWaterCoilInput();
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;

@@ -65,6 +65,7 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -85,11 +86,13 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -1498,7 +1501,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
     // expect energy to report according to multipliers
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).MechVentVolTotal / DataHeatBalance::ZonePreDefRep(1).MechVentVolTotal), 0.00001);
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).MechVentVolMin / DataHeatBalance::ZonePreDefRep(1).MechVentVolMin), 0.00001);
-    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnHvacCl / DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacCl), 0.00001);
+    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnZoneEqCl / DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl), 0.00001);
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnPeoplAdd / DataHeatBalance::ZonePreDefRep(1).SHGSAnPeoplAdd), 0.00001);
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnLiteAdd / DataHeatBalance::ZonePreDefRep(1).SHGSAnLiteAdd), 0.00001);
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnEquipAdd / DataHeatBalance::ZonePreDefRep(1).SHGSAnEquipAdd), 0.00001);
@@ -3752,7 +3755,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     DXCoils::DXCoil.allocate(2);
     DXCoils::DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     DXCoils::DXCoil(1).CondenserType(1) = DataHVACGlobals::AirCooled;
-    DXCoils::DXCoil(1).FuelType = DXCoils::FuelTypeNaturalGas;
+    DXCoils::DXCoil(1).FuelType = "NaturalGas";
     DXCoils::DXCoil(1).ElecCoolingConsumption = 100.0;
     DXCoils::DXCoil(1).TotalCoolingEnergy = 100.0;
     DXCoils::DXCoil(1).MSFuelWasteHeat = 1.0;
@@ -6896,7 +6899,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
     DataSizing::CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
     int numDesDays = 2;
-    DataAirLoop::AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state.dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
     DataGlobals::NumOfZones = 0;
     displayAirLoopComponentLoadSummary = true;
     CompLoadReportIsReq = true;
@@ -6905,7 +6908,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
     SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = 0;    // set to zero to indicate no design day chosen
 
-    WriteLoadComponentSummaryTables(state.dataCostEstimateManager);
+    WriteLoadComponentSummaryTables(state, state.dataCostEstimateManager);
 
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
@@ -7029,13 +7032,13 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
     DataSizing::CalcZoneSizing(2, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
 
-    DataAirLoop::AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataAirLoop::AirToZoneNodeInfo(1).NumZonesCooled = 1;
-    DataAirLoop::AirToZoneNodeInfo(1).CoolCtrlZoneNums.allocate(1);
-    DataAirLoop::AirToZoneNodeInfo(1).CoolCtrlZoneNums(1) = 1;
-    DataAirLoop::AirToZoneNodeInfo(1).NumZonesHeated = 1;
-    DataAirLoop::AirToZoneNodeInfo(1).HeatCtrlZoneNums.allocate(1);
-    DataAirLoop::AirToZoneNodeInfo(1).HeatCtrlZoneNums(1) = 1;
+    state.dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state.dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled = 1;
+    state.dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums.allocate(1);
+    state.dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums(1) = 1;
+    state.dataAirLoop->AirToZoneNodeInfo(1).NumZonesHeated = 1;
+    state.dataAirLoop->AirToZoneNodeInfo(1).HeatCtrlZoneNums.allocate(1);
+    state.dataAirLoop->AirToZoneNodeInfo(1).HeatCtrlZoneNums(1) = 1;
 
 
     // same Design Days peak and timestep peak as the zone it serves. This is the critical part of the test
@@ -7057,7 +7060,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
 
     AllocateLoadComponentArrays();
-    WriteLoadComponentSummaryTables(state.dataCostEstimateManager);
+    WriteLoadComponentSummaryTables(state, state.dataCostEstimateManager);
 
     // TableName, ReportName, value
     std::vector<std::tuple<std::string, std::string, std::string>> results_strings({
@@ -7398,6 +7401,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     DataSurfaces::TotSurfaces = 2 * nTests ;
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
+    SurfaceGeometry::AllocateSurfaceWindows(DataSurfaces::TotSurfaces);
 
     for (int i = 1; i <= nTests * 2; ++i) {
 
@@ -8280,4 +8284,58 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     EXPECT_EQ(powerGenDelaySeqCool1, powerGenDelaySeqCool2);
     EXPECT_EQ(lightDelaySeqCool1, lightDelaySeqCool2);
     EXPECT_EQ(feneSolarDelaySeqCool1, feneSolarDelaySeqCool2);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
+{
+
+    Real64 curSourceFactor;
+    bool fuelFactorUsed;
+    bool fFScheduleUsed;
+    int ffScheduleIndex;
+
+    PollutionModule::GetFuelFactorInfo("Steam", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+
+    EXPECT_EQ(curSourceFactor, 1.2);
+
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
+{
+    EnergyPlus::OutputReportTabular::clear_state();
+    EnergyPlus::DataGlobals::DoWeathSim = true;
+    
+    EnergyPlus::OutputReportPredefined::pdrSensibleGain = 1;
+    EnergyPlus::OutputReportPredefined::reportName.allocate(1);
+    EnergyPlus::OutputReportPredefined::reportName(pdrSensibleGain).show = true; 
+
+    EnergyPlus::DataHVACGlobals::TimeStepSys = 10.0;
+    EnergyPlus::DataGlobals::TimeStepZone = 20.0;
+    EnergyPlus::DataDefineEquip::NumAirDistUnits = 1;
+
+    EnergyPlus::DataHeatBalance::ZonePreDefRep.allocate(1);
+    EnergyPlus::DataDefineEquip::AirDistUnit.allocate(1);
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).ZoneNum = 1;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).HeatGain = 1000.0;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).CoolGain = 2000.0;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).HeatRate = 3.0;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).CoolRate = 4.0;
+
+    EnergyPlus::DataGlobals::NumOfZones = 1;
+    EnergyPlus::DataHeatBalance::Zone.allocate(NumOfZones);
+    EnergyPlus::DataHeatBalance::Zone(1).Multiplier = 1;
+    EnergyPlus::DataHeatBalance::Zone(1).ListMultiplier = 1;
+
+    EnergyPlus::DataHeatBalance::ZnRpt.allocate(1);
+    EnergyPlus::DataHeatBalance::ZnAirRpt.allocate(1);
+
+    EnergyPlus::DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
+    EnergyPlus::DataHeatBalance::ZoneWinHeatLossRepEnergy.allocate(1);
+    
+    GatherHeatGainReport(OutputProcessor::TimeStepType::TimeStepSystem);
+
+    EXPECT_EQ(1.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*SecInHour, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqHt);
+    EXPECT_EQ(0.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*SecInHour, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl);
+    EXPECT_EQ(1000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUHt);
+    EXPECT_EQ(-2000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUCl);
 }

@@ -492,7 +492,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
 \item
   HVAC,Average,Baseboard Radiant Heating Rate {[}W{]}
 \item
-  HVAC,Average,Baseboard Electric Power{[}W{]}
+  HVAC,Average,Baseboard Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Baseboard Total Heating Energy {[}J{]}
 \item
@@ -500,7 +500,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
 \item
   HVAC,Sum,Baseboard Convective Heating Energy {[}J{]}
 \item
-  HVAC,Sum,Baseboard Electric Energy {[}J{]}
+  HVAC,Sum,Baseboard Electricity Energy {[}J{]}
 \item
   HVAC,Meter,Baseboard:EnergyTransfer {[}J{]}
 \item
@@ -519,11 +519,11 @@ This field reports the rate at which convective heat addition is transferred fro
 
 This field reports the rate at which radiant heat addition is transferred from the baseboard to the people and the surfaces within the zone in Watts.  This field in combination with the baseboard convective heating rate (the previous field) equals the total heat addition to the space by the baseboard unit.
 
-\paragraph{Baseboard Electric Energy {[}J{]}}\label{baseboard-electric-energy-j-000}
+\paragraph{Baseboard Electricity Energy {[}J{]}}\label{baseboard-electric-energy-j-000}
 
 This is the electric energy used by the baseboard in Joules.
 
-\paragraph{Baseboard Electric Power {[}J{]}}\label{baseboard-electric-power-j}
+\paragraph{Baseboard Electricity Rate {[}J{]}}\label{baseboard-electric-power-j}
 
 This is the electric power required by the baseboard to heat the zone it is serving in Watts
 
@@ -969,9 +969,9 @@ ZoneHVAC:Baseboard:Convective:Electric,
 \item
   HVAC,Meter,Baseboard:EnergyTransfer {[}J{]}
 \item
-  HVAC,Sum,Baseboard Electric Energy {[}J{]}
+  HVAC,Sum,Baseboard Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Baseboard Electric Power{[}W{]}
+  HVAC,Average,Baseboard Electricity Rate {[}W{]}
 \item
   HVAC,Meter,Heating:Electricity{[}J{]}
 \end{itemize}
@@ -984,11 +984,11 @@ This is the heat addition rate of the electric convective baseboard to the zone 
 
 This is the heat addition of the convective baseboard to the zone it is serving in Joules over the timestep being reported.
 
-\paragraph{Baseboard Electric Energy {[}J{]}}\label{baseboard-electric-energy-j-1}
+\paragraph{Baseboard Electricity Energy {[}J{]}}\label{baseboard-electric-energy-j-1}
 
 This is the total electric consumption of the baseboard for the zone it is serving in Joules over the timestep being reported.
 
-\paragraph{Baseboard Electric Power {[}W{]}}\label{baseboard-electric-power-w-000}
+\paragraph{Baseboard Electricity Rate {[}W{]}}\label{baseboard-electric-power-w-000}
 
 This is the electric power required by the baseboard to the zone it is serving in Watts.
 
@@ -1545,9 +1545,9 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
 \item
   HVAC,Average,Zone Radiant HVAC Pump Inlet Temperature {[}C{]}
 \item
-  HVAC,Average,Zone Radiant HVAC Pump Electric Power{[}W{]}
+  HVAC,Average,Zone Radiant HVAC Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Zone Radiant HVAC Pump Electric Energy {[}J{]}
+  HVAC,Sum,Zone Radiant HVAC Pump Electricity Energy {[}J{]}
 \item
   HVAC,Average,Zone Radiant HVAC Pump Mass Flow Rate {[}kg/s{]}
 \item
@@ -1608,11 +1608,11 @@ This field reports the temperature of water leaving the low temperature radiant 
 
 This field reports the temperature of water entering the low temperature radiant system pump in Celsius. This may differ from the inlet node temperature for the component since this component has its own local secondary loop. It is assumed that the pump is upstream of the radiant system.
 
-\paragraph{Zone Radiant HVAC Pump Electric Power {[}W{]}}\label{zone-radiant-hvac-pump-electric-power-w}
+\paragraph{Zone Radiant HVAC Pump Electricity Rate {[}W{]}}\label{zone-radiant-hvac-pump-electric-power-w}
 
 This field reports the rate of electric power consumption for the pump which supplies flow to the constant flow radiant system in Watts.
 
-\paragraph{Zone Radiant HVAC Pump Electric Energy {[}J{]}}\label{zone-radiant-hvac-pump-electric-energy-j}
+\paragraph{Zone Radiant HVAC Pump Electricity Energy {[}J{]}}\label{zone-radiant-hvac-pump-electric-energy-j}
 
 This field reports the electric power consumption for the pump which supplies flow to the constant flow radiant system in Joules.
 
@@ -1752,20 +1752,20 @@ ZoneHVAC:LowTemperatureRadiant:Electric,
 
 \begin{itemize}
 \item
-  HVAC,Average, Zone Radiant HVAC Electric Power{[}W{]}
+  HVAC,Average, Zone Radiant HVAC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Zone Radiant HVAC Electric Energy {[}J{]}
+  HVAC,Sum, Zone Radiant HVAC Electricity Energy {[}J{]}
 \item
   HVAC,Sum,Zone Radiant HVAC Heating Energy {[}J{]}
 \item
   HVAC,Average, Zone Radiant HVAC Heating Rate {[}W{]}
 \end{itemize}
 
-\paragraph{Zone Radiant HVAC Electric Power {[}W{]}}\label{zone-radiant-hvac-electric-power-w}
+\paragraph{Zone Radiant HVAC Electricity Rate {[}W{]}}\label{zone-radiant-hvac-electric-power-w}
 
 This field reports the rate at which electric energy is ``burned'' in the low temperature radiant system in Watts. This is the heat source to the surface that is defined as the radiant system. The heating rate is determined by the zone conditions and the control scheme defined in the user input.
 
-\paragraph{Zone Radiant HVAC Electric Energy {[}J{]}}\label{zone-radiant-hvac-electric-energy-j}
+\paragraph{Zone Radiant HVAC Electricity Energy {[}J{]}}\label{zone-radiant-hvac-electric-energy-j}
 
 This field reports the amount of electric energy ``burned'' in the low temperature radiant system in Joules. This is the heat source to the surface that is defined as the radiant system. The heating rate is determined by the zone conditions, the control scheme defined in the user input, and the timestep.
 
@@ -1948,9 +1948,9 @@ ZoneHVAC:HighTemperatureRadiant, Zone 2 Radiant Heater,
 \item
   HVAC,Sum, Zone Radiant HVAC Gas Energy {[}J{]}
 \item
-  HVAC,Average, Zone Radiant HVAC Electric Power{[}W{]}
+  HVAC,Average, Zone Radiant HVAC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Zone Radiant HVAC Electric Energy {[}J{]}
+  HVAC,Sum, Zone Radiant HVAC Electricity Energy {[}J{]}
 \end{itemize}
 
 \paragraph{Zone Radiant HVAC Heating Rate {[}W{]}}\label{zone-radiant-hvac-heating-rate-w-3}
@@ -1969,11 +1969,11 @@ This field reports the rate at which gas is ``burned'' in a high temperature gas
 
 This field reports the amount of gas ``burned'' in a high temperature gas radiant system in Joules. This amount is determined by the zone conditions, the control scheme defined in the user input, and the timestep.
 
-\paragraph{Zone Radiant HVAC Electric Power{[}W{]}}\label{zone-radiant-hvac-electric-powerw}
+\paragraph{Zone Radiant HVAC Electricity Rate {[}W{]}}\label{zone-radiant-hvac-electric-powerw}
 
 This field reports the rate at which electric energy is ``burned'' in a high temperature electric radiant system in Watts. This rate is determined by the zone conditions and the control scheme defined in the user input.
 
-\paragraph{Zone Radiant HVAC Electric Energy {[}J{]}}\label{zone-radiant-hvac-electric-energy-j-1}
+\paragraph{Zone Radiant HVAC Electricity Energy {[}J{]}}\label{zone-radiant-hvac-electric-energy-j-1}
 
 This field reports the amount of electric energy ``burned'' in a high temperature electric radiant system in Joules. This amount is determined by the zone conditions, the control scheme defined in the user input, and the timestep.
 
@@ -2273,9 +2273,9 @@ An example IDF with a ventilated slab is shown below.
 \item
   HVAC,Average, Zone Ventilated Slab Air Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average, Zone Ventilated Slab Fan Electric Power {[}W{]}
+  HVAC,Average, Zone Ventilated Slab Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Zone Ventilated Slab Fan Electric Energy {[}J{]}
+  HVAC,Sum,Zone Ventilated Slab Fan Electricity Energy {[}J{]}
 \item
   HVAC,Average,Zone Ventilated Slab Inlet Air Temperature {[}C{]}
 \item
@@ -2342,11 +2342,11 @@ This field is the latent cooling output of the cooling coli of the ventilated sl
 
 This field reports the mass flow rate of air through the ventilated slab system in kilograms per second.
 
-\paragraph{Zone Ventilated Slab Fan Electric Power {[}W{]}}\label{zone-ventilated-slab-fan-electric-power-w}
+\paragraph{Zone Ventilated Slab Fan Electricity Rate {[}W{]}}\label{zone-ventilated-slab-fan-electric-power-w}
 
 This field reports the electric power consumption rate of the fan of the ventilated slab system in Watts.
 
-\paragraph{Zone Ventilated Slab Fan Electric Energy {[}J{]}}\label{zone-ventilated-slab-fan-electric-energy-j}
+\paragraph{Zone Ventilated Slab Fan Electricity Energy {[}J{]}}\label{zone-ventilated-slab-fan-electric-energy-j}
 
 This field reports the electric power consumed by the fan of the ventilated slab system over the timestep in Joules.
 
