@@ -464,7 +464,7 @@ The following output variables are reported for the WaterHeater:Mixed object:
 \item
   HVAC,Average,Water Heater Part Load Ratio {[]}
 \item
-  HVAC,Average,Water Heater Electric Power {[}W{]}
+  HVAC,Average,Water Heater Electricity Rate {[}W{]}
 \item
   HVAC,Average,Water Heater \textless{}Fuel Type\textgreater{} Rate {[}W{]}
 \item
@@ -609,7 +609,7 @@ The fraction of the Heater Maximum Capacity.
 
 \paragraph{Water Heater \textless{}Fuel Type\textgreater{} Rate {[}W{]}}\label{water-heater-fuel-type-rate-w}
 
-\paragraph{Water Heater Electric Power {[}W{]}}\label{water-heater-electric-power-w}
+\paragraph{Water Heater Electricity Rate {[}W{]}}\label{water-heater-electric-power-w}
 
 The average fuel consumption rate for the heater element or burner.
 
@@ -619,7 +619,7 @@ The fuel consumption energy for the heater element or burner.
 
 \paragraph{Water Heater Off Cycle Parasitic \textless{}Fuel Type\textgreater{} Rate {[}W{]}}\label{water-heater-off-cycle-parasitic-fuel-type-rate-w}
 
-\paragraph{Water Heater Off Cycle Parasitic Electric Power {[}W{]}}\label{water-heater-off-cycle-parasitic-electric-power-w-000}
+\paragraph{Water Heater Off Cycle Parasitic Electricity Rate {[}W{]}}\label{water-heater-off-cycle-parasitic-electric-power-w-000}
 
 The average fuel consumption rate for the off-cycle parasitics.
 
@@ -629,7 +629,7 @@ The fuel consumption energy for the off-cycle parasitics.
 
 \paragraph{Water Heater On Cycle Parasitic \textless{}Fuel Type\textgreater{} Rate {[}W{]}}\label{water-heater-on-cycle-parasitic-fuel-type-rate-w}
 
-\paragraph{Water Heater On Cycle Parasitic Electric Power {[}W{]}}\label{water-heater-on-cycle-parasitic-electric-power-w-000}
+\paragraph{Water Heater On Cycle Parasitic Electricity Rate {[}W{]}}\label{water-heater-on-cycle-parasitic-electric-power-w-000}
 
 The average fuel consumption rate for the on-cycle parasitics.
 
@@ -1483,26 +1483,26 @@ NOTE: branch object required only when tank use inlet nodes are used.
 \item
   \textbf{HVAC,Average,Water Heater Compressor Part Load Ratio}
 \item
-  \textbf{HVAC,Average,Water Heater On Cycle Ancillary Electric Power {[}W{]}}
+  \textbf{HVAC,Average,Water Heater On Cycle Ancillary Electricity Rate {[}W{]}}
 \item
-  \textbf{HVAC,Sum,Water Heater On Cycle Ancillary Electric Energy {[}J{]}}
+  \textbf{HVAC,Sum,Water Heater On Cycle Ancillary Electricity Energy {[}J{]}}
 \item
-  \textbf{HVAC,Average,Water Heater Off Cycle Ancillary Electric Power {[}W{]}}
+  \textbf{HVAC,Average,Water Heater Off Cycle Ancillary Electricity Rate {[}W{]}}
 \item
-  \textbf{HVAC,Sum,Water Heater Off Cycle Ancillary Electric Energy {[}J{]}}
+  \textbf{HVAC,Sum,Water Heater Off Cycle Ancillary Electricity Energy {[}J{]}}
 \end{itemize}
 
 \paragraph{Water Heater Compressor Part Load Ratio}\label{water-heater-compressor-part-load-ratio}
 
 This output is the average part-load ratio of the heat pump water heater's compressor (as well as its water pump and fan) for the timestep being reported. This output is independent of the ``Water Heater Part Load Ratio'' (Ref. Water Heater Outputs) which represents the part-load ratio of the supplemental heater (element or burner) in the water tank. When the water tank's (supplemental) heater set point temperature is higher than the cut-in temperature of the heat pump water heater's compressor, the heat pump compressor is disabled and the water tank's heater (element or burner) is used to heat the water. During these times the Water Heater Compressor Part Load Ratio is equal to 0.
 
-\paragraph{Water Heater On Cycle Ancillary Electric Power {[}W{]}}\label{water-heater-on-cycle-ancillary-electric-power-w}
+\paragraph{Water Heater On Cycle Ancillary Electricity Rate {[}W{]}}\label{water-heater-on-cycle-ancillary-electric-power-w}
 
-\paragraph{Water Heater On Cycle Ancillary Electric Energy {[}J{]}}\label{water-heater-on-cycle-ancillary-electric-energy-j}
+\paragraph{Water Heater On Cycle Ancillary Electricity Energy {[}J{]}}\label{water-heater-on-cycle-ancillary-electric-energy-j}
 
-\paragraph{Water Heater Off Cycle Ancillary Electric Power {[}W{]}}\label{water-heater-off-cycle-ancillary-electric-power-w}
+\paragraph{Water Heater Off Cycle Ancillary Electricity Rate {[}W{]}}\label{water-heater-off-cycle-ancillary-electric-power-w}
 
-\paragraph{Water Heater Off Cycle Ancillary Electric Energy {[}J{]}}\label{water-heater-off-cycle-ancillary-electric-energy-j}
+\paragraph{Water Heater Off Cycle Ancillary Electricity Energy {[}J{]}}\label{water-heater-off-cycle-ancillary-electric-energy-j}
 
 These outputs are the parasitic electric power and consumption associated with the heat pump water heater. Specific outputs represent parasitic electrical usage during the compressor/fan on and off cycles. These outputs represent electronic controls or other electric component. The model assumes that the parasitic power does not contribute to heating the water, but it can impact the zone air heat balance depending on user inputs. The parasitic electric consumption outputs are also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
@@ -1843,25 +1843,25 @@ Branch,
 \item
   \textbf{HVAC,Average,Water Heater Compressor Part Load Ratio}
 \item
-  \textbf{HVAC,Average,Water Heater On Cycle Ancillary Electric Power {[}W{]}}
+  \textbf{HVAC,Average,Water Heater On Cycle Ancillary Electricity Rate {[}W{]}}
 \item
-  \textbf{HVAC,Sum,Water Heater On Cycle Ancillary Electric Energy {[}J{]}}
+  \textbf{HVAC,Sum,Water Heater On Cycle Ancillary Electricity Energy {[}J{]}}
 \item
-  \textbf{HVAC,Average,Water Heater Off Cycle Ancillary Electric Power {[}W{]}}
+  \textbf{HVAC,Average,Water Heater Off Cycle Ancillary Electricity Rate {[}W{]}}
 \item
-  \textbf{HVAC,Sum,Water Heater Off Cycle Ancillary Electric Energy {[}J{]}}
+  \textbf{HVAC,Sum,Water Heater Off Cycle Ancillary Electricity Energy {[}J{]}}
 \end{itemize}
 
 \paragraph{Water Heater Compressor Part Load Ratio}\label{water-heater-compressor-part-load-ratio-1}
 
 This output is the average part-load ratio of the heat pump water heater's compressor (as well as its water pump and fan) for the timestep being reported. This output is independent of the ``Water Heater Part Load Ratio'' (Ref. Water Heater Outputs) which represents the part-load ratio of the supplemental heater (element or burner) in the water tank. When the water tank's (supplemental) heater set point temperature is higher than the cut-in temperature of the heat pump water heater's compressor, the heat pump compressor is disabled and the water tank's heater (element or burner) is used to heat the water. During these times the Water Heater Compressor Part Load Ratio is equal to 0.
 
-\paragraph{Water Heater On Cycle Ancillary Electric Power {[}W{]}}\label{water-heater-on-cycle-ancillary-electric-power-w-1}
+\paragraph{Water Heater On Cycle Ancillary Electricity Rate {[}W{]}}\label{water-heater-on-cycle-ancillary-electric-power-w-1}
 
-\paragraph{Water Heater On Cycle Ancillary Electric Energy {[}J{]}}\label{water-heater-on-cycle-ancillary-electric-energy-j-1}
+\paragraph{Water Heater On Cycle Ancillary Electricity Energy {[}J{]}}\label{water-heater-on-cycle-ancillary-electric-energy-j-1}
 
-\paragraph{Water Heater Off Cycle Ancillary Electric Power {[}W{]}}\label{water-heater-off-cycle-ancillary-electric-power-w-1}
+\paragraph{Water Heater Off Cycle Ancillary Electricity Rate {[}W{]}}\label{water-heater-off-cycle-ancillary-electric-power-w-1}
 
-\paragraph{Water Heater Off Cycle Ancillary Electric Energy {[}J{]}}\label{water-heater-off-cycle-ancillary-electric-energy-j-1}
+\paragraph{Water Heater Off Cycle Ancillary Electricity Energy {[}J{]}}\label{water-heater-off-cycle-ancillary-electric-energy-j-1}
 
 These outputs are the parasitic electric power and consumption associated with the heat pump water heater. Specific outputs represent parasitic electrical usage during the compressor/fan on and off cycles. These outputs represent electronic controls or other electric component. The model assumes that the parasitic power does not contribute to heating the water, but it can impact the zone air heat balance depending on user inputs. The parasitic electric consumption outputs are also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).

@@ -61,7 +61,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace SolarCollectors {
 
@@ -234,7 +233,7 @@ namespace SolarCollectors {
 
         void setupOutputVars();
 
-        void initialize(BranchInputManagerData &dataBranchInputManager);
+        void initialize(EnergyPlusData &state);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 

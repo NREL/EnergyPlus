@@ -62,7 +62,7 @@ namespace EnergyPlus {
 InputFile &InputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
     if (!good()) {
-        open(output_to_file);
+        open(false, output_to_file);
     }
     if (!good()) {
         ShowFatalError(fmt::format("{}: Could not open file {} for input (read).", caller, fileName));
@@ -107,7 +107,7 @@ std::ostream::pos_type InputFile::position() const noexcept
     return is->tellg();
 }
 
-void InputFile::open(bool)
+void InputFile::open(bool, bool)
 {
     is = std::unique_ptr<std::istream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::binary));
     is->imbue(std::locale("C"));
@@ -177,7 +177,7 @@ void InputFile::backspace() noexcept
 InputOutputFile &InputOutputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
     if (!good()) {
-        open(output_to_file);
+        open(false, output_to_file);
     }
     if (!good()) {
         ShowFatalError(fmt::format("{}: Could not open file {} for output (write).", caller, fileName));
@@ -187,7 +187,7 @@ InputOutputFile &InputOutputFile::ensure_open(const std::string &caller, bool ou
 
 bool InputOutputFile::good() const
 {
-    if (print_to_dev_null && os->bad()) { // badbit is set
+    if (os && print_to_dev_null && os->bad()) { // badbit is set
         return true;
     } else if (os) {
         return os->good();
@@ -286,7 +286,7 @@ std::vector<std::string> InputOutputFile::getLines()
 
 void IOFiles::OutputControl::getInput()
 {
-    auto const instances = inputProcessor->epJSON.find("Output:Control");
+    auto const instances = inputProcessor->epJSON.find("OutputControl:Files");
     if (instances != inputProcessor->epJSON.end()) {
 
         auto find_input = [](nlohmann::json const & fields, std::string const & field_name) -> std::string {
@@ -296,7 +296,7 @@ void IOFiles::OutputControl::getInput()
                 input = found.value().get<std::string>();
                 input = UtilityRoutines::MakeUPPERCase(input);
             } else {
-                inputProcessor->getDefaultValue("Output:Control", field_name, input);
+                inputProcessor->getDefaultValue("OutputControl:Files", field_name, input);
             }
             return input;
         };
@@ -400,13 +400,13 @@ void IOFiles::OutputControl::getInput()
                 extshd = boolean_choice(find_input(fields, "output_extshd"));
             }
             { // "json"
-                json = boolean_choice(find_input(fields, "json"));
+                json = boolean_choice(find_input(fields, "output_json"));
             }
             { // "tabular"
-                tabular = boolean_choice(find_input(fields, "tabular"));
+                tabular = boolean_choice(find_input(fields, "output_tabular"));
             }
             { // "sqlite"
-                sqlite = boolean_choice(find_input(fields, "sqlite"));
+                sqlite = boolean_choice(find_input(fields, "output_sqlite"));
             }
         }
     }

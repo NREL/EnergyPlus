@@ -134,8 +134,9 @@ SET( SRC
   DXFEarClipping.cc
   DXFEarClipping.hh
   Data/BaseData.hh
+  Data/CommonIncludes.hh
+  Data/EnergyPlusData.cc
   Data/EnergyPlusData.hh
-  DataAirLoop.cc
   DataAirLoop.hh
   DataAirSystems.cc
   DataAirSystems.hh

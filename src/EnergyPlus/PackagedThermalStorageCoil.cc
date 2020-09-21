@@ -75,7 +75,6 @@
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
@@ -113,7 +112,6 @@ namespace PackagedThermalStorageCoil {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using namespace Psychrometrics;
@@ -231,7 +229,7 @@ namespace PackagedThermalStorageCoil {
 
         TESOpMode = 1;
 
-        InitTESCoil(state.dataBranchInputManager, TESCoilNum);
+        InitTESCoil(state, TESCoilNum);
 
         TESOpMode = TESCoil(TESCoilNum).CurControlMode;
         {
@@ -239,15 +237,15 @@ namespace PackagedThermalStorageCoil {
             if (SELECT_CASE_var == OffMode) {
                 CalcTESCoilOffMode(TESCoilNum);
             } else if (SELECT_CASE_var == CoolingOnlyMode) {
-                CalcTESCoilCoolingOnlyMode(TESCoilNum, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingOnlyMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == CoolingAndChargeMode) {
-                CalcTESCoilCoolingAndChargeMode(TESCoilNum, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingAndChargeMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == CoolingAndDischargeMode) {
-                CalcTESCoilCoolingAndDischargeMode(TESCoilNum, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingAndDischargeMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == ChargeOnlyMode) {
-                CalcTESCoilChargeOnlyMode(TESCoilNum);
+                CalcTESCoilChargeOnlyMode(state, TESCoilNum);
             } else if (SELECT_CASE_var == DischargeOnlyMode) {
-                CalcTESCoilDischargeOnlyMode(TESCoilNum, PartLoadRatio);
+                CalcTESCoilDischargeOnlyMode(state, TESCoilNum, PartLoadRatio);
             }
         }
     }
@@ -275,7 +273,6 @@ namespace PackagedThermalStorageCoil {
         using FluidProperties::GetFluidSpecificHeatTemperatureLimits;
         using GlobalNames::VerifyUniqueCoilName;
         using NodeInputManager::GetOnlySingleNode;
-        using OutAirNodeManager::CheckOutAirNodeNumber;
         using ScheduleManager::GetScheduleIndex;
         using WaterManager::SetupTankDemandComponent;
         using WaterManager::SetupTankSupplyComponent;
@@ -464,7 +461,7 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingOnlyRatedSHR = rNumericArgs(8);
                 TESCoil(item).CoolingOnlyRatedCOP = rNumericArgs(9);
 
-                TESCoil(item).CoolingOnlyCapFTempCurve = GetCurveIndex(cAlphaArgs(11));
+                TESCoil(item).CoolingOnlyCapFTempCurve = GetCurveIndex(state, cAlphaArgs(11));
                 if (TESCoil(item).CoolingOnlyCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(11)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -476,15 +473,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingOnlyCapFTempCurve, // Curve index
-                                                                {2},                                    // Valid dimensions
-                                                                RoutineName,                            // Routine name
-                                                                cCurrentModuleObject,                   // Object Type
-                                                                TESCoil(item).Name,                     // Object Name
-                                                                cAlphaFieldNames(11));                  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                        TESCoil(item).CoolingOnlyCapFTempCurve,   // Curve index
+                         {2},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(11));                   // Field Name
                 }
 
-                TESCoil(item).CoolingOnlyCapFFlowCurve = GetCurveIndex(cAlphaArgs(12));
+                TESCoil(item).CoolingOnlyCapFFlowCurve = GetCurveIndex(state, cAlphaArgs(12));
                 if (TESCoil(item).CoolingOnlyCapFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(12)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -496,15 +494,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingOnlyCapFFlowCurve, // Curve index
-                                                                {1},                                    // Valid dimensions
-                                                                RoutineName,                            // Routine name
-                                                                cCurrentModuleObject,                   // Object Type
-                                                                TESCoil(item).Name,                     // Object Name
-                                                                cAlphaFieldNames(12));                  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                        TESCoil(item).CoolingOnlyCapFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(12));                   // Field Name
                 }
 
-                TESCoil(item).CoolingOnlyEIRFTempCurve = GetCurveIndex(cAlphaArgs(13));
+                TESCoil(item).CoolingOnlyEIRFTempCurve = GetCurveIndex(state, cAlphaArgs(13));
                 if (TESCoil(item).CoolingOnlyEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(13)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -516,15 +515,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingOnlyEIRFTempCurve, // Curve index
-                                                                {2},                                    // Valid dimensions
-                                                                RoutineName,                            // Routine name
-                                                                cCurrentModuleObject,                   // Object Type
-                                                                TESCoil(item).Name,                     // Object Name
-                                                                cAlphaFieldNames(13));                  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                        TESCoil(item).CoolingOnlyEIRFTempCurve,   // Curve index
+                         {2},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(13));                   // Field Name
                 }
 
-                TESCoil(item).CoolingOnlyEIRFFlowCurve = GetCurveIndex(cAlphaArgs(14));
+                TESCoil(item).CoolingOnlyEIRFFlowCurve = GetCurveIndex(state, cAlphaArgs(14));
                 if (TESCoil(item).CoolingOnlyEIRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(14)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -536,15 +536,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingOnlyEIRFFlowCurve, // Curve index
-                                                                {1},                                    // Valid dimensions
-                                                                RoutineName,                            // Routine name
-                                                                cCurrentModuleObject,                   // Object Type
-                                                                TESCoil(item).Name,                     // Object Name
-                                                                cAlphaFieldNames(14));                  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                        TESCoil(item).CoolingOnlyEIRFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(14));                   // Field Name
                 }
 
-                TESCoil(item).CoolingOnlyPLFFPLRCurve = GetCurveIndex(cAlphaArgs(15));
+                TESCoil(item).CoolingOnlyPLFFPLRCurve = GetCurveIndex(state, cAlphaArgs(15));
                 if (TESCoil(item).CoolingOnlyPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(15)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -556,15 +557,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingOnlyPLFFPLRCurve, // Curve index
-                                                                {1},                                   // Valid dimensions
-                                                                RoutineName,                           // Routine name
-                                                                cCurrentModuleObject,                  // Object Type
-                                                                TESCoil(item).Name,                    // Object Name
-                                                                cAlphaFieldNames(15));                 // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                        TESCoil(item).CoolingOnlyPLFFPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(15));                   // Field Name
                 }
 
-                TESCoil(item).CoolingOnlySHRFTempCurve = GetCurveIndex(cAlphaArgs(16));
+                TESCoil(item).CoolingOnlySHRFTempCurve = GetCurveIndex(state, cAlphaArgs(16));
                 if (TESCoil(item).CoolingOnlySHRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(16)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -576,15 +578,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingOnlySHRFTempCurve, // Curve index
-                                                                {2},                                    // Valid dimensions
-                                                                RoutineName,                            // Routine name
-                                                                cCurrentModuleObject,                   // Object Type
-                                                                TESCoil(item).Name,                     // Object Name
-                                                                cAlphaFieldNames(16));                  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                        TESCoil(item).CoolingOnlySHRFTempCurve,   // Curve index
+                         {2},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(16));                   // Field Name
                 }
 
-                TESCoil(item).CoolingOnlySHRFFlowCurve = GetCurveIndex(cAlphaArgs(17));
+                TESCoil(item).CoolingOnlySHRFFlowCurve = GetCurveIndex(state, cAlphaArgs(17));
                 if (TESCoil(item).CoolingOnlySHRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(17)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -596,12 +599,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingOnlySHRFFlowCurve, // Curve index
-                                                                {1},                                    // Valid dimensions
-                                                                RoutineName,                            // Routine name
-                                                                cCurrentModuleObject,                   // Object Type
-                                                                TESCoil(item).Name,                     // Object Name
-                                                                cAlphaFieldNames(17));                  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                        TESCoil(item).CoolingOnlySHRFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(17));                   // Field Name
                 }
             }
 
@@ -630,7 +634,7 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndChargeCoolingRatedCOP = rNumericArgs(15);            // Coefficient of performance , for cooling [W/W]
                 TESCoil(item).CoolingAndChargeChargingRatedCOP = rNumericArgs(16);           // Coefficient of performance , for charging [W/W]
 
-                TESCoil(item).CoolingAndChargeCoolingCapFTempCurve = GetCurveIndex(cAlphaArgs(19));
+                TESCoil(item).CoolingAndChargeCoolingCapFTempCurve = GetCurveIndex(state, cAlphaArgs(19));
                 if (TESCoil(item).CoolingAndChargeCoolingCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(19)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -642,15 +646,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndChargeCoolingCapFTempCurve, // Curve index
-                                                                {3},                                                // Valid dimensions
-                                                                RoutineName,                                        // Routine name
-                                                                cCurrentModuleObject,                               // Object Type
-                                                                TESCoil(item).Name,                                 // Object Name
-                                                                cAlphaFieldNames(19));                              // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndChargeCoolingCapFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(19));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve = GetCurveIndex(cAlphaArgs(20));
+                TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve = GetCurveIndex(state, cAlphaArgs(20));
                 if (TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(20)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -662,14 +667,15 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve, // Curve index
-                                                                {1},                                                // Valid dimensions
-                                                                RoutineName,                                        // Routine name
-                                                                cCurrentModuleObject,                               // Object Type
-                                                                TESCoil(item).Name,                                 // Object Name
-                                                                cAlphaFieldNames(20));                              // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(20));                   // Field Name
                 }
-                TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve = GetCurveIndex(cAlphaArgs(21));
+                TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve = GetCurveIndex(state, cAlphaArgs(21));
                 if (TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(21)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -681,15 +687,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve, // Curve index
-                                                                {3},                                                // Valid dimensions
-                                                                RoutineName,                                        // Routine name
-                                                                cCurrentModuleObject,                               // Object Type
-                                                                TESCoil(item).Name,                                 // Object Name
-                                                                cAlphaFieldNames(21));                              // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(21));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve = GetCurveIndex(cAlphaArgs(22));
+                TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve = GetCurveIndex(state, cAlphaArgs(22));
                 if (TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(22)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -701,15 +708,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve, // Curve index
-                                                                {1},                                                // Valid dimensions
-                                                                RoutineName,                                        // Routine name
-                                                                cCurrentModuleObject,                               // Object Type
-                                                                TESCoil(item).Name,                                 // Object Name
-                                                                cAlphaFieldNames(22));                              // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(22));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(23));
+                TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve = GetCurveIndex(state, cAlphaArgs(23));
                 if (TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(23)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -721,15 +729,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve, // Curve index
-                                                                {1},                                               // Valid dimensions
-                                                                RoutineName,                                       // Routine name
-                                                                cCurrentModuleObject,                              // Object Type
-                                                                TESCoil(item).Name,                                // Object Name
-                                                                cAlphaFieldNames(23));                             // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(23));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeChargingCapFTempCurve = GetCurveIndex(cAlphaArgs(24));
+                TESCoil(item).CoolingAndChargeChargingCapFTempCurve = GetCurveIndex(state, cAlphaArgs(24));
                 if (TESCoil(item).CoolingAndChargeChargingCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(24)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -741,15 +750,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndChargeChargingCapFTempCurve, // Curve index
-                                                                {3},                                                 // Valid dimensions
-                                                                RoutineName,                                         // Routine name
-                                                                cCurrentModuleObject,                                // Object Type
-                                                                TESCoil(item).Name,                                  // Object Name
-                                                                cAlphaFieldNames(24));                               // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndChargeChargingCapFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(24));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve = GetCurveIndex(cAlphaArgs(25));
+                TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve = GetCurveIndex(state, cAlphaArgs(25));
                 if (TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve == 0) {
                     if (lAlphaFieldBlanks(25)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -761,15 +771,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve, // Curve index
-                                                                {1},                                                    // Valid dimensions
-                                                                RoutineName,                                            // Routine name
-                                                                cCurrentModuleObject,                                   // Object Type
-                                                                TESCoil(item).Name,                                     // Object Name
-                                                                cAlphaFieldNames(25));                                  // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(25));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeChargingEIRFTempCurve = GetCurveIndex(cAlphaArgs(26));
+                TESCoil(item).CoolingAndChargeChargingEIRFTempCurve = GetCurveIndex(state, cAlphaArgs(26));
                 if (TESCoil(item).CoolingAndChargeChargingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(26)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -781,15 +792,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndChargeChargingEIRFTempCurve, // Curve index
-                                                                {3},                                                 // Valid dimensions
-                                                                RoutineName,                                         // Routine name
-                                                                cCurrentModuleObject,                                // Object Type
-                                                                TESCoil(item).Name,                                  // Object Name
-                                                                cAlphaFieldNames(26));                               // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndChargeChargingEIRFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(26));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve = GetCurveIndex(cAlphaArgs(27));
+                TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve = GetCurveIndex(state, cAlphaArgs(27));
                 if (TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve == 0) {
                     if (lAlphaFieldBlanks(27)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -801,15 +813,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve, // Curve index
-                                                                {1},                                                 // Valid dimensions
-                                                                RoutineName,                                         // Routine name
-                                                                cCurrentModuleObject,                                // Object Type
-                                                                TESCoil(item).Name,                                  // Object Name
-                                                                cAlphaFieldNames(27));                               // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(27));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(28));
+                TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve = GetCurveIndex(state, cAlphaArgs(28));
                 if (TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(28)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -821,15 +834,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve, // Curve index
-                                                                {1},                                                // Valid dimensions
-                                                                RoutineName,                                        // Routine name
-                                                                cCurrentModuleObject,                               // Object Type
-                                                                TESCoil(item).Name,                                 // Object Name
-                                                                cAlphaFieldNames(28));                              // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(28));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeSHRFTempCurve = GetCurveIndex(cAlphaArgs(29));
+                TESCoil(item).CoolingAndChargeSHRFTempCurve = GetCurveIndex(state, cAlphaArgs(29));
                 if (TESCoil(item).CoolingAndChargeSHRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(29)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -841,15 +855,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndChargeSHRFTempCurve, // Curve index
-                                                                {2, 3},                                      // Valid dimensions
-                                                                RoutineName,                                 // Routine name
-                                                                cCurrentModuleObject,                        // Object Type
-                                                                TESCoil(item).Name,                          // Object Name
-                                                                cAlphaFieldNames(29));                       // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndChargeSHRFTempCurve,   // Curve index
+                         {2, 3},                                  // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(29));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeSHRFFlowCurve = GetCurveIndex(cAlphaArgs(30));
+                TESCoil(item).CoolingAndChargeSHRFFlowCurve = GetCurveIndex(state, cAlphaArgs(30));
                 if (TESCoil(item).CoolingAndChargeSHRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(30)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -861,12 +876,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndChargeSHRFFlowCurve, // Curve index
-                                                                {1},                                         // Valid dimensions
-                                                                RoutineName,                                 // Routine name
-                                                                cCurrentModuleObject,                        // Object Type
-                                                                TESCoil(item).Name,                          // Object Name
-                                                                cAlphaFieldNames(30));                       // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndChargeSHRFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(30));                   // Field Name
                 }
 
             } // Cooling and Charge Mode available
@@ -896,7 +912,7 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndDischargeCoolingRatedCOP = rNumericArgs(22);               // Coefficient of performance , for cooling [W/W]
                 TESCoil(item).CoolingAndDischargeDischargingRatedCOP = rNumericArgs(23);           // Coefficient of performance , for charging [W/W]
 
-                TESCoil(item).CoolingAndDischargeCoolingCapFTempCurve = GetCurveIndex(cAlphaArgs(32));
+                TESCoil(item).CoolingAndDischargeCoolingCapFTempCurve = GetCurveIndex(state, cAlphaArgs(32));
                 if (TESCoil(item).CoolingAndDischargeCoolingCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(32)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -908,15 +924,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndDischargeCoolingCapFTempCurve, // Curve index
-                                                                {3},                                                   // Valid dimensions
-                                                                RoutineName,                                           // Routine name
-                                                                cCurrentModuleObject,                                  // Object Type
-                                                                TESCoil(item).Name,                                    // Object Name
-                                                                cAlphaFieldNames(32));                                 // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndDischargeCoolingCapFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(32));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve = GetCurveIndex(cAlphaArgs(33));
+                TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve = GetCurveIndex(state, cAlphaArgs(33));
                 if (TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(33)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -928,15 +945,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve, // Curve index
-                                                                {1},                                                   // Valid dimensions
-                                                                RoutineName,                                           // Routine name
-                                                                cCurrentModuleObject,                                  // Object Type
-                                                                TESCoil(item).Name,                                    // Object Name
-                                                                cAlphaFieldNames(33));                                 // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(33));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve = GetCurveIndex(cAlphaArgs(34));
+                TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve = GetCurveIndex(state, cAlphaArgs(34));
                 if (TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(34)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -948,15 +966,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve, // Curve index
-                                                                {3},                                                   // Valid dimensions
-                                                                RoutineName,                                           // Routine name
-                                                                cCurrentModuleObject,                                  // Object Type
-                                                                TESCoil(item).Name,                                    // Object Name
-                                                                cAlphaFieldNames(34));                                 // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(34));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve = GetCurveIndex(cAlphaArgs(35));
+                TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve = GetCurveIndex(state, cAlphaArgs(35));
                 if (TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(35)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -968,15 +987,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve, // Curve index
-                                                                {1},                                                   // Valid dimensions
-                                                                RoutineName,                                           // Routine name
-                                                                cCurrentModuleObject,                                  // Object Type
-                                                                TESCoil(item).Name,                                    // Object Name
-                                                                cAlphaFieldNames(35));                                 // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(35));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(36));
+                TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve = GetCurveIndex(state, cAlphaArgs(36));
                 if (TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(36)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -988,15 +1008,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve, // Curve index
-                                                                {1},                                                  // Valid dimensions
-                                                                RoutineName,                                          // Routine name
-                                                                cCurrentModuleObject,                                 // Object Type
-                                                                TESCoil(item).Name,                                   // Object Name
-                                                                cAlphaFieldNames(36));                                // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(36));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve = GetCurveIndex(cAlphaArgs(37));
+                TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve = GetCurveIndex(state, cAlphaArgs(37));
                 if (TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(37)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1008,15 +1029,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve, // Curve index
-                                                                {3},                                                       // Valid dimensions
-                                                                RoutineName,                                               // Routine name
-                                                                cCurrentModuleObject,                                      // Object Type
-                                                                TESCoil(item).Name,                                        // Object Name
-                                                                cAlphaFieldNames(37));                                     // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(37));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve = GetCurveIndex(cAlphaArgs(38));
+                TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve = GetCurveIndex(state, cAlphaArgs(38));
                 if (TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(38)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1028,15 +1050,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve, // Curve index
-                                                                {1},                                                       // Valid dimensions
-                                                                RoutineName,                                               // Routine name
-                                                                cCurrentModuleObject,                                      // Object Type
-                                                                TESCoil(item).Name,                                        // Object Name
-                                                                cAlphaFieldNames(38));                                     // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(38));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve = GetCurveIndex(cAlphaArgs(39));
+                TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve = GetCurveIndex(state, cAlphaArgs(39));
                 if (TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve == 0) {
                     if (lAlphaFieldBlanks(39)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1048,15 +1071,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve, // Curve index
-                                                                {1},                                                          // Valid dimensions
-                                                                RoutineName,                                                  // Routine name
-                                                                cCurrentModuleObject,                                         // Object Type
-                                                                TESCoil(item).Name,                                           // Object Name
-                                                                cAlphaFieldNames(39));                                        // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(39));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve = GetCurveIndex(cAlphaArgs(40));
+                TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve = GetCurveIndex(state, cAlphaArgs(40));
                 if (TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(40)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1068,15 +1092,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve, // Curve index
-                                                                {3},                                                       // Valid dimensions
-                                                                RoutineName,                                               // Routine name
-                                                                cCurrentModuleObject,                                      // Object Type
-                                                                TESCoil(item).Name,                                        // Object Name
-                                                                cAlphaFieldNames(40));                                     // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve,   // Curve index
+                         {3},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(40));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve = GetCurveIndex(cAlphaArgs(41));
+                TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve = GetCurveIndex(state, cAlphaArgs(41));
                 if (TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve == 0) {
                     if (lAlphaFieldBlanks(41)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1088,15 +1113,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve, // Curve index
-                                                                {1},                                                       // Valid dimensions
-                                                                RoutineName,                                               // Routine name
-                                                                cCurrentModuleObject,                                      // Object Type
-                                                                TESCoil(item).Name,                                        // Object Name
-                                                                cAlphaFieldNames(41));                                     // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(41));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(42));
+                TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve = GetCurveIndex(state, cAlphaArgs(42));
                 if (TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(42)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1108,15 +1134,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve, // Curve index
-                                                                {1},                                                      // Valid dimensions
-                                                                RoutineName,                                              // Routine name
-                                                                cCurrentModuleObject,                                     // Object Type
-                                                                TESCoil(item).Name,                                       // Object Name
-                                                                cAlphaFieldNames(42));                                    // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(42));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeSHRFTempCurve = GetCurveIndex(cAlphaArgs(43));
+                TESCoil(item).CoolingAndDischargeSHRFTempCurve = GetCurveIndex(state, cAlphaArgs(43));
                 if (TESCoil(item).CoolingAndDischargeSHRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(43)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1128,15 +1155,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndDischargeSHRFTempCurve, // Curve index
-                                                                {2, 3},                                         // Valid dimensions
-                                                                RoutineName,                                    // Routine name
-                                                                cCurrentModuleObject,                           // Object Type
-                                                                TESCoil(item).Name,                             // Object Name
-                                                                cAlphaFieldNames(43));                          // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndDischargeSHRFTempCurve,   // Curve index
+                         {2, 3},                                  // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(43));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeSHRFFlowCurve = GetCurveIndex(cAlphaArgs(44));
+                TESCoil(item).CoolingAndDischargeSHRFFlowCurve = GetCurveIndex(state, cAlphaArgs(44));
                 if (TESCoil(item).CoolingAndDischargeSHRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(44)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1148,12 +1176,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).CoolingAndDischargeSHRFFlowCurve, // Curve index
-                                                                {1},                                            // Valid dimensions
-                                                                RoutineName,                                    // Routine name
-                                                                cCurrentModuleObject,                           // Object Type
-                                                                TESCoil(item).Name,                             // Object Name
-                                                                cAlphaFieldNames(44));                          // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).CoolingAndDischargeSHRFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(44));                   // Field Name
                 }
 
             } // cooling and discharge mode available
@@ -1179,7 +1208,7 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).ChargeOnlyRatedCapacitySizingFactor = rNumericArgs(25); // sizing factor for charging capacity []
                 TESCoil(item).ChargeOnlyRatedCOP = rNumericArgs(26);                  // coefficient of performance at rating conditions [W/W]
 
-                TESCoil(item).ChargeOnlyChargingCapFTempCurve = GetCurveIndex(cAlphaArgs(46));
+                TESCoil(item).ChargeOnlyChargingCapFTempCurve = GetCurveIndex(state, cAlphaArgs(46));
                 if (TESCoil(item).ChargeOnlyChargingCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(46)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1191,15 +1220,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).ChargeOnlyChargingCapFTempCurve, // Curve index
-                                                                {2},                                           // Valid dimensions
-                                                                RoutineName,                                   // Routine name
-                                                                cCurrentModuleObject,                          // Object Type
-                                                                TESCoil(item).Name,                            // Object Name
-                                                                cAlphaFieldNames(46));                         // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).ChargeOnlyChargingCapFTempCurve,   // Curve index
+                         {2},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(46));                   // Field Name
                 }
 
-                TESCoil(item).ChargeOnlyChargingEIRFTempCurve = GetCurveIndex(cAlphaArgs(47));
+                TESCoil(item).ChargeOnlyChargingEIRFTempCurve = GetCurveIndex(state, cAlphaArgs(47));
                 if (TESCoil(item).ChargeOnlyChargingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(47)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1211,12 +1241,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).ChargeOnlyChargingEIRFTempCurve, // Curve index
-                                                                {2},                                           // Valid dimensions
-                                                                RoutineName,                                   // Routine name
-                                                                cCurrentModuleObject,                          // Object Type
-                                                                TESCoil(item).Name,                            // Object Name
-                                                                cAlphaFieldNames(47));                         // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).ChargeOnlyChargingEIRFTempCurve,   // Curve index
+                         {2},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(47));                   // Field Name
                 }
 
             } // Charge only mode available
@@ -1242,7 +1273,7 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).DischargeOnlyRatedSHR = rNumericArgs(29);                      // sensible heat ratio (sens cap/total cap)
                 TESCoil(item).DischargeOnlyRatedCOP = rNumericArgs(30);                      // coefficient of performance  for discharging [W/W]
 
-                TESCoil(item).DischargeOnlyCapFTempCurve = GetCurveIndex(cAlphaArgs(49));
+                TESCoil(item).DischargeOnlyCapFTempCurve = GetCurveIndex(state, cAlphaArgs(49));
                 if (TESCoil(item).DischargeOnlyCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(49)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1254,15 +1285,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).DischargeOnlyCapFTempCurve, // Curve index
-                                                                {2},                                      // Valid dimensions
-                                                                RoutineName,                              // Routine name
-                                                                cCurrentModuleObject,                     // Object Type
-                                                                TESCoil(item).Name,                       // Object Name
-                                                                cAlphaFieldNames(49));                    // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).DischargeOnlyCapFTempCurve,   // Curve index
+                         {2},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(49));                   // Field Name
                 }
 
-                TESCoil(item).DischargeOnlyCapFFlowCurve = GetCurveIndex(cAlphaArgs(50));
+                TESCoil(item).DischargeOnlyCapFFlowCurve = GetCurveIndex(state, cAlphaArgs(50));
                 if (TESCoil(item).DischargeOnlyCapFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(50)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1274,15 +1306,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).DischargeOnlyCapFFlowCurve, // Curve index
-                                                                {1},                                      // Valid dimensions
-                                                                RoutineName,                              // Routine name
-                                                                cCurrentModuleObject,                     // Object Type
-                                                                TESCoil(item).Name,                       // Object Name
-                                                                cAlphaFieldNames(50));                    // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).DischargeOnlyCapFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(50));                   // Field Name
                 }
 
-                TESCoil(item).DischargeOnlyEIRFTempCurve = GetCurveIndex(cAlphaArgs(51));
+                TESCoil(item).DischargeOnlyEIRFTempCurve = GetCurveIndex(state, cAlphaArgs(51));
                 if (TESCoil(item).DischargeOnlyEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(51)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1294,15 +1327,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).DischargeOnlyEIRFTempCurve, // Curve index
-                                                                {2},                                      // Valid dimensions
-                                                                RoutineName,                              // Routine name
-                                                                cCurrentModuleObject,                     // Object Type
-                                                                TESCoil(item).Name,                       // Object Name
-                                                                cAlphaFieldNames(51));                    // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).DischargeOnlyEIRFTempCurve,   // Curve index
+                         {2},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(51));                   // Field Name
                 }
 
-                TESCoil(item).DischargeOnlyEIRFFlowCurve = GetCurveIndex(cAlphaArgs(52));
+                TESCoil(item).DischargeOnlyEIRFFlowCurve = GetCurveIndex(state, cAlphaArgs(52));
                 if (TESCoil(item).DischargeOnlyEIRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(52)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1314,15 +1348,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).DischargeOnlyEIRFFlowCurve, // Curve index
-                                                                {1},                                      // Valid dimensions
-                                                                RoutineName,                              // Routine name
-                                                                cCurrentModuleObject,                     // Object Type
-                                                                TESCoil(item).Name,                       // Object Name
-                                                                cAlphaFieldNames(52));                    // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).DischargeOnlyEIRFFlowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(52));                   // Field Name
                 }
 
-                TESCoil(item).DischargeOnlyPLFFPLRCurve = GetCurveIndex(cAlphaArgs(53));
+                TESCoil(item).DischargeOnlyPLFFPLRCurve = GetCurveIndex(state, cAlphaArgs(53));
                 if (TESCoil(item).DischargeOnlyPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(53)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1334,15 +1369,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).DischargeOnlyPLFFPLRCurve, // Curve index
-                                                                {1},                                     // Valid dimensions
-                                                                RoutineName,                             // Routine name
-                                                                cCurrentModuleObject,                    // Object Type
-                                                                TESCoil(item).Name,                      // Object Name
-                                                                cAlphaFieldNames(53));                   // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).DischargeOnlyPLFFPLRCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(53));                   // Field Name
                 }
 
-                TESCoil(item).DischargeOnlySHRFTempCurve = GetCurveIndex(cAlphaArgs(54));
+                TESCoil(item).DischargeOnlySHRFTempCurve = GetCurveIndex(state, cAlphaArgs(54));
                 if (TESCoil(item).DischargeOnlySHRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(54)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1354,15 +1390,16 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).DischargeOnlySHRFTempCurve, // Curve index
-                                                                {2, 3},                                   // Valid dimensions
-                                                                RoutineName,                              // Routine name
-                                                                cCurrentModuleObject,                     // Object Type
-                                                                TESCoil(item).Name,                       // Object Name
-                                                                cAlphaFieldNames(54));                    // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).DischargeOnlySHRFTempCurve,   // Curve index
+                         {2, 3},                                  // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(54));                   // Field Name
                 }
 
-                TESCoil(item).DischargeOnlySHRFFLowCurve = GetCurveIndex(cAlphaArgs(55));
+                TESCoil(item).DischargeOnlySHRFFLowCurve = GetCurveIndex(state, cAlphaArgs(55));
                 if (TESCoil(item).DischargeOnlySHRFFLowCurve == 0) {
                     if (lAlphaFieldBlanks(55)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
@@ -1374,12 +1411,13 @@ namespace PackagedThermalStorageCoil {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(TESCoil(item).DischargeOnlySHRFFLowCurve, // Curve index
-                                                                {1},                                      // Valid dimensions
-                                                                RoutineName,                              // Routine name
-                                                                cCurrentModuleObject,                     // Object Type
-                                                                TESCoil(item).Name,                       // Object Name
-                                                                cAlphaFieldNames(55));                    // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
+                         TESCoil(item).DischargeOnlySHRFFLowCurve,   // Curve index
+                         {1},                                     // Valid dimensions
+                         RoutineName,                             // Routine name
+                         cCurrentModuleObject,                    // Object Type
+                         TESCoil(item).Name,                      // Object Name
+                         cAlphaFieldNames(55));                   // Field Name
                 }
 
             } // Discharge Only mode available
@@ -1782,7 +1820,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void InitTESCoil(BranchInputManagerData &dataBranchInputManager, int &TESCoilNum)
+    void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1848,8 +1886,7 @@ namespace PackagedThermalStorageCoil {
 
             if (TESCoil(TESCoilNum).TESPlantConnectionAvailable) {
                 errFlag = false;
-                ScanPlantLoopsForObject(
-                    dataBranchInputManager, TESCoil(TESCoilNum).Name, TypeOf_PackagedTESCoolingCoil, plloopnum, lsnum, brnum, cpnum, errFlag);
+                ScanPlantLoopsForObject(state, TESCoil(TESCoilNum).Name, TypeOf_PackagedTESCoolingCoil, plloopnum, lsnum, brnum, cpnum, errFlag);
 
                 // double check node names match
                 if (errFlag) {
@@ -1886,7 +1923,7 @@ namespace PackagedThermalStorageCoil {
 
         if (MySizeFlag(TESCoilNum)) {
 
-            SizeTESCoil(TESCoilNum);
+            SizeTESCoil(state, TESCoilNum);
 
             MySizeFlag(TESCoilNum) = false;
         }
@@ -2055,7 +2092,7 @@ namespace PackagedThermalStorageCoil {
         TESCoil(TESCoilNum).ElectEvapCondBasinHeaterEnergy = 0.0;
     }
 
-    void SizeTESCoil(int &TESCoilNum)
+    void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2175,7 +2212,7 @@ namespace PackagedThermalStorageCoil {
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                     MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, StdBaroPress, RoutineName);
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
-                    TotCapTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
+                    TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
                     CoolCapAtPeak = max(0.0, (rhoair * VolFlowRate * (MixEnth - SupEnth)));
                     if (TotCapTempModFac > 0.0) {
                         TESCoil(TESCoilNum).CoolingOnlyRatedTotCap = CoolCapAtPeak / TotCapTempModFac;
@@ -2215,7 +2252,7 @@ namespace PackagedThermalStorageCoil {
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                     MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, StdBaroPress, RoutineName);
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
-                    TotCapTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
+                    TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
                     CoolCapAtPeak = max(0.0, (rhoair * VolFlowRate * (MixEnth - SupEnth)));
                     if (TotCapTempModFac > 0.0) {
                         TESCoil(TESCoilNum).CoolingOnlyRatedTotCap = CoolCapAtPeak / TotCapTempModFac;
@@ -2427,7 +2464,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void CalcTESCoilCoolingOnlyMode(int const TESCoilNum, int const EP_UNUSED(FanOpMode), Real64 const PartLoadRatio)
+    void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, int const EP_UNUSED(FanOpMode), Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2557,9 +2594,9 @@ namespace PackagedThermalStorageCoil {
         if ((EvapAirMassFlow > SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
 
             AirMassFlowRatio = EvapAirMassFlow / TESCoil(TESCoilNum).RatedEvapAirMassFlowRate;
-            TotCapTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, EvapInletWetBulb, CondInletTemp);
+            TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, EvapInletWetBulb, CondInletTemp);
             TotCapTempModFac = max(0.0, TotCapTempModFac); // could warn if negative, DXcoil does
-            TotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyCapFFlowCurve, AirMassFlowRatio);
+            TotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFFlowCurve, AirMassFlowRatio);
             TotCapFlowModFac = max(0.0, TotCapFlowModFac); // could warn if negative, DXcoil does
             TotCap = TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TotCapTempModFac * TotCapFlowModFac;
             // now see if coil might be running dry
@@ -2573,9 +2610,9 @@ namespace PackagedThermalStorageCoil {
                 Counter = 0;
                 Converged = false;
                 while (!Converged) {
-                    TotCapTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, DryCoilTestEvapInletWetBulb, CondInletTemp);
+                    TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, DryCoilTestEvapInletWetBulb, CondInletTemp);
                     TotCapTempModFac = max(0.0, TotCapTempModFac); // could warn if negative, DXcoil does
-                    TotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyCapFFlowCurve, AirMassFlowRatio);
+                    TotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFFlowCurve, AirMassFlowRatio);
                     TotCapFlowModFac = max(0.0, TotCapFlowModFac); // could warn if negative, DXcoil does
                     TotCap = TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TotCapTempModFac * TotCapFlowModFac;
 
@@ -2609,8 +2646,8 @@ namespace PackagedThermalStorageCoil {
                 }
             }
 
-            SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
-            SHRFlowFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlySHRFFlowCurve, AirMassFlowRatio);
+            SHRTempFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
+            SHRFlowFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlySHRFFlowCurve, AirMassFlowRatio);
             SHR = TESCoil(TESCoilNum).CoolingOnlyRatedSHR * SHRTempFac * SHRFlowFac;
             SHR = min(SHR, 1.0); // warn maybe
             SHR = max(SHR, 0.0); // warn maybe
@@ -2621,7 +2658,7 @@ namespace PackagedThermalStorageCoil {
                     SHR = SHRadp;
                 }
             }
-            PLF = CurveValue(TESCoil(TESCoilNum).CoolingOnlyPLFFPLRCurve, PartLoadRatio);
+            PLF = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyPLFFPLRCurve, PartLoadRatio);
             if (PLF >= PartLoadRatio && PLF > 0.0) {
                 RuntimeFraction = PartLoadRatio / PLF;
             } else {
@@ -2649,9 +2686,9 @@ namespace PackagedThermalStorageCoil {
                 EvapOutletAirHumRat = PsyWFnTdbH(EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
             }
             // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
-            EIRTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyEIRFTempCurve, EvapInletWetBulb, CondInletTemp);
+            EIRTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyEIRFTempCurve, EvapInletWetBulb, CondInletTemp);
             EIRTempModFac = max(EIRTempModFac, 0.0);
-            EIRFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyEIRFFlowCurve, AirMassFlowRatio);
+            EIRFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyEIRFFlowCurve, AirMassFlowRatio);
             EIRFlowModFac = max(EIRFlowModFac, 0.0);
             EIR = EIRTempModFac * EIRFlowModFac / TESCoil(TESCoilNum).CoolingOnlyRatedCOP;
 
@@ -2733,7 +2770,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void CalcTESCoilCoolingAndChargeMode(int const TESCoilNum, int const EP_UNUSED(FanOpMode), Real64 const PartLoadRatio)
+    void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum, int const EP_UNUSED(FanOpMode), Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2903,9 +2940,9 @@ namespace PackagedThermalStorageCoil {
         if ((EvapAirMassFlow > SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
 
             AirMassFlowRatio = EvapAirMassFlow / TESCoil(TESCoilNum).RatedEvapAirMassFlowRate;
-            EvapTotCapTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+            EvapTotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
             EvapTotCapTempModFac = max(0.0, EvapTotCapTempModFac); // could warn if negative, DXcoil does
-            EvapTotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFFlowCurve, AirMassFlowRatio);
+            EvapTotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFFlowCurve, AirMassFlowRatio);
             EvapTotCapFlowModFac = max(0.0, EvapTotCapFlowModFac); // could warn if negative, DXcoil does
             EvapTotCap = TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap * EvapTotCapTempModFac * EvapTotCapFlowModFac;
             // now see if coil is running dry
@@ -2920,9 +2957,9 @@ namespace PackagedThermalStorageCoil {
                 Converged = false;
                 while (!Converged) {
                     EvapTotCapTempModFac =
-                        CurveValue(TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFTempCurve, DryCoilTestEvapInletWetBulb, CondInletTemp, sTES);
+                        CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFTempCurve, DryCoilTestEvapInletWetBulb, CondInletTemp, sTES);
                     EvapTotCapTempModFac = max(0.0, EvapTotCapTempModFac); // could warn if negative, DXcoil does
-                    EvapTotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFFlowCurve, AirMassFlowRatio);
+                    EvapTotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFFlowCurve, AirMassFlowRatio);
                     EvapTotCapFlowModFac = max(0.0, EvapTotCapFlowModFac); // could warn if negative, DXcoil does
                     EvapTotCap = TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap * EvapTotCapTempModFac * EvapTotCapFlowModFac;
                     // coil bypass factor = 0.0
@@ -2955,13 +2992,13 @@ namespace PackagedThermalStorageCoil {
                 }
             }
             {
-                if (CurveManager::PerfCurve(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve).NumDims == 2) {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
+                if (state.dataCurveManager->PerfCurve(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve).NumDims == 2) {
+                    SHRTempFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
                 } else {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
+                    SHRTempFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 }
             }
-            SHRFlowFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFFlowCurve, AirMassFlowRatio);
+            SHRFlowFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeSHRFFlowCurve, AirMassFlowRatio);
             SHR = TESCoil(TESCoilNum).CoolingAndChargeRatedSHR * SHRTempFac * SHRFlowFac;
             SHR = min(SHR, 1.0); // warn maybe
             SHR = max(SHR, 0.0); // warn maybe
@@ -2972,7 +3009,7 @@ namespace PackagedThermalStorageCoil {
                     SHR = SHRadp;
                 }
             }
-            PLF = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeCoolingPLFFPLRCurve, PartLoadRatio);
+            PLF = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeCoolingPLFFPLRCurve, PartLoadRatio);
             if (PLF >= PartLoadRatio && PLF > 0.0) {
                 EvapRuntimeFraction = PartLoadRatio / PLF;
             } else {
@@ -2980,19 +3017,19 @@ namespace PackagedThermalStorageCoil {
             }
 
             // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
-            EIRTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeCoolingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+            EIRTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeCoolingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
             EIRTempModFac = max(EIRTempModFac, 0.0);
-            EIRFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeCoolingEIRFFlowCurve, AirMassFlowRatio);
+            EIRFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeCoolingEIRFFlowCurve, AirMassFlowRatio);
             EIRFlowModFac = max(EIRFlowModFac, 0.0);
             EIR = EIRTempModFac * EIRFlowModFac / TESCoil(TESCoilNum).CoolingAndChargeCoolingRatedCOP;
 
             EvapElecCoolingPower = EvapTotCap * EIR * EvapRuntimeFraction;
 
             if (TESCanBeCharged) {
-                ChargeCapModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+                ChargeCapModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
                 ChargeCapModFac = max(0.0, ChargeCapModFac);
 
-                ChargeCapPLRModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingCapFEvapPLRCurve, PartLoadRatio);
+                ChargeCapPLRModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingCapFEvapPLRCurve, PartLoadRatio);
                 ChargeCapPLRModFac = max(0.0, ChargeCapPLRModFac);
 
                 TotChargeCap = TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCap * ChargeCapModFac * ChargeCapPLRModFac;
@@ -3002,9 +3039,9 @@ namespace PackagedThermalStorageCoil {
                 } else {
                     ChargeRuntimeFraction = 1.0;
                 }
-                ChargeEIRTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+                ChargeEIRTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
                 ChargeEIRTempModFac = max(0.0, ChargeEIRTempModFac);
-                ChargeEIRFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFFLowCurve, AirMassFlowRatio);
+                ChargeEIRFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFFLowCurve, AirMassFlowRatio);
                 ChargeEIRFlowModFac = max(0.0, ChargeEIRFlowModFac);
                 ChargeEIR = (ChargeEIRTempModFac * ChargeEIRFlowModFac) / TESCoil(TESCoilNum).CoolingAndChargeChargingRatedCOP;
                 ChargeElectricCoolingPower = TotChargeCap * ChargeEIR;
@@ -3080,10 +3117,10 @@ namespace PackagedThermalStorageCoil {
         } else {                   // Evap off, but may still charge
             if (TESCanBeCharged) { // coil is running to charge but not to cool at evaporator
                 AirMassFlowRatio = EvapAirMassFlow / TESCoil(TESCoilNum).RatedEvapAirMassFlowRate;
-                ChargeCapModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+                ChargeCapModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
                 ChargeCapModFac = max(0.0, ChargeCapModFac);
 
-                ChargeCapPLRModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingCapFEvapPLRCurve, PartLoadRatio);
+                ChargeCapPLRModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingCapFEvapPLRCurve, PartLoadRatio);
                 ChargeCapPLRModFac = max(0.0, ChargeCapPLRModFac);
 
                 TotChargeCap = TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCap * ChargeCapModFac * ChargeCapPLRModFac;
@@ -3093,9 +3130,9 @@ namespace PackagedThermalStorageCoil {
                 } else {
                     ChargeRuntimeFraction = 1.0;
                 }
-                ChargeEIRTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+                ChargeEIRTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
                 ChargeEIRTempModFac = max(0.0, ChargeEIRTempModFac);
-                ChargeEIRFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFFLowCurve, AirMassFlowRatio);
+                ChargeEIRFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFFLowCurve, AirMassFlowRatio);
                 ChargeEIRFlowModFac = max(0.0, ChargeEIRFlowModFac);
                 ChargeEIR = (ChargeEIRTempModFac * ChargeEIRFlowModFac) / TESCoil(TESCoilNum).CoolingAndChargeChargingRatedCOP;
                 ChargeElectricCoolingPower = TotChargeCap * ChargeEIR;
@@ -3164,7 +3201,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void CalcTESCoilCoolingAndDischargeMode(int const TESCoilNum, int const EP_UNUSED(FanOpMode), Real64 const PartLoadRatio)
+    void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoilNum, int const EP_UNUSED(FanOpMode), Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3335,9 +3372,9 @@ namespace PackagedThermalStorageCoil {
         if ((EvapAirMassFlow > SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
 
             AirMassFlowRatio = EvapAirMassFlow / TESCoil(TESCoilNum).RatedEvapAirMassFlowRate;
-            EvapTotCapTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+            EvapTotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
             EvapTotCapTempModFac = max(0.0, EvapTotCapTempModFac); // could warn if negative, DXcoil does
-            EvapTotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFFlowCurve, AirMassFlowRatio);
+            EvapTotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFFlowCurve, AirMassFlowRatio);
             EvapTotCapFlowModFac = max(0.0, EvapTotCapFlowModFac); // could warn if negative, DXcoil does
             EvapTotCap = TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap * EvapTotCapTempModFac * EvapTotCapFlowModFac;
             // now see if coil is running dry
@@ -3352,9 +3389,9 @@ namespace PackagedThermalStorageCoil {
                 Converged = false;
                 while (!Converged) {
                     EvapTotCapTempModFac =
-                        CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFTempCurve, DryCoilTestEvapInletWetBulb, CondInletTemp, sTES);
+                        CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFTempCurve, DryCoilTestEvapInletWetBulb, CondInletTemp, sTES);
                     EvapTotCapTempModFac = max(0.0, EvapTotCapTempModFac); // could warn if negative, DXcoil does
-                    EvapTotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFFlowCurve, AirMassFlowRatio);
+                    EvapTotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFFlowCurve, AirMassFlowRatio);
                     EvapTotCapFlowModFac = max(0.0, EvapTotCapFlowModFac); // could warn if negative, DXcoil does
                     EvapTotCap = TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap * EvapTotCapTempModFac * EvapTotCapFlowModFac;
                     // coil bypass factor = 0.0
@@ -3387,13 +3424,13 @@ namespace PackagedThermalStorageCoil {
                 }
             }
             {
-                if (CurveManager::PerfCurve(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve).NumDims == 2) {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
+                if (state.dataCurveManager->PerfCurve(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve).NumDims == 2) {
+                    SHRTempFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
                 } else {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
+                    SHRTempFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 }
             }
-            SHRFlowFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFFlowCurve, AirMassFlowRatio);
+            SHRFlowFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeSHRFFlowCurve, AirMassFlowRatio);
             SHR = TESCoil(TESCoilNum).CoolingAndDischargeRatedSHR * SHRTempFac * SHRFlowFac;
             SHR = min(SHR, 1.0); // warn maybe
             SHR = max(SHR, 0.0); // warn maybe
@@ -3404,16 +3441,16 @@ namespace PackagedThermalStorageCoil {
                     SHR = SHRadp;
                 }
             }
-            PLF = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeCoolingPLFFPLRCurve, PartLoadRatio);
+            PLF = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeCoolingPLFFPLRCurve, PartLoadRatio);
             if (PLF >= PartLoadRatio && PLF > 0.0) {
                 EvapRuntimeFraction = PartLoadRatio / PLF;
             } else {
                 EvapRuntimeFraction = 1.0; // warn maybe
             }
             // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
-            EIRTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeCoolingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+            EIRTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeCoolingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
             EIRTempModFac = max(EIRTempModFac, 0.0);
-            EIRFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeCoolingEIRFFlowCurve, AirMassFlowRatio);
+            EIRFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeCoolingEIRFFlowCurve, AirMassFlowRatio);
             EIRFlowModFac = max(EIRFlowModFac, 0.0);
             EIR = EIRTempModFac * EIRFlowModFac / TESCoil(TESCoilNum).CoolingAndDischargeCoolingRatedCOP;
 
@@ -3421,12 +3458,12 @@ namespace PackagedThermalStorageCoil {
 
             if (TESHasSomeCharge) {
                 DischargeCapTempModFac =
-                    CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeDischargingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+                    CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeDischargingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
                 DischargeCapTempModFac = max(0.0, DischargeCapTempModFac);
-                DischargeCapFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeDischargingCapFFlowCurve, AirMassFlowRatio);
+                DischargeCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeDischargingCapFFlowCurve, AirMassFlowRatio);
                 DischargeCapFlowModFac = max(0.0, DischargeCapFlowModFac);
 
-                DischargePLF = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeDischargingCapFEvapPLRCurve, PartLoadRatio);
+                DischargePLF = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeDischargingCapFEvapPLRCurve, PartLoadRatio);
                 if (DischargePLF >= PartLoadRatio && DischargePLF > 0.0) {
                     DischargeRuntimeFraction = PartLoadRatio / DischargePLF;
                 } else {
@@ -3439,9 +3476,9 @@ namespace PackagedThermalStorageCoil {
                     TotDischargeCap = min(TotDischargeCap, QdotDischargeLimit);
                 }
                 DischargeEIRTempModFac =
-                    CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeDischargingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+                    CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeDischargingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
                 DischargeEIRTempModFac = max(0.0, DischargeEIRTempModFac);
-                DischargeEIRFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeDischargingEIRFFLowCurve, AirMassFlowRatio);
+                DischargeEIRFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeDischargingEIRFFLowCurve, AirMassFlowRatio);
                 DischargeEIRFlowModFac = max(0.0, DischargeEIRFlowModFac);
 
                 DischargeEIR = (DischargeEIRTempModFac * DischargeEIRFlowModFac) / TESCoil(TESCoilNum).CoolingAndDischargeDischargingRatedCOP;
@@ -3552,7 +3589,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void CalcTESCoilChargeOnlyMode(int const TESCoilNum)
+    void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3679,7 +3716,7 @@ namespace PackagedThermalStorageCoil {
         }
 
         if (TESCanBeCharged) { // coil is running
-            CapModFac = CurveValue(TESCoil(TESCoilNum).ChargeOnlyChargingCapFTempCurve, CondInletTemp, sTES);
+            CapModFac = CurveValue(state, TESCoil(TESCoilNum).ChargeOnlyChargingCapFTempCurve, CondInletTemp, sTES);
             CapModFac = max(0.0, CapModFac);
             TotCap = TESCoil(TESCoilNum).ChargeOnlyRatedCapacity * CapModFac;
             if (TotCap > QdotChargeLimit) {
@@ -3688,7 +3725,7 @@ namespace PackagedThermalStorageCoil {
             } else {
                 TESCoil(TESCoilNum).RuntimeFraction = 1.0;
             }
-            EIRModFac = CurveValue(TESCoil(TESCoilNum).ChargeOnlyChargingEIRFTempCurve, CondInletTemp, sTES);
+            EIRModFac = CurveValue(state, TESCoil(TESCoilNum).ChargeOnlyChargingEIRFTempCurve, CondInletTemp, sTES);
             EIRModFac = max(0.0, EIRModFac);
             EIR = EIRModFac / TESCoil(TESCoilNum).ChargeOnlyRatedCOP;
             ElecCoolingPower = TotCap * EIR;
@@ -3737,7 +3774,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void CalcTESCoilDischargeOnlyMode(int const TESCoilNum, Real64 const PartLoadRatio)
+    void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3862,22 +3899,22 @@ namespace PackagedThermalStorageCoil {
         if ((EvapAirMassFlow > SmallMassFlow) && (PLR > 0.0) && TESHasSomeCharge) { // coil is running
             AirMassFlowRatio = EvapAirMassFlow / TESCoil(TESCoilNum).RatedEvapAirMassFlowRate;
 
-            TotCapTempModFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlyCapFTempCurve, EvapInletWetBulb, sTES);
+            TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlyCapFTempCurve, EvapInletWetBulb, sTES);
             TotCapTempModFac = max(0.0, TotCapTempModFac);
-            TotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlyCapFFlowCurve, AirMassFlowRatio);
+            TotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlyCapFFlowCurve, AirMassFlowRatio);
             TotCapFlowModFac = max(0.0, TotCapFlowModFac);
             TotCap = TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap * TotCapTempModFac * TotCapFlowModFac;
 
-            PLF = CurveValue(TESCoil(TESCoilNum).DischargeOnlyPLFFPLRCurve, PLR);
+            PLF = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlyPLFFPLRCurve, PLR);
             if (PLF >= PLR && PLF > 0.0) {
                 RuntimeFraction = PLR / PLF;
             } else {
                 RuntimeFraction = 1.0; // warn maybe
             }
             // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
-            EIRTempModFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlyEIRFTempCurve, EvapInletWetBulb, sTES);
+            EIRTempModFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlyEIRFTempCurve, EvapInletWetBulb, sTES);
             EIRTempModFac = max(EIRTempModFac, 0.0);
-            EIRFlowModFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlyEIRFFlowCurve, AirMassFlowRatio);
+            EIRFlowModFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlyEIRFFlowCurve, AirMassFlowRatio);
             EIRFlowModFac = max(EIRFlowModFac, 0.0);
             EIR = EIRTempModFac * EIRFlowModFac / TESCoil(TESCoilNum).DischargeOnlyRatedCOP;
 
@@ -3901,9 +3938,9 @@ namespace PackagedThermalStorageCoil {
                 Counter = 0;
                 Converged = false;
                 while (!Converged) {
-                    TotCapTempModFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlyCapFTempCurve, DryCoilTestEvapInletWetBulb, sTES);
+                    TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlyCapFTempCurve, DryCoilTestEvapInletWetBulb, sTES);
                     TotCapTempModFac = max(0.0, TotCapTempModFac);
-                    TotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlyCapFFlowCurve, AirMassFlowRatio);
+                    TotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlyCapFFlowCurve, AirMassFlowRatio);
                     TotCapFlowModFac = max(0.0, TotCapFlowModFac);
                     TotCap = TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap * TotCapTempModFac * TotCapFlowModFac;
                     // coil bypass factor = 0.0
@@ -3936,14 +3973,14 @@ namespace PackagedThermalStorageCoil {
                 }
             } // coil will be wet so use SHR curves
             {
-                if (CurveManager::PerfCurve(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve).NumDims == 2) {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
+                if (state.dataCurveManager->PerfCurve(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve).NumDims == 2) {
+                    SHRTempFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
                 } else {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
+                    SHRTempFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 }
             }
 
-            SHRFlowFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlySHRFFLowCurve, AirMassFlowRatio);
+            SHRFlowFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlySHRFFLowCurve, AirMassFlowRatio);
             SHR = TESCoil(TESCoilNum).DischargeOnlyRatedSHR * SHRTempFac * SHRFlowFac;
             SHR = min(SHR, 1.0); // warn maybe
             SHR = max(SHR, 0.0); // warn maybe
@@ -4154,7 +4191,7 @@ namespace PackagedThermalStorageCoil {
                     Par(3) = TESOpMode;
                     Par(4) = OutletNode;
                     Par(5) = double(FanOpMode);
-                    SolveRoot(Acc, MaxIte, SolFlag, PartLoadFrac, TESCoilResidualFunction, 0.0, 1.0, Par);
+                    TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFlag, PartLoadFrac, TESCoilResidualFunction, 0.0, 1.0, Par);
                     if (SolFlag == -1) {
                         if (!WarmupFlag) {
                             if (SensPLRIter < 1) {
@@ -4221,7 +4258,7 @@ namespace PackagedThermalStorageCoil {
                         Par(3) = TESOpMode;
                         Par(4) = OutletNode;
                         Par(5) = double(FanOpMode);
-                        SolveRoot(HumRatAcc, MaxIte, SolFlag, PartLoadFrac, TESCoilHumRatResidualFunction, 0.0, 1.0, Par);
+                        TempSolveRoot::SolveRoot(state, HumRatAcc, MaxIte, SolFlag, PartLoadFrac, TESCoilHumRatResidualFunction, 0.0, 1.0, Par);
                         if (SolFlag == -1) {
                             if (!WarmupFlag) {
                                 if (LatPLRIter < 1) {
@@ -4278,7 +4315,8 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    Real64 TESCoilResidualFunction(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 TESCoilResidualFunction(EnergyPlusData &state,
+                                   Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                    Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
@@ -4341,13 +4379,13 @@ namespace PackagedThermalStorageCoil {
         {
             auto const SELECT_CASE_var(TESOpMode);
             if (SELECT_CASE_var == CoolingOnlyMode) {
-                CalcTESCoilCoolingOnlyMode(CoilIndex, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingOnlyMode(state, CoilIndex, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == CoolingAndChargeMode) {
-                CalcTESCoilCoolingAndChargeMode(CoilIndex, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingAndChargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == CoolingAndDischargeMode) {
-                CalcTESCoilCoolingAndDischargeMode(CoilIndex, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingAndDischargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == DischargeOnlyMode) {
-                CalcTESCoilDischargeOnlyMode(CoilIndex, PartLoadRatio);
+                CalcTESCoilDischargeOnlyMode(state, CoilIndex, PartLoadRatio);
             }
         }
 
@@ -4357,7 +4395,8 @@ namespace PackagedThermalStorageCoil {
         return Residuum;
     }
 
-    Real64 TESCoilHumRatResidualFunction(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 TESCoilHumRatResidualFunction(EnergyPlusData &state,
+                                         Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                          Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
@@ -4420,13 +4459,13 @@ namespace PackagedThermalStorageCoil {
         {
             auto const SELECT_CASE_var(TESOpMode);
             if (SELECT_CASE_var == CoolingOnlyMode) {
-                CalcTESCoilCoolingOnlyMode(CoilIndex, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingOnlyMode(state, CoilIndex, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == CoolingAndChargeMode) {
-                CalcTESCoilCoolingAndChargeMode(CoilIndex, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingAndChargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == CoolingAndDischargeMode) {
-                CalcTESCoilCoolingAndDischargeMode(CoilIndex, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingAndDischargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == DischargeOnlyMode) {
-                CalcTESCoilDischargeOnlyMode(CoilIndex, PartLoadRatio);
+                CalcTESCoilDischargeOnlyMode(state, CoilIndex, PartLoadRatio);
             }
         }
 

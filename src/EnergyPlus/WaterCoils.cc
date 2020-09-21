@@ -1160,7 +1160,7 @@ namespace WaterCoils {
 
         if (PlantLoopScanFlag(CoilNum) && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(state.dataBranchInputManager,
+            ScanPlantLoopsForObject(state,
                                     WaterCoil(CoilNum).Name,
                                     WaterCoil(CoilNum).WaterCoilType_Num,
                                     WaterCoil(CoilNum).WaterLoopNum,
@@ -6190,6 +6190,7 @@ namespace WaterCoils {
                     auto const SELECT_CASE_var(ControlledVar);
                     if (SELECT_CASE_var == iTemperature) {
                         CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iTemperatureSetPoint, EMSSetPointErrorFlag);
+                        DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_Temp)) {
                                 ShowWarningError(RoutineName + WaterCoilType + "=\"" + WaterCoil(WhichCoil).Name + "\". ");
@@ -6201,6 +6202,7 @@ namespace WaterCoils {
                         }
                     } else if (SELECT_CASE_var == iHumidityRatio) {
                         CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
+                        DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_MaxHumRat)) {
                                 ShowWarningError(RoutineName + WaterCoilType + "=\"" + WaterCoil(WhichCoil).Name + "\". ");
@@ -6212,6 +6214,7 @@ namespace WaterCoils {
                         }
                     } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) {
                         CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iTemperatureSetPoint, EMSSetPointErrorFlag);
+                        DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_Temp)) {
                                 ShowWarningError(RoutineName + WaterCoilType + "=\"" + WaterCoil(WhichCoil).Name + "\". ");
@@ -6223,6 +6226,7 @@ namespace WaterCoils {
                         }
                         EMSSetPointErrorFlag = false;
                         CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
+                        DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
                             if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_MaxHumRat)) {
                                 ShowWarningError(RoutineName + WaterCoilType + "=\"" + WaterCoil(WhichCoil).Name + "\". ");

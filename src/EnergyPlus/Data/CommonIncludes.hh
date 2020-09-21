@@ -45,77 +45,19 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus Headers
+#ifndef ENERGYPLUS_DATA_COMMONINCLUDES
+#define ENERGYPLUS_DATA_COMMONINCLUDES
+
+// OK, now that we have split the EnergyPlusData class into a header and source file, and we are moving member
+// variables to pointer type, we no longer need to #include those headers in the Data header file.  But there are now
+// other places where we do need those includes, and multiple spots actually.  So I am putting all the required includes
+// here in this one file.  Basically, when a header inclusion is removed from EnergyPlusData.hh, put it here.
+
+// these are needed so that we don't have incomplete types when we manage the EnergyPlusData instance
+#include <EnergyPlus/AirLoopHVACDOAS.hh>
+#include <EnergyPlus/BaseboardElectric.hh>
+#include <EnergyPlus/BaseboardRadiator.hh>
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 
-namespace EnergyPlus {
-
-namespace DataAirLoop {
-
-    // MODULE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   November 2003
-    //       MODIFIED       L. Gu, Jan. 24, 2007. Add more variables to get information on OnOff fan operation
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS MODULE:
-    // This data-only module contains type definitions and variables
-    // associated with HVAC air loops (AirLoopHVAC objects).
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    int NumOASystems(0);                   // Number of Outdoor Air Systems
-    Real64 LoopDXCoilRTF(0.0); // OnOff fan run time fraction in an HVAC Air Loop
-    bool AirLoopInputsFilled(false);       // Set to TRUE after first pass through air loop
-
-    // Object Data
-    Array1D<AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
-    Array1D<AirLoopOutsideAirConnectData> AirToOANodeInfo;
-    Array1D<DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
-    Array1D<AirLooptoZoneData> AirLoopZoneInfo;
-    Array1D<AirLoopControlData> AirLoopControlInfo;
-    Array1D<AirLoopFlowData> AirLoopFlow;
-    Array1D<OutsideAirSysProps> OutsideAirSys;
-    Array1D<AirLoopAFNData> AirLoopAFNInfo;
-
-    // Clears the global data in DataAirLoop.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        NumOASystems = 0;
-        LoopDXCoilRTF = 0.0;
-        AirLoopInputsFilled = false;
-        AirLoopAFNInfo.deallocate();
-        AirToZoneNodeInfo.deallocate();
-        AirToOANodeInfo.deallocate();
-        PriAirSysAvailMgr.deallocate();
-        AirLoopZoneInfo.deallocate();
-        AirLoopControlInfo.deallocate();
-        AirLoopFlow.deallocate();
-        OutsideAirSys.deallocate();
-    }
-
-} // namespace DataAirLoop
-
-} // namespace EnergyPlus
+#endif

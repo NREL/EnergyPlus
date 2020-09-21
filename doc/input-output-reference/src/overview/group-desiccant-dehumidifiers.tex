@@ -267,9 +267,9 @@ Dehumidifier:Desiccant:NoFans,
 \item
   HVAC,Average,Dehumidifier Part Load Ratio {[]}
 \item
-  HVAC,Average,Dehumidifier Electric Power {[}W{]}
+  HVAC,Average,Dehumidifier Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Dehumidifier Electric Energy {[}J{]}
+  HVAC,Sum,Dehumidifier Electricity Energy {[}J{]}
 \item
   HVAC,Average,Dehumidifier Regeneration Specific Energy {[}J/kgWater{]}
 \item
@@ -296,11 +296,11 @@ Rate of water removal from process air stream.
 
 Dehumidifier water removal rate divided by full-load water removal rate.
 
-\paragraph{Dehumidifier Electric Power {[}W{]}}\label{dehumidifier-electric-power-w}
+\paragraph{Dehumidifier Electricity Rate {[}W{]}}\label{dehumidifier-electric-power-w}
 
 Dehumidifier rotor electric power.
 
-\paragraph{Dehumidifier Electric Energy {[}J{]}}\label{dehumidifier-electric-energy-j}
+\paragraph{Dehumidifier Electricity Energy {[}J{]}}\label{dehumidifier-electric-energy-j}
 
 Dehumidifier rotor electric energy.
 
@@ -503,9 +503,9 @@ Dehumidifier:Desiccant:System,
 \item
   HVAC,Average,Dehumidifier Part Load Ratio {[]}
 \item
-  HVAC,Average,Dehumidifier Exhaust Fan Electric Power {[}W{]}
+  HVAC,Average,Dehumidifier Exhaust Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Dehumidifier Exhaust Fan Electric Energy {[}J{]}
+  HVAC,Sum,Dehumidifier Exhaust Fan Electricity Energy {[}J{]}
 \end{itemize}
 
 \paragraph{Dehumidifier Removed Water Mass {[}kg{]}}\label{dehumidifier-removed-water-mass-kg-1}
@@ -520,10 +520,10 @@ This output is the average rate of water removal from the process air stream in 
 
 This output is the fraction of time that the desiccant heat exchanger (and associated regeneration air heater and fans, if appropriate) operate for the timestep being reported.
 
-\paragraph{Dehumidifier Exhaust Fan Electric Power {[}W{]}}\label{dehumidifier-exhaust-fan-electric-power-w}
+\paragraph{Dehumidifier Exhaust Fan Electricity Rate {[}W{]}}\label{dehumidifier-exhaust-fan-electric-power-w}
 
 This output is the average electric consumption rate for the exhaust fan in Watts for the timestep being reported.
 
-\paragraph{Dehumidifier Exhaust Fan Electric Energy {[}J{]}}\label{dehumidifier-exhaust-fan-electric-energy-j}
+\paragraph{Dehumidifier Exhaust Fan Electricity Energy {[}J{]}}\label{dehumidifier-exhaust-fan-electric-energy-j}
 
 This output is the electric consumption for the exhaust fan in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, EndUseKey = Cooling, GroupKey = System (ref. Output:Meter objects).

@@ -62,7 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace PlantComponentTemperatureSources {
 
@@ -113,7 +112,7 @@ namespace PlantComponentTemperatureSources {
         // Destructor
         ~WaterSourceSpecs() = default;
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, Real64 &MyLoad);
+        void initialize(EnergyPlusData &state, Real64 &MyLoad);
 
         void setupOutputVars();
 

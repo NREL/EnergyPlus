@@ -132,7 +132,7 @@ namespace FluidCoolers {
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool const RunFlag)
     {
-        this->initialize(state.dataBranchInputManager);
+        this->initialize(state);
         if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
             this->calcSingleSpeed();
         } else {
@@ -144,7 +144,7 @@ namespace FluidCoolers {
 
     void FluidCoolerspecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initialize(state.dataBranchInputManager);
+        this->initialize(state);
         this->size();
     }
 
@@ -674,7 +674,7 @@ namespace FluidCoolers {
         return ErrorsFound;
     }
 
-    void FluidCoolerspecs::initialize(BranchInputManagerData &dataBranchInputManager)
+    void FluidCoolerspecs::initialize(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -704,7 +704,7 @@ namespace FluidCoolers {
             this->setupOutputVars();
 
             // Locate the tower on the plant loops for later usage
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     this->FluidCoolerType_Num,
                                                     this->LoopNum,

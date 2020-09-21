@@ -157,7 +157,7 @@ namespace HVACCooledBeam {
         ZoneEquipmentListChecked = false;
     }
 
-    void SimCoolBeam(BranchInputManagerData &dataBranchInputManager,
+    void SimCoolBeam(EnergyPlusData &state,
                      std::string const &CompName,   // name of the cooled beam unit
                      bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                      int const ZoneNum,             // index of zone served by the unit
@@ -216,7 +216,7 @@ namespace HVACCooledBeam {
 
         DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(CoolBeam(CBNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
-        InitCoolBeam(dataBranchInputManager, CBNum, FirstHVACIteration);
+        InitCoolBeam(state, CBNum, FirstHVACIteration);
 
         ControlCoolBeam(CBNum, ZoneNum, ZoneNodeNum, FirstHVACIteration, NonAirSysOutput);
 
@@ -224,7 +224,7 @@ namespace HVACCooledBeam {
         UpdateCoolBeam(CBNum);
 
         // Fill the report variables. There are no report variables
-        ReportCoolBeam(CBNum);
+        ReportCoolBeam(state, CBNum);
     }
 
     void GetCoolBeams()
@@ -510,7 +510,7 @@ namespace HVACCooledBeam {
         }
     }
 
-    void InitCoolBeam(BranchInputManagerData &dataBranchInputManager,
+    void InitCoolBeam(EnergyPlusData &state,
                       int const CBNum,              // number of the current cooled beam unit being simulated
                       bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     )
@@ -557,7 +557,7 @@ namespace HVACCooledBeam {
 
         if (CoolBeam(CBNum).PlantLoopScanFlag && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(dataBranchInputManager,
+            ScanPlantLoopsForObject(state,
                                     CoolBeam(CBNum).Name,
                                     TypeOf_CooledBeamAirTerminal,
                                     CoolBeam(CBNum).CWLoopNum,
@@ -1336,7 +1336,7 @@ namespace HVACCooledBeam {
         }
     }
 
-    void ReportCoolBeam(int const CBNum)
+    void ReportCoolBeam(EnergyPlusData &state, int const CBNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1379,15 +1379,14 @@ namespace HVACCooledBeam {
         CoolBeam(CBNum).SupAirHeatingEnergy = CoolBeam(CBNum).SupAirHeatingRate * ReportingConstant;
 
         // set zone OA volume flow rate report variable
-        CoolBeam(CBNum).CalcOutdoorAirVolumeFlowRate();
+        CoolBeam(CBNum).CalcOutdoorAirVolumeFlowRate(state);
     }
 
-    void CoolBeamData::CalcOutdoorAirVolumeFlowRate()
+    void CoolBeamData::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate =
-                (DataLoopNode::Node(this->AirOutNode).MassFlowRate / DataEnvironment::StdRhoAir) * DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->AirOutNode).MassFlowRate / DataEnvironment::StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

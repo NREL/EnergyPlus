@@ -883,7 +883,7 @@ namespace WaterToAirHeatPumpSimple {
 
         if (MyPlantScanFlag(HPNum) && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(state.dataBranchInputManager,
+            ScanPlantLoopsForObject(state,
                                     SimpleWatertoAirHP(HPNum).Name,
                                     SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum,
                                     SimpleWatertoAirHP(HPNum).LoopNum,
@@ -1426,7 +1426,7 @@ namespace WaterToAirHeatPumpSimple {
                         } else {
                             RatedCapCoolTotalDes = CoolCapAtPeak;
                         }
-                        coilSelectionReportObj->setCoilEntAirTemp(SimpleWatertoAirHP(HPNum).Name, CompType, MixTemp, CurSysNum, CurZoneEqNum);
+                        coilSelectionReportObj->setCoilEntAirTemp(state, SimpleWatertoAirHP(HPNum).Name, CompType, MixTemp, CurSysNum, CurZoneEqNum);
                         coilSelectionReportObj->setCoilEntAirHumRat(SimpleWatertoAirHP(HPNum).Name, CompType, MixHumRat);
                         coilSelectionReportObj->setCoilLvgAirTemp(SimpleWatertoAirHP(HPNum).Name, CompType, SupTemp);
                         coilSelectionReportObj->setCoilLvgAirHumRat(SimpleWatertoAirHP(HPNum).Name, CompType, SupHumRat);
@@ -1515,7 +1515,7 @@ namespace WaterToAirHeatPumpSimple {
                         } else {
                             RatedCapCoolTotalDes = CoolCapAtPeak;
                         }
-                        coilSelectionReportObj->setCoilEntAirTemp(SimpleWatertoAirHP(HPNum).Name, CompType, MixTemp, CurSysNum, CurZoneEqNum);
+                        coilSelectionReportObj->setCoilEntAirTemp(state, SimpleWatertoAirHP(HPNum).Name, CompType, MixTemp, CurSysNum, CurZoneEqNum);
                         coilSelectionReportObj->setCoilEntAirHumRat(SimpleWatertoAirHP(HPNum).Name, CompType, MixHumRat);
                         coilSelectionReportObj->setCoilLvgAirTemp(SimpleWatertoAirHP(HPNum).Name, CompType, SupTemp);
                         coilSelectionReportObj->setCoilLvgAirHumRat(SimpleWatertoAirHP(HPNum).Name, CompType, SupHumRat);
@@ -1770,7 +1770,8 @@ namespace WaterToAirHeatPumpSimple {
                     }
                 }
             }
-            coilSelectionReportObj->setCoilCoolingCapacity(SimpleWatertoAirHP(HPNum).Name,
+            coilSelectionReportObj->setCoilCoolingCapacity(state,
+                                                           SimpleWatertoAirHP(HPNum).Name,
                                                            CompType,
                                                            SimpleWatertoAirHP(HPNum).RatedCapCoolTotal,
                                                            RatedCapCoolTotalAutoSized,
@@ -1971,7 +1972,8 @@ namespace WaterToAirHeatPumpSimple {
                 }
             }
 
-            coilSelectionReportObj->setCoilHeatingCapacity(SimpleWatertoAirHP(HPNum).Name,
+            coilSelectionReportObj->setCoilHeatingCapacity(state,
+                                                           SimpleWatertoAirHP(HPNum).Name,
                                                            CompType,
                                                            SimpleWatertoAirHP(HPNum).RatedCapHeat,
                                                            IsAutoSize,

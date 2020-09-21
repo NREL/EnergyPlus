@@ -538,7 +538,7 @@ namespace SteamCoils {
 
         if (MyPlantScanFlag(CoilNum) && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(state.dataBranchInputManager,
+            ScanPlantLoopsForObject(state,
                                     SteamCoil(CoilNum).Name,
                                     SteamCoil(CoilNum).Coil_PlantTypeNum,
                                     SteamCoil(CoilNum).LoopNum,
@@ -974,7 +974,8 @@ namespace SteamCoils {
         // save the design Steam volumetric flow rate for use by the Steam loop sizing algorithms
         RegisterPlantCompDesignFlow(SteamCoil(CoilNum).SteamInletNodeNum, SteamCoil(CoilNum).MaxSteamVolFlowRate);
 
-        coilSelectionReportObj->setCoilHeatingCapacity(SteamCoil(CoilNum).Name,
+        coilSelectionReportObj->setCoilHeatingCapacity(state,
+                                                       SteamCoil(CoilNum).Name,
                                                        "Coil:Heating:Steam",
                                                        DesCoilLoad,
                                                        coilWasAutosized,

@@ -136,13 +136,13 @@ namespace OutsideEnergySources {
     void OutsideEnergySourceSpecs::simulate(
         EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &CurLoad, bool RunFlag)
     {
-        this->initialize(state.dataBranchInputManager, CurLoad);
+        this->initialize(state, CurLoad);
         this->calculate(RunFlag, CurLoad);
     }
 
     void OutsideEnergySourceSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &)
     {
-        this->initialize(state.dataBranchInputManager, 0.0);
+        this->initialize(state, 0.0);
         this->size();
     }
 
@@ -277,7 +277,7 @@ namespace OutsideEnergySources {
         }
     }
 
-    void OutsideEnergySourceSpecs::initialize(BranchInputManagerData &dataBranchInputManager, Real64 MyLoad)
+    void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -300,7 +300,7 @@ namespace OutsideEnergySources {
         if (this->OneTimeInitFlag) {
             // Locate the unit on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     this->EnergyType,
                                                     this->LoopNum,

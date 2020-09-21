@@ -238,7 +238,7 @@ namespace PoweredInductionUnits {
 
         DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
-        InitPIU(state.dataBranchInputManager, PIUNum, FirstHVACIteration);
+        InitPIU(state, PIUNum, FirstHVACIteration);
 
         TermUnitPIU = true;
 
@@ -267,7 +267,7 @@ namespace PoweredInductionUnits {
         // no update needed: reheat coil updates outlet node; inlet nodes' mass flow rate set by Calc routine
 
         // Fill the report variables
-        ReportPIU(PIUNum);
+        ReportPIU(state, PIUNum);
     }
 
     void GetPIUs(EnergyPlusData &state)
@@ -735,7 +735,9 @@ namespace PoweredInductionUnits {
         }
 
         for (PIUNum = 1; PIUNum <= NumPIUs; ++PIUNum) {
-            // Setup Report variables for the Fan Coils
+            // Setup Report variables for the PIUs
+            SetupOutputVariable(
+                "Zone Air Terminal Primary Damper Position", OutputProcessor::Unit::None, PIU(PIUNum).PriDamperPosition, "System", "Average", PIU(PIUNum).Name);
             SetupOutputVariable(
                 "Zone Air Terminal Heating Rate", OutputProcessor::Unit::W, PIU(PIUNum).HeatingRate, "System", "Average", PIU(PIUNum).Name);
             SetupOutputVariable(
@@ -753,7 +755,7 @@ namespace PoweredInductionUnits {
         }
     }
 
-    void InitPIU(BranchInputManagerData &dataBranchInputManager,
+    void InitPIU(EnergyPlusData &state,
                  int const PIUNum,             // number of the current fan coil unit being simulated
                  bool const FirstHVACIteration // TRUE if first zone equip this HVAC step
     )
@@ -816,7 +818,7 @@ namespace PoweredInductionUnits {
         if (MyPlantScanFlag(PIUNum) && allocated(PlantLoop)) {
             if ((PIU(PIUNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) || (PIU(PIUNum).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         PIU(PIUNum).HCoil,
                                         PIU(PIUNum).HCoil_PlantTypeNum,
                                         PIU(PIUNum).HWLoopNum,
@@ -1676,6 +1678,11 @@ namespace PoweredInductionUnits {
         // Set inlet node flowrates
         Node(PriNode).MassFlowRate = PriAirMassFlow;
         Node(SecNode).MassFlowRate = SecAirMassFlow;
+        if (PriAirMassFlowMax == 0) {
+            PIU(PIUNum).PriDamperPosition = 0;
+        } else {
+            PIU(PIUNum).PriDamperPosition = PriAirMassFlow / PriAirMassFlowMax;
+        }
         // now that inlet airflows have been set, the terminal bos components can be simulated.
 
         // fire the mixer
@@ -1964,6 +1971,11 @@ namespace PoweredInductionUnits {
         Node(PriNode).MassFlowRate = PriAirMassFlow;
         Node(SecNode).MassFlowRate = SecAirMassFlow;
         Node(SecNode).MassFlowRateMaxAvail = SecAirMassFlow;
+        if (PriAirMassFlowMax == 0) {
+            PIU(PIUNum).PriDamperPosition = 0;
+        } else {
+            PIU(PIUNum).PriDamperPosition = PriAirMassFlow / PriAirMassFlowMax;
+        }
         // now that inlet airflows have been set, the terminal box components can be simulated.
         // fire the fan
 
@@ -2066,7 +2078,7 @@ namespace PoweredInductionUnits {
         Node(OutletNode).MassFlowRateMax = PIU(PIUNum).MaxPriAirMassFlow;
     }
 
-    void ReportPIU(int const PIUNum) // number of the current fan coil unit being simulated
+    void ReportPIU(EnergyPlusData &state, int const PIUNum) // number of the current fan coil unit being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -2107,7 +2119,7 @@ namespace PoweredInductionUnits {
         PIU(PIUNum).SensCoolEnergy = PIU(PIUNum).SensCoolRate * TimeStepSys * SecInHour;
 
         // set zone OA Volume flow rate
-        PIU(PIUNum).CalcOutdoorAirVolumeFlowRate();
+        PIU(PIUNum).CalcOutdoorAirVolumeFlowRate(state);
     }
 
     // ===================== Utilities =====================================
@@ -2174,12 +2186,11 @@ namespace PoweredInductionUnits {
         }
     }
 
-    void PowIndUnitData::CalcOutdoorAirVolumeFlowRate()
+    void PowIndUnitData::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / DataEnvironment::StdRhoAir) *
-                                       DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / DataEnvironment::StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

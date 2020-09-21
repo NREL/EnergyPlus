@@ -278,11 +278,11 @@ Real64 CoolingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
                     }
                 } else if (this->curOASysNum > 0 && this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                     DesVolFlow =
-                        this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow / DataEnvironment::StdRhoAir;
-                    if (this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].DXCoilFlag) {
+                        this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow / DataEnvironment::StdRhoAir;
+                    if (this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].DXCoilFlag) {
                         this->autoSizedValue = DesVolFlow / 0.00005;
                     } else {
-                        CoilInTemp = this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOATemp;
+                        CoilInTemp = this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOATemp;
                         if (this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanIndex > -1 &&
                             this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].FanBlowTroughFlag &&
                             this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanTypeNum ==
@@ -291,9 +291,9 @@ Real64 CoolingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
                             Real64 DeltaT = HVACFan::fanObjs[FanIndex]->getFanDesignTemperatureRise();
                             CoilInTemp += DeltaT;
                         }
-                        CoilInHumRat = this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOAHumRat;
-                        CoilOutTemp = this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].PrecoolTemp;
-                        CoilOutHumRat = this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].PrecoolHumRat;
+                        CoilInHumRat = this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOAHumRat;
+                        CoilOutTemp = this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].PrecoolTemp;
+                        CoilOutHumRat = this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].PrecoolHumRat;
                         this->autoSizedValue =
                             DesVolFlow * DataEnvironment::StdRhoAir *
                             (Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat) - Psychrometrics::PsyHFnTdbW(CoilOutTemp, CoilOutHumRat));

@@ -621,8 +621,8 @@ Real64 CoolingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
                     } else if (this->oaSysEqSizing(this->curOASysNum).CoolingAirFlow) {
                         // Parent object sets flow rate
                         this->autoSizedValue = this->oaSysEqSizing(this->curOASysNum).CoolingAirVolFlow;
-                    } else if (DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                        this->autoSizedValue = this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow /
+                    } else if (outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
+                        this->autoSizedValue = this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow /
                                                DataEnvironment::StdRhoAir;
                     } else {
                         this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;

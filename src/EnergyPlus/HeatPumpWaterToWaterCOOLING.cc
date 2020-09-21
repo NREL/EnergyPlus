@@ -174,7 +174,7 @@ namespace HeatPumpWaterToWaterCOOLING {
         if (this->plantScanFlag) {
             // Locate the heating on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_HPWaterPECooling,
                                                     this->SourceLoopNum,
@@ -187,7 +187,7 @@ namespace HeatPumpWaterToWaterCOOLING {
                                                     _,
                                                     this->SourceSideInletNodeNum,
                                                     _);
-            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_HPWaterPECooling,
                                                     this->LoadLoopNum,

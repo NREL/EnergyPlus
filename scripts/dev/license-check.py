@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import licensetext
+import sys
 
 TOOL_NAME = 'license-check'
 
@@ -21,11 +22,19 @@ fp = open(filename)
 filetxt = fp.read()
 fp.close()
 # Compare the two strings
-licensetext.checkLicense('LICENSE.txt',filetxt,licensetxt,toolname=TOOL_NAME)
+base_license_text_success = licensetext.checkLicense('LICENSE.txt',filetxt,licensetxt,toolname=TOOL_NAME)
 
 # Create Checker object
 checker = licensetext.Checker(current, toolname=TOOL_NAME)
 
 # Check files
+file_license_success = True
 for base in dirs:
-    checker.visit(base)
+    file_success = checker.visit(base)
+    if not file_success:
+        file_license_success = False
+
+if base_license_text_success and file_license_success:
+    sys.exit(0)
+else:
+    sys.exit(1)

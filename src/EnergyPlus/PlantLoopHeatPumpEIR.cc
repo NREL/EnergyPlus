@@ -87,7 +87,7 @@ namespace EIRPlantLoopHeatPumps {
         heatPumps.clear();
     }
 
-    void EIRPlantLoopHeatPump::simulate(EnergyPlusData &EP_UNUSED(state),
+    void EIRPlantLoopHeatPump::simulate(EnergyPlusData &state,
                                         const EnergyPlus::PlantLocation &calledFromLocation,
                                         bool const FirstHVACIteration,
                                         Real64 &CurLoad,
@@ -122,7 +122,7 @@ namespace EIRPlantLoopHeatPumps {
         }
 
         if (this->running) {
-            this->doPhysics(CurLoad);
+            this->doPhysics(state, CurLoad);
         } else {
             this->resetReportingVariables();
         }
@@ -292,7 +292,7 @@ namespace EIRPlantLoopHeatPumps {
         }
     }
 
-    void EIRPlantLoopHeatPump::doPhysics(Real64 currentLoad)
+    void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     {
 
         Real64 const reportingInterval = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -310,7 +310,7 @@ namespace EIRPlantLoopHeatPumps {
 
         // evaluate capacity modifier curve and determine load side heat transfer
         Real64 capacityModifierFuncTemp =
-            CurveManager::CurveValue(this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
+            CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
         Real64 availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
         Real64 partLoadRatio = 0.0;
         if (availableCapacity > 0) {
@@ -330,8 +330,8 @@ namespace EIRPlantLoopHeatPumps {
 
         // calculate power usage from EIR curves
         Real64 eirModifierFuncTemp =
-            CurveManager::CurveValue(this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
-        Real64 eirModifierFuncPLR = CurveManager::CurveValue(this->powerRatioFuncPLRCurveIndex, partLoadRatio);
+            CurveManager::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
+        Real64 eirModifierFuncPLR = CurveManager::CurveValue(state, this->powerRatioFuncPLRCurveIndex, partLoadRatio);
         this->powerUsage = (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
         this->powerEnergy = this->powerUsage * reportingInterval;
 
@@ -417,7 +417,7 @@ namespace EIRPlantLoopHeatPumps {
 
             // find this component on the plant
             bool thisErrFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->name,
                                                     this->plantTypeOfNum,
                                                     this->loadSideLocation.loopNum,
@@ -445,7 +445,7 @@ namespace EIRPlantLoopHeatPumps {
 
             thisErrFlag = false;
             if (this->waterSource) {
-                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->name,
                                                         this->plantTypeOfNum,
                                                         this->sourceSideLocation.loopNum,
@@ -906,10 +906,10 @@ namespace EIRPlantLoopHeatPumps {
         }
     }
 
-    PlantComponent *EIRPlantLoopHeatPump::factory(int hp_type_of_num, std::string hp_name)
+    PlantComponent *EIRPlantLoopHeatPump::factory(EnergyPlusData &state, int hp_type_of_num, std::string hp_name)
     {
         if (getInputsPLHP) {
-            EIRPlantLoopHeatPump::processInputForEIRPLHP();
+            EIRPlantLoopHeatPump::processInputForEIRPLHP(state);
             EIRPlantLoopHeatPump::pairUpCompanionCoils();
             getInputsPLHP = false;
         }
@@ -958,7 +958,7 @@ namespace EIRPlantLoopHeatPumps {
         }
     }
 
-    void EIRPlantLoopHeatPump::processInputForEIRPLHP()
+    void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
     {
         using namespace DataIPShortCuts;
 
@@ -1081,21 +1081,21 @@ namespace EIRPlantLoopHeatPumps {
                     }
 
                     auto &capFtName = fields.at("capacity_modifier_function_of_temperature_curve_name");
-                    thisPLHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(capFtName));
+                    thisPLHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName));
                     if (thisPLHP.capFuncTempCurveIndex == 0) {
                         ShowSevereError("Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
                                         "; entered curve name: " + capFtName.get<std::string>());
                         errorsFound = true;
                     }
                     auto &eirFtName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
-                    thisPLHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(eirFtName));
+                    thisPLHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName));
                     if (thisPLHP.capFuncTempCurveIndex == 0) {
                         ShowSevereError("Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
                                         "; entered curve name: " + eirFtName.get<std::string>());
                         errorsFound = true;
                     }
                     auto &eirFplrName = fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name");
-                    thisPLHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(eirFplrName));
+                    thisPLHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName));
                     if (thisPLHP.capFuncTempCurveIndex == 0) {
                         ShowSevereError("Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
                                         "; entered curve name: " + eirFplrName.get<std::string>());

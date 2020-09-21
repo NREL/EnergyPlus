@@ -61,7 +61,8 @@ namespace PlantPressureSystem {
     // Functions
     void clear_state();
 
-    void SimPressureDropSystem(int const LoopNum,                  // Plant Loop to update pressure information
+    void SimPressureDropSystem(EnergyPlusData &state,
+                               int const LoopNum,                  // Plant Loop to update pressure information
                                bool const FirstHVACIteration,      // System flag
                                int const CallType,                 // Enumerated call type
                                Optional_int_const LoopSideNum = _, // Loop side num for specific branch simulation
@@ -70,7 +71,8 @@ namespace PlantPressureSystem {
 
     void InitPressureDrop(int const LoopNum, bool const FirstHVACIteration);
 
-    void BranchPressureDrop(int const LoopNum,     // Plant Loop Index
+    void BranchPressureDrop(EnergyPlusData &state,
+                            int const LoopNum,     // Plant Loop Index
                             int const LoopSideNum, // LoopSide Index (1=Demand, 2=Supply) on Plant Loop LoopNum
                             int const BranchNum    // Branch Index on LoopSide LoopSideNum
     );
@@ -85,7 +87,8 @@ namespace PlantPressureSystem {
 
     void PassPressureAcrossInterface(int const LoopNum);
 
-    Real64 ResolveLoopFlowVsPressure(int const LoopNum,            // - Index of which plant/condenser loop is being simulated
+    Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
+                                     int const LoopNum,            // - Index of which plant/condenser loop is being simulated
                                      Real64 const SystemMassFlow,  // - Initial "guess" at system mass flow rate [kg/s]
                                      int const PumpCurveNum,       // - Pump curve to use when calling the curve manager for psi = f(phi)
                                      Real64 const PumpSpeed,       // - Pump rotational speed, [rps] (revs per second)

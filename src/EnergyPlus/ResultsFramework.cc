@@ -1294,7 +1294,7 @@ namespace ResultsFramework {
             return;
         }
         CSVWriter csv(outputVariables.size());
-        CSVWriter mtr(outputVariables.size());
+        CSVWriter mtr_csv(outputVariables.size());
 
         // Output yearly time series data
         if (hasRIYearlyTSData()) {
@@ -1303,7 +1303,7 @@ namespace ResultsFramework {
 
         if (hasYRMeters()) {
             csv.parseTSOutputs(YRMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
-            mtr.parseTSOutputs(YRMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
+            mtr_csv.parseTSOutputs(YRMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
         }
 
         // Output run period time series data
@@ -1313,7 +1313,7 @@ namespace ResultsFramework {
 
         if (hasSMMeters()) {
             csv.parseTSOutputs(SMMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
-            mtr.parseTSOutputs(SMMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
+            mtr_csv.parseTSOutputs(SMMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
         }
 
         // Output monthly time series data
@@ -1323,7 +1323,7 @@ namespace ResultsFramework {
 
         if (hasMNMeters()) {
             csv.parseTSOutputs(MNMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
-            mtr.parseTSOutputs(MNMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
+            mtr_csv.parseTSOutputs(MNMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
         }
 
         // Output daily time series data
@@ -1333,7 +1333,7 @@ namespace ResultsFramework {
 
         if (hasDYMeters()) {
             csv.parseTSOutputs(DYMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Daily);
-            mtr.parseTSOutputs(DYMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Daily);
+            mtr_csv.parseTSOutputs(DYMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Daily);
         }
 
         // Output hourly time series data
@@ -1343,7 +1343,7 @@ namespace ResultsFramework {
 
         if (hasHRMeters()) {
             csv.parseTSOutputs(HRMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
-            mtr.parseTSOutputs(HRMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
+            mtr_csv.parseTSOutputs(HRMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
         }
 
         // Output timestep time series data
@@ -1353,7 +1353,7 @@ namespace ResultsFramework {
 
         if (hasTSMeters()) {
             csv.parseTSOutputs(TSMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
-            mtr.parseTSOutputs(TSMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
+            mtr_csv.parseTSOutputs(TSMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
         }
 
         // Output detailed HVAC time series data
@@ -1368,7 +1368,7 @@ namespace ResultsFramework {
 
         csv.writeOutput(outputVariables, ioFiles.csv, ioFiles.outputControl.csv);
         if (hasMeterData()) {
-            mtr.writeOutput(outputVariables, ioFiles.mtr, ioFiles.outputControl.mtr);
+            mtr_csv.writeOutput(outputVariables, ioFiles.mtr_csv, ioFiles.outputControl.csv);
         }
     }
 

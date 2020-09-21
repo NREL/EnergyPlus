@@ -119,8 +119,8 @@ struct BaseSizer
     bool initialized = false;        // indicates initializeWithinEP was called
     AutoSizingResultType errorType = AutoSizingResultType::NoError;
     AutoSizingType sizingType = AutoSizingType::Unknown;
-    std::string sizingString = "";
-    std::string sizingStringScalable = "";
+    std::string sizingString;
+    std::string sizingStringScalable;
     bool overrideSizeString = true;
     Real64 originalValue = 0.0;
     Real64 autoSizedValue = 0.0;
@@ -132,8 +132,8 @@ struct BaseSizer
     bool airLoopSysFlag = false;
     bool oaSysFlag = false;
     int coilType_Num = 0;
-    std::string compType = "";
-    std::string compName = "";
+    std::string compType;
+    std::string compName;
     bool isEpJSON = false;
 
     bool sysSizingRunDone = false;
@@ -238,7 +238,7 @@ struct BaseSizer
     Real64 dataNonZoneNonAirloopValue = 0.0;
 
     bool printWarningFlag = false;
-    std::string callingRoutine = "";
+    std::string callingRoutine;
     Array1D<DataSizing::SystemSizingInputData> sysSizingInputData;
     Array1D<DataSizing::ZoneSizingInputData> zoneSizingInput;
     Array1D<DataSizing::ZoneEqSizingData> unitarySysEqSizing;
@@ -268,7 +268,7 @@ struct BaseSizer
     void overrideSizingString(std::string &string);
 
 protected:
-    std::string lastErrorMessages = "";
+    std::string lastErrorMessages;
 
     void addErrorMessage(std::string const &s);
 
