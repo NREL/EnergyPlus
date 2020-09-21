@@ -4360,7 +4360,7 @@ namespace EvaporativeCoolers {
                     if (DataGlobals::isEpJSON) stringOverride = "design_supply_air_flow_rate [m3/s]";
                     sizingCoolingAirFlow.overrideSizingString(stringOverride);
                     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(TempSize, errorsFound);
+                    ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
                 } else if (SAFMethod == FlowPerCoolingCapacity) {
                     SizingMethod = CoolingCapacitySizing;
@@ -4374,7 +4374,7 @@ namespace EvaporativeCoolers {
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DataCapacityUsedForSizing = sizerCoolingCapacity.size(TempSize, errorsFound);
+                    DataCapacityUsedForSizing = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                     DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     PrintFlag = true;
                     TempSize = AutoSize;
@@ -4384,7 +4384,7 @@ namespace EvaporativeCoolers {
                     if (DataGlobals::isEpJSON) stringOverride = "design_supply_air_flow_rate [m3/s]";
                     sizingCoolingAirFlow.overrideSizingString(stringOverride);
                     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(TempSize, errorsFound);
+                    ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                 }
                 DataScalableSizingON = false;
                 ZoneCoolingOnlyFan = false;
@@ -4402,7 +4402,7 @@ namespace EvaporativeCoolers {
                 if (DataGlobals::isEpJSON) stringOverride = "design_supply_air_flow_rate [m3/s]";
                 sizingCoolingAirFlow.overrideSizingString(stringOverride);
                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(TempSize, errorsFound);
+                ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                 ZoneCoolingOnlyFan = false;
             }
         }
