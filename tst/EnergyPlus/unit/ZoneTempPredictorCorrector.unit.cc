@@ -491,7 +491,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     ZoneSysEnergyDemand.allocate(NumTempControlledZones);
     TempZoneThermostatSetPoint.allocate(NumTempControlledZones);
     state.dataZoneTempPredictorCorrector.ZoneSetPointLast.allocate(NumTempControlledZones);
-    Setback.allocate(NumTempControlledZones);
     ZoneThermostatSetPointLo.allocate(NumTempControlledZones);
     ZoneThermostatSetPointHi.allocate(NumTempControlledZones);
     state.dataZoneTempPredictorCorrector.TempDepZnLd.allocate(NumTempControlledZones);
@@ -1235,7 +1234,6 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     DeadBandOrSetback.allocate(1);
     DataHeatBalance::Zone.allocate(1);
     state.dataZoneTempPredictorCorrector.ZoneSetPointLast.allocate(1);
-    DataZoneEnergyDemands::Setback.allocate(1);
 
     SNLoadPredictedRate.allocate(1);
     SNLoadPredictedHSPRate.allocate(1);
@@ -1370,7 +1368,6 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     DeadBandOrSetback.allocate(1);
     DataHeatBalance::Zone.allocate(1);
     state.dataZoneTempPredictorCorrector.ZoneSetPointLast.allocate(1);
-    DataZoneEnergyDemands::Setback.allocate(1);
 
     SNLoadPredictedRate.allocate(1);
     SNLoadPredictedHSPRate.allocate(1);
