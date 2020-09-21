@@ -130,7 +130,7 @@ void HeatingAirflowUASizer::initializeForSystemOtherDuct(Real64 const elevation)
     this->curSysNum = 1;
 }
 
-Real64 HeatingAirflowUASizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 HeatingAirflowUASizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;

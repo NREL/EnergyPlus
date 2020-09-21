@@ -50,7 +50,7 @@
 
 namespace EnergyPlus {
 
-Real64 HeatingWaterDesAirInletHumRatSizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 HeatingWaterDesAirInletHumRatSizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;

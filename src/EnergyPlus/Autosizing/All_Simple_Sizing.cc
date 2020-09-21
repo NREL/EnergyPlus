@@ -53,7 +53,7 @@
 
 namespace EnergyPlus {
 
-Real64 AutoCalculateSizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 AutoCalculateSizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -68,7 +68,7 @@ Real64 AutoCalculateSizer::size(Real64 _originalValue, bool &errorsFound)
     return this->autoSizedValue;
 }
 
-Real64 MaxHeaterOutletTempSizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 MaxHeaterOutletTempSizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -91,7 +91,7 @@ Real64 MaxHeaterOutletTempSizer::size(Real64 _originalValue, bool &errorsFound)
     return this->autoSizedValue;
 }
 
-Real64 ZoneCoolingLoadSizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 ZoneCoolingLoadSizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -119,7 +119,7 @@ Real64 ZoneCoolingLoadSizer::size(Real64 _originalValue, bool &errorsFound)
     return this->autoSizedValue;
 }
 
-Real64 ZoneHeatingLoadSizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 ZoneHeatingLoadSizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -147,7 +147,7 @@ Real64 ZoneHeatingLoadSizer::size(Real64 _originalValue, bool &errorsFound)
     return this->autoSizedValue;
 }
 
-Real64 ASHRAEMinSATCoolingSizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 ASHRAEMinSATCoolingSizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -209,7 +209,7 @@ Real64 ASHRAEMinSATCoolingSizer::size(Real64 _originalValue, bool &errorsFound)
     return this->autoSizedValue;
 }
 
-Real64 ASHRAEMaxSATHeatingSizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 ASHRAEMaxSATHeatingSizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -271,7 +271,7 @@ Real64 ASHRAEMaxSATHeatingSizer::size(Real64 _originalValue, bool &errorsFound)
     return this->autoSizedValue;
 }
 
-Real64 DesiccantDehumidifierBFPerfDataFaceVelocitySizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 DesiccantDehumidifierBFPerfDataFaceVelocitySizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -288,7 +288,7 @@ Real64 DesiccantDehumidifierBFPerfDataFaceVelocitySizer::size(Real64 _originalVa
     return this->autoSizedValue;
 }
 
-Real64 HeatingCoilDesAirInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 HeatingCoilDesAirInletTempSizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -324,7 +324,7 @@ Real64 HeatingCoilDesAirInletTempSizer::size(Real64 _originalValue, bool &errors
     return this->autoSizedValue;
 }
 
-Real64 HeatingCoilDesAirOutletTempSizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 HeatingCoilDesAirOutletTempSizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -356,7 +356,7 @@ Real64 HeatingCoilDesAirOutletTempSizer::size(Real64 _originalValue, bool &error
     return this->autoSizedValue;
 }
 
-Real64 HeatingCoilDesAirInletHumRatSizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 HeatingCoilDesAirInletHumRatSizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
