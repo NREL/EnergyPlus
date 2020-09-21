@@ -215,7 +215,7 @@ namespace DataHVACGlobals {
 
     int const CoilDX_Cooling(35);
 //    int const CoilDX_SubcoolReheat(36);
-//    int const CoilDX_CurveFit_Speed(37);
+    int const CoilDX_CurveFit_Speed(37);
 
     int const coilNormalMode = 0;        // Normal operation mode
     int const coilEnhancedMode = 1;      // Enhanced operation mode

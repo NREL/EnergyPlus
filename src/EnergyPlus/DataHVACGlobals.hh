@@ -203,7 +203,7 @@ namespace DataHVACGlobals {
     extern int const CoilVRF_FluidTCtrl_Cooling;
     extern int const CoilVRF_FluidTCtrl_Heating;
 //    extern int const CoilDX_SubcoolReheat;
-//    extern int const CoilDX_CurveFit_Speed;
+    extern int const CoilDX_CurveFit_Speed;
 
     extern int const coilNormalMode;        // Normal operation mode
     extern int const coilEnhancedMode;      // Enhanced operation mode
