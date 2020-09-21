@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -728,13 +729,16 @@ void CoilCoolingDX::simulate(EnergyPlusData& state, int useAlternateMode, Real64
     this->outletAirDryBulbTemp = evapOutletNode.Temp;
     this->outletAirHumRat = evapOutletNode.HumRat;
 
-    this->totalCoolingEnergyRate = evapOutletNode.MassFlowRate * (evapInletNode.Enthalpy - evapOutletNode.Enthalpy);
+    CalcComponentSensibleLatentOutput(evapOutletNode.MassFlowRate,
+                                      evapInletNode.Temp,
+                                      evapInletNode.HumRat,
+                                      evapOutletNode.Temp,
+                                      evapOutletNode.HumRat,
+                                      this->sensCoolingEnergyRate,
+                                      this->latCoolingEnergyRate,
+                                      this->totalCoolingEnergyRate);
     this->totalCoolingEnergy = this->totalCoolingEnergyRate * reportingConstant;
-    Real64 minAirHumRat = min(evapInletNode.HumRat, evapOutletNode.HumRat);
-    this->sensCoolingEnergyRate = evapOutletNode.MassFlowRate * (Psychrometrics::PsyHFnTdbW(evapInletNode.Temp, minAirHumRat) -
-                                                                 Psychrometrics::PsyHFnTdbW(evapOutletNode.Temp, minAirHumRat));
     this->sensCoolingEnergy = this->sensCoolingEnergyRate * reportingConstant;
-    this->latCoolingEnergyRate = this->totalCoolingEnergyRate - this->sensCoolingEnergyRate;
     this->latCoolingEnergy = this->latCoolingEnergyRate * reportingConstant;
 
     this->evapCondPumpElecConsumption = this->evapCondPumpElecPower * reportingConstant;
