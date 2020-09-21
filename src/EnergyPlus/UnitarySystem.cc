@@ -8418,13 +8418,17 @@ namespace UnitarySystems {
                             Real64 ZoneLatLoad = ZoneLoad * (1.0 / this->LoadSHR - 1.0);
                             Real64 SenPLR = (ZoneLoad - SensOutputOff) / (SensOutputOn - SensOutputOff);
                             Real64 LatPLR = (ZoneLatLoad - LatOutputOff) / (LatOutputOn - LatOutputOff);
-                            Real64 totalRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate *
-                                               (DataLoopNode::Node(CoilInletNode).Enthalpy - DataLoopNode::Node(this->AirOutNode).Enthalpy);
-                            Real64 minAirHumRat = min(DataLoopNode::Node(CoilInletNode).HumRat, DataLoopNode::Node(this->AirOutNode).HumRat);
-                            Real64 sensRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate *
-                                              (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CoilInletNode).Temp, minAirHumRat) -
-                                               Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(this->AirOutNode).Temp, minAirHumRat));
-                            Real64 latRate = totalRate - sensRate;
+                            Real64 totalRate = 0.0;
+                            Real64 sensRate = 0.0;
+                            Real64 latRate = 0.0;
+                            CalcComponentSensibleLatentOutput(DataLoopNode::Node(this->AirOutNode).MassFlowRate,
+                                                              DataLoopNode::Node(CoilInletNode).Temp,
+                                                              DataLoopNode::Node(CoilInletNode).HumRat,
+                                                              DataLoopNode::Node(this->AirOutNode).Temp,
+                                                              DataLoopNode::Node(this->AirOutNode).HumRat,
+                                                              sensRate,
+                                                              latRate,
+                                                              totalRate);
                             if (LatPLR > 1.0 || LatPLR < 0.0) {
                                 this->CoilSHR = this->LoadSHR;
                             } else {
@@ -8466,13 +8470,14 @@ namespace UnitarySystems {
                                                                   HeatCoilLoad,
                                                                   SupHeaterLoad,
                                                                   CompressorONFlag);
-                                    totalRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate *
-                                                (DataLoopNode::Node(CoilInletNode).Enthalpy - DataLoopNode::Node(this->AirOutNode).Enthalpy);
-                                    minAirHumRat = min(DataLoopNode::Node(CoilInletNode).HumRat, DataLoopNode::Node(this->AirOutNode).HumRat);
-                                    sensRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate *
-                                               (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CoilInletNode).Temp, minAirHumRat) -
-                                                Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(this->AirOutNode).Temp, minAirHumRat));
-                                    latRate = totalRate - sensRate;
+                                    CalcComponentSensibleLatentOutput(DataLoopNode::Node(this->AirOutNode).MassFlowRate,
+                                                                      DataLoopNode::Node(CoilInletNode).Temp,
+                                                                      DataLoopNode::Node(CoilInletNode).HumRat,
+                                                                      DataLoopNode::Node(this->AirOutNode).Temp,
+                                                                      DataLoopNode::Node(this->AirOutNode).HumRat,
+                                                                      sensRate,
+                                                                      latRate,
+                                                                      totalRate);
                                     SenSPR =
                                         (ZoneLoad - this->FullOutput[SpeedNum - 1]) / (this->FullOutput[SpeedNum] - this->FullOutput[SpeedNum - 1]);
                                     LatSPR = (ZoneLatLoad - this->FullLatOutput[SpeedNum - 1]) /
@@ -9267,7 +9272,6 @@ namespace UnitarySystems {
         // InitLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax
         ////////////////////////////////////////////////////////////////////////////////////
         // inlet node and system outlet node
-        Real64 MaxTemp = 0.0; // Maximum temperature used in latent loss calculation
         Real64 QZnReq = 0.0;
         Real64 QActual = 0.0;
         Real64 SensOutputOff = 0.0;
@@ -9445,11 +9449,12 @@ namespace UnitarySystems {
         //  IF (.NOT. FirstHVACIteration .AND. AirLoopPass .EQ. 1 .AND. AirflowNetworkFanActivated) THEN
         if (!FirstHVACIteration && AirflowNetwork::AirflowNetworkFanActivated) {
             Real64 DeltaMassRate = 0.0;
+            Real64 TotalOutput = 0.0;         // total output rate, {W}
+            Real64 SensibleOutputDelta = 0.0; // delta sensible output rate, {W}
+            Real64 LatentOutputDelta = 0.0;   // delta latent output rate, {W}
+            Real64 TotalOutputDelta = 0.0;    // delta total output rate, {W} 
             int ZoneInNode = this->m_ZoneInletNode;
-            Real64 MinHumRat = DataLoopNode::Node(ZoneInNode).HumRat;
             Real64 MassFlowRate = DataLoopNode::Node(ZoneInNode).MassFlowRate / this->ControlZoneMassFlowFrac;
-            if (DataLoopNode::Node(this->AirOutNode).Temp < DataLoopNode::Node(this->NodeNumOfControlledZone).Temp)
-                MinHumRat = DataLoopNode::Node(this->AirOutNode).HumRat;
             if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
                 DeltaMassRate =
                     DataLoopNode::Node(this->AirOutNode).MassFlowRate - DataLoopNode::Node(ZoneInNode).MassFlowRate / this->ControlZoneMassFlowFrac;
@@ -9458,19 +9463,28 @@ namespace UnitarySystems {
                 MassFlowRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate;
                 DeltaMassRate = 0.0;
             }
-            this->m_SenLoadLoss = MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(this->AirOutNode).Temp, MinHumRat) -
-                                                  Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(ZoneInNode).Temp, MinHumRat)) +
-                                  DeltaMassRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(this->AirOutNode).Temp, MinHumRat) -
-                                                   Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(this->NodeNumOfControlledZone).Temp, MinHumRat));
+            CalcComponentSensibleLatentOutput(MassFlowRate,
+                                              DataLoopNode::Node(this->AirOutNode).Temp,
+                                              DataLoopNode::Node(this->AirOutNode).HumRat,
+                                              DataLoopNode::Node(ZoneInNode).Temp,
+                                              DataLoopNode::Node(ZoneInNode).HumRat,
+                                              this->m_SenLoadLoss,
+                                              this->m_LatLoadLoss,
+                                              TotalOutput);
+            CalcComponentSensibleLatentOutput(DeltaMassRate,
+                                              DataLoopNode::Node(this->AirOutNode).Temp,
+                                              DataLoopNode::Node(this->AirOutNode).HumRat,
+                                              DataLoopNode::Node(this->NodeNumOfControlledZone).Temp,
+                                              DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat,
+                                              SensibleOutputDelta,
+                                              LatentOutputDelta,
+                                              TotalOutputDelta);
+            this->m_SenLoadLoss = this->m_SenLoadLoss + SensibleOutputDelta;
             if (std::abs(this->m_SensibleLoadMet) > 0.0) {
                 if (std::abs(this->m_SenLoadLoss / this->m_SensibleLoadMet) < 0.001) this->m_SenLoadLoss = 0.0;
             }
             if (this->m_Humidistat) {
-                MaxTemp = DataLoopNode::Node(this->NodeNumOfControlledZone).Temp;
-                this->m_LatLoadLoss = MassFlowRate * (Psychrometrics::PsyHFnTdbW(MaxTemp, DataLoopNode::Node(this->AirOutNode).HumRat) -
-                                                      Psychrometrics::PsyHFnTdbW(MaxTemp, DataLoopNode::Node(ZoneInNode).HumRat)) +
-                                      DeltaMassRate * (Psychrometrics::PsyHFnTdbW(MaxTemp, DataLoopNode::Node(this->AirOutNode).HumRat) -
-                                                       Psychrometrics::PsyHFnTdbW(MaxTemp, DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat));
+                this->m_LatLoadLoss = this->m_LatLoadLoss + LatentOutputDelta;
                 if (std::abs(this->m_LatentLoadMet) > 0.0) {
                     if (std::abs(this->m_LatLoadLoss / this->m_LatentLoadMet) < 0.001) this->m_LatLoadLoss = 0.0;
                 }
@@ -10413,60 +10427,65 @@ namespace UnitarySystems {
         Real64 AirMassFlow = DataLoopNode::Node(OutletNode).MassFlowRate;
         Real64 RefTemp = 0.0;
         Real64 RefHumRat = 0.0;
-        Real64 MinHumRatio = 0.0;
         if (this->m_ControlType == ControlType::Setpoint) {
             RefTemp = DataLoopNode::Node(this->AirInNode).Temp;
             RefHumRat = DataLoopNode::Node(this->AirInNode).HumRat;
-            MinHumRatio = DataLoopNode::Node(this->AirInNode).HumRat;
         } else {
             RefTemp = DataLoopNode::Node(this->NodeNumOfControlledZone).Temp;
             RefHumRat = DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat;
-            MinHumRatio = DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat;
         }
-        if (DataLoopNode::Node(OutletNode).Temp < RefTemp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat;
-
+        Real64 SensibleOutput(0.0); // sensible output rate, {W}
+        Real64 LatentOutput(0.0);   // latent output rate, {W}
+        Real64 TotalOutput(0.0);    // total output rate, {W}
         // calculate sensible load met
         if (this->ATMixerExists) {
             if (this->ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                 // Air terminal supply side mixer
                 int ATMixOutNode = this->ATMixerOutNode;
-                SensOutput =
-                    DataLoopNode::Node(ATMixOutNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(ATMixOutNode).Temp, MinHumRatio) -
-                                                                     Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio) - this->m_SenLoadLoss);
+                CalcZoneSensibleLatentOutput(DataLoopNode::Node(ATMixOutNode).MassFlowRate,
+                                             DataLoopNode::Node(ATMixOutNode).Temp,
+                                             DataLoopNode::Node(ATMixOutNode).HumRat,
+                                             RefTemp,
+                                             RefHumRat,
+                                             SensibleOutput,
+                                             LatentOutput,
+                                             TotalOutput);
+                SensOutput = SensibleOutput - this->m_SenLoadLoss;
                 if (this->m_Humidistat) {
-                    //   Calculate latent load met (at constant temperature)
-                    LatOutput = DataLoopNode::Node(ATMixOutNode).MassFlowRate *
-                                    (Psychrometrics::PsyHFnTdbW(RefTemp, DataLoopNode::Node(ATMixOutNode).HumRat) -
-                                     Psychrometrics::PsyHFnTdbW(RefTemp, RefHumRat)) -
-                                this->m_LatLoadLoss;
+                    LatOutput = LatentOutput - this->m_LatLoadLoss;
                 } else {
                     LatOutput = 0.0;
                 }
             } else {
                 // Air terminal inlet side mixer
-                SensOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) -
-                                            Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio)) -
-                             this->m_SenLoadLoss;
+                CalcZoneSensibleLatentOutput(AirMassFlow,
+                                             DataLoopNode::Node(OutletNode).Temp,
+                                             DataLoopNode::Node(OutletNode).HumRat,
+                                             RefTemp,
+                                             RefHumRat,
+                                             SensibleOutput,
+                                             LatentOutput,
+                                             TotalOutput);
+                SensOutput = SensibleOutput - this->m_SenLoadLoss;
                 if (this->m_Humidistat) {
-                    //   Calculate latent load met (at constant temperature)
-                    LatOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(RefTemp, DataLoopNode::Node(OutletNode).HumRat) -
-                                               Psychrometrics::PsyHFnTdbW(RefTemp, RefHumRat)) -
-                                this->m_LatLoadLoss;
+                    LatOutput = LatentOutput - this->m_LatLoadLoss;
                 } else {
                     LatOutput = 0.0;
                 }
             }
         } else {
-            // Calculate sensible load met (at constant humidity ratio)
-            SensOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) -
-                                        Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio)) -
-                         this->m_SenLoadLoss;
-
+            // Calculate sensible load met 
+            CalcZoneSensibleLatentOutput(AirMassFlow,
+                                         DataLoopNode::Node(OutletNode).Temp,
+                                         DataLoopNode::Node(OutletNode).HumRat,
+                                         RefTemp,
+                                         RefHumRat,
+                                         SensibleOutput,
+                                         LatentOutput,
+                                         TotalOutput);
+            SensOutput = SensibleOutput - this->m_SenLoadLoss;
             if (this->m_Humidistat) {
-                //   Calculate latent load met (at constant temperature)
-                LatOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(RefTemp, DataLoopNode::Node(OutletNode).HumRat) -
-                                           Psychrometrics::PsyHFnTdbW(RefTemp, RefHumRat)) -
-                            this->m_LatLoadLoss;
+                LatOutput = LatentOutput - this->m_LatLoadLoss;
             } else {
                 LatOutput = 0.0;
             }
@@ -11157,9 +11176,10 @@ namespace UnitarySystems {
             if ((SensibleLoad && this->m_RunOnSensibleLoad) || (LatentLoad && this->m_RunOnLatentLoad)) {
                 // calculate sensible PLR, don't care IF latent is true here but need to gaurd for
                 // when LatentLoad=TRUE and SensibleLoad=FALSE
-                ReqOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                            (Psychrometrics::PsyHFnTdbW(DesOutTemp, DataLoopNode::Node(OutletNode).HumRat) -
-                             Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(OutletNode).HumRat));
+                ReqOutput =
+                    DataLoopNode::Node(InletNode).MassFlowRate *
+                    Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                        DesOutTemp, DataLoopNode::Node(OutletNode).HumRat, DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
 
                 PartLoadFrac = 0.0;
                 CompOn = 0;
@@ -11424,9 +11444,11 @@ namespace UnitarySystems {
                     } else {
                     }
 
-                    FullOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                                 (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat) -
-                                  Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(OutletNode).HumRat));
+                    FullOutput =
+                        DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp,
+                                                                                                                DataLoopNode::Node(OutletNode).HumRat,
+                                                                                                                DataLoopNode::Node(InletNode).Temp,
+                                                                                                                DataLoopNode::Node(InletNode).HumRat);
 
                     FullLoadHumRatOut = DataLoopNode::Node(OutletNode).HumRat;
 
@@ -11738,8 +11760,10 @@ namespace UnitarySystems {
 
                         //               FullOutput will be different than the FullOutput determined above during sensible PLR calculations
                         FullOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                                     (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat) -
-                                      Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(OutletNode).HumRat));
+                                     Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp,
+                                                                                DataLoopNode::Node(OutletNode).HumRat,
+                                                                                DataLoopNode::Node(InletNode).Temp,
+                                                                                DataLoopNode::Node(InletNode).HumRat);
                         FullLoadHumRatOut = DataLoopNode::Node(OutletNode).HumRat;
 
                         //   Check to see if the system can meet the load with the compressor off
@@ -11779,8 +11803,10 @@ namespace UnitarySystems {
                         this->m_DehumidificationMode = DehumidMode;
                         DXCoils::SimDXCoilMultiMode(state, CompName, On, FirstHVACIteration, PartLoadFrac, DehumidMode, this->m_CoolingCoilIndex, FanOpMode);
                         FullOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                                     (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(InletNode).HumRat) -
-                                      Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat));
+                                     Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp,
+                                                                                DataLoopNode::Node(OutletNode).HumRat,
+                                                                                DataLoopNode::Node(InletNode).Temp,
+                                                                                DataLoopNode::Node(InletNode).HumRat);
                         FullLoadHumRatOut = DataLoopNode::Node(OutletNode).HumRat;
 
                         // Since we are cooling, we expect FullOutput to be < 0 and FullOutput < NoCoolOutput
@@ -12403,9 +12429,10 @@ namespace UnitarySystems {
             // IF DXHeatingSystem runs with a heating load then set PartLoadFrac on Heating System
             if (SensibleLoad) {
 
-                ReqOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                            (Psychrometrics::PsyHFnTdbW(DesOutTemp, DataLoopNode::Node(InletNode).HumRat) -
-                             Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat));
+                ReqOutput =
+                    DataLoopNode::Node(InletNode).MassFlowRate *
+                    Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                        DesOutTemp, DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
                 ReqOutput = max(0.0, ReqOutput);
 
                 // Get no load result
@@ -12677,10 +12704,11 @@ namespace UnitarySystems {
                         }
                     }
 
-                    FullOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                                 (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(InletNode).HumRat) -
-                                  Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat));
-
+                    FullOutput =
+                        DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp,
+                                                                                                                DataLoopNode::Node(OutletNode).HumRat,
+                                                                                                                DataLoopNode::Node(InletNode).Temp,
+                                                                                                                DataLoopNode::Node(InletNode).HumRat);
                     //       If the outlet temp is within ACC of set point,
                     if (std::abs(DataLoopNode::Node(OutletNode).Temp - DesOutTemp) < Acc ||
                         this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_UserDefined) {
@@ -12978,10 +13006,10 @@ namespace UnitarySystems {
 
             if (SensibleLoad) {
 
-                ReqOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                            (Psychrometrics::PsyHFnTdbW(DesOutTemp, DataLoopNode::Node(InletNode).HumRat) -
-                             Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat));
-
+                ReqOutput =
+                    DataLoopNode::Node(InletNode).MassFlowRate *
+                    Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                        DesOutTemp, DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
                 // Get no load result
                 PartLoadFrac = 0.0;
 
@@ -13111,9 +13139,11 @@ namespace UnitarySystems {
                         }
                     }
 
-                    FullOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                                 (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(InletNode).HumRat) -
-                                  Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat));
+                    FullOutput =
+                        DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp,
+                                                                                                                DataLoopNode::Node(OutletNode).HumRat,
+                                                                                                                DataLoopNode::Node(InletNode).Temp,
+                                                                                                                DataLoopNode::Node(InletNode).HumRat);
 
                     //         If the FullOutput outlet temp is less than (insufficient heating) or very near set point,
                     //         run the coil at PartLoadFrac = 1.
@@ -13562,6 +13592,9 @@ namespace UnitarySystems {
 
         Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
+        Real64 SensibleOutput = 0.0; // sensible output rate, {W}
+        Real64 LatentOutput = 0.0;   // latent output rate, {W}
+        Real64 TotalOutput = 0.0;    // total output rate, {W}
         Real64 QTotUnitOut = 0.0;
         Real64 QSensUnitOut = 0.0;
         this->m_PartLoadFrac = 0.0;
@@ -13584,19 +13617,29 @@ namespace UnitarySystems {
         if (SELECT_CASE_var == ControlType::Setpoint) {
             if (OutletNode > 0) {
                 int InletNode = this->AirInNode;
-                Real64 MinHumRatio = DataLoopNode::Node(InletNode).HumRat;
-                QSensUnitOut = AirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) -
-                                              Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, MinHumRatio)) -
-                               this->m_SenLoadLoss;
-                QTotUnitOut = AirMassFlow * (DataLoopNode::Node(OutletNode).Enthalpy - DataLoopNode::Node(InletNode).Enthalpy);
+                CalcComponentSensibleLatentOutput(AirMassFlow,
+                                                  DataLoopNode::Node(OutletNode).Temp,
+                                                  DataLoopNode::Node(OutletNode).HumRat,
+                                                  DataLoopNode::Node(InletNode).Temp,
+                                                  DataLoopNode::Node(InletNode).HumRat,
+                                                  SensibleOutput,
+                                                  LatentOutput,
+                                                  TotalOutput);
+                QSensUnitOut = SensibleOutput - this->m_SenLoadLoss;
+                QTotUnitOut = TotalOutput;
             }
         } else {
             if (OutletNode > 0 && this->NodeNumOfControlledZone > 0) {
-                Real64 MinHumRatio = DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat;
-                QSensUnitOut = AirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) -
-                                              Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(this->NodeNumOfControlledZone).Temp, MinHumRatio)) -
-                               this->m_SenLoadLoss;
-                QTotUnitOut = AirMassFlow * (DataLoopNode::Node(OutletNode).Enthalpy - DataLoopNode::Node(this->NodeNumOfControlledZone).Enthalpy);
+                CalcZoneSensibleLatentOutput(AirMassFlow,
+                                             DataLoopNode::Node(OutletNode).Temp,
+                                             DataLoopNode::Node(OutletNode).HumRat,
+                                             DataLoopNode::Node(this->NodeNumOfControlledZone).Temp,
+                                             DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat,
+                                             SensibleOutput,
+                                             LatentOutput,
+                                             TotalOutput);
+                QSensUnitOut = SensibleOutput - this->m_SenLoadLoss;
+                QTotUnitOut = TotalOutput;
             }
         }
 

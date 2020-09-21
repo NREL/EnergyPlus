@@ -146,7 +146,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
                           "  0.200000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}",
                           "  9.900000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}",
                           "  9.900000,0.000000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}",
-                          "BuildingSurface:Detailed,"
+                          "BuildingSurface:Detailed,",
                           "  Wall,                    !- Name",
                           "  Wall,                    !- Surface Type",
                           "  WallConstruction,        !- Construction Name",
@@ -161,7 +161,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
                           "  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
                           "  10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
                           "  10.00000,0.000000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}",
-                          "BuildingSurface:Detailed,"
+                          "BuildingSurface:Detailed,",
                           "  Floor,                   !- Name",
                           "  Floor,                   !- Surface Type",
                           "  WallConstruction,        !- Construction Name",
@@ -176,7 +176,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
                           "  0.000000,10.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
                           "  10.00000,10.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
                           "  10.00000,0.000000,0;  !- X,Y,Z ==> Vertex 4 {m}",
-                          "Zone,"
+                          "Zone,",
                           "  Zone,                    !- Name",
                           "  0,                       !- Direction of Relative North {deg}",
                           "  6.000000,                !- X Origin {m}",
@@ -203,6 +203,16 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     DataGlobals::BeginSimFlag = true;
     DataGlobals::BeginEnvrnFlag = true;
     DataEnvironment::OutBaroPress = 100000;
+
+    DataHeatBalFanSys::ZTAV.allocate(1);
+    DataHeatBalFanSys::ZT.allocate(1);
+    DataHeatBalance::MRT.allocate(1);
+    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(1);
+
+    DataHeatBalFanSys::ZT(1) = 0.0;
+    DataHeatBalFanSys::ZTAV(1) = 0.0;
+    DataHeatBalance::MRT(1) = 0.0;
+    DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.0;
 
     HeatBalanceManager::ManageHeatBalance(state);
 
@@ -308,24 +318,46 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 TEST_F(EnergyPlusFixture, WindowManager_TransAndReflAtPhi)
 {
 
-    Real64 const cs = 0.86603; // Cosine of incidence angle
-    Real64 const tf0 = 0.8980; // Transmittance at zero incidence angle
-    Real64 const rf0 = 0.0810; // Front reflectance at zero incidence angle
-    Real64 const rb0 = 0.0810; // Back reflectance at zero incidence angle
+    Real64 cs = 0.86603; // Cosine of incidence angle
+    Real64 tf0 = 0.8980; // Transmittance at zero incidence angle
+    Real64 rf0 = 0.0810; // Front reflectance at zero incidence angle
+    Real64 rb0 = 0.0810; // Back reflectance at zero incidence angle
 
     Real64 tfp = 0.; // Transmittance at cs
     Real64 rfp = 0.; // Front reflectance at cs
     Real64 rbp = 0.; // Back reflectance at cs
 
-    bool const SimpleGlazingSystem = false; // .TRUE. if simple block model being used
-    Real64 const SimpleGlazingSHGC = 0.;    // SHGC value to use in alternate model for simple glazing system
-    Real64 const SimpleGlazingU = 0.;       // U-factor value to use in alternate model for simple glazing system
+    bool SimpleGlazingSystem = false; // .TRUE. if simple block model being used
+    Real64 SimpleGlazingSHGC = 0.;    // SHGC value to use in alternate model for simple glazing system
+    Real64 SimpleGlazingU = 0.;       // U-factor value to use in alternate model for simple glazing system
 
     TransAndReflAtPhi(cs, tf0, rf0, rb0, tfp, rfp, rbp, SimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU);
 
     EXPECT_NEAR(tfp, 0.89455, 0.0001);
     EXPECT_NEAR(rfp, 0.08323, 0.0001);
     EXPECT_NEAR(rbp, 0.08323, 0.0001);
+
+    tf0 = 0.25; // Transmittance at zero incidence angle
+    rf0 = 0.55; // Front reflectance at zero incidence angle
+    rb0 = 0.55; // Back reflectance at zero incidence angle
+
+    tfp = 0.; // Transmittance at cs
+    rfp = 0.; // Front reflectance at cs
+    rbp = 0.; // Back reflectance at cs
+
+    SimpleGlazingSystem = true; // .TRUE. if simple block model being used
+    SimpleGlazingSHGC = 0.335;    // SHGC value to use in alternate model for simple glazing system
+    SimpleGlazingU = 1.704;       // U-factor value to use in alternate model for simple glazing system
+
+    for (Real64 theta = 0.0; theta <= DataGlobals::PiOvr2; theta += DataGlobals::PiOvr2/10.0) {
+        cs = std::cos(theta); // Cosine of incidence angle
+        TransAndReflAtPhi(cs, tf0, rf0, rb0, tfp, rfp, rbp, SimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU);
+        Real64 afp = 1. - tfp - rfp;
+
+        EXPECT_GE(afp, 0.00);
+    }
+
+
 }
 
 TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
@@ -387,7 +419,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
                           "  0.200000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}",
                           "  9.900000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}",
                           "  9.900000,0.000000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}",
-                          "BuildingSurface:Detailed,"
+                          "BuildingSurface:Detailed,",
                           "  Wall,                    !- Name",
                           "  Wall,                    !- Surface Type",
                           "  WallConstruction,        !- Construction Name",
@@ -402,7 +434,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
                           "  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
                           "  10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
                           "  10.00000,0.000000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}",
-                          "BuildingSurface:Detailed,"
+                          "BuildingSurface:Detailed,",
                           "  Floor,                   !- Name",
                           "  Floor,                   !- Surface Type",
                           "  WallConstruction,        !- Construction Name",
@@ -417,7 +449,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
                           "  0.000000,10.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
                           "  10.00000,10.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
                           "  10.00000,0.000000,0;  !- X,Y,Z ==> Vertex 4 {m}",
-                          "Zone,"
+                          "Zone,",
                           "  Zone,                    !- Name",
                           "  0,                       !- Direction of Relative North {deg}",
                           "  6.000000,                !- X Origin {m}",
@@ -2611,7 +2643,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
                           "  Through: 12/31,               !- Field 1",
                           "  For: AllDays,                 !- Field 2",
                           "  Until: 24:00, 15.0;           !- Field 3",
-                          "BuildingSurface:Detailed,"
+                          "BuildingSurface:Detailed,",
                           "  Wall,                    !- Name",
                           "  Wall,                    !- Surface Type",
                           "  WallConstruction,        !- Construction Name",

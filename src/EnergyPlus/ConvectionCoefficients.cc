@@ -6332,11 +6332,11 @@ namespace ConvectionCoefficients {
 
         Real64 Hforced;
 
-        Hforced = 3.873 + 0.082 * std::pow(ACH, 0.98);
-
-        if (ACH > 1.0) {
+        if (ACH >= 3.0) {
+            Hforced = 3.873 + 0.082 * std::pow(ACH, 0.98);
             return Hforced;
         } else { // Revert to purely natural convection
+            Hforced = 4.11365377688938; // Value of Hforced when ACH=3
             return CalcFisherPedersenCeilDiffuserNatConv(Hforced, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
         }
     }
@@ -6357,11 +6357,11 @@ namespace ConvectionCoefficients {
 
         Real64 Hforced;
 
-        Hforced = 2.234 + 4.099 * std::pow(ACH, 0.503);
-
-        if (ACH > 1.0) {
+        if (ACH >= 3.0) {
+            Hforced = 2.234 + 4.099 * std::pow(ACH, 0.503);
             return Hforced;
         } else { // Revert to purely natural convection
+            Hforced = 9.35711423763866; // Value of Hforced when ACH=3
             return CalcFisherPedersenCeilDiffuserNatConv(Hforced, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
         }
     }
@@ -6382,11 +6382,11 @@ namespace ConvectionCoefficients {
 
         Real64 Hforced;
 
-        Hforced = 1.208 + 1.012 * std::pow(ACH, 0.604);
-
-        if (ACH > 1.0) {
+        if (ACH >= 3.0) {
+            Hforced = 1.208 + 1.012 * std::pow(ACH, 0.604);
             return Hforced;
         } else { // Revert to purely natural convection
+            Hforced = 3.17299636062606; // Value of Hforced when ACH=3
             return CalcFisherPedersenCeilDiffuserNatConv(Hforced, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
         }
     }
@@ -6413,7 +6413,7 @@ namespace ConvectionCoefficients {
         if (ACH <= 0.5) {
             return Hnatural;
         } else {
-            return Hnatural + ((Hforced - Hnatural) * ((ACH - 0.5) / 0.5));
+            return Hnatural + ((Hforced - Hnatural) * ((ACH - 0.5) / 2.5)); // range for interpolation goes from ACH=0.5 to ACH=3.0 or a range of 2.5
         }
     }
 

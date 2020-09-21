@@ -1395,7 +1395,6 @@ namespace HVACSingleDuctInduc {
         Real64 SecAirMassFlow; // secondary air mass flow rate [kg/s]
         Real64 TotAirMassFlow; // total air mass flow rate [kg/s]
         Real64 InducRat;       // induction ratio
-        Real64 CpAirZn;        // zone air specific heat [J/kg-C]
         Real64 mdotHW;         // local temporary hot water flow rate [kg/s]
         Real64 mdotCW;         // local temporary cold water flow rate [kg/s]
         int HWOutletNode;
@@ -1407,7 +1406,6 @@ namespace HVACSingleDuctInduc {
         OutletNode = IndUnit(IUNum).OutAirNode;
         PriAirMassFlow = Node(PriNode).MassFlowRateMaxAvail;
         InducRat = IndUnit(IUNum).InducRatio;
-        CpAirZn = PsyCpAirFnW(Node(ZoneNode).HumRat);
         SecAirMassFlow = InducRat * PriAirMassFlow;
         TotAirMassFlow = PriAirMassFlow + SecAirMassFlow;
         HotControlNode = IndUnit(IUNum).HWControlNode;
@@ -1448,7 +1446,8 @@ namespace HVACSingleDuctInduc {
         SimulateWaterCoilComponents(state, IndUnit(IUNum).HCoil, FirstHVACIteration, IndUnit(IUNum).HCoil_Num);
         SimulateWaterCoilComponents(state, IndUnit(IUNum).CCoil, FirstHVACIteration, IndUnit(IUNum).CCoil_Num);
         SimAirMixer(IndUnit(IUNum).MixerName, IndUnit(IUNum).Mixer_Num);
-        LoadMet = TotAirMassFlow * CpAirZn * (Node(OutletNode).Temp - Node(ZoneNode).Temp);
+        LoadMet = TotAirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                                       Node(OutletNode).Temp, Node(OutletNode).HumRat, Node(ZoneNode).Temp, Node(ZoneNode).HumRat);
     }
 
     Real64 FourPipeIUHeatingResidual(EnergyPlusData &state, Real64 const HWFlow,       // hot water flow rate in kg/s

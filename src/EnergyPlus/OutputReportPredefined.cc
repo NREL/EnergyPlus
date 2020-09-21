@@ -638,8 +638,8 @@ namespace OutputReportPredefined {
     int pdrSensibleGain;
     // annual
     int pdstSHGSannual;
-    int pdchSHGSAnHvacHt;
-    int pdchSHGSAnHvacCl;
+    int pdchSHGSAnZoneEqHt;
+    int pdchSHGSAnZoneEqCl;
     int pdchSHGSAnHvacATUHt;
     int pdchSHGSAnHvacATUCl;
     int pdchSHGSAnSurfHt;
@@ -1487,8 +1487,8 @@ namespace OutputReportPredefined {
         pdchEMotherLmaxvaluetime = 0;
         pdrSensibleGain = 0;
         pdstSHGSannual = 0;
-        pdchSHGSAnHvacHt = 0;
-        pdchSHGSAnHvacCl = 0;
+        pdchSHGSAnZoneEqHt = 0;
+        pdchSHGSAnZoneEqCl = 0;
         pdchSHGSAnSurfHt = 0;
         pdchSHGSAnSurfCl = 0;
         pdchSHGSAnPeoplAdd = 0;
@@ -2489,8 +2489,8 @@ namespace OutputReportPredefined {
 
         pdstSHGSannual = newPreDefSubTable(pdrSensibleGain, "Annual Building Sensible Heat Gain Components");
 
-        pdchSHGSAnHvacHt = newPreDefColumn(pdstSHGSannual, "HVAC Zone Eq & Other Sensible Air Heating [GJ]");
-        pdchSHGSAnHvacCl = newPreDefColumn(pdstSHGSannual, "HVAC Zone Eq & Other Sensible Air Cooling [GJ]");
+        pdchSHGSAnZoneEqHt = newPreDefColumn(pdstSHGSannual, "HVAC Zone Eq & Other Sensible Air Heating [GJ]");
+        pdchSHGSAnZoneEqCl = newPreDefColumn(pdstSHGSannual, "HVAC Zone Eq & Other Sensible Air Cooling [GJ]");
         pdchSHGSAnHvacATUHt = newPreDefColumn(pdstSHGSannual, "HVAC Terminal Unit Sensible Air Heating [GJ]");
         pdchSHGSAnHvacATUCl = newPreDefColumn(pdstSHGSannual, "HVAC Terminal Unit Sensible Air Cooling [GJ]");
         pdchSHGSAnSurfHt = newPreDefColumn(pdstSHGSannual, "HVAC Input Heated Surface Heating [GJ]");
