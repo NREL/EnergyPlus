@@ -615,12 +615,13 @@ namespace TempSolveRoot {
         XX_0 = X0;
         XX_1 = X1;
     }
-/*
-    void SolveRoot(Real64 const Eps, // required absolute accuracy
+
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x) = 0
-                   std::function<Real64(Real64 const)> f,
+                   std::function<Real64(EnergyPlusData &state, Real64 const)> f,
                    Real64 const X_0, // 1st bound of interval that contains the solution
                    Real64 const X_1  // 2nd bound of interval that contains the solution
     )
@@ -686,8 +687,8 @@ namespace TempSolveRoot {
         NIte = 0;
         AltIte = 0;
 
-        Y0 = f(X0);
-        Y1 = f(X1);
+        Y0 = f(state, X0);
+        Y1 = f(state, X1);
         // check initial values
         if (Y0 * Y1 > 0) {
             Flag = -2;
@@ -742,7 +743,7 @@ namespace TempSolveRoot {
             }
             }
 
-            YTemp = f(XTemp);
+            YTemp = f(state, XTemp);
 
             ++NIte;
             ++AltIte;
@@ -790,7 +791,7 @@ namespace TempSolveRoot {
         }
         XRes = XTemp;
     }
-*/
+
 /*
     void SolveRoot(Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations

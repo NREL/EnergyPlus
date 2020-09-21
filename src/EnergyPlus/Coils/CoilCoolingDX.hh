@@ -75,11 +75,11 @@ struct CoilCoolingDXInputSpecification
 struct CoilCoolingDX
 {
     CoilCoolingDX() = default;
-    static int factory(std::string const &coilName);
-    static void getInput();
+    static int factory(EnergyPlusData &state, std::string const &coilName);
+    static void getInput(EnergyPlusData &state);
     static void clear_state();
     static void reportAllStandardRatings(IOFiles& ioFiles);
-    void instantiateFromInputSpec(const CoilCoolingDXInputSpecification &input_data);
+    void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXInputSpecification &input_data);
     void oneTimeInit();
     void simulate(EnergyPlusData& state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode, Real64 LoadSHR = -1.0);
     void setData(int fanIndex, int fanType, std::string const &fanName, int airLoopNum);
@@ -123,7 +123,7 @@ struct CoilCoolingDX
     int supplyFanIndex = 0;
     int supplyFanType = 0;
     std::string supplyFanName = "";
-    int CoolingCoilType = 0; // Coolig coil type
+    bool SubcoolReheatFlag = false; // Subcool reheat coil control
 
     CoilCoolingDXCurveFitSpeed &normModeNomSpeed();
     CoilCoolingDXCurveFitSpeed &altModeNomSpeed();
@@ -163,10 +163,6 @@ struct CoilCoolingDX
     void setToHundredPercentDOAS();
     bool isHundredPercentDOAS = false;
 };
-
-extern int const coilNormalMode; // Normal operation mode
-extern int const coilEnhancedMode; // Enhanced operation mode
-extern int const coilSubcoolReheatMode; // SubcoolReheat operation mode
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
 extern bool stillNeedToReportStandardRatings; // standard ratings flag for all coils to report at the same time

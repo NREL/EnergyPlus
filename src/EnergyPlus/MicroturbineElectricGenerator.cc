@@ -71,7 +71,6 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -107,11 +106,11 @@ namespace MicroturbineElectricGenerator {
         MTGenerator.clear();
     }
 
-    PlantComponent *MTGeneratorSpecs::factory(std::string const &objectName)
+    PlantComponent *MTGeneratorSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for generator if it hasn't been done already
         if (GetMTInput) {
-            GetMTGeneratorInput();
+            GetMTGeneratorInput(state);
             GetMTInput = false;
         }
 
@@ -127,7 +126,7 @@ namespace MicroturbineElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void GetMTGeneratorInput()
+    void GetMTGeneratorInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad/D. Shirey
@@ -246,7 +245,7 @@ namespace MicroturbineElectricGenerator {
                     RefBaroPressure, MTGenerator(GeneratorNum).RefCombustAirInletTemp, MTGenerator(GeneratorNum).RefCombustAirInletHumRat);
             }
 
-            MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum = CurveManager::GetCurveIndex(AlphArray(2)); // Convert curve name to number
+            MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum = CurveManager::GetCurveIndex(state, AlphArray(2)); // Convert curve name to number
             if (MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + AlphArray(2));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
@@ -257,7 +256,8 @@ namespace MicroturbineElectricGenerator {
                 if (!ErrorsFound) {
                     // Check electrical power output at reference combustion inlet temp and elevation
                     // Output of Electrical Power Output Modifier Curve (function of temp and elev)
-                    Real64 ElectOutFTempElevOutput = CurveManager::CurveValue(MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum,
+                    Real64 ElectOutFTempElevOutput = CurveManager::CurveValue(state,
+                                                                              MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum,
                                                                               MTGenerator(GeneratorNum).RefCombustAirInletTemp,
                                                                               MTGenerator(GeneratorNum).RefElevation);
                     if (std::abs(ElectOutFTempElevOutput - 1.0) > 0.1) {
@@ -273,7 +273,7 @@ namespace MicroturbineElectricGenerator {
                 }
             }
 
-            MTGenerator(GeneratorNum).ElecEffFTempCurveNum = CurveManager::GetCurveIndex(AlphArray(3)); // Convert curve name to number
+            MTGenerator(GeneratorNum).ElecEffFTempCurveNum = CurveManager::GetCurveIndex(state, AlphArray(3)); // Convert curve name to number
             if (MTGenerator(GeneratorNum).ElecEffFTempCurveNum == 0) {
                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                 ShowSevereError(DataIPShortCuts::cAlphaFieldNames(3) + " not found = " + AlphArray(3));
@@ -285,7 +285,7 @@ namespace MicroturbineElectricGenerator {
                     // Check electrical efficiency at reference combustion inlet temp
                     // Output of Electrical Efficiency Modifier Curve (function of temp)
                     Real64 ElecEfficFTempOutput =
-                        CurveManager::CurveValue(MTGenerator(GeneratorNum).ElecEffFTempCurveNum, MTGenerator(GeneratorNum).RefCombustAirInletTemp);
+                        CurveManager::CurveValue(state, MTGenerator(GeneratorNum).ElecEffFTempCurveNum, MTGenerator(GeneratorNum).RefCombustAirInletTemp);
                     if (std::abs(ElecEfficFTempOutput - 1.0) > 0.1) {
                         ShowWarningError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                         ShowContinueError(DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
@@ -297,7 +297,7 @@ namespace MicroturbineElectricGenerator {
                 }
             }
 
-            MTGenerator(GeneratorNum).ElecEffFPLRCurveNum = CurveManager::GetCurveIndex(AlphArray(4)); // Convert curve name to number
+            MTGenerator(GeneratorNum).ElecEffFPLRCurveNum = CurveManager::GetCurveIndex(state, AlphArray(4)); // Convert curve name to number
             if (MTGenerator(GeneratorNum).ElecEffFPLRCurveNum == 0) {
                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                 ShowSevereError(DataIPShortCuts::cAlphaFieldNames(4) + " not found = " + AlphArray(4));
@@ -308,7 +308,7 @@ namespace MicroturbineElectricGenerator {
                 if (!ErrorsFound) {
                     // Check electrical efficiency at PLR = 1
                     // Output of Electrical Efficiency Modifier Curve (function of PLR)
-                    Real64 ElecEfficFPLROutput = CurveManager::CurveValue(MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, 1.0);
+                    Real64 ElecEfficFPLROutput = CurveManager::CurveValue(state, MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, 1.0);
                     if (std::abs(ElecEfficFPLROutput - 1.0) > 0.1) {
                         ShowWarningError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                         ShowContinueError(DataIPShortCuts::cAlphaFieldNames(4) + " = " + AlphArray(4));
@@ -318,7 +318,7 @@ namespace MicroturbineElectricGenerator {
 
                     Real64 Var1Min(0.0);
                     Real64 Var1Max(0.0);
-                    CurveManager::GetCurveMinMaxValues(MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, Var1Min, Var1Max);
+                    CurveManager::GetCurveMinMaxValues(state,MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, Var1Min, Var1Max);
                     MTGenerator(GeneratorNum).MinPartLoadRat = Var1Min;
                     MTGenerator(GeneratorNum).MaxPartLoadRat = Var1Max;
                 }
@@ -377,7 +377,7 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).AncillaryPower = 0.0;
             }
 
-            MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum = CurveManager::GetCurveIndex(AlphArray(6)); // Convert curve name to number
+            MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum = CurveManager::GetCurveIndex(state, AlphArray(6)); // Convert curve name to number
             //   If blank, then the calc routine assumes modifier curve value = 1 for entire simulation
             if (!DataIPShortCuts::lAlphaFieldBlanks(6) && MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + AlphArray(6));
@@ -391,7 +391,7 @@ namespace MicroturbineElectricGenerator {
                     Real64 RefFuelUseMdot = (MTGenerator(GeneratorNum).RefElecPowerOutput / MTGenerator(GeneratorNum).RefElecEfficiencyLHV) /
                                             (MTGenerator(GeneratorNum).FuelLowerHeatingValue * 1000.0);
                     // Output of Ancillary Power Modifer Curve (function of temps and fuel flow)
-                    Real64 AncillaryPowerOutput = CurveManager::CurveValue(MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum, RefFuelUseMdot);
+                    Real64 AncillaryPowerOutput = CurveManager::CurveValue(state, MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum, RefFuelUseMdot);
                     if (std::abs(AncillaryPowerOutput - 1.0) > 0.1) {
                         ShowWarningError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                         ShowContinueError(DataIPShortCuts::cAlphaFieldNames(6) + " = " + AlphArray(6));
@@ -492,20 +492,20 @@ namespace MicroturbineElectricGenerator {
 
                 if (MTGenerator(GeneratorNum).InternalFlowControl) { // Get Heat Recovery Water Flow Rate Modifier Curve
 
-                    MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum = CurveManager::GetCurveIndex(AlphArray(10));
+                    MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum = CurveManager::GetCurveIndex(state, AlphArray(10));
                     if (MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum != 0) {
                         // Verify curve object, only legal type is BiQuadratic
                     }
 
                 } // End of IF (MTGenerator(GeneratorNum)%InternalFlowControl) THEN
 
-                MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum = CurveManager::GetCurveIndex(AlphArray(11)); // convert curve name to number
+                MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum = CurveManager::GetCurveIndex(state, AlphArray(11)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum != 0) {
                     // Verify curve object, only legal types are BiQuadratic and BiCubic
 
                     if (!ErrorsFound) {
                         // Output of Thermal Efficiency Modifier Curve (function of temp and elevation)
-                        Real64 ThermalEffTempElevOutput = CurveManager::CurveValue(MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum,
+                        Real64 ThermalEffTempElevOutput = CurveManager::CurveValue(state, MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum,
                                                                                    MTGenerator(GeneratorNum).RefCombustAirInletTemp,
                                                                                    MTGenerator(GeneratorNum).RefElevation);
 
@@ -521,13 +521,13 @@ namespace MicroturbineElectricGenerator {
                     }
                 }
 
-                MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum = CurveManager::GetCurveIndex(AlphArray(12)); // convert curve name to number
+                MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum = CurveManager::GetCurveIndex(state, AlphArray(12)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum != 0) {
                     // Verify curve object, only legal types are Quadratic or Cubic
 
                     if (!ErrorsFound) {
                         // Output of Heat Recovery Rate Modifier Curve (function of PLR)
-                        Real64 HeatRecRateFPLROutput = CurveManager::CurveValue(MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum, 1.0);
+                        Real64 HeatRecRateFPLROutput = CurveManager::CurveValue(state, MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum, 1.0);
 
                         if (std::abs(HeatRecRateFPLROutput - 1.0) > 0.1) {
                             ShowWarningError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
@@ -538,14 +538,14 @@ namespace MicroturbineElectricGenerator {
                     }
                 }
 
-                MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum = CurveManager::GetCurveIndex(AlphArray(13)); // convert curve name to number
+                MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum = CurveManager::GetCurveIndex(state, AlphArray(13)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum != 0) {
                     // Verify curve object, only legal type is Quadratic
 
                     if (!ErrorsFound) {
                         // Output of Heat Recovery Rate Modifier Curve (function of inlet water temp)
                         Real64 HeatRecRateFTempOutput =
-                            CurveManager::CurveValue(MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum, MTGenerator(GeneratorNum).RefInletWaterTemp);
+                            CurveManager::CurveValue(state, MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum, MTGenerator(GeneratorNum).RefInletWaterTemp);
 
                         if (std::abs(HeatRecRateFTempOutput - 1.0) > 0.1) {
                             ShowWarningError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
@@ -558,13 +558,13 @@ namespace MicroturbineElectricGenerator {
                     }
                 }
 
-                MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum = CurveManager::GetCurveIndex(AlphArray(14));
+                MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum = CurveManager::GetCurveIndex(state, AlphArray(14));
                 if (MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum != 0) {
                     // Verify curve object, only legal type is Quadratic
 
                     if (!ErrorsFound) {
                         // Output of Heat Recovery Rate Modifier Curve (function of water flow rate)
-                        Real64 HeatRecRateFFlowOutput = CurveManager::CurveValue(MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum,
+                        Real64 HeatRecRateFFlowOutput = CurveManager::CurveValue(state, MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum,
                                                                                  MTGenerator(GeneratorNum).RefHeatRecVolFlowRate);
 
                         if (std::abs(HeatRecRateFFlowOutput - 1.0) > 0.1) {
@@ -678,13 +678,13 @@ namespace MicroturbineElectricGenerator {
                     ErrorsFound = true;
                 }
 
-                MTGenerator(GeneratorNum).ExhFlowFTempCurveNum = CurveManager::GetCurveIndex(AlphArray(17));
+                MTGenerator(GeneratorNum).ExhFlowFTempCurveNum = CurveManager::GetCurveIndex(state, AlphArray(17));
                 if (MTGenerator(GeneratorNum).ExhFlowFTempCurveNum != 0) {
                     // Verify curve object, only legal types are Quadratic and Cubic
 
                     if (!ErrorsFound) {
                         // Output of Exhaust Air Flow Modifier Curve (function of inlet air temp)
-                        Real64 ExhFlowFTempOutput = CurveManager::CurveValue(MTGenerator(GeneratorNum).ExhFlowFTempCurveNum,
+                        Real64 ExhFlowFTempOutput = CurveManager::CurveValue(state, MTGenerator(GeneratorNum).ExhFlowFTempCurveNum,
                                                                              MTGenerator(GeneratorNum).RefCombustAirInletTemp);
 
                         if (std::abs(ExhFlowFTempOutput - 1.0) > 0.1) {
@@ -698,13 +698,13 @@ namespace MicroturbineElectricGenerator {
                     }
                 }
 
-                MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum = CurveManager::GetCurveIndex(AlphArray(18)); // convert curve name to number
+                MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum = CurveManager::GetCurveIndex(state, AlphArray(18)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum != 0) {
                     // Verify curve object, legal types are Quadratic or Cubic
 
                     if (!ErrorsFound) {
                         // Output of Exhaust Air Flow Modifier Curve (function of PLR)
-                        Real64 ExhFlowFPLROutput = CurveManager::CurveValue(MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum, 1.0);
+                        Real64 ExhFlowFPLROutput = CurveManager::CurveValue(state, MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum, 1.0);
 
                         if (std::abs(ExhFlowFPLROutput - 1.0) > 0.1) {
                             ShowWarningError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
@@ -717,13 +717,13 @@ namespace MicroturbineElectricGenerator {
 
                 MTGenerator(GeneratorNum).NomExhAirOutletTemp = NumArray(19);
 
-                MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum = CurveManager::GetCurveIndex(AlphArray(19));
+                MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum = CurveManager::GetCurveIndex(state, AlphArray(19));
                 if (MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum != 0) {
                     // Verify curve object, only legal types are Quadratic and Cubic
 
                     if (!ErrorsFound) {
                         // Output of Exhaust Air Temperature Modifier Curve (function of inlet air temp)
-                        Real64 ExhAirTempFTempOutput = CurveManager::CurveValue(MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum,
+                        Real64 ExhAirTempFTempOutput = CurveManager::CurveValue(state, MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum,
                                                                                 MTGenerator(GeneratorNum).RefCombustAirInletTemp);
 
                         if (std::abs(ExhAirTempFTempOutput - 1.0) > 0.1) {
@@ -737,13 +737,13 @@ namespace MicroturbineElectricGenerator {
                     }
                 }
 
-                MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum = CurveManager::GetCurveIndex(AlphArray(20)); // convert curve name to number
+                MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum = CurveManager::GetCurveIndex(state, AlphArray(20)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum != 0) {
                     // Verify curve object, legal types are Quadratic or Cubic
 
                     if (!ErrorsFound) {
                         // Output of Exhaust Air Temperature Modifier Curve (function of PLR)
-                        Real64 ExhOutAirTempFPLROutput = CurveManager::CurveValue(MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum, 1.0);
+                        Real64 ExhOutAirTempFPLROutput = CurveManager::CurveValue(state, MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum, 1.0);
 
                         if (std::abs(ExhOutAirTempFPLROutput - 1.0) > 0.1) {
                             ShowWarningError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
@@ -887,7 +887,7 @@ namespace MicroturbineElectricGenerator {
         OptLoad = 0.0;
     }
 
-    void MTGeneratorSpecs::InitMTGenerators(BranchInputManagerData &dataBranchInputManager,
+    void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
                                             bool const RunFlag,
                                             Real64 const MyLoad, // electrical load in W
                                             bool const FirstHVACIteration)
@@ -915,7 +915,7 @@ namespace MicroturbineElectricGenerator {
 
         if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop) && this->HeatRecActive) {
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Generator_MicroTurbine,
                                                     this->HRLoopNum,
@@ -995,7 +995,7 @@ namespace MicroturbineElectricGenerator {
                 if (this->HeatRecFlowFTempPowCurveNum != 0) {
                     DesiredMassFlowRate =
                         this->DesignHeatRecMassFlowRate *
-                        CurveManager::CurveValue(this->HeatRecFlowFTempPowCurveNum, DataLoopNode::Node(this->HeatRecInletNodeNum).Temp, MyLoad);
+                        CurveManager::CurveValue(state, this->HeatRecFlowFTempPowCurveNum, DataLoopNode::Node(this->HeatRecInletNodeNum).Temp, MyLoad);
                 } else {
                     DesiredMassFlowRate = this->DesignHeatRecMassFlowRate; // Assume modifier = 1 if curve not specified
                 }
@@ -1025,7 +1025,7 @@ namespace MicroturbineElectricGenerator {
                 if (this->HeatRecFlowFTempPowCurveNum != 0) {
                     Real64 DesiredMassFlowRate =
                         this->DesignHeatRecMassFlowRate *
-                        CurveManager::CurveValue(this->HeatRecFlowFTempPowCurveNum, DataLoopNode::Node(this->HeatRecInletNodeNum).Temp, MyLoad);
+                        CurveManager::CurveValue(state, this->HeatRecFlowFTempPowCurveNum, DataLoopNode::Node(this->HeatRecInletNodeNum).Temp, MyLoad);
                     PlantUtilities::SetComponentFlowRate(DesiredMassFlowRate,
                                                          this->HeatRecInletNodeNum,
                                                          this->HeatRecOutletNodeNum,
@@ -1054,7 +1054,8 @@ namespace MicroturbineElectricGenerator {
         }
     }
 
-    void MTGeneratorSpecs::CalcMTGeneratorModel(bool const RunFlag,  // TRUE when generator is being asked to operate
+    void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
+                                                bool const RunFlag,  // TRUE when generator is being asked to operate
                                                 Real64 const MyLoad) // Generator demand (W)
     {
         // SUBROUTINE INFORMATION:
@@ -1155,7 +1156,7 @@ namespace MicroturbineElectricGenerator {
 
         //   Calculate power modifier curve value (function of inlet air temperature and elevation)
         // Power ratio as a function of inlet air temperature and elevation
-        Real64 PowerFTempElev = CurveManager::CurveValue(this->ElecPowFTempElevCurveNum, CombustionAirInletTemp, DataEnvironment::Elevation);
+        Real64 PowerFTempElev = CurveManager::CurveValue(state, this->ElecPowFTempElevCurveNum, CombustionAirInletTemp, DataEnvironment::Elevation);
 
         //   Warn user if power modifier curve output is less than 0
         if (PowerFTempElev < 0.0) {
@@ -1217,7 +1218,7 @@ namespace MicroturbineElectricGenerator {
 
             //     Calculate electrical efficiency modifier curve output (function of temp)
             // Electrical efficiency as a function of temperature curve output
-            Real64 ElecEfficiencyFTemp = CurveManager::CurveValue(this->ElecEffFTempCurveNum, CombustionAirInletTemp);
+            Real64 ElecEfficiencyFTemp = CurveManager::CurveValue(state, this->ElecEffFTempCurveNum, CombustionAirInletTemp);
 
             //     Warn user if efficiency modifier curve output is less than 0
             if (ElecEfficiencyFTemp < 0.0) {
@@ -1241,7 +1242,7 @@ namespace MicroturbineElectricGenerator {
 
             //     Calculate efficiency modifier curve output (function of PLR)
             // Electrical efficiency as a function of PLR curve output
-            Real64 ElecEfficiencyFPLR = CurveManager::CurveValue(this->ElecEffFPLRCurveNum, PLR);
+            Real64 ElecEfficiencyFPLR = CurveManager::CurveValue(state, this->ElecEffFPLRCurveNum, PLR);
 
             //     Warn user if efficiency modifier curve output is less than 0
             if (ElecEfficiencyFPLR < 0.0) {
@@ -1282,7 +1283,7 @@ namespace MicroturbineElectricGenerator {
 
             //     Calculate ancillary power requirement
             if (this->AncillaryPowerFuelCurveNum > 0) {
-                AnciPowerFMdotFuel = CurveManager::CurveValue(this->AncillaryPowerFuelCurveNum, this->FuelMdot);
+                AnciPowerFMdotFuel = CurveManager::CurveValue(state, this->AncillaryPowerFuelCurveNum, this->FuelMdot);
                 //       Warn user if ancillary power modifier curve output is less than 0
                 if (AnciPowerFMdotFuel < 0.0) {
                     if (this->AnciPowerFMdotFuelErrorIndex == 0) {
@@ -1349,7 +1350,7 @@ namespace MicroturbineElectricGenerator {
             // Thermal efficiency as a function of air temperature and elevation
             Real64 ThermalEffFTempElev;
             if (this->ThermEffFTempElevCurveNum > 0) {
-                ThermalEffFTempElev = CurveManager::CurveValue(this->ThermEffFTempElevCurveNum, CombustionAirInletTemp, DataEnvironment::Elevation);
+                ThermalEffFTempElev = CurveManager::CurveValue(state, this->ThermEffFTempElevCurveNum, CombustionAirInletTemp, DataEnvironment::Elevation);
                 //       Warn user if power modifier curve output is less than 0
                 if (ThermalEffFTempElev < 0.0) {
                     if (this->ThermEffFTempElevErrorIndex == 0) {
@@ -1377,7 +1378,7 @@ namespace MicroturbineElectricGenerator {
 
             //     Calculate heat recovery rate modifier curve output (function of PLR)
             if (this->HeatRecRateFPLRCurveNum > 0) {
-                HeatRecRateFPLR = CurveManager::CurveValue(this->HeatRecRateFPLRCurveNum, PLR);
+                HeatRecRateFPLR = CurveManager::CurveValue(state, this->HeatRecRateFPLRCurveNum, PLR);
                 //       Warn user if heat recovery modifier curve output is less than 0
                 if (HeatRecRateFPLR < 0.0) {
                     if (this->HeatRecRateFPLRErrorIndex == 0) {
@@ -1403,7 +1404,7 @@ namespace MicroturbineElectricGenerator {
 
             //     Calculate heat recovery rate modifier curve output (function of inlet water temp)
             if (this->HeatRecRateFTempCurveNum > 0) {
-                HeatRecRateFTemp = CurveManager::CurveValue(this->HeatRecRateFTempCurveNum, HeatRecInTemp);
+                HeatRecRateFTemp = CurveManager::CurveValue(state, this->HeatRecRateFTempCurveNum, HeatRecInTemp);
                 if (HeatRecRateFTemp < 0.0) {
                     if (this->HeatRecRateFTempErrorIndex == 0) {
                         ShowWarningMessage("GENERATOR:MICROTURBINE \"" + this->Name + "\"");
@@ -1434,7 +1435,7 @@ namespace MicroturbineElectricGenerator {
 
                 // Heat recovery fluid flow rate (m3/s)
                 Real64 HeatRecVolFlowRate = heatRecMdot / rho;
-                HeatRecRateFFlow = CurveManager::CurveValue(this->HeatRecRateFWaterFlowCurveNum, HeatRecVolFlowRate);
+                HeatRecRateFFlow = CurveManager::CurveValue(state, this->HeatRecRateFWaterFlowCurveNum, HeatRecVolFlowRate);
                 if (HeatRecRateFFlow < 0.0) {
                     if (this->HeatRecRateFFlowErrorIndex == 0) {
                         ShowWarningMessage("GENERATOR:MICROTURBINE \"" + this->Name + "\"");
@@ -1540,7 +1541,7 @@ namespace MicroturbineElectricGenerator {
             Real64 ExhFlowFTemp; // Exhaust air flow rate as a function of temperature curve output
 
             if (this->ExhFlowFTempCurveNum != 0) { // Exhaust Flow Rate versus Inlet Air Temp
-                ExhFlowFTemp = CurveManager::CurveValue(this->ExhFlowFTempCurveNum, CombustionAirInletTemp);
+                ExhFlowFTemp = CurveManager::CurveValue(state, this->ExhFlowFTempCurveNum, CombustionAirInletTemp);
                 //       Warn user if exhaust modifier curve output is less than or equal to 0
                 if (ExhFlowFTemp <= 0.0) {
                     if (this->ExhFlowFTempErrorIndex == 0) {
@@ -1566,7 +1567,7 @@ namespace MicroturbineElectricGenerator {
             Real64 ExhFlowFPLR; // Exhaust air flow rate as a function of part-load ratio curve output
 
             if (this->ExhFlowFPLRCurveNum != 0) { // Exhaust Flow Rate versus Part-Load Ratio
-                ExhFlowFPLR = CurveManager::CurveValue(this->ExhFlowFPLRCurveNum, PLR);
+                ExhFlowFPLR = CurveManager::CurveValue(state, this->ExhFlowFPLRCurveNum, PLR);
                 //       Warn user if exhaust modifier curve output is less than or equal to 0
                 if (ExhFlowFPLR <= 0.0) {
                     if (this->ExhFlowFPLRErrorIndex == 0) {
@@ -1605,7 +1606,7 @@ namespace MicroturbineElectricGenerator {
             Real64 ExhAirTempFTemp; // Exhaust air temperature as a function of inlet air temp curve output
 
             if (this->ExhAirTempFTempCurveNum != 0) { // Exhaust Air Temp versus Inlet Air Temp
-                ExhAirTempFTemp = CurveManager::CurveValue(this->ExhAirTempFTempCurveNum, CombustionAirInletTemp);
+                ExhAirTempFTemp = CurveManager::CurveValue(state, this->ExhAirTempFTempCurveNum, CombustionAirInletTemp);
                 //       Warn user if exhaust modifier curve output is less than or equal to 0
                 if (ExhAirTempFTemp <= 0.0) {
                     if (this->ExhTempFTempErrorIndex == 0) {
@@ -1631,7 +1632,7 @@ namespace MicroturbineElectricGenerator {
             Real64 ExhAirTempFPLR; // Exhaust air temperature as a function of part-load ratio curve output
 
             if (this->ExhAirTempFPLRCurveNum != 0) { // Exhaust Air Temp versus Part-Load Ratio
-                ExhAirTempFPLR = CurveManager::CurveValue(this->ExhAirTempFPLRCurveNum, PLR);
+                ExhAirTempFPLR = CurveManager::CurveValue(state, this->ExhAirTempFPLRCurveNum, PLR);
                 //       Warn user if exhaust modifier curve output is less than or equal to 0
                 if (ExhAirTempFPLR <= 0.0) {
                     if (this->ExhTempFPLRErrorIndex == 0) {

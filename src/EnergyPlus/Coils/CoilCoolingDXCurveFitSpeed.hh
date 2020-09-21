@@ -89,8 +89,8 @@ struct CoilCoolingDXCurveFitSpeed
     std::string parentName;
 
     CoilCoolingDXCurveFitSpeed() = default;
-    explicit CoilCoolingDXCurveFitSpeed(const std::string& name);
-    void instantiateFromInputSpec(const CoilCoolingDXCurveFitSpeedInputSpecification& input_data);
+    explicit CoilCoolingDXCurveFitSpeed(EnergyPlusData &state, const std::string& name);
+    void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitSpeedInputSpecification& input_data);
 
     CoilCoolingDXCurveFitSpeedInputSpecification original_input_specs;
 
@@ -156,7 +156,7 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 minRatedVolFlowPerRatedTotCap = DataHVACGlobals::MinRatedVolFlowPerRatedTotCap1;
     Real64 maxRatedVolFlowPerRatedTotCap = DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap1;
 
-    void CalcSpeedOutput(
+    void CalcSpeedOutput(EnergyPlusData &state,
         const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int  const fanOpMode, Real64 condInletTemp);
     void size(EnergyPlusData &state, int speedNum, int maxSpeeds);
  
@@ -177,7 +177,8 @@ struct CoilCoolingDXCurveFitSpeed
     );
 
 private:
-    bool processCurve(const std::string& curveName,
+    bool processCurve(EnergyPlusData &state,
+                      const std::string& curveName,
                       int &curveIndex,
                       std::vector<int> validDims,
                       const std::string& routineName,

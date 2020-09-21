@@ -58,12 +58,17 @@ namespace EnergyPlus {
         this->dataAirLoopHVACDOAS = std::unique_ptr<AirLoopHVACDOASData>(new AirLoopHVACDOASData);
         this->dataBaseboardRadiator = std::unique_ptr<BaseboardRadiatorData>(new BaseboardRadiatorData);
         this->dataBaseboardElectric =  std::unique_ptr<BaseboardElectricData>(new BaseboardElectricData);
+        this->dataCurveManager = std::unique_ptr<CurveManagerData>(new CurveManagerData);
+        this->dataAirLoop = std::unique_ptr<DataAirLoopData>(new DataAirLoopData);
     }
 
     void EnergyPlusData::clear_state() {
-        dataAirLoopHVACDOAS->clear_state();
-        dataBaseboardElectric->clear_state();
-        dataBaseboardRadiator->clear_state();
+        this->dataAirLoopHVACDOAS->clear_state();
+        this->dataBaseboardElectric->clear_state();
+        this->dataBaseboardRadiator->clear_state();
+        this->dataCurveManager->clear_state();
+        this->dataAirLoop->clear_state();
+
         dataBoilers.clear_state();
         dataBranchInputManager.clear_state();
         dataSteamBoilers.clear_state();

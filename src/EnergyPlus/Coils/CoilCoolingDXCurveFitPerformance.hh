@@ -81,8 +81,9 @@ struct CoilCoolingDXCurveFitPerformance
 {
     std::string object_name = "Coil:Cooling:DX:CurveFit:Performance";
     std::string parentName;
-    void instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data);
-    void simulate(const DataLoopNode::NodeData &inletNode,
+    void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data);
+    void simulate(EnergyPlusData &state,
+                  const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
                   int useAlternateMode,
                   Real64 &PLR,
@@ -94,7 +95,8 @@ struct CoilCoolingDXCurveFitPerformance
                   bool const singleMode,
                   Real64 LoadSHR = 0.0);
 
-    void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
+    void calculate(EnergyPlusData &state,
+                   CoilCoolingDXCurveFitOperatingMode &currentMode,
                    const DataLoopNode::NodeData &inletNode,
                    DataLoopNode::NodeData &outletNode,
                    Real64 &PLR,
@@ -107,7 +109,7 @@ struct CoilCoolingDXCurveFitPerformance
     void calcStandardRatings210240();
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
     CoilCoolingDXCurveFitPerformance() = default;
-    explicit CoilCoolingDXCurveFitPerformance(const std::string &name);
+    explicit CoilCoolingDXCurveFitPerformance(EnergyPlusData &state, const std::string &name);
     void size(EnergyPlusData &state);
     void setOperMode(CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode);
 

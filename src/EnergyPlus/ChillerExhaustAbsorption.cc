@@ -113,15 +113,15 @@ namespace ChillerExhaustAbsorption {
     //    Development of the original(GasAbsoptionChiller) module was funded by the Gas Research Institute.
     //    (Please see copyright and disclaimer information at end of module)
 
-    PlantComponent *ExhaustAbsorberSpecs::factory(ChillerExhaustAbsorptionData &chillers, std::string const &objectName)
+    PlantComponent *ExhaustAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
-        if (chillers.Sim_GetInput) {
-            GetExhaustAbsorberInput(chillers);
-            chillers.Sim_GetInput = false;
+        if (state.dataChillerExhaustAbsorption.Sim_GetInput) {
+            GetExhaustAbsorberInput(state);
+            state.dataChillerExhaustAbsorption.Sim_GetInput = false;
         }
         // Now look for this particular pipe in the list
-        for (auto &comp : chillers.ExhaustAbsorber) {
+        for (auto &comp : state.dataChillerExhaustAbsorption.ExhaustAbsorber) {
             if (comp.Name == objectName) {
                 return &comp;
             }
@@ -142,13 +142,13 @@ namespace ChillerExhaustAbsorption {
         // Match inlet node name of calling branch to determine if this call is for heating or cooling
         if (BranchInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
             this->InCoolingMode = RunFlag != 0;
-            this->initialize(state.dataBranchInputManager);
-            this->calcChiller(CurLoad);
+            this->initialize(state);
+            this->calcChiller(state, CurLoad);
             this->updateCoolRecords(CurLoad, RunFlag);
         } else if (BranchInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
             this->InHeatingMode = RunFlag != 0;
-            this->initialize(state.dataBranchInputManager);
-            this->calcHeater(CurLoad, RunFlag);
+            this->initialize(state);
+            this->calcHeater(state, CurLoad, RunFlag);
             this->updateHeatRecords(CurLoad, RunFlag);
         } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
             if (this->CDLoopNum > 0) {
@@ -206,7 +206,7 @@ namespace ChillerExhaustAbsorption {
 
     void ExhaustAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
-        this->initialize(state.dataBranchInputManager);
+        this->initialize(state);
 
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int BranchInletNodeNum =
@@ -225,12 +225,12 @@ namespace ChillerExhaustAbsorption {
         TempDesCondIn = this->TempDesCondReturn;
     }
 
-    void GetExhaustAbsorberInput(ChillerExhaustAbsorptionData &chillers)
+    void GetExhaustAbsorberInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Jason Glazer
         //       DATE WRITTEN:    March 2001
-        //       MODIFIED         Mahabir Bhandari, ORNL, Aug 2011, modified to accomodate Exhaust Fired Double Effect Absorption Chiller
+        //       MODIFIED         Mahabir Bhandari, ORNL, Aug 2011, modified to accommodate Exhaust Fired Double Effect Absorption Chiller
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -267,10 +267,10 @@ namespace ChillerExhaustAbsorption {
             Get_ErrorsFound = true;
         }
 
-        if (allocated(chillers.ExhaustAbsorber)) return;
+        if (allocated(state.dataChillerExhaustAbsorption.ExhaustAbsorber)) return;
 
         // ALLOCATE ARRAYS
-        chillers.ExhaustAbsorber.allocate(NumExhaustAbsorbers);
+        state.dataChillerExhaustAbsorption.ExhaustAbsorber.allocate(NumExhaustAbsorbers);
 
         // LOAD ARRAYS
 
@@ -291,7 +291,7 @@ namespace ChillerExhaustAbsorption {
             // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.ExhaustAbsorber(AbsorberNum);
+            auto &thisChiller = state.dataChillerExhaustAbsorption.ExhaustAbsorber(AbsorberNum);
             thisChiller.Name = cAlphaArgs(1);
             ChillerName = cCurrentModuleObject + " Named " + thisChiller.Name;
 
@@ -372,13 +372,13 @@ namespace ChillerExhaustAbsorption {
                 thisChiller.HeatVolFlowRateWasAutoSized = true;
             }
             // Assign Curve Numbers
-            thisChiller.CoolCapFTCurve = GetCurveCheck(cAlphaArgs(8), Get_ErrorsFound, ChillerName);
-            thisChiller.ThermalEnergyCoolFTCurve = GetCurveCheck(cAlphaArgs(9), Get_ErrorsFound, ChillerName);
-            thisChiller.ThermalEnergyCoolFPLRCurve = GetCurveCheck(cAlphaArgs(10), Get_ErrorsFound, ChillerName);
-            thisChiller.ElecCoolFTCurve = GetCurveCheck(cAlphaArgs(11), Get_ErrorsFound, ChillerName);
-            thisChiller.ElecCoolFPLRCurve = GetCurveCheck(cAlphaArgs(12), Get_ErrorsFound, ChillerName);
-            thisChiller.HeatCapFCoolCurve = GetCurveCheck(cAlphaArgs(13), Get_ErrorsFound, ChillerName);
-            thisChiller.ThermalEnergyHeatFHPLRCurve = GetCurveCheck(cAlphaArgs(14), Get_ErrorsFound, ChillerName);
+            thisChiller.CoolCapFTCurve = GetCurveCheck(state, cAlphaArgs(8), Get_ErrorsFound, ChillerName);
+            thisChiller.ThermalEnergyCoolFTCurve = GetCurveCheck(state, cAlphaArgs(9), Get_ErrorsFound, ChillerName);
+            thisChiller.ThermalEnergyCoolFPLRCurve = GetCurveCheck(state, cAlphaArgs(10), Get_ErrorsFound, ChillerName);
+            thisChiller.ElecCoolFTCurve = GetCurveCheck(state, cAlphaArgs(11), Get_ErrorsFound, ChillerName);
+            thisChiller.ElecCoolFPLRCurve = GetCurveCheck(state, cAlphaArgs(12), Get_ErrorsFound, ChillerName);
+            thisChiller.HeatCapFCoolCurve = GetCurveCheck(state, cAlphaArgs(13), Get_ErrorsFound, ChillerName);
+            thisChiller.ThermalEnergyHeatFHPLRCurve = GetCurveCheck(state, cAlphaArgs(14), Get_ErrorsFound, ChillerName);
             if (Get_ErrorsFound) {
                 ShowFatalError("Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 Get_ErrorsFound = false;
@@ -458,7 +458,7 @@ namespace ChillerExhaustAbsorption {
                 thisChiller.CompType_Num = DataGlobalConstants::iGeneratorMicroturbine;
                 thisChiller.ExhuastSourceName = cAlphaArgs(18);
 
-                auto thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(thisChiller.ExhuastSourceName);
+                auto thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, thisChiller.ExhuastSourceName);
                 thisChiller.ExhaustAirInletNodeNum =
                     dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs *>(thisMTG)->CombustionAirOutletNodeNum;
             }
@@ -616,7 +616,7 @@ namespace ChillerExhaustAbsorption {
                             ChillerName);
     }
 
-    void ExhaustAbsorberSpecs::initialize(BranchInputManagerData &dataBranchInputManager)
+    void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -653,7 +653,7 @@ namespace ChillerExhaustAbsorption {
         if (this->plantScanInit) {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
                                                     this->CWLoopNum,
@@ -670,7 +670,7 @@ namespace ChillerExhaustAbsorption {
                 ShowFatalError("InitExhaustAbsorber: Program terminated due to previous condition(s).");
             }
 
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
                                                     this->HWLoopNum,
@@ -688,7 +688,7 @@ namespace ChillerExhaustAbsorption {
             }
 
             if (this->isWaterCooled) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
                                                         this->CDLoopNum,
@@ -727,6 +727,7 @@ namespace ChillerExhaustAbsorption {
                     // need call to EMS to check node
                     errFlag = false; // but not really fatal yet, but should be.
                     EMSManager::CheckIfNodeSetPointManagedByEMS(this->ChillSupplyNodeNum, EMSManager::iTemperatureSetPoint, errFlag);
+                    DataLoopNode::NodeSetpointCheck(this->ChillSupplyNodeNum).needsSetpointChecking = false;
                     if (errFlag) {
                         if (!this->ChillSetPointErrDone) {
                             ShowWarningError("Missing temperature setpoint on cool side for chiller heater named " + this->Name);
@@ -758,6 +759,7 @@ namespace ChillerExhaustAbsorption {
                     // need call to EMS to check node
                     errFlag = false; // but not really fatal yet, but should be.
                     EMSManager::CheckIfNodeSetPointManagedByEMS(this->HeatSupplyNodeNum, EMSManager::iTemperatureSetPoint, errFlag);
+                    DataLoopNode::NodeSetpointCheck(this->HeatSupplyNodeNum).needsSetpointChecking = false;
                     if (errFlag) {
                         if (!this->HeatSetPointErrDone) {
                             ShowWarningError("Missing temperature setpoint on heat side for chiller heater named " + this->Name);
@@ -1238,7 +1240,7 @@ namespace ChillerExhaustAbsorption {
         }
     }
 
-    void ExhaustAbsorberSpecs::calcChiller(Real64 &MyLoad)
+    void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1447,7 +1449,7 @@ namespace ChillerExhaustAbsorption {
             }
 
             // Determine available cooling capacity using the setpoint temperature
-            lAvailableCoolingCapacity = lNomCoolingCap * CurveManager::CurveValue(lCoolCapFTCurve, ChillSupplySetPointTemp, calcCondTemp);
+            lAvailableCoolingCapacity = lNomCoolingCap * CurveManager::CurveValue(state, lCoolCapFTCurve, ChillSupplySetPointTemp, calcCondTemp);
 
             // Calculate current load for cooling
             MyLoad = sign(max(std::abs(MyLoad), lAvailableCoolingCapacity * lMinPartLoadRat), MyLoad);
@@ -1564,15 +1566,15 @@ namespace ChillerExhaustAbsorption {
             // Calculate thermal energy consumption for cooling
             // Thermal Energy used for cooling availCap * TeFIR * TeFIR-FT * TeFIR-FPLR
             lCoolThermalEnergyUseRate = lAvailableCoolingCapacity * lThermalEnergyCoolRatio *
-                                        CurveManager::CurveValue(lThermalEnergyCoolFTCurve, lChillSupplyTemp, calcCondTemp) *
-                                        CurveManager::CurveValue(lThermalEnergyCoolFPLRCurve, lCoolPartLoadRatio) * lFractionOfPeriodRunning;
+                                        CurveManager::CurveValue(state, lThermalEnergyCoolFTCurve, lChillSupplyTemp, calcCondTemp) *
+                                        CurveManager::CurveValue(state, lThermalEnergyCoolFPLRCurve, lCoolPartLoadRatio) * lFractionOfPeriodRunning;
 
             // Calculate electric parasitics used
             // based on nominal capacity, not available capacity,
             // electric used for cooling nomCap * %OP * EIR * EIR-FT * EIR-FPLR
             lCoolElectricPower = lNomCoolingCap * lElecCoolRatio * lFractionOfPeriodRunning *
-                                 CurveManager::CurveValue(lElecCoolFTCurve, lChillSupplyTemp, calcCondTemp) *
-                                 CurveManager::CurveValue(lElecCoolFPLRCurve, lCoolPartLoadRatio);
+                                 CurveManager::CurveValue(state, lElecCoolFTCurve, lChillSupplyTemp, calcCondTemp) *
+                                 CurveManager::CurveValue(state, lElecCoolFPLRCurve, lCoolPartLoadRatio);
 
             // determine conderser load which is cooling load plus the
             // ThermalEnergy used for cooling plus
@@ -1634,7 +1636,7 @@ namespace ChillerExhaustAbsorption {
                 // iteration's value of condenser supply temperature and the actual calculated condenser supply
                 // temperature.  If this becomes too common then may need to iterate a solution instead of
                 // relying on previous iteration method.
-                revisedEstimateAvailCap = lNomCoolingCap * CurveManager::CurveValue(lCoolCapFTCurve, ChillSupplySetPointTemp, lCondSupplyTemp);
+                revisedEstimateAvailCap = lNomCoolingCap * CurveManager::CurveValue(state, lCoolCapFTCurve, ChillSupplySetPointTemp, lCondSupplyTemp);
                 if (revisedEstimateAvailCap > 0.0) {
                     errorAvailCap = std::abs((revisedEstimateAvailCap - lAvailableCoolingCapacity) / revisedEstimateAvailCap);
                     if (errorAvailCap > 0.05) { // if more than 5% error in estimate
@@ -1669,7 +1671,7 @@ namespace ChillerExhaustAbsorption {
         this->ElectricPower = lCoolElectricPower + lHeatElectricPower;
     }
 
-    void ExhaustAbsorberSpecs::calcHeater(Real64 &MyLoad, bool RunFlag)
+    void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1794,7 +1796,7 @@ namespace ChillerExhaustAbsorption {
 
             // Determine available heating capacity using the current cooling load
             lAvailableHeatingCapacity = this->NomHeatCoolRatio * this->NomCoolingCap *
-                                        CurveManager::CurveValue(lHeatCapFCoolCurve, (this->CoolingLoad / this->NomCoolingCap));
+                                        CurveManager::CurveValue(state, lHeatCapFCoolCurve, (this->CoolingLoad / this->NomCoolingCap));
 
             // Calculate current load for heating
             MyLoad = sign(max(std::abs(MyLoad), this->HeatingCapacity * lMinPartLoadRat), MyLoad);
@@ -1857,7 +1859,7 @@ namespace ChillerExhaustAbsorption {
             // ThermalEnergy used for heating availCap * HIR * HIR-FT * HIR-FPLR
 
             lHeatThermalEnergyUseRate =
-                lAvailableHeatingCapacity * lThermalEnergyHeatRatio * CurveManager::CurveValue(lThermalEnergyHeatFHPLRCurve, lHeatPartLoadRatio);
+                lAvailableHeatingCapacity * lThermalEnergyHeatRatio * CurveManager::CurveValue(state, lThermalEnergyHeatFHPLRCurve, lHeatPartLoadRatio);
 
             // calculate the fraction of the time period that the chiller would be running
             // use maximum from heating and cooling sides

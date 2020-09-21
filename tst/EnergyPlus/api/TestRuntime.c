@@ -105,8 +105,8 @@ void externalHVAC(EnergyPlusState state) {
 int main(int argc, const char * argv[]) {
 //    callbackBeginNewEnvironment(BeginNewEnvironmentHandler);
 //    callbackAfterNewEnvironmentWarmupComplete(AfterNewEnvironmentWarmupCompleteHandler);
-//    callbackBeginZoneTimeStepBeforeInitHeatBalance(BeginZoneTimeStepBeforeInitHeatBalanceHandler);
-//    callbackBeginZoneTimeStepAfterInitHeatBalance(BeginZoneTimeStepAfterInitHeatBalanceHandler);
+//    callbackBeginZoneTimeStepBeforeInitHeatBalance(state, BeginZoneTimeStepBeforeInitHeatBalanceHandler);
+//    callbackBeginZoneTimeStepAfterInitHeatBalance(state, BeginZoneTimeStepAfterInitHeatBalanceHandler);
 //    callbackBeginTimeStepBeforePredictor(BeginTimeStepBeforePredictorHandler);
 //    callbackAfterPredictorBeforeHVACManagers(AfterPredictorBeforeHVACManagersHandler);
 //    callbackAfterPredictorAfterHVACManagers(AfterPredictorAfterHVACManagersHandler);

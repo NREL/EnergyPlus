@@ -1777,6 +1777,8 @@
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
 
+  Output:Variable,*,Cooling Coil Dehumidification Mode,hourly;
+
   Output:VariableDictionary,IDF;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
