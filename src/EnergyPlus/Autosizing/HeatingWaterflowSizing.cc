@@ -53,7 +53,7 @@
 
 namespace EnergyPlus {
 
-Real64 HeatingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 HeatingWaterflowSizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;

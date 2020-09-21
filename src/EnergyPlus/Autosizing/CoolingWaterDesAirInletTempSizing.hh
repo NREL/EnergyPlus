@@ -61,7 +61,7 @@ struct CoolingWaterDesAirInletTempSizer : BaseSizerWithFanHeatInputs
     }
     ~CoolingWaterDesAirInletTempSizer() = default;
 
-    Real64 size(Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
 
     void clearState();
 };

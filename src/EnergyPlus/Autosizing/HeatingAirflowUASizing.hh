@@ -71,7 +71,7 @@ struct HeatingAirflowUASizer : BaseSizer
     void initializeForSystemHeatingDuct(Real64 elevation);
     void initializeForSystemOtherDuct(Real64 elevation);
 
-    Real64 size(Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
 };
 
 } // namespace EnergyPlus

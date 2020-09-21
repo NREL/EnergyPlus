@@ -60,7 +60,7 @@
 
 namespace EnergyPlus {
 
-Real64 CoolingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
+Real64 CoolingCapacitySizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
