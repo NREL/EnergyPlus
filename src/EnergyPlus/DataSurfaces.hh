@@ -527,7 +527,6 @@ namespace DataSurfaces {
     extern Array1D<int> SurfWinStormWinFlagPrevDay;                // Previous time step value of StormWinFlag
     extern Array1D<Real64> SurfWinFracTimeShadingDeviceOn;         // For a single time step, = 0.0 if no shading device or shading device is off = 1.0 if shading device is on; For time intervals longer than a time step, = fraction of time that shading device is on.
     extern Array1D<int> SurfWinExtIntShadePrevTS;                  // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
-    extern Array1D<int> SurfWinShadedConstruction;                 // For windows with shading, the construction with shading
     extern Array1D<bool> SurfWinHasShadeOrBlindLayer;              // mark as true if the window construction has a shade or a blind layer
     extern Array1D<bool> SurfWinSurfDayLightInit;                  // surface has been initialized for following 5 arrays
     extern Array1D<int> SurfWinDaylFacPoint;                       // Pointer to daylight factors for the window
@@ -832,11 +831,14 @@ namespace DataSurfaces {
         Plane plane;         // Plane
         Surface2D surface2d; // 2D projected surface for efficient intersection testing
         // Window Parameters (when surface is Window)
-        int WindowShadingControlPtr;    // Pointer to shading control (windows only)
+        int activeWindowShadingControl;    // Active window shading control (windows only)
+        std::vector<int> windowShadingControlList; // List of possible window shading controls
         bool HasShadeControl;           // True if the surface is listed in a WindowShadingControl object
-        int ShadedConstruction;         // Shaded construction (windows only)
+        int activeShadedConstruction;         // The currently active shaded construction (windows only)
+        std::vector<int> shadedConstructionList; // List of shaded constructions that correspond with window shading controls (windows only - same indexes as windowShadingControlList)
         int StormWinConstruction;       // Construction with storm window (windows only)
-        int StormWinShadedConstruction; // Shaded construction with storm window (windows only)
+        int activeStormWinShadedConstruction; // The currently active shaded construction with storm window (windows only)
+        std::vector<int> shadedStormWinConstructionList; // List of shaded constructions with storm window that correspond with window shading controls (windows only - same indexes as windowShadingControlList)
         int FrameDivider;               // Pointer to frame and divider information (windows only)
         Real64 Multiplier;              // Multiplies glazed area, frame area and divider area (windows only)
         // Daylighting pointers
@@ -911,6 +913,7 @@ namespace DataSurfaces {
         // Air boundaries
         int SolarEnclIndex;     // Pointer to solar enclosure this surface belongs to
         int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, ZoneSolarInfo(n).SurfacePtr(RadEnclSurfIndex) points to this surface
+        bool IsAirBoundarySurf; // True if surface is an air boundary surface (Construction:AirBoundary),
 
         std::vector<int> DisabledShadowingZoneList; // Array of all disabled shadowing zone number to the current surface
                                                     // the surface diffusion model
@@ -930,8 +933,8 @@ namespace DataSurfaces {
               MovInsulIntPresent(false), MovInsulIntPresentPrevTS(false), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
               lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0),
               CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0),
-              shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0), WindowShadingControlPtr(0), HasShadeControl(false), ShadedConstruction(0),
-              StormWinConstruction(0), StormWinShadedConstruction(0), FrameDivider(0), Multiplier(1.0), Shelf(0), TAirRef(ZoneMeanAirTemp),
+              shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0),
+              StormWinConstruction(0), activeStormWinShadedConstruction(0), FrameDivider(0), Multiplier(1.0), Shelf(0), TAirRef(ZoneMeanAirTemp),
               OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0),
               OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false),
               WindSpeedEMSOverrideValue(0.0),
@@ -946,7 +949,8 @@ namespace DataSurfaces {
               OutConvClassification(0), OutConvHfModelEq(0), OutConvHfUserCurveIndex(0), OutConvHnModelEq(0), OutConvHnUserCurveIndex(0),
               OutConvFaceArea(0.0), OutConvFacePerimeter(0.0), OutConvFaceHeight(0.0), IntConvZoneWallHeight(0.0), IntConvZonePerimLength(0.0),
               IntConvZoneHorizHydrDiam(0.0), IntConvWindowWallRatio(0.0), IntConvWindowLocation(InConvWinLoc_NotSet),
-              IntConvSurfGetsRadiantHeat(false), IntConvSurfHasActiveInIt(false), IsRadSurfOrVentSlabOrPool(false), GenericContam(0.0), SolarEnclIndex(0), SolarEnclSurfIndex(0)
+              IntConvSurfGetsRadiantHeat(false), IntConvSurfHasActiveInIt(false), IsRadSurfOrVentSlabOrPool(false), GenericContam(0.0),
+              SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false)
         {
         }
 
@@ -1108,9 +1112,10 @@ namespace DataSurfaces {
         //  CHARACTER(len=32) :: ShadingType    = ' ' ! Shading type (InteriorShade, SwitchableGlazing,
         //  ExteriorShade,InteriorBlind,ExteriorBlind,BetweenGlassShade,
         //  BetweenGlassBlind, or ExteriorScreen)
-        int ShadedConstruction; // Pointer to the shaded construction (for ShadingType=ExteriorScreen,InteriorShade,
+        int getInputShadedConstruction; // Pointer to the shaded construction (for ShadingType=ExteriorScreen,InteriorShade,
         //  ExteriorShade,BetweenGlassShade,InteriorBlind,ExteriorBlind,BetweenGlassBlind;
         //  this must be a window construction with a screen, shade or blind layer)
+        // this is only used during GetInput and should not be used during timestep calculations
         int ShadingDevice; // Pointer to the material for the shading device (for ShadingType=InteriorShade,
         //  ExteriorShade,BetweenGlassShade,InteriorBlind,ExteriorBlind,BetweenGlassBlind,
         //  ExteriorScreen;
@@ -1182,16 +1187,16 @@ namespace DataSurfaces {
                                         //    slat angle is set to the value given in the associated Material:WindowBlind.
         std::string DaylightingControlName;    // string holding the Daylighting Control Object Name string
         int DaylightControlIndex;              // Pointer to the array of Daylighting Controls
-        int MultiSurfaceCtrlIsGroup;           // True if Group, False if Sequential - type of control order when multiple surfaces are referenced
+        bool MultiSurfaceCtrlIsGroup;           // True if Group, False if Sequential - type of control order when multiple surfaces are referenced
         int FenestrationCount;                 // count of fenestration references
         Array1D<std::string> FenestrationName; // string holding list of fenestration surfaces
         Array1D_int FenestrationIndex;         // Pointers to fenestration surfaces
 
         // Default Constructor
         WindowShadingControlData()
-            : ZoneIndex(0), SequenceNumber(0), ShadingType(WSC_ST_NoShade), ShadedConstruction(0), ShadingDevice(0), ShadingControlType(0),
+            : ZoneIndex(0), SequenceNumber(0), ShadingType(WSC_ST_NoShade), getInputShadedConstruction(0), ShadingDevice(0), ShadingControlType(0),
               Schedule(0), SetPoint(0.0), SetPoint2(0.0), ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0),
-              SlatAngleControlForBlinds(0), DaylightControlIndex(0), MultiSurfaceCtrlIsGroup(false)
+              SlatAngleControlForBlinds(0), DaylightControlIndex(0), MultiSurfaceCtrlIsGroup(false), FenestrationCount(0)
         {
         }
     };
