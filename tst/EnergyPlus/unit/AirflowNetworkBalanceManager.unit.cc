@@ -20013,6 +20013,7 @@ std::string const idf_objects = delimited_string({
     EXPECT_EQ(AirflowNetwork::DisSysCompCVFData(1).AirLoopNum,1);
 
 }
+
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
 {
     Zone.allocate(1);
@@ -20141,3 +20142,4 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
     EXPECT_EQ(AirflowNetwork::MultizoneSurfaceData(2).VentSurfCtrNum, AirflowNetwork::VentControlType::Const);
 }
 } // namespace EnergyPlus
+

@@ -1423,7 +1423,7 @@ namespace WindowManager {
             if (!dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
             if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) continue; // Irrelevant for Complex Fen
             if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;    // not required
-            ConstrNumSh = SurfWinShadedConstruction(SurfNum);
+            ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
             if (ConstrNumSh == 0) continue;
             TotLay = dataConstruction.Construct(ConstrNumSh).TotLayers;
             IntShade = false;
@@ -1519,18 +1519,6 @@ namespace WindowManager {
 
     void W5InitGlassParameters(WindowManagerData &dataWindowManager)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         F. Winkelmann
-        //       DATE WRITTEN   October 1999
-        //       MODIFIED       Aug 2001 (FW): add blinds
-        //                      Oct 2002 (FW): change ConstrNumSh =
-        //         WindowShadingControl(Surface(SurfNum)%WindowShadingControlPtr)%ShadedConstruction
-        //         to Surface(SurfNum)%ShadedConstruction
-        //                      Jul 2003 (FW): remove unneeded warning if center-of-glass area < 0
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
         // Initializes variables used in the window optical and thermal calculation.
 
         using General::RoundSigDigits;
@@ -1580,29 +1568,15 @@ namespace WindowManager {
             // For a window with shading device, get number of shaded construction and, if window
             // has a blind (interior, exterior or between glass), get blind data pointer.
 
-            // TH 2/16/2010. CR 8010. The following code was modified and moved to GetSurfaceData
-            //  in SurfaceGeometry module, because for blinds with variable slats new blinds were created and assigned
             if (Surface(SurfNum).HasShadeControl) {
-                //  ConstrNumSh = Surface(SurfNum)%ShadedConstruction
-                ShadingType = WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType;
-                //  IF(ShadingType == WSC_ST_ExteriorBlind) THEN
-                //    MatNum = Construct(ConstrNumSh)%LayerPoint(1)
-                //    SurfaceWindow(SurfNum)%BlindNumber = dataMaterial.Material(MatNum)%BlindDataPtr
-                //  ELSE IF(ShadingType == WSC_ST_InteriorBlind) THEN
-                //    MatNum = Construct(ConstrNumSh)%LayerPoint(Construct(ConstrNumSh)%TotLayers)
-                //    SurfaceWindow(SurfNum)%BlindNumber = dataMaterial.Material(MatNum)%BlindDataPtr
-                // Between glass blind is layer 3 for double glazing and layer 5 for triple glazing.
-                //  ELSE IF(ShadingType == WSC_ST_BetweenGlassBlind) THEN
-                //    IF(Construct(ConstrNumSh)%TotGlassLayers == 2) THEN
-                //      SurfaceWindow(SurfNum)%BlindNumber = dataMaterial.Material(Construct(ConstrNumSh)%LayerPoint(3))%BlindDataPtr
-                //    ELSE
-                //      SurfaceWindow(SurfNum)%BlindNumber = dataMaterial.Material(Construct(ConstrNumSh)%LayerPoint(5))%BlindDataPtr
-                //    END IF
-                //  ELSE IF(ShadingType == WSC_ST_ExteriorScreen) THEN
-                if (ShadingType == WSC_ST_ExteriorScreen) {
-                    //     Count number of exterior window screens, initialize in InitGlassOpticalCalculations after returning
-                    //     from this subroutine. The blind structure is initialized first and then the screen structure is initialized.
-                    ++NumSurfaceScreens;
+                for (int winShadCtrl : Surface(SurfNum).windowShadingControlList) {
+                    ShadingType = WindowShadingControl(winShadCtrl).ShadingType;
+                    if (ShadingType == WSC_ST_ExteriorScreen) {
+                        //     Count number of exterior window screens, initialize in InitGlassOpticalCalculations after returning
+                        //     from this subroutine. The blind structure is initialized first and then the screen structure is initialized.
+                        ++NumSurfaceScreens;
+                        break; // only need to find the first window shading control since they should be identical
+                    }
                 }
             }
         }
@@ -1667,7 +1641,7 @@ namespace WindowManager {
                     if (!Surface(SurfNum).HasShadeControl) {
                         SurfWinSolarDiffusing(SurfNum) = true;
                     } else { // There is a shading control
-                        if (WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType == SwitchableGlazing) {
+                        if (WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType == SwitchableGlazing) {
                             SurfWinSolarDiffusing(SurfNum) = true;
                         } else {
                             SurfWinSolarDiffusing(SurfNum) = false;
@@ -2373,8 +2347,8 @@ namespace WindowManager {
             IConst = ConstrNum;
             if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn ||
                 ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn) {
-                IConst = surface.ShadedConstruction;
-                if (SurfWinStormWinFlag(SurfNum) > 0) IConst = surface.StormWinShadedConstruction;
+                IConst = surface.activeShadedConstruction;
+                if (SurfWinStormWinFlag(SurfNum) > 0) IConst = surface.activeStormWinShadedConstruction;
             }
             TotLay = dataConstruction.Construct(IConst).TotLayers;
             IGlass = 0;
@@ -3551,10 +3525,10 @@ namespace WindowManager {
             // Correct WinHeatGain for interior diffuse shortwave (solar and shortwave from lights) transmitted
             // back out window
             ConstrNum = Surface(SurfNum).Construction;
-            ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+            ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
             if (SurfWinStormWinFlag(SurfNum) == 1) {
                 ConstrNum = Surface(SurfNum).StormWinConstruction;
-                ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
+                ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
             }
 
             TransDiff = dataConstruction.Construct(ConstrNum).TransDiff; // Default value for TransDiff here
@@ -3691,8 +3665,8 @@ namespace WindowManager {
         //               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
         // DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
-        ConstrNumSh = SurfWinShadedConstruction(SurfNum);
-        if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
+        ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+        if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
         ShadeFlag = SurfWinShadingFlag(SurfNum);
         nglassfaces = 2 * dataConstruction.Construct(ConstrNumSh).TotGlassLayers;
         TotGaps = dataConstruction.Construct(ConstrNumSh).TotGlassLayers;
@@ -3888,7 +3862,7 @@ namespace WindowManager {
         int IGap;                         // Gap counter; 1 = gap on outer side of shade/blind, 2 = gap on inner side.
         int IGapInc;                      // Gap increment (0 or 1)
 
-        ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+        ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
         ShadeFlag = SurfWinShadingFlag(SurfNum);
         nglassfaces = 2 * dataConstruction.Construct(ConstrNumSh).TotGlassLayers;
 
@@ -4180,7 +4154,7 @@ namespace WindowManager {
         //               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
         // DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
-        ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+        ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
         ShadeFlag = SurfWinShadingFlag(SurfNum);
 
         if (dataConstruction.Construct(ConstrNumSh).TotGlassLayers == 2) { // Double glazing
@@ -7548,9 +7522,9 @@ namespace WindowManager {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
             if (Surface(SurfNum).HasShadeControl) {
-                ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+                ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 MatNum = dataConstruction.Construct(ConstrNumSh).LayerPoint(1);
-                ShadingType = WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType;
+                ShadingType = WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType;
                 if (ShadingType == WSC_ST_ExteriorScreen) {
 
                     if (dataMaterial.Material(MatNum).ScreenMapResolution > 0) PrintTransMap = true;
@@ -7622,8 +7596,7 @@ namespace WindowManager {
                     dataMaterial.Material(MatNum).ReflectSolBeamBack = SurfaceScreens(ScreenNum).DifReflect;
 
                 } // (ShadingType == 'EXTERIORSCREEN')
-            }     //(Surface(SurfNum)%WindowShadingControlPtr /= 0)
-
+            }
         } // End of screen surface initialization
 
         // Write transmittance versus direct normal angle to csv file
