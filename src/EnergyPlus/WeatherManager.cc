@@ -203,6 +203,8 @@ namespace WeatherManager {
     Array2D<Real64> TodayDifSolarRad;     // Sky diffuse horizontal solar irradiance NOLINT(cert-err58-cpp)
     Array2D<Real64> TodayAlbedo;          // Albedo NOLINT(cert-err58-cpp)
     Array2D<Real64> TodayLiquidPrecip;    // Liquid Precipitation Depth (mm) NOLINT(cert-err58-cpp)
+    Array2D<Real64> TodayTotalSkyCover;   // Total Sky Cover
+    Array2D<Real64> TodayOpaqueSkyCover;  // Opaque Sky Cover
 
     Array2D_bool TomorrowIsRain;             // Rain indicator, true=rain NOLINT(cert-err58-cpp)
     Array2D_bool TomorrowIsSnow;             // Snow indicator, true=snow NOLINT(cert-err58-cpp)
@@ -218,6 +220,8 @@ namespace WeatherManager {
     Array2D<Real64> TomorrowDifSolarRad;     // Sky diffuse horizontal solar irradiance NOLINT(cert-err58-cpp)
     Array2D<Real64> TomorrowAlbedo;          // Albedo NOLINT(cert-err58-cpp)
     Array2D<Real64> TomorrowLiquidPrecip;    // Liquid Precipitation Depth NOLINT(cert-err58-cpp)
+    Array2D<Real64> TomorrowTotalSkyCover;   // Total Sky Cover
+    Array2D<Real64> TomorrowOpaqueSkyCover;  // Opaque Sky Cover
 
     Array3D<Real64> DDDBRngModifier;      // Design Day Dry-bulb Temperature Range Modifier NOLINT(cert-err58-cpp)
     Array3D<Real64> DDHumIndModifier;     // Design Day relative humidity values or wet-bulb modifiers (per HumIndType) NOLINT(cert-err58-cpp)
@@ -316,6 +320,8 @@ namespace WeatherManager {
     Real64 LastHrDifSolarRad;
     Real64 LastHrAlbedo;
     Real64 LastHrLiquidPrecip;
+    Real64 LastHrTotalSkyCover;
+    Real64 LastHrOpaqueSkyCover;
     Real64 NextHrBeamSolarRad;
     Real64 NextHrDifSolarRad;
     Real64 NextHrLiquidPrecip;
@@ -393,6 +399,8 @@ namespace WeatherManager {
         TodayDifSolarRad.deallocate();        // Sky diffuse horizontal solar irradiance
         TodayAlbedo.deallocate();             // Albedo
         TodayLiquidPrecip.deallocate();       // Liquid Precipitation Depth (mm)
+        TodayTotalSkyCover.deallocate();       // Total Sky Cover
+        TodayOpaqueSkyCover.deallocate();      // Opaque Sky Cover
         TomorrowIsRain.deallocate();          // Rain indicator, true=rain
         TomorrowIsSnow.deallocate();          // Snow indicator, true=snow
         TomorrowOutDryBulbTemp.deallocate();  // Dry bulb temperature of outside air
@@ -407,6 +415,8 @@ namespace WeatherManager {
         TomorrowDifSolarRad.deallocate();     // Sky diffuse horizontal solar irradiance
         TomorrowAlbedo.deallocate();          // Albedo
         TomorrowLiquidPrecip.deallocate();    // Liquid Precipitation Depth
+        TomorrowTotalSkyCover.deallocate();   // Total Sky Cover
+        TomorrowOpaqueSkyCover.deallocate();  // Opaque Sky Cover
         DDDBRngModifier.deallocate();         // Design Day Dry-bulb Temperature Range Modifier
         DDHumIndModifier.deallocate();        // Design Day relative humidity values
         DDBeamSolarValues.deallocate();       // Design Day Beam Solar Values
@@ -809,6 +819,8 @@ namespace WeatherManager {
                                 "Zone",
                                 "Average",
                                 "Environment");
+            SetupOutputVariable("Site Total Sky Cover", OutputProcessor::Unit::None, DataEnvironment::TotalCloudCover, "Zone", "Average", "Environment");
+            SetupOutputVariable("Site Opaque Sky Cover", OutputProcessor::Unit::None, DataEnvironment::OpaqueCloudCover, "Zone", "Average", "Environment");
             SetupOutputVariable(
                 "Site Outdoor Air Enthalpy", OutputProcessor::Unit::J_kg, DataEnvironment::OutEnthalpy, "Zone", "Average", "Environment");
             SetupOutputVariable(
@@ -2168,6 +2180,8 @@ namespace WeatherManager {
         TodayBeamSolarRad = TomorrowBeamSolarRad;
         TodayDifSolarRad = TomorrowDifSolarRad;
         TodayLiquidPrecip = TomorrowLiquidPrecip;
+        TodayTotalSkyCover = TomorrowTotalSkyCover;
+        TodayOpaqueSkyCover = TomorrowOpaqueSkyCover;
 
         // Update Global Data
 
@@ -2342,6 +2356,8 @@ namespace WeatherManager {
         DataEnvironment::BeamSolarRad = TodayBeamSolarRad(DataGlobals::TimeStep, DataGlobals::HourOfDay);
         if (DataEnvironment::EMSBeamSolarRadOverrideOn) DataEnvironment::BeamSolarRad = DataEnvironment::EMSBeamSolarRadOverrideValue;
         DataEnvironment::LiquidPrecipitation = TodayLiquidPrecip(DataGlobals::TimeStep, DataGlobals::HourOfDay) / 1000.0; // convert from mm to m
+        DataEnvironment::TotalCloudCover = TodayTotalSkyCover(DataGlobals::TimeStep, DataGlobals::HourOfDay);
+        DataEnvironment::OpaqueCloudCover = TodayOpaqueSkyCover(DataGlobals::TimeStep, DataGlobals::HourOfDay);
 
         if (UseRainValues) {
             DataEnvironment::IsRain = TodayIsRain(DataGlobals::TimeStep, DataGlobals::HourOfDay); //.or. LiquidPrecipitation >= .8d0)  ! > .8 mm
@@ -2483,12 +2499,14 @@ namespace WeatherManager {
             Array1D<Real64> DifSolarRad;     // Hourly sky diffuse horizontal solar irradiance
             Array1D<Real64> Albedo;          // Albedo
             Array1D<Real64> LiquidPrecip;    // Liquid Precipitation
+            Array1D<Real64> TotalSkyCover;   // Total Sky Cover
+            Array1D<Real64> OpaqueSkyCover;  // Opaque Sky Cover            
 
             // Default Constructor
             HourlyWeatherData()
                 : IsRain(24, false), IsSnow(24, false), OutDryBulbTemp(24, 0.0), OutDewPointTemp(24, 0.0), OutBaroPress(24, 0.0), OutRelHum(24, 0.0),
                   WindSpeed(24, 0.0), WindDir(24, 0.0), SkyTemp(24, 0.0), HorizIRSky(24, 0.0), BeamSolarRad(24, 0.0), DifSolarRad(24, 0.0),
-                  Albedo(24, 0.0), LiquidPrecip(24, 0.0)
+                  Albedo(24, 0.0), LiquidPrecip(24, 0.0), TotalSkyCover(24, 0.0), OpaqueSkyCover(24, 0.0)
             {
             }
         };
@@ -2795,6 +2813,8 @@ namespace WeatherManager {
             TomorrowDifSolarRad = 0.0;
             TomorrowAlbedo = 0.0;
             TomorrowLiquidPrecip = 0.0;
+            TomorrowTotalSkyCover = 0.0;
+            TomorrowOpaqueSkyCover = 0.0;
             TomorrowIsRain = false;
             TomorrowIsSnow = false;
 
@@ -3093,33 +3113,15 @@ namespace WeatherManager {
                     TomorrowWindSpeed(CurTimeStep, hour) = WindSpeed;
                     TomorrowWindDir(CurTimeStep, hour) = WindDir;
                     TomorrowLiquidPrecip(CurTimeStep, hour) = LiquidPrecip;
+                    TomorrowTotalSkyCover(CurTimeStep, hour) = TotalSkyCover;
+                    TomorrowOpaqueSkyCover(CurTimeStep, hour) = OpaqueSkyCover;
 
-                    Real64 ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
-                    if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
-                        TomorrowHorizIRSky(CurTimeStep, hour) = ESky * Sigma * pow_4(DryBulb + DataGlobals::KelvinConv);
-                    } else {
-                        TomorrowHorizIRSky(CurTimeStep, hour) = IRHoriz;
-                    }
-
-                    Real64 SkyTemp;
-                    if (Environment(Envrn).SkyTempModel == EmissivityCalcType::BruntModel ||
-                        Environment(Envrn).SkyTempModel == EmissivityCalcType::IdsoModel ||
-                        Environment(Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
-                        Environment(Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
-                        Environment(Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
-                        // Calculate sky temperature, use IRHoriz if not missing
-                        if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
-                            // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
-                            SkyTemp = (DryBulb + DataGlobals::KelvinConv) * root_4(ESky) - DataGlobals::KelvinConv;
-                        } else {
-                            // Valid IR from weather files
-                            SkyTemp = root_4(IRHoriz / Sigma) - DataGlobals::KelvinConv;
-                        }
-                    } else {
-                        SkyTemp = 0.0; // dealt with later
-                    }
-
-                    TomorrowSkyTemp(CurTimeStep, hour) = SkyTemp;
+                    calcSky(TomorrowHorizIRSky(CurTimeStep, hour), TomorrowSkyTemp(CurTimeStep, hour),
+                                 OpaqueSkyCover,
+                                 DryBulb,
+                                 DewPoint,
+                                 RelHum,
+                                 IRHoriz); 
 
                     if (ETHoriz >= 9999.0) ETHoriz = 0.0;
                     if (ETDirect >= 9999.0) ETDirect = 0.0;
@@ -3201,6 +3203,8 @@ namespace WeatherManager {
                 Wthr.IsSnow(hour) = TomorrowIsSnow(1, hour);
                 Wthr.Albedo(hour) = TomorrowAlbedo(1, hour);
                 Wthr.LiquidPrecip(hour) = TomorrowLiquidPrecip(1, hour);
+                Wthr.TotalSkyCover(hour) = TomorrowTotalSkyCover(1, hour);
+                Wthr.OpaqueSkyCover(hour) = TomorrowOpaqueSkyCover(1, hour);
             }
 
             if (!LastHourSet) {
@@ -3218,6 +3222,9 @@ namespace WeatherManager {
                 LastHrDifSolarRad = Wthr.DifSolarRad(24);
                 LastHrAlbedo = Wthr.Albedo(24);
                 LastHrLiquidPrecip = Wthr.LiquidPrecip(24);
+                LastHrTotalSkyCover = Wthr.TotalSkyCover(24);
+                LastHrOpaqueSkyCover = Wthr.OpaqueSkyCover(24);
+
                 LastHourSet = true;
             }
 
@@ -3265,14 +3272,17 @@ namespace WeatherManager {
                     TomorrowOutRelHum(ts, hour) = LastHrOutRelHum * WtPrevHour + Wthr.OutRelHum(hour) * WtNow;
                     TomorrowWindSpeed(ts, hour) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed(hour) * WtNow;
                     TomorrowWindDir(ts, hour) = interpolateWindDirection(LastHrWindDir, Wthr.WindDir(hour), WtNow);
-                    TomorrowHorizIRSky(ts, hour) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(hour) * WtNow;
-                    if (Environment(Envrn).SkyTempModel == EmissivityCalcType::BruntModel ||
-                        Environment(Envrn).SkyTempModel == EmissivityCalcType::IdsoModel ||
-                        Environment(Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
-                        Environment(Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
-                        Environment(Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
-                        TomorrowSkyTemp(ts, hour) = LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp(hour) * WtNow;
-                    }
+                    TomorrowTotalSkyCover(ts, hour) = LastHrTotalSkyCover * WtPrevHour + Wthr.TotalSkyCover(hour) * WtNow;
+                    TomorrowOpaqueSkyCover(ts, hour) = LastHrOpaqueSkyCover * WtPrevHour + Wthr.OpaqueSkyCover(hour) * WtNow;
+                    // Sky emissivity now takes interpolated timestep inputs rather than interpolated calcation esky results
+                    calcSky(TomorrowHorizIRSky(ts, hour),
+                            TomorrowSkyTemp(ts, hour),
+                            TomorrowOpaqueSkyCover(ts, hour),
+                            TomorrowOutDryBulbTemp(ts, hour),
+                            TomorrowOutDewPointTemp(ts, hour),
+                            TomorrowOutRelHum(ts, hour) * 0.01,
+                            LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(hour) * WtNow);  
+
                     TomorrowDifSolarRad(ts, hour) =
                         LastHrDifSolarRad * WgtPrevHour + Wthr.DifSolarRad(hour) * WgtHourNow + NextHrDifSolarRad * WgtNextHour;
                     TomorrowBeamSolarRad(ts, hour) =
@@ -3298,7 +3308,8 @@ namespace WeatherManager {
                 LastHrDifSolarRad = Wthr.DifSolarRad(hour);
                 LastHrAlbedo = Wthr.Albedo(hour);
                 LastHrLiquidPrecip = Wthr.LiquidPrecip(hour);
-
+                LastHrTotalSkyCover = Wthr.TotalSkyCover(hour);
+                LastHrOpaqueSkyCover = Wthr.OpaqueSkyCover(hour);
             } // End of Hour Loop
         }
 
@@ -4351,6 +4362,10 @@ namespace WeatherManager {
         TodayAlbedo = 0.0;
         TodayLiquidPrecip.allocate(DataGlobals::NumOfTimeStepInHour, 24);
         TodayLiquidPrecip = 0.0;
+        TodayTotalSkyCover.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        TodayTotalSkyCover = 0.0;
+        TodayOpaqueSkyCover.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        TodayOpaqueSkyCover = 0.0;
 
         TomorrowIsRain.allocate(DataGlobals::NumOfTimeStepInHour, 24);
         TomorrowIsRain = false;
@@ -4380,6 +4395,10 @@ namespace WeatherManager {
         TomorrowAlbedo = 0.0;
         TomorrowLiquidPrecip.allocate(DataGlobals::NumOfTimeStepInHour, 24);
         TomorrowLiquidPrecip = 0.0;
+        TomorrowTotalSkyCover.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        TomorrowTotalSkyCover = 0.0;
+        TomorrowOpaqueSkyCover.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        TomorrowOpaqueSkyCover = 0.0;
     }
 
     void CalculateDailySolarCoeffs(int const DayOfYear,           // Day of year (1 - 366)
@@ -9036,6 +9055,42 @@ namespace WeatherManager {
 
         print(ioFiles.eio, "{}", ss.str());
     }
+
+    void calcSky(Real64 &HorizIRSky, Real64 &SkyTemp, Real64 OpaqueSkyCover, Real64 DryBulb, Real64 DewPoint, Real64 RelHum, Real64 IRHoriz)
+    {
+        Real64 ESky;
+        
+        if (IRHoriz <= 0.0) IRHoriz = 9999.0;
+
+        if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
+            // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
+            ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
+            HorizIRSky = ESky * Sigma * pow_4(DryBulb + DataGlobals::KelvinConv);
+            if (Environment(Envrn).SkyTempModel == EmissivityCalcType::BruntModel ||
+                Environment(Envrn).SkyTempModel == EmissivityCalcType::IdsoModel ||
+                Environment(Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
+                Environment(Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
+                Environment(Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
+                SkyTemp = (DryBulb + DataGlobals::KelvinConv) * root_4(ESky) - DataGlobals::KelvinConv;
+            } else {
+                SkyTemp = 0.0; // dealt with later
+            }
+        } 
+        else {
+            // Valid IR from weather files
+            HorizIRSky = IRHoriz;
+            if (Environment(Envrn).SkyTempModel == EmissivityCalcType::BruntModel ||
+                Environment(Envrn).SkyTempModel == EmissivityCalcType::IdsoModel ||
+                Environment(Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
+                Environment(Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
+                Environment(Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
+                SkyTemp = root_4(IRHoriz / Sigma) - DataGlobals::KelvinConv;
+            } else {
+                SkyTemp = 0.0; // dealt with later
+            }
+        }
+    }
+
 } // namespace WeatherManager
 
 } // namespace EnergyPlus
