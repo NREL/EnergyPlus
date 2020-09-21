@@ -1501,7 +1501,7 @@ namespace HVACStandAloneERV {
                 SystemAirFlowSizer sizerSystemAirFlow;
                 sizerSystemAirFlow.overrideSizingString(SizingString);
                 sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                TempSize = sizerSystemAirFlow.size(TempSize, ErrorsFound);
+                TempSize = sizerSystemAirFlow.size(state, TempSize, ErrorsFound);
             }
             StandAloneERV(StandAloneERVNum).SupplyAirVolFlow = TempSize;
         }
@@ -1538,7 +1538,7 @@ namespace HVACStandAloneERV {
                 SystemAirFlowSizer sizerSystemAirFlow;
                 sizerSystemAirFlow.overrideSizingString(SizingString);
                 sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                TempSize = sizerSystemAirFlow.size(TempSize, ErrorsFound);
+                TempSize = sizerSystemAirFlow.size(state, TempSize, ErrorsFound);
             }
             StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow = TempSize;
             StandAloneERV(StandAloneERVNum).DesignEAFanVolFlowRate = TempSize * StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio;

@@ -942,7 +942,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     bool errorsFound = false;
     SystemAirFlowSizer sizerSystemAirFlow;
     sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerSystemAirFlow.size(SizingResult, errorsFound);
+    SizingResult = sizerSystemAirFlow.size(state, SizingResult, errorsFound);
 
     // Check that the Design Day/Time is filled
     EXPECT_EQ(DDTitle, OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFanDesDay, CompName));

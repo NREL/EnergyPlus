@@ -880,7 +880,7 @@ namespace HighTempRadiantSystem {
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                HighTempRadSys(RadSysNum).MaxPowerCapac = sizerHeatingCapacity.size(TempSize, errorsFound);
+                HighTempRadSys(RadSysNum).MaxPowerCapac = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                 DataScalableCapSizingON = false;
             }
         }

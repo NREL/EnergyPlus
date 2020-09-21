@@ -243,7 +243,7 @@ namespace HVACFan {
         bool errorsFound = false;
         SystemAirFlowSizer sizerSystemAirFlow;
         sizerSystemAirFlow.initializeWithinEP(state, m_fanType, name, bPRINT, routineName);
-        designAirVolFlowRate = sizerSystemAirFlow.size(tempFlow, errorsFound);
+        designAirVolFlowRate = sizerSystemAirFlow.size(state, tempFlow, errorsFound);
 
         DataSizing::DataAutosizable = true; // should be false?
         DataSizing::DataEMSOverrideON = false;

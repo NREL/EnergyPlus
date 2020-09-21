@@ -1512,7 +1512,7 @@ namespace PurchasedAirManager {
                             HeatingCapacitySizer sizerHeatingCapacity;
                             sizerHeatingCapacity.overrideSizingString(SizingString);
                             sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                            DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(TempSize, ErrorsFound);
+                            DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                             DataFlowPerHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                             SizingMethod = HeatingAirflowSizing;
                             PrintFlag = true;
@@ -1555,7 +1555,7 @@ namespace PurchasedAirManager {
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    MaxHeatSensCapDes = sizerHeatingCapacity.size(TempSize, ErrorsFound);
+                    MaxHeatSensCapDes = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                     ZoneHeatingOnlyFan = false;
                     if (MaxHeatSensCapDes < SmallLoad) {
                         MaxHeatSensCapDes = 0.0;
@@ -1805,7 +1805,7 @@ namespace PurchasedAirManager {
                         HeatingCapacitySizer sizerHeatingCapacity;
                         sizerHeatingCapacity.overrideSizingString(SizingString);
                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        MaxHeatSensCapDes = sizerHeatingCapacity.size(PurchAir(PurchAirNum).MaxHeatSensCap, ErrorsFound);
+                        MaxHeatSensCapDes = sizerHeatingCapacity.size(state, PurchAir(PurchAirNum).MaxHeatSensCap, ErrorsFound);
                     }
                 } else {
                     TempSize = PurchAir(PurchAirNum).MaxHeatSensCap;
@@ -1815,7 +1815,7 @@ namespace PurchasedAirManager {
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    MaxHeatSensCapDes = sizerHeatingCapacity.size(TempSize, ErrorsFound);
+                    MaxHeatSensCapDes = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                     ZoneHeatingOnlyFan = false;
                 }
                 if (MaxHeatSensCapDes < SmallLoad) {

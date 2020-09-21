@@ -1251,7 +1251,7 @@ namespace Fans {
         SystemAirFlowSizer sizerSystemAirFlow;
         sizerSystemAirFlow.overrideSizingString(SizingString);
         sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-        Fan(FanNum).MaxAirFlowRate = sizerSystemAirFlow.size(TempFlow, errorsFound);
+        Fan(FanNum).MaxAirFlowRate = sizerSystemAirFlow.size(state, TempFlow, errorsFound);
 
         DataAutosizable = true;
         DataEMSOverrideON = false;

@@ -1053,7 +1053,7 @@ namespace HWBaseboardRadiator {
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                TempSize = sizerHeatingCapacity.size(TempSize, errorsFound);
+                TempSize = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                 if (HWBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
                     HWBaseboard(BaseboardNum).RatedCapacity = AutoSize;
                 } else {

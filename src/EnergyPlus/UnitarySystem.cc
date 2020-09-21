@@ -1774,7 +1774,7 @@ namespace UnitarySystems {
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                HeatCapAtPeak = sizerHeatingCapacity.size(TempSize, errorsFound);
+                HeatCapAtPeak = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                 if (DataSizing::CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
                 SysHeatingFlow = HeatCapAtPeak * this->m_MaxHeatAirVolFlow;
                 this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
@@ -1808,7 +1808,7 @@ namespace UnitarySystems {
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                HeatCapAtPeak = sizerHeatingCapacity.size(TempSize, errorsFound);
+                HeatCapAtPeak = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                 if (DataSizing::CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
                 EqSizing.HeatingCapacity = true;
                 EqSizing.DesHeatingLoad = HeatCapAtPeak;
@@ -1828,7 +1828,7 @@ namespace UnitarySystems {
                         HeatingCapacitySizer sizerHeatingCapacity;
                         sizerHeatingCapacity.overrideSizingString(SizingString);
                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        HeatCapAtPeak = sizerHeatingCapacity.size(TempSize, errorsFound);
+                        HeatCapAtPeak = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                         if (DataSizing::CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
                         EqSizing.HeatingCapacity = true;
                         EqSizing.DesHeatingLoad = HeatCapAtPeak;
@@ -1881,7 +1881,7 @@ namespace UnitarySystems {
             std::string sizingString = "Supply Air Flow Rate [m3/s]";
             sizerSystemAirFlow.overrideSizingString(sizingString);
             sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            this->m_DesignFanVolFlowRate = sizerSystemAirFlow.size(this->m_DesignFanVolFlowRate, errorsFound);
+            this->m_DesignFanVolFlowRate = sizerSystemAirFlow.size(state, this->m_DesignFanVolFlowRate, errorsFound);
 
             DataSizing::DataEMSOverrideON = false;
             EqSizing.SystemAirFlow = false;
@@ -2069,7 +2069,7 @@ namespace UnitarySystems {
             sizerSystemAirFlow.overrideSizingString(SizingString);
             // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
             sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            this->m_MaxNoCoolHeatAirVolFlow = sizerSystemAirFlow.size(TempSize, errorsFound);
+            this->m_MaxNoCoolHeatAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
             DataSizing::DataEMSOverrideON = false;
             DataSizing::DataConstantUsedForSizing = 0.0;
             DataSizing::DataFractionUsedForSizing = 0.0;
@@ -2640,7 +2640,7 @@ namespace UnitarySystems {
             HeatingCapacitySizer sizerHeatingCapacity;
             sizerHeatingCapacity.overrideSizingString(SizingString);
             sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            TempSize = sizerHeatingCapacity.size(TempSize, errorsFound);
+            TempSize = sizerHeatingCapacity.size(state, TempSize, errorsFound);
             if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) DataSizing::DXCoolCap = TempSize;
             if (DataSizing::CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
             this->m_DesignHeatingCapacity = TempSize;
@@ -2679,7 +2679,7 @@ namespace UnitarySystems {
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                this->m_DesignSuppHeatingCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
+                this->m_DesignSuppHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
             }
             // logic here isn't accurate. Replicating temporarily to minimize diffs in AutoSizingLibrary refactor
             TempSize = this->m_DesignSuppHeatingCapacity;
@@ -2696,7 +2696,7 @@ namespace UnitarySystems {
             HeatingCapacitySizer sizerHeatingCapacity;
             sizerHeatingCapacity.overrideSizingString(SizingString);
             sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            this->m_DesignSuppHeatingCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
+            this->m_DesignSuppHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
             IsAutoSize = false;
             DataSizing::DataConstantUsedForSizing = 0.0;
             DataSizing::DataFractionUsedForSizing = 0.0;

@@ -5033,7 +5033,7 @@ namespace PackagedTerminalHeatPump {
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    TempSize = sizerHeatingCapacity.size(TempSize, errorsFound);
+                    TempSize = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                     if (ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
                         DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                     }
@@ -5085,7 +5085,7 @@ namespace PackagedTerminalHeatPump {
                     sizerSystemAirFlow.overrideSizingString(SizingString);
                     // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow = sizerSystemAirFlow.size(TempSize, errorsFound);
+                    PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
                 }
 
                 // initialize capacity sizing variables: cooling
@@ -5238,7 +5238,7 @@ namespace PackagedTerminalHeatPump {
                 sizerSystemAirFlow.overrideSizingString(SizingString);
                 // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow = sizerSystemAirFlow.size(TempSize, errorsFound);
+                PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
                 DataConstantUsedForSizing = 0.0;
                 DataFractionUsedForSizing = 0.0;
             }

@@ -1105,7 +1105,7 @@ namespace UnitHeater {
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    TempSize = sizerHeatingCapacity.size(TempSize, errorsFound);
+                    TempSize = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                     if (ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
                         DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                     }
@@ -1211,7 +1211,7 @@ namespace UnitHeater {
                                 HeatingCapacitySizer sizerHeatingCapacity;
                                 sizerHeatingCapacity.overrideSizingString(SizingString);
                                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                DesCoilLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
+                                DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 DataScalableCapSizingON = false;
                             } else {
                                 SizingString = "";
@@ -1223,7 +1223,7 @@ namespace UnitHeater {
                                 HeatingCapacitySizer sizerHeatingCapacity;
                                 sizerHeatingCapacity.overrideSizingString(SizingString);
                                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                DesCoilLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
+                                DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                             }
 
                             if (DesCoilLoad >= SmallLoad) {
@@ -1330,7 +1330,7 @@ namespace UnitHeater {
                                 HeatingCapacitySizer sizerHeatingCapacity;
                                 sizerHeatingCapacity.overrideSizingString(SizingString);
                                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                DesCoilLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
+                                DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 DataScalableCapSizingON = false;
                             } else {
                                 DesCoilLoad = FinalZoneSizing(CurZoneEqNum).DesHeatLoad;

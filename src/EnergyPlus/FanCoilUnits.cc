@@ -1606,7 +1606,7 @@ namespace FanCoilUnits {
                         HeatingCapacitySizer sizerHeatingCapacity;
                         sizerHeatingCapacity.overrideSizingString(SizingString);
                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        TempSize = sizerHeatingCapacity.size(TempSize, errorsFound);
+                        TempSize = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                         if (ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
                             DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                         }
@@ -1641,7 +1641,7 @@ namespace FanCoilUnits {
                     SystemAirFlowSizer sizerSystemAirFlow;
                     // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    MaxAirVolFlowDes = sizerSystemAirFlow.size(TempSize, ErrorsFound);
+                    MaxAirVolFlowDes = sizerSystemAirFlow.size(state, TempSize, ErrorsFound);
                 } else {
                     MaxAirVolFlowDes = 0.0;
                 }
@@ -1841,7 +1841,7 @@ namespace FanCoilUnits {
                                             HeatingCapacitySizer sizerHeatingCapacity;
                                             sizerHeatingCapacity.overrideSizingString(SizingString);
                                             sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                            ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
+                                            ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                             ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                                         }
                                         TempSize = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
@@ -1855,7 +1855,7 @@ namespace FanCoilUnits {
                                         HeatingCapacitySizer sizerHeatingCapacity;
                                         sizerHeatingCapacity.overrideSizingString(SizingString);
                                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                        ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
+                                        ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                         ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                                         TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad * ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                                         DataScalableCapSizingON = true;
@@ -1867,7 +1867,7 @@ namespace FanCoilUnits {
                                 HeatingCapacitySizer sizerHeatingCapacity;
                                 sizerHeatingCapacity.overrideSizingString(SizingString);
                                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                DesCoilLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
+                                DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 DataScalableCapSizingON = false;
                                 DataFlowUsedForSizing = 0.0;
 
@@ -1879,7 +1879,7 @@ namespace FanCoilUnits {
                                 HeatingCapacitySizer sizerHeatingCapacity;
                                 sizerHeatingCapacity.overrideSizingString(SizingString);
                                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                DesCoilLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
+                                DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                             }
                             FanCoil(FanCoilNum).DesHeatingLoad = DesCoilLoad;
                             if (DesCoilLoad >= SmallLoad) {
@@ -1940,7 +1940,7 @@ namespace FanCoilUnits {
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                FanCoil(FanCoilNum).DesignHeatingCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
+                FanCoil(FanCoilNum).DesignHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                 FanCoil(FanCoilNum).DesHeatingLoad = FanCoil(FanCoilNum).DesignHeatingCapacity;
             }
         }

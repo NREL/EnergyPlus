@@ -7287,7 +7287,7 @@ namespace HVACVariableRefrigerantFlow {
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
+                DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                 DataFlowPerHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                 SizingMethod = HeatingAirflowSizing;
                 PrintFlag = true;
@@ -7451,13 +7451,13 @@ namespace HVACVariableRefrigerantFlow {
             std::string sizingString = "No Cooling Supply Air Flow Rate [m3/s]";
             sizerSystemAirFlow.overrideSizingString(sizingString);
             sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            VRFTU(VRFTUNum).MaxNoCoolAirVolFlow = sizerSystemAirFlow.size(VRFTU(VRFTUNum).MaxNoCoolAirVolFlow, errorsFound);
+            VRFTU(VRFTUNum).MaxNoCoolAirVolFlow = sizerSystemAirFlow.size(state, VRFTU(VRFTUNum).MaxNoCoolAirVolFlow, errorsFound);
 
             SystemAirFlowSizer sizerSystemAirFlow2;
             sizingString = "No Heating Supply Air Flow Rate [m3/s]";
             sizerSystemAirFlow2.overrideSizingString(sizingString);
             sizerSystemAirFlow2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            VRFTU(VRFTUNum).MaxNoHeatAirVolFlow = sizerSystemAirFlow2.size(VRFTU(VRFTUNum).MaxNoHeatAirVolFlow, errorsFound);
+            VRFTU(VRFTUNum).MaxNoHeatAirVolFlow = sizerSystemAirFlow2.size(state, VRFTU(VRFTUNum).MaxNoHeatAirVolFlow, errorsFound);
         }
         IsAutoSize = false;
         if (VRFTU(VRFTUNum).CoolOutAirVolFlow == AutoSize) {
@@ -7687,7 +7687,7 @@ namespace HVACVariableRefrigerantFlow {
                     if (DataGlobals::isEpJSON) stringOverride = "supplemental_heating_coil_nominal_capacity [W]";
                     sizerWaterHeatingCapacity.overrideSizingString(stringOverride);
                     sizerWaterHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    VRFTU(VRFTUNum).DesignSuppHeatingCapacity = sizerWaterHeatingCapacity.size(TempSize, ErrorsFound);
+                    VRFTU(VRFTUNum).DesignSuppHeatingCapacity = sizerWaterHeatingCapacity.size(state, TempSize, ErrorsFound);
                 }
             } else {
                 SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
@@ -7698,7 +7698,7 @@ namespace HVACVariableRefrigerantFlow {
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    VRFTU(VRFTUNum).DesignSuppHeatingCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
+                    VRFTU(VRFTUNum).DesignSuppHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                 }
             }
         }

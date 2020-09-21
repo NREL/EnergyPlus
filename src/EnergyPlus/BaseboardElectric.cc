@@ -511,7 +511,7 @@ namespace BaseboardElectric {
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                baseboard->Baseboard(BaseboardNum).NominalCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
+                baseboard->Baseboard(BaseboardNum).NominalCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                 DataScalableCapSizingON = false;
             }
         }

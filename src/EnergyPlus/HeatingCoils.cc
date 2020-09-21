@@ -1577,7 +1577,7 @@ namespace HeatingCoils {
         HeatingCapacitySizer sizerHeatingCapacity;
         sizerHeatingCapacity.overrideSizingString(SizingString);
         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-        TempCap = sizerHeatingCapacity.size(TempCap, errorsFound);
+        TempCap = sizerHeatingCapacity.size(state, TempCap, errorsFound);
         DataCoilIsSuppHeater = false; // reset global to false so other heating coils are not affected
         DataDesicRegCoil = false;     // reset global to false so other heating coils are not affected
         DataDesInletAirTemp = 0.0;    // reset global data to zero so other heating coils are not

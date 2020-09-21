@@ -1871,7 +1871,7 @@ namespace UnitVentilator {
                         HeatingCapacitySizer sizerHeatingCapacity;
                         sizerHeatingCapacity.overrideSizingString(SizingString);
                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
+                        DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                         DataFlowPerHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                         SizingMethod = HeatingAirflowSizing;
                         PrintFlag = true;
@@ -1985,7 +1985,7 @@ namespace UnitVentilator {
                                 HeatingCapacitySizer sizerHeatingCapacity;
                                 sizerHeatingCapacity.overrideSizingString(SizingString);
                                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
+                                DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 DataFlowPerHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                                 SizingMethod = HeatingAirflowSizing;
                                 PrintFlag = true;
@@ -2013,7 +2013,7 @@ namespace UnitVentilator {
                         SystemAirFlowSizer sizerSystemAirFlow;
                         // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                         sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        HeatingAirVolFlowScalable = sizerSystemAirFlow.size(TempSize, errorsFound);
+                        HeatingAirVolFlowScalable = sizerSystemAirFlow.size(state, TempSize, errorsFound);
                     }
                 }
 
@@ -2041,7 +2041,7 @@ namespace UnitVentilator {
                 SystemAirFlowSizer sizerSystemAirFlow;
                 // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                UnitVent(UnitVentNum).MaxAirVolFlow = sizerSystemAirFlow.size(TempSize, errorsFound);
+                UnitVent(UnitVentNum).MaxAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
             }
         }
 
@@ -2218,7 +2218,7 @@ namespace UnitVentilator {
                                     HeatingCapacitySizer sizerHeatingCapacity;
                                     sizerHeatingCapacity.overrideSizingString(SizingString);
                                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                    DesHeatingLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
+                                    DesHeatingLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                     DataScalableCapSizingON = false;
                                 } else {
                                     SizingString = "";
@@ -2229,7 +2229,7 @@ namespace UnitVentilator {
                                     HeatingCapacitySizer sizerHeatingCapacity;
                                     sizerHeatingCapacity.overrideSizingString(SizingString);
                                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                    DesHeatingLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
+                                    DesHeatingLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 }
                                 rho = GetDensityGlycol(PlantLoop(UnitVent(UnitVentNum).HWLoopNum).FluidName,
                                                        HWInitConvTemp,
@@ -2335,7 +2335,7 @@ namespace UnitVentilator {
                                     HeatingCapacitySizer sizerHeatingCapacity;
                                     sizerHeatingCapacity.overrideSizingString(SizingString);
                                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                    DesHeatingLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
+                                    DesHeatingLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                     DataScalableCapSizingON = false;
                                 } else {
                                     SizingString = "";
@@ -2346,7 +2346,7 @@ namespace UnitVentilator {
                                     HeatingCapacitySizer sizerHeatingCapacity;
                                     sizerHeatingCapacity.overrideSizingString(SizingString);
                                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                    DesHeatingLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
+                                    DesHeatingLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 }
                                 TempSteamIn = 100.00;
                                 EnthSteamInDry = GetSatEnthalpyRefrig(fluidNameSteam, TempSteamIn, 1.0, RefrigIndex, RoutineName);

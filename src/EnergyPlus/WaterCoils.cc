@@ -2594,7 +2594,7 @@ namespace WaterCoils {
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    TempSize = sizerHeatingCapacity.size(TempSize, errorsFound);
+                    TempSize = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                     WaterCoil(CoilNum).DesWaterHeatingCoilRate = TempSize;
                     WaterCoil(CoilNum).DesTotWaterCoilLoad = TempSize;
                     DataCapacityUsedForSizing = WaterCoil(CoilNum).DesWaterHeatingCoilRate;
@@ -2602,7 +2602,7 @@ namespace WaterCoils {
                     WaterHeatingCapacitySizer sizerWaterHeatingCapacity;
                     bool ErrorsFound = false;
                     sizerWaterHeatingCapacity.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).DesWaterHeatingCoilRate = sizerWaterHeatingCapacity.size(TempSize, ErrorsFound);
+                    WaterCoil(CoilNum).DesWaterHeatingCoilRate = sizerWaterHeatingCapacity.size(state, TempSize, ErrorsFound);
                     WaterCoil(CoilNum).DesTotWaterCoilLoad = WaterCoil(CoilNum).DesWaterHeatingCoilRate;
                     DataCapacityUsedForSizing = WaterCoil(CoilNum).DesWaterHeatingCoilRate;
                 }
@@ -2631,7 +2631,7 @@ namespace WaterCoils {
                 }
                 HeatingWaterflowSizer sizerHWWaterflow;
                 sizerHWWaterflow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                WaterCoil(CoilNum).MaxWaterVolFlowRate = sizerHWWaterflow.size(TempSize, ErrorsFound);
+                WaterCoil(CoilNum).MaxWaterVolFlowRate = sizerHWWaterflow.size(state, TempSize, ErrorsFound);
                 DataWaterFlowUsedForSizing = WaterCoil(CoilNum).MaxWaterVolFlowRate;
                 DataConstantUsedForSizing = 0.0; // reset these in case NomCapUserInp was true
                 DataFractionUsedForSizing = 0.0;
@@ -2669,12 +2669,12 @@ namespace WaterCoils {
                 } else {
                     HeatingWaterDesAirInletTempSizer sizerHWDesInletTemp;
                     sizerHWDesInletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).InletAirTemp = sizerHWDesInletTemp.size(DataSizing::AutoSize, ErrorsFound);
+                    WaterCoil(CoilNum).InletAirTemp = sizerHWDesInletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
 
                     TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from Sizers
                     HeatingWaterDesAirInletHumRatSizer sizerHWAirInletHumRat;
                     sizerHWAirInletHumRat.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).DesInletAirHumRat = sizerHWAirInletHumRat.size(DataSizing::AutoSize, ErrorsFound);
+                    WaterCoil(CoilNum).DesInletAirHumRat = sizerHWAirInletHumRat.size(state, DataSizing::AutoSize, ErrorsFound);
                     WaterCoil(CoilNum).InletAirHumRat = WaterCoil(CoilNum).DesInletAirHumRat;
 
                     HeatingAirflowUASizer sizerHWAirFlowUA;
@@ -2693,11 +2693,11 @@ namespace WaterCoils {
                     // get the design coil load used to size UA
                     HeatingWaterDesCoilLoadUsedForUASizer sizerHWDesCoilLoadForUA;
                     sizerHWDesCoilLoadForUA.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    DataCapacityUsedForSizing = sizerHWDesCoilLoadForUA.size(DataSizing::AutoSize, ErrorsFound);
+                    DataCapacityUsedForSizing = sizerHWDesCoilLoadForUA.size(state, DataSizing::AutoSize, ErrorsFound);
                     // get the water volume flow rate used to size UA
                     HeatingWaterDesCoilWaterVolFlowUsedForUASizer sizerHWWaterVolFlowUA;
                     sizerHWWaterVolFlowUA.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    DataWaterFlowUsedForSizing = sizerHWWaterVolFlowUA.size(DataSizing::AutoSize, ErrorsFound);
+                    DataWaterFlowUsedForSizing = sizerHWWaterVolFlowUA.size(state, DataSizing::AutoSize, ErrorsFound);
                     WaterCoil(CoilNum).InletWaterTemp = PlantSizData(PltSizHeatNum).ExitTemp;
                     WaterCoil(CoilNum).InletWaterMassFlowRate = rho * DataWaterFlowUsedForSizing;
                     WaterCoil(CoilNum).MaxWaterMassFlowRate = rho * DataWaterFlowUsedForSizing;
@@ -2728,7 +2728,7 @@ namespace WaterCoils {
                 // in UA = 1.
                 WaterHeatingCoilUASizer sizerHWCoilUA;
                 sizerHWCoilUA.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                WaterCoil(CoilNum).UACoil = sizerHWCoilUA.size(TempSize, ErrorsFound);
+                WaterCoil(CoilNum).UACoil = sizerHWCoilUA.size(state, TempSize, ErrorsFound);
                 if (DesCoilWaterInTempSaved < DesCoilHWInletTempMin) {
                     ShowWarningError("Autosizing of heating coil UA for Coil:Heating:Water \"" + CompName + "\"");
                     ShowContinueError(" Plant design loop exit temperature = " + TrimSigDigits(PlantSizData(DataPltSizHeatNum).ExitTemp, 2) + " C");

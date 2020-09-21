@@ -1687,7 +1687,7 @@ namespace HeatRecovery {
         sizerSystemAirFlow.overrideSizingString(SizingString);
         // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
         sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-        ExchCond(ExchNum).NomSupAirVolFlow = sizerSystemAirFlow.size(TempSize, errorsFound);
+        ExchCond(ExchNum).NomSupAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
         DataConstantUsedForSizing = 0.0;
         DataFractionUsedForSizing = 0.0;
         if (ExchCond(ExchNum).ExchTypeNum == HX_AIRTOAIR_FLATPLATE) {
@@ -1711,7 +1711,7 @@ namespace HeatRecovery {
             sizerSystemAirFlow2.overrideSizingString(SizingString);
             // sizerSystemAirFlow2.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
             sizerSystemAirFlow2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            ExchCond(ExchNum).NomSecAirVolFlow = sizerSystemAirFlow2.size(TempSize, errorsFound);
+            ExchCond(ExchNum).NomSecAirVolFlow = sizerSystemAirFlow2.size(state, TempSize, errorsFound);
             DataConstantUsedForSizing = 0.0;
             DataFractionUsedForSizing = 0.0;
         }
@@ -1731,7 +1731,7 @@ namespace HeatRecovery {
             sizerSystemAirFlow3.overrideSizingString(SizingString);
             // sizerSystemAirFlow3.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
             sizerSystemAirFlow3.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow = sizerSystemAirFlow3.size(TempSize, errorsFound);
+            BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow = sizerSystemAirFlow3.size(state, TempSize, errorsFound);
 
             DataAirFlowUsedForSizing = BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow;
             TempSize = BalDesDehumPerfData(BalDesDehumPerfIndex).NomProcAirFaceVel;

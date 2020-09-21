@@ -1083,7 +1083,7 @@ namespace WindowAC {
                 sizerSystemAirFlow.overrideSizingString(SizingString);
                 // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                state.dataWindowAC.WindAC(WindACNum).MaxAirVolFlow = sizerSystemAirFlow.size(TempSize, errorsFound);
+                state.dataWindowAC.WindAC(WindACNum).MaxAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
             }
         }
 

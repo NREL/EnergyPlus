@@ -6984,7 +6984,7 @@ namespace DXCoils {
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DXCoil(DXCoilNum).RatedTotCap(Mode) = sizerHeatingCapacity.size(TempSize, ErrorsFound);
+                    DXCoil(DXCoilNum).RatedTotCap(Mode) = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                 } else {
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
@@ -7757,7 +7757,7 @@ namespace DXCoils {
                         HeatingCapacitySizer sizerHeatingCapacity;
                         sizerHeatingCapacity.overrideSizingString(SizingString);
                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        MSRatedTotCapDesAtMaxSpeed = sizerHeatingCapacity.size(TempSize, ErrorsFound);
+                        MSRatedTotCapDesAtMaxSpeed = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                         SizingMethod = AutoCalculateSizing;
                         DataConstantUsedForSizing = MSRatedTotCapDesAtMaxSpeed;
                         DataFractionUsedForSizing = 1.0;
@@ -7769,7 +7769,7 @@ namespace DXCoils {
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    TempSize = sizerHeatingCapacity.size(TempSize, ErrorsFound);
+                    TempSize = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                     DXCoil(DXCoilNum).MSRatedTotCap(Mode) = TempSize;
                     if (IsAutoSize) {
                         MSRatedTotCapDesAtMaxSpeed = TempSize;
@@ -7795,7 +7795,7 @@ namespace DXCoils {
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    TempSize = sizerHeatingCapacity.size(TempSize, ErrorsFound);
+                    TempSize = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                     DXCoil(DXCoilNum).MSRatedTotCap(Mode) = TempSize;
                 }
                 PrintFlag = false;

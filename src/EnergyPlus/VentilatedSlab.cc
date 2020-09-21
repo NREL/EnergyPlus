@@ -1945,7 +1945,7 @@ namespace VentilatedSlab {
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(TempSize, ErrorsFound);
+                    DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                     DataFlowPerHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                     SizingMethod = HeatingAirflowSizing;
                     PrintFlag = true;
@@ -1971,7 +1971,7 @@ namespace VentilatedSlab {
             sizerSystemAirFlow.overrideSizingString(SizingString);
             // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
             sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            VentSlab(Item).MaxAirVolFlow = sizerSystemAirFlow.size(TempSize, ErrorsFound);
+            VentSlab(Item).MaxAirVolFlow = sizerSystemAirFlow.size(state, TempSize, ErrorsFound);
         }
 
         IsAutoSize = false;
@@ -2137,7 +2137,7 @@ namespace VentilatedSlab {
                                     HeatingCapacitySizer sizerHeatingCapacity;
                                     sizerHeatingCapacity.overrideSizingString(SizingString);
                                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                    DesCoilLoad = sizerHeatingCapacity.size(TempSize, ErrorsFound);
+                                    DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                                     DataScalableCapSizingON = false;
                                 } else {
                                     SizingString = "";
@@ -2146,7 +2146,7 @@ namespace VentilatedSlab {
                                     HeatingCapacitySizer sizerHeatingCapacity;
                                     sizerHeatingCapacity.overrideSizingString(SizingString);
                                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                    DesCoilLoad = sizerHeatingCapacity.size(TempSize, ErrorsFound);
+                                    DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                                 }
                                 rho = GetDensityGlycol(PlantLoop(VentSlab(Item).HWLoopNum).FluidName,
                                                        HWInitConvTemp,
@@ -2250,7 +2250,7 @@ namespace VentilatedSlab {
                                     HeatingCapacitySizer sizerHeatingCapacity;
                                     sizerHeatingCapacity.overrideSizingString(SizingString);
                                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                    DesCoilLoad = sizerHeatingCapacity.size(TempSize, ErrorsFound);
+                                    DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                                     DataScalableCapSizingON = false;
                                 } else {
                                     SizingString = "";
@@ -2259,7 +2259,7 @@ namespace VentilatedSlab {
                                     HeatingCapacitySizer sizerHeatingCapacity;
                                     sizerHeatingCapacity.overrideSizingString(SizingString);
                                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                    DesCoilLoad = sizerHeatingCapacity.size(TempSize, ErrorsFound);
+                                    DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                                 }
                                 TempSteamIn = 100.00;
                                 EnthSteamInDry = GetSatEnthalpyRefrig(fluidNameSteam, TempSteamIn, 1.0, VentSlab(Item).HCoil_FluidIndex, RoutineName);
