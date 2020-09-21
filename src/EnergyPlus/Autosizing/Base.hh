@@ -252,6 +252,7 @@ struct BaseSizer
     Array1D<DataSizing::PlantSizingData> plantSizData;
     Array1D<DataAirSystems::DefinePrimaryAirSystem> primaryAirSystem;
     std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
+    Array1D<DataAirLoop::AirLoopControlData> airLoopControlInfo;
 
     // public methods
 

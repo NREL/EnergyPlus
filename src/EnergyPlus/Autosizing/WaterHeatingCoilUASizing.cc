@@ -53,7 +53,7 @@
 
 namespace EnergyPlus {
 
-Real64 WaterHeatingCoilUASizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
+Real64 WaterHeatingCoilUASizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -392,7 +392,8 @@ Real64 WaterHeatingCoilUASizer::size(EnergyPlusData &State, Real64 _originalValu
     }
     this->selectSizerOutput(errorsFound);
     if (this->isCoilReportObject && this->curSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
-        coilSelectionReportObj->setCoilUA(this->compName,
+        coilSelectionReportObj->setCoilUA(state,
+                                          this->compName,
                                           this->compType,
                                           this->autoSizedValue,
                                           this->dataCapacityUsedForSizing,

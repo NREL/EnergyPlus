@@ -101,7 +101,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->zoneSizingInput = DataSizing::ZoneSizingInput;
     this->unitarySysEqSizing = DataSizing::UnitarySysEqSizing;
     this->oaSysEqSizing = DataSizing::OASysEqSizing;
-    this->outsideAirSys = DataAirLoop::OutsideAirSys;
+    this->outsideAirSys = state.dataAirLoop->OutsideAirSys;
     this->termUnitSizing = DataSizing::TermUnitSizing;
     this->finalZoneSizing = DataSizing::FinalZoneSizing;
     this->termUnitFinalZoneSizing = DataSizing::TermUnitFinalZoneSizing;
@@ -110,7 +110,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->finalSysSizing = DataSizing::FinalSysSizing;
     this->plantSizData = DataSizing::PlantSizData;
     this->primaryAirSystem = DataAirSystems::PrimaryAirSystem;
-
+    this->airLoopControlInfo = state.dataAirLoop->AirLoopControlInfo;
     this->airloopDOAS = state.dataAirLoopHVACDOAS->airloopDOAS;
     if (EnergyPlus::BaseSizer::isValidCoilType(this->compType)) { // coil reports fail if compType is not one of DataHVACGlobals::cAllCoilTypes
         this->isCoilReportObject = true;

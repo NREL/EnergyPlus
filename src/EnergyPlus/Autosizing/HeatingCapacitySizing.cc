@@ -60,7 +60,7 @@
 
 namespace EnergyPlus {
 
-Real64 HeatingCapacitySizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
+Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -305,7 +305,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &State, Real64 _originalValue, 
                     } else if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                         DesCoilLoad = CpAirStd * DesMassFlow *
                                       (this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].PreheatTemp - CoilInTemp);
-                        CoilOutTemp = this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].PreheatTemp;
+                        CoilOutTemp = this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].PreheatTemp;
                     } else {
                         DesCoilLoad = CpAirStd * DesMassFlow * (this->finalSysSizing(this->curSysNum).PreheatTemp - CoilInTemp);
                         CoilOutTemp = this->finalSysSizing(this->curSysNum).PreheatTemp;
@@ -326,7 +326,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &State, Real64 _originalValue, 
                         CoilOutHumRat = this->finalSysSizing(this->curSysNum).HeatSupHumRat;
                     }
                 }
-                if (this->curSysNum <= DataHVACGlobals::NumPrimaryAirSys && DataAirLoop::AirLoopControlInfo(this->curSysNum).UnitarySys) {
+                if (this->curSysNum <= DataHVACGlobals::NumPrimaryAirSys && this->airLoopControlInfo(this->curSysNum).UnitarySys) {
                     if (this->dataCoilIsSuppHeater) {
                         NominalCapacityDes = this->suppHeatCap;
                     } else if (this->dataCoolCoilCap > 0.0) {
@@ -335,7 +335,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &State, Real64 _originalValue, 
                         // TRUE for all air loop parent equipment except UnitarySystem where flag is reset to FALSE after simulating
                         // This method allows downstream heating coils to size individually.Probably should do this for all air loop equipment
                         // ChangoverBypass model always sets AirLoopControlInfo%UnitarySys to FALSE so heating coil can individually size
-                        if (DataAirLoop::AirLoopControlInfo(this->curSysNum).UnitarySysSimulating &&
+                        if (this->airLoopControlInfo(this->curSysNum).UnitarySysSimulating &&
                             !UtilityRoutines::SameString(this->compType, "COIL:HEATING:WATER")) {
                             NominalCapacityDes = this->unitaryHeatCap;
                         } else {
@@ -467,14 +467,15 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &State, Real64 _originalValue, 
 
     if (this->isCoilReportObject && this->curSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
         if (CoilInTemp > -999.0) { // set inlet air properties used during capacity sizing if available, allow for negative winter temps
-            coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, CoilInTemp, this->curSysNum, this->curZoneEqNum);
+            coilSelectionReportObj->setCoilEntAirTemp(state, this->compName, this->compType, CoilInTemp, this->curSysNum, this->curZoneEqNum);
             coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, CoilInHumRat);
         }
         if (CoilOutTemp > -999.0) { // set outlet air properties used during capacity sizing if available
             coilSelectionReportObj->setCoilLvgAirTemp(this->compName, this->compType, CoilOutTemp);
             coilSelectionReportObj->setCoilLvgAirHumRat(this->compName, this->compType, CoilOutHumRat);
         }
-        coilSelectionReportObj->setCoilHeatingCapacity(this->compName,
+        coilSelectionReportObj->setCoilHeatingCapacity(state,
+                                                       this->compName,
                                                        this->compType,
                                                        this->autoSizedValue,
                                                        this->wasAutoSized,

@@ -2238,7 +2238,7 @@ namespace WaterCoils {
                 TempSize = WaterCoil(CoilNum).MaxWaterVolFlowRate;
                 CoolingWaterflowSizer sizerCWWaterflow;
                 sizerCWWaterflow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                DataWaterFlowUsedForSizing = sizerCWWaterflow.size(TempSize, ErrorsFound);
+                DataWaterFlowUsedForSizing = sizerCWWaterflow.size(state, TempSize, ErrorsFound);
                 // end pre-sizing data calculations
 
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
@@ -2337,7 +2337,7 @@ namespace WaterCoils {
                 CoolingCapacitySizer sizerCoolingCapacity2;
                 sizerCoolingCapacity2.overrideSizingString(SizingString);
                 sizerCoolingCapacity2.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                WaterCoil(CoilNum).DesWaterCoolingCoilRate = sizerCoolingCapacity2.size(TempSize, ErrorsFound);
+                WaterCoil(CoilNum).DesWaterCoolingCoilRate = sizerCoolingCapacity2.size(state, TempSize, ErrorsFound);
                 WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * DataFlowUsedForSizing; // inlet air mass flow rate is the autosized value
                 DataCapacityUsedForSizing = WaterCoil(CoilNum).DesWaterCoolingCoilRate;
 
@@ -2346,7 +2346,7 @@ namespace WaterCoils {
                 bPRINT = true;
                 TempSize = WaterCoil(CoilNum).MaxWaterVolFlowRate;
                 sizerCWWaterflow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                WaterCoil(CoilNum).MaxWaterVolFlowRate = sizerCWWaterflow.size(TempSize, ErrorsFound);
+                WaterCoil(CoilNum).MaxWaterVolFlowRate = sizerCWWaterflow.size(state, TempSize, ErrorsFound);
                 DataWaterFlowUsedForSizing = WaterCoil(CoilNum).MaxWaterVolFlowRate;
 
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
@@ -2362,7 +2362,7 @@ namespace WaterCoils {
                 sizingCoolingAirFlow2.overrideSizingString(stringOverride);
                 // sizingCoolingAirFlow2.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizingCoolingAirFlow2.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                WaterCoil(CoilNum).DesAirVolFlowRate = sizingCoolingAirFlow2.size(TempSize, errorsFound);
+                WaterCoil(CoilNum).DesAirVolFlowRate = sizingCoolingAirFlow2.size(state, TempSize, errorsFound);
                 WaterCoil(CoilNum).DesAirMassFlowRate = WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
 
                 if (WaterCoil(CoilNum).DesAirVolFlowRate <= 0.0) {
@@ -2393,7 +2393,7 @@ namespace WaterCoils {
                     if (DataGlobals::isEpJSON) stringOverride = "fin_diameter [m]";
                     sizerFinDiameter.overrideSizingString(stringOverride);
                     sizerFinDiameter.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).FinDiam = sizerFinDiameter.size(TempSize, ErrorsFound);
+                    WaterCoil(CoilNum).FinDiam = sizerFinDiameter.size(state, TempSize, ErrorsFound);
 
                     // Auto size water coil minimum airflow area = 0.44 * WaterCoil( CoilNum ).InletAirMassFlowRate
                     DataConstantUsedForSizing = WaterCoil(CoilNum).InletAirMassFlowRate;
@@ -2405,7 +2405,7 @@ namespace WaterCoils {
                     if (DataGlobals::isEpJSON) stringOverride = "minimum_airflow_area [m2]";
                     sizerMinAirFlowArea.overrideSizingString(stringOverride);
                     sizerMinAirFlowArea.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).MinAirFlowArea = sizerMinAirFlowArea.size(TempSize, ErrorsFound);
+                    WaterCoil(CoilNum).MinAirFlowArea = sizerMinAirFlowArea.size(state, TempSize, ErrorsFound);
 
                     if (WaterCoil(CoilNum).MinAirFlowArea <= 0.0) {
                         ShowSevereError("Coil:Cooling:Water:DetailedGeometry: \"" + WaterCoil(CoilNum).Name + "\"");
@@ -2425,7 +2425,7 @@ namespace WaterCoils {
                     if (DataGlobals::isEpJSON) stringOverride = "fin_surface_area [m2]";
                     sizerFinSurfaceArea.overrideSizingString(stringOverride);
                     sizerFinSurfaceArea.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).FinSurfArea = sizerFinSurfaceArea.size(TempSize, ErrorsFound);
+                    WaterCoil(CoilNum).FinSurfArea = sizerFinSurfaceArea.size(state, TempSize, ErrorsFound);
 
                     // Auto size water coil total tube inside surface area = 4.4 * WaterCoil( CoilNum ).TubeInsideDiam * WaterCoil( CoilNum
                     // ).NumOfTubeRows * WaterCoil( CoilNum ).NumOfTubesPerRow
@@ -2439,7 +2439,7 @@ namespace WaterCoils {
                     if (DataGlobals::isEpJSON) stringOverride = "total_tube_inside_area [m2]";
                     sizerTubeInsideArea.overrideSizingString(stringOverride);
                     sizerTubeInsideArea.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).TotTubeInsideArea = sizerTubeInsideArea.size(TempSize, ErrorsFound);
+                    WaterCoil(CoilNum).TotTubeInsideArea = sizerTubeInsideArea.size(state, TempSize, ErrorsFound);
 
                     // Auto size water coil total tube outside surface area = 4.1 * WaterCoil( CoilNum ).TubeOutsideDiam * WaterCoil( CoilNum
                     // ).NumOfTubeRows * WaterCoil( CoilNum ).NumOfTubesPerRow
@@ -2453,7 +2453,7 @@ namespace WaterCoils {
                     if (DataGlobals::isEpJSON) stringOverride = "tube_outside_surface_area [m2]";
                     sizerTubeOutsideArea.overrideSizingString(stringOverride);
                     sizerTubeOutsideArea.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).TubeOutsideSurfArea = sizerTubeOutsideArea.size(TempSize, ErrorsFound);
+                    WaterCoil(CoilNum).TubeOutsideSurfArea = sizerTubeOutsideArea.size(state, TempSize, ErrorsFound);
 
                     if ((WaterCoil(CoilNum).FinSurfArea + WaterCoil(CoilNum).TubeOutsideSurfArea) <= 0.0) {
                         ShowSevereError("Coil:Cooling:Water:DetailedGeometry: \"" + WaterCoil(CoilNum).Name + "\"");
@@ -2472,7 +2472,7 @@ namespace WaterCoils {
                     if (DataGlobals::isEpJSON) stringOverride = "coil_depth [m]";
                     sizerCoilDepth.overrideSizingString(stringOverride);
                     sizerCoilDepth.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).CoilDepth = sizerCoilDepth.size(TempSize, ErrorsFound);
+                    WaterCoil(CoilNum).CoilDepth = sizerCoilDepth.size(state, TempSize, ErrorsFound);
                 }
                 DataPltSizCoolNum = 0; // reset all globals to 0 to ensure correct sizing for other child components
                 DataWaterLoopNum = 0;
@@ -2554,12 +2554,12 @@ namespace WaterCoils {
                     HeatingCoilDesAirInletTempSizer sizerHeatingDesInletTemp;
                     bool ErrorsFound = false;
                     sizerHeatingDesInletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    DataDesInletAirTemp = sizerHeatingDesInletTemp.size(DataSizing::AutoSize, ErrorsFound);
+                    DataDesInletAirTemp = sizerHeatingDesInletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
 
                     HeatingCoilDesAirOutletTempSizer sizerHeatingDesOutletTemp;
                     ErrorsFound = false;
                     sizerHeatingDesOutletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    DataDesOutletAirTemp = sizerHeatingDesOutletTemp.size(DataSizing::AutoSize, ErrorsFound);
+                    DataDesOutletAirTemp = sizerHeatingDesOutletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
 
                     if (CurOASysNum > 0) {
                         OASysEqSizing(CurOASysNum).AirFlow = true;
@@ -2661,7 +2661,7 @@ namespace WaterCoils {
                     HeatingCoilDesAirInletHumRatSizer sizerHeatingDesInletHumRat;
                     bool ErrorsFound = false;
                     sizerHeatingDesInletHumRat.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                    WaterCoil(CoilNum).DesInletAirHumRat = sizerHeatingDesInletHumRat.size(DataSizing::AutoSize, ErrorsFound);
+                    WaterCoil(CoilNum).DesInletAirHumRat = sizerHeatingDesInletHumRat.size(state, DataSizing::AutoSize, ErrorsFound);
                     WaterCoil(CoilNum).InletAirHumRat = WaterCoil(CoilNum).DesInletAirHumRat;
 
                     WaterCoil(CoilNum).DesAirVolFlowRate = DataAirFlowUsedForSizing;                // coil report

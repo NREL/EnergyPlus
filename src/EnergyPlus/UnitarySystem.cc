@@ -2663,7 +2663,7 @@ namespace UnitarySystems {
             TempSize = this->DesignMaxOutletTemp;
             MaxHeaterOutletTempSizer sizerMaxHeaterOutTemp;
             sizerMaxHeaterOutTemp.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            this->DesignMaxOutletTemp = sizerMaxHeaterOutTemp.size(TempSize, ErrFound);
+            this->DesignMaxOutletTemp = sizerMaxHeaterOutTemp.size(state, TempSize, ErrFound);
         }
 
         if (this->m_SuppCoilExists) {
@@ -2793,7 +2793,7 @@ namespace UnitarySystems {
             if (DataGlobals::isEpJSON) stringOverride = "minimum_supply_air_temperature [C]";
             sizerASHRAEMinSATCooling.overrideSizingString(stringOverride);
             sizerASHRAEMinSATCooling.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            this->DesignMinOutletTemp = sizerASHRAEMinSATCooling.size(this->DesignMinOutletTemp, ErrFound);
+            this->DesignMinOutletTemp = sizerASHRAEMinSATCooling.size(state, this->DesignMinOutletTemp, ErrFound);
 
             if (SizingDesRunThisSys) {
                 DataSizing::DataCapacityUsedForSizing = DataSizing::FinalZoneSizing(this->ControlZoneNum).DesHeatLoad * capacityMultiplier;
@@ -2807,7 +2807,7 @@ namespace UnitarySystems {
             if (DataGlobals::isEpJSON) stringOverride = "maximum_supply_air_temperature [C]";
             sizerASHRAEMaxSATHeating.overrideSizingString(stringOverride);
             sizerASHRAEMaxSATHeating.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            this->DesignMaxOutletTemp = sizerASHRAEMaxSATHeating.size(this->DesignMaxOutletTemp, ErrFound);
+            this->DesignMaxOutletTemp = sizerASHRAEMaxSATHeating.size(state, this->DesignMaxOutletTemp, ErrFound);
 
             DataSizing::DataCapacityUsedForSizing = 0.0; // reset so other routines don't use this inadvertently
             DataSizing::DataFlowUsedForSizing = 0.0;

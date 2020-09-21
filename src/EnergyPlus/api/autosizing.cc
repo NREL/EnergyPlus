@@ -116,7 +116,7 @@ int sizerHeatingAirflowUASize(EnergyPlusState state, Sizer sizer) {
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
     auto st = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     bool errorsFound = false;
-    s->size(st, EnergyPlus::DataSizing::AutoSize, errorsFound);
+    s->size(*st, EnergyPlus::DataSizing::AutoSize, errorsFound);
     if (errorsFound) {
         return 1;
     }

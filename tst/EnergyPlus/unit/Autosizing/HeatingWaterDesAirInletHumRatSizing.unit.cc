@@ -392,7 +392,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     // OUTDOOR AIR SYSTEM EQUIPMENT TESTING
     // Test 17 - Outdoor Air System Equipment, no DOAS air loop
     EnergyPlus::DataSizing::OASysEqSizing.allocate(1);
-    EnergyPlus::DataAirLoop::OutsideAirSys.allocate(1);
+    state.dataAirLoop->OutsideAirSys.allocate(1);
     DataSizing::CurOASysNum = 1;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
@@ -409,7 +409,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
 
     // Test 18 - Outdoor Air System Equipment with DOAS system
     EnergyPlus::DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.0;
-    EnergyPlus::DataAirLoop::OutsideAirSys(1).AirLoopDOASNum = 0;
+    state.dataAirLoop->OutsideAirSys(1).AirLoopDOASNum = 0;
     state.dataAirLoopHVACDOAS->airloopDOAS.emplace_back();
     state.dataAirLoopHVACDOAS->airloopDOAS[0].HeatOutHumRat = 0.0036;
 

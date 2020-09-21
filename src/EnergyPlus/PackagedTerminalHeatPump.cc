@@ -5491,7 +5491,7 @@ namespace PackagedTerminalHeatPump {
             PrintFlag = true;
             ASHRAEMinSATCoolingSizer sizerASHRAEMinSATCooling;
             sizerASHRAEMinSATCooling.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            PTUnit(PTUnitNum).DesignMinOutletTemp = sizerASHRAEMinSATCooling.size(PTUnit(PTUnitNum).DesignMinOutletTemp, ErrorsFound);
+            PTUnit(PTUnitNum).DesignMinOutletTemp = sizerASHRAEMinSATCooling.size(state, PTUnit(PTUnitNum).DesignMinOutletTemp, ErrorsFound);
 
             if (SizingDesRunThisZone) {
                 DataCapacityUsedForSizing = FinalZoneSizing(PTUnit(PTUnitNum).ControlZoneNum).DesHeatLoad * capacityMultiplier;
@@ -5502,7 +5502,7 @@ namespace PackagedTerminalHeatPump {
             DataFlowUsedForSizing = PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow;
             ASHRAEMaxSATHeatingSizer sizerASHRAEMaxSATHeating;
             sizerASHRAEMaxSATHeating.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            PTUnit(PTUnitNum).DesignMaxOutletTemp = sizerASHRAEMaxSATHeating.size(PTUnit(PTUnitNum).DesignMaxOutletTemp, ErrorsFound);
+            PTUnit(PTUnitNum).DesignMaxOutletTemp = sizerASHRAEMaxSATHeating.size(state, PTUnit(PTUnitNum).DesignMaxOutletTemp, ErrorsFound);
 
             DataCapacityUsedForSizing = 0.0; // reset so other routines don't use this inadvertently
             DataFlowUsedForSizing = 0.0;

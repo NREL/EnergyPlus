@@ -769,7 +769,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     EnergyPlus::DataSizing::FinalSysSizing(1).DesHeatVolFlow = 0.0;
     EnergyPlus::DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 3.0;
     EnergyPlus::DataSizing::OASysEqSizing.allocate(1);
-    EnergyPlus::DataAirLoop::OutsideAirSys.allocate(1);
+    state.dataAirLoop->OutsideAirSys.allocate(1);
     DataSizing::CurOASysNum = 1;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;

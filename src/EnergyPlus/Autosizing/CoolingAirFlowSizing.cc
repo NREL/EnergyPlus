@@ -55,7 +55,7 @@
 
 namespace EnergyPlus {
 
-Real64 CoolingAirFlowSizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
+Real64 CoolingAirFlowSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;

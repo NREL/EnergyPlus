@@ -205,7 +205,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
         sizerCondEvapPumpPower.overrideSizingString(stringOverride);
         TempSize = this->original_input_specs.nominal_evap_condenser_pump_power;
         sizerCondEvapPumpPower.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-        this->nominalEvaporativePumpPower = sizerCondEvapPumpPower.size(TempSize, errorsFound);
+        this->nominalEvaporativePumpPower = sizerCondEvapPumpPower.size(state, TempSize, errorsFound);
     }
 
     for (auto &curSpeed : this->speeds) {

@@ -415,7 +415,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
 
     DataSizing::SysSizingRunDone = true;
     DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirLoop::AirLoopControlInfo.allocate(1);
+    state.dataAirLoop->AirLoopControlInfo.allocate(1);
     DataSizing::UnitarySysEqSizing.allocate(1);
     DataSizing::SysSizInput.allocate(1);
     DataSizing::SysSizInput(1).AirLoopNum = 1;
@@ -632,7 +632,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
 
     // Test 31 - Airloop Equipment, CurDuctType = Main, Unitary system does not set size for HW coils
     // even when AirLoopControlInfo(1).UnitarySysSimulating = true
-    DataAirLoop::AirLoopControlInfo(1).UnitarySys = true;
+    state.dataAirLoop->AirLoopControlInfo(1).UnitarySys = true;
     DataSizing::UnitaryHeatCap = 4790.0;
     DataSizing::CurDuctType = DataHVACGlobals::Main;
     // start with an autosized value
@@ -647,7 +647,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 32 - Airloop Equipment, CurDuctType = Main, Unitary system does set size for non-water heating coils
-    DataAirLoop::AirLoopControlInfo(1).UnitarySysSimulating = true;
+    state.dataAirLoop->AirLoopControlInfo(1).UnitarySysSimulating = true;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -689,7 +689,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
     DataSizing::DataCoolCoilCap = 0.0;
 
-    DataAirLoop::AirLoopControlInfo(1).UnitarySys = false;
+    state.dataAirLoop->AirLoopControlInfo(1).UnitarySys = false;
 
     // Test 35 - Airloop Equipment, CurDuctType = Main, air loop uses scaled sizing
     DataSizing::FinalSysSizing(1).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
@@ -723,7 +723,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
 
     // Test 37 - OA Equipment, OA Sys capacity sizing
     DataSizing::CurOASysNum = 1;
-    DataAirLoop::OutsideAirSys.allocate(1);
+    state.dataAirLoop->OutsideAirSys.allocate(1);
     DataSizing::OASysEqSizing.allocate(1);
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
@@ -800,8 +800,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
 
     // Test 42 - OA Equipment, DOAS Air loop
     DataSizing::OASysEqSizing(1).HeatingAirFlow = false;
-    DataAirLoop::OutsideAirSys.allocate(1);
-    DataAirLoop::OutsideAirSys(1).AirLoopDOASNum = 0;
+    state.dataAirLoop->OutsideAirSys.allocate(1);
+    state.dataAirLoop->OutsideAirSys(1).AirLoopDOASNum = 0;
     state.dataAirLoopHVACDOAS->airloopDOAS.emplace_back();
     state.dataAirLoopHVACDOAS->airloopDOAS[0].SizingMassFlow = 1.1;
     state.dataAirLoopHVACDOAS->airloopDOAS[0].HeatOutTemp = 5.0;

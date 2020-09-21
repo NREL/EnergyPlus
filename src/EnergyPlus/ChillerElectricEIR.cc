@@ -1445,7 +1445,7 @@ namespace ChillerElectricEIR {
                     if (DataGlobals::isEpJSON) stringOverride = "reference_condenser_fluid_flow_rate [m3/s]";
                     sizerCondAirFlow.overrideSizingString(stringOverride);
                     sizerCondAirFlow.initializeWithinEP(state, CompType, this->Name, bPRINT, RoutineName);
-                    this->CondVolFlowRate = sizerCondAirFlow.size(TempSize, ErrorsFound);
+                    this->CondVolFlowRate = sizerCondAirFlow.size(state, TempSize, ErrorsFound);
                 }
             }
         }

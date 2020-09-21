@@ -54,7 +54,7 @@
 
 namespace EnergyPlus {
 
-Real64 HeatingAirFlowSizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
+Real64 HeatingAirFlowSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -194,8 +194,8 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &State, Real64 _originalValue, b
                     } else if (this->oaSysEqSizing(this->curOASysNum).HeatingAirFlow) {
                         // Parent object sets heating flow rate
                         this->autoSizedValue = this->oaSysEqSizing(this->curOASysNum).HeatingAirVolFlow;
-                    } else if (DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                        this->autoSizedValue = this->airloopDOAS[DataAirLoop::OutsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow /
+                    } else if (outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
+                        this->autoSizedValue = this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow /
                                                DataEnvironment::StdRhoAir;
                     } else {
                         this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;

@@ -7375,7 +7375,7 @@ namespace HVACVariableRefrigerantFlow {
                 sizingNoHeatingAirFlow.overrideSizingString(SizingString);
                 // sizingNoHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizingNoHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                VRFTU(VRFTUNum).MaxNoHeatAirVolFlow = sizingNoHeatingAirFlow.size(TempSize, errorsFound);
+                VRFTU(VRFTUNum).MaxNoHeatAirVolFlow = sizingNoHeatingAirFlow.size(state, TempSize, errorsFound);
             }
 
             // initialize capacity sizing variables: cooling
@@ -7664,7 +7664,7 @@ namespace HVACVariableRefrigerantFlow {
             if (DataGlobals::isEpJSON) stringOverride = "maximum_supply_air_temperature_from_supplemental_heater [C]";
             sizerMaxHeaterOutTemp.overrideSizingString(stringOverride);
             sizerMaxHeaterOutTemp.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil = sizerMaxHeaterOutTemp.size(TempSize, ErrorsFound);
+            VRFTU(VRFTUNum).MaxSATFromSuppHeatCoil = sizerMaxHeaterOutTemp.size(state, TempSize, ErrorsFound);
         }
 
         if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {

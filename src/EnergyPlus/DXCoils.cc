@@ -6781,7 +6781,7 @@ namespace DXCoils {
                         if (DataGlobals::isEpJSON) stringOverride = "rated_evaporator_air_flow_rate [m3/s]";
                         sizerHPRatedAirVolFlow.overrideSizingString(stringOverride);
                         sizerHPRatedAirVolFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        DXCoil(DXCoilNum).RatedAirVolFlowRate(1) = sizerHPRatedAirVolFlow.size(TempSize, ErrorsFound);
+                        DXCoil(DXCoilNum).RatedAirVolFlowRate(1) = sizerHPRatedAirVolFlow.size(state, TempSize, ErrorsFound);
                         PrintFlag = false;
                     }
 
@@ -6799,7 +6799,7 @@ namespace DXCoils {
                         if (DataGlobals::isEpJSON) stringOverride = "rated_condenser_water_flow_rate [m3/s]";
                         sizerHPWHCondWaterFlow.overrideSizingString(stringOverride);
                         sizerHPWHCondWaterFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        DXCoil(DXCoilNum).RatedHPWHCondWaterFlow = sizerHPWHCondWaterFlow.size(TempSize, ErrorsFound);
+                        DXCoil(DXCoilNum).RatedHPWHCondWaterFlow = sizerHPWHCondWaterFlow.size(state, TempSize, ErrorsFound);
                         PrintFlag = false;
                     }
                 } else {
@@ -7063,7 +7063,7 @@ namespace DXCoils {
                     TempSize = DXCoil(DXCoilNum).EvapCondAirFlow(Mode);
                     sizerEvapCondAirFlow.overrideSizingString(stringOverride);
                     sizerEvapCondAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DXCoil(DXCoilNum).EvapCondAirFlow(Mode) = sizerEvapCondAirFlow.size(TempSize, ErrorsFound);
+                    DXCoil(DXCoilNum).EvapCondAirFlow(Mode) = sizerEvapCondAirFlow.size(state, TempSize, ErrorsFound);
                 }
 
                 if (SizeSecDXCoil) { // autosize secondary coil air flow rate for AirCooled condenser type
@@ -7122,7 +7122,7 @@ namespace DXCoils {
                     if (DataGlobals::isEpJSON) stringOverride = "low_speed_evaporative_condenser_air_flow_rate [m3/s]";
                     sizerEvapCondAirFlow2.overrideSizingString(stringOverride);
                     sizerEvapCondAirFlow2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DXCoil(DXCoilNum).EvapCondAirFlow2 = sizerEvapCondAirFlow2.size(TempSize, ErrorsFound);
+                    DXCoil(DXCoilNum).EvapCondAirFlow2 = sizerEvapCondAirFlow2.size(state, TempSize, ErrorsFound);
                 }
 
                 // Sizing evaporative condenser pump electric nominal power
@@ -7153,7 +7153,7 @@ namespace DXCoils {
                     TempSize = DXCoil(DXCoilNum).EvapCondPumpElecNomPower(Mode);
                     sizerEvapCondPumpPower.overrideSizingString(stringOverride);
                     sizerEvapCondPumpPower.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DXCoil(DXCoilNum).EvapCondPumpElecNomPower(Mode) = sizerEvapCondPumpPower.size(TempSize, ErrorsFound);
+                    DXCoil(DXCoilNum).EvapCondPumpElecNomPower(Mode) = sizerEvapCondPumpPower.size(state, TempSize, ErrorsFound);
                 }
 
                 // Sizing low speed evaporative condenser pump electric nominal power
@@ -7170,7 +7170,7 @@ namespace DXCoils {
                     if (DataGlobals::isEpJSON) stringOverride = "low_speed_evaporative_condenser_pump_rated_power_consumption [W]";
                     sizerEvapCondPumpPower2.overrideSizingString(stringOverride);
                     sizerEvapCondPumpPower2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DXCoil(DXCoilNum).EvapCondPumpElecNomPower2 = sizerEvapCondPumpPower2.size(TempSize, ErrorsFound);
+                    DXCoil(DXCoilNum).EvapCondPumpElecNomPower2 = sizerEvapCondPumpPower2.size(state, TempSize, ErrorsFound);
                 }
 
                 //				// Sizing rated low speed air flow rate
@@ -7186,7 +7186,7 @@ namespace DXCoils {
                     if (DataGlobals::isEpJSON) stringOverride = "low_speed_rated_air_flow_rate [m3/s]";
                     sizerLowSpdAirFlow.overrideSizingString(stringOverride);
                     sizerLowSpdAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DXCoil(DXCoilNum).RatedAirVolFlowRate2 = sizerLowSpdAirFlow.size(TempSize, ErrorsFound);
+                    DXCoil(DXCoilNum).RatedAirVolFlowRate2 = sizerLowSpdAirFlow.size(state, TempSize, ErrorsFound);
                 }
 
                 //				// Sizing rated low speed total cooling capacity
@@ -7202,7 +7202,7 @@ namespace DXCoils {
                     if (DataGlobals::isEpJSON) stringOverride = "low_speed_gross_rated_total_cooling_capacity [W]";
                     sizerLowSpdCap.overrideSizingString(stringOverride);
                     sizerLowSpdCap.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DXCoil(DXCoilNum).RatedTotCap2 = sizerLowSpdCap.size(TempSize, ErrorsFound);
+                    DXCoil(DXCoilNum).RatedTotCap2 = sizerLowSpdCap.size(state, TempSize, ErrorsFound);
                 }
 
                 if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
@@ -7278,7 +7278,7 @@ namespace DXCoils {
                         if (DataGlobals::isEpJSON) stringOverride = "resistive_defrost_heater_capacity [W]";
                         sizerResDefCap.overrideSizingString(stringOverride);
                         sizerResDefCap.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        DXCoil(DXCoilNum).DefrostCapacity = sizerResDefCap.size(TempSize, ErrorsFound);
+                        DXCoil(DXCoilNum).DefrostCapacity = sizerResDefCap.size(state, TempSize, ErrorsFound);
                     } else {
                         DXCoil(DXCoilNum).DefrostCapacity = 0.0;
                     }
@@ -7401,7 +7401,7 @@ namespace DXCoils {
                     CoolingCapacitySizer sizerCoolingCapacity2;
                     sizerCoolingCapacity2.overrideSizingString(SizingString);
                     sizerCoolingCapacity2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    TempSize = sizerCoolingCapacity2.size(TempSize, ErrorsFound);
+                    TempSize = sizerCoolingCapacity2.size(state, TempSize, ErrorsFound);
                     DXCoil(DXCoilNum).MSRatedTotCap(Mode) = TempSize;
                     if (IsAutoSize) {
                         MSRatedTotCapDesAtMaxSpeed = TempSize;
@@ -7645,7 +7645,7 @@ namespace DXCoils {
                         sizingHeatingAirFlow2.overrideSizingString(SizingString);
                         // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                         sizingHeatingAirFlow2.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                        MSRatedAirVolFlowRateDes = sizingHeatingAirFlow2.size(TempSize, errorsFound);
+                        MSRatedAirVolFlowRateDes = sizingHeatingAirFlow2.size(state, TempSize, errorsFound);
                         bPRINT = true;
                     }
                 } else {

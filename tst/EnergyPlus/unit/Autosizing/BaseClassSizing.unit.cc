@@ -315,7 +315,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(SizingResult, errorsFound);
+    SizingResult = sizerCoolingCapacity.size(state, SizingResult, errorsFound);
     EXPECT_NEAR(18882.0, SizingResult, 0.1);
 
     // confirm that sizing data is saved for use by parent object
@@ -334,7 +334,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
 
     // chilled water cooling coil capacity sizing
     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(SizingResult, errorsFound);
+    SizingResult = sizerCoolingCapacity.size(state, SizingResult, errorsFound);
     EXPECT_NEAR(19234.6, SizingResult, 0.1);
 }
 
@@ -493,7 +493,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(SizingResult, errorsFound);
+    SizingResult = sizerCoolingCapacity.size(this->state, SizingResult, errorsFound);
     EXPECT_NEAR(18882.0, SizingResult, 0.1);
     Real64 dxCoilSizeNoFan = SizingResult;
 
@@ -514,7 +514,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
 
     // dx cooling coil capacity sizing
     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(SizingResult, errorsFound);
+    SizingResult = sizerCoolingCapacity.size(this->state, SizingResult, errorsFound);
     EXPECT_NEAR(expectedDXCoilSize, SizingResult, 0.1);
 
     // With Test Fan 3 fan heat - this fails before the #6126 fix
@@ -535,7 +535,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
 
     // dx cooling coil capacity sizing
     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(SizingResult, errorsFound);
+    SizingResult = sizerCoolingCapacity.size(this->state, SizingResult, errorsFound);
     EXPECT_NEAR(expectedDXCoilSize, SizingResult, 0.1);
 }
 
@@ -590,7 +590,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(SizingResult, errorsFound);
+    SizingResult = sizerCoolingCapacity.size(this->state, SizingResult, errorsFound);
     EXPECT_NEAR(5664.6, SizingResult, 0.1);
 
     CompType = "COIL:COOLING:WATER";
@@ -602,7 +602,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
 
     // chilled water cooling coil capacity sizing
     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(SizingResult, errorsFound);
+    SizingResult = sizerCoolingCapacity.size(this->state, SizingResult, errorsFound);
     EXPECT_NEAR(5770.4, SizingResult, 0.1);
 }
 
