@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/api/autosizing.h>
+#include <EnergyPlus/api/state.h>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/DataSizing.hh>
 
@@ -68,7 +69,7 @@ void sizerHeatingAirflowUADelete(Sizer sizer) {
     delete reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
 }
 void sizerHeatingAirflowUAInitializeForZone(
-    Sizer sizer, HeatingAirflowUAZoneConfigType zoneConfig, Real64 elevation, Real64 representativeFlowRate, Real64 reheatMultiplier
+    EnergyPlusState, Sizer sizer, HeatingAirflowUAZoneConfigType zoneConfig, Real64 elevation, Real64 representativeFlowRate, Real64 reheatMultiplier
 )
 {
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
@@ -84,7 +85,8 @@ void sizerHeatingAirflowUAInitializeForZone(
         break;
     }
 }
-void sizerHeatingAirflowUAInitializeForSystem(Sizer sizer,
+void sizerHeatingAirflowUAInitializeForSystem(EnergyPlusState,
+                                              Sizer sizer,
                                               HeatingAirflowUASystemConfigType sysConfig,
                                               Real64 elevation,
                                               Real64 representativeFlowRate,
@@ -110,10 +112,11 @@ void sizerHeatingAirflowUAInitializeForSystem(Sizer sizer,
         break;
     }
 }
-int sizerHeatingAirflowUASize(Sizer sizer) {
+int sizerHeatingAirflowUASize(EnergyPlusState state, Sizer sizer) {
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
+    auto st = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     bool errorsFound = false;
-    s->size(EnergyPlus::DataSizing::AutoSize, errorsFound);
+    s->size(st, EnergyPlus::DataSizing::AutoSize, errorsFound);
     if (errorsFound) {
         return 1;
     }

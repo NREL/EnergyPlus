@@ -40,13 +40,13 @@ class HeatingAirflowUASizer:
         self.api = api
         self.api.sizerHeatingAirflowUANew.argtypes = []
         self.api.sizerHeatingAirflowUANew.restype = c_void_p
-        self.api.sizerHeatingAirflowUAInitializeForZone.argtypes = [c_void_p, c_int, RealEP, RealEP, RealEP]
+        self.api.sizerHeatingAirflowUAInitializeForZone.argtypes = [c_void_p, c_void_p, c_int, RealEP, RealEP, RealEP]
         self.api.sizerHeatingAirflowUAInitializeForZone.restype = c_void_p
-        self.api.sizerHeatingAirflowUAInitializeForSystem.argtypes = [c_void_p, c_int, RealEP, RealEP, RealEP, c_int]
+        self.api.sizerHeatingAirflowUAInitializeForSystem.argtypes = [c_void_p, c_void_p, c_int, RealEP, RealEP, RealEP, c_int]
         self.api.sizerHeatingAirflowUAInitializeForSystem.restype = c_void_p
         self.api.sizerHeatingAirflowUADelete.argtypes = [c_void_p]
         self.api.sizerHeatingAirflowUADelete.restype = c_void_p
-        self.api.sizerHeatingAirflowUASize.argtypes = [c_void_p]
+        self.api.sizerHeatingAirflowUASize.argtypes = [c_void_p, c_void_p]
         self.api.sizerHeatingAirflowUASize.restype = int
         self.api.sizerHeatingAirflowUAValue.argtypes = [c_void_p]
         self.api.sizerHeatingAirflowUAValue.restype = RealEP
@@ -59,19 +59,19 @@ class HeatingAirflowUASizer:
     def get_last_error_messages(self):
         return self.base_worker.get_error_messages(self.api, self.instance)
 
-    def initialize_for_zone(self, zone_config: int, elevation: float, representative_flow_rate: float, reheat_multiplier: float = 1.0) -> None:
-        self.api.sizerHeatingAirflowUAInitializeForZone(self.instance, zone_config, elevation, representative_flow_rate, reheat_multiplier)
+    def initialize_for_zone(self, state: c_void_p, zone_config: int, elevation: float, representative_flow_rate: float, reheat_multiplier: float = 1.0) -> None:
+        self.api.sizerHeatingAirflowUAInitializeForZone(state, self.instance, zone_config, elevation, representative_flow_rate, reheat_multiplier)
 
-    def initialize_for_system_outdoor_air(self, sys_config: int, elevation: float, representative_flow_rate: float, min_flow_rate_ratio: float, doas: bool) -> None:
-        self.api.sizerHeatingAirflowUAInitializeForSystem(self.instance, sys_config, elevation, representative_flow_rate, min_flow_rate_ratio, 1 if doas else 0)
+    def initialize_for_system_outdoor_air(self, state: c_void_p, sys_config: int, elevation: float, representative_flow_rate: float, min_flow_rate_ratio: float, doas: bool) -> None:
+        self.api.sizerHeatingAirflowUAInitializeForSystem(state, self.instance, sys_config, elevation, representative_flow_rate, min_flow_rate_ratio, 1 if doas else 0)
 
-    def size(self) -> bool:
+    def size(self, state: c_void_p) -> bool:
         """
         Performs autosizing calculations with the given initialized values
 
         :return: True if the sizing was successful, or False if not
         """
-        return True if self.api.sizerHeatingAirflowUASize(self.instance) == 0 else False
+        return True if self.api.sizerHeatingAirflowUASize(state, self.instance) == 0 else False
 
     def autosized_value(self) -> float:
         """

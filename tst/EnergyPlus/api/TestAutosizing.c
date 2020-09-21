@@ -47,14 +47,16 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include <stdlib.h>
+// #include <stdlib.h>
 #include <string.h>
 #include <EnergyPlus/api/autosizing.h>
+#include <EnergyPlus/api/state.h>
 
 int runSuccess() {
+    EnergyPlusState st = stateNew();
     Sizer s = sizerHeatingAirflowUANew();
-    sizerHeatingAirflowUAInitializeForZone(s, HeatingAirflowUAZoneTerminal, 0.0, 500, 0.0);
-    int status = sizerHeatingAirflowUASize(s);
+    sizerHeatingAirflowUAInitializeForZone(st, s, HeatingAirflowUAZoneTerminal, 0.0, 500, 0.0);
+    int status = sizerHeatingAirflowUASize(st, s);
     if (status == 0) {
         Real64 val = sizerHeatingAirflowUAValue(s);
         printf("Calculated successfully!  Value = %8.4f\n", val);
@@ -66,8 +68,8 @@ int runSuccess() {
        // free(messages);
         return 1;
     }
-    sizerHeatingAirflowUAInitializeForZone(s, HeatingAirflowUAZoneInductionUnit, 0.0, 500, 1.0);
-    status = sizerHeatingAirflowUASize(s);
+    sizerHeatingAirflowUAInitializeForZone(st, s, HeatingAirflowUAZoneInductionUnit, 0.0, 500, 1.0);
+    status = sizerHeatingAirflowUASize(st, s);
     if (status == 0) {
         Real64 val = sizerHeatingAirflowUAValue(s);
         printf("Calculated successfully!  Value = %8.4f\n", val);
@@ -79,8 +81,8 @@ int runSuccess() {
         // free(messages);
         return 1;
     }
-    sizerHeatingAirflowUAInitializeForZone(s, HeatingAirflowUAZoneFanCoil, 0.0, 500, 1.0);
-    status = sizerHeatingAirflowUASize(s);
+    sizerHeatingAirflowUAInitializeForZone(st, s, HeatingAirflowUAZoneFanCoil, 0.0, 500, 1.0);
+    status = sizerHeatingAirflowUASize(st, s);
     if (status == 0) {
         Real64 val = sizerHeatingAirflowUAValue(s);
         printf("Calculated successfully!  Value = %8.4f\n", val);

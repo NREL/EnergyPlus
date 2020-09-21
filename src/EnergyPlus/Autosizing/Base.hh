@@ -261,7 +261,7 @@ struct BaseSizer
                                     bool const &_printWarningFlag,
                                     std::string const &_callingRoutine);
 
-    virtual Real64 size(Real64 originalValue, bool &errorsFound) = 0;
+    virtual Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) = 0;
 
     std::string getLastErrorMessages();
 
