@@ -1423,7 +1423,7 @@ namespace WindowManager {
             if (!dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
             if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) continue; // Irrelevant for Complex Fen
             if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;    // not required
-            ConstrNumSh = SurfWinShadedConstruction(SurfNum);
+            ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
             if (ConstrNumSh == 0) continue;
             TotLay = dataConstruction.Construct(ConstrNumSh).TotLayers;
             IntShade = false;
@@ -1519,18 +1519,6 @@ namespace WindowManager {
 
     void W5InitGlassParameters(WindowManagerData &dataWindowManager)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         F. Winkelmann
-        //       DATE WRITTEN   October 1999
-        //       MODIFIED       Aug 2001 (FW): add blinds
-        //                      Oct 2002 (FW): change ConstrNumSh =
-        //         WindowShadingControl(Surface(SurfNum)%WindowShadingControlPtr)%ShadedConstruction
-        //         to Surface(SurfNum)%ShadedConstruction
-        //                      Jul 2003 (FW): remove unneeded warning if center-of-glass area < 0
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
         // Initializes variables used in the window optical and thermal calculation.
 
         using General::RoundSigDigits;
@@ -1580,29 +1568,15 @@ namespace WindowManager {
             // For a window with shading device, get number of shaded construction and, if window
             // has a blind (interior, exterior or between glass), get blind data pointer.
 
-            // TH 2/16/2010. CR 8010. The following code was modified and moved to GetSurfaceData
-            //  in SurfaceGeometry module, because for blinds with variable slats new blinds were created and assigned
             if (Surface(SurfNum).HasShadeControl) {
-                //  ConstrNumSh = Surface(SurfNum)%ShadedConstruction
-                ShadingType = WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType;
-                //  IF(ShadingType == WSC_ST_ExteriorBlind) THEN
-                //    MatNum = Construct(ConstrNumSh)%LayerPoint(1)
-                //    SurfaceWindow(SurfNum)%BlindNumber = dataMaterial.Material(MatNum)%BlindDataPtr
-                //  ELSE IF(ShadingType == WSC_ST_InteriorBlind) THEN
-                //    MatNum = Construct(ConstrNumSh)%LayerPoint(Construct(ConstrNumSh)%TotLayers)
-                //    SurfaceWindow(SurfNum)%BlindNumber = dataMaterial.Material(MatNum)%BlindDataPtr
-                // Between glass blind is layer 3 for double glazing and layer 5 for triple glazing.
-                //  ELSE IF(ShadingType == WSC_ST_BetweenGlassBlind) THEN
-                //    IF(Construct(ConstrNumSh)%TotGlassLayers == 2) THEN
-                //      SurfaceWindow(SurfNum)%BlindNumber = dataMaterial.Material(Construct(ConstrNumSh)%LayerPoint(3))%BlindDataPtr
-                //    ELSE
-                //      SurfaceWindow(SurfNum)%BlindNumber = dataMaterial.Material(Construct(ConstrNumSh)%LayerPoint(5))%BlindDataPtr
-                //    END IF
-                //  ELSE IF(ShadingType == WSC_ST_ExteriorScreen) THEN
-                if (ShadingType == WSC_ST_ExteriorScreen) {
-                    //     Count number of exterior window screens, initialize in InitGlassOpticalCalculations after returning
-                    //     from this subroutine. The blind structure is initialized first and then the screen structure is initialized.
-                    ++NumSurfaceScreens;
+                for (int winShadCtrl : Surface(SurfNum).windowShadingControlList) {
+                    ShadingType = WindowShadingControl(winShadCtrl).ShadingType;
+                    if (ShadingType == WSC_ST_ExteriorScreen) {
+                        //     Count number of exterior window screens, initialize in InitGlassOpticalCalculations after returning
+                        //     from this subroutine. The blind structure is initialized first and then the screen structure is initialized.
+                        ++NumSurfaceScreens;
+                        break; // only need to find the first window shading control since they should be identical
+                    }
                 }
             }
         }
@@ -1667,7 +1641,7 @@ namespace WindowManager {
                     if (!Surface(SurfNum).HasShadeControl) {
                         SurfWinSolarDiffusing(SurfNum) = true;
                     } else { // There is a shading control
-                        if (WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType == SwitchableGlazing) {
+                        if (WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType == SwitchableGlazing) {
                             SurfWinSolarDiffusing(SurfNum) = true;
                         } else {
                             SurfWinSolarDiffusing(SurfNum) = false;
@@ -2373,8 +2347,8 @@ namespace WindowManager {
             IConst = ConstrNum;
             if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn ||
                 ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn) {
-                IConst = surface.ShadedConstruction;
-                if (SurfWinStormWinFlag(SurfNum) > 0) IConst = surface.StormWinShadedConstruction;
+                IConst = surface.activeShadedConstruction;
+                if (SurfWinStormWinFlag(SurfNum) > 0) IConst = surface.activeStormWinShadedConstruction;
             }
             TotLay = dataConstruction.Construct(IConst).TotLayers;
             IGlass = 0;
@@ -3551,10 +3525,10 @@ namespace WindowManager {
             // Correct WinHeatGain for interior diffuse shortwave (solar and shortwave from lights) transmitted
             // back out window
             ConstrNum = Surface(SurfNum).Construction;
-            ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+            ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
             if (SurfWinStormWinFlag(SurfNum) == 1) {
                 ConstrNum = Surface(SurfNum).StormWinConstruction;
-                ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
+                ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
             }
 
             TransDiff = dataConstruction.Construct(ConstrNum).TransDiff; // Default value for TransDiff here
@@ -3692,8 +3666,8 @@ namespace WindowManager {
         //               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
         // DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
-        ConstrNumSh = SurfWinShadedConstruction(SurfNum);
-        if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
+        ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+        if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
         ShadeFlag = SurfWinShadingFlag(SurfNum);
         nglassfaces = 2 * dataConstruction.Construct(ConstrNumSh).TotGlassLayers;
         TotGaps = dataConstruction.Construct(ConstrNumSh).TotGlassLayers;
@@ -3889,7 +3863,7 @@ namespace WindowManager {
         int IGap;                         // Gap counter; 1 = gap on outer side of shade/blind, 2 = gap on inner side.
         int IGapInc;                      // Gap increment (0 or 1)
 
-        ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+        ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
         ShadeFlag = SurfWinShadingFlag(SurfNum);
         nglassfaces = 2 * dataConstruction.Construct(ConstrNumSh).TotGlassLayers;
 
@@ -4181,7 +4155,7 @@ namespace WindowManager {
         //               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
         // DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
-        ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+        ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
         ShadeFlag = SurfWinShadingFlag(SurfNum);
 
         if (dataConstruction.Construct(ConstrNumSh).TotGlassLayers == 2) { // Double glazing
@@ -4929,35 +4903,7 @@ namespace WindowManager {
         Real64 expmabfdivcgf;
         Real64 expm2abfdivcgf;
         Real64 expmabbdivcgb;
-        Real64 TransCurveA;   // result for curve A for Transmission as a function of angle
-        Real64 TransCurveB;   // result for curve B for Transmission as a function of angle
-        Real64 TransCurveC;   // result for curve C for Transmission as a function of angle
-        Real64 TransCurveD;   // result for curve D for Transmission as a function of angle
-        Real64 TransCurveE;   // result for curve E for Transmission as a function of angle
-        Real64 TransCurveF;   // result for curve F for Transmission as a function of angle
-        Real64 TransCurveG;   // result for curve G for Transmission as a function of angle
-        Real64 TransCurveH;   // result for curve H for Transmission as a function of angle
-        Real64 TransCurveI;   // result for curve I for Transmission as a function of angle
-        Real64 TransCurveJ;   // result for curve J for Transmission as a function of angle
-        Real64 ReflectCurveA; // result for curve A for Reflectance as a function of angle
-        Real64 ReflectCurveB; // result for curve B for Reflectance as a function of angle
-        Real64 ReflectCurveC; // result for curve C for Reflectance as a function of angle
-        Real64 ReflectCurveD; // result for curve D for Reflectance as a function of angle
-        Real64 ReflectCurveE; // result for curve E for Reflectance as a function of angle
-        Real64 ReflectCurveF; // result for curve F for Reflectance as a function of angle
-        Real64 ReflectCurveG; // result for curve G for Reflectance as a function of angle
-        Real64 ReflectCurveH; // result for curve H for Reflectance as a function of angle
-        Real64 ReflectCurveI; // result for curve I for Reflectance as a function of angle
-        Real64 ReflectCurveJ; // result for curve J for Reflectance as a function of angle
 
-        Real64 TransCurveFGHI;   // average of curves F, G, H, and I
-        Real64 ReflectCurveFGHI; // average of curves F, G, H, and I
-        Real64 TransCurveFH;     // average of curves F and H
-        Real64 ReflectCurveFH;   // average of curves F and H
-        Real64 TransCurveBDCD;   // average of curves B, D, C, and D (again)
-        Real64 ReflectCurveBDCD; // average of curves B, D, C, and D (again)
-        Real64 TransTmp(0.0);    // temporary value for normalized transmission (carry out of if blocks)
-        Real64 ReflectTmp(0.0);  // temporary value for normalized reflectance (carry out of if blocks)
         Real64 testval;          // temporary value for calculations
         Real64 tmp1;             // temporary value for calculations
         Real64 tmp2;             // temporary value for calculations
@@ -4974,33 +4920,37 @@ namespace WindowManager {
             Real64 const cs_2(pow_2(cs));
             Real64 const cs_3(pow_3(cs));
             Real64 const cs_4(pow_4(cs));
-            TransCurveA = 1.4703E-02 * cs_4 + 1.4858 * cs_3 - 3.852 * cs_2 + 3.3549 * cs - 1.4739E-03;
-            TransCurveB = 5.5455E-01 * cs_4 + 3.563E-02 * cs_3 - 2.4157 * cs_2 + 2.8305 * cs - 2.0373E-03;
-            TransCurveC = 7.7087E-01 * cs_4 - 6.3831E-01 * cs_3 - 1.5755 * cs_2 + 2.4482 * cs - 2.042E-03;
-            TransCurveD = 3.4624E-01 * cs_4 + 3.9626E-01 * cs_3 - 2.5819 * cs_2 + 2.845 * cs - 2.8036E-04;
-            TransCurveE = 2.8825 * cs_4 - 5.8734 * cs_3 + 2.4887 * cs_2 + 1.510 * cs - 2.5766E-03;
-            TransCurveF = 3.0254 * cs_4 - 6.3664 * cs_3 + 3.1371 * cs_2 + 1.213 * cs - 1.3667E-03;
-            TransCurveG = 3.2292 * cs_4 - 6.844 * cs_3 + 3.5351 * cs_2 + 1.0881 * cs - 2.8905E-03;
-            TransCurveH = 3.3341 * cs_4 - 7.1306 * cs_3 + 3.8287 * cs_2 + 9.7663E-01 * cs - 2.9521E-03;
-            TransCurveI = 3.1464 * cs_4 - 6.8549 * cs_3 + 3.9311 * cs_2 + 7.85950E-01 * cs - 2.9344E-03;
-            TransCurveJ = 3.744 * cs_4 - 8.8364 * cs_3 + 6.0178 * cs_2 + 8.4071E-02 * cs + 4.825E-04;
-            TransCurveFGHI = (TransCurveF + TransCurveG + TransCurveH + TransCurveI) / 4.0;
-            TransCurveFH = (TransCurveF + TransCurveH) / 2.0;
-            TransCurveBDCD = (TransCurveB + TransCurveD + TransCurveC + TransCurveD) / 4.0;
+            Real64 TransCurveA = 0.00 + 3.36 * cs - 3.85 * cs_2 + 1.49 * cs_3 + 0.01 * cs_4;
+            Real64 TransCurveB = 0.00 + 2.83 * cs - 2.42 * cs_2 + 0.04 * cs_3 + 0.55 * cs_4;
+            Real64 TransCurveC = 0.00 + 2.45 * cs - 1.58 * cs_2 - 0.64 * cs_3 + 0.77 * cs_4;
+            Real64 TransCurveD = 0.00 + 2.85 * cs - 2.58 * cs_2 + 0.40 * cs_3 + 0.35 * cs_4;
+            Real64 TransCurveE = 0.00 + 1.51 * cs + 2.49 * cs_2 - 5.87 * cs_3 + 2.88 * cs_4;
+            Real64 TransCurveF = 0.00 + 1.21 * cs + 3.14 * cs_2 - 6.37 * cs_3 + 3.03 * cs_4;
+            Real64 TransCurveG = 0.00 + 1.09 * cs + 3.54 * cs_2 - 6.84 * cs_3 + 3.23 * cs_4;
+            Real64 TransCurveH = 0.00 + 0.98 * cs + 3.83 * cs_2 - 7.13 * cs_3 + 3.33 * cs_4;
+            Real64 TransCurveI = 0.00 + 0.79 * cs + 3.93 * cs_2 - 6.86 * cs_3 + 3.15 * cs_4;
+            Real64 TransCurveJ = 0.00 + 0.08 * cs + 6.02 * cs_2 - 8.84 * cs_3 + 3.74 * cs_4;
+            Real64 TransCurveFGHI = (TransCurveF + TransCurveG + TransCurveH + TransCurveI) / 4.0;
+            Real64 TransCurveFH = (TransCurveF + TransCurveH) / 2.0;
+            Real64 TransCurveBDCD = (TransCurveB + TransCurveD + TransCurveC + TransCurveD) / 4.0;
 
-            ReflectCurveA = 1.6322E+01 * cs_4 - 5.7819E+01 * cs_3 + 7.9244E+01 * cs_2 - 5.0081E+01 * cs + 1.3335E+01;
-            ReflectCurveB = 4.0478E+01 * cs_4 - 1.1934E+02 * cs_3 + 1.3477E+02 * cs_2 - 7.0973E+01 * cs + 1.6112E+01;
-            ReflectCurveC = 5.749E+01 * cs_4 - 1.6451E+02 * cs_3 + 1.780E+02 * cs_2 - 8.8748E+01 * cs + 1.8839E+01;
-            ReflectCurveD = 5.7139 * cs_4 - 1.6666E+01 * cs_3 + 1.8627E+01 * cs_2 - 9.7561 * cs + 3.0743;
-            ReflectCurveE = -5.4884E-01 * cs_4 - 6.4976 * cs_3 + 2.11990E+01 * cs_2 - 2.0971E+01 * cs + 7.8138;
-            ReflectCurveF = 4.2902 * cs_4 - 1.2671E+01 * cs_3 + 1.4656E+01 * cs_2 - 8.1534 * cs + 2.8711;
-            ReflectCurveG = 2.174E+01 * cs_4 - 6.4436E+01 * cs_3 + 7.4893E+01 * cs_2 - 4.1792E+01 * cs + 1.0624E+01;
-            ReflectCurveH = 4.3405 * cs_4 - 1.280E+01 * cs_3 + 1.4777E+01 * cs_2 - 8.2034 * cs + 2.8793;
-            ReflectCurveI = 4.1357E+01 * cs_4 - 1.1775E+02 * cs_3 + 1.2756E+02 * cs_2 - 6.4373E+01 * cs + 1.426E+01;
-            ReflectCurveJ = 4.4901 * cs_4 - 1.2658E+01 * cs_3 + 1.3969E+01 * cs_2 - 7.501 * cs + 2.6928;
-            ReflectCurveFGHI = (ReflectCurveF + ReflectCurveG + ReflectCurveH + ReflectCurveI) / 4.0;
-            ReflectCurveFH = (ReflectCurveF + ReflectCurveH) / 2.0;
-            ReflectCurveBDCD = (ReflectCurveB + ReflectCurveD + ReflectCurveC + ReflectCurveD) / 4.0;
+            Real64 ReflectCurveA = 1.00 - 0.70 * cs + 2.57  * cs_2 - 3.20  * cs_3 + 1.33 * cs_4 - TransCurveA;
+            Real64 ReflectCurveB = 1.00 - 1.87 * cs + 6.50  * cs_2 - 7.86  * cs_3 + 3.23 * cs_4 - TransCurveB;
+            Real64 ReflectCurveC = 1.00 - 2.52 * cs + 8.40  * cs_2 - 9.86  * cs_3 + 3.99 * cs_4 - TransCurveC;
+            Real64 ReflectCurveD = 1.00 - 1.85 * cs + 6.40  * cs_2 - 7.64  * cs_3 + 3.11 * cs_4 - TransCurveD;
+            Real64 ReflectCurveE = 1.00 - 1.57 * cs + 5.60  * cs_2 - 6.82  * cs_3 + 2.80 * cs_4 - TransCurveE;
+            Real64 ReflectCurveF = 1.00 - 3.15 * cs + 10.98 * cs_2 - 13.14 * cs_3 + 5.32 * cs_4 - TransCurveF;
+            Real64 ReflectCurveG = 1.00 - 3.25 * cs + 11.32 * cs_2 - 13.54 * cs_3 + 5.49 * cs_4 - TransCurveG;
+            Real64 ReflectCurveH = 1.00 - 3.39 * cs + 11.70 * cs_2 - 13.94 * cs_3 + 5.64 * cs_4 - TransCurveH;
+            Real64 ReflectCurveI = 1.00 - 4.06 * cs + 13.55 * cs_2 - 15.74 * cs_3 + 6.27 * cs_4 - TransCurveI;
+            Real64 ReflectCurveJ = 1.00 - 4.35 * cs + 14.27 * cs_2 - 16.32 * cs_3 + 6.39 * cs_4 - TransCurveJ;
+
+            Real64 ReflectCurveFGHI = (ReflectCurveF + ReflectCurveG + ReflectCurveH + ReflectCurveI) / 4.0;
+            Real64 ReflectCurveFH = (ReflectCurveF + ReflectCurveH) / 2.0;
+            Real64 ReflectCurveBDCD = (ReflectCurveB + ReflectCurveD + ReflectCurveC + ReflectCurveD) / 4.0;
+
+            Real64 TransTmp(0.0);
+            Real64 ReflectTmp(0.0);
 
             if (SimpleGlazingU < 1.4195) { // cell 1, 2, or 3
                 if (SimpleGlazingSHGC > 0.45) {
@@ -5222,42 +5172,21 @@ namespace WindowManager {
                 assert(false);
             }
 
-            if (cs == 1.0) { // at 0 deg incident, TransTmp should be 1.0
+            if (cs == 1.0) { // at 0 deg incident, TransTmp and ReflectTmp should be 1.0
                 TransTmp = 1.0;
+                ReflectTmp = 0.0;
             }
 
             // now apply normalization factors to zero incidence angle properties
             tfp = tf0 * TransTmp;
-            if (tfp < 0.0) tfp = 0.0;
-            if (tfp > 1.0) tfp = 1.0;
-            rfp = rf0 * ReflectTmp;
+            tfp = max(min(1.0, tfp),0.0);
 
-            if (rfp < 0.0) rfp = 0.0;
-            if (rfp > 1.0) rfp = 1.0;
+            rfp = rf0 * (1. - ReflectTmp) + ReflectTmp;
+            rfp = max(min(0.9999 - tfp, rfp),0.0);
 
-            rbp = rb0 * ReflectTmp;
-            if (rbp < 0.0) rbp = 0.0;
-            if (rbp > 1.0) rbp = 1.0;
+            rbp = rfp;
 
-            if (cs == 0.0) { // at 90 degree incident, reflectance should be 1.0
-                rfp = 1.0;
-                rbp = 1.0;
-            }
-
-            //   older model, was in Version 3.1
-            //    IncidenceAngle = ACOS(cs)
-            //    CoefFuncSHGC   = 0.768d0 +0.817d0*SimpleGlazingSHGC**4
-            //    tfp = tf0 * cs * (1 + CoefFuncSHGC*(Sin(IncidenceAngle)**3))
-            //    f1     = (((2.403d0*cs - 6.192d0)*cs + 5.625d0)*cs - 2.095d0) * cs + 1
-            //    f2     = (((-1.188d0* cs + 2.022d0)* cs + 0.137d0) * cs - 1.71d0) * cs
-            //    Rfit_o = 0.7413d0 - (0.7396d0 * SQRT(SimpleGlazingSHGC))
-            //    rfp = rf0 * (f1 + f2*SQRT(SimpleGlazingSHGC))/Rfit_o
-            //    rbp = rfp  ! uncoated assumption, back equal front
-
-            return;
-        }
-
-        if (tf0 <= 0.0) {
+        } else if (tf0 <= 0.0) {
             // This is an opaque window.  For all angles, set transmittance to 0; set reflectance to that at zero incidence angle.
             tfp = 0.0;
             rfp = rf0;
@@ -5394,6 +5323,10 @@ namespace WindowManager {
                 }
             }
         }
+
+        // total absorptance cannot be negative
+        assert(1.0 - rfp - tfp >= -1e6);
+        assert(1.0 - rbp - tfp >= -1e6);
     }
 
     Real64 InterpolateBetweenTwoValues(Real64 const X, Real64 const X0, Real64 const X1, Real64 const F0, Real64 const F1)
@@ -7590,9 +7523,9 @@ namespace WindowManager {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
             if (Surface(SurfNum).HasShadeControl) {
-                ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+                ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 MatNum = dataConstruction.Construct(ConstrNumSh).LayerPoint(1);
-                ShadingType = WindowShadingControl(Surface(SurfNum).WindowShadingControlPtr).ShadingType;
+                ShadingType = WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType;
                 if (ShadingType == WSC_ST_ExteriorScreen) {
 
                     if (dataMaterial.Material(MatNum).ScreenMapResolution > 0) PrintTransMap = true;
@@ -7664,8 +7597,7 @@ namespace WindowManager {
                     dataMaterial.Material(MatNum).ReflectSolBeamBack = SurfaceScreens(ScreenNum).DifReflect;
 
                 } // (ShadingType == 'EXTERIORSCREEN')
-            }     //(Surface(SurfNum)%WindowShadingControlPtr /= 0)
-
+            }
         } // End of screen surface initialization
 
         // Write transmittance versus direct normal angle to csv file

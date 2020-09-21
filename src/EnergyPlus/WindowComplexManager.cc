@@ -2971,14 +2971,6 @@ namespace WindowComplexManager {
             fclr = 1.0 - CloudFraction;
         }
 
-        // now fill layer data
-        // IConst = ConstrNum
-        // IF(ShadeFlag==IntShadeOn.OR.ShadeFlag==ExtShadeOn.OR.ShadeFlag==IntBlindOn.OR.ShadeFlag==ExtBlindOn &
-        //    .OR.ShadeFlag==BGShadeOn.OR.ShadeFlag==BGBlindOn.OR.ShadeFlag==ExtScreenOn) THEN
-        //  IConst = Surface(SurfNum)%ShadedConstruction
-        //  IF(Surfacewindow(SurfNum)%StormWinFlag > 0) IConst = Surface(SurfNum)%StormWinShadedConstruction
-        // END IF
-        // TotLay = Construct(IConst)%TotLayers
         TotLay = dataConstruction.Construct(ConstrNum).TotLayers;
         IGap = 0;
 

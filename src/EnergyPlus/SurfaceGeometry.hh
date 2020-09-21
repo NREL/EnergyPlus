@@ -302,6 +302,10 @@ namespace SurfaceGeometry {
     void InitialAssociateWindowShadingControlFenestration(bool &ErrorsFound, int &SurfNum);
 
     void FinalAssociateWindowShadingControlFenestration(bool &ErrorsFound);
+    
+    void CheckWindowShadingControlSimilarForWindow(bool& ErrorsFound);
+
+    bool isWindowShadingControlSimilar(int a, int b);
 
     void GetStormWindowData(bool &ErrorsFound); // If errors found in input
 
@@ -374,10 +378,17 @@ namespace SurfaceGeometry {
 
     void CreateShadedWindowConstruction(int const SurfNum, // Surface number
                                         int const WSCPtr,  // Pointer to WindowShadingControl for SurfNum
-                                        int const ShDevNum // Shading device material number for WSCptr
+                                        int const ShDevNum, // Shading device material number for WSCptr
+                                        int const shadeControlIndex // index to the Surface().windowShadingControlList, 
+                                              // Surface().shadedConstructionList, and Surface().shadedStormWinConstructionList
     );
 
     void CreateStormWindowConstructions();
+
+    int createAirMaterialFromDistance(Real64 distance, std::string namePrefix); //return new material number
+
+    // create a new construction with storm based on an old construction and storm and gap materials
+    int createConstructionWithStorm(int oldConstruction, std::string name, int stormMaterial, int gapMaterial); 
 
     void ModifyWindow(int const SurfNum,    // SurfNum has construction of glazing system from Window5 Data File;
                       bool &ErrorsFound,    // Set to true if errors found
