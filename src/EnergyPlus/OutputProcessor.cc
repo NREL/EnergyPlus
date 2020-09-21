@@ -3338,9 +3338,6 @@ namespace OutputProcessor {
         if (!ResultsFramework::resultsFramework->DYMeters.rVariablesScanned()) {
             ResultsFramework::resultsFramework->initializeMeters(EnergyMeters, ReportingFrequency::Daily);
         }
-        if (ResultsFramework::resultsFramework->DYMeters.rDataFrameEnabled()) {
-            ResultsFramework::resultsFramework->DYMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
-        }
 
         PrintTimeStamp = true;
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
@@ -3439,9 +3436,6 @@ namespace OutputProcessor {
 
         if (!ResultsFramework::resultsFramework->MNMeters.rVariablesScanned()) {
             ResultsFramework::resultsFramework->initializeMeters(EnergyMeters, ReportingFrequency::Monthly);
-        }
-        if (ResultsFramework::resultsFramework->MNMeters.rDataFrameEnabled()) {
-            ResultsFramework::resultsFramework->MNMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
         }
 
         PrintTimeStamp = true;
@@ -3613,9 +3607,6 @@ namespace OutputProcessor {
 
         if (!ResultsFramework::resultsFramework->SMMeters.rVariablesScanned()) {
             ResultsFramework::resultsFramework->initializeMeters(EnergyMeters, ReportingFrequency::Simulation);
-        }
-        if (ResultsFramework::resultsFramework->SMMeters.rDataFrameEnabled()) {
-            ResultsFramework::resultsFramework->SMMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
         }
 
         PrintTimeStamp = true;
