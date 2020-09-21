@@ -4564,7 +4564,6 @@ namespace UnitarySystems {
                                 newCoil.supplyFanIndex = thisSys.m_FanIndex;
                                 newCoil.supplyFanType = thisSys.m_FanType_Num;
                                 if (newCoil.SubcoolReheatFlag) {
-                                    thisSys.m_CoolingCoilSubType_Num = DataHVACGlobals::CoilDX_SubcoolReheat;
                                     thisSys.m_Humidistat = true;
                                     if (thisSys.m_NumOfSpeedCooling > 1) {
                                         thisSys.FullOutput.resize(thisSys.m_NumOfSpeedCooling + 1);
@@ -11293,12 +11292,12 @@ namespace UnitarySystems {
                     // speed n uses MSHPMassFlowRateHigh and speed n-1 uses MSHPMassFlowRateLow
                     DataHVACGlobals::MSHPMassFlowRateLow = this->m_DesignMassFlowRate;
                     DataHVACGlobals::MSHPMassFlowRateHigh = this->m_DesignMassFlowRate;
-                    int OperationMode = coilNormalMode;
-                    if (coilCoolingDXs[this->m_CoolingCoilIndex].CoolingCoilType == DataHVACGlobals::CoilDX_SubcoolReheat) {
-                        OperationMode = coilSubcoolReheatMode;
+                    int OperationMode = DataHVACGlobals::coilNormalMode;
+                    if (coilCoolingDXs[this->m_CoolingCoilIndex].SubcoolReheatFlag) {
+                        OperationMode = DataHVACGlobals::coilSubcoolReheatMode;
                     }
                     else if (this->m_DehumidificationMode == 1) {
-                        OperationMode = coilEnhancedMode;
+                        OperationMode = DataHVACGlobals::coilEnhancedMode;
                     }
                     bool const singleMode = (this->m_SingleMode == 1);
                     coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
@@ -11451,12 +11450,12 @@ namespace UnitarySystems {
                         this->m_CompPartLoadRatio = PartLoadFrac;
 
                     } else if (CoilType_Num == DataHVACGlobals::CoilDX_Cooling) { // CoilCoolingDX
-                        int OperationMode = coilNormalMode;
-                        if (coilCoolingDXs[this->m_CoolingCoilIndex].CoolingCoilType == DataHVACGlobals::CoilDX_SubcoolReheat) {
-                            OperationMode = coilSubcoolReheatMode;
+                        int OperationMode = DataHVACGlobals::coilNormalMode;
+                        if (coilCoolingDXs[this->m_CoolingCoilIndex].SubcoolReheatFlag) {
+                            OperationMode = DataHVACGlobals::coilSubcoolReheatMode;
                         }
                         else if (this->m_DehumidificationMode == 1) {
-                            OperationMode = coilEnhancedMode;
+                            OperationMode = DataHVACGlobals::coilEnhancedMode;
                         }
                         this->m_CoolingSpeedRatio = 1.0;
                         bool const singleMode = (this->m_SingleMode == 1);
@@ -11966,9 +11965,9 @@ namespace UnitarySystems {
                         this->m_CompPartLoadRatio = PartLoadFrac;
 
                     } else if (CoilType_Num == DataHVACGlobals::CoilDX_Cooling) { // CoilCoolingDX
-                        int OperationMode = coilEnhancedMode;
-                        if (coilCoolingDXs[this->m_CoolingCoilIndex].CoolingCoilType == DataHVACGlobals::CoilDX_SubcoolReheat) {
-                            OperationMode = coilSubcoolReheatMode;
+                        int OperationMode = DataHVACGlobals::coilEnhancedMode;
+                        if (coilCoolingDXs[this->m_CoolingCoilIndex].SubcoolReheatFlag) {
+                            OperationMode = DataHVACGlobals::coilSubcoolReheatMode;
                         }
                         if (this->m_CoolingSpeedNum == 0) this->m_CoolingSpeedNum = 1;
                         bool const singleMode = (this->m_SingleMode == 1);
@@ -12309,7 +12308,7 @@ namespace UnitarySystems {
                             this->m_CompPartLoadRatio = PartLoadFrac;
 
                         } else if (CoilType_Num == DataHVACGlobals::CoilDX_Cooling) { // CoilCoolingDX
-                            int OperationMode = coilNormalMode;
+                            int OperationMode = DataHVACGlobals::coilNormalMode;
                             if (this->m_CoolingSpeedNum == 0) this->m_CoolingSpeedNum = 1;
                             bool const singleMode = (this->m_SingleMode == 1);
                             PartLoadFrac = 1.0;
@@ -13607,7 +13606,7 @@ namespace UnitarySystems {
                 OperationMode = DataHVACGlobals::coilEnhancedMode;
             }
 
-            coilCoolingDXs[this->m_CoolingCoilIndex].simulate(state,
+            coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
                 state, OperationMode, CycRatio, this->m_CoolingSpeedNum, SpeedRatio, this->m_FanOpMode, singleMode, this->CoilSHR);
 
         } else if (CoilTypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {

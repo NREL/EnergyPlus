@@ -532,7 +532,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlusData &state,
 
     Real64 wasteHeatTempModFac = 1.0; // waste heat fraction as a function of temperature curve result
     if (indexWHFT > 0) {
-        wasteHeatempModFac = CurveManager::CurveValue(state, indexWHFT, condInletTemp, inletNode.Temp);
+        wasteHeatTempModFac = CurveManager::CurveValue(state, indexWHFT, condInletTemp, inletNode.Temp);
     }
 
     Real64 EIR = RatedEIR * EIRFlowModFac * EIRTempModFac;

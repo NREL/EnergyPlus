@@ -106,7 +106,7 @@ struct CoilCoolingDXCurveFitPerformance
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode,
                    bool const singleMode);
-    void calcStandardRatings210240();
+    void calcStandardRatings210240(EnergyPlusData& state);
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
     CoilCoolingDXCurveFitPerformance() = default;
     explicit CoilCoolingDXCurveFitPerformance(EnergyPlusData &state, const std::string &name);

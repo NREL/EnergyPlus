@@ -843,7 +843,8 @@ void CoilCoolingDX::simulate(EnergyPlusData& state, int useAlternateMode, Real64
             DataEnvironment::OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
             DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
 
-            this->performance.simulate(dummyEvapInlet,
+            this->performance.simulate(state,
+                                       dummyEvapInlet,
                                        dummyEvapOutlet,
                                        false,
                                        dummyPLR,
@@ -910,20 +911,20 @@ void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, 
     out.MassFlowRateMinAvail = in.MassFlowRateMinAvail;
 }
 
-void CoilCoolingDX::reportAllStandardRatings(IOFiles& ioFiles) {
+void CoilCoolingDX::reportAllStandardRatings(EnergyPlusData& state) {
 
     if (!coilCoolingDXs.empty()) {
         Real64 const ConvFromSIToIP(3.412141633);              // Conversion from SI to IP [3.412 Btu/hr-W]
         static constexpr auto Format_990(
                 "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
                 "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
-        print(ioFiles.eio, "{}", Format_990);
+        print(state.files.eio, "{}", Format_990);
         for (auto &coil : coilCoolingDXs) {
-            coil.performance.calcStandardRatings210240();
+            coil.performance.calcStandardRatings210240(state);
 
             static constexpr auto Format_991(
                     " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
-            print(ioFiles.eio, Format_991,
+            print(state.files.eio, Format_991,
                   "Coil:Cooling:DX", coil.name,
                   coil.performance.standardRatingCoolingCapacity,
                   coil.performance.standardRatingEER,

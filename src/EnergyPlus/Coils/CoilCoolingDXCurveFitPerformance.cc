@@ -286,7 +286,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const Dat
             return;
         }
 
-    } else if (useAlternateMode == coilEnhancedMode) {
+    } else if (useAlternateMode == DataHVACGlobals::coilEnhancedMode) {
         this->calculate(state, this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
     } else {
         this->calculate(state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
@@ -367,7 +367,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlusData &state,
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
+void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlusData& state) {
 
     // for now this will provide standard ratings for the coil at the normal mode at speed N
     // future iterations will extend the inputs to give the user the flexibility to select different standards to
@@ -421,11 +421,11 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
 
     if (mode.ratedGrossTotalCap > 0.0) {
         // SEER calculations:
-        TotCapFlowModFac = CurveManager::CurveValue(speed.indexCapFFF, AirMassFlowRatioRated);
-        TotCapTempModFac = CurveManager::CurveValue(speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
+        TotCapFlowModFac = CurveManager::CurveValue(state, speed.indexCapFFF, AirMassFlowRatioRated);
+        TotCapTempModFac = CurveManager::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
         TotCoolingCapAHRI = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac;
-        EIRTempModFac = CurveManager::CurveValue(speed.indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
-        EIRFlowModFac = CurveManager::CurveValue(speed.indexEIRFFF, AirMassFlowRatioRated);
+        EIRTempModFac = CurveManager::CurveValue(state, speed.indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
+        EIRFlowModFac = CurveManager::CurveValue(state, speed.indexEIRFFF, AirMassFlowRatioRated);
         if (speed.ratedCOP > 0.0) { // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
             EIR = EIRTempModFac * EIRFlowModFac / speed.ratedCOP;
         } else {
@@ -437,7 +437,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
         TotalElecPower = EIR * TotCoolingCapAHRI + FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
         // Calculate SEER value from the Energy Efficiency Ratio (EER) at the AHRI test conditions and the part load factor.
         // First evaluate the Part Load Factor curve at PLR = 0.5 (AHRI Standard 210/240)
-        PartLoadFactor = CurveManager::CurveValue(speed.indexPLRFPLF, PLRforSEER);
+        PartLoadFactor = CurveManager::CurveValue(state, speed.indexPLRFPLF, PLRforSEER);
         if (TotalElecPower > 0.0) {
             this->standardRatingSEER = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFactor;
         } else {
@@ -446,10 +446,10 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
 
         // EER calculations:
         // Calculate the net cooling capacity at the rated conditions (19.44C WB and 35.0C DB )
-        TotCapTempModFac = CurveManager::CurveValue(speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
+        TotCapTempModFac = CurveManager::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
         this->standardRatingCoolingCapacity = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
         // Calculate Energy Efficiency Ratio (EER) at (19.44C WB and 35.0C DB ), ANSI/AHRI Std. 340/360
-        EIRTempModFac = CurveManager::CurveValue(speed.indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
+        EIRTempModFac = CurveManager::CurveValue(state, speed.indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
         if (speed.ratedCOP > 0.0) {
             // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
             EIR = EIRTempModFac * EIRFlowModFac / speed.ratedCOP;
@@ -466,7 +466,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
         // IEER calculations:
         this->standardRatingIEER = 0.0;
         // Calculate the net cooling capacity at the rated conditions (19.44C WB and 35.0C DB )
-        TotCapTempModFac = CurveManager::CurveValue(speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
+        TotCapTempModFac = CurveManager::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
         this->standardRatingCoolingCapacity = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
         for (RedCapNum = 1; RedCapNum <= NumOfReducedCap; ++RedCapNum) {
             // get the outdoor air dry bulb temperature for the reduced capacity test conditions
