@@ -217,7 +217,7 @@ namespace WindowManager {
             if (!dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
             if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) continue; // Irrelevant for Complex Fen
             if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;    // not required
-            auto ConstrNumSh = SurfWinShadedConstruction(SurfNum);
+            auto ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
             if (ConstrNumSh == 0) continue;
             auto TotLay = dataConstruction.Construct(ConstrNumSh).TotLayers;
             auto IntShade = false;
