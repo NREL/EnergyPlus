@@ -51,7 +51,7 @@
 
 namespace EnergyPlus {
 
-Real64 CoolingWaterDesAirInletTempSizer::size(EnergyPlusData &State, Real64 _originalValue, bool &errorsFound)
+Real64 CoolingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -128,7 +128,7 @@ Real64 CoolingWaterDesAirInletTempSizer::size(EnergyPlusData &State, Real64 _ori
     this->selectSizerOutput(errorsFound);
     if (this->isCoilReportObject) {
         if (this->curSysNum <= this->numPrimaryAirSys) {
-            coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
+            coilSelectionReportObj->setCoilEntAirTemp(state, this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
         }
     }
     return this->autoSizedValue;
