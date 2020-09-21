@@ -399,12 +399,10 @@ namespace PVWatts {
         ssc_data_set_number(pvwattsData, "tcell", m_cellTemperature);
         ssc_data_set_number(pvwattsData, "poa", m_planeOfArrayIrradiance);
 
-
-        // TODO: Get the shad_beam from the geometry again.
-//        Real64 shad_beam = 1.0;
-//        if (m_geometryType == GeometryType::SURFACE) {
-//            shad_beam = DataHeatBalance::SunlitFrac(TimeStep, HourOfDay, m_surfaceNum);
-//        }
+        // Get the shading from the geometry, if applicable
+        if (m_geometryType == GeometryType::SURFACE) {
+            ssc_data_set_number(pvwattsData, "shaded_percent", DataHeatBalance::SunlitFrac(TimeStep, HourOfDay, m_surfaceNum) * 100.0);
+        }
 
         if ( ssc_module_exec(pvwattsModule, pvwattsData) == 0) {
             // Error
