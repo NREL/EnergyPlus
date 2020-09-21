@@ -69,6 +69,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
@@ -1644,7 +1645,6 @@ namespace HVACStandAloneERV {
         int ExhaustInletNode; // unit exhaust air inlet node
         int SupInletNode;     // unit supply air inlet node
         Real64 AirMassFlow;   // total mass flow through supply side of the ERV (supply air outlet node)
-        Real64 MinHumRatio;   // minimum humidity ratio for calculating sensible load met
         // (so enthalpy routines work without error)
         Real64 TotLoadMet;    // total zone load met by unit (W)
         Real64 LatLoadMet;    // latent zone load met by unit (W)
@@ -1712,15 +1712,15 @@ namespace HVACStandAloneERV {
             StandAloneERV(StandAloneERVNum).ElecUseRate += HVACFan::fanObjs[StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->fanPower();
         }
 
-        MinHumRatio = Node(ExhaustInletNode).HumRat;
-        if (Node(SupOutletNode).HumRat < Node(ExhaustInletNode).HumRat) MinHumRatio = Node(SupOutletNode).HumRat;
-
         AirMassFlow = Node(SupOutletNode).MassFlowRate;
-        SensLoadMet = AirMassFlow * (PsyHFnTdbW(Node(SupOutletNode).Temp, MinHumRatio) - PsyHFnTdbW(Node(ExhaustInletNode).Temp, MinHumRatio));
-        TotLoadMet = AirMassFlow * (PsyHFnTdbW(Node(SupOutletNode).Temp, Node(SupOutletNode).HumRat) -
-                                    PsyHFnTdbW(Node(ExhaustInletNode).Temp, Node(ExhaustInletNode).HumRat));
-        LatLoadMet = TotLoadMet - SensLoadMet; // watts
-
+        CalcZoneSensibleLatentOutput(AirMassFlow,
+                                     Node(SupOutletNode).Temp,
+                                     Node(SupOutletNode).HumRat,
+                                     Node(ExhaustInletNode).Temp,
+                                     Node(ExhaustInletNode).HumRat,
+                                     SensLoadMet,
+                                     LatLoadMet,
+                                     TotLoadMet);
         LatentMassLoadMet = AirMassFlow * (Node(SupOutletNode).HumRat - Node(ExhaustInletNode).HumRat); // kg/s, dehumidification = negative
 
         if (SensLoadMet < 0.0) {
