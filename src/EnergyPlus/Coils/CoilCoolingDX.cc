@@ -268,7 +268,7 @@ void CoilCoolingDX::oneTimeInit() {
                         "Sum",
                         this->name,
                         _,
-                        "Electric",
+                        "Electricity",
                         "COOLING",
                         _,
                         "System");
