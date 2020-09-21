@@ -165,7 +165,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     if (DataGlobals::isEpJSON) stringOverride = "rated_evaporator_air_flow_rate";
     sizingCoolingAirFlow.overrideSizingString(stringOverride);
     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-    this->ratedEvapAirFlowRate = sizingCoolingAirFlow.size(TempSize, errorsFound);
+    this->ratedEvapAirFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
     Real64 const ratedInletAirTemp(26.6667);     // 26.6667C or 80F
     Real64 const ratedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
@@ -179,7 +179,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-    this->ratedGrossTotalCap = sizerCoolingCapacity.size(TempSize, errorsFound);
+    this->ratedGrossTotalCap = sizerCoolingCapacity.size(state, TempSize, errorsFound);
 
     // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
     DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
@@ -191,7 +191,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     if (DataGlobals::isEpJSON) stringOverride = "rated_condenser_air_flow_rate";
     sizerCondAirFlow.overrideSizingString(stringOverride);
     sizerCondAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-    this->ratedCondAirFlowRate = sizerCondAirFlow.size(TempSize, errorsFound);
+    this->ratedCondAirFlowRate = sizerCondAirFlow.size(state, TempSize, errorsFound);
 
     for (auto &curSpeed : this->speeds) {
         curSpeed.parentModeRatedGrossTotalCap = this->ratedGrossTotalCap;

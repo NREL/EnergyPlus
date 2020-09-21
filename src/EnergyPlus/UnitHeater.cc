@@ -1093,7 +1093,7 @@ namespace UnitHeater {
                     sizingHeatingAirFlow.overrideSizingString(SizingString);
                     // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    UnitHeat(UnitHeatNum).MaxAirVolFlow = sizingHeatingAirFlow.size(TempSize, errorsFound);
+                    UnitHeat(UnitHeatNum).MaxAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
 
                 } else if (SAFMethod == FlowPerHeatingCapacity) {
                     SizingMethod = HeatingCapacitySizing;
@@ -1119,7 +1119,7 @@ namespace UnitHeater {
                     sizingHeatingAirFlow.overrideSizingString(SizingString);
                     // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    UnitHeat(UnitHeatNum).MaxAirVolFlow = sizingHeatingAirFlow.size(TempSize, errorsFound);
+                    UnitHeat(UnitHeatNum).MaxAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                 }
                 DataScalableSizingON = false;
             } else {
@@ -1135,7 +1135,7 @@ namespace UnitHeater {
                 sizingHeatingAirFlow.overrideSizingString(SizingString);
                 // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                UnitHeat(UnitHeatNum).MaxAirVolFlow = sizingHeatingAirFlow.size(TempSize, errorsFound);
+                UnitHeat(UnitHeatNum).MaxAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
             }
         }
 

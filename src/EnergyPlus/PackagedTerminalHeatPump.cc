@@ -4961,7 +4961,7 @@ namespace PackagedTerminalHeatPump {
                     sizingCoolingAirFlow.overrideSizingString(stringOverride);
                     // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    PTUnit(PTUnitNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(TempSize, errorsFound);
+                    PTUnit(PTUnitNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                 } else if (SAFMethod == FlowPerCoolingCapacity) {
                     SizingMethod = CoolingCapacitySizing;
                     TempSize = AutoSize;
@@ -4974,7 +4974,7 @@ namespace PackagedTerminalHeatPump {
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(TempSize, ErrorsFound);
+                    DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                     DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     PrintFlag = true;
                     TempSize = AutoSize;
@@ -4985,7 +4985,7 @@ namespace PackagedTerminalHeatPump {
                     sizingCoolingAirFlow.overrideSizingString(stringOverride);
                     // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    PTUnit(PTUnitNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(TempSize, errorsFound);
+                    PTUnit(PTUnitNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                 }
 
                 SizingMethod = HeatingAirflowSizing;
@@ -5019,7 +5019,7 @@ namespace PackagedTerminalHeatPump {
                     sizingHeatingAirFlow.overrideSizingString(SizingString);
                     // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    PTUnit(PTUnitNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(TempSize, errorsFound);
+                    PTUnit(PTUnitNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                 } else if (SAFMethod == FlowPerHeatingCapacity) {
                     SizingMethod = HeatingCapacitySizing;
                     TempSize = AutoSize;
@@ -5044,7 +5044,7 @@ namespace PackagedTerminalHeatPump {
                     sizingHeatingAirFlow.overrideSizingString(SizingString);
                     // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    PTUnit(PTUnitNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(TempSize, errorsFound);
+                    PTUnit(PTUnitNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                 }
 
                 FieldNum = 3; // N3, \field Supply Air Flow Rate When No Cooling or Heating is Needed
@@ -5172,7 +5172,7 @@ namespace PackagedTerminalHeatPump {
                 sizingCoolingAirFlow.overrideSizingString(stringOverride);
                 // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                PTUnit(PTUnitNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(TempSize, errorsFound);
+                PTUnit(PTUnitNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
                 ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = false;
 
@@ -5210,7 +5210,7 @@ namespace PackagedTerminalHeatPump {
                 sizingHeatingAirFlow.overrideSizingString(SizingString);
                 // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                PTUnit(PTUnitNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(TempSize, errorsFound);
+                PTUnit(PTUnitNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                 ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = false;
 
                 if (PTUnit(PTUnitNum).ZoneEquipType == PkgTermHPAirToAir_Num || PTUnit(PTUnitNum).ZoneEquipType == PkgTermACAirToAir_Num) {

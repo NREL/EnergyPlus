@@ -1463,14 +1463,14 @@ namespace PurchasedAirManager {
                                 sizingHeatingAirFlow.overrideSizingString(SizingString);
                                 // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                                 sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                HeatingAirVolFlowDes = sizingHeatingAirFlow.size(TempSize, ErrorsFound);
+                                HeatingAirVolFlowDes = sizingHeatingAirFlow.size(state, TempSize, ErrorsFound);
                             } else {
                                 if (ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow > 0.0) {
                                     HeatingAirFlowSizer sizingHeatingAirFlow;
                                     sizingHeatingAirFlow.overrideSizingString(SizingString);
                                     // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                                     sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                    HeatingAirVolFlowDes = sizingHeatingAirFlow.size(ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow, ErrorsFound);
+                                    HeatingAirVolFlowDes = sizingHeatingAirFlow.size(state, ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow, ErrorsFound);
                                 }
                             }
                         } else if (SAFMethod == FlowPerFloorArea) {
@@ -1482,7 +1482,7 @@ namespace PurchasedAirManager {
                             sizingHeatingAirFlow.overrideSizingString(SizingString);
                             // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                             sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                            HeatingAirVolFlowDes = sizingHeatingAirFlow.size(TempSize, ErrorsFound);
+                            HeatingAirVolFlowDes = sizingHeatingAirFlow.size(state, TempSize, ErrorsFound);
                         } else if (SAFMethod == FractionOfAutosizedHeatingAirflow) {
                             DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                             if ((ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow == AutoSize) &&
@@ -1494,7 +1494,7 @@ namespace PurchasedAirManager {
                                 sizingHeatingAirFlow.overrideSizingString(SizingString);
                                 // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                                 sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                HeatingAirVolFlowDes = sizingHeatingAirFlow.size(TempSize, ErrorsFound);
+                                HeatingAirVolFlowDes = sizingHeatingAirFlow.size(state, TempSize, ErrorsFound);
                             }
 
                         } else {
@@ -1521,7 +1521,7 @@ namespace PurchasedAirManager {
                             sizingHeatingAirFlow.overrideSizingString(SizingString);
                             // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                             sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                            HeatingAirVolFlowDes = sizingHeatingAirFlow.size(TempSize, ErrorsFound);
+                            HeatingAirVolFlowDes = sizingHeatingAirFlow.size(state, TempSize, ErrorsFound);
                         }
                     }
                     MaxHeatVolFlowRateDes = max(0.0, HeatingAirVolFlowDes);
@@ -1614,14 +1614,14 @@ namespace PurchasedAirManager {
                                 CoolingAirFlowSizer sizingCoolingAirFlow;
                                 sizingCoolingAirFlow.overrideSizingString(SizingString);
                                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                CoolingAirVolFlowDes = sizingCoolingAirFlow.size(TempSize, ErrorsFound);
+                                CoolingAirVolFlowDes = sizingCoolingAirFlow.size(state, TempSize, ErrorsFound);
                             } else {
                                 if (ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
                                     CoolingAirVolFlowDes = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                                     CoolingAirFlowSizer sizingCoolingAirFlow;
                                     sizingCoolingAirFlow.overrideSizingString(SizingString);
                                     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                    CoolingAirVolFlowDes = sizingCoolingAirFlow.size(CoolingAirVolFlowDes, ErrorsFound);
+                                    CoolingAirVolFlowDes = sizingCoolingAirFlow.size(state, CoolingAirVolFlowDes, ErrorsFound);
                                 }
                             }
                         } else if (SAFMethod == FlowPerFloorArea) {
@@ -1635,7 +1635,7 @@ namespace PurchasedAirManager {
                             sizingCoolingAirFlow.overrideSizingString(stringOverride);
                             // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                             sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                            CoolingAirVolFlowDes = sizingCoolingAirFlow.size(TempSize, ErrorsFound);
+                            CoolingAirVolFlowDes = sizingCoolingAirFlow.size(state, TempSize, ErrorsFound);
                         } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
                             if ((ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow == AutoSize) &&
                                 ((PurchAir(PurchAirNum).CoolingLimit == LimitFlowRate) ||
@@ -1650,7 +1650,7 @@ namespace PurchasedAirManager {
                                 sizingCoolingAirFlow.overrideSizingString(stringOverride);
                                 // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                CoolingAirVolFlowDes = sizingCoolingAirFlow.size(TempSize, ErrorsFound);
+                                CoolingAirVolFlowDes = sizingCoolingAirFlow.size(state, TempSize, ErrorsFound);
                             }
                         } else {
                             // Invalid scalable sizing method
@@ -1666,7 +1666,7 @@ namespace PurchasedAirManager {
                             CoolingCapacitySizer sizerCoolingCapacity;
                             sizerCoolingCapacity.overrideSizingString(SizingString);
                             sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                            DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(TempSize, ErrorsFound);
+                            DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                             DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                             PrintFlag = true;
                             TempSize = AutoSize;
@@ -1677,7 +1677,7 @@ namespace PurchasedAirManager {
                             sizingCoolingAirFlow.overrideSizingString(stringOverride);
                             // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                             sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                            CoolingAirVolFlowDes = sizingCoolingAirFlow.size(TempSize, ErrorsFound);
+                            CoolingAirVolFlowDes = sizingCoolingAirFlow.size(state, TempSize, ErrorsFound);
                         }
                     }
                     MaxCoolVolFlowRateDes = max(0.0, CoolingAirVolFlowDes);
@@ -1716,7 +1716,7 @@ namespace PurchasedAirManager {
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    MaxCoolTotCapDes = sizerCoolingCapacity.size(TempSize, ErrorsFound);
+                    MaxCoolTotCapDes = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                     ZoneCoolingOnlyFan = false;
                     if (MaxCoolTotCapDes < SmallLoad) {
                         MaxCoolTotCapDes = 0.0;
@@ -1777,7 +1777,7 @@ namespace PurchasedAirManager {
                         sizingHeatingAirFlow.overrideSizingString(SizingString);
                         // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                         sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        PurchAir(PurchAirNum).MaxHeatVolFlowRate = sizingHeatingAirFlow.size(PurchAir(PurchAirNum).MaxHeatVolFlowRate, ErrorsFound);
+                        PurchAir(PurchAirNum).MaxHeatVolFlowRate = sizingHeatingAirFlow.size(state, PurchAir(PurchAirNum).MaxHeatVolFlowRate, ErrorsFound);
                     }
                     MaxHeatVolFlowRateDes = 0.0;
                 } else {
@@ -1787,7 +1787,7 @@ namespace PurchasedAirManager {
                     sizingHeatingAirFlow.overrideSizingString(SizingString);
                     // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    MaxHeatVolFlowRateDes = sizingHeatingAirFlow.size(PurchAir(PurchAirNum).MaxHeatVolFlowRate, ErrorsFound);
+                    MaxHeatVolFlowRateDes = sizingHeatingAirFlow.size(state, PurchAir(PurchAirNum).MaxHeatVolFlowRate, ErrorsFound);
                     PurchAir(PurchAirNum).MaxHeatVolFlowRate = MaxHeatVolFlowRateDes;
                     ZoneHeatingOnlyFan = false;
                 }
@@ -1874,7 +1874,7 @@ namespace PurchasedAirManager {
                         sizingCoolingAirFlow.overrideSizingString(stringOverride);
                         // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                         sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        PurchAir(PurchAirNum).MaxCoolVolFlowRate = sizingCoolingAirFlow.size(PurchAir(PurchAirNum).MaxCoolVolFlowRate, ErrorsFound);
+                        PurchAir(PurchAirNum).MaxCoolVolFlowRate = sizingCoolingAirFlow.size(state, PurchAir(PurchAirNum).MaxCoolVolFlowRate, ErrorsFound);
                     }
                 } else {
                     ZoneCoolingOnlyFan = true;
@@ -1885,7 +1885,7 @@ namespace PurchasedAirManager {
                     sizingCoolingAirFlow.overrideSizingString(stringOverride);
                     // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    MaxCoolVolFlowRateDes = sizingCoolingAirFlow.size(TempSize, ErrorsFound);
+                    MaxCoolVolFlowRateDes = sizingCoolingAirFlow.size(state, TempSize, ErrorsFound);
                     PurchAir(PurchAirNum).MaxCoolVolFlowRate = MaxCoolVolFlowRateDes;
                     ZoneCoolingOnlyFan = false;
                 }
@@ -1903,7 +1903,7 @@ namespace PurchasedAirManager {
                         CoolingCapacitySizer sizerCoolingCapacity;
                         sizerCoolingCapacity.overrideSizingString(SizingString);
                         sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        PurchAir(PurchAirNum).MaxCoolTotCap = sizerCoolingCapacity.size(PurchAir(PurchAirNum).MaxCoolTotCap, ErrorsFound);
+                        PurchAir(PurchAirNum).MaxCoolTotCap = sizerCoolingCapacity.size(state, PurchAir(PurchAirNum).MaxCoolTotCap, ErrorsFound);
                     }
                 } else {
                     ZoneCoolingOnlyFan = true;
@@ -1913,7 +1913,7 @@ namespace PurchasedAirManager {
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    MaxCoolTotCapDes = sizerCoolingCapacity.size(TempSize, ErrorsFound);
+                    MaxCoolTotCapDes = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                     ZoneCoolingOnlyFan = false;
                 }
                 if (MaxCoolTotCapDes < SmallLoad) {

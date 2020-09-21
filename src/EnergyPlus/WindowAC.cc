@@ -1021,7 +1021,7 @@ namespace WindowAC {
                     sizingCoolingAirFlow.overrideSizingString(stringOverride);
                     // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    state.dataWindowAC.WindAC(WindACNum).MaxAirVolFlow = sizingCoolingAirFlow.size(TempSize, errorsFound);
+                    state.dataWindowAC.WindAC(WindACNum).MaxAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
                 } else if (SAFMethod == FlowPerCoolingCapacity) {
                     SizingMethod = CoolingCapacitySizing;
@@ -1036,7 +1036,7 @@ namespace WindowAC {
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DataCapacityUsedForSizing = sizerCoolingCapacity.size(TempSize, errorsFound);
+                    DataCapacityUsedForSizing = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                     DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     PrintFlag = true;
                     TempSize = AutoSize;
@@ -1047,7 +1047,7 @@ namespace WindowAC {
                     sizingCoolingAirFlow.overrideSizingString(stringOverride);
                     // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    state.dataWindowAC.WindAC(WindACNum).MaxAirVolFlow = sizingCoolingAirFlow.size(TempSize, errorsFound);
+                    state.dataWindowAC.WindAC(WindACNum).MaxAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                 }
                 // DataScalableSizingON = false;
 

@@ -956,13 +956,13 @@ namespace CoolingPanelSimple {
                     TempSize = ThisCP.ScaledCoolingCapacity;
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DesCoilLoad = sizerCoolingCapacity.size(TempSize, errorsFound);
+                    DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     DataScalableCapSizingON = true;
                     TempSize = ThisCP.ScaledCoolingCapacity * Zone(ThisCP.ZonePtr).FloorArea;
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DesCoilLoad = sizerCoolingCapacity.size(TempSize, errorsFound);
+                    DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                     DataScalableCapSizingON = false;
                 } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                     if (ThisCP.WaterVolFlowRateMax == AutoSize) {
@@ -1007,7 +1007,7 @@ namespace CoolingPanelSimple {
                     }
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DesCoilLoad = sizerCoolingCapacity.size(TempSize, errorsFound);
+                    DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                     DataConstantUsedForSizing = 0.0;
                     DataFractionUsedForSizing = 0.0;
                     DataScalableCapSizingON = false;

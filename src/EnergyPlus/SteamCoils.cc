@@ -819,7 +819,7 @@ namespace SteamCoils {
                         sizingHeatingAirFlow.overrideSizingString(SizingString);
                         // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                         sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                        DesVolFlow = sizingHeatingAirFlow.size(TempSize, errorsFound);
+                        DesVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                     }
                     DesMassFlow = RhoAirStd * DesVolFlow;
                     // get the outside air fraction
