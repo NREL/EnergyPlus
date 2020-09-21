@@ -352,13 +352,13 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state)
     if (DataGlobals::isEpJSON) stringOverride = "rated_air_flow_rate [m3/s]";
     sizingCoolingAirFlow.overrideSizingString(stringOverride);
     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-    this->evap_air_flow_rate = sizingCoolingAirFlow.size(this->evap_air_flow_rate, errorsFound);
+    this->evap_air_flow_rate = sizingCoolingAirFlow.size(state, this->evap_air_flow_rate, errorsFound);
 
     std::string SizingString = "Gross Cooling Capacity [W]";
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-    this->rated_total_capacity = sizerCoolingCapacity.size(this->rated_total_capacity, errorsFound);
+    this->rated_total_capacity = sizerCoolingCapacity.size(state, this->rated_total_capacity, errorsFound);
 
     //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
     //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
@@ -369,12 +369,12 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state)
     sizerCoolingSHR.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
     if (this->grossRatedSHR == DataSizing::AutoSize && this->parentOperatingMode == 2) {
         DataSizing::DataSizingFraction = 0.667;
-        this->grossRatedSHR = sizerCoolingSHR.size(this->grossRatedSHR, errorFound);
+        this->grossRatedSHR = sizerCoolingSHR.size(state, this->grossRatedSHR, errorFound);
     } else if (this->grossRatedSHR == DataSizing::AutoSize && this->parentOperatingMode == 3) {
         DataSizing::DataSizingFraction = 0.333;
-        this->grossRatedSHR = sizerCoolingSHR.size(this->grossRatedSHR, errorFound);
+        this->grossRatedSHR = sizerCoolingSHR.size(state, this->grossRatedSHR, errorFound);
     } else {
-        this->grossRatedSHR = sizerCoolingSHR.size(this->grossRatedSHR, errorFound);
+        this->grossRatedSHR = sizerCoolingSHR.size(state, this->grossRatedSHR, errorFound);
     }
     DataSizing::DataFlowUsedForSizing = 0.0;
     DataSizing::DataCapacityUsedForSizing = 0.0;

@@ -2742,14 +2742,14 @@ namespace LowTempRadiantSystem {
                         CoolingCapacitySizer sizerCoolingCapacity;
                         sizerCoolingCapacity.overrideSizingString(SizingString);
                         sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        DesCoilLoad = sizerCoolingCapacity.size(TempSize, ErrorsFound);
+                        DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
                         DataScalableCapSizingON = true;
                         TempSize = HydrRadSys(RadSysNum).ScaledCoolingCapacity * Zone(HydrRadSys(RadSysNum).ZonePtr).FloorArea;
                         CoolingCapacitySizer sizerCoolingCapacity;
                         sizerCoolingCapacity.overrideSizingString(SizingString);
                         sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        DesCoilLoad = sizerCoolingCapacity.size(TempSize, ErrorsFound);
+                        DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                         DataScalableCapSizingON = false;
                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                         if (HydrRadSys(RadSysNum).WaterVolFlowMaxCool == AutoSize) {
@@ -2796,7 +2796,7 @@ namespace LowTempRadiantSystem {
                         CoolingCapacitySizer sizerCoolingCapacity;
                         sizerCoolingCapacity.overrideSizingString(SizingString);
                         sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        DesCoilLoad = sizerCoolingCapacity.size(TempSize, ErrorsFound);
+                        DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                         DataConstantUsedForSizing = 0.0;
                         DataFractionUsedForSizing = 0.0;
                         DataScalableCapSizingON = false;

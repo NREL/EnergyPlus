@@ -1804,7 +1804,7 @@ namespace UnitVentilator {
                         sizingCoolingAirFlow.overrideSizingString(stringOverride);
                         // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                         sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(TempSize, errorsFound);
+                        CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
                     } else if (SAFMethod == FlowPerCoolingCapacity) {
                         SizingMethod = CoolingCapacitySizing;
@@ -1815,7 +1815,7 @@ namespace UnitVentilator {
                         CoolingCapacitySizer sizerCoolingCapacity;
                         sizerCoolingCapacity.overrideSizingString(SizingString);
                         sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(TempSize, ErrorsFound);
+                        DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                         DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                         PrintFlag = true;
                         TempSize = AutoSize;
@@ -1826,7 +1826,7 @@ namespace UnitVentilator {
                         sizingCoolingAirFlow.overrideSizingString(stringOverride);
                         // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                         sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(TempSize, errorsFound);
+                        CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                     }
                     // DataScalableSizingON = false;
 
@@ -1859,7 +1859,7 @@ namespace UnitVentilator {
                         sizingHeatingAirFlow.overrideSizingString(SizingString);
                         // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                         sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(TempSize, errorsFound);
+                        HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
 
                     } else if (SAFMethod == FlowPerHeatingCapacity) {
                         SizingMethod = HeatingCapacitySizing;
@@ -1881,7 +1881,7 @@ namespace UnitVentilator {
                         sizingHeatingAirFlow.overrideSizingString(SizingString);
                         // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                         sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                        HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(TempSize, errorsFound);
+                        HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                     }
                     // DataScalableSizingON = false;
                 } else {
@@ -1919,7 +1919,7 @@ namespace UnitVentilator {
                                 sizingCoolingAirFlow.overrideSizingString(stringOverride);
                                 // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(TempSize, errorsFound);
+                                CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
                             } else if (SAFMethod == FlowPerCoolingCapacity) {
                                 SizingMethod = CoolingCapacitySizing;
@@ -1930,7 +1930,7 @@ namespace UnitVentilator {
                                 CoolingCapacitySizer sizerCoolingCapacity;
                                 sizerCoolingCapacity.overrideSizingString(SizingString);
                                 sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(TempSize, ErrorsFound);
+                                DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                                 DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                                 PrintFlag = true;
                                 TempSize = AutoSize;
@@ -1941,7 +1941,7 @@ namespace UnitVentilator {
                                 sizingCoolingAirFlow.overrideSizingString(stringOverride);
                                 // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(TempSize, errorsFound);
+                                CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                             }
                         } else if (ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod > 0) {
                             SizingMethod = HeatingAirflowSizing;
@@ -1973,7 +1973,7 @@ namespace UnitVentilator {
                                 sizingHeatingAirFlow.overrideSizingString(SizingString);
                                 // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                                 sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(TempSize, errorsFound);
+                                HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
 
                             } else if (SAFMethod == FlowPerHeatingCapacity) {
                                 SizingMethod = HeatingCapacitySizing;
@@ -1995,7 +1995,7 @@ namespace UnitVentilator {
                                 sizingHeatingAirFlow.overrideSizingString(SizingString);
                                 // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                                 sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(TempSize, errorsFound);
+                                HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                             }
                         }
                         // DataScalableSizingON = false;
@@ -2476,7 +2476,7 @@ namespace UnitVentilator {
                                     CoolingCapacitySizer sizerCoolingCapacity;
                                     sizerCoolingCapacity.overrideSizingString(SizingString);
                                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                    DesCoolingLoad = sizerCoolingCapacity.size(TempSize, ErrorsFound);
+                                    DesCoolingLoad = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                                     DataScalableCapSizingON = false;
                                 } else {
                                     SizingString = "";
@@ -2486,7 +2486,7 @@ namespace UnitVentilator {
                                     CoolingCapacitySizer sizerCoolingCapacity;
                                     sizerCoolingCapacity.overrideSizingString(SizingString);
                                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                                    DesCoolingLoad = sizerCoolingCapacity.size(TempSize, ErrorsFound);
+                                    DesCoolingLoad = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                                 }
                                 rho = GetDensityGlycol(PlantLoop(UnitVent(UnitVentNum).CWLoopNum).FluidName,
                                                        5.,
