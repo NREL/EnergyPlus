@@ -2557,17 +2557,20 @@ BeginSimFlag = true;
 HeatBalanceManager::InitHeatBalance(state, state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files);
 EXPECT_FALSE(FoundError);
 
-SolarShading::AllocateModuleArrays();
-SolarShading::DetermineShadowingCombinations();
+if (SolarShading::penumbra) {
+    SolarShading::AllocateModuleArrays();
+    SolarShading::DetermineShadowingCombinations();
 
-std::string error_string = delimited_string({"** Severe  ** Problem in interior solar distribution calculation (CHKBKS)"});
+    std::string error_string = delimited_string({"** Severe  ** Problem in interior solar distribution calculation (CHKBKS)"});
 
-EXPECT_FALSE(match_err_stream(error_string));
+    EXPECT_FALSE(match_err_stream(error_string));
 
-error_string = delimited_string({"** Severe  ** DetermineShadowingCombinations: There are 1 surfaces which are casting surfaces and are non-convex."});
+    error_string = delimited_string({"** Severe  ** DetermineShadowingCombinations: There are 1 surfaces which are casting surfaces and are non-convex."});
 
-EXPECT_FALSE(match_err_stream(error_string));
-
+    EXPECT_FALSE(match_err_stream(error_string));
+} else {
+    EXPECT_FALSE(false) << "Machine cannot create a valid OpenGL instance.";  // Replace with GTEST_SKIP() when it's released?
+}
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)

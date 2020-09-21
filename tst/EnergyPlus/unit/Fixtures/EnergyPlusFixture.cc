@@ -300,7 +300,6 @@ bool EnergyPlusFixture::match_err_stream(std::string const &expected_match, bool
     } else {
         match_found = stream_str.find(expected_match) != std::string::npos;
     }
-    EXPECT_TRUE(match_found);
     if (reset_stream) this->err_stream->str(std::string());
     return match_found;
 }
