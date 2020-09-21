@@ -1599,15 +1599,15 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass_Window;
     DataSurfaces::Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
     DataSurfaces::Surface(2).ExtBoundCond = DataSurfaces::ExternalEnvironment;
-    DataSurfaces::Surface(1).WindowShadingControlPtr = 1;
-    DataSurfaces::Surface(2).WindowShadingControlPtr = 2;
+    DataSurfaces::Surface(1).windowShadingControlList.push_back(1);
+    DataSurfaces::Surface(2).windowShadingControlList.push_back(2);
     DataSurfaces::Surface(1).HasShadeControl = true;
     DataSurfaces::Surface(2).HasShadeControl = true;
 
     DataSurfaces::SurfWinHasShadeOrBlindLayer(1) = false;
     DataSurfaces::SurfWinHasShadeOrBlindLayer(2) = false;
-    DataSurfaces::SurfWinShadedConstruction(1) = 1;
-    DataSurfaces::SurfWinShadedConstruction(2) = 1;
+    DataSurfaces::Surface(1).activeShadedConstruction = 1;
+    DataSurfaces::Surface(2).activeShadedConstruction = 1;
 
     dataConstruction.Construct(1).Name = "Construction1";
 
@@ -1615,6 +1615,9 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataSurfaces::WindowShadingControl(2).ShadingType = DataSurfaces::WSC_ST_ExteriorScreen;
 
     DataSurfaces::TotSurfaces = 2;
+
+    DataSurfaces::Surface(1).activeWindowShadingControl = DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(1)];
+    DataSurfaces::Surface(2).activeWindowShadingControl = DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(2)];
 
     SetupWindowShadingControlActuators();
 
