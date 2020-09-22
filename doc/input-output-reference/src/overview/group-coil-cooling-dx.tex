@@ -634,13 +634,13 @@ Following are the list of possible output variables from this coil model:
 \item HVAC, Sum, Cooling Coil Sensible Cooling Energy {[}J{]}
 \item HVAC, Average, Cooling Coil Latent Cooling Rate {[}W{]}
 \item HVAC, Sum, Cooling Coil Latent Cooling Energy {[}J{]}
-\item HVAC, Average, Cooling Coil Electric Power{[}W{]}
-\item HVAC, Sum, Cooling Coil Electric Energy {[}J{]}
+\item HVAC, Average, Cooling Coil Electricity Rate{[}W{]}
+\item HVAC, Sum, Cooling Coil Electricity Energy {[}J{]}
 \item HVAC, Average, Cooling Coil <Fuel> Rate {[}W{]}
 \item HVAC, Sum, Cooling Coil <Fuel> Energy {[}J{]}
 \item HVAC, Average, Cooling Coil Runtime Fraction {[]}
-\item HVAC, Average, Cooling Coil Crankcase Heater Electric Power {[}W{]}
-\item HVAC, Sum, Cooling Coil Crankcase Heater Electric Energy {[}J{]}
+\item HVAC, Average, Cooling Coil Crankcase Heater Electricity Rate {[}W{]}
+\item HVAC, Sum, Cooling Coil Crankcase Heater Electricity Energy {[}J{]}
 \item HVAC, Average, Cooling Coil Air Mass Flow Rate {[}kg/s{]}
 \item HVAC, Average, Cooling Coil Air Inlet Temperature {[}C{]}
 \item HVAC, Average, Cooling Coil Air Inlet Humidity Ratio {[}kgWater/kgDryAir{]}
@@ -653,12 +653,12 @@ Following are the list of possible output variables from this coil model:
 \item HVAC, Average, Cooling Coil Dehumidification Mode {[]}
 \item HVAC, Average, Cooling Coil Waste Heat Power {[}W{]}
 \item HVAC, Sum, Cooling Coil Waste Heat Energy {[}J{]}
-\item HVAC, Average, Cooling Coil Basin Heater Electric Power {[}W{]}
-\item HVAC, Sum, Cooling Coil Basin Heater Electric Energy {[}J{]}
+\item HVAC, Average, Cooling Coil Basin Heater Electricity Rate {[}W{]}
+\item HVAC, Sum, Cooling Coil Basin Heater Electricity Energy {[}J{]}
 \item HVAC, Average, Cooling Coil Condensate Volume Flow Rate {[}m3/s{]}
 \item HVAC, Sum, Cooling Coil Condensate Volume {[}m3{]}
-\item HVAC, Average, Cooling Coil Evaporative Condenser Pump Electric Power {[}W{]}
-\item HVAC, Sum, Cooling Coil Evaporative Condenser Pump Electric Energy {[}J{]}
+\item HVAC, Average, Cooling Coil Evaporative Condenser Pump Electricity Rate {[}W{]}
+\item HVAC, Sum, Cooling Coil Evaporative Condenser Pump Electricity Energy {[}J{]}
 \item HVAC, Average, Cooling Coil Evaporative Condenser Water Volume Flow Rate {[}m3/s{]}
 \item HVAC, Sum, Cooling Coil Evaporative Condenser Mains Supply Water Volume {[}m3{]}
 \item HVAC, Sum, Cooling Coil Evaporative Condenser Water Volume {[}m3{]}
@@ -708,7 +708,7 @@ Electricity consumption of the DX coil compressor and condenser fan(s) in Joules
 
 \paragraph{Cooling Coil <Fuel> Power {[}W{]}}
 
-Electricity consumption rate of the DX coil compressor and condenser fan(s) in Watts. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
+Fuel consumption rate of the DX coil compressor and condenser fan(s) in Watts. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
 
 \paragraph{Cooling Coil <Fuel> Energy {[}J{]}}
 
@@ -718,11 +718,11 @@ Fuel consumption of the DX coil compressor and condenser fan(s) in Joules for th
 
 Runtime fraction of the DX coil compressor and condenser fan(s) for the timestep being reported. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
 
-\paragraph{Cooling Coil Crankcase Heater Electric Power {[}W{]}}
+\paragraph{Cooling Coil Crankcase Heater Electricity Rate {[}W{]}}
 
 Electricity consumption rate of the DX coil compressor crankcase heater in Watts. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
 
-\paragraph{Cooling Coil Crankcase Heater Electric Energy {[}J{]}}
+\paragraph{Cooling Coil Crankcase Heater Electricity Energy {[}J{]}}
 
 Electricity consumption of the DX coil compressor and condenser fan(s) in Joules for the timestep being reported. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
 
@@ -774,11 +774,11 @@ The fraction of power input to the DX coil that is available as recoverable wast
 
 The fraction of energy input to the DX coil that is available as recoverable waste heat at full load and rated conditions for a specific speed in Joules. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported.
 
-\paragraph{Cooling Coil Basin Heater Electric Power {[}W{]}}
+\paragraph{Cooling Coil Basin Heater Electricity Rate {[}W{]}}
 
 The electric power input to the DX coil basin electric heater in Watts. Only available for evaporatively cooled condensers. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
 
-\paragraph{Cooling Coil Basin Heater Electric Energy {[}J{]}}
+\paragraph{Cooling Coil Basin Heater Electricity Energy {[}J{]}}
 
 The electric energy input to the DX coil basin electric heater in Joules. Only available for evaporatively cooled condensers. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
 
@@ -790,11 +790,11 @@ The flow rate of condensate water collected from the DX coil. Only available if 
 
 The volume of condensate water collected from the DX coil. Only available if a condensate water collection tank is specified. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported. This output is also added to a meter with Resource Type = OnSiteWater, End Use Key = Condensate, Group Key = System (Ref. Output:Meter objects).
 
-\paragraph{Cooling Coil Evaporative Condenser Pump Electric Power {[}W{]}}
+\paragraph{Cooling Coil Evaporative Condenser Pump Electricity Rate {[}W{]}}
 
 The electricity consumption rate of the evaporative condenser water pump in Watts. Only available if an evaporative condenser supply water tank is provided. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
 
-\paragraph{Cooling Coil Evaporative Condenser Pump Electric Energy {[}J{]}}
+\paragraph{Cooling Coil Evaporative Condenser Pump Electricity Energy {[}J{]}}
 
 The electricity consumption rate of the evaporative condenser water pump in Joules. Only available if an evaporative condenser supply water tank is provided. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported. This output is also added to a meter with Resource Type = Electric, End Use Key = Cooling, Group Key = System (Ref. Output:Meter objects).
 
