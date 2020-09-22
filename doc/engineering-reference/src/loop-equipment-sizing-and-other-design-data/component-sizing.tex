@@ -651,7 +651,7 @@ Where:
 
 \subsubsection{Rated Cooling Power Consumption}\label{rated-cooling-power-consumption}
 
-The following calculations are then performed to determine the rated cooling power consumption.
+The following calculations are performed to determine the rated cooling power consumption.
 
 The calculation for coil operating temperatures (inlet and outlet) are identical to that done for \emph{Coil:Cooling:Water}. 
 
@@ -670,7 +670,7 @@ $T_{WB,ratio} = $ ratio of load-side inlet air wet-bulb temperature in Kelvin to
 $T_{S,ratio} = $ ratio of source-side inlet water temperature in Kelvin to a reference temperature
 
 \begin{equation}
-	CoolPowCoeffModFac = CPC1 + CPC2 (T_{WB,ratio})+CPC3(T_{S,ratio})+CPC4+CPC5
+	CoolPowCoeffModFac = CPC1 + CPC2 \left(T_{WB,ratio} \right)+CPC3 \left(T_{S,ratio} \right)+CPC4+CPC5
 \end{equation}
 
 where:
@@ -768,7 +768,7 @@ The calculation is identical to that done for \emph{Coil:Cooling:Water} , which 
 
 \subsubsection{Rated Total Heating Capacity}\label{rated-total-heating-capacity}
 
-The following calculations are then performed to determine the rated total heating capacity.
+The following calculations are performed to determine the rated total heating capacity.
 
 \begin{equation}
 TotHeatCapTempModFac = THCC1 + THCC2\left( {{T_{DB,ratio}}} \right) + THCC3\left( {{T_{S,ratio}}} \right) + THCC4 + THCC5
@@ -814,10 +814,10 @@ $T_{S,ratio} = $ ratio of source-side inlet water temperature in Kelvin to a ref
 
 \subsubsection{Rated Heating Power Consumption}\label{rated-heating-power-consumption}
 
-The following calculations are then performed to determine the rated heating power consumption.
+The following calculations are performed to determine the rated heating power consumption.
 
 \begin{equation}
-	HeatPowCoeffModFac = HPC1 + HPC2 (T_{DB,ratio})+HPC3(T_{S,ratio})+HPC4+HPC5
+	HeatPowCoeffModFac = HPC1 + HPC2 \left(T_{DB,ratio} \right)+ HPC3 \left(T_{S,ratio} \right)+ HPC4+ HPC5
 \end{equation}
 
 where:
