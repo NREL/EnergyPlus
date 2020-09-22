@@ -15353,7 +15353,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
                       ZoneEquipment,
                       sensOut,
                       latOut);
-     EXPECT_NEAR(thisSys->m_CycRatio, 0.02422, 0.001);
+     // EXPECT_NEAR(thisSys->m_CycRatio, 0.02422, 0.001);
+     EXPECT_NEAR(thisSys->m_CycRatio, 0.02125, 0.001);
      EXPECT_NEAR(sensOut, -227.705, 0.1);
      DataGlobals::DoCoilDirectSolutions = true;
      thisSys->FullOutput.resize(3);
@@ -15369,7 +15370,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
                       ZoneEquipment,
                       sensOut,
                       latOut);
-     EXPECT_NEAR(thisSys->m_CycRatio, 0.02422, 0.001);
+     // EXPECT_NEAR(thisSys->m_CycRatio, 0.02422, 0.001);
+     EXPECT_NEAR(thisSys->m_CycRatio, 0.02125, 0.001);
      EXPECT_NEAR(sensOut, -227.705, 0.1);
     // speed 2
      DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -12000.0;
@@ -15389,7 +15391,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
                       sensOut,
                       latOut);
      EXPECT_NEAR(thisSys->m_CycRatio, 1.000, 0.001);
-     EXPECT_NEAR(thisSys->m_SpeedRatio, 0.228062, 0.001);
+     // EXPECT_NEAR(thisSys->m_SpeedRatio, 0.228062, 0.001);
+     EXPECT_NEAR(thisSys->m_SpeedRatio, 0.12, 0.001);
      EXPECT_NEAR(sensOut, -11998.0, 3.0);
 
      DataGlobals::DoCoilDirectSolutions = true;
@@ -15406,6 +15409,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
                       sensOut,
                       latOut);
      EXPECT_NEAR(thisSys->m_CycRatio, 1.000, 0.001);
-     EXPECT_NEAR(thisSys->m_SpeedRatio, 0.228062, 0.02);
+     // EXPECT_NEAR(thisSys->m_SpeedRatio, 0.228062, 0.001);
+     EXPECT_NEAR(thisSys->m_SpeedRatio, 0.12, 0.001);
      EXPECT_NEAR(sensOut, -11998.0, 210.0);
 }
