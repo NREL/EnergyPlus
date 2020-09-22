@@ -769,7 +769,10 @@ namespace WeatherManager {
         void CalcAnnualAndMonthlyDryBulbTemp(EnergyPlusData &state, IOFiles &ioFiles); // true if this is CorrelationFromWeatherFile
     };
 
+    extern AnnualMonthlyDryBulbWeatherData OADryBulbAverage;
+
     void ReportWaterMainsTempParameters(EnergyPlusData &state, IOFiles &ioFiles);
+    void calcSky(EnergyPlusData &state, Real64 &TmrHorizIRSky, Real64 &TmrSkyTemp, Real64 OpaqueSkyCover, Real64 DryBulb, Real64 DewPoint, Real64 RelHum, Real64 IRHoriz);
 
 } // namespace WeatherManager
 
@@ -853,6 +856,8 @@ namespace WeatherManager {
         Array2D<Real64> TodayDifSolarRad;     // Sky diffuse horizontal solar irradiance NOLINT(cert-err58-cpp)
         Array2D<Real64> TodayAlbedo;          // Albedo NOLINT(cert-err58-cpp)
         Array2D<Real64> TodayLiquidPrecip;    // Liquid Precipitation Depth (mm) NOLINT(cert-err58-cpp)
+        Array2D<Real64> TodayTotalSkyCover;      // Total Sky Cover(cert-err58-cpp)
+        Array2D<Real64> TodayOpaqueSkyCover;     // Opaque Sky Cover(cert-err58-cpp)
 
         Array2D_bool TomorrowIsRain;             // Rain indicator, true=rain NOLINT(cert-err58-cpp)
         Array2D_bool TomorrowIsSnow;             // Snow indicator, true=snow NOLINT(cert-err58-cpp)
@@ -868,6 +873,8 @@ namespace WeatherManager {
         Array2D<Real64> TomorrowDifSolarRad;     // Sky diffuse horizontal solar irradiance NOLINT(cert-err58-cpp)
         Array2D<Real64> TomorrowAlbedo;          // Albedo NOLINT(cert-err58-cpp)
         Array2D<Real64> TomorrowLiquidPrecip;    // Liquid Precipitation Depth NOLINT(cert-err58-cpp)
+        Array2D<Real64> TomorrowTotalSkyCover;   // Total Sky Cover {tenth of sky}(cert-err58-cpp)
+        Array2D<Real64> TomorrowOpaqueSkyCover;  // Opaque Sky Cover {tenth of sky}(cert-err58-cpp)
 
         Array3D<Real64> DDDBRngModifier;      // Design Day Dry-bulb Temperature Range Modifier NOLINT(cert-err58-cpp)
         Array3D<Real64> DDHumIndModifier;     // Design Day relative humidity values or wet-bulb modifiers (per HumIndType) NOLINT(cert-err58-cpp)
@@ -966,6 +973,8 @@ namespace WeatherManager {
         Real64 LastHrDifSolarRad;
         Real64 LastHrAlbedo;
         Real64 LastHrLiquidPrecip;
+        Real64 LastHrTotalSkyCover;
+        Real64 LastHrOpaqueSkyCover;
         Real64 NextHrBeamSolarRad;
         Real64 NextHrDifSolarRad;
         Real64 NextHrLiquidPrecip;
@@ -1040,6 +1049,8 @@ namespace WeatherManager {
             this->TodayDifSolarRad.deallocate();        // Sky diffuse horizontal solar irradiance
             this->TodayAlbedo.deallocate();             // Albedo
             this->TodayLiquidPrecip.deallocate();       // Liquid Precipitation Depth (mm)
+            this->TodayTotalSkyCover.deallocate();      // Total Sky Cover
+            this->TomorrowOpaqueSkyCover.deallocate();  // Opaque Sky Cover {tenth of sky}
             this->TomorrowIsRain.deallocate();          // Rain indicator, true=rain
             this->TomorrowIsSnow.deallocate();          // Snow indicator, true=snow
             this->TomorrowOutDryBulbTemp.deallocate();  // Dry bulb temperature of outside air
@@ -1054,6 +1065,8 @@ namespace WeatherManager {
             this->TomorrowDifSolarRad.deallocate();     // Sky diffuse horizontal solar irradiance
             this->TomorrowAlbedo.deallocate();          // Albedo
             this->TomorrowLiquidPrecip.deallocate();    // Liquid Precipitation Depth
+            this->TomorrowTotalSkyCover.deallocate();   // Total Sky Cover {tenth of sky}
+            this->TomorrowOpaqueSkyCover.deallocate();  // Opaque Sky Cover {tenth of sky}
             this->DDDBRngModifier.deallocate();         // Design Day Dry-bulb Temperature Range Modifier
             this->DDHumIndModifier.deallocate();        // Design Day relative humidity values
             this->DDBeamSolarValues.deallocate();       // Design Day Beam Solar Values
@@ -1146,6 +1159,24 @@ namespace WeatherManager {
 
             // SetUpDesignDay static vars
             this->PrintDDHeader = true;
+
+            this->LastHrOutDryBulbTemp = 0.0;
+            this->LastHrOutDewPointTemp = 0.0;
+            this->LastHrOutBaroPress = 0.0;
+            this->LastHrOutRelHum = 0.0;
+            this->LastHrWindSpeed = 0.0;
+            this->LastHrWindDir = 0.0;
+            this->LastHrSkyTemp = 0.0;
+            this->LastHrHorizIRSky = 0.0;
+            this->LastHrBeamSolarRad = 0.0;
+            this->LastHrDifSolarRad = 0.0;
+            this->LastHrAlbedo = 0.0;
+            this->LastHrLiquidPrecip = 0.0;
+            this->LastHrTotalSkyCover = 0.0;
+            this->LastHrOpaqueSkyCover = 0.0;
+            this->NextHrBeamSolarRad = 0.0;
+            this->NextHrDifSolarRad = 0.0;
+            this->NextHrLiquidPrecip = 0.0;
 
             // ProcessEPWHeader static vars
             this->EPWHeaderTitle = "";

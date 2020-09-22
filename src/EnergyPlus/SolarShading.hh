@@ -381,6 +381,8 @@ namespace SolarShading {
 
     void WindowShadingManager(EnergyPlusData &state);
 
+    int selectActiveWindowShadingControlIndex(int curSurface);
+
     void WindowGapAirflowControl();
 
     void SkyDifSolarShading();

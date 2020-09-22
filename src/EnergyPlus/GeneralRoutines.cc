@@ -2135,4 +2135,94 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
     }
 }
 
+void CalcComponentSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
+                                       Real64 const TDB2,      // dry-bulb temperature at state 2 {C}
+                                       Real64 const W2,        // humidity ratio at state 2
+                                       Real64 const TDB1,      // dry-bulb temperature at  at state 1 {C}
+                                       Real64 const W1,        // humidity ratio at state 1
+                                       Real64 &SensibleOutput, // sensible output rate (state 2 -> State 1), {W}
+                                       Real64 &LatentOutput,   // latent output rate (state 2 -> State 1), {W}
+                                       Real64 &TotalOutput     // total = sensible + latent putput rate (state 2 -> State 1), {W}
+)
+{
+
+    // Purpose:
+    // returns total, sensible and latent heat rate of change of moist air transitioning
+    // between two states. The moist air energy transfer can be cooling or heating process
+    // across a cooling, a heating coil, or an HVAC component.
+
+    // Methodology:
+    // Q_total = m_dot * (h2 - h1)
+    // Q_sensible = m_dot * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(TDB2, W2, TDB1, W1);
+    // or Q_sensible = m_dot * cp_moistair_MinHumRat * (TDB2 - TDB1)
+    //    cp_moistair_MinHumRat = Psychrometrics::PsyCpAirFnW(min(W2, W1));
+    // Q_latent = Q_total - Q_latent;
+
+    TotalOutput = 0.0;
+    LatentOutput = 0.0;
+    SensibleOutput = 0.0;
+    if (MassFlow > 0.0) {
+        TotalOutput = MassFlow * (Psychrometrics::PsyHFnTdbW(TDB2, W2) - Psychrometrics::PsyHFnTdbW(TDB1, W1)); // total addition/removal rate, {W};
+        SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(TDB2, W2, TDB1, W1); // sensible addition/removal rate, {W};
+        LatentOutput = TotalOutput - SensibleOutput;                                                // latent addition/removal rate, {W}
+    }
+}
+
+void CalcZoneSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
+                                  Real64 const TDBEquip,  // dry-bulb temperature at equipment outlet {C}
+                                  Real64 const WEquip,    // humidity ratio at equipment outlet
+                                  Real64 const TDBZone,   // dry-bulb temperature at zone air node {C}
+                                  Real64 const WZone,     // humidity ratio at zone air node
+                                  Real64 &SensibleOutput, // sensible output rate (state 2 -> State 1), {W}
+                                  Real64 &LatentOutput,   // latent output rate (state 2 -> State 1), {W}
+                                  Real64 &TotalOutput     // total = sensible + latent putput rate (state 2 -> State 1), {W}
+)
+{
+
+    // Purpose:
+    // returns total, sensible and latent heat rate of transfer between the supply air zone inlet
+    // node and zone air node. The moist air energy transfer can be cooling or heating depending
+    // on the supply air zone inlet node and zone air node conditions.
+
+    // Methodology:
+    // Q_total = m_dot * (hEquip - hZone)
+    // Q_sensible = m_dot * Psychrometrics::PsyDeltaHSenFnTdbEquipTdbWZone(TDBEquip, TDBZone, WZone);
+    // or Q_sensible = m_dot * cp_moistair_zoneHumRat * (TDBEquip - TDBZone)
+    //    cp_moistair_zoneHumRat = Psychrometrics::PsyCpAirFnW(WZone);
+    // Q_latent = Q_total - Q_latent;
+
+    TotalOutput = 0.0;
+    LatentOutput = 0.0;
+    SensibleOutput = 0.0;
+    if (MassFlow > 0.0) {
+        TotalOutput = MassFlow * (Psychrometrics::PsyHFnTdbW(TDBEquip, WEquip) -
+                                  Psychrometrics::PsyHFnTdbW(TDBZone, WZone)); // total addition/removal rate, {W};
+        SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2Tdb1W(TDBEquip, TDBZone, WZone); // sensible addition/removal rate, {W};
+        LatentOutput = TotalOutput - SensibleOutput;                                                          // latent addition/removal rate, {W}
+    }
+}
+
+void CalcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
+                            Real64 const TDBEquip, // dry-bulb temperature at equipment outlet {C}
+                            Real64 const TDBZone,  // dry-bulb temperature at zone air node {C}
+                            Real64 const WZone,    // humidity ratio at zone air node
+                            Real64 &SensibleOutput // sensible output rate (state 2 -> State 1), {W}
+)
+{
+
+    // Purpose:
+    // returns sensible heat rate of transfer between the supply air zone inlet node and
+    // zone air node. The moist air energy transfer can be cooling or heating depending
+    // on the supply air zone inlet node and zone air node conditions.
+
+    // Methodology:
+    // Q_sensible = m_dot * Psychrometrics::PsyDeltaHSenFnTdbEquipTdbWZone(TDBEquip, TDBZone, WZone);
+    // or Q_sensible = m_dot * cp_moistair_zoneHumRat * (TDBEquip - TDBZone)
+    //    cp_moistair_zoneHumRat = Psychrometrics::PsyCpAirFnW(WZone);
+
+    SensibleOutput = 0.0;
+    if (MassFlow > 0.0) {
+        SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2Tdb1W(TDBEquip, TDBZone, WZone); // sensible addition/removal rate, {W};
+    }
+}
 } // namespace EnergyPlus

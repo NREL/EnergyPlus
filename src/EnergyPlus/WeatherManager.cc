@@ -142,7 +142,7 @@ namespace WeatherManager {
         InitializeWeather(state, state.files, state.dataWeatherManager->PrintEnvrnStamp);
 
         bool anyEMSRan = false;
-        // Cannot call this during sizing, because EMS will not intialize properly until after simulation kickoff
+        // Cannot call this during sizing, because EMS will not initialize properly until after simulation kickoff
         if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
             EMSManager::ManageEMS(
                 state, DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
@@ -430,6 +430,8 @@ namespace WeatherManager {
                                 "Zone",
                                 "Average",
                                 "Environment");
+            SetupOutputVariable("Site Total Sky Cover", OutputProcessor::Unit::None, DataEnvironment::TotalCloudCover, "Zone", "Average", "Environment");
+            SetupOutputVariable("Site Opaque Sky Cover", OutputProcessor::Unit::None, DataEnvironment::OpaqueCloudCover, "Zone", "Average", "Environment");
             SetupOutputVariable(
                 "Site Outdoor Air Enthalpy", OutputProcessor::Unit::J_kg, DataEnvironment::OutEnthalpy, "Zone", "Average", "Environment");
             SetupOutputVariable(
@@ -1789,6 +1791,8 @@ namespace WeatherManager {
         state.dataWeatherManager->TodayBeamSolarRad = state.dataWeatherManager->TomorrowBeamSolarRad;
         state.dataWeatherManager->TodayDifSolarRad = state.dataWeatherManager->TomorrowDifSolarRad;
         state.dataWeatherManager->TodayLiquidPrecip = state.dataWeatherManager->TomorrowLiquidPrecip;
+        state.dataWeatherManager->TodayTotalSkyCover = state.dataWeatherManager->TomorrowTotalSkyCover;
+        state.dataWeatherManager->TodayOpaqueSkyCover = state.dataWeatherManager->TomorrowTotalSkyCover;
 
         // Update Global Data
 
@@ -1963,6 +1967,8 @@ namespace WeatherManager {
         DataEnvironment::BeamSolarRad = state.dataWeatherManager->TodayBeamSolarRad(DataGlobals::TimeStep, DataGlobals::HourOfDay);
         if (DataEnvironment::EMSBeamSolarRadOverrideOn) DataEnvironment::BeamSolarRad = DataEnvironment::EMSBeamSolarRadOverrideValue;
         DataEnvironment::LiquidPrecipitation = state.dataWeatherManager->TodayLiquidPrecip(DataGlobals::TimeStep, DataGlobals::HourOfDay) / 1000.0; // convert from mm to m
+        DataEnvironment::TotalCloudCover = state.dataWeatherManager->TodayTotalSkyCover(DataGlobals::TimeStep, DataGlobals::HourOfDay);
+        DataEnvironment::OpaqueCloudCover = state.dataWeatherManager->TodayOpaqueSkyCover(DataGlobals::TimeStep, DataGlobals::HourOfDay);
 
         if (state.dataWeatherManager->UseRainValues) {
             DataEnvironment::IsRain = state.dataWeatherManager->TodayIsRain(DataGlobals::TimeStep, DataGlobals::HourOfDay); //.or. LiquidPrecipitation >= .8d0)  ! > .8 mm
@@ -2104,12 +2110,14 @@ namespace WeatherManager {
             Array1D<Real64> DifSolarRad;     // Hourly sky diffuse horizontal solar irradiance
             Array1D<Real64> Albedo;          // Albedo
             Array1D<Real64> LiquidPrecip;    // Liquid Precipitation
+            Array1D<Real64> TotalSkyCover;   // Total Sky Cover
+            Array1D<Real64> OpaqueSkyCover;  // Opaque Sky Cover
 
             // Default Constructor
             HourlyWeatherData()
                 : IsRain(24, false), IsSnow(24, false), OutDryBulbTemp(24, 0.0), OutDewPointTemp(24, 0.0), OutBaroPress(24, 0.0), OutRelHum(24, 0.0),
                   WindSpeed(24, 0.0), WindDir(24, 0.0), SkyTemp(24, 0.0), HorizIRSky(24, 0.0), BeamSolarRad(24, 0.0), DifSolarRad(24, 0.0),
-                  Albedo(24, 0.0), LiquidPrecip(24, 0.0)
+                  Albedo(24, 0.0), LiquidPrecip(24, 0.0), TotalSkyCover(24, 0.0), OpaqueSkyCover(24, 0.0)
             {
             }
         };
@@ -2714,33 +2722,17 @@ namespace WeatherManager {
                     state.dataWeatherManager->TomorrowWindSpeed(CurTimeStep, hour) = WindSpeed;
                     state.dataWeatherManager->TomorrowWindDir(CurTimeStep, hour) = WindDir;
                     state.dataWeatherManager->TomorrowLiquidPrecip(CurTimeStep, hour) = LiquidPrecip;
+                    state.dataWeatherManager->TomorrowTotalSkyCover(CurTimeStep, hour) = TotalSkyCover;
+                    state.dataWeatherManager->TomorrowOpaqueSkyCover(CurTimeStep, hour) = OpaqueSkyCover;
 
-                    Real64 ESky = CalcSkyEmissivity(state, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
-                    if (!state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
-                        state.dataWeatherManager->TomorrowHorizIRSky(CurTimeStep, hour) = ESky * state.dataWeatherManager->Sigma * pow_4(DryBulb + DataGlobals::KelvinConv);
-                    } else {
-                        state.dataWeatherManager->TomorrowHorizIRSky(CurTimeStep, hour) = IRHoriz;
-                    }
-
-                    Real64 SkyTemp;
-                    if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BruntModel ||
-                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::IdsoModel ||
-                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
-                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
-                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
-                        // Calculate sky temperature, use IRHoriz if not missing
-                        if (!state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
-                            // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
-                            SkyTemp = (DryBulb + DataGlobals::KelvinConv) * root_4(ESky) - DataGlobals::KelvinConv;
-                        } else {
-                            // Valid IR from weather files
-                            SkyTemp = root_4(IRHoriz / state.dataWeatherManager->Sigma) - DataGlobals::KelvinConv;
-                        }
-                    } else {
-                        SkyTemp = 0.0; // dealt with later
-                    }
-
-                    state.dataWeatherManager->TomorrowSkyTemp(CurTimeStep, hour) = SkyTemp;
+                    calcSky(state,
+                            state.dataWeatherManager->TomorrowHorizIRSky(CurTimeStep, hour),
+                            state.dataWeatherManager->TomorrowSkyTemp(CurTimeStep, hour),
+                            OpaqueSkyCover,
+                            DryBulb,
+                            DewPoint,
+                            RelHum,
+                            IRHoriz);
 
                     if (ETHoriz >= 9999.0) ETHoriz = 0.0;
                     if (ETDirect >= 9999.0) ETDirect = 0.0;
@@ -2822,6 +2814,8 @@ namespace WeatherManager {
                 Wthr.IsSnow(hour) = state.dataWeatherManager->TomorrowIsSnow(1, hour);
                 Wthr.Albedo(hour) = state.dataWeatherManager->TomorrowAlbedo(1, hour);
                 Wthr.LiquidPrecip(hour) = state.dataWeatherManager->TomorrowLiquidPrecip(1, hour);
+                Wthr.TotalSkyCover(hour) = state.dataWeatherManager->TomorrowTotalSkyCover(1, hour);
+                Wthr.OpaqueSkyCover(hour) = state.dataWeatherManager->TomorrowOpaqueSkyCover(1, hour);
             }
 
             if (!state.dataWeatherManager->LastHourSet) {
@@ -2839,6 +2833,9 @@ namespace WeatherManager {
                 state.dataWeatherManager->LastHrDifSolarRad = Wthr.DifSolarRad(24);
                 state.dataWeatherManager->LastHrAlbedo = Wthr.Albedo(24);
                 state.dataWeatherManager->LastHrLiquidPrecip = Wthr.LiquidPrecip(24);
+                state.dataWeatherManager->LastHrTotalSkyCover = Wthr.TotalSkyCover(24);
+                state.dataWeatherManager->LastHrOpaqueSkyCover = Wthr.OpaqueSkyCover(24);
+
                 state.dataWeatherManager->LastHourSet = true;
             }
 
@@ -2886,14 +2883,18 @@ namespace WeatherManager {
                     state.dataWeatherManager->TomorrowOutRelHum(ts, hour) = state.dataWeatherManager->LastHrOutRelHum * WtPrevHour + Wthr.OutRelHum(hour) * WtNow;
                     state.dataWeatherManager->TomorrowWindSpeed(ts, hour) = state.dataWeatherManager->LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed(hour) * WtNow;
                     state.dataWeatherManager->TomorrowWindDir(ts, hour) = interpolateWindDirection(state.dataWeatherManager->LastHrWindDir, Wthr.WindDir(hour), WtNow);
-                    state.dataWeatherManager->TomorrowHorizIRSky(ts, hour) = state.dataWeatherManager->LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(hour) * WtNow;
-                    if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BruntModel ||
-                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::IdsoModel ||
-                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
-                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
-                        state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
-                        state.dataWeatherManager->TomorrowSkyTemp(ts, hour) = state.dataWeatherManager->LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp(hour) * WtNow;
-                    }
+                    state.dataWeatherManager->TomorrowTotalSkyCover(ts, hour) = state.dataWeatherManager->LastHrTotalSkyCover * WtPrevHour + Wthr.TotalSkyCover(hour) * WtNow;
+                    state.dataWeatherManager->TomorrowOpaqueSkyCover(ts, hour) = state.dataWeatherManager->LastHrOpaqueSkyCover * WtPrevHour + Wthr.OpaqueSkyCover(hour) * WtNow;
+                    // Sky emissivity now takes interpolated timestep inputs rather than interpolated calculation esky results
+                    calcSky(state,
+                            state.dataWeatherManager->TomorrowHorizIRSky(ts, hour),
+                            state.dataWeatherManager->TomorrowSkyTemp(ts, hour),
+                            state.dataWeatherManager->TomorrowOpaqueSkyCover(ts, hour),
+                            state.dataWeatherManager->TomorrowOutDryBulbTemp(ts, hour),
+                            state.dataWeatherManager->TomorrowOutDewPointTemp(ts, hour),
+                            state.dataWeatherManager->TomorrowOutRelHum(ts, hour) * 0.01,
+                            state.dataWeatherManager->LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(hour) * WtNow);
+
                     state.dataWeatherManager->TomorrowDifSolarRad(ts, hour) =
                         state.dataWeatherManager->LastHrDifSolarRad * WgtPrevHour + Wthr.DifSolarRad(hour) * WgtHourNow + state.dataWeatherManager->NextHrDifSolarRad * WgtNextHour;
                     state.dataWeatherManager->TomorrowBeamSolarRad(ts, hour) =
@@ -2919,7 +2920,8 @@ namespace WeatherManager {
                 state.dataWeatherManager->LastHrDifSolarRad = Wthr.DifSolarRad(hour);
                 state.dataWeatherManager->LastHrAlbedo = Wthr.Albedo(hour);
                 state.dataWeatherManager->LastHrLiquidPrecip = Wthr.LiquidPrecip(hour);
-
+                state.dataWeatherManager->LastHrTotalSkyCover = Wthr.TotalSkyCover(hour);
+                state.dataWeatherManager->LastHrOpaqueSkyCover = Wthr.OpaqueSkyCover(hour);
             } // End of Hour Loop
         }
 
@@ -3972,6 +3974,10 @@ namespace WeatherManager {
         state.dataWeatherManager->TodayAlbedo = 0.0;
         state.dataWeatherManager->TodayLiquidPrecip.allocate(DataGlobals::NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TodayLiquidPrecip = 0.0;
+        state.dataWeatherManager->TodayTotalSkyCover.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayTotalSkyCover = 0.0;
+        state.dataWeatherManager->TodayOpaqueSkyCover.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TodayOpaqueSkyCover = 0.0;
 
         state.dataWeatherManager->TomorrowIsRain.allocate(DataGlobals::NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowIsRain = false;
@@ -4001,6 +4007,10 @@ namespace WeatherManager {
         state.dataWeatherManager->TomorrowAlbedo = 0.0;
         state.dataWeatherManager->TomorrowLiquidPrecip.allocate(DataGlobals::NumOfTimeStepInHour, 24);
         state.dataWeatherManager->TomorrowLiquidPrecip = 0.0;
+        state.dataWeatherManager->TomorrowTotalSkyCover.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowTotalSkyCover = 0.0;
+        state.dataWeatherManager->TomorrowOpaqueSkyCover.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+        state.dataWeatherManager->TomorrowOpaqueSkyCover = 0.0;
     }
 
     void CalculateDailySolarCoeffs(int const DayOfYear,           // Day of year (1 - 366)
@@ -8657,6 +8667,42 @@ namespace WeatherManager {
 
         print(ioFiles.eio, "{}", ss.str());
     }
+
+    void calcSky(EnergyPlusData &state, Real64 &HorizIRSky, Real64 &SkyTemp, Real64 OpaqueSkyCover, Real64 DryBulb, Real64 DewPoint, Real64 RelHum, Real64 IRHoriz)
+    {
+        Real64 ESky;
+
+        if (IRHoriz <= 0.0) IRHoriz = 9999.0;
+
+        if (!state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
+            // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
+            ESky = CalcSkyEmissivity(state, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
+            HorizIRSky = ESky * state.dataWeatherManager->Sigma * pow_4(DryBulb + DataGlobals::KelvinConv);
+            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BruntModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::IdsoModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
+                SkyTemp = (DryBulb + DataGlobals::KelvinConv) * root_4(ESky) - DataGlobals::KelvinConv;
+            } else {
+                SkyTemp = 0.0; // dealt with later
+            }
+        }
+        else {
+            // Valid IR from weather files
+            HorizIRSky = IRHoriz;
+            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BruntModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::IdsoModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
+                SkyTemp = root_4(IRHoriz / state.dataWeatherManager->Sigma) - DataGlobals::KelvinConv;
+            } else {
+                SkyTemp = 0.0; // dealt with later
+            }
+        }
+    }
+
 } // namespace WeatherManager
 
 } // namespace EnergyPlus
