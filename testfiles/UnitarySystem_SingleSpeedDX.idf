@@ -1787,8 +1787,6 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
-
   Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
@@ -1798,8 +1796,6 @@
   Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
-
-  Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
   Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
