@@ -1807,8 +1807,6 @@ Output:Variable,*,Unitary System DX Coil Speed Level,hourly; !- HVAC Average []
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
-
   Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
   OutputControl:Table:Style,
