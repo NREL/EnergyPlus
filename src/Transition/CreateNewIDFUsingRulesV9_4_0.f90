@@ -128,6 +128,12 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   LOGICAL :: alreadyProcessedOneOutputDiagnostic=.false.
   INTEGER :: nE, nEC, nG, nNG, nFO, nFON
 
+  LOGICAL :: changeMeterNameFlag
+  INTEGER :: numMeterCustomNames = 0
+  INTEGER numMeterCustom
+  CHARACTER(len=MaxNameLength) :: MeterCustomName
+  CHARACTER, ALLOCATABLE, DIMENSION(:) :: MeterCustomNames
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -242,6 +248,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           ALLOCATE(NwAorN(MaxTotalArgs),NwReqFld(MaxTotalArgs),NwFldNames(MaxTotalArgs),NwFldDefaults(MaxTotalArgs),NwFldUnits(MaxTotalArgs))
           ALLOCATE(OutArgs(MaxTotalArgs))
           ALLOCATE(DeleteThisRecord(NumIDFRecords))
+          ALLOCATE(MeterCustomNames(NumIDFRecords))
+
           DeleteThisRecord=.false.
 
           NoVersion=.true.
@@ -291,7 +299,20 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             ENDDO
             CALL DisplayString('Processing IDF -- OutputDiagnostics preprocessing complete.')
           ENDIF
-       ! End Pre-process OutputDiagnostics
+      ! End Pre-process OutputDiagnostics
+
+      !- Pre-process for names of Meter:Custom objects
+          numMeterCustomNames = GetNumObjectsFound('METER:CUSTOM')
+          IF (numMeterCustomNames > 1) THEN
+            DO numMeterCustom=1, numMeterCustomNames
+              CALL GetObjectItem('METER:CUSTOM', numMeterCustom, Alphas, NumAlphas, Numbers, NumNumbers, Status)
+              MeterCustomName = MakeUpperCase(TRIM(Alphas(1)))
+              MeterCustomNames(numMeterCustom) = MeterCustomName
+            END DO
+          END IF
+      !- Ene Pre-process for names of Meter:Custom objects
+
+        CALL DisplayString(MeterCustomNames(1))
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                                       P R O C E S S I N G                                                        !
@@ -604,7 +625,16 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    .false.)
                 IF (DelThis) CYCLE
                 IF (CurArgs .GE. 1) THEN
-                  CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(1), NoDiff)
+                  changeMeterNameFlag = .true.
+                  DO numMeterCustom=1, numMeterCustomNames
+                    MeterCustomName = MeterCustomNames(numMeterCustom)
+                    IF (MeterCustomName .eq. InArgs(1)) THEN
+                      changeMeterNameFlag = .false.
+                    END IF
+                  END DO
+                  IF (changeMeterNameFlag) THEN
+                    CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(1), NoDiff)
+                  END IF
                 END IF
 
               CASE('OUTPUT:TABLE:TIMEBINS')
