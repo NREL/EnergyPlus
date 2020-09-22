@@ -53,6 +53,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -191,10 +192,10 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const Dat
         Real64 sensNorRate;
         Real64 sensSubRate;
         Real64 sensRehRate;
+        Real64 latRate;
         Real64 SysNorSHR;
         Real64 SysSubSHR;
         Real64 SysRehSHR;
-        Real64 minAirHumRat;
         Real64 HumRatNorOut;
         Real64 TempNorOut;
         Real64 EnthalpyNorOut;
@@ -205,10 +206,8 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const Dat
         this->calculate(state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
 
         //this->OperatingMode = 1;
-        totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
-        minAirHumRat = min(inletNode.HumRat, outletNode.HumRat);
-        sensNorRate = outletNode.MassFlowRate *
-                      (Psychrometrics::PsyHFnTdbW(inletNode.Temp, minAirHumRat) - Psychrometrics::PsyHFnTdbW(outletNode.Temp, minAirHumRat));
+        CalcComponentSensibleLatentOutput(
+            outletNode.MassFlowRate, inletNode.Temp, inletNode.HumRat, outletNode.Temp, outletNode.HumRat, sensNorRate, latRate, totalCoolingRate);
         if (totalCoolingRate > 1.0E-10) {
             this->OperatingMode = 1;
             this->NormalSHR = sensNorRate / totalCoolingRate;
@@ -230,18 +229,26 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const Dat
         if (LoadSHR < SysNorSHR) {
             outletNode.MassFlowRate = inletNode.MassFlowRate;
             this->calculate(state, this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
-            totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
-            minAirHumRat = min(inletNode.HumRat, outletNode.HumRat);
-            sensSubRate = outletNode.MassFlowRate *
-                          (Psychrometrics::PsyHFnTdbW(inletNode.Temp, minAirHumRat) - Psychrometrics::PsyHFnTdbW(outletNode.Temp, minAirHumRat));
+            CalcComponentSensibleLatentOutput(outletNode.MassFlowRate,
+                                              inletNode.Temp,
+                                              inletNode.HumRat,
+                                              outletNode.Temp,
+                                              outletNode.HumRat,
+                                              sensSubRate,
+                                              latRate,
+                                              totalCoolingRate);
             SysSubSHR = sensSubRate / totalCoolingRate;
             if (LoadSHR < SysSubSHR) {
                 outletNode.MassFlowRate = inletNode.MassFlowRate;
                 this->calculate(state, this->alternateMode2, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
-                totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
-                minAirHumRat = min(inletNode.HumRat, outletNode.HumRat);
-                sensRehRate = outletNode.MassFlowRate *
-                              (Psychrometrics::PsyHFnTdbW(inletNode.Temp, minAirHumRat) - Psychrometrics::PsyHFnTdbW(outletNode.Temp, minAirHumRat));
+                CalcComponentSensibleLatentOutput(outletNode.MassFlowRate,
+                                                  inletNode.Temp,
+                                                  inletNode.HumRat,
+                                                  outletNode.Temp,
+                                                  outletNode.HumRat,
+                                                  sensRehRate,
+                                                  latRate,
+                                                  totalCoolingRate);
                 SysRehSHR = sensRehRate / totalCoolingRate;
                 if (LoadSHR > SysRehSHR) {
                     modeRatio = (LoadSHR - SysNorSHR) / (SysRehSHR - SysNorSHR);
