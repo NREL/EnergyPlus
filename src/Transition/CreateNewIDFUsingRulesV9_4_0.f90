@@ -129,10 +129,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER :: nE, nEC, nG, nNG, nFO, nFON
 
   LOGICAL :: changeMeterNameFlag
-  INTEGER :: numMeterCustomNames = 0
+  INTEGER :: totMeterCustom = 0
+  INTEGER :: totMeterCustomDecr = 0
   INTEGER numMeterCustom
   CHARACTER(len=MaxNameLength) :: MeterCustomName
-  CHARACTER, ALLOCATABLE, DIMENSION(:) :: MeterCustomNames
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: MeterCustomNames
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
@@ -302,9 +303,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
       ! End Pre-process OutputDiagnostics
 
       !- Pre-process for names of Meter:Custom objects
-          numMeterCustomNames = GetNumObjectsFound('METER:CUSTOM')
-          IF (numMeterCustomNames > 1) THEN
-            DO numMeterCustom=1, numMeterCustomNames
+          totMeterCustom = GetNumObjectsFound('METER:CUSTOM')
+          IF (totMeterCustom > 1) THEN
+            DO numMeterCustom=1, totMeterCustom
               CALL GetObjectItem('METER:CUSTOM', numMeterCustom, Alphas, NumAlphas, Numbers, NumNumbers, Status)
               MeterCustomName = MakeUpperCase(TRIM(Alphas(1)))
               MeterCustomNames(numMeterCustom) = MeterCustomName
@@ -312,7 +313,17 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           END IF
       !- Ene Pre-process for names of Meter:Custom objects
 
-        CALL DisplayString(MeterCustomNames(1))
+      !- Pre-process for names of Meter:CustomDecrement objects
+          totMeterCustomDecr = GetNumObjectsFound('METER:CUSTOMDECREMENT')
+          IF (totMeterCustomDecr > 1) THEN
+            DO numMeterCustom=1, totMeterCustomDecr
+              CALL GetObjectItem('METER:CUSTOMDECREMENT', numMeterCustom, Alphas, NumAlphas, Numbers, NumNumbers, Status)
+              MeterCustomName = MakeUpperCase(TRIM(Alphas(1)))
+              CALL DisplayString(MeterCustomName)
+              MeterCustomNames(numMeterCustom + totMeterCustom) = MeterCustomName
+            END DO
+          END IF
+      !- Ene Pre-process for names of Meter:CustomDecrement objects
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                                       P R O C E S S I N G                                                        !
@@ -626,9 +637,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 IF (DelThis) CYCLE
                 IF (CurArgs .GE. 1) THEN
                   changeMeterNameFlag = .true.
-                  DO numMeterCustom=1, numMeterCustomNames
+                  DO numMeterCustom=1, totMeterCustom + totMeterCustomDecr
                     MeterCustomName = MeterCustomNames(numMeterCustom)
-                    IF (MeterCustomName .eq. InArgs(1)) THEN
+                    IF (MeterCustomName .eq. MakeUPPERCase(InArgs(1))) THEN
                       changeMeterNameFlag = .false.
                     END IF
                   END DO
