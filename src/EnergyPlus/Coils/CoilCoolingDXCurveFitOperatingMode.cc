@@ -280,13 +280,15 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlusData &state
     // Currently speedNum is 1-based, while this->speeds are zero-based
     auto &thisspeed(this->speeds[max(speedNum - 1, 0)]);
 
+    if (condInletNode.Press <= 0.0) {
+        condInletNode.Press = DataEnvironment::OutBaroPress;
+    }
     if (this->condenserType == CondenserType::AIRCOOLED) {
         this->condInletTemp = condInletNode.Temp;
     } else if (this->condenserType == CondenserType::EVAPCOOLED) {
         this->condInletTemp = Psychrometrics::PsyTwbFnTdbWPb(
-            condInletNode.Temp, condInletNode.HumRat, DataEnvironment::StdPressureSeaLevel, "CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode");
+            condInletNode.Temp, condInletNode.HumRat, condInletNode.Press, "CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode");
     }
-    // thisspeed.ambPressure = inletNode.Press;
     thisspeed.ambPressure = condInletNode.Press;
     thisspeed.AirMassFlow = inletNode.MassFlowRate;
     if (fanOpMode == DataHVACGlobals::CycFanCycCoil && speedNum == 1) {

@@ -441,6 +441,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlusData &state,
         CBF = 0.0;
     }
 
+    assert(ambPressure > 0.0);
     Real64 inletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(inletNode.Temp, inletNode.HumRat, ambPressure);
     Real64 inletw = inletNode.HumRat;
 
@@ -510,6 +511,8 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlusData &state,
             }
         }
     }
+
+    assert(SHR >= 0.0);
 
     Real64 PLF = 1.0; // part load factor as a function of PLR, RTF = PLR / PLF
     if (indexPLRFPLF > 0) {
