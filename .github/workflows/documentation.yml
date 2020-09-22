@@ -23,7 +23,7 @@ jobs:
 
     - name: Configure CMake
       working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
-      run: cmake -DTEX_INTERACTION=batchmode ..
+      run: cmake -DTEX_INTERACTION=batchmode -DDOCS_TESTING=ON ..
 
     - name: Build Docs
       working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
