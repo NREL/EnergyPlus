@@ -523,50 +523,6 @@ void CoilCoolingDX::oneTimeInit() {
                             this->name);
     }
 
-    // HPWH and/or VRF output variables
-
-    //    SetupOutputVariable("Cooling Coil VRF Super Heating Degrees",
-    //                        OutputProcessor::Unit::C,
-    //                        this->secCoilSensHeatRejEnergy,
-    //                        "System",
-    //                        "Sum",
-    //                        this->name);
-
-    //    SetupOutputVariable("Cooling Coil VRF Evaporating Temperature",
-    //                        OutputProcessor::Unit::C,
-    //                        this->secCoilSensHeatRejEnergy,
-    //                        "System",
-    //                        "Average",
-    //                        this->name);
-
-    //    SetupOutputVariable("Cooling Coil Water Heating Electric Power",
-    //                        OutputProcessor::Unit::W,
-    //                        this->secCoilSensHeatRejEnergy,
-    //                        "System",
-    //                        "Sum",
-    //                        this->name);
-
-    //    SetupOutputVariable("Cooling Coil Water Heating Electric Energy",
-    //                        OutputProcessor::Unit::J,
-    //                        this->secCoilSensHeatRejEnergy,
-    //                        "System",
-    //                        "Average",
-    //                        this->name);
-
-    //    SetupOutputVariable("Cooling Coil Total Water Heating Rate",
-    //                        OutputProcessor::Unit::W,
-    //                        this->secCoilSensHeatRejEnergy,
-    //                        "System",
-    //                        "Sum",
-    //                        this->name);
-
-    //    SetupOutputVariable("Cooling Coil Total Water Heating Energy",
-    //                        OutputProcessor::Unit::J,
-    //                        this->secCoilSensHeatRejEnergy,
-    //                        "System",
-    //                        "Average",
-    //                        this->name);
-
 }
 
 int CoilCoolingDX::getNumModes() {
@@ -647,7 +603,7 @@ void CoilCoolingDX::size(EnergyPlusData& state) {
     this->performance.size(state);
 }
 
-void CoilCoolingDX::simulate(EnergyPlusData& state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode, Real64 LoadSHR)
+void CoilCoolingDX::simulate(EnergyPlusData &state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode, Real64 LoadSHR)
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit();
@@ -915,7 +871,7 @@ void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, 
     out.MassFlowRateMinAvail = in.MassFlowRateMinAvail;
 }
 
-void CoilCoolingDX::reportAllStandardRatings(EnergyPlusData& state) {
+void CoilCoolingDX::reportAllStandardRatings(EnergyPlusData &state) {
 
     if (!coilCoolingDXs.empty()) {
         Real64 const ConvFromSIToIP(3.412141633);              // Conversion from SI to IP [3.412 Btu/hr-W]

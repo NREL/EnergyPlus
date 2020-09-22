@@ -4576,12 +4576,6 @@ namespace UnitarySystems {
                                                           "Simulation continues.");
                                         thisSys.m_ControlType = ControlType::Load;
                                     }
-                                    if (thisSys.m_ControlType == ControlType::Setpoint) {
-                                        ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
-                                        ShowContinueError("Setpoint control is not available for SubcoolReheat cooling coil. Load control is forced. "
-                                                          "Simulation continues.");
-                                        thisSys.m_ControlType = ControlType::Load;
-                                    }
                                 }
                                 newCoil.setData(thisSys.m_FanIndex, thisSys.m_FanType_Num, thisSys.m_FanName, thisSys.m_SuppCoilLoopNum);
 
