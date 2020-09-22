@@ -128,10 +128,10 @@ namespace SurfaceGeometry {
     static std::string const BlankString;
     Array1D_string const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
     Array1D_string const SubSurfCls(6, {"WINDOW", "DOOR", "GLASSDOOR", "SHADING", "TUBULARDAYLIGHTDOME", "TUBULARDAYLIGHTDIFFUSER"});
-    Array1D<SurfaceClass> const BaseSurfIDs(3, {SurfaceClass::SurfaceClass_Wall, SurfaceClass::SurfaceClass_Floor, SurfaceClass::SurfaceClass_Roof});
+    Array1D<SurfaceClass> const BaseSurfIDs(3, {SurfaceClass::Wall, SurfaceClass::Floor, SurfaceClass::Roof});
 
     Array1D<SurfaceClass> const SubSurfIDs(
-        6, {SurfaceClass::SurfaceClass_Window, SurfaceClass::SurfaceClass_Door, SurfaceClass::SurfaceClass_GlassDoor, SurfaceClass::SurfaceClass_Shading, SurfaceClass::SurfaceClass_TDD_Dome, SurfaceClass::SurfaceClass_TDD_Diffuser});
+        6, {SurfaceClass::Window, SurfaceClass::Door, SurfaceClass::GlassDoor, SurfaceClass::Shading, SurfaceClass::TDD_Dome, SurfaceClass::TDD_Diffuser});
 
     int const UnenteredAdjacentZoneSurface(-998); // allows users to enter one zone surface ("Zone")
     // referencing another in adjacent zone
@@ -317,7 +317,7 @@ namespace SurfaceGeometry {
         SurfWinGlazedFrac.dimension(NumSurfaces, 1);
         SurfWinCenterGlArea.dimension(NumSurfaces, 0);
         SurfWinEdgeGlCorrFac.dimension(NumSurfaces, 1);
-        SurfWinOriginalClass.dimension(NumSurfaces, SurfaceClass::SurfaceClass_None);
+        SurfWinOriginalClass.dimension(NumSurfaces, SurfaceClass::None);
         SurfWinShadeAbsFacFace1.dimension(NumSurfaces, 0.5);
         SurfWinShadeAbsFacFace2.dimension(NumSurfaces, 0.5);
         SurfWinConvCoeffWithShade.dimension(NumSurfaces, 0);
@@ -476,14 +476,14 @@ namespace SurfaceGeometry {
 
             // Set flag that determines whether a surface is a shadowing surface
             Surface(SurfNum).ShadowingSurf = false;
-            if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Shading || Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_F ||
-                Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_B)
+            if (Surface(SurfNum).Class == SurfaceClass::Shading || Surface(SurfNum).Class == SurfaceClass::Detached_F ||
+                Surface(SurfNum).Class == SurfaceClass::Detached_B)
                 Surface(SurfNum).ShadowingSurf = true;
-            if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Shading) ++AttachedShadingCount;
-            if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_F) ++FixedShadingCount;
-            if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_B) ++BuildingShadingCount;
+            if (Surface(SurfNum).Class == SurfaceClass::Shading) ++AttachedShadingCount;
+            if (Surface(SurfNum).Class == SurfaceClass::Detached_F) ++FixedShadingCount;
+            if (Surface(SurfNum).Class == SurfaceClass::Detached_B) ++BuildingShadingCount;
 
-            if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_IntMass) ProcessSurfaceVertices(state.files, SurfNum, ErrorsFound);
+            if (Surface(SurfNum).Class != SurfaceClass::IntMass) ProcessSurfaceVertices(state.files, SurfNum, ErrorsFound);
         }
 
         for (auto &e : Zone) {
@@ -510,11 +510,11 @@ namespace SurfaceGeometry {
                 Zone(ZoneNum).TotalSurfArea += SurfWinFrameArea(SurfNum);
                 Zone(ZoneNum).HasWindow = true;
             }
-            if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Roof) ZoneCeilingArea(ZoneNum) += Surface(SurfNum).Area;
+            if (Surface(SurfNum).Class == SurfaceClass::Roof) ZoneCeilingArea(ZoneNum) += Surface(SurfNum).Area;
             if (!dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) {
                 if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment || Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
                     Zone(ZoneNum).ExteriorTotalSurfArea += Surface(SurfNum).GrossArea;
-                    if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall) {
+                    if (Surface(SurfNum).Class == SurfaceClass::Wall) {
                         Zone(ZoneNum).ExtNetWallArea += Surface(SurfNum).Area;
                         Zone(ZoneNum).ExtGrossWallArea += Surface(SurfNum).GrossArea;
                         Zone(ZoneNum).ExtGrossWallArea_Multiplied +=
@@ -530,7 +530,7 @@ namespace SurfaceGeometry {
                 } else if (Surface(SurfNum).ExtBoundCond == Ground || Surface(SurfNum).ExtBoundCond == GroundFCfactorMethod ||
                            Surface(SurfNum).ExtBoundCond == KivaFoundation) {
                     Zone(ZoneNum).ExteriorTotalGroundSurfArea += Surface(SurfNum).GrossArea;
-                    if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall) {
+                    if (Surface(SurfNum).Class == SurfaceClass::Wall) {
                         Zone(ZoneNum).ExtGrossGroundWallArea += Surface(SurfNum).GrossArea;
                         Zone(ZoneNum).ExtGrossGroundWallArea_Multiplied +=
                             Surface(SurfNum).GrossArea * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
@@ -550,7 +550,7 @@ namespace SurfaceGeometry {
                     Zone(Surface(SurfNum).Zone).HasInterZoneWindow = true;
                 } else {
                     if (((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) &&
-                        (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_TDD_Dome)) {
+                        (Surface(SurfNum).Class != SurfaceClass::TDD_Dome)) {
                         Zone(Surface(SurfNum).Zone).ExtWindowArea += Surface(SurfNum).GrossArea;
                         Zone(Surface(SurfNum).Zone).ExtWindowArea_Multiplied =
                             Zone(Surface(SurfNum).Zone).ExtWindowArea +
@@ -587,7 +587,7 @@ namespace SurfaceGeometry {
                                                                     Zone(ZoneNum).ExtWindowArea);
             }
             for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Roof) {
+                if (Surface(SurfNum).Class == SurfaceClass::Roof) {
                     // Use Average Z for surface, more important for roofs than floors...
                     ++CeilCount;
                     Z1 = minval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
@@ -595,7 +595,7 @@ namespace SurfaceGeometry {
                     //        ZCeilAvg=ZCeilAvg+(Z1+Z2)/2.d0
                     ZCeilAvg += ((Z1 + Z2) / 2.0) * (Surface(SurfNum).Area / ZoneCeilingArea(ZoneNum));
                 }
-                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) {
+                if (Surface(SurfNum).Class == SurfaceClass::Floor) {
                     // Use Average Z for surface, more important for roofs than floors...
                     ++FloorCount;
                     Z1 = minval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
@@ -603,7 +603,7 @@ namespace SurfaceGeometry {
                     //        ZFlrAvg=ZFlrAvg+(Z1+Z2)/2.d0
                     ZFlrAvg += ((Z1 + Z2) / 2.0) * (Surface(SurfNum).Area / Zone(ZoneNum).FloorArea);
                 }
-                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall) {
+                if (Surface(SurfNum).Class == SurfaceClass::Wall) {
                     // Use Wall calculation in case no roof & floor in zone
                     ++Count;
                     if (Count == 1) {
@@ -663,10 +663,10 @@ namespace SurfaceGeometry {
                 Zone(ZoneNum).MaximumZ = Surface(Zone(ZoneNum).SurfaceFirst).Vertex(1).z;
             }
             for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_IntMass) continue;
+                if (Surface(SurfNum).Class == SurfaceClass::IntMass) continue;
                 nonInternalMassSurfacesPresent = true;
-                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall || (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Roof) ||
-                    (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor)) {
+                if (Surface(SurfNum).Class == SurfaceClass::Wall || (Surface(SurfNum).Class == SurfaceClass::Roof) ||
+                    (Surface(SurfNum).Class == SurfaceClass::Floor)) {
 
                     Zone(ZoneNum).Centroid.x += Surface(SurfNum).Centroid.x * Surface(SurfNum).GrossArea;
                     Zone(ZoneNum).Centroid.y += Surface(SurfNum).Centroid.y * Surface(SurfNum).GrossArea;
@@ -708,14 +708,14 @@ namespace SurfaceGeometry {
 
                 if (Surface(SurfNum).Zone != ZoneNum) continue;
 
-                if (Surface(SurfNum).HeatTransSurf && (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall || Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Roof ||
-                                                       Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor))
+                if (Surface(SurfNum).HeatTransSurf && (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Roof ||
+                                                       Surface(SurfNum).Class == SurfaceClass::Floor))
                     ++Zone(ZoneNum).NumSurfaces;
 
                 if (Surface(SurfNum).HeatTransSurf &&
-                    (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window || Surface(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor ||
-                     Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Door || Surface(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Dome ||
-                     Surface(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Diffuser))
+                    (Surface(SurfNum).Class == SurfaceClass::Window || Surface(SurfNum).Class == SurfaceClass::GlassDoor ||
+                     Surface(SurfNum).Class == SurfaceClass::Door || Surface(SurfNum).Class == SurfaceClass::TDD_Dome ||
+                     Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser))
                     ++Zone(ZoneNum).NumSubSurfaces;
 
             } // surfaces
@@ -729,8 +729,8 @@ namespace SurfaceGeometry {
                 } else {
                     cNominalUwithConvCoeffs = "[invalid]";
                 }
-                if ((Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window) || (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Dome)) {
-                    // SurfaceClass::SurfaceClass_Window also covers glass doors and TDD:Diffusers
+                if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::TDD_Dome)) {
+                    // SurfaceClass::Window also covers glass doors and TDD:Diffusers
                     cNominalU = "N/A";
                 } else {
                     cNominalU = RoundSigDigits(NominalU(Surface(SurfNum).Construction), 3);
@@ -748,15 +748,15 @@ namespace SurfaceGeometry {
             auto const SurfaceClass(Surface(SurfNum).Class);
             if ((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == Ground) ||
                 (Surface(SurfNum).ExtBoundCond == KivaFoundation) || (Surface(SurfNum).ExtBoundCond == GroundFCfactorMethod)) {
-                if ((SurfaceClass == SurfaceClass::SurfaceClass_Wall) || (SurfaceClass == SurfaceClass::SurfaceClass_Floor) || (SurfaceClass == SurfaceClass::SurfaceClass_Roof)) {
+                if ((SurfaceClass == SurfaceClass::Wall) || (SurfaceClass == SurfaceClass::Floor) || (SurfaceClass == SurfaceClass::Roof)) {
                     PreDefTableEntry(pdchOpUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
-                } else if (SurfaceClass == SurfaceClass::SurfaceClass_Door) {
+                } else if (SurfaceClass == SurfaceClass::Door) {
                     PreDefTableEntry(pdchDrUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
                 }
             }else{
-                if ((SurfaceClass == SurfaceClass::SurfaceClass_Wall) || (SurfaceClass == SurfaceClass::SurfaceClass_Floor) || (SurfaceClass == SurfaceClass::SurfaceClass_Roof)) {
+                if ((SurfaceClass == SurfaceClass::Wall) || (SurfaceClass == SurfaceClass::Floor) || (SurfaceClass == SurfaceClass::Roof)) {
                     PreDefTableEntry(pdchIntOpUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
-                } else if (SurfaceClass == SurfaceClass::SurfaceClass_Door) {
+                } else if (SurfaceClass == SurfaceClass::Door) {
                     PreDefTableEntry(pdchIntDrUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
                 }
             }
@@ -1346,14 +1346,14 @@ namespace SurfaceGeometry {
             SurfaceTmp(SurfNum).ExtBoundCond = UnreconciledZoneSurface;
             SurfaceTmp(CurNewSurf).ExtBoundCondName = SurfaceTmp(SurfNum).Name;
             SurfaceTmp(SurfNum).ExtBoundCondName = SurfaceTmp(CurNewSurf).Name;
-            if (SurfaceTmp(CurNewSurf).Class == SurfaceClass::SurfaceClass_Roof || SurfaceTmp(CurNewSurf).Class == SurfaceClass::SurfaceClass_Wall ||
-                SurfaceTmp(CurNewSurf).Class == SurfaceClass::SurfaceClass_Floor) {
+            if (SurfaceTmp(CurNewSurf).Class == SurfaceClass::Roof || SurfaceTmp(CurNewSurf).Class == SurfaceClass::Wall ||
+                SurfaceTmp(CurNewSurf).Class == SurfaceClass::Floor) {
                 // base surface
-                if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Roof) {
-                    SurfaceTmp(CurNewSurf).Class = SurfaceClass::SurfaceClass_Floor;
+                if (SurfaceTmp(SurfNum).Class == SurfaceClass::Roof) {
+                    SurfaceTmp(CurNewSurf).Class = SurfaceClass::Floor;
                     // Debug          write(outputfiledebug,*) ' new surfaces is a floor'
-                } else if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) {
-                    SurfaceTmp(CurNewSurf).Class = SurfaceClass::SurfaceClass_Roof;
+                } else if (SurfaceTmp(SurfNum).Class == SurfaceClass::Floor) {
+                    SurfaceTmp(CurNewSurf).Class = SurfaceClass::Roof;
                     // Debug          write(outputfiledebug,*) ' new surfaces is a roof'
                 }
                 SurfaceTmp(CurNewSurf).BaseSurf = CurNewSurf;
@@ -1366,7 +1366,7 @@ namespace SurfaceGeometry {
                     SurfaceTmp(CurNewSurf).BaseSurfName = "iz-" + SurfaceTmp(SurfNum).BaseSurfName;
                     SurfaceTmp(CurNewSurf).BaseSurf = Found;
                     SurfaceTmp(Found).Area -= SurfaceTmp(CurNewSurf).Area;
-                    if (SurfaceTmp(CurNewSurf).Class == SurfaceClass::SurfaceClass_Window || SurfaceTmp(CurNewSurf).Class == SurfaceClass::SurfaceClass_GlassDoor) {
+                    if (SurfaceTmp(CurNewSurf).Class == SurfaceClass::Window || SurfaceTmp(CurNewSurf).Class == SurfaceClass::GlassDoor) {
                         SurfaceTmp(Found).NetAreaShadowCalc -= SurfaceTmp(CurNewSurf).Area / SurfaceTmp(CurNewSurf).Multiplier;
                     } else { // Door, TDD:Diffuser, TDD:DOME
                         SurfaceTmp(Found).NetAreaShadowCalc -= SurfaceTmp(CurNewSurf).Area;
@@ -1404,8 +1404,8 @@ namespace SurfaceGeometry {
                 SurfaceTmp(SurfNum).BaseSurf = Found;
                 if (SurfNum != Found) { // for subsurfaces
                     if (SurfaceTmp(SurfNum).HeatTransSurf) ++SurfaceTmp(Found).NumSubSurfaces;
-                    if (SurfaceTmp(SurfNum).Class < SurfaceClass::SurfaceClass_Window || SurfaceTmp(SurfNum).Class > SurfaceClass::SurfaceClass_TDD_Diffuser) {
-                        if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_None) {
+                    if (SurfaceTmp(SurfNum).Class < SurfaceClass::Window || SurfaceTmp(SurfNum).Class > SurfaceClass::TDD_Diffuser) {
+                        if (SurfaceTmp(SurfNum).Class == SurfaceClass::None) {
                             ShowSevereError(RoutineName + "Invalid SubSurface detected, Surface=" + SurfaceTmp(SurfNum).Name);
                         } else {
                             ShowSevereError(RoutineName + "Invalid SubSurface detected, Surface=" + SurfaceTmp(SurfNum).Name +
@@ -1455,15 +1455,15 @@ namespace SurfaceGeometry {
         // Move all shading Surfaces to Front
 
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_Detached_F && SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_Detached_B &&
-                SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_Shading)
+            if (SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_F && SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_B &&
+                SurfaceTmp(SurfNum).Class != SurfaceClass::Shading)
                 continue;
 
             //  A shading surface
 
             ++MovedSurfs;
             Surface(MovedSurfs) = SurfaceTmp(SurfNum);
-            SurfaceTmp(SurfNum).Class = SurfaceClass::SurfaceClass_Moved; //'Moved'
+            SurfaceTmp(SurfNum).Class = SurfaceClass::Moved; //'Moved'
             // Store list of moved surface numbers in reporting order 
             DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
         }
@@ -1485,7 +1485,7 @@ namespace SurfaceGeometry {
 
                     ++MovedSurfs;
                     Surface(MovedSurfs) = SurfaceTmp(SurfNum);
-                    SurfaceTmp(SurfNum).Class = SurfaceClass::SurfaceClass_Moved; // 'Moved'
+                    SurfaceTmp(SurfNum).Class = SurfaceClass::Moved; // 'Moved'
                     SurfaceTmp(SurfNum).BaseSurf = -1;              // Default has base surface = base surface
                     BaseSurfNum = MovedSurfs;
                     Surface(MovedSurfs).BaseSurf = BaseSurfNum;
@@ -1509,30 +1509,30 @@ namespace SurfaceGeometry {
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
                 if (!UtilityRoutines::SameString(SurfaceTmp(SurfNum).ZoneName, Zone(ZoneNum).Name)) continue;
-                if (SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_IntMass) continue;
+                if (SurfaceTmp(SurfNum).Class != SurfaceClass::IntMass) continue;
 
                 ++MovedSurfs;
                 Surface(MovedSurfs) = SurfaceTmp(SurfNum);
                 Surface(MovedSurfs).BaseSurf = MovedSurfs;
-                SurfaceTmp(SurfNum).Class = SurfaceClass::SurfaceClass_Moved; // 'Moved'
+                SurfaceTmp(SurfNum).Class = SurfaceClass::Moved; // 'Moved'
                 // Store list of moved surface numbers in reporting order
                 DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
             }
 
             // Non-window) subsurfaces are next (anything left in this zone that's not a window or a glass door)
-            // includes SurfaceClass::SurfaceClass_TDD_Dome which transmits light but is not a window for heat balance purposes
+            // includes SurfaceClass::TDD_Dome which transmits light but is not a window for heat balance purposes
             for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
-                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass::SurfaceClass_Moved) continue;
+                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass::Moved) continue;
                 if (SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
-                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass::SurfaceClass_Window) continue;
-                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor) continue;
-                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass::SurfaceClass_TDD_Diffuser) continue;
+                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass::Window) continue;
+                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass::GlassDoor) continue;
+                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass::TDD_Diffuser) continue;
 
 
                 ++MovedSurfs;
                 Surface(MovedSurfs) = SurfaceTmp(SubSurfNum);
-                SurfaceTmp(SubSurfNum).Class = SurfaceClass::SurfaceClass_Moved; // 'Moved'
+                SurfaceTmp(SubSurfNum).Class = SurfaceClass::Moved; // 'Moved'
                 // Reset BaseSurf to it's positive value (set to negative earlier)
                 Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
                 SurfaceTmp(SubSurfNum).BaseSurf = -1;
@@ -1540,18 +1540,18 @@ namespace SurfaceGeometry {
                 std::replace(DataSurfaces::AllSurfaceListReportOrder.begin(), DataSurfaces::AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
             }
 
-            // Last but not least, the window subsurfaces (includes SurfaceClass::SurfaceClass_TDD_Diffuser)
+            // Last but not least, the window subsurfaces (includes SurfaceClass::TDD_Diffuser)
             for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
-                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass::SurfaceClass_Moved) continue;
+                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass::Moved) continue;
                 if (SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
-                if ((SurfaceTmp(SubSurfNum).Class != SurfaceClass::SurfaceClass_Window) && (SurfaceTmp(SubSurfNum).Class != SurfaceClass::SurfaceClass_GlassDoor) &&
-                    (SurfaceTmp(SubSurfNum).Class != SurfaceClass::SurfaceClass_TDD_Diffuser))
+                if ((SurfaceTmp(SubSurfNum).Class != SurfaceClass::Window) && (SurfaceTmp(SubSurfNum).Class != SurfaceClass::GlassDoor) &&
+                    (SurfaceTmp(SubSurfNum).Class != SurfaceClass::TDD_Diffuser))
                     continue;
 
                 ++MovedSurfs;
                 Surface(MovedSurfs) = SurfaceTmp(SubSurfNum);
-                SurfaceTmp(SubSurfNum).Class = SurfaceClass::SurfaceClass_Moved; // 'Moved'
+                SurfaceTmp(SubSurfNum).Class = SurfaceClass::Moved; // 'Moved'
                 // Reset BaseSurf to it's positive value (set to negative earlier)
                 Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
                 SurfaceTmp(SubSurfNum).BaseSurf = -1;
@@ -1564,7 +1564,7 @@ namespace SurfaceGeometry {
             ShowSevereError(format("{}Reordered # of Surfaces ({}) not = Total # of Surfaces ({})", RoutineName, MovedSurfs, TotSurfaces));
             SurfError = true;
             for (int Loop = 1; Loop <= TotSurfaces; ++Loop) {
-                if (SurfaceTmp(Loop).Class != SurfaceClass::SurfaceClass_Moved) {
+                if (SurfaceTmp(Loop).Class != SurfaceClass::Moved) {
                     if (SurfaceTmpClassInvalid(Loop)) {
                         ShowSevereError(RoutineName + "Error in Surface= \"" + SurfaceTmp(Loop).Name + "\" Class=" +
                                         cSurfaceClass(SurfaceTmp(Loop).Class) + " indicated Zone=\"" + SurfaceTmp(Loop).ZoneName + "\"");
@@ -1761,8 +1761,8 @@ namespace SurfaceGeometry {
                                                   ", Zone=" + Surface(Found).ZoneName);
                             }
                             // check surface class match.  interzone surface.
-                            if ((Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall && Surface(Found).Class != SurfaceClass::SurfaceClass_Wall) ||
-                                (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Wall && Surface(Found).Class == SurfaceClass::SurfaceClass_Wall)) {
+                            if ((Surface(SurfNum).Class == SurfaceClass::Wall && Surface(Found).Class != SurfaceClass::Wall) ||
+                                (Surface(SurfNum).Class != SurfaceClass::Wall && Surface(Found).Class == SurfaceClass::Wall)) {
                                 ShowWarningError(RoutineName + "InterZone Surface Classes do not match as expected.");
                                 ShowContinueError("Surface=\"" + Surface(SurfNum).Name +
                                                   "\", surface class=" + cSurfaceClass(Surface(SurfNum).Class));
@@ -1770,8 +1770,8 @@ namespace SurfaceGeometry {
                                                   "\", surface class=" + cSurfaceClass(Surface(Found).Class));
                                 ShowContinueError("Other errors/warnings may follow about these surfaces.");
                             }
-                            if ((Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Roof && Surface(Found).Class != SurfaceClass::SurfaceClass_Floor) ||
-                                (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Roof && Surface(Found).Class == SurfaceClass::SurfaceClass_Floor)) {
+                            if ((Surface(SurfNum).Class == SurfaceClass::Roof && Surface(Found).Class != SurfaceClass::Floor) ||
+                                (Surface(SurfNum).Class != SurfaceClass::Roof && Surface(Found).Class == SurfaceClass::Floor)) {
                                 ShowWarningError(RoutineName + "InterZone Surface Classes do not match as expected.");
                                 ShowContinueError("Surface=\"" + Surface(SurfNum).Name +
                                                   "\", surface class=" + cSurfaceClass(Surface(SurfNum).Class));
@@ -1779,13 +1779,13 @@ namespace SurfaceGeometry {
                                                   "\", surface class=" + cSurfaceClass(Surface(Found).Class));
                                 ShowContinueError("Other errors/warnings may follow about these surfaces.");
                             }
-                            if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Roof && Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Floor) {
+                            if (Surface(SurfNum).Class != SurfaceClass::Roof && Surface(SurfNum).Class != SurfaceClass::Floor) {
                                 // Walls, Windows, Doors, Glass Doors
-                                if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Wall) {
+                                if (Surface(SurfNum).Class != SurfaceClass::Wall) {
                                     // Surface is a Door, Window or Glass Door
                                     if (Surface(SurfNum).BaseSurf == 0) continue; // error detected elsewhere
-                                    if (Surface(Surface(SurfNum).BaseSurf).Class == SurfaceClass::SurfaceClass_Roof ||
-                                        Surface(Surface(SurfNum).BaseSurf).Class == SurfaceClass::SurfaceClass_Floor)
+                                    if (Surface(Surface(SurfNum).BaseSurf).Class == SurfaceClass::Roof ||
+                                        Surface(Surface(SurfNum).BaseSurf).Class == SurfaceClass::Floor)
                                         continue;
                                 }
                                 if (std::abs(std::abs(Surface(SurfNum).Azimuth - Surface(Found).Azimuth) - 180.0) > 1.0) {
@@ -1962,9 +1962,9 @@ namespace SurfaceGeometry {
                         // Non window surfaces are grouped first within each zone
                         Zone(ZoneNum).NonWindowSurfaceFirst = SurfNum;
                     }
-                    if ((Zone(ZoneNum).WindowSurfaceFirst == 0) && ((Surface(SurfNum).Class == DataSurfaces::SurfaceClass::SurfaceClass_Window) ||
-                                                                    (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::SurfaceClass_GlassDoor) ||
-                                                                    (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::SurfaceClass_TDD_Diffuser))) {
+                    if ((Zone(ZoneNum).WindowSurfaceFirst == 0) && ((Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) ||
+                                                                    (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::GlassDoor) ||
+                                                                    (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::TDD_Diffuser))) {
                         // Window surfaces are grouped last within each zone
                         Zone(ZoneNum).WindowSurfaceFirst = SurfNum;
                         Zone(ZoneNum).NonWindowSurfaceLast = SurfNum - 1;
@@ -1976,9 +1976,9 @@ namespace SurfaceGeometry {
         //  Surface First pointers are set, set last
         if (NumOfZones > 0) {
             Zone(NumOfZones).SurfaceLast = TotSurfaces;
-            if ((Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass::SurfaceClass_Window) ||
-                (Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass::SurfaceClass_GlassDoor) ||
-                (Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass::SurfaceClass_TDD_Diffuser)) {
+            if ((Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass::Window) ||
+                (Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass::GlassDoor) ||
+                (Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass::TDD_Diffuser)) {
                 Zone(NumOfZones).WindowSurfaceLast = TotSurfaces;
             } else {
                 // If there are no windows in the zone, then set this to -1 so any for loops on WindowSurfaceFirst to WindowSurfaceLast will not
@@ -1989,9 +1989,9 @@ namespace SurfaceGeometry {
         }
         for (int ZoneNum = 1; ZoneNum <= NumOfZones - 1; ++ZoneNum) {
             Zone(ZoneNum).SurfaceLast = Zone(ZoneNum + 1).SurfaceFirst - 1;
-            if ((Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass::SurfaceClass_Window) ||
-                (Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass::SurfaceClass_GlassDoor) ||
-                (Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass::SurfaceClass_TDD_Diffuser)) {
+            if ((Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass::Window) ||
+                (Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass::GlassDoor) ||
+                (Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Diffuser)) {
                 Zone(ZoneNum).WindowSurfaceLast = Zone(ZoneNum + 1).SurfaceFirst - 1;
             } else {
                 // If there are no windows in the zone, then set this to -1 so any for loops on WindowSurfaceFirst to WindowSurfaceLast will not
@@ -2012,11 +2012,11 @@ namespace SurfaceGeometry {
         if (!SurfError) {
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                    if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) {
+                    if (Surface(SurfNum).Class == SurfaceClass::Floor) {
                         Zone(ZoneNum).FloorArea += Surface(SurfNum).Area;
                         Zone(ZoneNum).HasFloor = true;
                     }
-                    if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Roof) {
+                    if (Surface(SurfNum).Class == SurfaceClass::Roof) {
                         Zone(ZoneNum).CeilingArea += Surface(SurfNum).Area;
                         Zone(ZoneNum).HasRoof = true;
                     }
@@ -2074,10 +2074,10 @@ namespace SurfaceGeometry {
 
             SurfWinOriginalClass(SurfNum) = Surface(SurfNum).Class;
 
-            if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor || Surface(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Diffuser)
-                Surface(SurfNum).Class = SurfaceClass::SurfaceClass_Window;
+            if (Surface(SurfNum).Class == SurfaceClass::GlassDoor || Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)
+                Surface(SurfNum).Class = SurfaceClass::Window;
 
-            if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Dome) {
+            if (Surface(SurfNum).Class == SurfaceClass::TDD_Dome) {
                 // Reset the TDD:DOME subsurface to act as a base surface that can shade and be shaded
                 // NOTE: This must be set early so that subsequent shading calculations are done correctly
                 Surface(SurfNum).BaseSurf = SurfNum;
@@ -2144,13 +2144,13 @@ namespace SurfaceGeometry {
             InternalMassSurfs = 0;
             if (Zone(ZoneNum).SurfaceFirst == 0) continue; // Zone with no surfaces
             for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor || Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall ||
-                    Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Roof)
+                if (Surface(SurfNum).Class == SurfaceClass::Floor || Surface(SurfNum).Class == SurfaceClass::Wall ||
+                    Surface(SurfNum).Class == SurfaceClass::Roof)
                     ++OpaqueHTSurfs;
-                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_IntMass) ++InternalMassSurfs;
-                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window) {
+                if (Surface(SurfNum).Class == SurfaceClass::IntMass) ++InternalMassSurfs;
+                if (Surface(SurfNum).Class == SurfaceClass::Window) {
                     // Count base surface only once for multiple windows on a wall
-                    if (SurfNum > 1 && Surface(SurfNum - 1).Class != SurfaceClass::SurfaceClass_Window) ++OpaqueHTSurfsWithWin;
+                    if (SurfNum > 1 && Surface(SurfNum - 1).Class != SurfaceClass::Window) ++OpaqueHTSurfsWithWin;
                 }
             }
             if (OpaqueHTSurfsWithWin == 1 && OpaqueHTSurfs == 1 && InternalMassSurfs == 0) {
@@ -2192,7 +2192,7 @@ namespace SurfaceGeometry {
                 auto &surfZone(Zone(zoneNum));
                 surfZone.ZoneHTSurfaceList.push_back(SurfNum);
                 // Sort window vs non-window surfaces
-                if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::SurfaceClass_Window) {
+                if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
                     DataSurfaces::AllHTWindowSurfaceList.push_back(SurfNum);
                     surfZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
                 } else {
@@ -2208,7 +2208,7 @@ namespace SurfaceGeometry {
                     adjZone.ZoneHTSurfaceList.push_back(SurfNum);
                     adjZone.ZoneIZSurfaceList.push_back(SurfNum);
                     // Sort window vs non-window surfaces
-                    if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::SurfaceClass_Window) {
+                    if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
                         adjZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
                     } else {
                         adjZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
@@ -2225,7 +2225,7 @@ namespace SurfaceGeometry {
             if (Surface(SurfNum).HeatTransSurf && Surface(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt) continue;
             if (Surface(SurfNum).HeatTransSurf && Surface(SurfNum).ExtBoundCond == OtherSideCoefCalcExt) continue;
             // Exclude windows and doors, i.e., consider only their base surfaces as possible obstructions
-            if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window || Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Door) continue;
+            if (Surface(SurfNum).Class == SurfaceClass::Window || Surface(SurfNum).Class == SurfaceClass::Door) continue;
             // Exclude duplicate shading surfaces
             if (Surface(SurfNum).MirroredSurf) continue;
             // Exclude air boundary surfaces
@@ -2734,10 +2734,10 @@ namespace SurfaceGeometry {
             cCurrentModuleObject = cModuleObjects(Item);
             if (Item == 1) {
                 ItemsToGet = TotDetachedFixed;
-                ClassItem = SurfaceClass::SurfaceClass_Detached_F;
+                ClassItem = SurfaceClass::Detached_F;
             } else { // IF (Item == 2) THEN
                 ItemsToGet = TotDetachedBldg;
-                ClassItem = SurfaceClass::SurfaceClass_Detached_B;
+                ClassItem = SurfaceClass::Detached_B;
             }
 
             inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
@@ -2888,10 +2888,10 @@ namespace SurfaceGeometry {
             cCurrentModuleObject = cModuleObjects(Item);
             if (Item == 1) {
                 ItemsToGet = TotRectDetachedFixed;
-                ClassItem = SurfaceClass::SurfaceClass_Detached_F;
+                ClassItem = SurfaceClass::Detached_F;
             } else { // IF (Item == 2) THEN
                 ItemsToGet = TotRectDetachedBldg;
-                ClassItem = SurfaceClass::SurfaceClass_Detached_B;
+                ClassItem = SurfaceClass::Detached_B;
             }
 
             inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, Loop, NumAlphas, NumNumbers);
@@ -2925,10 +2925,10 @@ namespace SurfaceGeometry {
                 SurfaceTmp(SurfNum).HeatTransSurf = false;
 
                 SurfaceTmp(SurfNum).Azimuth = rNumericArgs(1);
-                if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_B && !WorldCoordSystem) {
+                if (SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B && !WorldCoordSystem) {
                     SurfaceTmp(SurfNum).Azimuth += BuildingAzimuth;
                 }
-                if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_B) {
+                if (SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B) {
                     SurfaceTmp(SurfNum).Azimuth += BuildingRotationAppendixG;
                 }
                 SurfaceTmp(SurfNum).Tilt = rNumericArgs(2);
@@ -3249,13 +3249,13 @@ namespace SurfaceGeometry {
                         }
                     }
                     if (SurfaceTmp(SurfNum).Construction > 0) {
-                        if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Wall && !dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsCfactorWall) {
+                        if (SurfaceTmp(SurfNum).Class == SurfaceClass::Wall && !dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsCfactorWall) {
                             ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(ArgPointer));
                             ShowContinueError("Construction=\"" + dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).Name +
                                               "\" is not type Construction:CfactorUndergroundWall.");
                             ErrorsFound = true;
                         }
-                        if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Floor && !dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsFfactorFloor) {
+                        if (SurfaceTmp(SurfNum).Class == SurfaceClass::Floor && !dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsFfactorFloor) {
                             ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(ArgPointer));
                             ShowContinueError("Construction=\"" + dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).Name +
                                               "\" is not type Construction:FfactorGroundFloor.");
@@ -3457,7 +3457,7 @@ namespace SurfaceGeometry {
                 }
                 if (SurfaceTmp(SurfNum).Construction > 0) {
                     // Check wall height for the CFactor walls
-                    if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Wall && dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsCfactorWall) {
+                    if (SurfaceTmp(SurfNum).Class == SurfaceClass::Wall && dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsCfactorWall) {
                         if (std::abs(SurfaceTmp(SurfNum).Height - dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).Height) > 0.05) {
                             ShowWarningError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
                                              "\", underground Wall Height = " + TrimSigDigits(SurfaceTmp(SurfNum).Height, 2));
@@ -3466,7 +3466,7 @@ namespace SurfaceGeometry {
                     }
 
                     // Check area and perimeter for the FFactor floors
-                    if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Floor && dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsFfactorFloor) {
+                    if (SurfaceTmp(SurfNum).Class == SurfaceClass::Floor && dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsFfactorFloor) {
                         if (std::abs(SurfaceTmp(SurfNum).Area - dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).Area) > 0.1) {
                             ShowWarningError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
                                              "\", underground Floor Area = " + TrimSigDigits(SurfaceTmp(SurfNum).Area, 2));
@@ -3687,7 +3687,7 @@ namespace SurfaceGeometry {
 
                 SurfaceTmp(SurfNum).ExtBoundCond = ExtBoundCondition;
                 if (SurfaceTmp(SurfNum).Construction > 0) {
-                    if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Wall && dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsCfactorWall &&
+                    if (SurfaceTmp(SurfNum).Class == SurfaceClass::Wall && dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsCfactorWall &&
                         SurfaceTmp(SurfNum).ExtBoundCond == Ground) {
                         SurfaceTmp(SurfNum).ExtBoundCond = GroundFCfactorMethod;
                     } else if (dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsCfactorWall) {
@@ -3695,7 +3695,7 @@ namespace SurfaceGeometry {
                         ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
                                         "\", Construction type is \"Construction:CfactorUndergroundWall\" but invalid for this object.");
                     }
-                    if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Floor && dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsFfactorFloor &&
+                    if (SurfaceTmp(SurfNum).Class == SurfaceClass::Floor && dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsFfactorFloor &&
                         SurfaceTmp(SurfNum).ExtBoundCond == Ground) {
                         SurfaceTmp(SurfNum).ExtBoundCond = GroundFCfactorMethod;
                     } else if (dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsFfactorFloor) {
@@ -3779,7 +3779,7 @@ namespace SurfaceGeometry {
                 }
 
                 // Check wall height for the CFactor walls
-                if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Wall && SurfaceTmp(SurfNum).ExtBoundCond == GroundFCfactorMethod) {
+                if (SurfaceTmp(SurfNum).Class == SurfaceClass::Wall && SurfaceTmp(SurfNum).ExtBoundCond == GroundFCfactorMethod) {
                     if (std::abs(SurfaceTmp(SurfNum).Height - dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).Height) > 0.05) {
                         ShowWarningError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
                                          "\", underground Wall Height = " + TrimSigDigits(SurfaceTmp(SurfNum).Height, 2));
@@ -3788,7 +3788,7 @@ namespace SurfaceGeometry {
                 }
 
                 // Check area and perimeter for the FFactor floors
-                if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Floor && SurfaceTmp(SurfNum).ExtBoundCond == GroundFCfactorMethod) {
+                if (SurfaceTmp(SurfNum).Class == SurfaceClass::Floor && SurfaceTmp(SurfNum).ExtBoundCond == GroundFCfactorMethod) {
                     if (std::abs(SurfaceTmp(SurfNum).Area - dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).Area) > 0.1) {
                         ShowWarningError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
                                          "\", underground Floor Area = " + TrimSigDigits(SurfaceTmp(SurfNum).Area, 2));
@@ -3862,7 +3862,7 @@ namespace SurfaceGeometry {
         int Vrt;
 
         if (SurfaceTmp(SurfNum).Zone == 0 &&
-            (SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_Detached_F && SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_Detached_B))
+            (SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_F && SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_B))
             return;
 
         SurfaceTmp(SurfNum).Height = Height;
@@ -3884,7 +3884,7 @@ namespace SurfaceGeometry {
                 YLLC = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
                 ZLLC = ZCoord + Zone(SurfaceTmp(SurfNum).Zone).OriginZ;
             } else {
-                if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_B) {
+                if (SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B) {
                     Xb = XCoord;
                     Yb = YCoord;
                     XLLC = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
@@ -3901,7 +3901,7 @@ namespace SurfaceGeometry {
             Xb = XCoord;
             Yb = YCoord;
             ZLLC = ZCoord;
-            if (SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_Detached_F) {
+            if (SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_F) {
                 XLLC = Xb * CosBldgRotAppGonly - Yb * SinBldgRotAppGonly;
                 YLLC = Xb * SinBldgRotAppGonly + Yb * CosBldgRotAppGonly;
             } else {
@@ -3956,14 +3956,14 @@ namespace SurfaceGeometry {
             if (std::abs(SurfaceTmp(SurfNum).OutNormVec(n)) < 1.e-06) SurfaceTmp(SurfNum).OutNormVec(n) = 0.0;
         }
 
-        //  IF (SurfaceTmp(SurfNum)%Class == SurfaceClass::SurfaceClass_Roof .and. SurfTilt > 80.) THEN
+        //  IF (SurfaceTmp(SurfNum)%Class == SurfaceClass::Roof .and. SurfTilt > 80.) THEN
         //    WRITE(TiltString,'(F5.1)') SurfTilt
         //    TiltString=ADJUSTL(TiltString)
         //    CALL ShowWarningError('Roof/Ceiling Tilt='//TRIM(TiltString)//', much greater than expected tilt of 0,'// &
         //                          ' for Surface='//TRIM(SurfaceTmp(SurfNum)%Name)//  &
         //                          ', in Zone='//TRIM(SurfaceTmp(SurfNum)%ZoneName))
         //  ENDIF
-        //  IF (SurfaceTmp(SurfNum)%Class == SurfaceClass::SurfaceClass_Floor .and. SurfTilt < 170.) THEN
+        //  IF (SurfaceTmp(SurfNum)%Class == SurfaceClass::Floor .and. SurfTilt < 170.) THEN
         //    WRITE(TiltString,'(F5.1)') SurfTilt
         //    TiltString=ADJUSTL(TiltString)
         //    CALL ShowWarningError('Floor Tilt='//TRIM(TiltString)//', much less than expected tilt of 180,'//   &
@@ -4162,8 +4162,8 @@ namespace SurfaceGeometry {
                 SurfaceTmp(SurfNum).ConstructionStoredInputValue = SurfaceTmp(SurfNum).Construction;
             }
 
-            if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor ||
-                SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Diffuser || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Dome) {
+            if (SurfaceTmp(SurfNum).Class == SurfaceClass::Window || SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor ||
+                SurfaceTmp(SurfNum).Class == SurfaceClass::TDD_Diffuser || SurfaceTmp(SurfNum).Class == SurfaceClass::TDD_Dome) {
 
                 if (SurfaceTmp(SurfNum).Construction != 0) {
                     if (!dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsWindow) {
@@ -4218,7 +4218,7 @@ namespace SurfaceGeometry {
                 ErrorsFound = true;
             }
 
-            if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Dome || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Diffuser) {
+            if (SurfaceTmp(SurfNum).Class == SurfaceClass::TDD_Dome || SurfaceTmp(SurfNum).Class == SurfaceClass::TDD_Diffuser) {
                 SurfaceTmp(SurfNum).ExtBoundCond = ExternalEnvironment;
             }
 
@@ -4304,12 +4304,12 @@ namespace SurfaceGeometry {
                 }
             }
             SurfaceTmp(SurfNum).Vertex.allocate(SurfaceTmp(SurfNum).Sides);
-            if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor ||
-                SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Door)
+            if (SurfaceTmp(SurfNum).Class == SurfaceClass::Window || SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor ||
+                SurfaceTmp(SurfNum).Class == SurfaceClass::Door)
                 SurfaceTmp(SurfNum).Multiplier = int(rNumericArgs(2));
             // Only windows, glass doors and doors can have Multiplier > 1:
-            if ((SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_Window && SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_GlassDoor &&
-                 SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_Door) &&
+            if ((SurfaceTmp(SurfNum).Class != SurfaceClass::Window && SurfaceTmp(SurfNum).Class != SurfaceClass::GlassDoor &&
+                 SurfaceTmp(SurfNum).Class != SurfaceClass::Door) &&
                 rNumericArgs(2) > 1.0) {
                 ShowWarningError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cNumericFieldNames(2) + "=[" +
                                  TrimSigDigits(rNumericArgs(2), 1) + "].");
@@ -4330,8 +4330,8 @@ namespace SurfaceGeometry {
             SurfaceTmp(SurfNum).shadedStormWinConstructionList.clear();
             SurfaceTmp(SurfNum).activeStormWinShadedConstruction= 0;
 
-            if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor ||
-                SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Diffuser || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Dome) {
+            if (SurfaceTmp(SurfNum).Class == SurfaceClass::Window || SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor ||
+                SurfaceTmp(SurfNum).Class == SurfaceClass::TDD_Diffuser || SurfaceTmp(SurfNum).Class == SurfaceClass::TDD_Dome) {
 
                 if (SurfaceTmp(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt || SurfaceTmp(SurfNum).ExtBoundCond == OtherSideCoefCalcExt) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
@@ -4508,7 +4508,7 @@ namespace SurfaceGeometry {
                     SurfaceTmp(SurfNum).ConstructionStoredInputValue = SurfaceTmp(SurfNum).Construction;
                 }
 
-                if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor) {
+                if (SurfaceTmp(SurfNum).Class == SurfaceClass::Window || SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor) {
 
                     if (SurfaceTmp(SurfNum).Construction != 0) {
                         if (!dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).TypeIsWindow) {
@@ -4626,12 +4626,12 @@ namespace SurfaceGeometry {
 
                 SurfaceTmp(SurfNum).Sides = 4;
                 SurfaceTmp(SurfNum).Vertex.allocate(SurfaceTmp(SurfNum).Sides);
-                if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor ||
-                    SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Door)
+                if (SurfaceTmp(SurfNum).Class == SurfaceClass::Window || SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor ||
+                    SurfaceTmp(SurfNum).Class == SurfaceClass::Door)
                     SurfaceTmp(SurfNum).Multiplier = int(rNumericArgs(1));
                 // Only windows, glass doors and doors can have Multiplier > 1:
-                if ((SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_Window && SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_GlassDoor &&
-                     SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_Door) &&
+                if ((SurfaceTmp(SurfNum).Class != SurfaceClass::Window && SurfaceTmp(SurfNum).Class != SurfaceClass::GlassDoor &&
+                     SurfaceTmp(SurfNum).Class != SurfaceClass::Door) &&
                     rNumericArgs(1) > 1.0) {
                     ShowWarningError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cNumericFieldNames(1) + "=[" +
                                      TrimSigDigits(rNumericArgs(1), 1) + "].");
@@ -4659,7 +4659,7 @@ namespace SurfaceGeometry {
 
                 InitialAssociateWindowShadingControlFenestration(ErrorsFound, SurfNum);
 
-                if (!GettingIZSurfaces && (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor)) {
+                if (!GettingIZSurfaces && (SurfaceTmp(SurfNum).Class == SurfaceClass::Window || SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor)) {
 
                     if (SurfaceTmp(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt || SurfaceTmp(SurfNum).ExtBoundCond == OtherSideCoefCalcExt) {
                         ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
@@ -4977,7 +4977,7 @@ namespace SurfaceGeometry {
 
         // Warning if window has multiplier > 1 and SolarDistribution = FullExterior or FullInteriorExterior
 
-        if ((SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor) &&
+        if ((SurfaceTmp(SurfNum).Class == SurfaceClass::Window || SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor) &&
             SolarDistribution > MinimalShadowing && SurfaceTmp(SurfNum).Multiplier > 1.0) {
             if (DisplayExtraWarnings) {
                 ShowWarningError(cRoutineName + ": A Multiplier > 1.0 for window/glass door " + SurfaceTmp(SurfNum).Name);
@@ -5009,7 +5009,7 @@ namespace SurfaceGeometry {
         // Disallow glass transmittance dirt factor for interior windows and glass doors
 
         if (SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment &&
-            (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor)) {
+            (SurfaceTmp(SurfNum).Class == SurfaceClass::Window || SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor)) {
             ConstrNum = SurfaceTmp(SurfNum).Construction;
             if (ConstrNum > 0) {
                 for (Lay = 1; Lay <= dataConstruction.Construct(ConstrNum).TotLayers; ++Lay) {
@@ -5044,7 +5044,7 @@ namespace SurfaceGeometry {
                     SurfaceTmp(SurfaceTmp(SurfNum).BaseSurf).Area -= SurfaceTmp(SurfNum).Area;
 
                     // Subtract TDD:DIFFUSER area from other side interzone surface
-                    if ((SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Diffuser) &&
+                    if ((SurfaceTmp(SurfNum).Class == SurfaceClass::TDD_Diffuser) &&
                         not_blank(SurfaceTmp(SurfaceTmp(SurfNum).BaseSurf).ExtBoundCondName)) { // Base surface is an interzone surface
 
                         // Lookup interzone surface of the base surface
@@ -5062,9 +5062,9 @@ namespace SurfaceGeometry {
                     // Net area of base surface with unity window multipliers (used in shadowing checks)
                     // For Windows, Glass Doors and Doors, just one area is subtracted.  For the rest, should be
                     // full area.
-                    if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor) {
+                    if (SurfaceTmp(SurfNum).Class == SurfaceClass::Window || SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor) {
                         SurfaceTmp(SurfaceTmp(SurfNum).BaseSurf).NetAreaShadowCalc -= SurfaceTmp(SurfNum).Area / SurfaceTmp(SurfNum).Multiplier;
-                    } else if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Door) { // Door, TDD:Diffuser, TDD:DOME
+                    } else if (SurfaceTmp(SurfNum).Class == SurfaceClass::Door) { // Door, TDD:Diffuser, TDD:DOME
                         SurfaceTmp(SurfaceTmp(SurfNum).BaseSurf).NetAreaShadowCalc -= SurfaceTmp(SurfNum).Area / SurfaceTmp(SurfNum).Multiplier;
                     } else {
                         SurfaceTmp(SurfaceTmp(SurfNum).BaseSurf).NetAreaShadowCalc -= SurfaceTmp(SurfNum).Area;
@@ -5191,8 +5191,8 @@ namespace SurfaceGeometry {
         SurfaceTmp(SurfNum).CosAzim = CosSurfAzimuth;
         SurfaceTmp(SurfNum).SinTilt = SinSurfTilt;
         SurfaceTmp(SurfNum).CosTilt = CosSurfTilt;
-        if (SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_Window && SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_GlassDoor &&
-            SurfaceTmp(SurfNum).Class != SurfaceClass::SurfaceClass_Door)
+        if (SurfaceTmp(SurfNum).Class != SurfaceClass::Window && SurfaceTmp(SurfNum).Class != SurfaceClass::GlassDoor &&
+            SurfaceTmp(SurfNum).Class != SurfaceClass::Door)
             SurfaceTmp(SurfNum).ViewFactorGround = 0.5 * (1.0 - SurfaceTmp(SurfNum).CosTilt);
         // Outward normal unit vector (pointing away from room)
         SurfaceTmp(SurfNum).OutNormVec = SurfaceTmp(SurfNum).NewellSurfaceNormalVector;
@@ -5202,22 +5202,22 @@ namespace SurfaceGeometry {
             if (std::abs(SurfaceTmp(SurfNum).OutNormVec(n)) < 1.e-06) SurfaceTmp(SurfNum).OutNormVec(n) = 0.0;
         }
 
-        //  IF (SurfaceTmp(SurfNum)%Class == SurfaceClass::SurfaceClass_Roof .and. SurfTilt > 80.) THEN
+        //  IF (SurfaceTmp(SurfNum)%Class == SurfaceClass::Roof .and. SurfTilt > 80.) THEN
         //    WRITE(TiltString,'(F5.1)') SurfTilt
         //    TiltString=ADJUSTL(TiltString)
         //    CALL ShowWarningError('Roof/Ceiling Tilt='//TRIM(TiltString)//', much greater than expected tilt of 0,'// &
         //                          ' for Surface='//TRIM(SurfaceTmp(SurfNum)%Name)//  &
         //                          ', in Zone='//TRIM(SurfaceTmp(SurfNum)%ZoneName))
         //  ENDIF
-        //  IF (SurfaceTmp(SurfNum)%Class == SurfaceClass::SurfaceClass_Floor .and. SurfTilt < 170.) THEN
+        //  IF (SurfaceTmp(SurfNum)%Class == SurfaceClass::Floor .and. SurfTilt < 170.) THEN
         //    WRITE(TiltString,'(F5.1)') SurfTilt
         //    TiltString=ADJUSTL(TiltString)
         //    CALL ShowWarningError('Floor Tilt='//TRIM(TiltString)//', much less than expected tilt of 180,'//   &
         //                          ' for Surface='//TRIM(SurfaceTmp(SurfNum)%Name)//  &
         //                          ', in Zone='//TRIM(SurfaceTmp(SurfNum)%ZoneName))
         //  ENDIF
-        if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor ||
-            SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Door)
+        if (SurfaceTmp(SurfNum).Class == SurfaceClass::Window || SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor ||
+            SurfaceTmp(SurfNum).Class == SurfaceClass::Door)
             SurfaceTmp(SurfNum).Area *= SurfaceTmp(SurfNum).Multiplier;
         // Can perform tests on this surface here
         SurfaceTmp(SurfNum).ViewFactorSky = 0.5 * (1.0 + SurfaceTmp(SurfNum).CosTilt);
@@ -5336,7 +5336,7 @@ namespace SurfaceGeometry {
 
             ++SurfNum;
             SurfaceTmp(SurfNum).Name = cAlphaArgs(1); // Set the Surface Name in the Derived Type
-            SurfaceTmp(SurfNum).Class = SurfaceClass::SurfaceClass_Shading;
+            SurfaceTmp(SurfNum).Class = SurfaceClass::Shading;
             SurfaceTmp(SurfNum).HeatTransSurf = false;
             SurfaceTmp(SurfNum).BaseSurfName = cAlphaArgs(2);
             //  The subsurface inherits properties from the base surface
@@ -5529,7 +5529,7 @@ namespace SurfaceGeometry {
 
                 ++SurfNum;
                 SurfaceTmp(SurfNum).Name = cAlphaArgs(1); // Set the Surface Name in the Derived Type
-                SurfaceTmp(SurfNum).Class = SurfaceClass::SurfaceClass_Shading;
+                SurfaceTmp(SurfNum).Class = SurfaceClass::Shading;
                 SurfaceTmp(SurfNum).HeatTransSurf = false;
                 // this object references a window or door....
                 Found = UtilityRoutines::FindItemInList(cAlphaArgs(2), SurfaceTmp, TotSurfaces);
@@ -5731,7 +5731,7 @@ namespace SurfaceGeometry {
 
                     ++SurfNum;
                     SurfaceTmp(SurfNum).Name = cAlphaArgs(1) + " Right"; // Set the Surface Name in the Derived Type
-                    SurfaceTmp(SurfNum).Class = SurfaceClass::SurfaceClass_Shading;
+                    SurfaceTmp(SurfNum).Class = SurfaceClass::Shading;
                     SurfaceTmp(SurfNum).HeatTransSurf = false;
                     BaseSurfNum = SurfaceTmp(Found).BaseSurf;
                     SurfaceTmp(SurfNum).BaseSurfName = SurfaceTmp(Found).BaseSurfName;
@@ -5938,7 +5938,7 @@ namespace SurfaceGeometry {
                     if (!IntMassObjects(Loop).ZoneListActive) {
                         SurfaceTmp(SurfNum).Zone = IntMassObjects(Loop).ZoneOrZoneListPtr;
                         SurfaceTmp(SurfNum).Name = IntMassObjects(Loop).Name;
-                        SurfaceTmp(SurfNum).Class = SurfaceClass::SurfaceClass_IntMass;
+                        SurfaceTmp(SurfNum).Class = SurfaceClass::IntMass;
                         SurfaceTmp(SurfNum).ZoneName = IntMassObjects(Loop).ZoneOrZoneListName;
                         SurfaceTmp(SurfNum).HeatTransSurf = true;
                     } else {
@@ -5954,7 +5954,7 @@ namespace SurfaceGeometry {
 
                         ZoneNum = ZoneList(IntMassObjects(Loop).ZoneOrZoneListPtr).Zone(Item1);
                         SurfaceTmp(SurfNum).Zone = ZoneNum;
-                        SurfaceTmp(SurfNum).Class = SurfaceClass::SurfaceClass_IntMass;
+                        SurfaceTmp(SurfNum).Class = SurfaceClass::IntMass;
                         SurfaceTmp(SurfNum).ZoneName = Zone(ZoneNum).Name;
                         SurfaceTmp(SurfNum).HeatTransSurf = true;
                         if (errFlag) ErrorsFound = true;
@@ -6067,9 +6067,9 @@ namespace SurfaceGeometry {
         // For shading surfaces, initialize value of reflectance values to default values. These values
         // may be overridden below for shading surfaces with an associated Shading Surface Reflectance object.
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!(SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Shading || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_F ||
-                  SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_B || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Overhang ||
-                  SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Fin))
+            if (!(SurfaceTmp(SurfNum).Class == SurfaceClass::Shading || SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_F ||
+                  SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B || SurfaceTmp(SurfNum).Class == SurfaceClass::Overhang ||
+                  SurfaceTmp(SurfNum).Class == SurfaceClass::Fin))
                 continue;
             SurfaceTmp(SurfNum).ShadowSurfDiffuseSolRefl = 0.2;
             SurfaceTmp(SurfNum).ShadowSurfDiffuseVisRefl = 0.2;
@@ -6106,9 +6106,9 @@ namespace SurfaceGeometry {
             // Check that associated surface is a shading surface
             WrongSurfaceType = false;
             if (SurfNum != 0) {
-                if (!(SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Shading || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_F ||
-                      SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_B || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Overhang ||
-                      SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Fin))
+                if (!(SurfaceTmp(SurfNum).Class == SurfaceClass::Shading || SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_F ||
+                      SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B || SurfaceTmp(SurfNum).Class == SurfaceClass::Overhang ||
+                      SurfaceTmp(SurfNum).Class == SurfaceClass::Fin))
                     WrongSurfaceType = true;
                 if (WrongSurfaceType) {
                     ShowSevereError("GetShadingSurfReflectanceData: " + cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
@@ -6153,9 +6153,9 @@ namespace SurfaceGeometry {
                "Visible Reflectance,Surface Glazing Fraction,Surface Glazing Contruction\n");
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!(SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Shading || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_F ||
-                  SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_B || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Overhang ||
-                  SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Fin))
+            if (!(SurfaceTmp(SurfNum).Class == SurfaceClass::Shading || SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_F ||
+                  SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B || SurfaceTmp(SurfNum).Class == SurfaceClass::Overhang ||
+                  SurfaceTmp(SurfNum).Class == SurfaceClass::Fin))
                 continue;
 
             constexpr auto fmt{"ShadingProperty Reflectance,{},{},{:.2R},{:.2R},{:.2R}, {}\n"};
@@ -6495,7 +6495,7 @@ namespace SurfaceGeometry {
                 ErrorsFound = true;
             }
             alpF++;
-            if (Surface(Found).Class != SurfaceClass::SurfaceClass_Floor) {
+            if (Surface(Found).Class != SurfaceClass::Floor) {
                 ShowWarningError(cCurrentModuleObject + ": " + Surface(Found).Name + ", surface is not a floor surface");
                 ShowContinueError(cCurrentModuleObject + " will not be used");
                 continue;
@@ -7104,7 +7104,7 @@ namespace SurfaceGeometry {
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         if (!Surface(SurfNum).HeatTransSurf) continue;
                         if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
-                        if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Wall) continue;
+                        if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
                         if (dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
                         SurfacesOfType = true;
                         Surface(SurfNum).HeatTransferAlgorithm = tmpAlgoInput;
@@ -7115,7 +7115,7 @@ namespace SurfaceGeometry {
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         if (!Surface(SurfNum).HeatTransSurf) continue;
                         if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
-                        if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Roof) continue;
+                        if (Surface(SurfNum).Class != SurfaceClass::Roof) continue;
                         if (dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
                         SurfacesOfType = true;
                         Surface(SurfNum).HeatTransferAlgorithm = tmpAlgoInput;
@@ -7126,7 +7126,7 @@ namespace SurfaceGeometry {
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         if (!Surface(SurfNum).HeatTransSurf) continue;
                         if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
-                        if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Floor) continue;
+                        if (Surface(SurfNum).Class != SurfaceClass::Floor) continue;
                         if (dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
                         SurfacesOfType = true;
                         Surface(SurfNum).HeatTransferAlgorithm = tmpAlgoInput;
@@ -7156,7 +7156,7 @@ namespace SurfaceGeometry {
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         if (!Surface(SurfNum).HeatTransSurf) continue;
                         if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
-                        if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Wall) continue;
+                        if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
                         if (dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
                         SurfacesOfType = true;
                         Surface(SurfNum).HeatTransferAlgorithm = tmpAlgoInput;
@@ -7167,7 +7167,7 @@ namespace SurfaceGeometry {
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         if (!Surface(SurfNum).HeatTransSurf) continue;
                         if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
-                        if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Roof) continue;
+                        if (Surface(SurfNum).Class != SurfaceClass::Roof) continue;
                         if (dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
                         SurfacesOfType = true;
                         Surface(SurfNum).HeatTransferAlgorithm = tmpAlgoInput;
@@ -7178,7 +7178,7 @@ namespace SurfaceGeometry {
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         if (!Surface(SurfNum).HeatTransSurf) continue;
                         if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
-                        if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Floor) continue;
+                        if (Surface(SurfNum).Class != SurfaceClass::Floor) continue;
                         if (dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
                         SurfacesOfType = true;
                         Surface(SurfNum).HeatTransferAlgorithm = tmpAlgoInput;
@@ -7442,7 +7442,7 @@ namespace SurfaceGeometry {
 
         // Assign model type to windows, shading surfaces, and TDDs
         for (Item = 1; Item <= TotSurfaces; ++Item) {
-            if (Surface(Item).Class == SurfaceClass::SurfaceClass_Window || Surface(Item).Class == SurfaceClass::SurfaceClass_GlassDoor) {
+            if (Surface(Item).Class == SurfaceClass::Window || Surface(Item).Class == SurfaceClass::GlassDoor) {
                 // todo, add complex fenestration switch  HeatTransferModel_ComplexFenestration
                 if (SurfWinWindowModelType(Item) == WindowBSDFModel) {
                     Surface(Item).HeatTransferAlgorithm = HeatTransferModel_ComplexFenestration;
@@ -7450,12 +7450,12 @@ namespace SurfaceGeometry {
                     Surface(Item).HeatTransferAlgorithm = HeatTransferModel_Window5;
                 }
             }
-            if (Surface(Item).Class == SurfaceClass::SurfaceClass_Detached_B || Surface(Item).Class == SurfaceClass::SurfaceClass_Detached_F ||
-                Surface(Item).Class == SurfaceClass::SurfaceClass_Shading || Surface(Item).Class == SurfaceClass::SurfaceClass_Overhang ||
-                Surface(Item).Class == SurfaceClass::SurfaceClass_Fin) {
+            if (Surface(Item).Class == SurfaceClass::Detached_B || Surface(Item).Class == SurfaceClass::Detached_F ||
+                Surface(Item).Class == SurfaceClass::Shading || Surface(Item).Class == SurfaceClass::Overhang ||
+                Surface(Item).Class == SurfaceClass::Fin) {
                 Surface(Item).HeatTransferAlgorithm = HeatTransferModel_None;
             }
-            if (Surface(Item).Class == SurfaceClass::SurfaceClass_TDD_Diffuser || Surface(Item).Class == SurfaceClass::SurfaceClass_TDD_Dome) {
+            if (Surface(Item).Class == SurfaceClass::TDD_Diffuser || Surface(Item).Class == SurfaceClass::TDD_Dome) {
                 Surface(Item).HeatTransferAlgorithm = HeatTransferModel_TDD;
             }
 
@@ -7598,7 +7598,7 @@ namespace SurfaceGeometry {
                     SurfaceTmp(SurfNum).Vertex(n).y = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
                     SurfaceTmp(SurfNum).Vertex(n).z += Zone(ZoneNum).OriginZ;
                 }
-            } else if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_B) {
+            } else if (SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B) {
                 for (n = 1; n <= NSides; ++n) {
                     Xb = SurfaceTmp(SurfNum).Vertex(n).x;
                     Yb = SurfaceTmp(SurfNum).Vertex(n).y;
@@ -7616,7 +7616,7 @@ namespace SurfaceGeometry {
                     SurfaceTmp(SurfNum).Vertex(n).x = Xb * CosBldgRotAppGonly - Yb * SinBldgRotAppGonly;
                     SurfaceTmp(SurfNum).Vertex(n).y = Xb * SinBldgRotAppGonly + Yb * CosBldgRotAppGonly;
                 }
-            } else if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_B) {
+            } else if (SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B) {
                 for (n = 1; n <= NSides; ++n) {
                     Xb = SurfaceTmp(SurfNum).Vertex(n).x;
                     Yb = SurfaceTmp(SurfNum).Vertex(n).y;
@@ -7737,25 +7737,25 @@ namespace SurfaceGeometry {
                                     SurfaceTmp(SurfNum).GrossArea,
                                     SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
             dotp = dot(SurfaceTmp(SurfNum).NewellSurfaceNormalVector, TestVector);
-            if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Roof && dotp < -0.000001) {
+            if (SurfaceTmp(SurfNum).Class == SurfaceClass::Roof && dotp < -0.000001) {
                 TiltString = RoundSigDigits(SurfTilt, 1);
                 ShowWarningError(RoutineName + "Roof/Ceiling is upside down! Tilt angle=[" + TiltString + "], should be near 0, Surface=\"" +
                                  SurfaceTmp(SurfNum).Name + "\", in Zone=\"" + SurfaceTmp(SurfNum).ZoneName + "\".");
                 ShowContinueError("Automatic fix is attempted.");
                 ReverseAndRecalculate(ioFiles, SurfNum, SurfaceTmp(SurfNum).Sides, SurfWorldAz, SurfTilt);
-            } else if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Roof && SurfTilt > 80.0) {
+            } else if (SurfaceTmp(SurfNum).Class == SurfaceClass::Roof && SurfTilt > 80.0) {
                 TiltString = RoundSigDigits(SurfTilt, 1);
                 ShowWarningError(RoutineName + "Roof/Ceiling is not oriented correctly! Tilt angle=[" + TiltString +
                                  "], should be near 0, Surface=\"" + SurfaceTmp(SurfNum).Name + "\", in Zone=\"" + SurfaceTmp(SurfNum).ZoneName +
                                  "\".");
             }
-            if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Floor && dotp > 0.000001) {
+            if (SurfaceTmp(SurfNum).Class == SurfaceClass::Floor && dotp > 0.000001) {
                 TiltString = RoundSigDigits(SurfTilt, 1);
                 ShowWarningError(RoutineName + "Floor is upside down! Tilt angle=[" + TiltString + "], should be near 180, Surface=\"" +
                                  SurfaceTmp(SurfNum).Name + "\", in Zone=\"" + SurfaceTmp(SurfNum).ZoneName + "\".");
                 ShowContinueError("Automatic fix is attempted.");
                 ReverseAndRecalculate(ioFiles, SurfNum, SurfaceTmp(SurfNum).Sides, SurfWorldAz, SurfTilt);
-            } else if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Floor && SurfTilt < 158.2) { // slope/grade = 40%!
+            } else if (SurfaceTmp(SurfNum).Class == SurfaceClass::Floor && SurfTilt < 158.2) { // slope/grade = 40%!
                 TiltString = RoundSigDigits(SurfTilt, 1);
                 ShowWarningError(RoutineName + "Floor is not oriented correctly! Tilt angle=[" + TiltString + "], should be near 180, Surface=\"" +
                                  SurfaceTmp(SurfNum).Name + "\", in Zone=\"" + SurfaceTmp(SurfNum).ZoneName + "\".");
@@ -7779,8 +7779,8 @@ namespace SurfaceGeometry {
                 if (std::abs(SurfaceTmp(SurfNum).OutNormVec(n)) < 1.e-06) SurfaceTmp(SurfNum).OutNormVec(n) = 0.0;
             }
 
-            if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor ||
-                SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Door)
+            if (SurfaceTmp(SurfNum).Class == SurfaceClass::Window || SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor ||
+                SurfaceTmp(SurfNum).Class == SurfaceClass::Door)
                 SurfaceTmp(SurfNum).Area *= SurfaceTmp(SurfNum).Multiplier;
             // Can perform tests on this surface here
             SurfaceTmp(SurfNum).ViewFactorSky = 0.5 * (1.0 + SurfaceTmp(SurfNum).CosTilt);
@@ -7883,12 +7883,12 @@ namespace SurfaceGeometry {
                                 SurfaceTmp(SurfNum).lcsz,
                                 SurfaceTmp(SurfNum).GrossArea,
                                 SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
-        if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Roof && SurfTilt > 80.0) {
+        if (SurfaceTmp(SurfNum).Class == SurfaceClass::Roof && SurfTilt > 80.0) {
             TiltString = RoundSigDigits(SurfTilt, 1);
             ShowWarningError(RoutineName + "Roof/Ceiling is still upside down! Tilt angle=[" + TiltString +
                              "], should be near 0, please fix manually.");
         }
-        if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Floor && SurfTilt < 158.2) { // 40% grade!
+        if (SurfaceTmp(SurfNum).Class == SurfaceClass::Floor && SurfTilt < 158.2) { // 40% grade!
             ShowWarningError(RoutineName + "Floor is still upside down! Tilt angle=[" + TiltString + "], should be near 180, please fix manually.");
         }
     }
@@ -8788,7 +8788,7 @@ namespace SurfaceGeometry {
                 ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid.");
                 ErrorsFound = true;
             } else {
-                if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Window || Surface(SurfNum).ExtBoundCond != 0) {
+                if (Surface(SurfNum).Class != SurfaceClass::Window || Surface(SurfNum).ExtBoundCond != 0) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowSevereError("cannot be used with surface=" + Surface(SurfNum).Name);
                     ShowContinueError("because that surface is not an exterior window.");
@@ -8897,8 +8897,8 @@ namespace SurfaceGeometry {
             // Check that associated surface is a 2- or 3-pane exterior window
             WrongSurfaceType = false;
             if (SurfNum != 0) {
-                if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Window) WrongSurfaceType = true;
-                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window) {
+                if (Surface(SurfNum).Class != SurfaceClass::Window) WrongSurfaceType = true;
+                if (Surface(SurfNum).Class == SurfaceClass::Window) {
                     ConstrNum = Surface(SurfNum).Construction;
                     if (dataConstruction.Construct(ConstrNum).TotGlassLayers != 2 && dataConstruction.Construct(ConstrNum).TotGlassLayers != 3) WrongSurfaceType = true;
                     if (Surface(SurfNum).ExtBoundCond != ExternalEnvironment) WrongSurfaceType = true;
@@ -10095,7 +10095,7 @@ namespace SurfaceGeometry {
                             } else {
                             }
                         }
-                        if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Window) {
+                        if (SurfaceTmp(SurfNum).Class == SurfaceClass::Window) {
                             ShowSevereError(cCurrentModuleObject + ", " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\"");
                             ShowContinueError("invalid use on a Window. Use WindowShadingControl instead.");
                             ErrorsFound = true;
@@ -10184,8 +10184,8 @@ namespace SurfaceGeometry {
 
                 // Only include Base Surfaces in Calc.
 
-                if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Wall && Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Floor &&
-                    Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Roof) {
+                if (Surface(SurfNum).Class != SurfaceClass::Wall && Surface(SurfNum).Class != SurfaceClass::Floor &&
+                    Surface(SurfNum).Class != SurfaceClass::Roof) {
                     ++notused;
                     surfacenotused(notused) = SurfNum;
                     continue;
@@ -10646,7 +10646,7 @@ namespace SurfaceGeometry {
         // make list of x and y coordinates for all faces that are on the floor or ceiling
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
             int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
-            if (Surface(curSurfNum).Class == SurfaceClass::SurfaceClass_Floor || Surface(curSurfNum).Class == SurfaceClass::SurfaceClass_Roof) {
+            if (Surface(curSurfNum).Class == SurfaceClass::Floor || Surface(curSurfNum).Class == SurfaceClass::Roof) {
                 for (int jVertex = 1; jVertex <= zonePoly.SurfaceFace(iFace).NSides; ++jVertex) {
                     Vector curVertex = zonePoly.SurfaceFace(iFace).FacePoints(jVertex);
                     Vector2dCount curXYc;
@@ -10695,7 +10695,7 @@ namespace SurfaceGeometry {
         bool foundWallHeight = false;
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
             int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
-            if (Surface(curSurfNum).Class == SurfaceClass::SurfaceClass_Wall) {
+            if (Surface(curSurfNum).Class == SurfaceClass::Wall) {
                 Real64 maxZ = -1.0E50;
                 for (int jVertex = 1; jVertex <= zonePoly.SurfaceFace(iFace).NSides; ++jVertex) {
                     Vector curVertex = zonePoly.SurfaceFace(iFace).FacePoints(jVertex);
@@ -10728,15 +10728,15 @@ namespace SurfaceGeometry {
         bool areWlVert = true;
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
             int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
-            if (Surface(curSurfNum).Class == SurfaceClass::SurfaceClass_Floor) {
+            if (Surface(curSurfNum).Class == SurfaceClass::Floor) {
                 if (std::abs(Surface(curSurfNum).Tilt - 180.) > 1.) { // with 1 degree angle
                     isFlrHoriz = false;
                 }
-            } else if (Surface(curSurfNum).Class == SurfaceClass::SurfaceClass_Roof) { // includes ceilings
+            } else if (Surface(curSurfNum).Class == SurfaceClass::Roof) { // includes ceilings
                 if (std::abs(Surface(curSurfNum).Tilt) > 1.) {           // with 1 degree angle of
                     isClgHoriz = false;
                 }
-            } else if (Surface(curSurfNum).Class == SurfaceClass::SurfaceClass_Wall) {
+            } else if (Surface(curSurfNum).Class == SurfaceClass::Wall) {
                 if (std::abs(Surface(curSurfNum).Tilt - 90) > 1.) { // with 1 degree angle
                     areWlVert = false;
                 }
@@ -10760,7 +10760,7 @@ namespace SurfaceGeometry {
         bool foundOppEqual = false;
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
             int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
-            if (Surface(curSurfNum).Class == SurfaceClass::SurfaceClass_Wall) {
+            if (Surface(curSurfNum).Class == SurfaceClass::Wall) {
                 std::vector<int> facesAtAz = listOfFacesFacingAzimuth(zonePoly, Surface(curSurfNum).Azimuth);
                 bool allFacesEquidistant = true;
                 oppositeWallArea = 0.;
@@ -11070,9 +11070,9 @@ namespace SurfaceGeometry {
 
                 if (Surface(ThisSurf).Sides == 4) {
                     ThisShape = SurfaceShape::RectangularDoorWindow;
-                } else if (Surface(ThisSurf).Sides == 3 && Surface(ThisSurf).Class == SurfaceClass::SurfaceClass_Window) {
+                } else if (Surface(ThisSurf).Sides == 3 && Surface(ThisSurf).Class == SurfaceClass::Window) {
                     ThisShape = SurfaceShape::TriangularWindow;
-                } else if (Surface(ThisSurf).Sides == 3 && Surface(ThisSurf).Class == SurfaceClass::SurfaceClass_Door) {
+                } else if (Surface(ThisSurf).Sides == 3 && Surface(ThisSurf).Class == SurfaceClass::Door) {
                     ThisShape = SurfaceShape::TriangularDoor;
                 } else {
                     assert(false);
@@ -11146,7 +11146,7 @@ namespace SurfaceGeometry {
                     Zpsv(3) = ZLLC;
                     Zpsv(4) = ZLLC;
 
-                    if (Surface(ThisSurf).Class == SurfaceClass::SurfaceClass_Window && Surface(ThisSurf).ExtBoundCond == ExternalEnvironment &&
+                    if (Surface(ThisSurf).Class == SurfaceClass::Window && Surface(ThisSurf).ExtBoundCond == ExternalEnvironment &&
                         Surface(ThisSurf).FrameDivider > 0) {
                         FrDivNum = Surface(ThisSurf).FrameDivider;
                         // Set flag for calculating beam solar reflection from outside and/or inside window reveal
@@ -12540,7 +12540,7 @@ namespace SurfaceGeometry {
         // check surface type.
         if (!SurfaceTmp(SurfNum).HeatTransSurf) {
             // Site Shading do not get transformed.
-            if (SurfaceTmp(SurfNum).Class == SurfaceClass::SurfaceClass_Detached_F) return;
+            if (SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_F) return;
         }
 
         // testing method of transforming  x and y coordinates as follows
@@ -12619,7 +12619,7 @@ namespace SurfaceGeometry {
         for (int ThisSurf = 1; ThisSurf <= TotSurfaces; ++ThisSurf) {
             auto &surface(Surface(ThisSurf));
 
-            if (surface.Class == SurfaceClass::SurfaceClass_IntMass) continue;
+            if (surface.Class == SurfaceClass::IntMass) continue;
 
             auto const &vertex(surface.Vertex);
 
@@ -12909,7 +12909,7 @@ namespace SurfaceGeometry {
                         // Interior convection coefficient set to low H limit in ConvectionCoefficients::GetUserConvectionCoefficients
                     } else if (solarSetup && constr.TypeIsAirBoundaryInteriorWindow) {
                         // Override surface class for interior window
-                        surf.Class = SurfaceClass::SurfaceClass_Window;
+                        surf.Class = SurfaceClass::Window;
                         Zone(surf.Zone).HasInterZoneWindow = true;
                     } else if ((radiantSetup && constr.TypeIsAirBoundaryGroupedRadiant) || (solarSetup && constr.TypeIsAirBoundarySolar)) {
                         // Boundary is grouped - assign enclosure

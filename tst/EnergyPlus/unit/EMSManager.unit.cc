@@ -1595,8 +1595,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataSurfaces::Surface(2).Name = "Surface2";
     DataSurfaces::Surface(1).Zone = 1;
     DataSurfaces::Surface(2).Zone = 1;
-    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::SurfaceClass_Window;
-    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass::SurfaceClass_Window;
+    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::Window;
+    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass::Window;
     DataSurfaces::Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
     DataSurfaces::Surface(2).ExtBoundCond = DataSurfaces::ExternalEnvironment;
     DataSurfaces::Surface(1).windowShadingControlList.push_back(1);

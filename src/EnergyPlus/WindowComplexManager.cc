@@ -860,7 +860,7 @@ namespace WindowComplexManager {
             BaseSurf = Surface(ISurf).BaseSurf; // ShadowComb is organized by base surface
             JSurf = ShadowComb(BaseSurf).BackSurf(KBkSurf);
             if (SurfWinWindowModelType(JSurf) == WindowBSDFModel) continue;
-            if (!(Surface(JSurf).Class == SurfaceClass::SurfaceClass_Window || Surface(JSurf).Class == SurfaceClass::SurfaceClass_GlassDoor)) continue;
+            if (!(Surface(JSurf).Class == SurfaceClass::Window || Surface(JSurf).Class == SurfaceClass::GlassDoor)) continue;
             if (!(Surface(JSurf).HeatTransSurf && Surface(JSurf).ExtBoundCond == ExternalEnvironment && Surface(JSurf).ExtSolar)) continue;
             // Back surface is an exterior window or door
             RegWindFnd = true;
@@ -2959,7 +2959,7 @@ namespace WindowComplexManager {
             // outdoor wind speed
             if (!Surface(SurfNum).ExtWind) {
                 wso = 0.0; // No wind exposure
-                           // ELSE IF (Surface(SurfNum)%Class == SurfaceClass::SurfaceClass_Window .AND. SurfaceWindow(SurfNum)%ShadingFlag == ExtShadeOn) THEN
+                           // ELSE IF (Surface(SurfNum)%Class == SurfaceClass::Window .AND. SurfaceWindow(SurfNum)%ShadingFlag == ExtShadeOn) THEN
                 //  wso =  0.0  ! Assume zero wind speed at outside glass surface of window with exterior shade
             } else {
                 wso = Surface(SurfNum).WindSpeed;

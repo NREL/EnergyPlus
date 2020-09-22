@@ -1633,7 +1633,7 @@ namespace WindowManager {
         DifOverrideCount = 0;
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             SurfWinSolarDiffusing(SurfNum) = false;
-            if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window && Surface(SurfNum).ExtBoundCond == ExternalEnvironment &&
+            if (Surface(SurfNum).Class == SurfaceClass::Window && Surface(SurfNum).ExtBoundCond == ExternalEnvironment &&
                 Surface(SurfNum).StormWinConstruction == 0) {
                 ConstrNum = Surface(SurfNum).Construction;
                 MatNum = dataConstruction.Construct(ConstrNum).LayerPoint(dataConstruction.Construct(ConstrNum).TotLayers);

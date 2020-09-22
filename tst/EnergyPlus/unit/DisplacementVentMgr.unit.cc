@@ -87,7 +87,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
 
     // Surface 1 Vertical wall
     Surface(1).Name = "Class1_Wall_6_0_0_0_0_0_Subsurface";
-    Surface(1).Class = SurfaceClass::SurfaceClass_Door;
+    Surface(1).Class = SurfaceClass::Door;
     Surface(1).Zone = 1;
     Surface(1).HeatTransSurf = true;
     Surface(1).Construction = 1;
@@ -112,7 +112,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
 
     // Surface 2 Door floor
     Surface(2).Name = "Class1_Floor_9_0_8_0_8_0_Subsurface";
-    Surface(2).Class = SurfaceClass::SurfaceClass_Door;
+    Surface(2).Class = SurfaceClass::Door;
     Surface(2).Zone = 1;
     Surface(2).HeatTransSurf = true;
     Surface(2).Construction = 1;
@@ -139,7 +139,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     Surface(3).Name = "Class1_Ceiling_0_0_9_0_9_0_Subsurface";
     Surface(3).HeatTransSurf = true;
     Surface(3).Zone = 1;
-    Surface(3).Class = SurfaceClass::SurfaceClass_Door;
+    Surface(3).Class = SurfaceClass::Door;
     Surface(3).Construction = 1;
     Surface(3).BaseSurf = 1;
     Surface(3).Sides = 4;

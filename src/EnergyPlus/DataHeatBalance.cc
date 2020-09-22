@@ -2319,14 +2319,14 @@ namespace DataHeatBalance {
                     // use companion surface in adjacent zone
                     {
                         auto const SELECT_CASE_var1(Surface(Surface(numSurf).ExtBoundCond).Class);
-                        if ((SELECT_CASE_var1 == SurfaceClass::SurfaceClass_Wall) ||
-                            (SELECT_CASE_var1 == SurfaceClass::SurfaceClass_Door)) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
+                        if ((SELECT_CASE_var1 == SurfaceClass::Wall) ||
+                            (SELECT_CASE_var1 == SurfaceClass::Door)) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
                             outsideFilm = 0.1197548;
                         } else if (SELECT_CASE_var1 ==
-                                   SurfaceClass::SurfaceClass_Floor) { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
+                                   SurfaceClass::Floor) { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
                             outsideFilm = 0.1620212;
                         } else if (SELECT_CASE_var1 ==
-                                   SurfaceClass::SurfaceClass_Roof) { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
+                                   SurfaceClass::Roof) { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
                             outsideFilm = 0.1074271;
                         } else {
                             outsideFilm = 0.0810106; // All semi-exterior surfaces
@@ -2341,12 +2341,12 @@ namespace DataHeatBalance {
         if (NominalU(Surface(numSurf).Construction) > 0.0) {
             {
                 auto const SELECT_CASE_var(Surface(numSurf).Class);
-                if ((SELECT_CASE_var == SurfaceClass::SurfaceClass_Wall) ||
-                    (SELECT_CASE_var == SurfaceClass::SurfaceClass_Door)) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
+                if ((SELECT_CASE_var == SurfaceClass::Wall) ||
+                    (SELECT_CASE_var == SurfaceClass::Door)) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
                     insideFilm = 0.1197548;
-                } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Floor) { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
+                } else if (SELECT_CASE_var == SurfaceClass::Floor) { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
                     insideFilm = 0.1620212;
-                } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Roof) { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
+                } else if (SELECT_CASE_var == SurfaceClass::Roof) { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
                     insideFilm = 0.1074271;
                 } else {
                     insideFilm = 0.0;
@@ -2379,7 +2379,7 @@ namespace DataHeatBalance {
         // Using/Aliasing
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Surface;
-//        using DataSurfaces::SurfaceClass::SurfaceClass_Window;
+//        using DataSurfaces::SurfaceClass::Window;
         using DataSurfaces::TotSurfaces;
 
         // Locals
@@ -2404,7 +2404,7 @@ namespace DataHeatBalance {
 
         for (loopSurfNum = 1; loopSurfNum <= TotSurfaces; ++loopSurfNum) {
 
-            if (Surface(loopSurfNum).Class != DataSurfaces::SurfaceClass::SurfaceClass_Window) continue;
+            if (Surface(loopSurfNum).Class != DataSurfaces::SurfaceClass::Window) continue;
             if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
             if (!Surface(loopSurfNum).HasShadeControl) continue;
             if (Surface(loopSurfNum).activeShadedConstruction == 0) continue;

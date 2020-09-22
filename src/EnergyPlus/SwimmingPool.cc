@@ -436,7 +436,7 @@ namespace SwimmingPool {
                             " is a pool and is attempting to use a non-CTF solution algorithm.  This is "
                             "not allowed.  Use the CTF solution algorithm for this surface.");
             ErrorsFound = true;
-        } else if (DataSurfaces::Surface(this->SurfacePtr).Class == DataSurfaces::SurfaceClass::SurfaceClass_Window) {
+        } else if (DataSurfaces::Surface(this->SurfacePtr).Class == DataSurfaces::SurfaceClass::Window) {
             ShowSevereError(DataSurfaces::Surface(this->SurfacePtr).Name +
                             " is a pool and is defined as a window.  This is not allowed.  A pool must be a floor that is NOT a window.");
             ErrorsFound = true;
@@ -454,7 +454,7 @@ namespace SwimmingPool {
             DataSurfaces::Surface(this->SurfacePtr).IsPool = true;
             this->ZonePtr = DataSurfaces::Surface(this->SurfacePtr).Zone;
             // Check to make sure pool surface is a floor
-            if (DataSurfaces::Surface(this->SurfacePtr).Class != DataSurfaces::SurfaceClass::SurfaceClass_Floor) {
+            if (DataSurfaces::Surface(this->SurfacePtr).Class != DataSurfaces::SurfaceClass::Floor) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha1 + " contains a surface name that is NOT a floor.");
                 ShowContinueError(
                     "A swimming pool must be associated with a surface that is a FLOOR.  Association with other surface types is not permitted.");
@@ -1037,7 +1037,7 @@ namespace SwimmingPool {
 
             Real64 Area = DataSurfaces::Surface(SurfNum).Area; // Effective surface area
 
-            if (DataSurfaces::Surface(SurfNum).Class == DataSurfaces::SurfaceClass::SurfaceClass_Window) {
+            if (DataSurfaces::Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
                 if (DataSurfaces::SurfWinShadingFlag(SurfNum) == DataSurfaces::IntShadeOn ||
                     DataSurfaces::SurfWinShadingFlag(SurfNum) == DataSurfaces::IntBlindOn) {
                     // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)

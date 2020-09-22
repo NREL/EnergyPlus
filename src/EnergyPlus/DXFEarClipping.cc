@@ -276,7 +276,7 @@ namespace DXFEarClipping {
         //  else
         //    trackit=.FALSE.
         //  endif
-        if (surfclass == SurfaceClass::SurfaceClass_Floor || surfclass == SurfaceClass::SurfaceClass_Roof || surfclass == SurfaceClass::SurfaceClass_Overhang) {
+        if (surfclass == SurfaceClass::Floor || surfclass == SurfaceClass::Roof || surfclass == SurfaceClass::Overhang) {
             CalcRfFlrCoordinateTransformation(nsides, polygon, surfazimuth, surftilt, xvt, yvt, zvt);
             for (svert = 1; svert <= nsides; ++svert) {
                 for (mvert = svert + 1; mvert <= nsides; ++mvert) {

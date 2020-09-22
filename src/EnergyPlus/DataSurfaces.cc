@@ -171,23 +171,23 @@ namespace DataSurfaces {
 //        SurfaceClass_Shading,
 //        SurfaceClass_Overhang,
 //        SurfaceClass_Fin,
-//        SurfaceClass::SurfaceClass_TDD_Dome,
-//        SurfaceClass::SurfaceClass_TDD_Diffuser,
+//        SurfaceClass::TDD_Dome,
+//        SurfaceClass::TDD_Diffuser,
 //    };
-//    int const SurfaceClass::SurfaceClass_Wall(1);
-//    int const SurfaceClass::SurfaceClass_Floor(2);
-//    int const SurfaceClass::SurfaceClass_Roof(3);
-//    int const SurfaceClass::SurfaceClass_IntMass(5);
-//    int const SurfaceClass::SurfaceClass_Detached_B(6);
-//    int const SurfaceClass::SurfaceClass_Detached_F(7);
-//    int const SurfaceClass::SurfaceClass_Window(11);
-//    int const SurfaceClass::SurfaceClass_Door(13);
-//    int const SurfaceClass::SurfaceClass_GlassDoor(12);
-//    int const SurfaceClass::SurfaceClass_Shading(14);
-//    int const SurfaceClass::SurfaceClass_Overhang(15);
-//    int const SurfaceClass::SurfaceClass_Fin(16);
-//    int const SurfaceClass::SurfaceClass_TDD_Dome(17);
-//    int const SurfaceClass::SurfaceClass_TDD_Diffuser(18);
+//    int const SurfaceClass::Wall(1);
+//    int const SurfaceClass::Floor(2);
+//    int const SurfaceClass::Roof(3);
+//    int const SurfaceClass::IntMass(5);
+//    int const SurfaceClass::Detached_B(6);
+//    int const SurfaceClass::Detached_F(7);
+//    int const SurfaceClass::Window(11);
+//    int const SurfaceClass::Door(13);
+//    int const SurfaceClass::GlassDoor(12);
+//    int const SurfaceClass::Shading(14);
+//    int const SurfaceClass::Overhang(15);
+//    int const SurfaceClass::Fin(16);
+//    int const SurfaceClass::TDD_Dome(17);
+//    int const SurfaceClass::TDD_Diffuser(18);
 
     Array1D_string const HeatTransferModelNames(10,
                                                 {"CTF - ConductionTransferFunction",
@@ -1558,40 +1558,40 @@ namespace DataSurfaces {
 
         {
             auto const SELECT_CASE_var(ClassNo);
-            if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Wall) {
+            if (SELECT_CASE_var == SurfaceClass::Wall) {
                 ClassName = "Wall";
 
-            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Floor) {
+            } else if (SELECT_CASE_var == SurfaceClass::Floor) {
                 ClassName = "Floor";
 
-            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Roof) {
+            } else if (SELECT_CASE_var == SurfaceClass::Roof) {
                 ClassName = "Roof";
 
-            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Window) {
+            } else if (SELECT_CASE_var == SurfaceClass::Window) {
                 ClassName = "Window";
 
-            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_GlassDoor) {
+            } else if (SELECT_CASE_var == SurfaceClass::GlassDoor) {
                 ClassName = "Glass Door";
 
-            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Door) {
+            } else if (SELECT_CASE_var == SurfaceClass::Door) {
                 ClassName = "Door";
 
-            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_TDD_Dome) {
+            } else if (SELECT_CASE_var == SurfaceClass::TDD_Dome) {
                 ClassName = "TubularDaylightDome";
 
-            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_TDD_Diffuser) {
+            } else if (SELECT_CASE_var == SurfaceClass::TDD_Diffuser) {
                 ClassName = "TubularDaylightDiffuser";
 
-            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_IntMass) {
+            } else if (SELECT_CASE_var == SurfaceClass::IntMass) {
                 ClassName = "Internal Mass";
 
-            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Shading) {
+            } else if (SELECT_CASE_var == SurfaceClass::Shading) {
                 ClassName = "Shading";
 
-            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Detached_B) {
+            } else if (SELECT_CASE_var == SurfaceClass::Detached_B) {
                 ClassName = "Detached Shading:Building";
 
-            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Detached_F) {
+            } else if (SELECT_CASE_var == SurfaceClass::Detached_F) {
                 ClassName = "Detached Shading:Fixed";
 
             } else {

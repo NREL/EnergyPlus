@@ -102,25 +102,25 @@ namespace DataSurfaces {
     };
 
     enum class SurfaceClass : int {
-        SurfaceClass_None = 0,
-        SurfaceClass_Wall,
-        SurfaceClass_Floor,
-        SurfaceClass_Roof,
-        SurfaceClass_Moved,
-        SurfaceClass_IntMass,
-        SurfaceClass_Detached_B,
-        SurfaceClass_Detached_F,
-        SurfaceClass_PH1,
-        SurfaceClass_PH2,
-        SurfaceClass_PH3,
-        SurfaceClass_Window,
-        SurfaceClass_GlassDoor,
-        SurfaceClass_Door,
-        SurfaceClass_Shading,
-        SurfaceClass_Overhang,
-        SurfaceClass_Fin,
-        SurfaceClass_TDD_Dome,
-        SurfaceClass_TDD_Diffuser
+        None = 0,
+        Wall,
+        Floor,
+        Roof,
+        Moved,
+        IntMass,
+        Detached_B,
+        Detached_F,
+        PH1,
+        PH2,
+        PH3,
+        Window,
+        GlassDoor,
+        Door,
+        Shading,
+        Overhang,
+        Fin,
+        TDD_Dome,
+        TDD_Diffuser
     };
 
     // Parameters to indicate exterior boundary conditions for use with
@@ -167,20 +167,20 @@ namespace DataSurfaces {
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential (LKL - 13 Aug 2007)
 
-//    extern int const SurfaceClass::SurfaceClass_Wall;
-//    extern int const SurfaceClass::SurfaceClass_Floor;
-//    extern int const SurfaceClass::SurfaceClass_Roof;
-//    extern int const SurfaceClass::SurfaceClass_IntMass;
-//    extern int const SurfaceClass::SurfaceClass_Detached_B;
-//    extern int const SurfaceClass::SurfaceClass_Detached_F;
-//    extern int const SurfaceClass::SurfaceClass_Window;
-//    extern int const SurfaceClass::SurfaceClass_Door;
-//    extern int const SurfaceClass::SurfaceClass_GlassDoor;
-//    extern int const SurfaceClass::SurfaceClass_Shading;
-//    extern int const SurfaceClass::SurfaceClass_Overhang;
-//    extern int const SurfaceClass::SurfaceClass_Fin;
-//    extern int const SurfaceClass::SurfaceClass_TDD_Dome;
-//    extern int const SurfaceClass::SurfaceClass_TDD_Diffuser;
+//    extern int const SurfaceClass::Wall;
+//    extern int const SurfaceClass::Floor;
+//    extern int const SurfaceClass::Roof;
+//    extern int const SurfaceClass::IntMass;
+//    extern int const SurfaceClass::Detached_B;
+//    extern int const SurfaceClass::Detached_F;
+//    extern int const SurfaceClass::Window;
+//    extern int const SurfaceClass::Door;
+//    extern int const SurfaceClass::GlassDoor;
+//    extern int const SurfaceClass::Shading;
+//    extern int const SurfaceClass::Overhang;
+//    extern int const SurfaceClass::Fin;
+//    extern int const SurfaceClass::TDD_Dome;
+//    extern int const SurfaceClass::TDD_Diffuser;
 
     // Parameters to indicate heat transfer model to use for surface
     extern Array1D_string const HeatTransferModelNames;
@@ -944,7 +944,7 @@ namespace DataSurfaces {
 
         // Default Constructor
         SurfaceData()
-            : Construction(0), EMSConstructionOverrideON(false), EMSConstructionOverrideValue(0), ConstructionStoredInputValue(0), Class(SurfaceClass::SurfaceClass_None),
+            : Construction(0), EMSConstructionOverrideON(false), EMSConstructionOverrideValue(0), ConstructionStoredInputValue(0), Class(SurfaceClass::None),
               Shape(SurfaceShape::None), Sides(0), Area(0.0), GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0), Azimuth(0.0), Height(0.0),
               Reveal(0.0), Tilt(0.0), Width(0.0), HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
               HeatTransferAlgorithm(HeatTransferModel_NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), ExtBoundCond(0), LowTempErrCount(0),

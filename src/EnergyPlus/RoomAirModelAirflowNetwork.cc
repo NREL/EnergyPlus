@@ -868,7 +868,7 @@ namespace RoomAirModelAirflowNetwork {
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataLoopNode::Node;
         using DataSurfaces::Surface;
-//        using DataSurfaces::SurfaceClass::SurfaceClass_Window;
+//        using DataSurfaces::SurfaceClass::Window;
         using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumInternalConvectionGainsByIndices;
         //using InternalHeatGains::SumInternalConvectionGainsByTypes;
@@ -1068,7 +1068,7 @@ namespace RoomAirModelAirflowNetwork {
             HA = 0.0;
             Area = Surface(SurfNum).Area; // For windows, this is the glazing area
 
-            if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::SurfaceClass_Window) {
+            if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
 
                 // Add to the convective internal gains
                 if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
@@ -1200,7 +1200,7 @@ namespace RoomAirModelAirflowNetwork {
 
         for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non - heat transfer surfaces
-            if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window) continue;
+            if (Surface(SurfNum).Class == SurfaceClass::Window) continue;
 
             if (RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID == RoomAirNode) {
                 Found = false;

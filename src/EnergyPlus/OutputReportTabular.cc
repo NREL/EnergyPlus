@@ -10657,8 +10657,8 @@ namespace OutputReportTabular {
                         // vertical walls and windows
                         {
                             auto const SELECT_CASE_var(Surface(iSurf).Class);
-                            if ((SELECT_CASE_var == SurfaceClass::SurfaceClass_Wall) || (SELECT_CASE_var == SurfaceClass::SurfaceClass_Floor) ||
-                                (SELECT_CASE_var == SurfaceClass::SurfaceClass_Roof)) {
+                            if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
+                                (SELECT_CASE_var == SurfaceClass::Roof)) {
                                 mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
                                 if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
                                     wallAreaN += curArea * mult;
@@ -10692,7 +10692,7 @@ namespace OutputReportTabular {
                                 if (DetailedWWR) {
                                     print(ioFiles.debug, "{},Wall,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
                                 }
-                            } else if ((SELECT_CASE_var == SurfaceClass::SurfaceClass_Window) || (SELECT_CASE_var == SurfaceClass::SurfaceClass_TDD_Dome)) {
+                            } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
                                 mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
                                 if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
                                     windowAreaN += curArea * mult;
@@ -10718,14 +10718,14 @@ namespace OutputReportTabular {
                     } else if (Surface(iSurf).Tilt < 60.0) { // roof and skylights
                         {
                             auto const SELECT_CASE_var(Surface(iSurf).Class);
-                            if ((SELECT_CASE_var == SurfaceClass::SurfaceClass_Wall) || (SELECT_CASE_var == SurfaceClass::SurfaceClass_Floor) ||
-                                (SELECT_CASE_var == SurfaceClass::SurfaceClass_Roof)) {
+                            if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
+                                (SELECT_CASE_var == SurfaceClass::Roof)) {
                                 mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
                                 roofArea += curArea * mult;
                                 if (DetailedWWR) {
                                     print(ioFiles.debug, "{},Roof,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
                                 }
-                            } else if ((SELECT_CASE_var == SurfaceClass::SurfaceClass_Window) || (SELECT_CASE_var == SurfaceClass::SurfaceClass_TDD_Dome)) {
+                            } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
                                 mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
                                 skylightArea += curArea * mult;
                                 if (DetailedWWR) {
@@ -12614,7 +12614,7 @@ namespace OutputReportTabular {
         using DataGlobals::NumOfTimeStepInHour;
         using DataSizing::CurOverallSimDay;
         using DataSurfaces::Surface;
-//        using DataSurfaces::SurfaceClass::SurfaceClass_Window;
+//        using DataSurfaces::SurfaceClass::Window;
         using DataSurfaces::TotSurfaces;
         using DataSurfaces::SurfWinGainConvGlazShadGapToZoneRep;
         using DataSurfaces::SurfWinGainConvGlazToZoneRep;
@@ -12647,7 +12647,7 @@ namespace OutputReportTabular {
             for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
                 ZoneNum = Surface(iSurf).Zone;
                 if (ZoneNum == 0) continue;
-                if (Surface(iSurf).Class != DataSurfaces::SurfaceClass::SurfaceClass_Window) continue;
+                if (Surface(iSurf).Class != DataSurfaces::SurfaceClass::Window) continue;
                 // IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
                 feneCondInstantSeq(CurOverallSimDay, TimeStepInDay, ZoneNum) +=
                     SurfWinGainConvGlazToZoneRep(iSurf) + SurfWinGainConvGlazShadGapToZoneRep(iSurf) + SurfWinGainConvShadeToZoneRep(iSurf) +
@@ -13393,7 +13393,7 @@ namespace OutputReportTabular {
         using DataGlobals::NumOfTimeStepInHour;
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
-//        using DataSurfaces::SurfaceClass::SurfaceClass_Window;
+//        using DataSurfaces::SurfaceClass::Window;
 
         // static bool initAdjFenDone(false); moved to anonymous namespace for unit testing
         static Array3D_bool adjFenDone;
@@ -13470,7 +13470,7 @@ namespace OutputReportTabular {
                          lightSWConvFromSurf +
                          feneSolarConvFromSurf); // remove net radiant for the surface
                                                  // also remove the net radiant component on the instanteous conduction for fenestration
-                    if (Surface(jSurf).Class == DataSurfaces::SurfaceClass::SurfaceClass_Window) {
+                    if (Surface(jSurf).Class == DataSurfaces::SurfaceClass::Window) {
                         adjFeneSurfNetRadSeq += netSurfRadSeq(desDaySelected, kTimeStep, jSurf);
                     }
                 } // for jSurf
@@ -13655,7 +13655,7 @@ namespace OutputReportTabular {
                 singleSurfDelay = AvgData(timeOfMax);
                 {
                     auto const SELECT_CASE_var(Surface(kSurf).Class);
-                    if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Wall) {
+                    if (SELECT_CASE_var == SurfaceClass::Wall) {
                         {
                             auto const SELECT_CASE_var1(curExtBoundCond);
                             if (SELECT_CASE_var1 == ExternalEnvironment) {
@@ -13669,7 +13669,7 @@ namespace OutputReportTabular {
                                 delayOpaque(rIntZonWall) += singleSurfDelay;
                             }
                         }
-                    } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Floor) {
+                    } else if (SELECT_CASE_var == SurfaceClass::Floor) {
                         {
                             auto const SELECT_CASE_var1(curExtBoundCond);
                             if (SELECT_CASE_var1 == ExternalEnvironment) {
@@ -13684,7 +13684,7 @@ namespace OutputReportTabular {
                                 delayOpaque(rIntZonFlr) += singleSurfDelay;
                             }
                         }
-                    } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Roof) {
+                    } else if (SELECT_CASE_var == SurfaceClass::Roof) {
                         {
                             auto const SELECT_CASE_var1(curExtBoundCond);
                             if (SELECT_CASE_var1 == ExternalEnvironment) {
@@ -13697,7 +13697,7 @@ namespace OutputReportTabular {
                                 delayOpaque(rIntZonCeil) += singleSurfDelay;
                             }
                         }
-                    } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Door) {
+                    } else if (SELECT_CASE_var == SurfaceClass::Door) {
                         delayOpaque(rOpqDoor) += singleSurfDelay;
                     }
                 }
@@ -13912,7 +13912,7 @@ namespace OutputReportTabular {
                 curSurface.ExtBoundCond == Ground || curSurface.ExtBoundCond == GroundFCfactorMethod || curSurface.ExtBoundCond == KivaFoundation;
             int curZoneIndex = curSurface.Zone;
             // ZoneData curZone = Zone(curSurface.Zone);
-            if (curSurface.Class == SurfaceClass::SurfaceClass_Wall) {
+            if (curSurface.Class == SurfaceClass::Wall) {
                 if (isExterior) {
                     areas(curZoneIndex).extWall += curSurface.GrossArea;
                 } else if (isTouchingGround) {
@@ -13920,13 +13920,13 @@ namespace OutputReportTabular {
                 } else {
                     areas(curZoneIndex).intZoneWall += curSurface.GrossArea;
                 }
-            } else if (curSurface.Class == SurfaceClass::SurfaceClass_Roof) {
+            } else if (curSurface.Class == SurfaceClass::Roof) {
                 if (isExterior) {
                     areas(curZoneIndex).roof += curSurface.GrossArea;
                 } else {
                     areas(curZoneIndex).ceiling += curSurface.GrossArea;
                 }
-            } else if (curSurface.Class == SurfaceClass::SurfaceClass_Floor) {
+            } else if (curSurface.Class == SurfaceClass::Floor) {
                 if (isExterior) {
                     areas(curZoneIndex).extFloor += curSurface.GrossArea;
                 } else if (isTouchingGround) {
@@ -13934,9 +13934,9 @@ namespace OutputReportTabular {
                 } else {
                     areas(curZoneIndex).intZoneFloor += curSurface.GrossArea;
                 }
-            } else if (curSurface.Class == SurfaceClass::SurfaceClass_Window || curSurface.Class == SurfaceClass::SurfaceClass_TDD_Dome) {
+            } else if (curSurface.Class == SurfaceClass::Window || curSurface.Class == SurfaceClass::TDD_Dome) {
                 areas(curZoneIndex).fenestration += curSurface.GrossArea;
-            } else if (curSurface.Class == SurfaceClass::SurfaceClass_Door || curSurface.Class == SurfaceClass::SurfaceClass_GlassDoor) {
+            } else if (curSurface.Class == SurfaceClass::Door || curSurface.Class == SurfaceClass::GlassDoor) {
                 areas(curZoneIndex).door += curSurface.GrossArea;
             }
         }

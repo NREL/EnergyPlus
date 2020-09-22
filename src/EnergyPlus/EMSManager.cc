@@ -1975,7 +1975,7 @@ namespace EMSManager {
         // Using/Aliasing
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Surface;
-//        using DataSurfaces::SurfaceClass::SurfaceClass_Window;
+//        using DataSurfaces::SurfaceClass::Window;
         using DataSurfaces::TotSurfaces;
         using DataSurfaces::WindowShadingControl;
         using DataSurfaces::WSC_ST_SwitchableGlazing;
@@ -1999,7 +1999,7 @@ namespace EMSManager {
 
         for (loopSurfNum = 1; loopSurfNum <= TotSurfaces; ++loopSurfNum) {
 
-            if (Surface(loopSurfNum).Class != DataSurfaces::SurfaceClass::SurfaceClass_Window) continue;
+            if (Surface(loopSurfNum).Class != DataSurfaces::SurfaceClass::Window) continue;
             if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
             if (!Surface(loopSurfNum).HasShadeControl) continue;
 
