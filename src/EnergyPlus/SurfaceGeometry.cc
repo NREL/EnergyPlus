@@ -275,7 +275,6 @@ namespace SurfaceGeometry {
         SurfWinStormWinFlagPrevDay.dimension(NumSurfaces, 0);
         SurfWinFracTimeShadingDeviceOn.dimension(NumSurfaces, 0);
         SurfWinExtIntShadePrevTS.dimension(NumSurfaces, 0);
-        SurfWinShadedConstruction.dimension(NumSurfaces, 0);
         SurfWinHasShadeOrBlindLayer.dimension(NumSurfaces, 0);
         SurfWinSurfDayLightInit.dimension(NumSurfaces, 0);
         SurfWinDaylFacPoint.dimension(NumSurfaces, 0);
@@ -1110,7 +1109,7 @@ namespace SurfaceGeometry {
         int iTmp2;
         // unused  INTEGER :: SchID
         int BlNumNew;
-        int WinShadingControlPtr;
+        int WinShadingControlPtr(0);
         int ShadingType;
         int ErrCount;
         Real64 diffp;
@@ -2085,22 +2084,13 @@ namespace SurfaceGeometry {
         errFlag = false;
         if (!SurfError) {
             for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
-                // Set ShadedConstruction numbers for windows whose shaded constructions were created
-                // when shading device was specified in the WindowShadingControl for the window
-                if (Surface(SurfNum).ShadedConstruction != 0) SurfWinShadedConstruction(SurfNum) = Surface(SurfNum).ShadedConstruction;
-
-                // no need to set the below -- it is the default
-                // Set variable that indicates if shading device has movable slats
-                //      SurfaceWindow(SurfNum)%MovableSlats = .FALSE.
-
-                // TH 2/9/2010. Fixed for CR 8010 for speed up purpose rather than fixing the problem
-                WinShadingControlPtr = Surface(SurfNum).WindowShadingControlPtr;
                 if (Surface(SurfNum).HasShadeControl) {
+                    WinShadingControlPtr = Surface(SurfNum).activeWindowShadingControl; // use first item since others should be identical
                     if (WindowShadingControl(WinShadingControlPtr).SlatAngleControlForBlinds != WSC_SAC_FixedSlatAngle)
                         SurfWinMovableSlats(SurfNum) = true;
                 }
 
-                ConstrNumSh = SurfWinShadedConstruction(SurfNum);
+                ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 if (ConstrNumSh <= 0) continue;
 
                 ShadingType = WindowShadingControl(WinShadingControlPtr).ShadingType;
@@ -2136,21 +2126,12 @@ namespace SurfaceGeometry {
                         ShowContinueError("WindowShadingControl " + WindowShadingControl(WinShadingControlPtr).Name +
                                           " has errors, program will terminate.");
                     }
-
-                    // TH 5/17/2010. Fixed for CR 8121. Overwrite the blind slat angle with the constant scheduled value
-                    // TH 3/14/2011. With fix for CR 8347, the following code is no longer needed.
-                    // IF (SurfaceWindow(SurfNum)%BlindNumber >0 .AND. WinShadingControlPtr >0 ) THEN
-                    //  IF (.NOT. SurfaceWindow(SurfNum)%MovableSlats .AND. &
-                    //    WindowShadingControl(WinShadingControlPtr)%SlatAngleControlForBlinds == WSC_SAC_ScheduledSlatAngle) THEN
-                    //    Blind(SurfaceWindow(SurfNum)%BlindNumber)%SlatAngle = SchSlatAngle
-                    //  ENDIF
-                    // ENDIF
                 }
-
             } // End of surface loop
 
             // final associate fenestration surfaces referenced in WindowShadingControl
             FinalAssociateWindowShadingControlFenestration(ErrorsFound);
+            CheckWindowShadingControlSimilarForWindow(ErrorsFound);
         }
 
         // Check for zones with not enough surfaces
@@ -4336,8 +4317,15 @@ namespace SurfaceGeometry {
             GetVertices(ioFiles, SurfNum, SurfaceTmp(SurfNum).Sides, rNumericArgs({4, _}));
 
             CheckConvexity(SurfNum, SurfaceTmp(SurfNum).Sides);
-            SurfaceTmp(SurfNum).WindowShadingControlPtr = 0;
+            SurfaceTmp(SurfNum).windowShadingControlList.clear();
+            SurfaceTmp(SurfNum).activeWindowShadingControl = 0;
             SurfaceTmp(SurfNum).HasShadeControl = false;
+
+            SurfaceTmp(SurfNum).shadedConstructionList.clear();
+            SurfaceTmp(SurfNum).activeShadedConstruction = 0;
+            SurfaceTmp(SurfNum).shadedStormWinConstructionList.clear();
+            SurfaceTmp(SurfNum).activeStormWinShadedConstruction= 0;
+
 
             if (SurfaceTmp(SurfNum).Class == SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass_GlassDoor ||
                 SurfaceTmp(SurfNum).Class == SurfaceClass_TDD_Diffuser || SurfaceTmp(SurfNum).Class == SurfaceClass_TDD_Dome) {
@@ -4657,8 +4645,15 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
 
-                SurfaceTmp(SurfNum).WindowShadingControlPtr = 0;
+                SurfaceTmp(SurfNum).windowShadingControlList.clear();
+                SurfaceTmp(SurfNum).activeWindowShadingControl = 0;
                 SurfaceTmp(SurfNum).HasShadeControl = false;
+
+                SurfaceTmp(SurfNum).shadedConstructionList.clear();
+                SurfaceTmp(SurfNum).activeShadedConstruction = 0;
+                SurfaceTmp(SurfNum).shadedStormWinConstructionList.clear();
+                SurfaceTmp(SurfNum).activeStormWinShadedConstruction= 0;
+
                 InitialAssociateWindowShadingControlFenestration(ErrorsFound, SurfNum);
 
                 if (!GettingIZSurfaces && (SurfaceTmp(SurfNum).Class == SurfaceClass_Window || SurfaceTmp(SurfNum).Class == SurfaceClass_GlassDoor)) {
@@ -4707,7 +4702,6 @@ namespace SurfaceGeometry {
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int WSCPtr;         // WindowShadingControl Index
         int ConstrNumSh;    // Construction number with Shade
         int ConstrNum;      // Construction number
         int ShDevNum;       // Shading Device number
@@ -4726,155 +4720,157 @@ namespace SurfaceGeometry {
         // Otherwise, create shaded construction if WindowShadingControl for this window has
         // interior or exterior shade/blind (but not between-glass shade/blind) specified.
 
-        WSCPtr = SurfaceTmp(SurfNum).WindowShadingControlPtr;
-        ConstrNumSh = 0;
-        if (!ErrorsFound && SurfaceTmp(SurfNum).HasShadeControl) {
-            ConstrNumSh = WindowShadingControl(WSCPtr).ShadedConstruction;
-            if (ConstrNumSh > 0) {
-                SurfaceTmp(SurfNum).ShadedConstruction = ConstrNumSh;
-            } else {
+        for (std::size_t shadeControlIndex = 0; shadeControlIndex < SurfaceTmp(SurfNum).windowShadingControlList.size(); ++shadeControlIndex){
+            int WSCPtr = SurfaceTmp(SurfNum).windowShadingControlList[shadeControlIndex];
+            ConstrNumSh = 0;
+            if (!ErrorsFound && SurfaceTmp(SurfNum).HasShadeControl) {
+                ConstrNumSh = SurfaceTmp(SurfNum).shadedConstructionList[shadeControlIndex];
+                if (ConstrNumSh > 0) {
+                    SurfaceTmp(SurfNum).activeShadedConstruction = ConstrNumSh;
+                } else {
+                    if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorShade ||
+                        WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorBlind ||
+                        WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorShade ||
+                        WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorScreen ||
+                        WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorBlind) {
+                        ShDevNum = WindowShadingControl(WSCPtr).ShadingDevice;
+                        if (ShDevNum > 0) {
+                            CreateShadedWindowConstruction(SurfNum, WSCPtr, ShDevNum, shadeControlIndex);
+                            ConstrNumSh = SurfaceTmp(SurfNum).activeShadedConstruction;
+                        }
+                    }
+                }
+            }
+
+            // Error checks for shades and blinds
+
+            ConstrNum = SurfaceTmp(SurfNum).Construction;
+            if (!ErrorsFound && WSCPtr > 0 && ConstrNum > 0 && ConstrNumSh > 0) {
+
                 if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorShade ||
-                    WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorBlind ||
-                    WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorShade ||
+                    WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorBlind) {
+                    TotLayers = dataConstruction.Construct(ConstrNum).TotLayers;
+                    TotShLayers = dataConstruction.Construct(ConstrNumSh).TotLayers;
+                    if (TotShLayers - 1 != TotLayers) {
+                        ShowWarningError("WindowShadingControl: Interior shade or blind: Potential problem in match of unshaded/shaded constructions, "
+                                         "shaded should have 1 more layers than unshaded.");
+                        ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
+                        ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
+                        ShowContinueError("If preceding two constructions are same name, you have likely specified a WindowShadingControl (Field #3) "
+                                          "with the Window Construction rather than a shaded construction.");
+                    }
+                    for (Lay = 1; Lay <= dataConstruction.Construct(ConstrNum).TotLayers; ++Lay) {
+                        if (dataConstruction.Construct(ConstrNum).LayerPoint(Lay) != dataConstruction.Construct(ConstrNumSh).LayerPoint(Lay)) {
+                            ErrorsFound = true;
+                            ShowSevereError(" The glass and gas layers in the shaded and unshaded constructions do not match for window=" +
+                                            SurfaceTmp(SurfNum).Name);
+                            ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
+                            ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
+                            break;
+                        }
+                    }
+                }
+
+                if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorShade ||
                     WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorScreen ||
                     WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorBlind) {
-                    ShDevNum = WindowShadingControl(WSCPtr).ShadingDevice;
-                    if (ShDevNum > 0) {
-                        CreateShadedWindowConstruction(SurfNum, WSCPtr, ShDevNum);
-                        ConstrNumSh = SurfaceTmp(SurfNum).ShadedConstruction;
-                    }
-                }
-            }
-        }
-
-        // Error checks for shades and blinds
-
-        ConstrNum = SurfaceTmp(SurfNum).Construction;
-        if (!ErrorsFound && WSCPtr > 0 && ConstrNum > 0 && ConstrNumSh > 0) {
-
-            if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorShade ||
-                WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorBlind) {
-                TotLayers = dataConstruction.Construct(ConstrNum).TotLayers;
-                TotShLayers = dataConstruction.Construct(ConstrNumSh).TotLayers;
-                if (TotShLayers - 1 != TotLayers) {
-                    ShowWarningError("WindowShadingControl: Interior shade or blind: Potential problem in match of unshaded/shaded constructions, "
-                                     "shaded should have 1 more layers than unshaded.");
-                    ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
-                    ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
-                    ShowContinueError("If preceding two constructions are same name, you have likely specified a WindowShadingControl (Field #3) "
-                                      "with the Window Construction rather than a shaded construction.");
-                }
-                for (Lay = 1; Lay <= dataConstruction.Construct(ConstrNum).TotLayers; ++Lay) {
-                    if (dataConstruction.Construct(ConstrNum).LayerPoint(Lay) != dataConstruction.Construct(ConstrNumSh).LayerPoint(Lay)) {
-                        ErrorsFound = true;
-                        ShowSevereError(" The glass and gas layers in the shaded and unshaded constructions do not match for window=" +
-                                        SurfaceTmp(SurfNum).Name);
+                    TotLayers = dataConstruction.Construct(ConstrNum).TotLayers;
+                    TotShLayers = dataConstruction.Construct(ConstrNumSh).TotLayers;
+                    if (TotShLayers - 1 != TotLayers) {
+                        ShowWarningError("WindowShadingControl: Exterior shade, screen or blind: Potential problem in match of unshaded/shaded "
+                                         "constructions, shaded should have 1 more layer than unshaded.");
                         ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
                         ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
-                        break;
+                        ShowContinueError("If preceding two constructions have the same name, you have likely specified a WindowShadingControl (Field "
+                                          "#3) with the Window Construction rather than a shaded construction.");
                     }
-                }
-            }
-
-            if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorShade ||
-                WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorScreen ||
-                WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorBlind) {
-                TotLayers = dataConstruction.Construct(ConstrNum).TotLayers;
-                TotShLayers = dataConstruction.Construct(ConstrNumSh).TotLayers;
-                if (TotShLayers - 1 != TotLayers) {
-                    ShowWarningError("WindowShadingControl: Exterior shade, screen or blind: Potential problem in match of unshaded/shaded "
-                                     "constructions, shaded should have 1 more layer than unshaded.");
-                    ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
-                    ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
-                    ShowContinueError("If preceding two constructions have the same name, you have likely specified a WindowShadingControl (Field "
-                                      "#3) with the Window Construction rather than a shaded construction.");
-                }
-                for (Lay = 1; Lay <= dataConstruction.Construct(ConstrNum).TotLayers; ++Lay) {
-                    if (dataConstruction.Construct(ConstrNum).LayerPoint(Lay) != dataConstruction.Construct(ConstrNumSh).LayerPoint(Lay + 1)) {
-                        ErrorsFound = true;
-                        ShowSevereError(" The glass and gas layers in the shaded and unshaded constructions do not match for window=" +
-                                        SurfaceTmp(SurfNum).Name);
-                        ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
-                        ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
-                        break;
-                    }
-                }
-            }
-
-            if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
-                WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
-                // Divider not allowed with between-glass shade or blind
-                if (SurfaceTmp(SurfNum).FrameDivider > 0) {
-                    if (FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth > 0.0) {
-                        ShowWarningError("A divider cannot be specified for window " + SurfaceTmp(SurfNum).Name);
-                        ShowContinueError(", which has a between-glass shade or blind.");
-                        ShowContinueError("Calculation will proceed without the divider for this window.");
-                        FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth = 0.0;
-                    }
-                }
-                // Check consistency of gap widths between unshaded and shaded constructions
-                TotGlassLayers = dataConstruction.Construct(ConstrNum).TotGlassLayers;
-                TotLayers = dataConstruction.Construct(ConstrNum).TotLayers;
-                TotShLayers = dataConstruction.Construct(ConstrNumSh).TotLayers;
-                if (TotShLayers - 2 != TotLayers) {
-                    ShowWarningError("WindowShadingControl: Between Glass Shade/Blind: Potential problem in match of unshaded/shaded constructions, "
-                                     "shaded should have 2 more layers than unshaded.");
-                    ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
-                    ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
-                    ShowContinueError("If preceding two constructions are same name, you have likely specified a WindowShadingControl (Field #3) "
-                                      "with the Window Construction rather than a shaded construction.");
-                }
-                if (dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers) != dataConstruction.Construct(ConstrNumSh).LayerPoint(TotShLayers)) {
-                    ShowSevereError(cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
-                    ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name +
-                                      ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers)).Name);
-                    ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name +
-                                      ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotShLayers)).Name);
-                    ErrorsFound = true;
-                }
-                if (dataConstruction.Construct(ConstrNum).LayerPoint(1) != dataConstruction.Construct(ConstrNumSh).LayerPoint(1)) {
-                    ShowSevereError(cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
-                    ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name +
-                                      ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Name);
-                    ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name +
-                                      ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Name);
-                    ErrorsFound = true;
-                }
-                if (TotGlassLayers == 2 || TotGlassLayers == 3) {
-                    MatGap = dataConstruction.Construct(ConstrNum).LayerPoint(2 * TotGlassLayers - 2);
-                    MatGap1 = dataConstruction.Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 2);
-                    MatGap2 = dataConstruction.Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers);
-                    MatSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 1);
-                    if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
-                        MatGapCalc = std::abs(dataMaterial.Material(MatGap).Thickness - (dataMaterial.Material(MatGap1).Thickness + dataMaterial.Material(MatGap2).Thickness));
-                        if (MatGapCalc > 0.001) {
-                            ShowSevereError(cRoutineName + ": The gap width(s) for the unshaded window construction " + dataConstruction.Construct(ConstrNum).Name);
-                            ShowContinueError("are inconsistent with the gap widths for shaded window construction " + dataConstruction.Construct(ConstrNumSh).Name);
-                            ShowContinueError("for window " + SurfaceTmp(SurfNum).Name + ", which has a between-glass blind.");
-                            ShowContinueError("..Material=" + dataMaterial.Material(MatGap).Name + " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap).Thickness, 3) +
-                                              " -");
-                            ShowContinueError("..( Material=" + dataMaterial.Material(MatGap1).Name +
-                                              " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap1).Thickness, 3) + " +");
-                            ShowContinueError("..Material=" + dataMaterial.Material(MatGap2).Name + " thickness=" +
-                                              RoundSigDigits(dataMaterial.Material(MatGap2).Thickness, 3) + " )=[" + RoundSigDigits(MatGapCalc, 3) + "] >.001");
+                    for (Lay = 1; Lay <= dataConstruction.Construct(ConstrNum).TotLayers; ++Lay) {
+                        if (dataConstruction.Construct(ConstrNum).LayerPoint(Lay) != dataConstruction.Construct(ConstrNumSh).LayerPoint(Lay + 1)) {
                             ErrorsFound = true;
+                            ShowSevereError(" The glass and gas layers in the shaded and unshaded constructions do not match for window=" +
+                                            SurfaceTmp(SurfNum).Name);
+                            ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
+                            ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
+                            break;
                         }
-                    } else { // Between-glass shade
-                        MatGapCalc = std::abs(dataMaterial.Material(MatGap).Thickness -
-                                              (dataMaterial.Material(MatGap1).Thickness + dataMaterial.Material(MatGap2).Thickness + dataMaterial.Material(MatSh).Thickness));
-                        if (MatGapCalc > 0.001) {
-                            ShowSevereError(cRoutineName + ": The gap width(s) for the unshaded window construction " + dataConstruction.Construct(ConstrNum).Name);
-                            ShowContinueError("are inconsistent with the gap widths for shaded window construction " + dataConstruction.Construct(ConstrNumSh).Name);
-                            ShowContinueError("for window " + SurfaceTmp(SurfNum).Name + ", which has a between-glass shade.");
-                            ShowContinueError("..Material=" + dataMaterial.Material(MatGap).Name + " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap).Thickness, 3) +
-                                              " -");
-                            ShowContinueError("...( Material=" + dataMaterial.Material(MatGap1).Name +
-                                              " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap1).Thickness, 3) + " +");
-                            ShowContinueError("..Material=" + dataMaterial.Material(MatGap2).Name +
-                                              " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap2).Thickness, 3) + " +");
-                            ShowContinueError("..Material=" + dataMaterial.Material(MatSh).Name + " thickness=" + RoundSigDigits(dataMaterial.Material(MatSh).Thickness, 3) +
-                                              " )=[" + RoundSigDigits(MatGapCalc, 3) + "] >.001");
-                            ErrorsFound = true;
+                    }
+                }
+
+                if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
+                    WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
+                    // Divider not allowed with between-glass shade or blind
+                    if (SurfaceTmp(SurfNum).FrameDivider > 0) {
+                        if (FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth > 0.0) {
+                            ShowWarningError("A divider cannot be specified for window " + SurfaceTmp(SurfNum).Name);
+                            ShowContinueError(", which has a between-glass shade or blind.");
+                            ShowContinueError("Calculation will proceed without the divider for this window.");
+                            FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth = 0.0;
+                        }
+                    }
+                    // Check consistency of gap widths between unshaded and shaded constructions
+                    TotGlassLayers = dataConstruction.Construct(ConstrNum).TotGlassLayers;
+                    TotLayers = dataConstruction.Construct(ConstrNum).TotLayers;
+                    TotShLayers = dataConstruction.Construct(ConstrNumSh).TotLayers;
+                    if (TotShLayers - 2 != TotLayers) {
+                        ShowWarningError("WindowShadingControl: Between Glass Shade/Blind: Potential problem in match of unshaded/shaded constructions, "
+                                         "shaded should have 2 more layers than unshaded.");
+                        ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
+                        ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
+                        ShowContinueError("If preceding two constructions are same name, you have likely specified a WindowShadingControl (Field #3) "
+                                          "with the Window Construction rather than a shaded construction.");
+                    }
+                    if (dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers) != dataConstruction.Construct(ConstrNumSh).LayerPoint(TotShLayers)) {
+                        ShowSevereError(cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
+                        ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name +
+                                          ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers)).Name);
+                        ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name +
+                                          ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotShLayers)).Name);
+                        ErrorsFound = true;
+                    }
+                    if (dataConstruction.Construct(ConstrNum).LayerPoint(1) != dataConstruction.Construct(ConstrNumSh).LayerPoint(1)) {
+                        ShowSevereError(cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
+                        ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name +
+                                          ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Name);
+                        ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name +
+                                          ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Name);
+                        ErrorsFound = true;
+                    }
+                    if (TotGlassLayers == 2 || TotGlassLayers == 3) {
+                        MatGap = dataConstruction.Construct(ConstrNum).LayerPoint(2 * TotGlassLayers - 2);
+                        MatGap1 = dataConstruction.Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 2);
+                        MatGap2 = dataConstruction.Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers);
+                        MatSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 1);
+                        if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
+                            MatGapCalc = std::abs(dataMaterial.Material(MatGap).Thickness - (dataMaterial.Material(MatGap1).Thickness + dataMaterial.Material(MatGap2).Thickness));
+                            if (MatGapCalc > 0.001) {
+                                ShowSevereError(cRoutineName + ": The gap width(s) for the unshaded window construction " + dataConstruction.Construct(ConstrNum).Name);
+                                ShowContinueError("are inconsistent with the gap widths for shaded window construction " + dataConstruction.Construct(ConstrNumSh).Name);
+                                ShowContinueError("for window " + SurfaceTmp(SurfNum).Name + ", which has a between-glass blind.");
+                                ShowContinueError("..Material=" + dataMaterial.Material(MatGap).Name + " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap).Thickness, 3) +
+                                                  " -");
+                                ShowContinueError("..( Material=" + dataMaterial.Material(MatGap1).Name +
+                                                  " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap1).Thickness, 3) + " +");
+                                ShowContinueError("..Material=" + dataMaterial.Material(MatGap2).Name + " thickness=" +
+                                                  RoundSigDigits(dataMaterial.Material(MatGap2).Thickness, 3) + " )=[" + RoundSigDigits(MatGapCalc, 3) + "] >.001");
+                                ErrorsFound = true;
+                            }
+                        } else { // Between-glass shade
+                            MatGapCalc = std::abs(dataMaterial.Material(MatGap).Thickness -
+                                                  (dataMaterial.Material(MatGap1).Thickness + dataMaterial.Material(MatGap2).Thickness + dataMaterial.Material(MatSh).Thickness));
+                            if (MatGapCalc > 0.001) {
+                                ShowSevereError(cRoutineName + ": The gap width(s) for the unshaded window construction " + dataConstruction.Construct(ConstrNum).Name);
+                                ShowContinueError("are inconsistent with the gap widths for shaded window construction " + dataConstruction.Construct(ConstrNumSh).Name);
+                                ShowContinueError("for window " + SurfaceTmp(SurfNum).Name + ", which has a between-glass shade.");
+                                ShowContinueError("..Material=" + dataMaterial.Material(MatGap).Name + " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap).Thickness, 3) +
+                                    " -");
+                                ShowContinueError("...( Material=" + dataMaterial.Material(MatGap1).Name +
+                                    " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap1).Thickness, 3) + " +");
+                                ShowContinueError("..Material=" + dataMaterial.Material(MatGap2).Name +
+                                    " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap2).Thickness, 3) + " +");
+                                ShowContinueError("..Material=" + dataMaterial.Material(MatSh).Name + " thickness=" + RoundSigDigits(dataMaterial.Material(MatSh).Thickness, 3) +
+                                    " )=[" + RoundSigDigits(MatGapCalc, 3) + "] >.001");
+                                ErrorsFound = true;
+                            }
                         }
                     }
                 }
@@ -4914,22 +4910,24 @@ namespace SurfaceGeometry {
                         }
                     }
                     // Divider not allowed with between-glass shade or blind
-                    if (!ErrorsFound && WSCPtr > 0 && ConstrNumSh > 0) {
-                        if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
-                            WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
-                            if (SurfaceTmp(SurfNum).FrameDivider > 0) {
-                                if (FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth > 0.0) {
-                                    ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
-                                                    cAlphaFieldNames(FrameField) + "=\"" + cAlphaArgs(FrameField) + "\"");
-                                    ShowContinueError("Divider cannot be specified because the construction has a between-glass shade or blind.");
-                                    ShowContinueError("Calculation will proceed without the divider for this window.");
-                                    ShowContinueError("Divider width = [" +
-                                                      RoundSigDigits(FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth, 2) + "].");
-                                    FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth = 0.0;
-                                }
-                            } // End of check if window has divider
-                        }     // End of check if window has a between-glass shade or blind
-                    }         // End of check if window has a shaded construction
+                    for (int WSCPtr : SurfaceTmp(SurfNum).windowShadingControlList) {
+                        if (!ErrorsFound && WSCPtr > 0 && ConstrNumSh > 0) {
+                            if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
+                                WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
+                                if (SurfaceTmp(SurfNum).FrameDivider > 0) {
+                                    if (FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth > 0.0) {
+                                        ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
+                                                        cAlphaFieldNames(FrameField) + "=\"" + cAlphaArgs(FrameField) + "\"");
+                                        ShowContinueError("Divider cannot be specified because the construction has a between-glass shade or blind.");
+                                        ShowContinueError("Calculation will proceed without the divider for this window.");
+                                        ShowContinueError("Divider width = [" +
+                                                          RoundSigDigits(FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth, 2) + "].");
+                                        FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth = 0.0;
+                                    }
+                                } // End of check if window has divider
+                            }     // End of check if window has a between-glass shade or blind
+                        }         // End of check if window has a shaded construction
+                    }             // end of looping through window shading controls of window
                 }             // End of check if window has an associated FrameAndDivider
             }                 // End of check if window has a construction
         }
@@ -7974,9 +7972,10 @@ namespace SurfaceGeometry {
         SurfaceTmp(SurfNum + 1).MaterialMovInsulInt = SurfaceTmp(SurfNum).MaterialMovInsulInt;
         SurfaceTmp(SurfNum + 1).SchedMovInsulExt = SurfaceTmp(SurfNum).SchedMovInsulExt;
         SurfaceTmp(SurfNum + 1).SchedMovInsulInt = SurfaceTmp(SurfNum).SchedMovInsulInt;
-        SurfaceTmp(SurfNum + 1).WindowShadingControlPtr = SurfaceTmp(SurfNum).WindowShadingControlPtr;
+        SurfaceTmp(SurfNum + 1).activeWindowShadingControl = SurfaceTmp(SurfNum).activeWindowShadingControl;
+        SurfaceTmp(SurfNum + 1).windowShadingControlList = SurfaceTmp(SurfNum).windowShadingControlList;
         SurfaceTmp(SurfNum + 1).HasShadeControl = SurfaceTmp(SurfNum).HasShadeControl;
-        SurfaceTmp(SurfNum + 1).ShadedConstruction = SurfaceTmp(SurfNum).ShadedConstruction;
+        SurfaceTmp(SurfNum + 1).activeShadedConstruction = SurfaceTmp(SurfNum).activeShadedConstruction;
         SurfaceTmp(SurfNum + 1).FrameDivider = SurfaceTmp(SurfNum).FrameDivider;
         SurfaceTmp(SurfNum + 1).Multiplier = SurfaceTmp(SurfNum).Multiplier;
         SurfaceTmp(SurfNum + 1).NetAreaShadowCalc = SurfaceTmp(SurfNum).NetAreaShadowCalc;
@@ -8197,7 +8196,8 @@ namespace SurfaceGeometry {
             }
 
             WindowShadingControl(ControlNum).SequenceNumber = int(rNumericArgs(1));
-            WindowShadingControl(ControlNum).ShadedConstruction = UtilityRoutines::FindItemInList(cAlphaArgs(4), dataConstruction.Construct, TotConstructs);
+            // WindowShadingControl().getInputShadedConstruction is only used during GetInput process and is ultimately stored in Surface().shadedConstructionList
+            WindowShadingControl(ControlNum).getInputShadedConstruction = UtilityRoutines::FindItemInList(cAlphaArgs(4), dataConstruction.Construct, TotConstructs);
             WindowShadingControl(ControlNum).ShadingDevice = UtilityRoutines::FindItemInList(cAlphaArgs(9), dataMaterial.Material, TotMaterials);
             WindowShadingControl(ControlNum).Schedule = GetScheduleIndex(cAlphaArgs(6));
             WindowShadingControl(ControlNum).SetPoint = rNumericArgs(2);
@@ -8287,9 +8287,9 @@ namespace SurfaceGeometry {
                     ShowContinueError("Valid shading control types for exterior window screens are ALWAYSON, ALWAYSOFF, or ONIFSCHEDULEALLOWS.");
                 }
             } else {
-                if (WindowShadingControl(ControlNum).ShadedConstruction > 0) {
-                    dataConstruction.Construct(WindowShadingControl(ControlNum).ShadedConstruction).IsUsed = true;
-                    if (dataMaterial.Material(dataConstruction.Construct(WindowShadingControl(ControlNum).ShadedConstruction).LayerPoint(1)).Group == Screen &&
+                if (WindowShadingControl(ControlNum).getInputShadedConstruction > 0) {
+                    dataConstruction.Construct(WindowShadingControl(ControlNum).getInputShadedConstruction).IsUsed = true;
+                    if (dataMaterial.Material(dataConstruction.Construct(WindowShadingControl(ControlNum).getInputShadedConstruction).LayerPoint(1)).Group == Screen &&
                         !(ControlType == "ALWAYSON" || ControlType == "ALWAYSOFF" || ControlType == "ONIFSCHEDULEALLOWS")) {
                         ErrorsFound = true;
                         ShowSevereError(cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(5) +
@@ -8402,7 +8402,7 @@ namespace SurfaceGeometry {
             }
 
             ShTyp = WindowShadingControl(ControlNum).ShadingType;
-            IShadedConst = WindowShadingControl(ControlNum).ShadedConstruction;
+            IShadedConst = WindowShadingControl(ControlNum).getInputShadedConstruction;
             IShadingDevice = WindowShadingControl(ControlNum).ShadingDevice;
 
             if (IShadedConst == 0 && IShadingDevice == 0) {
@@ -8558,36 +8558,33 @@ namespace SurfaceGeometry {
 
     void InitialAssociateWindowShadingControlFenestration(bool &ErrorsFound, int &SurfNum)
     {
-        // J.Glazer 2018 - operates on SurfaceTmp array before final indices are known for windows and sets the WindowShadingControlPtr
+        // J.Glazer 2018 - operates on SurfaceTmp array before final indices are known for windows and sets the activeWindowShadingControl
         for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
+            int curShadedConstruction = WindowShadingControl(iShadeCtrl).getInputShadedConstruction;
             for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
                 if (UtilityRoutines::SameString(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), SurfaceTmp(SurfNum).Name)) {
-                    if (SurfaceTmp(SurfNum).WindowShadingControlPtr == 0) {
-                        SurfaceTmp(SurfNum).WindowShadingControlPtr = iShadeCtrl;
-                        SurfaceTmp(SurfNum).HasShadeControl = true;
-                        // check to make the window refenced is an exterior window
-                        if (SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment) {
-                            ErrorsFound = true;
-                            ShowSevereError("InitialAssociateWindowShadingControlFenestration: \"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
-                                            " because it is not an exterior window.");
-                            ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
-                        }
-                        // check to make sure the window is not using equivalent layer window construction
-                        if (dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
-                            ErrorsFound = true;
-                            ShowSevereError("InitialAssociateWindowShadingControlFenestration: =\"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
-                                            "\".");
-                            ShowContinueError(".. equivalent layer window model does not use shading control object.");
-                            ShowContinueError(".. Shading control is set to none or zero, and simulation continues.");
-                            ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
-                            SurfaceTmp(SurfNum).WindowShadingControlPtr = 0;
-                        }
-                    } else {
+                    SurfaceTmp(SurfNum).HasShadeControl = true;
+                    SurfaceTmp(SurfNum).windowShadingControlList.push_back(iShadeCtrl);
+                    SurfaceTmp(SurfNum).activeWindowShadingControl = iShadeCtrl;
+                    SurfaceTmp(SurfNum).shadedConstructionList.push_back(curShadedConstruction);
+                    SurfaceTmp(SurfNum).activeShadedConstruction = curShadedConstruction;
+
+                    // check to make the window refenced is an exterior window
+                    if (SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment) {
                         ErrorsFound = true;
-                        ShowSevereError("InitialAssociateWindowShadingControlFenestration: Fenestration surface named \"" + SurfaceTmp(SurfNum).Name +
-                                        "\" appears on more than one WindowShadingControl list.");
-                        ShowContinueError("It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name +
-                                          "\" and another one.");
+                        ShowSevereError("InitialAssociateWindowShadingControlFenestration: \"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
+                                        " because it is not an exterior window.");
+                        ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
+                    }
+                    // check to make sure the window is not using equivalent layer window construction
+                    if (dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
+                        ErrorsFound = true;
+                        ShowSevereError("InitialAssociateWindowShadingControlFenestration: =\"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
+                                        "\".");
+                        ShowContinueError(".. equivalent layer window model does not use shading control object.");
+                        ShowContinueError(".. Shading control is set to none or zero, and simulation continues.");
+                        ShowContinueError(".. It appears on WindowShadingControl object: \"" + WindowShadingControl(iShadeCtrl).Name);
+                        SurfaceTmp(SurfNum).activeWindowShadingControl = 0;
                     }
                 }
             }
@@ -8601,7 +8598,8 @@ namespace SurfaceGeometry {
             for (int jFeneRef = 1; jFeneRef <= WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
                 int fenestrationIndex =
                     UtilityRoutines::FindItemInList(WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef), Surface, TotSurfaces);
-                if (Surface(fenestrationIndex).WindowShadingControlPtr == iShadeCtrl) {
+                if (std::find(Surface(fenestrationIndex).windowShadingControlList.begin(), Surface(fenestrationIndex).windowShadingControlList.end(), 
+                      iShadeCtrl) != Surface(fenestrationIndex).windowShadingControlList.end()) {
                     WindowShadingControl(iShadeCtrl).FenestrationIndex(jFeneRef) = fenestrationIndex;
                 } else {
                     // this error condition should not occur since the rearrangement of Surface() from SurfureTmp() is reliable.
@@ -8614,6 +8612,42 @@ namespace SurfaceGeometry {
                 }
             }
         }
+    }
+
+    void CheckWindowShadingControlSimilarForWindow(bool& ErrorsFound)
+    {
+        // For each window check if all window shading controls on list are the same except for name, schedule name, construction, and material
+        for (auto theSurf : Surface) {
+            if (theSurf.HasShadeControl) {
+                if (theSurf.windowShadingControlList.size() > 1) {
+                    int firstWindowShadingControl = theSurf.windowShadingControlList.front();
+                    for (auto wsc = std::next(theSurf.windowShadingControlList.begin()); wsc != theSurf.windowShadingControlList.end(); ++wsc) {
+                        if (!isWindowShadingControlSimilar(firstWindowShadingControl, *wsc)) {
+                            ErrorsFound = true;
+                            ShowSevereError("CheckWindowShadingControlSimilarForWindow: Fenestration surface named \"" + theSurf.Name +
+                                        "\" has multiple WindowShadingContols that are not similar.");
+                            ShowContinueError("for: \"" + WindowShadingControl(firstWindowShadingControl).Name + " and: " + WindowShadingControl(*wsc).Name); 
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    bool isWindowShadingControlSimilar(int a, int b)
+    {
+        // Compares two window shading controls are the same except for the name, schedule name, construction, and material
+        return (WindowShadingControl(a).ZoneIndex == WindowShadingControl(b).ZoneIndex &&
+            WindowShadingControl(a).ShadingType == WindowShadingControl(b).ShadingType &&
+            WindowShadingControl(a).ShadingControlType == WindowShadingControl(b).ShadingControlType &&
+            WindowShadingControl(a).SetPoint == WindowShadingControl(b).SetPoint &&
+            WindowShadingControl(a).ShadingControlIsScheduled == WindowShadingControl(b).ShadingControlIsScheduled &&
+            WindowShadingControl(a).GlareControlIsActive == WindowShadingControl(b).GlareControlIsActive &&
+            WindowShadingControl(a).SlatAngleControlForBlinds == WindowShadingControl(b).SlatAngleControlForBlinds &&
+            WindowShadingControl(a).SetPoint2 == WindowShadingControl(b).SetPoint2 &&
+            WindowShadingControl(a).DaylightingControlName == WindowShadingControl(b).DaylightingControlName &&
+            WindowShadingControl(a).DaylightControlIndex == WindowShadingControl(b).DaylightControlIndex &&
+            WindowShadingControl(a).MultiSurfaceCtrlIsGroup == WindowShadingControl(b).MultiSurfaceCtrlIsGroup);
     }
 
     void GetStormWindowData(bool &ErrorsFound) // If errors found in input
@@ -8828,7 +8862,6 @@ namespace SurfaceGeometry {
         int SurfNum;      // Surface number
         int ConstrNum(0); // Construction number
         int ConstrNumSh;  // Shaded Construction number
-        int WSCPtr;       // Window shading control pointer
         int MatGapFlow;   // Material number of gas in airflow gap of window's construction
         int MatGapFlow1;  // Material number of gas on either side of a between-glass shade/blind
         int MatGapFlow2;
@@ -9001,22 +9034,26 @@ namespace SurfaceGeometry {
                                         dataConstruction.Construct(ConstrNum).Name);
                     }
                     // Require that gas be air in airflow gaps on either side of a between glass shade/blind
-                    WSCPtr = Surface(SurfNum).WindowShadingControlPtr;
                     if (Surface(SurfNum).HasShadeControl) {
-                        if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
-                            WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
-                            ConstrNumSh = WindowShadingControl(WSCPtr).ShadedConstruction;
-                            if (dataConstruction.Construct(ConstrNum).TotGlassLayers == 2) {
-                                MatGapFlow1 = dataConstruction.Construct(ConstrNumSh).LayerPoint(2);
-                                MatGapFlow2 = dataConstruction.Construct(ConstrNumSh).LayerPoint(4);
-                            } else {
-                                MatGapFlow1 = dataConstruction.Construct(ConstrNumSh).LayerPoint(4);
-                                MatGapFlow2 = dataConstruction.Construct(ConstrNumSh).LayerPoint(6);
-                            }
-                            if (dataMaterial.Material(MatGapFlow1).GasType(1) != 1 || dataMaterial.Material(MatGapFlow2).GasType(1) != 1) {
-                                ErrorsFound = true;
-                                ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                                "\", gas type must be air on either side of the shade/blind");
+                        for (std::size_t listIndex = 0; listIndex < Surface(SurfNum).windowShadingControlList.size(); ++listIndex) {
+                            int WSCPtr = Surface(SurfNum).windowShadingControlList[listIndex];
+                            if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
+                                WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
+                                ConstrNumSh = Surface(SurfNum).shadedConstructionList[listIndex];
+                                if (dataConstruction.Construct(ConstrNum).TotGlassLayers == 2) {
+                                    MatGapFlow1 = dataConstruction.Construct(ConstrNumSh).LayerPoint(2);
+                                    MatGapFlow2 = dataConstruction.Construct(ConstrNumSh).LayerPoint(4);
+                                }
+                                else {
+                                    MatGapFlow1 = dataConstruction.Construct(ConstrNumSh).LayerPoint(4);
+                                    MatGapFlow2 = dataConstruction.Construct(ConstrNumSh).LayerPoint(6);
+                                }
+                                if (dataMaterial.Material(MatGapFlow1).GasType(1) != 1 || dataMaterial.Material(MatGapFlow2).GasType(1) != 1) {
+                                    ErrorsFound = true;
+                                    ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                        "\", gas type must be air on either side of the shade/blind");
+                                }
+                                break; // only need the first window shading control since they should be the same
                             }
                         }
                     }
@@ -11460,7 +11497,9 @@ namespace SurfaceGeometry {
 
     void CreateShadedWindowConstruction(int const SurfNum, // Surface number
                                         int const WSCPtr,  // Pointer to WindowShadingControl for SurfNum
-                                        int const ShDevNum // Shading device material number for WSCptr
+                                        int const ShDevNum, // Shading device material number for WSCptr
+                                        int const shadeControlIndex // index to the Surface().windowShadingControlList, 
+                                              // Surface().shadedConstructionList, and Surface().shadedStormWinConstructionList
     )
     {
 
@@ -11498,13 +11537,15 @@ namespace SurfaceGeometry {
         ConstrNewSh = UtilityRoutines::FindItemInList(ConstrNameSh, dataConstruction.Construct);
 
         if (ConstrNewSh > 0) {
-            SurfaceTmp(SurfNum).ShadedConstruction = ConstrNewSh;
+            SurfaceTmp(SurfNum).shadedConstructionList[shadeControlIndex] = ConstrNewSh;
+            SurfaceTmp(SurfNum).activeShadedConstruction = ConstrNewSh; //set the active to the current for now
         } else {
 
             // Create new construction
 
             ConstrNewSh = TotConstructs + 1;
-            SurfaceTmp(SurfNum).ShadedConstruction = ConstrNewSh;
+            SurfaceTmp(SurfNum).shadedConstructionList[shadeControlIndex] = ConstrNewSh;
+            SurfaceTmp(SurfNum).activeShadedConstruction = ConstrNewSh; //set the active to the current for now
             TotConstructs = ConstrNewSh;
             dataConstruction.Construct.redimension(TotConstructs);
             NominalRforNominalUCalculation.redimension(TotConstructs);
@@ -11591,255 +11632,216 @@ namespace SurfaceGeometry {
 
     void CreateStormWindowConstructions()
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Winkelmann
-        //       DATE WRITTEN   Jan 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
         // For windows with an associated StormWindow object, creates a construction
         // consisting of the base construction plus a storm window and air gap on the outside.
         // If the window has an interior or between-glass shade/blind, also creates a
         // construction consisting of the storm window added to the shaded construction.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SurfNum;                // Surface number
-        int StormWinNum;            // Number of StormWindow object
-        int ConstrNum;              // Number of unshaded construction
-        int ConstrNumSh;            // Number of shaded construction
-        int ConstrOld;              // Number of old construction (unshaded or shaded)
-        int ConstrNewSt;            // Number of unshaded storm window construction that is created
-        int ConstrNewStSh;          // Number of shaded storm window construction that is created
-        int ConstrNew;              // Number of new construction with storm window (unshaded or shaded)
-        int MatNewStAir;            // Number of created air layer material
-        std::string ConstrName;     // Name of original unshaded window construction
-        std::string ConstrNameSh;   // Name of original shaded window construction
-        std::string ConstrNameSt;   // Name of unshaded construction with storm window
-        std::string ConstrNameStSh; // Name of shaded construction with storm window
-        std::string MatNameStAir;   // Name of created air layer material
-        int StormWinMatNum;         // Material number of storm window glass layer
-        int IntDistance;            // Thickness of air gap between storm window and rest of window (mm)
-        int TotLayers;              // Total layers in a construction
-        int TotGlassLayers;         // Total glass layers in a construction
-        int TotLayersOld;           // Total layers in old (without storm window) construction
-        int MatIntSh;               // Material number of interior shade or blind
-        int MatBGsh;                // Material number of between-glass shade or blind
-        int loop;                   // DO loop index
-        bool ShAndSt;               // True if unshaded and shaded window can have a storm window
-        //  INTEGER :: LenName               ! Name length
-
         DisplayString("Creating Storm Window Constructions");
 
-        for (StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum) {
-            SurfNum = StormWindow(StormWinNum).BaseWindowNum;
-            ConstrNum = Surface(SurfNum).Construction;
+        for (int StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum) {
+            int SurfNum = StormWindow(StormWinNum).BaseWindowNum; // Surface number
+            int ConstrNum = Surface(SurfNum).Construction; // Number of unshaded construction
             // Fatal error if base construction has more than three glass layers
             if (dataConstruction.Construct(ConstrNum).TotGlassLayers > 3) {
                 ShowFatalError("Window=" + Surface(SurfNum).Name + " has more than 3 glass layers; a storm window cannot be applied.");
             }
-            ConstrNumSh = Surface(SurfNum).ShadedConstruction;
-            ConstrName = dataConstruction.Construct(ConstrNum).Name;
-            StormWinMatNum = StormWindow(StormWinNum).StormWinMaterialNum;
-            IntDistance = int(1000 * StormWindow(StormWinNum).StormWinDistance);
-            const auto ChrIntDistance = fmt::to_string(IntDistance);
-            // Set ShAndSt, which is true if the window has a shaded construction to which a storm window
-            // can be added. (A storm window can be added if there is an interior shade or blind and up to three
-            // glass layers, or there is a between-glass shade or blind and two glass layers.)
-            ShAndSt = false;
-            if (ConstrNumSh > 0) {
-                ConstrNameSh = dataConstruction.Construct(ConstrNumSh).Name;
-                TotLayers = dataConstruction.Construct(ConstrNumSh).TotLayers;
-                TotGlassLayers = dataConstruction.Construct(ConstrNumSh).TotGlassLayers;
-                MatIntSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLayers);
-                MatBGsh = 0;
-                if (TotLayers == 5) MatBGsh = dataConstruction.Construct(ConstrNumSh).LayerPoint(3);
-                if (TotGlassLayers <= 3 && (dataMaterial.Material(MatIntSh).Group == Shade || dataMaterial.Material(MatIntSh).Group == WindowBlind)) ShAndSt = true;
-                if (MatBGsh > 0) {
-                    if (dataMaterial.Material(MatBGsh).Group == Shade || dataMaterial.Material(MatBGsh).Group == WindowBlind) ShAndSt = true;
-                }
-                if (!ShAndSt) {
-                    ShowContinueError("Window=" + Surface(SurfNum).Name + " has a shaded construction to which a storm window cannot be applied.");
-                    ShowContinueError("Storm windows can only be applied to shaded constructions that:");
-                    ShowContinueError("have an interior shade or blind and up to three glass layers, or");
-                    ShowContinueError("have a between-glass shade or blind and two glass layers.");
-                    ShowFatalError("EnergyPlus is exiting due to reason stated above.");
-                }
+
+            // create unshaded construction with storm window
+            const auto ChrNum = fmt::to_string(StormWinNum);
+            std::string ConstrNameSt = "BARECONSTRUCTIONWITHSTORMWIN:" + ChrNum; // Name of unshaded construction with storm window
+            // If this construction name already exists, set the surface's storm window construction number to it
+            int ConstrNewSt = UtilityRoutines::FindItemInList(ConstrNameSt, dataConstruction.Construct, TotConstructs); // Number of unshaded storm window construction that is created
+            // If necessary, create new material corresponding to the air layer between the storm winddow and the rest of the window
+            int MatNewStAir = createAirMaterialFromDistance(StormWindow(StormWinNum).StormWinDistance, "AIR:STORMWIN:");
+            if (ConstrNewSt == 0) {
+                ConstrNewSt = createConstructionWithStorm(ConstrNum, ConstrNameSt, StormWindow(StormWinNum).StormWinMaterialNum, MatNewStAir);
             }
+            Surface(SurfNum).StormWinConstruction = ConstrNewSt;
 
-            // Loop over unshaded (loop=1) and shaded (loop=2) constructions and create new constructions
-            // with storm window and air gap added on outside
-            for (loop = 1; loop <= 2; ++loop) {
-                const auto ChrNum = fmt::to_string(StormWinNum);
-                if (loop == 1) {
-                    ConstrNameSt = "BARECONSTRUCTIONWITHSTORMWIN:" + ChrNum;
-                    // If this construction name already exists, set the surface's storm window construction number to it
-                    ConstrNewSt = UtilityRoutines::FindItemInList(ConstrNameSt, dataConstruction.Construct, TotConstructs);
-                    ConstrNewStSh = 0;
-                    if (ConstrNewSt > 0) Surface(SurfNum).StormWinConstruction = ConstrNewSt;
-                } else {
-                    if (!ShAndSt) break;
-                    ConstrNameStSh = "SHADEDCONSTRUCTIONWITHSTORMWIN:" + ChrNum;
-                    ConstrNewStSh = UtilityRoutines::FindItemInList(ConstrNameStSh, dataConstruction.Construct, TotConstructs);
-                    if (ConstrNewStSh > 0) Surface(SurfNum).StormWinShadedConstruction = ConstrNewStSh;
-                }
-
-                if (loop == 1 && ConstrNewSt == 0) {
-                    // If necessary, create new material corresponding to the air layer between the storm winddow
-                    // and the rest of the window
-                    MatNameStAir = "AIR:STORMWIN:" + ChrIntDistance + "MM";
-                    MatNewStAir = UtilityRoutines::FindItemInList(MatNameStAir, dataMaterial.Material, TotMaterials);
-                    if (MatNewStAir == 0) {
-                        // Create new material
-                        MatNewStAir = TotMaterials + 1;
-                        TotMaterials = MatNewStAir;
-                        dataMaterial.Material.redimension(TotMaterials);
-                        NominalR.redimension(TotMaterials);
-                        dataMaterial.Material(TotMaterials).Name = MatNameStAir;
-                        dataMaterial.Material(TotMaterials).Group = WindowGas;
-                        dataMaterial.Material(TotMaterials).Roughness = 3;
-                        dataMaterial.Material(TotMaterials).Conductivity = 0.0;
-                        dataMaterial.Material(TotMaterials).Density = 0.0;
-                        dataMaterial.Material(TotMaterials).IsoMoistCap = 0.0;
-                        dataMaterial.Material(TotMaterials).Porosity = 0.0;
-                        dataMaterial.Material(TotMaterials).Resistance = 0.0;
-                        dataMaterial.Material(TotMaterials).SpecHeat = 0.0;
-                        dataMaterial.Material(TotMaterials).ThermGradCoef = 0.0;
-                        dataMaterial.Material(TotMaterials).Thickness = StormWindow(StormWinNum).StormWinDistance;
-                        dataMaterial.Material(TotMaterials).VaporDiffus = 0.0;
-                        dataMaterial.Material(TotMaterials).GasType = 0;
-                        dataMaterial.Material(TotMaterials).GasCon = 0.0;
-                        dataMaterial.Material(TotMaterials).GasVis = 0.0;
-                        dataMaterial.Material(TotMaterials).GasCp = 0.0;
-                        dataMaterial.Material(TotMaterials).GasWght = 0.0;
-                        dataMaterial.Material(TotMaterials).GasFract = 0.0;
-                        dataMaterial.Material(TotMaterials).GasType(1) = 1;
-                        dataMaterial.Material(TotMaterials).GlassSpectralDataPtr = 0;
-                        dataMaterial.Material(TotMaterials).NumberOfGasesInMixture = 1;
-                        dataMaterial.Material(TotMaterials).GasCon(1, 1) = 2.873e-3;
-                        dataMaterial.Material(TotMaterials).GasCon(2, 1) = 7.760e-5;
-                        dataMaterial.Material(TotMaterials).GasVis(1, 1) = 3.723e-6;
-                        dataMaterial.Material(TotMaterials).GasVis(2, 1) = 4.940e-8;
-                        dataMaterial.Material(TotMaterials).GasCp(1, 1) = 1002.737;
-                        dataMaterial.Material(TotMaterials).GasCp(2, 1) = 1.2324e-2;
-                        dataMaterial.Material(TotMaterials).GasWght(1) = 28.97;
-                        dataMaterial.Material(TotMaterials).GasFract(1) = 1.0;
-                        dataMaterial.Material(TotMaterials).AbsorpSolar = 0.0;
-                        dataMaterial.Material(TotMaterials).AbsorpThermal = 0.0;
-                        dataMaterial.Material(TotMaterials).AbsorpVisible = 0.0;
-                        dataMaterial.Material(TotMaterials).Trans = 0.0;
-                        dataMaterial.Material(TotMaterials).TransVis = 0.0;
-                        dataMaterial.Material(TotMaterials).GlassTransDirtFactor = 0.0;
-                        dataMaterial.Material(TotMaterials).ReflectShade = 0.0;
-                        dataMaterial.Material(TotMaterials).ReflectShadeVis = 0.0;
-                        dataMaterial.Material(TotMaterials).AbsorpThermalBack = 0.0;
-                        dataMaterial.Material(TotMaterials).AbsorpThermalFront = 0.0;
-                        dataMaterial.Material(TotMaterials).ReflectSolBeamBack = 0.0;
-                        dataMaterial.Material(TotMaterials).ReflectSolBeamFront = 0.0;
-                        dataMaterial.Material(TotMaterials).ReflectSolDiffBack = 0.0;
-                        dataMaterial.Material(TotMaterials).ReflectSolDiffFront = 0.0;
-                        dataMaterial.Material(TotMaterials).ReflectVisBeamBack = 0.0;
-                        dataMaterial.Material(TotMaterials).ReflectVisBeamFront = 0.0;
-                        dataMaterial.Material(TotMaterials).ReflectVisDiffBack = 0.0;
-                        dataMaterial.Material(TotMaterials).ReflectVisDiffFront = 0.0;
-                        dataMaterial.Material(TotMaterials).TransSolBeam = 0.0;
-                        dataMaterial.Material(TotMaterials).TransThermal = 0.0;
-                        dataMaterial.Material(TotMaterials).TransVisBeam = 0.0;
-                        dataMaterial.Material(TotMaterials).BlindDataPtr = 0;
-                        dataMaterial.Material(TotMaterials).WinShadeToGlassDist = 0.0;
-                        dataMaterial.Material(TotMaterials).WinShadeTopOpeningMult = 0.0;
-                        dataMaterial.Material(TotMaterials).WinShadeBottomOpeningMult = 0.0;
-                        dataMaterial.Material(TotMaterials).WinShadeLeftOpeningMult = 0.0;
-                        dataMaterial.Material(TotMaterials).WinShadeRightOpeningMult = 0.0;
-                        dataMaterial.Material(TotMaterials).WinShadeAirFlowPermeability = 0.0;
-                    } // End of check if new air layer material has to be created
-                }
-
-                if ((loop == 1 && ConstrNewSt == 0) || (loop == 2 && ConstrNewStSh == 0)) {
-                    // Create new constructions
-                    ConstrNew = TotConstructs + 1;
-                    if (loop == 1) {
-                        Surface(SurfNum).StormWinConstruction = ConstrNew;
+            // create shaded constructions with storm window
+            Surface(SurfNum).shadedStormWinConstructionList.resize(Surface(SurfNum).shadedConstructionList.size(), 0);  // make the shaded storm window size the same size as the number of shaded constructions
+            for (std::size_t iConstruction = 0; iConstruction < Surface(SurfNum).shadedConstructionList.size(); ++iConstruction) {
+                int curConstruction = Surface(SurfNum).shadedConstructionList[iConstruction];
+                // Set ShAndSt, which is true if the window has a shaded construction to which a storm window
+                // can be added. (A storm window can be added if there is an interior shade or blind and up to three
+                // glass layers, or there is a between-glass shade or blind and two glass layers.)
+                bool ShAndSt = false; // True if unshaded and shaded window can have a storm window
+                std::string ConstrNameSh = dataConstruction.Construct(curConstruction).Name; // Name of original shaded window construction
+                int TotLayers = dataConstruction.Construct(curConstruction).TotLayers; // Total layers in a construction
+                int MatIntSh = dataConstruction.Construct(curConstruction).LayerPoint(TotLayers); // Material number of interior shade or blind
+                int MatBetweenGlassSh = 0; // Material number of between-glass shade or blind
+                if (TotLayers == 5) MatBetweenGlassSh = dataConstruction.Construct(curConstruction).LayerPoint(3);
+                if (dataConstruction.Construct(curConstruction).TotGlassLayers <= 3 && (dataMaterial.Material(MatIntSh).Group == Shade || dataMaterial.Material(MatIntSh).Group == WindowBlind)) ShAndSt = true;
+                if (MatBetweenGlassSh > 0) {
+                    if (dataMaterial.Material(MatBetweenGlassSh).Group == Shade || dataMaterial.Material(MatBetweenGlassSh).Group == WindowBlind) {
+                        ShAndSt = true;
                     } else {
-                        Surface(SurfNum).StormWinShadedConstruction = ConstrNew;
+                        ShowContinueError("Window=" + Surface(SurfNum).Name + " has a shaded construction to which a storm window cannot be applied.");
+                        ShowContinueError("Storm windows can only be applied to shaded constructions that:");
+                        ShowContinueError("have an interior shade or blind and up to three glass layers, or");
+                        ShowContinueError("have a between-glass shade or blind and two glass layers.");
+                        ShowFatalError("EnergyPlus is exiting due to reason stated above.");
                     }
-                    TotConstructs = ConstrNew;
-                    dataConstruction.Construct.redimension(TotConstructs);
-                    NominalRforNominalUCalculation.redimension(TotConstructs);
-                    NominalU.redimension(TotConstructs);
+                }
+                if (ShAndSt) {
+                    std::string ConstrNameStSh = "SHADEDCONSTRUCTIONWITHSTORMWIN:" + dataConstruction.Construct(iConstruction).Name + ":" + ChrNum  ; // Name of shaded construction with storm window
+                    int ConstrNewStSh = createConstructionWithStorm(ConstrNum, ConstrNameStSh, StormWindow(StormWinNum).StormWinMaterialNum, MatNewStAir);
+                    Surface(SurfNum).shadedStormWinConstructionList[iConstruction] = ConstrNewStSh; // put in same index as the shaded constuction
+                }
+            } // end of loop for shaded constructions
+        } // end of loop over storm window objects
+    }
 
-                    ConstrOld = ConstrNum;
-                    if (loop == 2) ConstrOld = ConstrNumSh;
-                    TotLayersOld = dataConstruction.Construct(ConstrOld).TotLayers;
-                    dataConstruction.Construct(ConstrNew).LayerPoint({1, Construction::MaxLayersInConstruct}) = 0;
-                    dataConstruction.Construct(ConstrNew).LayerPoint(1) = StormWinMatNum;
-                    dataConstruction.Construct(ConstrNew).LayerPoint(2) = MatNewStAir;
-                    dataConstruction.Construct(ConstrNew).LayerPoint({3, TotLayersOld + 2}) = dataConstruction.Construct(ConstrOld).LayerPoint({1, TotLayersOld});
-                    dataConstruction.Construct(ConstrNew).Name = ConstrNameSt;
-                    if (loop == 2) dataConstruction.Construct(ConstrNew).Name = ConstrNameStSh;
-                    dataConstruction.Construct(ConstrNew).TotLayers = TotLayersOld + 2;
-                    dataConstruction.Construct(ConstrNew).TotSolidLayers = dataConstruction.Construct(ConstrOld).TotSolidLayers + 1;
-                    dataConstruction.Construct(ConstrNew).TotGlassLayers = dataConstruction.Construct(ConstrOld).TotGlassLayers + 1;
-                    dataConstruction.Construct(ConstrNew).TypeIsWindow = true;
-                    dataConstruction.Construct(ConstrNew).InsideAbsorpVis = 0.0;
-                    dataConstruction.Construct(ConstrNew).OutsideAbsorpVis = 0.0;
-                    dataConstruction.Construct(ConstrNew).InsideAbsorpSolar = 0.0;
-                    dataConstruction.Construct(ConstrNew).OutsideAbsorpSolar = 0.0;
-                    dataConstruction.Construct(ConstrNew).InsideAbsorpThermal = dataConstruction.Construct(ConstrOld).InsideAbsorpThermal;
-                    dataConstruction.Construct(ConstrNew).OutsideAbsorpThermal = dataMaterial.Material(StormWinMatNum).AbsorpThermalFront;
-                    dataConstruction.Construct(ConstrNew).OutsideRoughness = VerySmooth;
-                    dataConstruction.Construct(ConstrNew).DayltPropPtr = 0;
-                    dataConstruction.Construct(ConstrNew).CTFCross = 0.0;
-                    dataConstruction.Construct(ConstrNew).CTFFlux = 0.0;
-                    dataConstruction.Construct(ConstrNew).CTFInside = 0.0;
-                    dataConstruction.Construct(ConstrNew).CTFOutside = 0.0;
-                    dataConstruction.Construct(ConstrNew).CTFSourceIn = 0.0;
-                    dataConstruction.Construct(ConstrNew).CTFSourceOut = 0.0;
-                    dataConstruction.Construct(ConstrNew).CTFTimeStep = 0.0;
-                    dataConstruction.Construct(ConstrNew).CTFTSourceOut = 0.0;
-                    dataConstruction.Construct(ConstrNew).CTFTSourceIn = 0.0;
-                    dataConstruction.Construct(ConstrNew).CTFTSourceQ = 0.0;
-                    dataConstruction.Construct(ConstrNew).CTFTUserOut = 0.0;
-                    dataConstruction.Construct(ConstrNew).CTFTUserIn = 0.0;
-                    dataConstruction.Construct(ConstrNew).CTFTUserSource = 0.0;
-                    dataConstruction.Construct(ConstrNew).NumHistories = 0;
-                    dataConstruction.Construct(ConstrNew).NumCTFTerms = 0;
-                    dataConstruction.Construct(ConstrNew).UValue = 0.0;
-                    dataConstruction.Construct(ConstrNew).SourceSinkPresent = false;
-                    dataConstruction.Construct(ConstrNew).SolutionDimensions = 0;
-                    dataConstruction.Construct(ConstrNew).SourceAfterLayer = 0;
-                    dataConstruction.Construct(ConstrNew).TempAfterLayer = 0;
-                    dataConstruction.Construct(ConstrNew).ThicknessPerpend = 0.0;
-                    dataConstruction.Construct(ConstrNew).AbsDiffIn = 0.0;
-                    dataConstruction.Construct(ConstrNew).AbsDiffOut = 0.0;
-                    dataConstruction.Construct(ConstrNew).AbsDiff = 0.0;
-                    dataConstruction.Construct(ConstrNew).AbsDiffBack = 0.0;
-                    dataConstruction.Construct(ConstrNew).AbsDiffShade = 0.0;
-                    dataConstruction.Construct(ConstrNew).AbsDiffBackShade = 0.0;
-                    dataConstruction.Construct(ConstrNew).ShadeAbsorpThermal = 0.0;
-                    dataConstruction.Construct(ConstrNew).AbsBeamCoef = 0.0;
-                    dataConstruction.Construct(ConstrNew).AbsBeamBackCoef = 0.0;
-                    dataConstruction.Construct(ConstrNew).AbsBeamShadeCoef = 0.0;
-                    dataConstruction.Construct(ConstrNew).TransDiff = 0.0;
-                    dataConstruction.Construct(ConstrNew).TransDiffVis = 0.0;
-                    dataConstruction.Construct(ConstrNew).ReflectSolDiffBack = 0.0;
-                    dataConstruction.Construct(ConstrNew).ReflectSolDiffFront = 0.0;
-                    dataConstruction.Construct(ConstrNew).ReflectVisDiffBack = 0.0;
-                    dataConstruction.Construct(ConstrNew).ReflectVisDiffFront = 0.0;
-                    dataConstruction.Construct(ConstrNew).TransSolBeamCoef = 0.0;
-                    dataConstruction.Construct(ConstrNew).TransVisBeamCoef = 0.0;
-                    dataConstruction.Construct(ConstrNew).ReflSolBeamFrontCoef = 0.0;
-                    dataConstruction.Construct(ConstrNew).ReflSolBeamBackCoef = 0.0;
-                    dataConstruction.Construct(ConstrNew).W5FrameDivider = 0;
-                    dataConstruction.Construct(ConstrNew).FromWindow5DataFile = false;
-                    dataConstruction.Construct(ConstrNew).W5FileMullionWidth = 0.0;
-                    dataConstruction.Construct(ConstrNew).W5FileMullionOrientation = 0;
-                    dataConstruction.Construct(ConstrNew).W5FileGlazingSysWidth = 0.0;
-                    dataConstruction.Construct(ConstrNew).W5FileGlazingSysHeight = 0.0;
-                } // End of check if new window constructions have to be created
-            }     // End of loop over unshaded and shaded window constructions
-        }         // End of loop over storm window objects
+    int createAirMaterialFromDistance(Real64 distance, std::string namePrefix)
+    {
+        int mmDistance = int(1000 * distance); // Thickness of air gap in mm (usually between storm window and rest of window)
+        std::string MatNameStAir = namePrefix + fmt::to_string(mmDistance) + "MM";   // Name of created air layer material
+        int newAirMaterial = UtilityRoutines::FindItemInList(MatNameStAir, dataMaterial.Material, TotMaterials);
+        if (newAirMaterial == 0) {
+            // Create new material
+            TotMaterials = TotMaterials + 1;
+            newAirMaterial = TotMaterials;
+            dataMaterial.Material.redimension(TotMaterials);
+            NominalR.redimension(TotMaterials);
+            dataMaterial.Material(TotMaterials).Name = MatNameStAir;
+            dataMaterial.Material(TotMaterials).Group = WindowGas;
+            dataMaterial.Material(TotMaterials).Roughness = 3;
+            dataMaterial.Material(TotMaterials).Conductivity = 0.0;
+            dataMaterial.Material(TotMaterials).Density = 0.0;
+            dataMaterial.Material(TotMaterials).IsoMoistCap = 0.0;
+            dataMaterial.Material(TotMaterials).Porosity = 0.0;
+            dataMaterial.Material(TotMaterials).Resistance = 0.0;
+            dataMaterial.Material(TotMaterials).SpecHeat = 0.0;
+            dataMaterial.Material(TotMaterials).ThermGradCoef = 0.0;
+            dataMaterial.Material(TotMaterials).Thickness = distance;
+            dataMaterial.Material(TotMaterials).VaporDiffus = 0.0;
+            dataMaterial.Material(TotMaterials).GasType = 0;
+            dataMaterial.Material(TotMaterials).GasCon = 0.0;
+            dataMaterial.Material(TotMaterials).GasVis = 0.0;
+            dataMaterial.Material(TotMaterials).GasCp = 0.0;
+            dataMaterial.Material(TotMaterials).GasWght = 0.0;
+            dataMaterial.Material(TotMaterials).GasFract = 0.0;
+            dataMaterial.Material(TotMaterials).GasType(1) = 1;
+            dataMaterial.Material(TotMaterials).GlassSpectralDataPtr = 0;
+            dataMaterial.Material(TotMaterials).NumberOfGasesInMixture = 1;
+            dataMaterial.Material(TotMaterials).GasCon(1, 1) = 2.873e-3;
+            dataMaterial.Material(TotMaterials).GasCon(2, 1) = 7.760e-5;
+            dataMaterial.Material(TotMaterials).GasVis(1, 1) = 3.723e-6;
+            dataMaterial.Material(TotMaterials).GasVis(2, 1) = 4.940e-8;
+            dataMaterial.Material(TotMaterials).GasCp(1, 1) = 1002.737;
+            dataMaterial.Material(TotMaterials).GasCp(2, 1) = 1.2324e-2;
+            dataMaterial.Material(TotMaterials).GasWght(1) = 28.97;
+            dataMaterial.Material(TotMaterials).GasFract(1) = 1.0;
+            dataMaterial.Material(TotMaterials).AbsorpSolar = 0.0;
+            dataMaterial.Material(TotMaterials).AbsorpThermal = 0.0;
+            dataMaterial.Material(TotMaterials).AbsorpVisible = 0.0;
+            dataMaterial.Material(TotMaterials).Trans = 0.0;
+            dataMaterial.Material(TotMaterials).TransVis = 0.0;
+            dataMaterial.Material(TotMaterials).GlassTransDirtFactor = 0.0;
+            dataMaterial.Material(TotMaterials).ReflectShade = 0.0;
+            dataMaterial.Material(TotMaterials).ReflectShadeVis = 0.0;
+            dataMaterial.Material(TotMaterials).AbsorpThermalBack = 0.0;
+            dataMaterial.Material(TotMaterials).AbsorpThermalFront = 0.0;
+            dataMaterial.Material(TotMaterials).ReflectSolBeamBack = 0.0;
+            dataMaterial.Material(TotMaterials).ReflectSolBeamFront = 0.0;
+            dataMaterial.Material(TotMaterials).ReflectSolDiffBack = 0.0;
+            dataMaterial.Material(TotMaterials).ReflectSolDiffFront = 0.0;
+            dataMaterial.Material(TotMaterials).ReflectVisBeamBack = 0.0;
+            dataMaterial.Material(TotMaterials).ReflectVisBeamFront = 0.0;
+            dataMaterial.Material(TotMaterials).ReflectVisDiffBack = 0.0;
+            dataMaterial.Material(TotMaterials).ReflectVisDiffFront = 0.0;
+            dataMaterial.Material(TotMaterials).TransSolBeam = 0.0;
+            dataMaterial.Material(TotMaterials).TransThermal = 0.0;
+            dataMaterial.Material(TotMaterials).TransVisBeam = 0.0;
+            dataMaterial.Material(TotMaterials).BlindDataPtr = 0;
+            dataMaterial.Material(TotMaterials).WinShadeToGlassDist = 0.0;
+            dataMaterial.Material(TotMaterials).WinShadeTopOpeningMult = 0.0;
+            dataMaterial.Material(TotMaterials).WinShadeBottomOpeningMult = 0.0;
+            dataMaterial.Material(TotMaterials).WinShadeLeftOpeningMult = 0.0;
+            dataMaterial.Material(TotMaterials).WinShadeRightOpeningMult = 0.0;
+            dataMaterial.Material(TotMaterials).WinShadeAirFlowPermeability = 0.0;
+        } 
+        return(newAirMaterial);
+    }
+
+    // create a new construction with storm based on an old construction and storm and gap materials
+    int createConstructionWithStorm(int oldConstruction, std::string name, int stormMaterial, int gapMaterial)
+    {
+        int newConstruct = UtilityRoutines::FindItemInList(name, dataConstruction.Construct, TotConstructs); // Number of shaded storm window construction that is created
+        if (newConstruct == 0) {
+            TotConstructs = TotConstructs + 1;
+            newConstruct = TotConstructs;
+            dataConstruction.Construct.redimension(TotConstructs);
+            NominalRforNominalUCalculation.redimension(TotConstructs);
+            NominalU.redimension(TotConstructs);
+
+            int TotLayersOld = dataConstruction.Construct(oldConstruction).TotLayers;
+            dataConstruction.Construct(TotConstructs).LayerPoint({ 1, Construction::MaxLayersInConstruct }) = 0;
+            dataConstruction.Construct(TotConstructs).LayerPoint(1) = stormMaterial;
+            dataConstruction.Construct(TotConstructs).LayerPoint(2) = gapMaterial;
+            dataConstruction.Construct(TotConstructs).LayerPoint({ 3, TotLayersOld + 2 }) = dataConstruction.Construct(oldConstruction).LayerPoint({ 1, TotLayersOld });
+            dataConstruction.Construct(TotConstructs).Name = name;
+            dataConstruction.Construct(TotConstructs).TotLayers = TotLayersOld + 2;
+            dataConstruction.Construct(TotConstructs).TotSolidLayers = dataConstruction.Construct(oldConstruction).TotSolidLayers + 1;
+            dataConstruction.Construct(TotConstructs).TotGlassLayers = dataConstruction.Construct(oldConstruction).TotGlassLayers + 1;
+            dataConstruction.Construct(TotConstructs).TypeIsWindow = true;
+            dataConstruction.Construct(TotConstructs).InsideAbsorpVis = 0.0;
+            dataConstruction.Construct(TotConstructs).OutsideAbsorpVis = 0.0;
+            dataConstruction.Construct(TotConstructs).InsideAbsorpSolar = 0.0;
+            dataConstruction.Construct(TotConstructs).OutsideAbsorpSolar = 0.0;
+            dataConstruction.Construct(TotConstructs).InsideAbsorpThermal = dataConstruction.Construct(oldConstruction).InsideAbsorpThermal;
+            dataConstruction.Construct(TotConstructs).OutsideAbsorpThermal = dataMaterial.Material(stormMaterial).AbsorpThermalFront;
+            dataConstruction.Construct(TotConstructs).OutsideRoughness = VerySmooth;
+            dataConstruction.Construct(TotConstructs).DayltPropPtr = 0;
+            dataConstruction.Construct(TotConstructs).CTFCross = 0.0;
+            dataConstruction.Construct(TotConstructs).CTFFlux = 0.0;
+            dataConstruction.Construct(TotConstructs).CTFInside = 0.0;
+            dataConstruction.Construct(TotConstructs).CTFOutside = 0.0;
+            dataConstruction.Construct(TotConstructs).CTFSourceIn = 0.0;
+            dataConstruction.Construct(TotConstructs).CTFSourceOut = 0.0;
+            dataConstruction.Construct(TotConstructs).CTFTimeStep = 0.0;
+            dataConstruction.Construct(TotConstructs).CTFTSourceOut = 0.0;
+            dataConstruction.Construct(TotConstructs).CTFTSourceIn = 0.0;
+            dataConstruction.Construct(TotConstructs).CTFTSourceQ = 0.0;
+            dataConstruction.Construct(TotConstructs).CTFTUserOut = 0.0;
+            dataConstruction.Construct(TotConstructs).CTFTUserIn = 0.0;
+            dataConstruction.Construct(TotConstructs).CTFTUserSource = 0.0;
+            dataConstruction.Construct(TotConstructs).NumHistories = 0;
+            dataConstruction.Construct(TotConstructs).NumCTFTerms = 0;
+            dataConstruction.Construct(TotConstructs).UValue = 0.0;
+            dataConstruction.Construct(TotConstructs).SourceSinkPresent = false;
+            dataConstruction.Construct(TotConstructs).SolutionDimensions = 0;
+            dataConstruction.Construct(TotConstructs).SourceAfterLayer = 0;
+            dataConstruction.Construct(TotConstructs).TempAfterLayer = 0;
+            dataConstruction.Construct(TotConstructs).ThicknessPerpend = 0.0;
+            dataConstruction.Construct(TotConstructs).AbsDiffIn = 0.0;
+            dataConstruction.Construct(TotConstructs).AbsDiffOut = 0.0;
+            dataConstruction.Construct(TotConstructs).AbsDiff = 0.0;
+            dataConstruction.Construct(TotConstructs).AbsDiffBack = 0.0;
+            dataConstruction.Construct(TotConstructs).AbsDiffShade = 0.0;
+            dataConstruction.Construct(TotConstructs).AbsDiffBackShade = 0.0;
+            dataConstruction.Construct(TotConstructs).ShadeAbsorpThermal = 0.0;
+            dataConstruction.Construct(TotConstructs).AbsBeamCoef = 0.0;
+            dataConstruction.Construct(TotConstructs).AbsBeamBackCoef = 0.0;
+            dataConstruction.Construct(TotConstructs).AbsBeamShadeCoef = 0.0;
+            dataConstruction.Construct(TotConstructs).TransDiff = 0.0;
+            dataConstruction.Construct(TotConstructs).TransDiffVis = 0.0;
+            dataConstruction.Construct(TotConstructs).ReflectSolDiffBack = 0.0;
+            dataConstruction.Construct(TotConstructs).ReflectSolDiffFront = 0.0;
+            dataConstruction.Construct(TotConstructs).ReflectVisDiffBack = 0.0;
+            dataConstruction.Construct(TotConstructs).ReflectVisDiffFront = 0.0;
+            dataConstruction.Construct(TotConstructs).TransSolBeamCoef = 0.0;
+            dataConstruction.Construct(TotConstructs).TransVisBeamCoef = 0.0;
+            dataConstruction.Construct(TotConstructs).ReflSolBeamFrontCoef = 0.0;
+            dataConstruction.Construct(TotConstructs).ReflSolBeamBackCoef = 0.0;
+            dataConstruction.Construct(TotConstructs).W5FrameDivider = 0;
+            dataConstruction.Construct(TotConstructs).FromWindow5DataFile = false;
+            dataConstruction.Construct(TotConstructs).W5FileMullionWidth = 0.0;
+            dataConstruction.Construct(TotConstructs).W5FileMullionOrientation = 0;
+            dataConstruction.Construct(TotConstructs).W5FileGlazingSysWidth = 0.0;
+            dataConstruction.Construct(TotConstructs).W5FileGlazingSysHeight = 0.0;
+        }
+        return(newConstruct);
     }
 
     void ModifyWindow(int const SurfNum,    // SurfNum has construction of glazing system from Window5 Data File;
@@ -12138,9 +12140,14 @@ namespace SurfaceGeometry {
         SurfaceTmp(TotSurfaces).MaterialMovInsulExt = SurfaceTmp(SurfNum).MaterialMovInsulExt;
         SurfaceTmp(TotSurfaces).MaterialMovInsulInt = SurfaceTmp(SurfNum).MaterialMovInsulInt;
         SurfaceTmp(TotSurfaces).SchedMovInsulExt = SurfaceTmp(SurfNum).SchedMovInsulExt;
-        SurfaceTmp(TotSurfaces).WindowShadingControlPtr = SurfaceTmp(SurfNum).WindowShadingControlPtr;
+        SurfaceTmp(TotSurfaces).activeWindowShadingControl = SurfaceTmp(SurfNum).activeWindowShadingControl;
+        SurfaceTmp(TotSurfaces).windowShadingControlList = SurfaceTmp(SurfNum).windowShadingControlList;
         SurfaceTmp(TotSurfaces).HasShadeControl = SurfaceTmp(SurfNum).HasShadeControl;
-        SurfaceTmp(TotSurfaces).ShadedConstruction = SurfaceTmp(SurfNum).ShadedConstruction;
+        SurfaceTmp(TotSurfaces).activeShadedConstruction = SurfaceTmp(SurfNum).activeShadedConstruction;
+        SurfaceTmp(TotSurfaces).windowShadingControlList = SurfaceTmp(SurfNum).windowShadingControlList;
+        SurfaceTmp(TotSurfaces).StormWinConstruction = SurfaceTmp(SurfNum).StormWinConstruction;
+        SurfaceTmp(TotSurfaces).activeStormWinShadedConstruction = SurfaceTmp(SurfNum).activeStormWinShadedConstruction;
+        SurfaceTmp(TotSurfaces).shadedStormWinConstructionList = SurfaceTmp(SurfNum).shadedStormWinConstructionList;
         SurfaceTmp(TotSurfaces).FrameDivider = SurfaceTmp(SurfNum).FrameDivider;
         SurfaceTmp(TotSurfaces).Multiplier = SurfaceTmp(SurfNum).Multiplier;
         SurfaceTmp(TotSurfaces).NetAreaShadowCalc = SurfaceTmp(SurfNum).NetAreaShadowCalc;
