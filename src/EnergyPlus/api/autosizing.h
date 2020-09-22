@@ -100,10 +100,10 @@ enum HeatingAirflowUAZoneConfigType{
 /// \param[in] zoneConfig One zone configuration type from the `HeatingAirflowUAZoneConfigType` enumeration
 /// \param[in] elevation The elevation above sea level for evaluating fluid properties, in m
 /// \param[in] representativeFlowRate The flow rate used for this configuration type.
-///            - Terminal: this flow rate should be the BLAHBLAHBLAH
-///            - InductionUnit: this flow rate should be the BLAHBLAHBLAH
-///            - FanCoil: this flow rate should be the BLAHBLAHBLAH
-/// \param[in] reheatMultiplier Define the reheat multiplier in BLAHBLAHBLAH configs, for other configs it will be ignored
+///            - Terminal: this flow rate should be the base volume flow rate in the terminal unit
+///            - InductionUnit: this flow rate should be the base volume flow rate in the unit before any multipliers are applied
+///            - FanCoil: this flow rate should be the base heating volume flow rate in the fan coil unit
+/// \param[in] reheatMultiplier Define the reheat multiplier in induction unit configs, for other configs it will be ignored
 /// \remark This or another initialization function must be called prior to each call to sizerHeatingAirflowUASize
 /// \see Sizer
 /// \see stateNew
@@ -134,8 +134,8 @@ enum HeatingAirflowUASystemConfigType {
 /// \param[in] sysConfig One System configuration type from the `HeatingAirflowUASystemConfigType` enumeration
 /// \param[in] elevation The elevation above sea level for evaluating fluid properties, in m
 /// \param[in] representativeFlowRate The flow rate used for this configuration type.
-///            - OutdoorAir: this flow rate should be the BLAHBLAHBLAH
-///            - MainDuct: this flow rate should be the BLAHBLAHBLAH
+///            - OutdoorAir: this flow rate should be the base mass flow rate in the outdoor air loop
+///            - MainDuct: this flow rate should be the base volume flow in the main air loop
 ///            - CoolingDuct: this flow rate should be the BLAHBLAHBLAH
 ///            - HeatingDuct: this flow rate should be the BLAHBLAHBLAH
 ///            - OtherDuct: this flow rate should be the BLAHBLAHBLAH
