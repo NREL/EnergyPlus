@@ -283,7 +283,7 @@ void InputProcessor::processInput()
             std::string input_file;
             std::string line;
             while (std::getline(input_stream, line)) {
-                input_file.append(line + DataStringGlobals::NL);
+                input_file.append(line + '\n');
             }
             if (input_file.empty()) {
                 ShowFatalError("Failed to read input file: " + DataStringGlobals::inputFileName);
