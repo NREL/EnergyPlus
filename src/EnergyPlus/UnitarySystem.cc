@@ -10615,11 +10615,11 @@ namespace UnitarySystems {
                 } else {
                     if (CoolingLoad) {
                         if (this->m_CoolingSpeedNum > 1) {
-                            if (singleMode) {
+                            if (!singleMode) {
                                 CoilPLR = 1.0 * double(CompOn);
                                 this->m_CoolingSpeedRatio = PartLoadRatio * double(CompOn);
                             } else {
-                                CoilPLR = 1.0 * double(CompOn);
+                                CoilPLR = PartLoadRatio * double(CompOn);
                             }
                         } else {
                             CoilPLR = PartLoadRatio * double(CompOn);
@@ -10649,12 +10649,12 @@ namespace UnitarySystems {
                         this->m_CoolCompPartLoadRatio = double(CompOn);
                     } else {
                         this->m_CoolCompPartLoadRatio = PartLoadRatio * double(CompOn);
-                        this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
+                        //this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
                         this->m_CoolingSpeedRatio = 1.0;
                     }
                 } else {
                     this->m_CoolCompPartLoadRatio = this->m_CoolingCycRatio * double(CompOn);
-                    this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
+                    //this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
                     this->m_CoolingSpeedRatio = 0.0;
                 }
 
