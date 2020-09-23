@@ -14130,6 +14130,8 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -50.0;
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -0.007806893;
     DataEnvironment::StdRhoAir = 1.2043;
+    // This unit test was built with values based on zero barometric pressure - should be updated
+    DataEnvironment::OutBaroPress = 0.000001;
     thisSys->simulate(state,
                       compName,
                       FirstHVACIteration,
@@ -14425,6 +14427,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput_Autosizing)
     DataSizing::ZoneEqSizing.allocate(1);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
+    DataEnvironment::OutBaroPress = 101325.0;
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -14983,6 +14986,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsNoLoadFlowRateSiz
     bool FirstHVACIteration = true;
     UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[0];
+    DataEnvironment::OutBaroPress = 101325.0;
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;                                    // indicate zone data is available
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
