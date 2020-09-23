@@ -88,7 +88,7 @@ namespace DataHVACGlobals {
     Real64 const DesCoilHWInletTempMin(46.0); // minimum heating water coil water inlet temp for UA sizing only. [deg C]
 
     // Number of Sizing types from list below
-    int const NumOfSizingTypes(33); // number of sizing types
+    int const NumOfSizingTypes(35); // number of sizing types, should be paired with the list in Autosizing/Base.hh
 
     // Sizing types
     int const CoolingAirflowSizing(1);                               // request sizing for cooling air flow rate
