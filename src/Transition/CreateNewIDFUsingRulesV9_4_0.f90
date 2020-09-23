@@ -304,7 +304,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
       !- Pre-process for names of Meter:Custom objects
           totMeterCustom = GetNumObjectsFound('METER:CUSTOM')
-          IF (totMeterCustom > 1) THEN
+          IF (totMeterCustom > 0) THEN
             DO numMeterCustom=1, totMeterCustom
               CALL GetObjectItem('METER:CUSTOM', numMeterCustom, Alphas, NumAlphas, Numbers, NumNumbers, Status)
               MeterCustomName = MakeUpperCase(TRIM(Alphas(1)))
@@ -315,11 +315,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
       !- Pre-process for names of Meter:CustomDecrement objects
           totMeterCustomDecr = GetNumObjectsFound('METER:CUSTOMDECREMENT')
-          IF (totMeterCustomDecr > 1) THEN
+          IF (totMeterCustomDecr > 0) THEN
             DO numMeterCustom=1, totMeterCustomDecr
               CALL GetObjectItem('METER:CUSTOMDECREMENT', numMeterCustom, Alphas, NumAlphas, Numbers, NumNumbers, Status)
               MeterCustomName = MakeUpperCase(TRIM(Alphas(1)))
-              CALL DisplayString(MeterCustomName)
               MeterCustomNames(numMeterCustom + totMeterCustom) = MeterCustomName
             END DO
           END IF
