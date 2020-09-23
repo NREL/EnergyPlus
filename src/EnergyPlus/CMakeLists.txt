@@ -786,7 +786,7 @@ SET( API_HEADERS
   api/runtime.h
   api/datatransfer.h
   api/state.h
-  api/autosizing.h
+#  api/autosizing.h
   api/EnergyPlusPgm.hh
   api/EnergyPlusAPI.h
   api/TypeDefs.h
@@ -796,7 +796,7 @@ SET( API_CORE_SRC
   api/runtime.cc
   api/state.cc
   api/datatransfer.cc
-  api/autosizing.cc
+#  api/autosizing.cc
   api/EnergyPlusPgm.cc)
 
 option( BUILD_STATIC_ENERGYPLUS_API "Build a static library instead of a shared library for the EnergyPlus API" OFF )
@@ -857,6 +857,8 @@ add_custom_command(
         TARGET energyplusapi
         POST_BUILD
         DEPENDS "${PROJECT_SOURCE_DIR}/src/EnergyPlus/api"
+        # TODO: temporary "hack" to depend on a specific file that doesn't exist to force this to run
+        DEPENDS __ALWAYSRUNME
         COMMAND ${CMAKE_COMMAND}
         -DREPO_ROOT=${PROJECT_SOURCE_DIR}
         -DEXECUTABLE_PATH=$<TARGET_FILE:energyplusapi>
@@ -867,9 +869,6 @@ add_custom_command(
         -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}"
         -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}"
         -P "${PROJECT_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake"
-        # TODO: temporary "hack" to depend on a specific file that doesn't exist to force this to run
-        # ideally the whole process would be revamped
-        DEPENDS __ALWAYSRUNME
 )
 
 install( TARGETS energyplus energyplusapi DESTINATION ./ )
@@ -969,11 +968,11 @@ if( BUILD_TESTING )
   target_link_libraries( TestAPI_DataTransfer_C energyplusapi )
   add_test(NAME "API.TestDataTransferC" COMMAND TestAPI_DataTransfer_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
 
-  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/autosizing")
-  file(MAKE_DIRECTORY ${TEST_DIR})
-  add_executable( TestAPI_Autosizing_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestAutosizing.c )
-  target_link_libraries( TestAPI_Autosizing_C energyplusapi )
-  add_test(NAME "API.TestAutosizingC" COMMAND TestAPI_Autosizing_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
+#  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/autosizing")
+#  file(MAKE_DIRECTORY ${TEST_DIR})
+#  add_executable( TestAPI_Autosizing_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestAutosizing.c )
+#  target_link_libraries( TestAPI_Autosizing_C energyplusapi )
+#  add_test(NAME "API.TestAutosizingC" COMMAND TestAPI_Autosizing_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
 
   # This is tricky, the test scripts should be copied into the Products/<config> directory, but add_test has to be
   # called so early, it's hard to figure that out ahead of time.  I dunno.  Just skipping these on MSVC builds for now.
@@ -999,12 +998,12 @@ if( BUILD_TESTING )
             COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
             WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
-    set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/autosizing_python")
-    file(MAKE_DIRECTORY ${TEST_DIR})
-    configure_file( "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestAutosizing.py" "${API_TEST_TARGET_DIR}/TestAutosizing.py" )
-    add_test(NAME "API.TestAutosizingPython"
-            COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestAutosizing.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
-            WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+#    set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/autosizing_python")
+#    file(MAKE_DIRECTORY ${TEST_DIR})
+#    configure_file( "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestAutosizing.py" "${API_TEST_TARGET_DIR}/TestAutosizing.py" )
+#    add_test(NAME "API.TestAutosizingPython"
+#            COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestAutosizing.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
+#            WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
     set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/plugin_tester_tester")
     file(MAKE_DIRECTORY ${TEST_DIR})
