@@ -370,13 +370,14 @@ def parse_field(data, token):
                     root['data_type'] = 'external_list'
                 else:
                     raise RuntimeError("Two external-lists?")
-
             elif match_string(data, REAL_STR) or match_string(data, INTEGER_STR):
                 if 'type' not in root or 'type' != 'number':
                     root['type'] = 'number'
-
             elif match_string(data, NODE_STR):
                 root['type'] = 'string'
+            else:
+                bad_type = parse_line(data)
+                raise RuntimeError("Invalid \\type: \"%s\"" % bad_type)
 
         elif token == TOKEN_OBJ_LIST:
             next_token(data)
