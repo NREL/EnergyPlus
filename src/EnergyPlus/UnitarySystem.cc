@@ -7811,6 +7811,15 @@ namespace UnitarySystems {
                 }
                 this->m_DesiredOutletTemp = min(this->m_DesiredOutletTemp, MaxOutletTemp);
 
+                if (this->m_FanOpModeSchedPtr > 0) {
+                    if (ScheduleManager::GetCurrentScheduleValue(this->m_FanOpModeSchedPtr) == 0.0) {
+                        this->m_FanOpMode = DataHVACGlobals::CycFanCycCoil;
+                    } else {
+                        this->m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
+                        DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
+                    }
+                }
+
             } else {
                 // should never get here, only 3 control types
             }

@@ -15634,7 +15634,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_SingleSpeedDXCoolCoil_Only)
                       sensOut,
                       latOut);
 
-    EXPECT_NEAR(thisSys->m_CompPartLoadRatio, 1.0, 0.001);
+    EXPECT_NEAR(thisSys->m_CompPartLoadRatio, 0.35, 0.001);
+    // check that cooling coil air outlet node is at set point
+    EXPECT_NEAR(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).TempSetPoint, 0.001);
     // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
     EXPECT_GT(DataLoopNode::Node(3).Temp, DataLoopNode::Node(2).Temp);
 }
