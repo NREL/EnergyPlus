@@ -82,6 +82,7 @@ namespace HybridUnitaryAirConditioners {
     Array1D_bool CheckZoneHybridEvapName;
     bool GetInputZoneHybridEvap(true);
     bool ZoneEquipmentListChecked(false);
+    bool HybridCoolOneTimeFlag(true); // one time flag
 
     void clear_state()
     {
@@ -90,6 +91,7 @@ namespace HybridUnitaryAirConditioners {
         CheckZoneHybridEvapName.deallocate();
         GetInputZoneHybridEvap = true;
         ZoneEquipmentListChecked = false;
+        HybridCoolOneTimeFlag = true;
     }
 
     // Begin routines for zone HVAC Hybrid Evaporative cooler unit
@@ -203,7 +205,6 @@ namespace HybridUnitaryAirConditioners {
         int Loop;
         static Array1D_bool MySizeFlag;
 
-        static bool HybridCoolOneTimeFlag(true); // one time flag
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyFanFlag;
         static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers

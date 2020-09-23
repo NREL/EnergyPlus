@@ -142,7 +142,7 @@ std::vector<std::string> parseLine(std::string line)
     return vect;
 }
 
-TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
+TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_Unittest)
 {
     std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
@@ -505,7 +505,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 }
 
 
-TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateFieldsParsing)
+TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_ValidateFieldsParsing)
 {
     std::string idf_objects = delimited_string({
                                                          "ZoneHVAC:HybridUnitaryHVAC,",
@@ -584,7 +584,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateFieldsParsing
 }
 
 
-TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateMinimumIdfInput)
+TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_ValidateMinimumIdfInput)
 {
     std::string idf_objects = delimited_string({
                                        "ZoneHVAC:HybridUnitaryHVAC,",
@@ -627,7 +627,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateMinimumIdfInp
     EXPECT_EQ(pZoneHybridUnitaryAirConditioner->OperatingModes.size(), expectedOperatingModesSize);
 }
 
-TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
+TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_CalculateCurveVal)
 {
     std::string const idf_objects = delimited_string({
                                                          "ZoneHVAC:HybridUnitaryHVAC,",
@@ -858,7 +858,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
     }
 }
 
-TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ModelOperatingSettings_SolutionSpaceSearching)
+TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_ModelOperatingSettings_SolutionSpaceSearching)
 {
 
     std::string const idf_objects = delimited_string({
