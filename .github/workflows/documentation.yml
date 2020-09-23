@@ -25,6 +25,9 @@ jobs:
       working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
       run: cmake -DTEX_INTERACTION=batchmode -DDOCS_TESTING=ON ..
 
+    - name: Add problem matcher
+      run: echo "::add-matcher::.github/workflows/doc-problem-match.json"
+
     - name: Build Docs
       working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
       run: cmake --build . -j 2
