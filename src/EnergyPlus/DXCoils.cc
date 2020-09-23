@@ -6154,7 +6154,7 @@ namespace DXCoils {
                                                 "Electricity",
                                                 "COOLING",
                                                 _,
-                                                "Plant");
+                                                "System");
                             DXCoil(DXCoilNumTemp).ReportCoolingCoilCrankcasePower = false;
                         }
                     }
