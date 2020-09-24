@@ -167,6 +167,8 @@ namespace WeatherManager {
     extern Array2D<Real64> TodayDifSolarRad;     // Sky diffuse horizontal solar irradiance {W/m2}
     extern Array2D<Real64> TodayAlbedo;          // Albedo {dimensionless}
     extern Array2D<Real64> TodayLiquidPrecip;    // Liquid Precipitation Depth {mm}
+    extern Array2D<Real64> TodayTotalSkyCover;   // Total Sky Cover
+    extern Array2D<Real64> TodayOpaqueSkyCover;  // Opaque Sky Cover
 
     extern Array2D_bool TomorrowIsRain;             // Rain indicator, true=rain
     extern Array2D_bool TomorrowIsSnow;             // Snow indicator, true=snow
@@ -182,6 +184,8 @@ namespace WeatherManager {
     extern Array2D<Real64> TomorrowDifSolarRad;     // Sky diffuse horizontal solar irradiance {W/m2}
     extern Array2D<Real64> TomorrowAlbedo;          // Albedo {dimensionless}
     extern Array2D<Real64> TomorrowLiquidPrecip;    // Liquid Precipitation Depth {mm}
+    extern Array2D<Real64> TomorrowTotalSkyCover;   // Total Sky Cover {tenth of sky}
+    extern Array2D<Real64> TomorrowOpaqueSkyCover;  // Opaque Sky Cover {tenth of sky}
 
     extern Real64 TimeStepFraction; // Fraction of hour each time step represents
     extern Array1D_int EndDayOfMonth;
@@ -865,6 +869,7 @@ namespace WeatherManager {
     extern AnnualMonthlyDryBulbWeatherData OADryBulbAverage;
 
     void ReportWaterMainsTempParameters(IOFiles &ioFiles);
+    void calcSky(Real64 &TmrHorizIRSky, Real64 &TmrSkyTemp, Real64 OpaqueSkyCover, Real64 DryBulb, Real64 DewPoint, Real64 RelHum, Real64 IRHoriz);
 
 } // namespace WeatherManager
 

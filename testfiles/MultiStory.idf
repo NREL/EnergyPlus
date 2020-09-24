@@ -3378,13 +3378,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
-
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
-
-  Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
