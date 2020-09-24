@@ -186,6 +186,8 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const Dat
                                                 Real64 LoadSHR)
 {
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    this->recoveredEnergyRate = 0.0;
+    this->NormalSHR = 0.0;
 
     if (useAlternateMode == DataHVACGlobals::coilSubcoolReheatMode) {
         Real64 totalCoolingRate;
@@ -201,102 +203,159 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const Dat
         Real64 EnthalpyNorOut;
         Real64 modeRatio;
 
-        this->recoveredEnergyRate = 0.0;
-        this->NormalSHR = 0.0;
-        this->calculate(state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
+        this->calculate(
+            state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
 
-        //this->OperatingMode = 1;
+        // this->OperatingMode = 1;
         CalcComponentSensibleLatentOutput(
             outletNode.MassFlowRate, inletNode.Temp, inletNode.HumRat, outletNode.Temp, outletNode.HumRat, sensNorRate, latRate, totalCoolingRate);
         if (totalCoolingRate > 1.0E-10) {
             this->OperatingMode = 1;
             this->NormalSHR = sensNorRate / totalCoolingRate;
+            this->powerUse = this->normalMode.OpModePower;
+            this->RTF = this->normalMode.OpModeRTF;
+            this->wasteHeatRate = this->normalMode.OpModeWasteHeat;
         }
 
-        if (PLR == 0.0) return;
-        if (LoadSHR == 0.0) return;
+        if ((PLR != 0.0) || (LoadSHR != 0.0)) {
+            if (totalCoolingRate == 0.0) {
+                SysNorSHR = 1.0;
+            } else {
+                SysNorSHR = sensNorRate / totalCoolingRate;
+            }
+            HumRatNorOut = outletNode.HumRat;
+            TempNorOut = outletNode.Temp;
+            EnthalpyNorOut = outletNode.Enthalpy;
+            this->recoveredEnergyRate = sensNorRate;
 
-        if (totalCoolingRate == 0.0) {
-            SysNorSHR = 1.0;
-        } else {
-            SysNorSHR = sensNorRate / totalCoolingRate;
-        }
-        HumRatNorOut = outletNode.HumRat;
-        TempNorOut = outletNode.Temp;
-        EnthalpyNorOut = outletNode.Enthalpy;
-        this->recoveredEnergyRate = sensNorRate;
-
-        if (LoadSHR < SysNorSHR) {
-            outletNode.MassFlowRate = inletNode.MassFlowRate;
-            this->calculate(state, this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
-            CalcComponentSensibleLatentOutput(outletNode.MassFlowRate,
-                                              inletNode.Temp,
-                                              inletNode.HumRat,
-                                              outletNode.Temp,
-                                              outletNode.HumRat,
-                                              sensSubRate,
-                                              latRate,
-                                              totalCoolingRate);
-            SysSubSHR = sensSubRate / totalCoolingRate;
-            if (LoadSHR < SysSubSHR) {
+            if (LoadSHR < SysNorSHR) {
                 outletNode.MassFlowRate = inletNode.MassFlowRate;
-                this->calculate(state, this->alternateMode2, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
+                this->calculate(state,
+                                this->alternateMode,
+                                inletNode,
+                                outletNode,
+                                PLR,
+                                speedNum,
+                                speedRatio,
+                                fanOpMode,
+                                condInletNode,
+                                condOutletNode,
+                                singleMode);
                 CalcComponentSensibleLatentOutput(outletNode.MassFlowRate,
                                                   inletNode.Temp,
                                                   inletNode.HumRat,
                                                   outletNode.Temp,
                                                   outletNode.HumRat,
-                                                  sensRehRate,
+                                                  sensSubRate,
                                                   latRate,
                                                   totalCoolingRate);
-                SysRehSHR = sensRehRate / totalCoolingRate;
-                if (LoadSHR > SysRehSHR) {
-                    modeRatio = (LoadSHR - SysNorSHR) / (SysRehSHR - SysNorSHR);
-                    this->OperatingMode = 3;
+                SysSubSHR = sensSubRate / totalCoolingRate;
+                if (LoadSHR < SysSubSHR) {
+                    outletNode.MassFlowRate = inletNode.MassFlowRate;
+                    this->calculate(state,
+                                    this->alternateMode2,
+                                    inletNode,
+                                    outletNode,
+                                    PLR,
+                                    speedNum,
+                                    speedRatio,
+                                    fanOpMode,
+                                    condInletNode,
+                                    condOutletNode,
+                                    singleMode);
+                    CalcComponentSensibleLatentOutput(outletNode.MassFlowRate,
+                                                      inletNode.Temp,
+                                                      inletNode.HumRat,
+                                                      outletNode.Temp,
+                                                      outletNode.HumRat,
+                                                      sensRehRate,
+                                                      latRate,
+                                                      totalCoolingRate);
+                    SysRehSHR = sensRehRate / totalCoolingRate;
+                    if (LoadSHR > SysRehSHR) {
+                        modeRatio = (LoadSHR - SysNorSHR) / (SysRehSHR - SysNorSHR);
+                        this->OperatingMode = 3;
+                        outletNode.HumRat = HumRatNorOut * (1.0 - modeRatio) + modeRatio * outletNode.HumRat;
+                        outletNode.Enthalpy = EnthalpyNorOut * (1.0 - modeRatio) + modeRatio * outletNode.Enthalpy;
+                        outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
+                        this->ModeRatio = modeRatio;
+                        // update other reporting terms
+                        this->powerUse = this->normalMode.OpModePower * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModePower;
+                        this->RTF = this->normalMode.OpModeRTF * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModeRTF;
+                        this->wasteHeatRate = this->normalMode.OpModeWasteHeat * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModeWasteHeat;
+                        this->recoveredEnergyRate = (this->recoveredEnergyRate - sensRehRate) * this->ModeRatio;
+                    } else {
+                        this->ModeRatio = 1.0;
+                        this->OperatingMode = 3;
+                        this->recoveredEnergyRate = (this->recoveredEnergyRate - sensRehRate) * this->ModeRatio;
+                    }
+                } else {
+                    modeRatio = (LoadSHR - SysNorSHR) / (SysSubSHR - SysNorSHR);
+                    this->OperatingMode = 2;
+                    // process outlet conditions and total output
                     outletNode.HumRat = HumRatNorOut * (1.0 - modeRatio) + modeRatio * outletNode.HumRat;
                     outletNode.Enthalpy = EnthalpyNorOut * (1.0 - modeRatio) + modeRatio * outletNode.Enthalpy;
                     outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
                     this->ModeRatio = modeRatio;
                     // update other reporting terms
-                    this->powerUse = this->normalMode.OpModePower * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModePower;
-                    this->RTF = this->normalMode.OpModeRTF * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModeRTF;
-                    this->electricityConsumption = this->powerUse * reportingConstant;
-                    this->wasteHeatRate = this->normalMode.OpModeWasteHeat * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModeWasteHeat;
-                    this->recoveredEnergyRate = (this->recoveredEnergyRate - sensRehRate) * this->ModeRatio;
-                    return;
-                } else {
-                    this->ModeRatio = 1.0;
-                    this->OperatingMode = 3;
-                    this->recoveredEnergyRate = (this->recoveredEnergyRate - sensRehRate) * this->ModeRatio;
-                    return;
+                    this->powerUse = this->normalMode.OpModePower * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModePower;
+                    this->RTF = this->normalMode.OpModeRTF * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModeRTF;
+                    this->wasteHeatRate = this->normalMode.OpModeWasteHeat * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModeWasteHeat;
+                    this->recoveredEnergyRate = (this->recoveredEnergyRate - sensSubRate) * this->ModeRatio;
                 }
             } else {
-                modeRatio = (LoadSHR - SysNorSHR) / (SysSubSHR - SysNorSHR);
-                this->OperatingMode = 2;
-                // process outlet conditions and total output
-                outletNode.HumRat = HumRatNorOut * (1.0 - modeRatio) + modeRatio * outletNode.HumRat;
-                outletNode.Enthalpy = EnthalpyNorOut * (1.0 - modeRatio) + modeRatio * outletNode.Enthalpy;
-                outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
-                this->ModeRatio = modeRatio;
-                // update other reporting terms
-                this->powerUse = this->normalMode.OpModePower * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModePower;
-                this->RTF = this->normalMode.OpModeRTF * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModeRTF;
-                this->electricityConsumption = this->powerUse * reportingConstant;
-                this->wasteHeatRate = this->normalMode.OpModeWasteHeat * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModeWasteHeat;
-                this->recoveredEnergyRate = (this->recoveredEnergyRate - sensSubRate) * this->ModeRatio;
-                return;
+                this->ModeRatio = 0.0;
+                this->OperatingMode = 1;
+                this->recoveredEnergyRate = 0.0;
             }
-        } else {
-            this->ModeRatio = 0.0;
-            this->OperatingMode = 1;
-            this->recoveredEnergyRate = 0.0;
-            return;
         }
-
     } else if (useAlternateMode == DataHVACGlobals::coilEnhancedMode) {
-        this->calculate(state, this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
+        this->calculate(
+            state, this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
+        this->OperatingMode = 2;
+        this->powerUse = this->alternateMode.OpModePower;
+        this->RTF = this->alternateMode.OpModeRTF;
+        this->wasteHeatRate = this->alternateMode.OpModeWasteHeat;
     } else {
-        this->calculate(state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
+        this->calculate(
+            state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
+        this->OperatingMode = 1;
+        this->powerUse = this->normalMode.OpModePower;
+        this->RTF = this->normalMode.OpModeRTF;
+        this->wasteHeatRate = this->normalMode.OpModeWasteHeat;
+    }
+
+    // calculate crankcase heater operation
+    if (DataEnvironment::OutDryBulbTemp < this->maxOutdoorDrybulbForBasin) {
+        this->crankcaseHeaterPower = this->crankcaseHeaterCap;
+    } else {
+        this->crankcaseHeaterPower = 0.0;
+    }
+    this->crankcaseHeaterPower = this->crankcaseHeaterPower * (1.0 - this->RTF);
+    this->crankcaseHeaterElectricityConsumption = this->crankcaseHeaterPower * reportingConstant;
+
+    // basin heater
+    if (this->evapCondBasinHeatSchedulIndex > 0) {
+        Real64 currentBasinHeaterAvail = ScheduleManager::GetCurrentScheduleValue(this->evapCondBasinHeatSchedulIndex);
+        if (this->evapCondBasinHeatCap > 0.0 && currentBasinHeaterAvail > 0.0) {
+            this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - DataEnvironment::OutDryBulbTemp));
+        }
+    } else {
+        // If schedule does not exist, basin heater operates anytime outdoor dry-bulb temp is below setpoint
+        if (this->evapCondBasinHeatCap > 0.0) {
+            this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - DataEnvironment::OutDryBulbTemp));
+        }
+    }
+    this->basinHeaterPower *= (1.0 - this->RTF);
+    this->electricityConsumption = this->powerUse * reportingConstant;
+
+    if (this->compressorFuelType != DataGlobalConstants::iRT_Electricity) {
+        this->compressorFuelRate = this->powerUse;
+        this->compressorFuelConsumption = this->electricityConsumption;
+
+        // check this after adding parasitic loads
+        this->powerUse = 0.0;
+        this->electricityConsumption = 0.0;
     }
 }
 
@@ -331,47 +390,6 @@ void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlusData &state,
 
     // calculate the performance at this mode/speed
     currentMode.CalcOperatingMode(state, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
-
-    // scaling term to get rate into consumptions
-    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-
-    // calculate crankcase heater operation
-    if (DataEnvironment::OutDryBulbTemp < this->maxOutdoorDrybulbForBasin) {
-        this->crankcaseHeaterPower = this->crankcaseHeaterCap;
-    } else {
-        this->crankcaseHeaterPower = 0.0;
-    }
-    this->crankcaseHeaterPower = this->crankcaseHeaterPower * (1.0 - this->RTF);
-    this->crankcaseHeaterElectricityConsumption = this->crankcaseHeaterPower * reportingConstant;
-
-    // basin heater
-    if (this->evapCondBasinHeatSchedulIndex > 0) {
-        Real64 currentBasinHeaterAvail = ScheduleManager::GetCurrentScheduleValue(this->evapCondBasinHeatSchedulIndex);
-        if (this->evapCondBasinHeatCap > 0.0 && currentBasinHeaterAvail > 0.0) {
-            this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - DataEnvironment::OutDryBulbTemp));
-        }
-    } else {
-        // If schedule does not exist, basin heater operates anytime outdoor dry-bulb temp is below setpoint
-        if (this->evapCondBasinHeatCap > 0.0) {
-            this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - DataEnvironment::OutDryBulbTemp));
-        }
-    }
-    this->basinHeaterPower *= (1.0 - this->RTF);
-
-    // update other reporting terms
-    this->powerUse = currentMode.OpModePower;
-    this->RTF = currentMode.OpModeRTF;
-    this->electricityConsumption = this->powerUse * reportingConstant;
-    this->wasteHeatRate = currentMode.OpModeWasteHeat;
-
-    if (this->compressorFuelType != DataGlobalConstants::iRT_Electricity) {
-        this->compressorFuelRate = this->powerUse;
-        this->compressorFuelConsumption = this->electricityConsumption;
-
-        // check this after adding parasitic loads
-        this->powerUse = 0.0;
-        this->electricityConsumption = 0.0;
-    }
 }
 
 void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlusData& state) {
