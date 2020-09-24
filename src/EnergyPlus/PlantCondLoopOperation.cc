@@ -58,13 +58,13 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -75,10 +75,10 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PluginManager.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -314,7 +314,8 @@ namespace PlantCondLoopOperation {
             FindCompSPLoad(LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum);
         } else if (CurSchemeType == EMSOpSchemeType) {
             TurnOnPlantLoopPipes(LoopNum, LoopSideNum);
-            DistributeUserDefinedPlantLoad(state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum, CurSchemePtr, LoopDemand, RemLoopDemand);
+            DistributeUserDefinedPlantLoad(
+                state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum, CurSchemePtr, LoopDemand, RemLoopDemand);
         } else { // it's a range based control type with multiple equipment lists
             CurListNum = 0;
             for (ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
@@ -1317,7 +1318,6 @@ namespace PlantCondLoopOperation {
         using EMSManager::iTemperatureMaxSetPoint;
         using EMSManager::iTemperatureMinSetPoint;
         using EMSManager::iTemperatureSetPoint;
-        using ReportSizingManager::ReportSizingOutput;
         using ScheduleManager::GetScheduleIndex;
         using SetPointManager::SetUpNewScheduledTESSetPtMgr;
 
@@ -1436,10 +1436,10 @@ namespace PlantCondLoopOperation {
                                     // call error...Demand node must be component inlet node for autosizing
                                 }
                             }
-                            ReportSizingOutput(CurrentModuleObject,
-                                               PlantLoop(LoopNum).OpScheme(SchemeNum).Name,
-                                               "Design Water Flow Rate [m3/s] Equipment # " + std::to_string(Num),
-                                               CompFlowRate);
+                            BaseSizer::reportSizerOutput(CurrentModuleObject,
+                                                         PlantLoop(LoopNum).OpScheme(SchemeNum).Name,
+                                                         "Design Water Flow Rate [m3/s] Equipment # " + std::to_string(Num),
+                                                         CompFlowRate);
                         }
 
                         {
@@ -1467,14 +1467,13 @@ namespace PlantCondLoopOperation {
                         if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage") {
 
                             // Special case for ThermalStorage:Ice:XXXX objects which can only be dual (cf #6958)
-                            if ( ( (cAlphaArgs(CompNumA - 3) == "THERMALSTORAGE:ICE:SIMPLE") ||
-                                   (cAlphaArgs(CompNumA - 3) == "THERMALSTORAGE:ICE:DETAILED") ) &&
-                                 (cAlphaArgs(CompNumA + 1) != "DUAL") ) {
+                            if (((cAlphaArgs(CompNumA - 3) == "THERMALSTORAGE:ICE:SIMPLE") ||
+                                 (cAlphaArgs(CompNumA - 3) == "THERMALSTORAGE:ICE:DETAILED")) &&
+                                (cAlphaArgs(CompNumA + 1) != "DUAL")) {
 
-                                ShowWarningError("Equipment Operation Mode was reset to 'DUAL' for Component '" + cAlphaArgs(CompNumA - 2) +
-                                        "' in "  + CurrentModuleObject + "='" + cAlphaArgs(1) + "'.");
-                                ShowContinueError("Equipment Operation Mode can only be 'DUAL' for " + cAlphaArgs(CompNumA - 3)
-                                        + " objects.");
+                                ShowWarningError("Equipment Operation Mode was reset to 'DUAL' for Component '" + cAlphaArgs(CompNumA - 2) + "' in " +
+                                                 CurrentModuleObject + "='" + cAlphaArgs(1) + "'.");
+                                ShowContinueError("Equipment Operation Mode can only be 'DUAL' for " + cAlphaArgs(CompNumA - 3) + " objects.");
 
                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = DualOp;
                             }
@@ -1767,7 +1766,8 @@ namespace PlantCondLoopOperation {
                 if (StackMngrNum > 0) { // found it
                     PlantLoop(LoopNum).OpScheme(SchemeNum).ErlSimProgramMngr = StackMngrNum;
                 } else {
-                    PlantLoop(LoopNum).OpScheme(SchemeNum).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
+                    PlantLoop(LoopNum).OpScheme(SchemeNum).simPluginLocation =
+                        EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
                     if (PlantLoop(LoopNum).OpScheme(SchemeNum).simPluginLocation == -1) {
                         ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                         ShowContinueError("Entered in " + CurrentModuleObject + '=' + cAlphaArgs(1));
@@ -1780,7 +1780,8 @@ namespace PlantCondLoopOperation {
                     if (StackMngrNum > 0) { // found it
                         PlantLoop(LoopNum).OpScheme(SchemeNum).ErlInitProgramMngr = StackMngrNum;
                     } else {
-                        PlantLoop(LoopNum).OpScheme(SchemeNum).initPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(3));
+                        PlantLoop(LoopNum).OpScheme(SchemeNum).initPluginLocation =
+                            EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(3));
                         if (PlantLoop(LoopNum).OpScheme(SchemeNum).initPluginLocation == -1) {
                             ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                             ShowContinueError("Entered in " + CurrentModuleObject + '=' + cAlphaArgs(1));
@@ -2400,8 +2401,7 @@ namespace PlantCondLoopOperation {
                 }
                 if (numAvail > 0) {
                     UniformLoad = std::abs(RemLoopDemand) / numAvail;
-                }
-                else {
+                } else {
                     UniformLoad = 0.0;
                 }
                 for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
@@ -3085,7 +3085,8 @@ namespace PlantCondLoopOperation {
             bool anyEMSRan;
             ManageEMS(state, emsCallFromUserDefinedComponentModel, anyEMSRan, PlantLoop(LoopNum).OpScheme(CurSchemePtr).ErlSimProgramMngr);
         } else if (PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation > -1) {
-            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation);
+            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state,
+                                                                                    PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation);
         }
 
         // move actuated value to MyLoad

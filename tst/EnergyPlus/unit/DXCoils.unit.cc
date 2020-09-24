@@ -1453,7 +1453,7 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     SetPredefinedTables();
     CurZoneEqNum = 1;
 
-    // Need this to prevent crash in RequestSizing
+    // Need this to prevent crash in Sizers
     FinalZoneSizing.allocate(1);
     FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.1;
     FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.1;
@@ -2207,7 +2207,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     DataEnvironment::StdBaroPress = 101325.0;
     Psychrometrics::InitializePsychRoutines();
 
-    // Need this to prevent crash in RequestSizing
+    // Need this to prevent crash in Sizers
     DataSizing::UnitarySysEqSizing.allocate(1);
     DataSizing::OASysEqSizing.allocate(1);
 
@@ -2216,7 +2216,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     DataSizing::CurDuctType = DataHVACGlobals::Cooling;
 
     // We aim to test resulting values that are in this report, so request it
-    // We actually don't need this because ReportSizingOutput also outputs to the "ComponentSizes" table
+    // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table
     // OutputReportTabular::displayEioSummary = true;
 
     // Setting predefined tables is needed though
@@ -2245,7 +2245,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     EXPECT_NEAR(lowSpeedCondPumpPower, DXCoils::DXCoil(1).EvapCondPumpElecNomPower2, 0.1);
 
     // Write the EIO Table we need
-    // We actually don't need this because ReportSizingOutput also outputs to the "ComponentSizes" table
+    // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table
     // OutputReportTabular::WriteEioTables();
 
     // Now check output tables / EIO
@@ -2433,7 +2433,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     DataEnvironment::StdBaroPress = 101325.0;
     Psychrometrics::InitializePsychRoutines();
 
-    // Need this to prevent crash in RequestSizing
+    // Need this to prevent crash in Sizers
     DataSizing::UnitarySysEqSizing.allocate(1);
     DataSizing::OASysEqSizing.allocate(1);
 
@@ -2441,7 +2441,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     DataSizing::CurDuctType = DataHVACGlobals::Cooling;
 
     // We aim to test resulting values that are in this report, so request it
-    // We actually don't need this because ReportSizingOutput also outputs to the "ComponentSizes" table
+    // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table
     // OutputReportTabular::displayEioSummary = true;
 
     // Setting predefined tables is needed though
@@ -2462,7 +2462,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     EXPECT_NEAR(condPumpPower, DXCoils::DXCoil(1).EvapCondPumpElecNomPower(1), 0.1);
 
     // Write the EIO Table we need
-    // We actually don't need this because ReportSizingOutput also outputs to the "ComponentSizes" table
+    // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table
     // OutputReportTabular::WriteEioTables();
 
     // Now check output tables / EIO
@@ -3539,7 +3539,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     DataSizing::SysSizInput.allocate(1);
     DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;
     DataSizing::NumSysSizInput = 1;
-    // Need this to prevent crash in RequestSizing
+    // Need this to prevent crash in Sizers
     DataSizing::UnitarySysEqSizing.allocate(1);
 
     SizeDXCoil(state, 1);
@@ -3791,7 +3791,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     DataSizing::SysSizInput.allocate(1);
     DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;
     DataSizing::NumSysSizInput = 1;
-    // Need this to prevent crash in RequestSizing
+    // Need this to prevent crash in Sizers
     DataSizing::UnitarySysEqSizing.allocate(1);
 
     // test SHR design size when all autosized

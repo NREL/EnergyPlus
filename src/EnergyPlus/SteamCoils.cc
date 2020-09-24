@@ -53,12 +53,14 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
+#include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
@@ -67,15 +69,14 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -173,7 +174,8 @@ namespace SteamCoils {
         CheckEquipName.deallocate();
     }
 
-    void SimulateSteamCoilComponents(EnergyPlusData &state, std::string const &CompName,
+    void SimulateSteamCoilComponents(EnergyPlusData &state,
+                                     std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64 const> QCoilReq, // coil load to be met
@@ -292,7 +294,7 @@ namespace SteamCoils {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        bool ErrorsFound(false);  // If errors detected in input
+        bool ErrorsFound(false);         // If errors detected in input
         std::string CurrentModuleObject; // for ease in getting objects
         Array1D_string AlphArray;        // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
@@ -696,8 +698,6 @@ namespace SteamCoils {
         using FluidProperties::GetSatEnthalpyRefrig;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         //  USE BranchInputManager, ONLY: MyPlantSizingIndex
-        using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -778,14 +778,17 @@ namespace SteamCoils {
                         DataDesicDehumNum = SteamCoil(CoilNum).DesiccantDehumNum;
                         CompType = SteamCoil(CoilNum).SteamCoilType;
                         CompName = SteamCoil(CoilNum).Name;
-                        SizingString = "";
                         bPRINT = false;
-                        TempSize = AutoSize;
-                        RequestSizing(state, CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
-                        DataDesInletAirTemp = TempSize;
-                        TempSize = AutoSize;
-                        RequestSizing(state, CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
-                        DataDesOutletAirTemp = TempSize;
+                        HeatingCoilDesAirInletTempSizer sizerHeatingDesInletTemp;
+                        bool ErrorsFound = false;
+                        sizerHeatingDesInletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                        DataDesInletAirTemp = sizerHeatingDesInletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
+
+                        HeatingCoilDesAirOutletTempSizer sizerHeatingDesOutletTemp;
+                        ErrorsFound = false;
+                        sizerHeatingDesOutletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                        DataDesOutletAirTemp = sizerHeatingDesOutletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
+
                         if (CurOASysNum > 0) {
                             OASysEqSizing(CurOASysNum).AirFlow = true;
                             OASysEqSizing(CurOASysNum).AirVolFlow = FinalSysSizing(CurSysNum).DesOutAirVolFlow;
@@ -811,8 +814,12 @@ namespace SteamCoils {
                     if (DataDesicRegCoil) {
                         bPRINT = false;
                         TempSize = AutoSize;
-                        RequestSizing(state, CompType, CompName, HeatingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
-                        DesVolFlow = TempSize;
+                        bool errorsFound = false;
+                        HeatingAirFlowSizer sizingHeatingAirFlow;
+                        sizingHeatingAirFlow.overrideSizingString(SizingString);
+                        // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                        sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                        DesVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                     }
                     DesMassFlow = RhoAirStd * DesVolFlow;
                     // get the outside air fraction
@@ -862,7 +869,7 @@ namespace SteamCoils {
                         // CALL ShowContinueError('To change this, input a value for UA, change the heating design day, or lower')
                         // CALL ShowContinueError('  the system heating design supply air temperature')
                     }
-                    ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         "Coil:Heating:Steam", SteamCoil(CoilNum).Name, "Maximum Steam Flow Rate [m3/s]", SteamCoil(CoilNum).MaxSteamVolFlowRate);
                 }
                 DataDesicRegCoil = false; // reset all globals to 0 to ensure correct sizing for other child components
@@ -871,7 +878,8 @@ namespace SteamCoils {
                 case DataAirSystems::structArrayLegacyFanModels: {
                     int SupFanNum = DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum;
                     if (SupFanNum > 0) {
-                        coilSelectionReportObj->setCoilSupplyFanInfo(state, SteamCoil(CoilNum).Name,
+                        coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                                     SteamCoil(CoilNum).Name,
                                                                      "Coil:Heating:Steam",
                                                                      Fans::Fan(DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum).FanName,
                                                                      DataAirSystems::structArrayLegacyFanModels,
@@ -882,7 +890,8 @@ namespace SteamCoils {
                 }
                 case DataAirSystems::objectVectorOOFanSystemModel: {
                     if (DataAirSystems::PrimaryAirSystem(CurSysNum).supFanVecIndex >= 0) {
-                        coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                        coilSelectionReportObj->setCoilSupplyFanInfo(
+                            state,
                             SteamCoil(CoilNum).Name,
                             "Coil:Heating:Steam",
                             HVACFan::fanObjs[DataAirSystems::PrimaryAirSystem(CurSysNum).supFanVecIndex]->name,
@@ -948,7 +957,7 @@ namespace SteamCoils {
                         // CALL ShowContinueError('To change this, input a value for UA, change the heating design day, or lower')
                         // CALL ShowContinueError('  the system heating design supply air temperature')
                     }
-                    ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         "Coil:Heating:Steam", SteamCoil(CoilNum).Name, "Maximum Steam Flow Rate [m3/s]", SteamCoil(CoilNum).MaxSteamVolFlowRate);
                 }
             } // end zone coil ELSE - IF
@@ -2071,7 +2080,8 @@ namespace SteamCoils {
         return NodeNumber;
     }
 
-    Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state),
+                           std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     )
