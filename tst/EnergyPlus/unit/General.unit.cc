@@ -309,7 +309,7 @@ TEST_F(EnergyPlusFixture, General_SolveRootTest)
     Par.allocate(2);
     Par(1) = 1.0;
     Par(2) = 1.0;
-
+    
     General::SolveRoot(ErrorToler, 40, SolFla, Frac, ResidualTest, 0.0, small, Par);
     EXPECT_EQ(-1, SolFla);
 
@@ -371,43 +371,25 @@ TEST_F(EnergyPlusFixture, General_EpexpTest)
 {
     //Global exp function test
     Real64 x;
-    Real64 d(1.0);
     Real64 y;
 
-    // Underflow and near zero tests
+    // Negative value
     x = -69.0;
-    y = epexp(x,d);
+    y = epexp(x);
     EXPECT_NEAR(0.0, y, 1.0E-20);
 
     x = -700.0;
-    y = epexp(x,d);
+    y = epexp(x);
     EXPECT_NEAR(0.0, y, 1.0E-20);
 
-    x = -1000.0; // Will cause underflow
-    y = epexp(x,d);
-    EXPECT_EQ(0.0, y);
-
-    // Divide by zero tests
-    d = 0.0;
-    x = -1000.0;
-    y = epexp(x,d);
-    EXPECT_EQ(0.0, y);
-
-    d = 0.0;
-    x = 1000.0;
-    y = epexp(x,d);
-    EXPECT_EQ(0.0, y);
-
-    /*// Overflow and near-overflow tests (Not currently used in code)
+    // Positive values
     x = 10.0;
-    d = 1.0;
-    y = epexpOverflow(x, d);
+    y = epexp(x, 700.0);
     EXPECT_NEAR(22026.46579480, y, 0.00001);
 
     x = 800.0;
-    d = 1.0;
-    y = epexpOverflow(x, d);
+    y = epexp(x, 700.0);
     EXPECT_NEAR(1.0142320547350045e+304, y, 1.0E2);
-    */
 }
+
 } // namespace EnergyPlus

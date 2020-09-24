@@ -147,11 +147,6 @@ CHECKED_AND_OKED = {
             "anyProgramRan"
         ]
     },
-    "Fans.cc": {
-        "FanInputsForDesHeatGain": [
-            "fanCompModel"
-        ]
-    },
     "FaultsManager.cc": {
         "SetFaultyCoilSATSensor": [
             "FaultyCoilSATFlag"

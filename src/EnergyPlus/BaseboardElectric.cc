@@ -48,7 +48,6 @@
 // C++ Headers
 
 // EnergyPlus Headers
-#include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -64,6 +63,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -83,11 +83,10 @@ namespace BaseboardElectric {
     using namespace ScheduleManager;
 
     // MODULE PARAMETER DEFINITIONS
-    const char *cCMO_BBRadiator_Electric = "ZoneHVAC:Baseboard:Convective:Electric";
+    const char * cCMO_BBRadiator_Electric = "ZoneHVAC:Baseboard:Convective:Electric";
     constexpr Real64 SimpConvAirFlowSpeed(0.5); // m/s
 
-    void SimElectricBaseboard(
-        EnergyPlusData &state, std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex)
+    void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -102,8 +101,8 @@ namespace BaseboardElectric {
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using General::TrimSigDigits;
 
-        int BaseboardNum; // index of unit in baseboard array
-        Real64 QZnReq;    // zone load not yet satisfied
+        int BaseboardNum;               // index of unit in baseboard array
+        Real64 QZnReq;                  // zone load not yet satisfied
 
         if (state.dataBaseboardElectric->getInputFlag) {
             GetBaseboardInput(state);
@@ -234,7 +233,7 @@ namespace BaseboardElectric {
                 VerifyUniqueBaseboardName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
 
                 ++BaseboardNum;
-                auto &thisBaseboard = baseboard->Baseboard(BaseboardNum);
+                auto & thisBaseboard = baseboard->Baseboard(BaseboardNum);
                 thisBaseboard.EquipName = cAlphaArgs(1);                                        // name of this baseboard
                 thisBaseboard.EquipType = UtilityRoutines::MakeUPPERCase(cCurrentModuleObject); // the type of baseboard-rename change
                 thisBaseboard.Schedule = cAlphaArgs(2);
@@ -345,8 +344,12 @@ namespace BaseboardElectric {
                                 _,
                                 "System");
 
-            SetupOutputVariable(
-                "Baseboard Total Heating Rate", OutputProcessor::Unit::W, thisBaseboard.Power, "System", "Average", thisBaseboard.EquipName);
+            SetupOutputVariable("Baseboard Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                thisBaseboard.Power,
+                                "System",
+                                "Average",
+                                thisBaseboard.EquipName);
 
             SetupOutputVariable("Baseboard Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -360,8 +363,12 @@ namespace BaseboardElectric {
                                 _,
                                 "System");
 
-            SetupOutputVariable(
-                "Baseboard Electricity Rate", OutputProcessor::Unit::W, thisBaseboard.ElecUseRate, "System", "Average", thisBaseboard.EquipName);
+            SetupOutputVariable("Baseboard Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                thisBaseboard.ElecUseRate,
+                                "System",
+                                "Average",
+                                thisBaseboard.EquipName);
         }
     }
 
@@ -411,6 +418,7 @@ namespace BaseboardElectric {
         if (!SysSizingCalc && baseboard->Baseboard(BaseboardNum).MySizeFlag) {
             // for each coil, do the sizing once.
             SizeElectricBaseboard(state, BaseboardNum);
+
             baseboard->Baseboard(BaseboardNum).MySizeFlag = false;
         }
 
@@ -449,6 +457,8 @@ namespace BaseboardElectric {
         using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
         using General::RoundSigDigits;
+        using ReportSizingManager::ReportSizingOutput;
+        using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeElectricBaseboard");
@@ -462,11 +472,11 @@ namespace BaseboardElectric {
         std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
         Real64 TempSize;          // autosized value of coil input field
         int FieldNum;             // IDD numeric field number where input field description is found
-        int SizingMethod;    // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing,
-                             // HeatingCapacitySizing, etc.)
-        bool PrintFlag;      // TRUE when sizing information is reported in the eio file
-        int CapSizingMethod; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
-                             // FractionOfAutosizedHeatingCapacity )
+        int SizingMethod;         // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing,
+                                  // HeatingCapacitySizing, etc.)
+        bool PrintFlag;           // TRUE when sizing information is reported in the eio file
+        int CapSizingMethod;      // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
+                                  // FractionOfAutosizedHeatingCapacity )
 
         DataScalableCapSizingON = false;
 
@@ -493,8 +503,7 @@ namespace BaseboardElectric {
                     TempSize = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                    ZoneEqSizing(CurZoneEqNum).DesHeatingLoad =
-                        baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
+                    ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
                     TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                     DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
@@ -507,11 +516,8 @@ namespace BaseboardElectric {
                 } else {
                     TempSize = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
                 }
-                bool errorsFound = false;
-                HeatingCapacitySizer sizerHeatingCapacity;
-                sizerHeatingCapacity.overrideSizingString(SizingString);
-                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                baseboard->Baseboard(BaseboardNum).NominalCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
+                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                baseboard->Baseboard(BaseboardNum).NominalCapacity = TempSize;
                 DataScalableCapSizingON = false;
             }
         }

@@ -329,7 +329,7 @@ namespace ResultsFramework {
         friend class EnergyPlus::ResultsFrameworkFixture;
 
         char s[129] = {0};
-        OutputProcessor::ReportingFrequency smallestReportingFrequency = OutputProcessor::ReportingFrequency::Yearly;
+        OutputProcessor::ReportingFrequency smallestReportingFrequency = OutputProcessor::ReportingFrequency::Hourly;
         std::map<std::string, std::vector<std::string>> outputs;
         std::vector<bool> outputVariableIndices;
 

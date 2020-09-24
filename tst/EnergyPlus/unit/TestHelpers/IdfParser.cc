@@ -47,6 +47,12 @@
 
 #include "IdfParser.hh"
 
+#ifdef _WIN32
+#define NL "\r\n"
+#else
+#define NL "\n"
+#endif
+
 namespace EnergyPlus {
 
 std::vector<std::vector<std::string>> IdfParser::decode(std::string const &idf)
@@ -72,7 +78,7 @@ std::string IdfParser::encode(std::vector<std::vector<std::string>> const &idf_l
         for (int i = 0; i < size - 1; ++i) {
             idf += object[i] + ',';
         }
-        idf += object[size - 1] + ';' + '\n';
+        idf += object[size - 1] + ';' + NL;
     }
     return idf;
 }

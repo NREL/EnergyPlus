@@ -126,14 +126,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: OutputDiagnosticsName
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: OutputDiagnosticsNames
   LOGICAL :: alreadyProcessedOneOutputDiagnostic=.false.
-  INTEGER :: nE, nEC, nG, nNG, nFO, nFON
-
-  LOGICAL :: changeMeterNameFlag
-  INTEGER :: totMeterCustom = 0
-  INTEGER :: totMeterCustomDecr = 0
-  INTEGER numMeterCustom
-  CHARACTER(len=MaxNameLength) :: MeterCustomName
-  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: MeterCustomNames
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
@@ -249,8 +241,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           ALLOCATE(NwAorN(MaxTotalArgs),NwReqFld(MaxTotalArgs),NwFldNames(MaxTotalArgs),NwFldDefaults(MaxTotalArgs),NwFldUnits(MaxTotalArgs))
           ALLOCATE(OutArgs(MaxTotalArgs))
           ALLOCATE(DeleteThisRecord(NumIDFRecords))
-          ALLOCATE(MeterCustomNames(NumIDFRecords))
-
           DeleteThisRecord=.false.
 
           NoVersion=.true.
@@ -300,29 +290,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             ENDDO
             CALL DisplayString('Processing IDF -- OutputDiagnostics preprocessing complete.')
           ENDIF
-      ! End Pre-process OutputDiagnostics
-
-      !- Pre-process for names of Meter:Custom objects
-          totMeterCustom = GetNumObjectsFound('METER:CUSTOM')
-          IF (totMeterCustom > 0) THEN
-            DO numMeterCustom=1, totMeterCustom
-              CALL GetObjectItem('METER:CUSTOM', numMeterCustom, Alphas, NumAlphas, Numbers, NumNumbers, Status)
-              MeterCustomName = MakeUpperCase(TRIM(Alphas(1)))
-              MeterCustomNames(numMeterCustom) = MeterCustomName
-            END DO
-          END IF
-      !- Ene Pre-process for names of Meter:Custom objects
-
-      !- Pre-process for names of Meter:CustomDecrement objects
-          totMeterCustomDecr = GetNumObjectsFound('METER:CUSTOMDECREMENT')
-          IF (totMeterCustomDecr > 0) THEN
-            DO numMeterCustom=1, totMeterCustomDecr
-              CALL GetObjectItem('METER:CUSTOMDECREMENT', numMeterCustom, Alphas, NumAlphas, Numbers, NumNumbers, Status)
-              MeterCustomName = MakeUpperCase(TRIM(Alphas(1)))
-              MeterCustomNames(numMeterCustom + totMeterCustom) = MeterCustomName
-            END DO
-          END IF
-      !- Ene Pre-process for names of Meter:CustomDecrement objects
+       ! End Pre-process OutputDiagnostics
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                                       P R O C E S S I N G                                                        !
@@ -634,18 +602,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    Written, &
                    .false.)
                 IF (DelThis) CYCLE
-                IF (CurArgs .GE. 1) THEN
-                  changeMeterNameFlag = .true.
-                  DO numMeterCustom=1, totMeterCustom + totMeterCustomDecr
-                    MeterCustomName = MeterCustomNames(numMeterCustom)
-                    IF (MeterCustomName .eq. MakeUPPERCase(InArgs(1))) THEN
-                      changeMeterNameFlag = .false.
-                    END IF
-                  END DO
-                  IF (changeMeterNameFlag) THEN
-                    CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(1), NoDiff)
-                  END IF
-                END IF
 
               CASE('OUTPUT:TABLE:TIMEBINS')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -1229,26 +1185,3 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   RETURN
 
 END SUBROUTINE CreateNewIDFUsingRules
-
-SUBROUTINE ReplaceFuelNameWithEndUseSubcategory(InOutArg, NoDiffArg)
-  CHARACTER(*), INTENT(INOUT) :: InOutArg
-  LOGICAL, INTENT(INOUT) :: NoDiffArg
-  nE=INDEX(InOutArg,'Electric')
-  nEC=INDEX(InOutArg,'Electricity')
-  nG=INDEX(InOutArg,'Gas')
-  nNG=INDEX(InOutArg,'NaturalGas')
-  nFO=INDEX(InOutArg,'FuelOil#')
-  nFON=INDEX(InOutArg,'FuelOilNo')
-  IF (nE > 0 .AND. nEC == 0) THEN
-    InOutArg = InOutArg(:nE-1) // 'Electricity'(:11) // InOutArg(nE+8:)
-    NoDiffArg=.false.
-  END IF
-  IF (nG > 0 .AND. nNG == 0) THEN
-    InOutArg = InOutArg(:nG-1) // 'NaturalGas'(:10) // InOutArg(nG+3:)
-    NoDiffArg=.false.
-  END IF
-  IF (nFO > 0 .AND. nFON== 0) THEN
-    InOutArg = InOutArg(:nFO-1) // 'FuelOilNo'(:9) // InOutArg(nFO+8:)
-    NoDiffArg=.false.
-  END IF
-END SUBROUTINE

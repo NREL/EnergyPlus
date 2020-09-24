@@ -79,7 +79,6 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HybridModel.hh>
@@ -6429,7 +6428,6 @@ namespace ZoneTempPredictorCorrector {
         Real64 Threshold;
         Real64 SumRetAirGains;
         Real64 ADUHeatAddRate;
-        Real64 QSensRate;
 
         SumIntGains = 0.0;    // Zone sum of convective internal gains
         SumHADTsurfs = 0.0;   // Zone sum of Hc*Area*(Tsurf - Tz)
@@ -6445,7 +6443,6 @@ namespace ZoneTempPredictorCorrector {
         SumSysMCpT = 0.0;
         ADUHeatAddRate = 0.0;
         ADUNum = 0;
-        QSensRate = 0;
 
         // Sum all convective internal gains: SumIntGain
         SumAllInternalConvectionGains(ZoneNum, SumIntGains);
@@ -6495,14 +6492,16 @@ namespace ZoneTempPredictorCorrector {
                 // Get node conditions
                 NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                 MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
-                SumMCpDTsystem += QSensRate;
+                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+
+                SumMCpDTsystem += MassFlowRate * CpAir * (NodeTemp - MAT(ZoneNum));
 
                 ADUNum = ZoneEquipConfig(ZoneEquipConfigNum).InletNodeADUNum(NodeNum);
                 if (ADUNum > 0) {
                     NodeTemp = Node(AirDistUnit(ADUNum).OutletNodeNum).Temp;
                     MassFlowRate = Node(AirDistUnit(ADUNum).OutletNodeNum).MassFlowRate;
-                    CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), ADUHeatAddRate);
+                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                    ADUHeatAddRate = MassFlowRate * CpAir * (NodeTemp - MAT(ZoneNum));
                     AirDistUnit(ADUNum).HeatRate = max(0.0, ADUHeatAddRate);
                     AirDistUnit(ADUNum).CoolRate = std::abs(min(0.0, ADUHeatAddRate));
                     AirDistUnit(ADUNum).HeatGain = AirDistUnit(ADUNum).HeatRate * TimeStepSys * SecInHour;
@@ -6517,8 +6516,9 @@ namespace ZoneTempPredictorCorrector {
                 // Get node conditions
                 NodeTemp = Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
                 MassFlowRate = Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
-                CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
-                SumMCpDTsystem += QSensRate;
+                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+
+                SumMCpDTsystem += MassFlowRate * CpAir * (NodeTemp - MAT(ZoneNum));
 
             } // NodeNum
             // add in the leaks
@@ -6528,15 +6528,15 @@ namespace ZoneTempPredictorCorrector {
                     ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
                     NodeTemp = Node(ADUInNode).Temp;
                     MassFlowRate = AirDistUnit(ADUNum).MassFlowRateUpStrLk;
-                    CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
-                    SumMCpDTsystem += QSensRate;
+                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                    SumMCpDTsystem += MassFlowRate * CpAir * (NodeTemp - MAT(ZoneNum));
                 }
                 if (AirDistUnit(ADUNum).DownStreamLeak) {
                     ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
                     NodeTemp = Node(ADUOutNode).Temp;
                     MassFlowRate = AirDistUnit(ADUNum).MassFlowRateDnStrLk;
-                    CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
-                    SumMCpDTsystem += QSensRate;
+                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                    SumMCpDTsystem += MassFlowRate * CpAir * (NodeTemp - MAT(ZoneNum));
                 }
             }
 
@@ -6545,8 +6545,9 @@ namespace ZoneTempPredictorCorrector {
             // Get node conditions
             NodeTemp = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
             MassFlowRate = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
-            CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
-            SumMCpDTsystem += QSensRate;
+            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+
+            SumMCpDTsystem += MassFlowRate * CpAir * (NodeTemp - MAT(ZoneNum));
         }
 
         // non air system response.

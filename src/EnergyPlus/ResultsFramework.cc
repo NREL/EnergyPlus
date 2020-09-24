@@ -879,7 +879,7 @@ namespace ResultsFramework {
             print(outputFile, "{}{}", sep, *it);
             if (sep.empty()) sep = ",";
         }
-        print(outputFile, "{}", '\n');
+        print(outputFile, "{}", DataStringGlobals::NL);
 
         for (auto & item : outputs) {
             std::string datetime = item.first;
@@ -897,7 +897,7 @@ namespace ResultsFramework {
                 last = (result + 1).base();
             }
             print(item.second.begin(), last, outputFile, ",");
-            print(outputFile, "{}{}", *last, '\n');
+            print(outputFile, "{}{}", *last, DataStringGlobals::NL);
         }
 
         outputFile.close();

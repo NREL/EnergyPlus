@@ -1084,7 +1084,7 @@ namespace HeatBalanceSurfaceManager {
                                 PreDefTableEntry(pdchFenDir, surfName, "W");
                             }
                         }
-                        curWSC = Surface(iSurf).activeWindowShadingControl;
+                        curWSC = Surface(iSurf).WindowShadingControlPtr;
                         // compute totals for area weighted averages
                         fenTotArea += windowAreaWMult;
                         ufactArea += nomUfact * windowAreaWMult;
@@ -1174,19 +1174,10 @@ namespace HeatBalanceSurfaceManager {
                                     PreDefTableEntry(pdchWscControl, surfName, "OnIfHighZoneAirTempAndHighHorizontalSolar");
                                 }
                             }
-
-                            // output list of all possible shading contructions for shaded windows including those with storms
-                            std::string names = "";
-                            for (auto construction : Surface(iSurf).shadedConstructionList) {
-                                if (!names.empty()) names.append("; ");
-                                names.append(dataConstruction.Construct(construction).Name);
+                            if (WindowShadingControl(curWSC).ShadedConstruction != 0) {
+                                PreDefTableEntry(
+                                    pdchWscShadCons, surfName, dataConstruction.Construct(WindowShadingControl(curWSC).ShadedConstruction).Name);
                             }
-                            for (auto construction : Surface(iSurf).shadedStormWinConstructionList) {
-                                if (!names.empty()) names.append("; ");
-                                names.append(dataConstruction.Construct(construction).Name);
-                            }
-                            PreDefTableEntry(pdchWscShadCons, surfName, names);
-
                             if (WindowShadingControl(curWSC).GlareControlIsActive) {
                                 PreDefTableEntry(pdchWscGlare, surfName, "Yes");
                             } else {
@@ -2922,8 +2913,8 @@ namespace HeatBalanceSurfaceManager {
                                     ShadeFlag = SurfWinShadingFlag(SurfNum);
 
                                     if (ShadeFlag > 0) { // Shaded window
-                                        ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
-                                        if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
+                                        ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+                                        if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
 
                                         if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn ||
                                             ShadeFlag == ExtScreenOn) { // Shade/screen on
@@ -3556,10 +3547,10 @@ namespace HeatBalanceSurfaceManager {
 
                 if (SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
 
-                    ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+                    ConstrNumSh = Surface(SurfNum).ShadedConstruction;
                     if (SurfWinStormWinFlag(SurfNum) == 1) {
                         ConstrNum = Surface(SurfNum).StormWinConstruction;
-                        ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
+                        ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
                     }
                     TotGlassLayers = dataConstruction.Construct(ConstrNum).TotGlassLayers;
                     ShadeFlag = SurfWinShadingFlag(SurfNum);
@@ -3682,7 +3673,9 @@ namespace HeatBalanceSurfaceManager {
 
                 } else {
 
+                    // ConstrNumSh = Surface(SurfNum)%ShadedConstruction
                     ConstrNum = Surface(SurfNum).Construction;
+                    // TotGlassLayers = Construct(ConstrNum)%TotGlassLayers
 
                     // These calculations are repeated from InitInternalHeatGains for the Zone Component Loads Report
                     pulseMultipler = 0.01; // the W/sqft pulse for the zone
@@ -3742,10 +3735,10 @@ namespace HeatBalanceSurfaceManager {
                 }
 
                 if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel && SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
-                    ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+                    ConstrNumSh = Surface(SurfNum).ShadedConstruction;
                     if (SurfWinStormWinFlag(SurfNum) == 1) {
                         ConstrNum = Surface(SurfNum).StormWinConstruction;
-                        ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
+                        ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
                     }
                     TotGlassLayers = dataConstruction.Construct(ConstrNum).TotGlassLayers;
                     ShadeFlag = SurfWinShadingFlag(SurfNum);
@@ -3791,10 +3784,10 @@ namespace HeatBalanceSurfaceManager {
                 InitialDifSolInTransReport(SurfNum) = 0.0;
                 InitialDifSolInTransReport(SurfNum) += InitialDifSolInTrans(SurfNum) * Surface(SurfNum).Area;
                 if (SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
-                    ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+                    ConstrNumSh = Surface(SurfNum).ShadedConstruction;
                     if (SurfWinStormWinFlag(SurfNum) == 1) {
                         ConstrNum = Surface(SurfNum).StormWinConstruction;
-                        ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
+                        ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
                     }
                     if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
                         TotGlassLayers = dataConstruction.Construct(ConstrNum).TotSolidLayers;
@@ -3931,7 +3924,8 @@ namespace HeatBalanceSurfaceManager {
                 } else { // Switchable glazing
                     SUM1 += Surface(SurfNum).Area * InterpSw(SurfWinSwitchingFactor(SurfNum),
                                                              dataConstruction.Construct(ConstrNum).InsideAbsorpThermal,
-                                                             dataConstruction.Construct(Surface(SurfNum).activeShadedConstruction).InsideAbsorpThermal);
+                                                             dataConstruction.Construct(SurfWinShadedConstruction(
+                                                                     SurfNum)).InsideAbsorpThermal);
                 }
 
                 // Window frame and divider effects
@@ -3943,7 +3937,7 @@ namespace HeatBalanceSurfaceManager {
                     if (SurfWinDividerType(SurfNum) == Suspended) DividerThermAbs = dataConstruction.Construct(ConstrNum).InsideAbsorpThermal;
                     if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
                         // Interior shade or blind in place
-                        int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+                        int ConstrNumSh = SurfWinShadedConstruction(SurfNum);
                         if (SurfWinHasShadeOrBlindLayer(SurfNum)) {
                             // Shade layer material number
                             int MatNumSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(dataConstruction.Construct(ConstrNumSh).TotLayers);
@@ -4076,10 +4070,10 @@ namespace HeatBalanceSurfaceManager {
                     if (!dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) {
                         ShadeFlag = SurfWinShadingFlag(SurfNum);
                         AbsDiffTotWin = 0.0;
-                        ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+                        ConstrNumSh = Surface(SurfNum).ShadedConstruction;
                         if (SurfWinStormWinFlag(SurfNum) == 1) {
                             ConstrNum = Surface(SurfNum).StormWinConstruction;
-                            ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
+                            ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
                         }
                         SwitchFac = SurfWinSwitchingFactor(SurfNum);
 
@@ -6902,7 +6896,7 @@ namespace HeatBalanceSurfaceManager {
                             auto const shading_flag(SurfWinShadingFlag(SurfNum));
                             if (shading_flag == ExtShadeOn || shading_flag == ExtBlindOn || shading_flag == ExtScreenOn) {
                                 // Exterior shade in place
-                                int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+                                int ConstrNumSh = SurfWinShadedConstruction(SurfNum);
                                 if (ConstrNumSh != 0) {
                                     RoughSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Roughness;
                                     EmisOut = dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).AbsorpThermal;
@@ -7620,7 +7614,7 @@ namespace HeatBalanceSurfaceManager {
                                 auto const shading_flag(SurfWinShadingFlag(surfNum));
                                 if (shading_flag == ExtShadeOn || shading_flag == ExtBlindOn || shading_flag == ExtScreenOn) {
                                     // Exterior shade in place
-                                    int ConstrNumSh = Surface(surfNum).activeShadedConstruction;
+                                    int ConstrNumSh = SurfWinShadedConstruction(surfNum);
                                     if (ConstrNumSh != 0) {
                                         RoughSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Roughness;
                                         EmisOut = dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).AbsorpThermal;

@@ -50,13 +50,10 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-#include "AutosizingFixture.hh"
-#include "../Fixtures/EnergyPlusFixture.hh"
-#include "../Fixtures/SQLiteFixture.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
+#include "Fixtures/SQLiteFixture.hh"
 
 // EnergyPlus Headers
-#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
-#include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -70,6 +67,7 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -84,8 +82,9 @@ using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::Psychrometrics;
+using namespace EnergyPlus::ReportSizingManager;
 
-TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
+TEST_F(EnergyPlusFixture, ReportSizingManager_GetCoilDesFlowT)
 {
     // setup global allocation
     DataSizing::SysSizInput.allocate(1);
@@ -127,14 +126,14 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
 
     // Single path for VAV
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VAV;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    ReportSizingManager::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(0.002, designFlowValue);
 
     // Single path for OnOff
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::OnOff;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    ReportSizingManager::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(0.2, designFlowValue);
@@ -143,14 +142,14 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     // CoolSupTemp > calculated value
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VT;
     DataSizing::CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 10;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    ReportSizingManager::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).DesCoolVolFlow, designFlowValue);
     // CoolSupTemp < calculated value
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VT;
     DataSizing::CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 15;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    ReportSizingManager::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_NEAR(13.00590, designExitTemp, 0.0001);
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).DesCoolVolFlow, designFlowValue);
@@ -160,13 +159,13 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::Bypass;
     DataSizing::CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 13;
     DataSizing::CalcSysSizing(1).MixTempAtCoolPeak = 15;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    ReportSizingManager::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(10, designExitTemp);
     EXPECT_NEAR(0.119823, designFlowValue, 0.0001);
     // MixTemp < DesExitTemp
     DataSizing::CalcSysSizing(1).MixTempAtCoolPeak = 5;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    ReportSizingManager::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(10, designExitTemp);
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).DesCoolVolFlow, designFlowValue);
@@ -177,7 +176,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     // Repeat a VT case
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VT;
     DataSizing::CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 10;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    ReportSizingManager::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).DesCoolVolFlow, designFlowValue);
@@ -185,12 +184,12 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::Bypass;
     DataSizing::CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 13;
     DataSizing::CalcSysSizing(1).MixTempAtCoolPeak = 15;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    ReportSizingManager::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(10, designExitTemp);
     EXPECT_NEAR(0.119823, designFlowValue, 0.0001);
 }
-TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
+TEST_F(EnergyPlusFixture, ReportSizingManager_GetCoilDesFlowT_NoPeak)
 {
     // setup global allocation
     DataSizing::SysSizInput.allocate(1);
@@ -229,14 +228,14 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
 
     // Single path for VAV
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VAV;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    ReportSizingManager::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(0.002, designFlowValue);
 
     // Single path for OnOff
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::OnOff;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    ReportSizingManager::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(0.2, designFlowValue);
@@ -244,7 +243,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
     // VT
     // CoolSupTemp > calculated value
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VT;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    ReportSizingManager::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     // Expect warning and same result as VAV
     EXPECT_TRUE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
@@ -252,13 +251,13 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
 
     // Bypass
     DataSizing::SysSizInput(1).CoolCapControl = DataSizing::Bypass;
-    DataSizing::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
+    ReportSizingManager::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     // Expect warning and same result as VAV
     EXPECT_TRUE(has_err_output(true));
     EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(0.002, designFlowValue);
 }
-TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
+TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystem)
 {
 
     std::string CompName;       // component name
@@ -269,6 +268,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     bool PrintWarning;          // true when sizing information is reported in the eio file
     std::string CallingRoutine; // calling routine
 
+    DataConstantUsedForSizing = 1.0;
+    DataFractionUsedForSizing = 1.0;
     DataTotCapCurveIndex = 0;
     DataDesOutletAirTemp = 0.0;
 
@@ -297,7 +298,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     InitializePsychRoutines();
 
     DataFlowUsedForSizing = FinalSysSizing(CurSysNum).DesCoolVolFlow;
-    // Need this to prevent crash in Sizers
+    // Need this to prevent crash in RequestSizing
     UnitarySysEqSizing.allocate(1);
     OASysEqSizing.allocate(1);
 
@@ -311,11 +312,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     DataIsDXCoil = true;
 
     // dx cooling coil capacity sizing
-    bool errorsFound = false;
-    CoolingCapacitySizer sizerCoolingCapacity;
-    sizerCoolingCapacity.overrideSizingString(SizingString);
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(state, SizingResult, errorsFound);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
     EXPECT_NEAR(18882.0, SizingResult, 0.1);
 
     // confirm that sizing data is saved for use by parent object
@@ -333,12 +330,11 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     DataIsDXCoil = false;
 
     // chilled water cooling coil capacity sizing
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(state, SizingResult, errorsFound);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
     EXPECT_NEAR(19234.6, SizingResult, 0.1);
 }
 
-TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
+TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystemWithFans)
 {
 
     // Add three fans to this model - one Fan:ConstantVolume, and three Fan:SystemModel in order to make the SupFanIndex=2
@@ -445,6 +441,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     bool PrintWarning;          // true when sizing information is reported in the eio file
     std::string CallingRoutine; // calling routine
 
+    DataConstantUsedForSizing = 1.0;
+    DataFractionUsedForSizing = 1.0;
     DataTotCapCurveIndex = 0;
     DataDesOutletAirTemp = 0.0;
 
@@ -474,7 +472,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     InitializePsychRoutines();
 
     DataFlowUsedForSizing = FinalSysSizing(CurSysNum).DesCoolVolFlow;
-    // Need this to prevent crash in Sizers
+    // Need this to prevent crash in RequestSizing
     UnitarySysEqSizing.allocate(1);
     OASysEqSizing.allocate(1);
 
@@ -489,11 +487,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     DataIsDXCoil = true;
 
     // dx cooling coil capacity sizing
-    bool errorsFound = false;
-    CoolingCapacitySizer sizerCoolingCapacity;
-    sizerCoolingCapacity.overrideSizingString(SizingString);
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(this->state, SizingResult, errorsFound);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
     EXPECT_NEAR(18882.0, SizingResult, 0.1);
     Real64 dxCoilSizeNoFan = SizingResult;
 
@@ -513,11 +507,10 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     Real64 expectedDXCoilSize = dxCoilSizeNoFan + locDesignHeatGain4;
 
     // dx cooling coil capacity sizing
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(this->state, SizingResult, errorsFound);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
     EXPECT_NEAR(expectedDXCoilSize, SizingResult, 0.1);
 
-    // With Test Fan 3 fan heat - this fails before the #6126 fix
+    // With Test Fan 3 fan heat - this fails before the #6126 fix in ReportSizingManager
     PrimaryAirSystem(CurSysNum).SupFanNum = 2;
     PrimaryAirSystem(CurSysNum).supFanVecIndex = 2;
     PrimaryAirSystem(CurSysNum).RetFanNum = 0;
@@ -534,12 +527,11 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     expectedDXCoilSize = dxCoilSizeNoFan + locDesignHeatGain3;
 
     // dx cooling coil capacity sizing
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(this->state, SizingResult, errorsFound);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
     EXPECT_NEAR(expectedDXCoilSize, SizingResult, 0.1);
 }
 
-TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
+TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingZone)
 {
     int const ZoneNum = 1;
     std::string CompName;       // component name
@@ -550,6 +542,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
     bool PrintWarning;          // true when sizing information is reported in the eio file
     std::string CallingRoutine; // calling routine
 
+    DataConstantUsedForSizing = 1.0;
+    DataFractionUsedForSizing = 1.0;
     DataTotCapCurveIndex = 0;
     DataDesOutletAirTemp = 0.0;
 
@@ -568,7 +562,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
     StdBaroPress = 101325.0;
     InitializePsychRoutines();
 
-    // Need this to prevent crash in Sizers
+    // Need this to prevent crash in RequestSizing
     ZoneEqSizing.allocate(1);
     ZoneSizingInput.allocate(1);
     ZoneSizingInput(1).ZoneNum = ZoneNum;
@@ -586,11 +580,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
     DataIsDXCoil = true;
 
     // dx cooling coil capacity sizing
-    bool errorsFound = false;
-    CoolingCapacitySizer sizerCoolingCapacity;
-    sizerCoolingCapacity.overrideSizingString(SizingString);
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(this->state, SizingResult, errorsFound);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
     EXPECT_NEAR(5664.6, SizingResult, 0.1);
 
     CompType = "COIL:COOLING:WATER";
@@ -601,12 +591,11 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
     DataIsDXCoil = false;
 
     // chilled water cooling coil capacity sizing
-    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerCoolingCapacity.size(this->state, SizingResult, errorsFound);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
     EXPECT_NEAR(5770.4, SizingResult, 0.1);
 }
 
-TEST_F(SQLiteFixture, BaseSizer_SQLiteRecordReportSizerOutputTest)
+TEST_F(SQLiteFixture, ReportSizingManager_SQLiteRecordReportSizingOutputTest)
 {
     // issue #6112
     std::string CompName;
@@ -624,7 +613,7 @@ TEST_F(SQLiteFixture, BaseSizer_SQLiteRecordReportSizerOutputTest)
     UsrDesc = "User-Specified Nominal Capacity [W]";
     UsrValue = 26352.97405;
     // boiler hot water autosizing and userspecified nominal capacity reporting to SQLite output
-    BaseSizer::reportSizerOutput(CompType, CompName, VarDesc, VarValue, UsrDesc, UsrValue);
+    ReportSizingManager::ReportSizingOutput(CompType, CompName, VarDesc, VarValue, UsrDesc, UsrValue);
     // get the sqlite output
     // query the sqLite
     auto result = queryResult("SELECT * FROM ComponentSizes;", "ComponentSizes");
@@ -638,9 +627,8 @@ TEST_F(SQLiteFixture, BaseSizer_SQLiteRecordReportSizerOutputTest)
     EXPECT_EQ(testResult1, result[1]);
 }
 
-TEST_F(EnergyPlusFixture, BaseSizer_setOAFracForZoneEqSizing_Test)
+TEST_F(EnergyPlusFixture, setOAFracForZoneEqSizing_Test)
 {
-    CoolingCapacitySizer sizer;
     DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.34;
@@ -655,7 +643,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setOAFracForZoneEqSizing_Test)
     ZoneEqSizingData &zoneEqSizing = DataSizing::ZoneEqSizing(1);
 
     // ATMixer flow rate = 0 so oaFrac depends on ZoneEqSizing.OAVolFlow
-    oaFrac = sizer.setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing);
+    oaFrac = setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing);
     EXPECT_EQ(oaFrac, oaFrac_Test);
 
     zoneEqSizing.ATMixerVolFlow = 0.11;
@@ -665,7 +653,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setOAFracForZoneEqSizing_Test)
     oaFrac_Test = massFlowRate / DesMassFlow;
 
     // ATMixer flow rate > 0 so oaFrac depends on ZoneEqSizing.ATMixerVolFlow
-    oaFrac = sizer.EnergyPlus::BaseSizer::setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing);
+    oaFrac = setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing);
     EXPECT_EQ(oaFrac, oaFrac_Test);
 
     DesMassFlow = 0.0;
@@ -674,11 +662,11 @@ TEST_F(EnergyPlusFixture, BaseSizer_setOAFracForZoneEqSizing_Test)
     zoneEqSizing.OAVolFlow = 1.0;
     zoneEqSizing.ATMixerVolFlow = 1.0;
     // DesMassFlow = 0 so oaFrac = 0 regardless of OAVolFlow or ATMixerVolFlow
-    oaFrac = sizer.EnergyPlus::BaseSizer::setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing);
+    oaFrac = setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing);
     EXPECT_EQ(oaFrac, oaFrac_Test);
 }
 
-TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
+TEST_F(EnergyPlusFixture, setZoneCoilInletConditions)
 {
     DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::CurZoneEqNum = 1;
@@ -705,8 +693,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     zoneEqSizing.OAVolFlow = 0.0;
     Real64 zoneCond = finalZoneSizing.ZoneTempAtHeatPeak;
     Real64 calcCoilInletCond = zoneCond;
-    CoolingCapacitySizer sizer;
-    Real64 coilInletCond = sizer.setHeatCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    Real64 coilInletCond = setHeatCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate > 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition based on mixed return and ATMixer condition
@@ -715,7 +702,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     zoneCond = finalZoneSizing.ZoneRetTempAtHeatPeak;
     Real64 oaCond = zoneEqSizing.ATMixerHeatPriDryBulb;
     calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
-    coilInletCond = sizer.setHeatCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setHeatCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow > 0 so coilInlet condition based on mixed return and OA condition
@@ -724,7 +711,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     zoneCond = finalZoneSizing.ZoneTempAtHeatPeak;
     oaCond = finalZoneSizing.OutTempAtHeatPeak;
     calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
-    coilInletCond = sizer.setHeatCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setHeatCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, calcCoilInletCond);
 
     // Test heating mode coil inlet humidity ratio
@@ -742,7 +729,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     zoneEqSizing.OAVolFlow = 0.0;
     zoneCond = finalZoneSizing.ZoneHumRatAtHeatPeak;
     calcCoilInletCond = zoneCond;
-    coilInletCond = sizer.setHeatCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setHeatCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate > 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition based on mixed return and ATMixer condition
@@ -751,7 +738,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     zoneCond = finalZoneSizing.ZoneHumRatAtHeatPeak;
     oaCond = zoneEqSizing.ATMixerHeatPriHumRat;
     calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
-    coilInletCond = sizer.setHeatCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setHeatCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow > 0 so coilInlet condition based on mixed return and OA condition
@@ -760,7 +747,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     zoneCond = finalZoneSizing.ZoneHumRatAtHeatPeak;
     oaCond = finalZoneSizing.OutHumRatAtHeatPeak;
     calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
-    coilInletCond = sizer.setHeatCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setHeatCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, calcCoilInletCond);
 
     // Test cooling mode coil inlet temperature
@@ -778,7 +765,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     zoneEqSizing.OAVolFlow = 0.0;
     zoneCond = finalZoneSizing.ZoneTempAtCoolPeak;
     calcCoilInletCond = zoneCond;
-    coilInletCond = sizer.setCoolCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setCoolCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate > 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition based on mixed return and ATMixer condition
@@ -787,7 +774,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     zoneCond = finalZoneSizing.ZoneRetTempAtCoolPeak;
     oaCond = zoneEqSizing.ATMixerCoolPriDryBulb;
     calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
-    coilInletCond = sizer.setCoolCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setCoolCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow > 0 so coilInlet condition based on mixed return and OA condition
@@ -796,7 +783,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     zoneCond = finalZoneSizing.ZoneTempAtCoolPeak;
     oaCond = finalZoneSizing.OutTempAtCoolPeak;
     calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
-    coilInletCond = sizer.setCoolCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setCoolCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, calcCoilInletCond);
 
     // Test cooling mode coil inlet humidity ratio
@@ -814,7 +801,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     zoneEqSizing.OAVolFlow = 0.0;
     zoneCond = finalZoneSizing.ZoneHumRatAtCoolPeak;
     calcCoilInletCond = zoneCond;
-    coilInletCond = sizer.setCoolCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setCoolCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate > 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition based on mixed return and ATMixer condition
@@ -823,7 +810,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     zoneCond = finalZoneSizing.ZoneHumRatAtCoolPeak;
     oaCond = zoneEqSizing.ATMixerCoolPriHumRat;
     calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
-    coilInletCond = sizer.setCoolCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setCoolCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, calcCoilInletCond);
 
     // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow > 0 so coilInlet condition based on mixed return and OA condition
@@ -832,7 +819,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     zoneCond = finalZoneSizing.ZoneHumRatAtCoolPeak;
     oaCond = finalZoneSizing.OutHumRatAtCoolPeak;
     calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
-    coilInletCond = sizer.setCoolCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setCoolCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, calcCoilInletCond);
 
     zoneEqSizing.ATMixerCoolPriHumRat = 0.0;
@@ -842,41 +829,41 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     // all ZoneEqSizing and FinalZoneSizing temp and humrat variables have been zero'd out now, all results should = 0
     zoneEqSizing.ATMixerVolFlow = 0.0;
     zoneEqSizing.OAVolFlow = 0.0;
-    coilInletCond = sizer.setHeatCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setHeatCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, 0.0);
-    coilInletCond = sizer.setHeatCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setHeatCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, 0.0);
-    coilInletCond = sizer.setCoolCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setCoolCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, 0.0);
-    coilInletCond = sizer.setCoolCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setCoolCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, 0.0);
 
     zoneEqSizing.ATMixerVolFlow = 1.0;
     zoneEqSizing.OAVolFlow = 0.0;
-    coilInletCond = sizer.setHeatCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setHeatCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, 0.0);
-    coilInletCond = sizer.setHeatCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setHeatCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, 0.0);
-    coilInletCond = sizer.setCoolCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setCoolCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, 0.0);
-    coilInletCond = sizer.setCoolCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setCoolCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, 0.0);
 
     zoneEqSizing.ATMixerVolFlow = 0.0;
     zoneEqSizing.OAVolFlow = 1.0;
-    coilInletCond = sizer.setHeatCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setHeatCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, 0.0);
-    coilInletCond = sizer.setHeatCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setHeatCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, 0.0);
-    coilInletCond = sizer.setCoolCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setCoolCoilInletTempForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, 0.0);
-    coilInletCond = sizer.setCoolCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
+    coilInletCond = setCoolCoilInletHumRatForZoneEqSizing(oaFrac, zoneEqSizing, finalZoneSizing);
     EXPECT_EQ(coilInletCond, 0.0);
 }
 
 // This tests checks that the Design Day + Peak Time is filled up for Fans
 // https://github.com/NREL/EnergyPlus/issues/6899
-TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
+TEST_F(EnergyPlusFixture, ReportSizingManager_FanPeak)
 {
 
     // This is needed to compute time of Peak as a string
@@ -929,7 +916,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
 
     DataSizing::ZoneSizingRunDone = true;
 
-    // Need this to prevent crash in Sizers
+    // Need this to prevent crash in RequestSizing
     ZoneEqSizing.allocate(1);
     ZoneSizingInput.allocate(1);
     ZoneSizingInput(1).ZoneNum = ZoneNum;
@@ -939,10 +926,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingType) = DataSizing::SupplyAirFlowRate;
 
     // Now, we're ready to call the function
-    bool errorsFound = false;
-    SystemAirFlowSizer sizerSystemAirFlow;
-    sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
-    SizingResult = sizerSystemAirFlow.size(state, SizingResult, errorsFound);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
 
     // Check that the Design Day/Time is filled
     EXPECT_EQ(DDTitle, OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFanDesDay, CompName));
@@ -951,7 +935,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     // Bonus test for #6949
     EXPECT_EQ("End Use Subcategory", OutputReportPredefined::columnTag(OutputReportPredefined::pdchFanEndUse).heading);
 }
-TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
+TEST_F(EnergyPlusFixture, ReportSizingManager_SupplyAirTempLessThanZoneTStatTest)
 {
     // GitHub issue 7039
     std::string const idf_objects = delimited_string({

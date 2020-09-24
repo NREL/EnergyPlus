@@ -792,19 +792,28 @@ namespace ZoneAirLoopEquipmentManager {
             }
         }
         if (ProvideSysOutput) {
-            int OutletNodeNum = AirDistUnit(AirDistUnitNum).OutletNodeNum;
-            int ZoneAirNode = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-            SpecHumOut = Node(OutletNodeNum).HumRat;
-            SpecHumIn = Node(ZoneAirNode).HumRat;
             // Sign convention: SysOutputProvided <0 Zone is cooled
             //                  SysOutputProvided >0 Zone is heated
-            SysOutputProvided =
-                Node(OutletNodeNum).MassFlowRate *
-                Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(Node(OutletNodeNum).Temp, SpecHumOut, Node(ZoneAirNode).Temp, SpecHumIn); // sensible {W};
+            SpecHumOut = Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).HumRat;
+            SpecHumIn = Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).HumRat;
+            if (AirDistUnit(AirDistUnitNum).EquipType_Num(1) == SingleDuctConstVolNoReheat) {
+                // Use old direct air method to avoid diffs for now
+                SysOutputProvided = Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).MassFlowRate *
+                                    (Psychrometrics::PsyHFnTdbW(Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).Temp,
+                                                                Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).HumRat) -
+                                     Psychrometrics::PsyHFnTdbW(Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).Temp,
+                                                                Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).HumRat));
+            } else {
+                Real64 CpAirAvg = PsyCpAirFnW(0.5 * (SpecHumOut + SpecHumOut));
+                SysOutputProvided = Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).MassFlowRate * CpAirAvg *
+                                    (Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).Temp - Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).Temp);
+            }
+
             // Sign convention: LatOutputProvided <0 Zone is dehumidified
             //                  LatOutputProvided >0 Zone is humidified
             // CR9155 Remove specific humidity calculations
-            LatOutputProvided = Node(OutletNodeNum).MassFlowRate * (SpecHumOut - SpecHumIn); // Latent rate (kg/s), dehumid = negative
+            LatOutputProvided =
+                Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).MassFlowRate * (SpecHumOut - SpecHumIn); // Latent rate (kg/s), dehumid = negative
         } else {
             SysOutputProvided = 0.0;
             LatOutputProvided = 0.0;

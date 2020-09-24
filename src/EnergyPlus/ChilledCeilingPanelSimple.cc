@@ -53,7 +53,6 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -78,6 +77,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 
 namespace EnergyPlus {
@@ -905,6 +905,8 @@ namespace CoolingPanelSimple {
         using General::RoundSigDigits;
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
+        using ReportSizingManager::ReportSizingOutput;
+        using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeCoolingPanel");
@@ -946,7 +948,6 @@ namespace CoolingPanelSimple {
             SizingMethod = CoolingCapacitySizing;
             FieldNum = 4;
             PrintFlag = true;
-            bool errorsFound = false;
             SizingString = state.dataChilledCeilingPanelSimple.CoolingPanelSysNumericFields(CoolingPanelNum).FieldNames(FieldNum) + " [W]";
             CapSizingMethod = ThisCP.CoolingCapMethod;
             ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
@@ -954,15 +955,13 @@ namespace CoolingPanelSimple {
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                 if (CapSizingMethod == CoolingDesignCapacity && ThisCP.ScaledCoolingCapacity > 0.0) {
                     TempSize = ThisCP.ScaledCoolingCapacity;
-                    CoolingCapacitySizer sizerCoolingCapacity;
-                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    DesCoilLoad = TempSize;
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     DataScalableCapSizingON = true;
                     TempSize = ThisCP.ScaledCoolingCapacity * Zone(ThisCP.ZonePtr).FloorArea;
-                    CoolingCapacitySizer sizerCoolingCapacity;
-                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    DesCoilLoad = TempSize;
                     DataScalableCapSizingON = false;
                 } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                     if (ThisCP.WaterVolFlowRateMax == AutoSize) {
@@ -1005,9 +1004,8 @@ namespace CoolingPanelSimple {
                     } else {
                         TempSize = ThisCP.ScaledCoolingCapacity;
                     }
-                    CoolingCapacitySizer sizerCoolingCapacity;
-                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    DesCoilLoad = TempSize;
                     DataConstantUsedForSizing = 0.0;
                     DataFractionUsedForSizing = 0.0;
                     DataScalableCapSizingON = false;
@@ -1026,7 +1024,7 @@ namespace CoolingPanelSimple {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                 if (ThisCP.WaterVolFlowRateMax > 0.0) {
-                    BaseSizer::reportSizerOutput(CompType, ThisCP.EquipID, "User-Specified Maximum Cold Water Flow [m3/s]", ThisCP.WaterVolFlowRateMax);
+                    ReportSizingOutput(CompType, ThisCP.EquipID, "User-Specified Maximum Cold Water Flow [m3/s]", ThisCP.WaterVolFlowRateMax);
                 }
             } else { // Autosize or hard-size with sizing run
                 if (ThisCP.WaterInletNode > 0 && ThisCP.WaterOutletNode > 0) {
@@ -1048,11 +1046,11 @@ namespace CoolingPanelSimple {
 
                 if (IsAutoSize) {
                     ThisCP.WaterVolFlowRateMax = WaterVolFlowMaxCoolDes;
-                    BaseSizer::reportSizerOutput(CompType, ThisCP.EquipID, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes);
+                    ReportSizingOutput(CompType, ThisCP.EquipID, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes);
                 } else { // hard-size with sizing data
                     if (ThisCP.WaterVolFlowRateMax > 0.0 && WaterVolFlowMaxCoolDes > 0.0) {
                         WaterVolFlowMaxCoolUser = ThisCP.WaterVolFlowRateMax;
-                        BaseSizer::reportSizerOutput(CompType,
+                        ReportSizingOutput(CompType,
                                            ThisCP.EquipID,
                                            "Design Size Maximum Cold Water Flow [m3/s]",
                                            WaterVolFlowMaxCoolDes,

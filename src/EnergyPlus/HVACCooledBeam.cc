@@ -53,9 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
@@ -63,6 +61,8 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -73,9 +73,9 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -109,6 +109,7 @@ namespace HVACCooledBeam {
 
     // Using/Aliasing
     using namespace DataLoopNode;
+    using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::NumOfZones;
@@ -146,11 +147,10 @@ namespace HVACCooledBeam {
 
     // Object Data
     Array1D<CoolBeamData> CoolBeam;
-    bool GetInputFlag(true);              // First time, input is "gotten"
+    bool GetInputFlag(true); // First time, input is "gotten"
     bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
 
-    void clear_state()
-    {
+    void clear_state() {
         CheckEquipName.clear();
         GetInputFlag = true;
         NumCB = true;
@@ -181,7 +181,7 @@ namespace HVACCooledBeam {
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int CBNum; // index of cooled beam unit being simulated
+        int CBNum;                      // index of cooled beam unit being simulated
 
         // First time SimIndUnit is called, get the input for all the cooled beam units
         if (GetInputFlag) {
@@ -548,8 +548,8 @@ namespace HVACCooledBeam {
         int InWaterNode;  // unit inlet chilled water node
         int OutWaterNode; // unit outlet chilled water node
         Real64 RhoAir;    // air density at outside pressure and standard temperature and humidity
-        Real64 rho;       // local fluid density
-        int Loop;         // Loop checking control variable
+        Real64 rho;                                  // local fluid density
+        int Loop;                                    // Loop checking control variable
         std::string CurrentModuleObject;
         bool errFlag;
 
@@ -590,7 +590,7 @@ namespace HVACCooledBeam {
 
         if (!SysSizingCalc && CoolBeam(CBNum).MySizeFlag && !CoolBeam(CBNum).PlantLoopScanFlag) {
 
-            SizeCoolBeam(CBNum);
+            SizeCoolBeam( CBNum);
 
             InWaterNode = CoolBeam(CBNum).CWInNode;
             OutWaterNode = CoolBeam(CBNum).CWOutNode;
@@ -641,11 +641,11 @@ namespace HVACCooledBeam {
                 }
             }
 
-            CoolBeam(CBNum).MyEnvrnFlag = false;
+            CoolBeam(CBNum).MyEnvrnFlag= false;
         } // end one time inits
 
         if (!BeginEnvrnFlag) {
-            CoolBeam(CBNum).MyEnvrnFlag = true;
+            CoolBeam(CBNum).MyEnvrnFlag= true;
         }
 
         InAirNode = CoolBeam(CBNum).AirInNode;
@@ -706,6 +706,7 @@ namespace HVACCooledBeam {
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
+        using ReportSizingManager::ReportSizingOutput;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("SizeCoolBeam");
@@ -747,7 +748,7 @@ namespace HVACCooledBeam {
             } else {
                 CoolBeam(CBNum).Kin = 2.0;
             }
-            BaseSizer::reportSizerOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Coefficient of Induction Kin", CoolBeam(CBNum).Kin);
+            ReportSizingOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Coefficient of Induction Kin", CoolBeam(CBNum).Kin);
         }
 
         if (CoolBeam(CBNum).MaxAirVolFlow == AutoSize) {
@@ -760,8 +761,7 @@ namespace HVACCooledBeam {
                 if (CoolBeam(CBNum).MaxAirVolFlow < SmallAirVolFlow) {
                     CoolBeam(CBNum).MaxAirVolFlow = 0.0;
                 }
-                BaseSizer::reportSizerOutput(
-                    CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Supply Air Flow Rate [m3/s]", CoolBeam(CBNum).MaxAirVolFlow);
+                ReportSizingOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Supply Air Flow Rate [m3/s]", CoolBeam(CBNum).MaxAirVolFlow);
             }
         }
 
@@ -808,10 +808,10 @@ namespace HVACCooledBeam {
                         CoolBeam(CBNum).MaxCoolWaterVolFlow = 0.0;
                     }
 
-                    BaseSizer::reportSizerOutput(CoolBeam(CBNum).UnitType,
-                                                 CoolBeam(CBNum).Name,
-                                                 "Maximum Total Chilled Water Flow Rate [m3/s]",
-                                                 CoolBeam(CBNum).MaxCoolWaterVolFlow);
+                    ReportSizingOutput(CoolBeam(CBNum).UnitType,
+                                       CoolBeam(CBNum).Name,
+                                       "Maximum Total Chilled Water Flow Rate [m3/s]",
+                                       CoolBeam(CBNum).MaxCoolWaterVolFlow);
                 } else {
                     ShowSevereError("Autosizing of water flow requires a cooling loop Sizing:Plant object");
                     ShowContinueError("Occurs in" + CoolBeam(CBNum).UnitType + " Object=" + CoolBeam(CBNum).Name);
@@ -828,7 +828,7 @@ namespace HVACCooledBeam {
 
             NumBeams = int(CoolBeam(CBNum).MaxCoolWaterVolFlow * rho / NomMassFlowPerBeam) + 1;
             CoolBeam(CBNum).NumBeams = double(NumBeams);
-            BaseSizer::reportSizerOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Number of Beams", CoolBeam(CBNum).NumBeams);
+            ReportSizingOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Number of Beams", CoolBeam(CBNum).NumBeams);
         }
 
         if (CoolBeam(CBNum).BeamLength == AutoSize) {
@@ -890,7 +890,7 @@ namespace HVACCooledBeam {
                     }
                     CoolBeam(CBNum).BeamLength = Length;
                     CoolBeam(CBNum).BeamLength = max(CoolBeam(CBNum).BeamLength, 1.0);
-                    BaseSizer::reportSizerOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Beam Length [m]", CoolBeam(CBNum).BeamLength);
+                    ReportSizingOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Beam Length [m]", CoolBeam(CBNum).BeamLength);
                 } else {
                     ShowSevereError("Autosizing of cooled beam length requires a cooling loop Sizing:Plant object");
                     ShowContinueError("Occurs in" + CoolBeam(CBNum).UnitType + " Object=" + CoolBeam(CBNum).Name);

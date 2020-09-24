@@ -52,7 +52,6 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -85,6 +84,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
@@ -5895,17 +5895,17 @@ namespace WaterThermalTanks {
                 //     report autosizing information here (must be done after GetWaterThermalTankInputFlag is complete)
                 if (HPWaterHeater(HPNum).WaterFlowRateAutoSized &&
                     (DataPlant::PlantFirstSizesOkayToReport || !DataGlobals::AnyPlantInModel || this->AlreadyRated)) {
-                    BaseSizer::reportSizerOutput(HPWaterHeater(HPNum).Type,
-                                                 HPWaterHeater(HPNum).Name,
-                                                 "Condenser water flow rate [m3/s]",
-                                                 HPWaterHeater(HPNum).OperatingWaterFlowRate);
+                    ReportSizingManager::ReportSizingOutput(HPWaterHeater(HPNum).Type,
+                                                            HPWaterHeater(HPNum).Name,
+                                                            "Condenser water flow rate [m3/s]",
+                                                            HPWaterHeater(HPNum).OperatingWaterFlowRate);
                 }
                 if (HPWaterHeater(HPNum).AirFlowRateAutoSized &&
                     (DataPlant::PlantFirstSizesOkayToReport || !DataGlobals::AnyPlantInModel || this->AlreadyRated)) {
-                    BaseSizer::reportSizerOutput(HPWaterHeater(HPNum).Type,
-                                                 HPWaterHeater(HPNum).Name,
-                                                 "Evaporator air flow rate [m3/s]",
-                                                 HPWaterHeater(HPNum).OperatingAirFlowRate);
+                    ReportSizingManager::ReportSizingOutput(HPWaterHeater(HPNum).Type,
+                                                            HPWaterHeater(HPNum).Name,
+                                                            "Evaporator air flow rate [m3/s]",
+                                                            HPWaterHeater(HPNum).OperatingAirFlowRate);
                 }
                 DataSizing::DataNonZoneNonAirloopValue = HPWaterHeater(HPNum).OperatingAirFlowRate;
                 HPWaterHeater(HPNum).OperatingAirMassFlowRate = HPWaterHeater(HPNum).OperatingAirFlowRate * DataEnvironment::StdRhoAir;
@@ -10202,10 +10202,11 @@ namespace WaterThermalTanks {
                             }
                         }
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(this->Type, this->Name, "Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
+                            ReportSizingManager::ReportSizingOutput(
+                                this->Type, this->Name, "Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            ReportSizingManager::ReportSizingOutput(
                                 this->Type, this->Name, "Initial Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToFinalize) {
@@ -10263,11 +10264,11 @@ namespace WaterThermalTanks {
                             }
                         }
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            ReportSizingManager::ReportSizingOutput(
                                 this->Type, this->Name, "Source Side Design Flow Rate [m3/s]", this->SourceDesignVolFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            ReportSizingManager::ReportSizingOutput(
                                 this->Type, this->Name, "Initial Source Side Design Flow Rate [m3/s]", this->SourceDesignVolFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToFinalize) {
@@ -10480,19 +10481,19 @@ namespace WaterThermalTanks {
                 if (this->VolumeWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->Volume = tmpTankVolume;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
                     }
                 }
                 if (this->MaxCapacityWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->MaxCapacity = tmpMaxCapacity;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
                 }
             } else if (SELECT_CASE_var == SizeEnum::PerPerson) {
@@ -10525,19 +10526,19 @@ namespace WaterThermalTanks {
                 if (this->VolumeWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->Volume = tmpTankVolume;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
                     }
                 }
                 if (this->MaxCapacityWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->MaxCapacity = tmpMaxCapacity;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
                 }
             } else if (SELECT_CASE_var == SizeEnum::PerFloorArea) {
@@ -10566,19 +10567,19 @@ namespace WaterThermalTanks {
                 if (this->VolumeWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->Volume = tmpTankVolume;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
                     }
                 }
                 if (this->MaxCapacityWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->MaxCapacity = tmpMaxCapacity;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
                 }
             } else if (SELECT_CASE_var == SizeEnum::PerUnit) {
@@ -10608,19 +10609,19 @@ namespace WaterThermalTanks {
                 if (this->VolumeWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->Volume = tmpTankVolume;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
                     }
                 }
                 if (this->MaxCapacityWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->MaxCapacity = tmpMaxCapacity;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
                 }
             } else if (SELECT_CASE_var == SizeEnum::PerSolarColArea) {
@@ -10633,10 +10634,10 @@ namespace WaterThermalTanks {
             if ((this->HeightWasAutoSized) && (!this->VolumeWasAutoSized)) {
                 this->Height = std::pow((4.0 * this->Volume * pow_2(this->Sizing.HeightAspectRatio)) / DataGlobals::Pi, 0.3333333333333333);
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Height [m]", this->Height);
+                    ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Tank Height [m]", this->Height);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(this->Type, this->Name, "Initial Tank Height [m]", this->Height);
+                    ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Initial Tank Height [m]", this->Height);
                 }
                 // check if DataGlobals::AutoCalculate Use outlet and source inlet are still set to autosize by earlier
                 if (this->UseOutletHeightWasAutoSized) {
@@ -10685,10 +10686,10 @@ namespace WaterThermalTanks {
                 if (this->VolumeWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->Volume = tmpTankVolume;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
                     }
                 }
                 if (this->MaxCapacityWasAutoSized) {
@@ -10719,10 +10720,10 @@ namespace WaterThermalTanks {
                 if (this->MaxCapacityWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->MaxCapacity = tmpMaxCapacity;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
                 }
             } else if (SELECT_CASE_var == SizeEnum::PerSolarColArea) {
@@ -10737,19 +10738,19 @@ namespace WaterThermalTanks {
                 if (this->VolumeWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->Volume = tmpTankVolume;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
                     }
                 }
                 if (this->MaxCapacityWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->MaxCapacity = tmpMaxCapacity;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
                 }
             }
@@ -10760,10 +10761,10 @@ namespace WaterThermalTanks {
             if ((this->HeightWasAutoSized) && (!this->VolumeWasAutoSized)) {
                 this->Height = std::pow((4.0 * this->Volume * pow_2(this->Sizing.HeightAspectRatio)) / DataGlobals::Pi, 0.3333333333333333);
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Height [m]", this->Height);
+                    ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Tank Height [m]", this->Height);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(this->Type, this->Name, "Initial Tank Height [m]", this->Height);
+                    ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Initial Tank Height [m]", this->Height);
                 }
             }
         }
@@ -10855,10 +10856,11 @@ namespace WaterThermalTanks {
                             ErrorsFound = true;
                         }
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(this->Type, this->Name, "Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
+                            ReportSizingManager::ReportSizingOutput(
+                                this->Type, this->Name, "Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            ReportSizingManager::ReportSizingOutput(
                                 this->Type, this->Name, "Initial Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToFinalize) {
@@ -10938,11 +10940,11 @@ namespace WaterThermalTanks {
                             ErrorsFound = true;
                         }
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            ReportSizingManager::ReportSizingOutput(
                                 this->Type, this->Name, "Source Side Design Flow Rate [m3/s]", this->SourceDesignVolFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(
+                            ReportSizingManager::ReportSizingOutput(
                                 this->Type, this->Name, "Initial Source Side Design Flow Rate [m3/s]", this->SourceDesignVolFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToFinalize) {
@@ -11023,7 +11025,7 @@ namespace WaterThermalTanks {
                     if (this->VolumeWasAutoSized) {
                         tmpTankVolume = this->Sizing.TankDrawTime * DrawDesignVolFlowRate * DataGlobals::SecInHour; // hours | m3/s | (3600 s/1 hour)
                         this->Volume = tmpTankVolume;
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
                     }
                     if (this->MaxCapacityWasAutoSized) {
                         if (this->Sizing.RecoveryTime > 0.0) {
@@ -11037,7 +11039,7 @@ namespace WaterThermalTanks {
                                            "\", requested sizing for max capacity but entered Recovery Time is zero.");
                         }
                         this->MaxCapacity = tmpMaxCapacity;
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
 
                 } else if (SELECT_CASE_var == SizeEnum::ResidentialMin) {
@@ -11173,11 +11175,11 @@ namespace WaterThermalTanks {
                     }
                     if (this->VolumeWasAutoSized) {
                         this->Volume = tmpTankVolume;
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
                     }
                     if (this->MaxCapacityWasAutoSized) {
                         this->MaxCapacity = tmpMaxCapacity;
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
 
                 } else if (SELECT_CASE_var == SizeEnum::PerPerson) {
@@ -11196,11 +11198,11 @@ namespace WaterThermalTanks {
 
                     if (this->VolumeWasAutoSized) {
                         this->Volume = tmpTankVolume;
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
                     }
                     if (this->MaxCapacityWasAutoSized) {
                         this->MaxCapacity = tmpMaxCapacity;
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
 
                 } else if (SELECT_CASE_var == SizeEnum::PerFloorArea) {
@@ -11218,11 +11220,11 @@ namespace WaterThermalTanks {
                     }
                     if (this->VolumeWasAutoSized) {
                         this->Volume = tmpTankVolume;
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
                     }
                     if (this->MaxCapacityWasAutoSized) {
                         this->MaxCapacity = tmpMaxCapacity;
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
                 } else if (SELECT_CASE_var == SizeEnum::PerUnit) {
 
@@ -11237,11 +11239,11 @@ namespace WaterThermalTanks {
 
                     if (this->VolumeWasAutoSized) {
                         this->Volume = tmpTankVolume;
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
                     }
                     if (this->MaxCapacityWasAutoSized) {
                         this->MaxCapacity = tmpMaxCapacity;
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
                 } else if (SELECT_CASE_var == SizeEnum::PerSolarColArea) {
                     this->Sizing.TotalSolarCollectorArea = 0.0;
@@ -11253,11 +11255,11 @@ namespace WaterThermalTanks {
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 0.0;
                     if (this->VolumeWasAutoSized) {
                         this->Volume = tmpTankVolume;
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
                     }
                     if (this->MaxCapacityWasAutoSized) {
                         this->MaxCapacity = tmpMaxCapacity;
-                        BaseSizer::reportSizerOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                        ReportSizingManager::ReportSizingOutput(this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                     }
                 }
             }

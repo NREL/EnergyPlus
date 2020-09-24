@@ -100,12 +100,7 @@ public:
     void open(bool = false, bool = true);
     std::fstream::pos_type position() const noexcept;
 
-    void rewind() noexcept {
-        if (is) {
-            is->clear(); // clear eofbit and potentially failbit
-            is->seekg(0, std::ios::beg);
-        }
-    }
+    void rewind() noexcept { if (is) { is->seekg(0); } }
 
     ReadResult<std::string> readLine() noexcept;
 

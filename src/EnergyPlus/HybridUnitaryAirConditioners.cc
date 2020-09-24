@@ -51,7 +51,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
-#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -66,6 +65,7 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -82,16 +82,13 @@ namespace HybridUnitaryAirConditioners {
     Array1D_bool CheckZoneHybridEvapName;
     bool GetInputZoneHybridEvap(true);
     bool ZoneEquipmentListChecked(false);
-    bool HybridCoolOneTimeFlag(true); // one time flag
 
-    void clear_state()
-    {
+    void clear_state() {
         ZoneHybridUnitaryAirConditioner.deallocate();
         NumZoneHybridEvap = 0;
         CheckZoneHybridEvapName.deallocate();
         GetInputZoneHybridEvap = true;
         ZoneEquipmentListChecked = false;
-        HybridCoolOneTimeFlag = true;
     }
 
     // Begin routines for zone HVAC Hybrid Evaporative cooler unit
@@ -205,6 +202,7 @@ namespace HybridUnitaryAirConditioners {
         int Loop;
         static Array1D_bool MySizeFlag;
 
+        static bool HybridCoolOneTimeFlag(true); // one time flag
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyFanFlag;
         static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
@@ -257,10 +255,11 @@ namespace HybridUnitaryAirConditioners {
             for (Loop = 1; Loop <= NumZoneHybridEvap; ++Loop) {
                 if (CheckZoneEquipmentList("ZoneHVAC:HybridUnitaryHVAC", ZoneHybridUnitaryAirConditioner(Loop).Name)) {
                     ZoneHybridUnitaryAirConditioner(Loop).ZoneNodeNum = ZoneEquipConfig(ZoneNum).ZoneNode;
-                } else {
-                    ShowSevereError(
-                        "InitZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC = " + ZoneHybridUnitaryAirConditioner(Loop).Name +
-                        ", is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
+                }
+                else
+                {
+                    ShowSevereError("InitZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC = " + ZoneHybridUnitaryAirConditioner(Loop).Name +
+                                    ", is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
                 }
             }
         }
@@ -275,8 +274,7 @@ namespace HybridUnitaryAirConditioners {
 
         // Set the inlet volumetric flow rate from the mass flow rate
         if (DataEnvironment::StdRhoAir > 1) {
-            ZoneHybridUnitaryAirConditioner(UnitNum).InletVolumetricFlowRate =
-                ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate / DataEnvironment::StdRhoAir;
+            ZoneHybridUnitaryAirConditioner(UnitNum).InletVolumetricFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate / DataEnvironment::StdRhoAir;
         } else {
             ZoneHybridUnitaryAirConditioner(UnitNum).InletVolumetricFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate / 1.225;
         }
@@ -290,6 +288,7 @@ namespace HybridUnitaryAirConditioners {
                                                                          ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat,
                                                                          ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure,
                                                                          "InitZoneHybridUnitaryAirConditioners");
+
 
         // Set default outlet state to inlet states, just to be safe
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp = ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;
@@ -317,9 +316,9 @@ namespace HybridUnitaryAirConditioners {
         ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletEnthalpy = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Enthalpy;
         ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletPressure = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Press;
         ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletRH = PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp,
-                                                                             ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat,
-                                                                             ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure,
-                                                                             "InitZoneHybridUnitaryAirConditioners");
+                                                                            ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat,
+                                                                            ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure,
+                                                                            "InitZoneHybridUnitaryAirConditioners");
     }
 
     void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
@@ -434,14 +433,12 @@ namespace HybridUnitaryAirConditioners {
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Temp = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp;
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).HumRat = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat;
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Enthalpy = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletEnthalpy;
-        Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).MassFlowRate =
-            ZoneHybridUnitaryAirConditioner(UnitNum).SecInletMassFlowRate;
+        Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).MassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletMassFlowRate;
 
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryOutletNode).Temp = ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletTemp;
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryOutletNode).HumRat = ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletHumRat;
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryOutletNode).Enthalpy = ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletEnthalpy;
-        Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryOutletNode).MassFlowRate =
-            ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletMassFlowRate;
+        Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryOutletNode).MassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletMassFlowRate;
     }
 
     void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Errors)
@@ -462,6 +459,7 @@ namespace HybridUnitaryAirConditioners {
         // na
 
         // Using/Aliasing
+        using ReportSizingManager::ReportSizingOutput;
         using BranchNodeConnections::TestCompSet;
         using namespace ScheduleManager;
         using BranchNodeConnections::SetUpCompSets;
@@ -491,8 +489,8 @@ namespace HybridUnitaryAirConditioners {
         CurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
         NumZoneHybridEvap = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
-        int MaxNumbers = max(0, NumNumbers); // Maximum number of numeric fields in all objects
-        int MaxAlphas = max(0, NumAlphas);   // Maximum number of alpha fields in all objects
+        int MaxNumbers = max(0, NumNumbers);    // Maximum number of numeric fields in all objects
+        int MaxAlphas = max(0, NumAlphas);      // Maximum number of alpha fields in all objects
         Alphas.allocate(MaxAlphas);
         Numbers.dimension(MaxNumbers, 0.0);
         cAlphaFields.allocate(MaxAlphas);
@@ -627,11 +625,9 @@ namespace HybridUnitaryAirConditioners {
                 ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate = Numbers(1) * Numbers(4);
                 if (DataEnvironment::StdRhoAir > 1) {
                     // SystemMaximumSupplyAirFlowRate*ScalingFactor*AirDensity;
-                    ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate =
-                        ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate * DataEnvironment::StdRhoAir;
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate = ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate * DataEnvironment::StdRhoAir;
                 } else {
-                    ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate =
-                        ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate * 1.225;
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate = ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate * 1.225;
                 }
 
                 // N5, \field Minimum Time Between Mode Change
@@ -674,12 +670,10 @@ namespace HybridUnitaryAirConditioners {
                     }
                 }
                 // add the ZoneHVAC:HybridUnitaryHVAC Scaled Maximum Supply Air Volume Flow Rate to the Component Sizing Report Summary
-                BaseSizer::reportSizerOutput(CurrentModuleObject,
-                                             ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                                             "Scaled Maximum Supply Air Volume Flow Rate [m3/s]",
-                                             ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate);
+                ReportSizingOutput(CurrentModuleObject, ZoneHybridUnitaryAirConditioner(UnitLoop).Name, "Scaled Maximum Supply Air Volume Flow Rate [m3/s]", ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate);
             }
         }
+
 
         // setup output variables
         for (UnitLoop = 1; UnitLoop <= NumZoneHybridEvap; ++UnitLoop) {
