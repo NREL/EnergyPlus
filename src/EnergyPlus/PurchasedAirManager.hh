@@ -247,6 +247,9 @@ namespace PurchasedAirManager {
         int ZonePtr;               // pointer to a zone served by an Ideal load air system
         int HVACSizingIndex;       // index of a HVAC Sizing object for an Ideal load air system
 
+        Real64 ZoneIdealLoadsSupplyAirTemperature; // ZoneIdealLoadsSupplyAirTemperature [C]
+        Real64 ZoneIdealLoadsSupplyAirHumidityRatio; // ZoneIdealLoadsSupplyAirHumidityRatio [kgWater/kgDryAir]
+
         // Default Constructor
         ZonePurchasedAir()
             : AvailSchedPtr(0), ZoneSupplyAirNodeNum(0), ZoneExhaustAirNodeNum(0), PlenumExhaustAirNodeNum(0), ReturnPlenumIndex(0),
@@ -271,7 +274,7 @@ namespace PurchasedAirManager {
               ZoneLatHeatRate(0.0), ZoneTotHeatRate(0.0), ZoneSenCoolRate(0.0), ZoneLatCoolRate(0.0), ZoneTotCoolRate(0.0), OASenHeatRate(0.0),
               OALatHeatRate(0.0), OATotHeatRate(0.0), OASenCoolRate(0.0), OALatCoolRate(0.0), OATotCoolRate(0.0), HtRecSenHeatRate(0.0),
               HtRecLatHeatRate(0.0), HtRecTotHeatRate(0.0), HtRecSenCoolRate(0.0), HtRecLatCoolRate(0.0), HtRecTotCoolRate(0.0), TimeEconoActive(0.0),
-              TimeHtRecActive(0.0), ZonePtr(0), HVACSizingIndex(0)
+              TimeHtRecActive(0.0), ZoneIdealLoadsSupplyAirTemperature(0.0), ZoneIdealLoadsSupplyAirHumidityRatio (0.0), ZonePtr(0), HVACSizingIndex(0)
         {
         }
     };

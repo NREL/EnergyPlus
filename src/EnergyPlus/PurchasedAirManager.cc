@@ -1057,6 +1057,21 @@ namespace PurchasedAirManager {
                                 "Average",
                                 PurchAir(PurchAirNum).Name);
 
+            // Air temperature
+            SetupOutputVariable("Zone Ideal Loads Supply Air Temperature",
+                                OutputProcessor::Unit::C,
+                                PurchAir(PurchAirNum).ZoneIdealLoadsSupplyAirTemperature,
+                                "System",
+                                "Average",
+                                PurchAir(PurchAirNum).Name);
+            // Humidity Ratio
+            SetupOutputVariable("Zone Ideal Loads Supply Air Humidity Ratio",
+                                OutputProcessor::Unit::kgWater_kgDryAir,
+                                PurchAir(PurchAirNum).ZoneIdealLoadsSupplyAirHumidityRatio,
+                                "System",
+                                "Average",
+                                PurchAir(PurchAirNum).Name);
+
             if (AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("Ideal Loads Air System",
                                  PurchAir(PurchAirNum).Name,
@@ -2080,6 +2095,8 @@ namespace PurchasedAirManager {
         PurchAir(PurchAirNum).MinOAMassFlowRate = 0.0;
         PurchAir(PurchAirNum).TimeEconoActive = 0.0;
         PurchAir(PurchAirNum).TimeHtRecActive = 0.0;
+        PurchAir(PurchAirNum).ZoneIdealLoadsSupplyAirTemperature = 0.0;
+        PurchAir(PurchAirNum).ZoneIdealLoadsSupplyAirHumidityRatio = 0.0;
         SysOutputProvided = 0.0;
         MoistOutputProvided = 0.0;
         CoolSensOutput = 0.0;
@@ -2785,6 +2802,8 @@ namespace PurchasedAirManager {
         PurchAir(PurchAirNum).OutdoorAirVolFlowRateStdRho = OAMassFlowRate / StdRhoAir;
         PurchAir(PurchAirNum).SupplyAirMassFlowRate = SupplyMassFlowRate;
         PurchAir(PurchAirNum).SupplyAirVolFlowRateStdRho = SupplyMassFlowRate / StdRhoAir;
+        PurchAir(PurchAirNum).ZoneIdealLoadsSupplyAirTemperature = Node(InNodeNum).Temp;
+        PurchAir(PurchAirNum).ZoneIdealLoadsSupplyAirHumidityRatio = Node(InNodeNum).HumRat;
 
         if (PurchAir(PurchAirNum).PlenumExhaustAirNodeNum > 0) {
             Node(PurchAir(PurchAirNum).PlenumExhaustAirNodeNum).MassFlowRate = SupplyMassFlowRate;
