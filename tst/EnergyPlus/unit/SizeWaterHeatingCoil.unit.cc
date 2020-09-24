@@ -82,7 +82,6 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataGlobals;
-using DataEnvironment::StdBaroPress;
 using DataEnvironment::StdRhoAir;
 using namespace EnergyPlus::GlobalNames;
 using namespace EnergyPlus::DataHeatBalance;

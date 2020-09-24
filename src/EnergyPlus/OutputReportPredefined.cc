@@ -2824,38 +2824,38 @@ namespace OutputReportPredefined {
         pdrThermalResilience = newPreDefReport("ThermalResilienceSummary", "ThermR", "Annual Thermal Resilience Summary");
 
         pdstHIHours = newPreDefSubTable(pdrThermalResilience, "Heat Index Hours");
-        pdchHIHourSafe = newPreDefColumn(pdstHIHours, "Safe (≤ 26.7°C) [hr]");
-        pdchHIHourCaution = newPreDefColumn(pdstHIHours, "Caution (> 26.7, ≤ 32.2°C) [hr]");
-        pdchHIHourExtremeCaution = newPreDefColumn(pdstHIHours, "Extreme Caution (> 32.2, ≤ 39.4°C) [hr]");
-        pdchHIHourDanger = newPreDefColumn(pdstHIHours, "Danger (> 39.4, ≤ 51.7°C) [hr]");
+        pdchHIHourSafe = newPreDefColumn(pdstHIHours, "Safe (<= 26.7°C) [hr]");
+        pdchHIHourCaution = newPreDefColumn(pdstHIHours, "Caution (> 26.7, <= 32.2°C) [hr]");
+        pdchHIHourExtremeCaution = newPreDefColumn(pdstHIHours, "Extreme Caution (> 32.2, <= 39.4°C) [hr]");
+        pdchHIHourDanger = newPreDefColumn(pdstHIHours, "Danger (> 39.4, <= 51.7°C) [hr]");
         pdchHIHourExtremeDanger = newPreDefColumn(pdstHIHours, "Extreme Danger (> 51.7°C) [hr]");
 
         pdstHIOccuHours = newPreDefSubTable(pdrThermalResilience, "Heat Index OccupantHours");
-        pdchHIOccuHourSafe = newPreDefColumn(pdstHIOccuHours, "Safe (≤ 26.7°C) [hr]");
-        pdchHIOccuHourCaution = newPreDefColumn(pdstHIOccuHours, "Caution (> 26.7, ≤ 32.2°C) [hr]");
-        pdchHIOccuHourExtremeCaution = newPreDefColumn(pdstHIOccuHours, "Extreme Caution (> 32.2, ≤ 39.4°C) [hr]");
-        pdchHIOccuHourDanger = newPreDefColumn(pdstHIOccuHours, "Danger (> 39.4, ≤ 51.7°C) [hr]");
+        pdchHIOccuHourSafe = newPreDefColumn(pdstHIOccuHours, "Safe (<= 26.7°C) [hr]");
+        pdchHIOccuHourCaution = newPreDefColumn(pdstHIOccuHours, "Caution (> 26.7, <= 32.2°C) [hr]");
+        pdchHIOccuHourExtremeCaution = newPreDefColumn(pdstHIOccuHours, "Extreme Caution (> 32.2, <= 39.4°C) [hr]");
+        pdchHIOccuHourDanger = newPreDefColumn(pdstHIOccuHours, "Danger (> 39.4, <= 51.7°C) [hr]");
         pdchHIOccuHourExtremeDanger = newPreDefColumn(pdstHIOccuHours, "Extreme Danger (> 51.7°C) [hr]");
 
         pdstHumidexHours = newPreDefSubTable(pdrThermalResilience, "Humidex Hours");
-        pdchHumidexHourLittle = newPreDefColumn(pdstHumidexHours, "Little to no Discomfort (≤ 29) [hr]");
-        pdchHumidexHourSome = newPreDefColumn(pdstHumidexHours, "Some Discomfort (> 29, ≤ 40) [hr]");
-        pdchHumidexHourGreat = newPreDefColumn(pdstHumidexHours, "Great Discomfort; Avoid Exertion (> 40, ≤ 45) [hr]");
-        pdchHumidexHourDanger = newPreDefColumn(pdstHumidexHours, "Dangerous (> 45, ≤ 50) [hr]");
+        pdchHumidexHourLittle = newPreDefColumn(pdstHumidexHours, "Little to no Discomfort (<= 29) [hr]");
+        pdchHumidexHourSome = newPreDefColumn(pdstHumidexHours, "Some Discomfort (> 29, <= 40) [hr]");
+        pdchHumidexHourGreat = newPreDefColumn(pdstHumidexHours, "Great Discomfort; Avoid Exertion (> 40, <= 45) [hr]");
+        pdchHumidexHourDanger = newPreDefColumn(pdstHumidexHours, "Dangerous (> 45, <= 50) [hr]");
         pdchHumidexHourStroke = newPreDefColumn(pdstHumidexHours, "Heat Stroke Quite Possible (> 50) [hr]");
 
         pdstHumidexOccuHours = newPreDefSubTable(pdrThermalResilience, "Humidex OccupantHours");
-        pdchHumidexOccuHourLittle = newPreDefColumn(pdstHumidexOccuHours, "Little to no Discomfort (≤ 29) [hr]");
-        pdchHumidexOccuHourSome = newPreDefColumn(pdstHumidexOccuHours, "Some Discomfort (> 29, ≤ 40) [hr]");
-        pdchHumidexOccuHourGreat = newPreDefColumn(pdstHumidexOccuHours, "Great Discomfort; Avoid Exertion (> 40, ≤ 45) [hr]");
-        pdchHumidexOccuHourDanger = newPreDefColumn(pdstHumidexOccuHours, "Dangerous (> 45, ≤ 50) [hr]");
+        pdchHumidexOccuHourLittle = newPreDefColumn(pdstHumidexOccuHours, "Little to no Discomfort (<= 29) [hr]");
+        pdchHumidexOccuHourSome = newPreDefColumn(pdstHumidexOccuHours, "Some Discomfort (> 29, <= 40) [hr]");
+        pdchHumidexOccuHourGreat = newPreDefColumn(pdstHumidexOccuHours, "Great Discomfort; Avoid Exertion (> 40, <= 45) [hr]");
+        pdchHumidexOccuHourDanger = newPreDefColumn(pdstHumidexOccuHours, "Dangerous (> 45, <= 50) [hr]");
         pdchHumidexOccuHourStroke = newPreDefColumn(pdstHumidexOccuHours, "Heat Stroke Quite Possible (> 50) [hr]");
 
         pdstHeatingSETHours = newPreDefSubTable(pdrThermalResilience, "Heating SET Hours");
-        pdchHeatingSETHours = newPreDefColumn(pdstHeatingSETHours, "SET ≤ 12.2°C Hours (°C)");
-        pdchHeatingSETOccuHours = newPreDefColumn(pdstHeatingSETHours, "SET ≤ 12.2°C OccupantHours (°C)");
-        pdchHeatingSETUnmetDuration = newPreDefColumn(pdstHeatingSETHours, "Longest SET ≤ 12.2°C Duration [hr]");
-        pdchHeatingSETUnmetTime = newPreDefColumn(pdstHeatingSETHours, "Start Time of the Longest SET ≤ 12.2°C Duration");
+        pdchHeatingSETHours = newPreDefColumn(pdstHeatingSETHours, "SET <= 12.2°C Hours (°C)");
+        pdchHeatingSETOccuHours = newPreDefColumn(pdstHeatingSETHours, "SET <= 12.2°C OccupantHours (°C)");
+        pdchHeatingSETUnmetDuration = newPreDefColumn(pdstHeatingSETHours, "Longest SET <= 12.2°C Duration [hr]");
+        pdchHeatingSETUnmetTime = newPreDefColumn(pdstHeatingSETHours, "Start Time of the Longest SET <= 12.2°C Duration");
 
         pdstCoolingSETHours = newPreDefSubTable(pdrThermalResilience, "Cooling SET Hours");
         pdchCoolingSETHours = newPreDefColumn(pdstCoolingSETHours, "SET > 30°C Hours (°C)");

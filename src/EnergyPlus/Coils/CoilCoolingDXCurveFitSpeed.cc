@@ -45,21 +45,23 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
 #include <utility>
 
+#include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
+#include <EnergyPlus/Autosizing/CoolingSHRSizing.hh>
+#include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
@@ -199,8 +201,8 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlusData &state,
                                               const std::string& curveName,
                                               int &curveIndex,
                                               std::vector<int> validDims,
-                                              const std::string& routineName,
-                                              const std::string& fieldName,
+                                              const std::string &routineName,
+                                              const std::string &fieldName,
                                               Real64 const Var1,           // required 1st independent variable
                                               Optional<Real64 const> Var2, // 2nd independent variable
                                               Optional<Real64 const> Var3, // 3rd independent variable
@@ -224,7 +226,6 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlusData &state,
                                                            this->object_name, // Object Type
                                                            this->name,        // Object Name
                                                            fieldName);        // Field Name
-
             if (!errorFound) {
                 CurveManager::checkCurveIsNormalizedToOne(state,
                     routineName + this->object_name, this->name, curveIndex, fieldName, curveName, Var1, Var2, Var3, Var4, Var5);
@@ -240,7 +241,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlusData &state, co
       indexCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexSHRFT(0), indexSHRFFF(0),
 
       // speed class inputs
-      RatedAirMassFlowRate(0.0), // rated air mass flow rate at speed {kg/s}
+      RatedAirMassFlowRate(0.0),     // rated air mass flow rate at speed {kg/s}
       RatedCondAirMassFlowRate(0.0), // condenser air mass flow rate at speed {kg/s}
       grossRatedSHR(0.0),             // rated sensible heat ratio at speed
       RatedCBF(0.0),             // rated coil bypass factor at speed
@@ -267,15 +268,15 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlusData &state, co
       RTF(0.0),               // coil runtime fraction at speed
       AirMassFlow(0.0),       // coil inlet air mass flow rate {kg/s}
 
-        // other data members
+      // other data members
       evap_air_flow_rate(0.0), condenser_air_flow_rate(0.0), active_fraction_of_face_coil_area(0.0),
       ratedLatentCapacity(0.0), // Latent capacity at rated conditions {W}
 
       // rating data
-      RatedInletAirTemp(26.6667),        // 26.6667C or 80F
-      RatedInletWetBulbTemp(19.4444),      // 19.44 or 67F
+      RatedInletAirTemp(26.6667),       // 26.6667C or 80F
+      RatedInletWetBulbTemp(19.4444),   // 19.44 or 67F
       RatedInletAirHumRat(0.0111847),   // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-      RatedOutdoorAirTemp(35.0),         // 35 C or 95F
+      RatedOutdoorAirTemp(35.0),        // 35 C or 95F
       DryCoilOutletHumRatioMin(0.00001) // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
 {
@@ -342,49 +343,45 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state, int const speedNum,
         Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
 
     bool PrintFlag = true;
-    std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_Cooling);
+    bool errorsFound = false;
+    std::string CompType = this->object_name;
     std::string CompName = this->parentName;
 
-    int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+    CoolingAirFlowSizer sizingCoolingAirFlow;
+    std::string stringOverride = "Rated Air Flow Rate [m3/s]";
+    if (DataGlobals::isEpJSON) stringOverride = "rated_air_flow_rate [m3/s]";
     std::string preFixString;
     if (maxSpeeds > 1) preFixString = "Speed " + std::to_string(speedNum + 1) + " ";
-    std::string SizingString = preFixString + "Rated Air Flow Rate [m3/s]";
-    // DataSizing::DataConstantUsedForSizing = this->original_input_specs.evaporator_air_flow_fraction / this->active_fraction_of_face_coil_area;
-    Real64 tempSize = this->evap_air_flow_rate;
-    DataSizing::DataIsDXCoil = true;
-    //if (this->ratedEvapAirFlowRateIsAutosized) {
-    //    DataSizing::DataBypassFrac = 1 - this->active_fraction_of_face_coil_area;
-    //    tempSize = DataSizing::AutoSize;
-    //}
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, tempSize, PrintFlag, RoutineName);
-    DataSizing::DataBypassFrac = 0;
-    DataSizing::DataIsDXCoil = false;
-    //this->evap_air_flow_rate = tempSize;
+    stringOverride = preFixString + stringOverride;
+    sizingCoolingAirFlow.overrideSizingString(stringOverride);
+    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    this->evap_air_flow_rate = sizingCoolingAirFlow.size(state, this->evap_air_flow_rate, errorsFound);
 
-    SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
-    SizingString = preFixString + "Gross Cooling Capacity [W]";
-    //DataSizing::DataConstantUsedForSizing = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal;
-    tempSize = this->rated_total_capacity;
-    //if (this->ratedGrossTotalCapIsAutosized) tempSize = DataSizing::AutoSize;
+    std::string SizingString = preFisString + "Gross Cooling Capacity [W]";
+    CoolingCapacitySizer sizerCoolingCapacity;
+    sizerCoolingCapacity.overrideSizingString(SizingString);
+    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    this->rated_total_capacity = sizerCoolingCapacity.size(state, this->rated_total_capacity, errorsFound);
 
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, tempSize, PrintFlag, RoutineName);
-    //this->rated_total_capacity = tempSize;
-
-     //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
+    //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
     //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
-    SizingMethod = DataHVACGlobals::CoolingSHRSizing;
-    SizingString = preFixString + "Gross Sensible Heat Ratio";
     DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
     DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
+    bool errorFound = false;
+    CoolingSHRSizer sizerCoolingSHR;
+    sizerCoolingSHR.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
     if (this->grossRatedSHR == DataSizing::AutoSize && this->parentOperatingMode == 2) {
-        ReportSizingManager::RequestSizing(state,CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName, 0.667);
+        DataSizing::DataSizingFraction = 0.667;
+        this->grossRatedSHR = sizerCoolingSHR.size(state, this->grossRatedSHR, errorFound);
     } else if (this->grossRatedSHR == DataSizing::AutoSize && this->parentOperatingMode == 3) {
-        ReportSizingManager::RequestSizing(state,CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName, 0.333);
+        DataSizing::DataSizingFraction = 0.333;
+        this->grossRatedSHR = sizerCoolingSHR.size(state, this->grossRatedSHR, errorFound);
     } else {
-        ReportSizingManager::RequestSizing(state,CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName);
+        this->grossRatedSHR = sizerCoolingSHR.size(state, this->grossRatedSHR, errorFound);
     }
     DataSizing::DataFlowUsedForSizing = 0.0;
     DataSizing::DataCapacityUsedForSizing = 0.0;
+    DataSizing::DataSizingFraction = 1.0;
     //  DataSizing::DataEMSOverrideON = false;
     //  DataSizing::DataEMSOverride = 0.0;
 
@@ -424,9 +421,9 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlusData &state,
         return;
     }
 
-    Real64 hDelta;    // enthalpy difference across cooling coil
-    Real64 A0;  // ratio of UA to Cp
-    Real64 CBF; // adjusted coil bypass factor
+    Real64 hDelta; // enthalpy difference across cooling coil
+    Real64 A0;     // ratio of UA to Cp
+    Real64 CBF;    // adjusted coil bypass factor
     if (RatedCBF > 0.0) {
         A0 = -std::log(RatedCBF) * RatedAirMassFlowRate;
     } else {
