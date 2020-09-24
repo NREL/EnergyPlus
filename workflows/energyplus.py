@@ -17,15 +17,16 @@ class ColumnNames(object):
 class EPlusRunManager(object):
 
     @staticmethod
-    def get_end_summary(end_file_path):
-        contents = open(end_file_path, 'r').read()
-        if 'EnergyPlus Completed Successfully' not in contents:
+    def get_end_summary_from_err(err_file_path):
+        contents = open(err_file_path, 'r').readlines()
+        last_line = contents[-1]
+        if 'EnergyPlus' not in last_line and 'Elapsed Time' not in last_line:
             return False, None, None, None
-        last_line_tokens = contents.split(' ')
-        num_warnings = int(last_line_tokens[3])
-        num_errors = int(last_line_tokens[5])
-        time_position_marker = contents.index('Time=')
-        time_string = contents[time_position_marker:]
+        last_line_tokens = last_line.split(' ')
+        num_warnings = int(last_line_tokens[7])
+        num_errors = int(last_line_tokens[9])
+        time_position_marker = last_line.index('Time=')
+        time_string = last_line[time_position_marker:]
         num_hours = int(time_string[5:7])
         num_minutes = int(time_string[10:12])
         num_seconds = float(time_string[16:21])
@@ -353,9 +354,9 @@ class EPlusRunManager(object):
                         os.remove(eplusout_bnd_path)
 
                 # check on .end file and finish up
-                end_file_name = "{0}.end".format(file_name_no_ext)
-                end_file_path = os.path.join(run_directory, end_file_name)
-                success, errors, warnings, runtime = EPlusRunManager.get_end_summary(end_file_path)
+                err_file_name = "{0}.err".format(file_name_no_ext)
+                err_file_path = os.path.join(run_directory, err_file_name)
+                success, errors, warnings, runtime = EPlusRunManager.get_end_summary_from_err(err_file_path)
 
                 column_data = {
                     ColumnNames.Errors: errors,
