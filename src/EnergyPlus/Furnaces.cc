@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DXCoils.hh>
