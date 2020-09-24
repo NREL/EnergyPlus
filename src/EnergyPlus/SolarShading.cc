@@ -1583,7 +1583,7 @@ namespace SolarShading {
                     // Added TH 5/26/2009 for switchable windows to report switching factor (tinted level)
                     // CurrentModuleObject='Switchable Windows'
                     if (Surface(SurfLoop).HasShadeControl) {
-                        if (WindowShadingControl(Surface(SurfLoop).WindowShadingControlPtr).ShadingType == WSC_ST_SwitchableGlazing) {
+                        if (WindowShadingControl(Surface(SurfLoop).activeWindowShadingControl).ShadingType == WSC_ST_SwitchableGlazing) {
                             // IF (SurfaceWindow(SurfLoop)%ShadingFlag == SwitchableGlazing) THEN  !ShadingFlag is not set to SwitchableGlazing yet!
                             SetupOutputVariable("Surface Window Switchable Glazing Switching Factor",
                                                 OutputProcessor::Unit::None,
@@ -5556,7 +5556,9 @@ namespace SolarShading {
                     // interior windows. Was removed to allow such beam solar but then somehow was put back in.
                     // IF (Surface(BackSurfaceNumber)%BaseSurf /= BackSurfaceNumber) CYCLE ! Not for subsurfaces of Back Surface
 
-                    CHKBKS(BackSurfaceNumber, GRSNR); // CHECK FOR CONVEX ZONE; severe error if not
+                    if (!penumbra) {
+                        CHKBKS(BackSurfaceNumber, GRSNR); // CHECK FOR CONVEX ZONE; severe error if not
+                    }
                     ++NBKS;
                     if (NBKS > MaxBKS) {
                         BKS.redimension(MaxBKS *= 2, 0);
@@ -5597,92 +5599,94 @@ namespace SolarShading {
         SBS.deallocate();
         BKS.deallocate();
 
-        if (shd_stream) {
-            *shd_stream << "Shadowing Combinations\n";
-            if (SolarDistribution == MinimalShadowing) {
-                *shd_stream << "..Solar Distribution=Minimal Shadowing, Detached Shading will not be used in shadowing calculations\n";
-            } else if (SolarDistribution == FullExterior) {
-                if (CalcSolRefl) {
-                    *shd_stream << "..Solar Distribution=FullExteriorWithReflectionsFromExteriorSurfaces\n";
-                } else {
-                    *shd_stream << "..Solar Distribution=FullExterior\n";
-                }
-            } else if (SolarDistribution == FullInteriorExterior) {
-                if (CalcSolRefl) {
-                    *shd_stream << "..Solar Distribution=FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces\n";
-                } else {
-                    *shd_stream << "..Solar Distribution=FullInteriorAndExterior\n";
-                }
-            } else {
-            }
-
-            *shd_stream << "..In the following, only the first 10 reference surfaces will be shown.\n";
-            *shd_stream << "..But all surfaces are used in the calculations.\n";
-
-            for (int HTSnum : DataSurfaces::AllSurfaceListReportOrder) {
-                *shd_stream << "==================================\n";
-                if (ShadowComb(HTSnum).UseThisSurf) {
-                    if (Surface(HTSnum).IsConvex) {
-                        *shd_stream << "Surface=" << Surface(HTSnum).Name << " is used as Receiving Surface in calculations and is convex.\n";
+        if (!penumbra) {
+            if (shd_stream) {
+                *shd_stream << "Shadowing Combinations\n";
+                if (SolarDistribution == MinimalShadowing) {
+                    *shd_stream << "..Solar Distribution=Minimal Shadowing, Detached Shading will not be used in shadowing calculations\n";
+                } else if (SolarDistribution == FullExterior) {
+                    if (CalcSolRefl) {
+                        *shd_stream << "..Solar Distribution=FullExteriorWithReflectionsFromExteriorSurfaces\n";
                     } else {
-                        *shd_stream << "Surface=" << Surface(HTSnum).Name << " is used as Receiving Surface in calculations and is non-convex.\n";
-                        if (ShadowComb(HTSnum).NumGenSurf > 0) {
-                            if (DisplayExtraWarnings) {
-                                ShowWarningError("DetermineShadowingCombinations: Surface=\"" + Surface(HTSnum).Name +
-                                                 "\" is a receiving surface and is non-convex.");
-                                ShowContinueError("...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
-                            } else {
-                                ++TotalReceivingNonConvexSurfaces;
-                            }
-                        }
+                        *shd_stream << "..Solar Distribution=FullExterior\n";
+                    }
+                } else if (SolarDistribution == FullInteriorExterior) {
+                    if (CalcSolRefl) {
+                        *shd_stream << "..Solar Distribution=FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces\n";
+                    } else {
+                        *shd_stream << "..Solar Distribution=FullInteriorAndExterior\n";
                     }
                 } else {
-                    *shd_stream << "Surface=" << Surface(HTSnum).Name << " is not used as Receiving Surface in calculations.\n";
                 }
-                *shd_stream << "Number of general casting surfaces=" << ShadowComb(HTSnum).NumGenSurf << '\n';
-                for (NGSS = 1; NGSS <= ShadowComb(HTSnum).NumGenSurf; ++NGSS) {
-                    if (NGSS <= 10) *shd_stream << "..Surface=" << Surface(ShadowComb(HTSnum).GenSurf(NGSS)).Name << '\n';
-                    CastingSurface(ShadowComb(HTSnum).GenSurf(NGSS)) = true;
-                }
-                *shd_stream << "Number of back surfaces=" << ShadowComb(HTSnum).NumBackSurf << '\n';
-                for (NGSS = 1; NGSS <= min(10, ShadowComb(HTSnum).NumBackSurf); ++NGSS) {
-                    *shd_stream << "...Surface=" << Surface(ShadowComb(HTSnum).BackSurf(NGSS)).Name << '\n';
-                }
-                *shd_stream << "Number of receiving sub surfaces=" << ShadowComb(HTSnum).NumSubSurf << '\n';
-                for (NGSS = 1; NGSS <= min(10, ShadowComb(HTSnum).NumSubSurf); ++NGSS) {
-                    *shd_stream << "....Surface=" << Surface(ShadowComb(HTSnum).SubSurf(NGSS)).Name << '\n';
+
+                *shd_stream << "..In the following, only the first 10 reference surfaces will be shown.\n";
+                *shd_stream << "..But all surfaces are used in the calculations.\n";
+
+                for (int HTSnum : DataSurfaces::AllSurfaceListReportOrder) {
+                    *shd_stream << "==================================\n";
+                    if (ShadowComb(HTSnum).UseThisSurf) {
+                        if (Surface(HTSnum).IsConvex) {
+                            *shd_stream << "Surface=" << Surface(HTSnum).Name << " is used as Receiving Surface in calculations and is convex.\n";
+                        } else {
+                            *shd_stream << "Surface=" << Surface(HTSnum).Name << " is used as Receiving Surface in calculations and is non-convex.\n";
+                            if (ShadowComb(HTSnum).NumGenSurf > 0) {
+                                if (DisplayExtraWarnings) {
+                                    ShowWarningError("DetermineShadowingCombinations: Surface=\"" + Surface(HTSnum).Name +
+                                        "\" is a receiving surface and is non-convex.");
+                                    ShowContinueError("...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
+                                } else {
+                                    ++TotalReceivingNonConvexSurfaces;
+                                }
+                            }
+                        }
+                    } else {
+                        *shd_stream << "Surface=" << Surface(HTSnum).Name << " is not used as Receiving Surface in calculations.\n";
+                    }
+                    *shd_stream << "Number of general casting surfaces=" << ShadowComb(HTSnum).NumGenSurf << '\n';
+                    for (NGSS = 1; NGSS <= ShadowComb(HTSnum).NumGenSurf; ++NGSS) {
+                        if (NGSS <= 10) *shd_stream << "..Surface=" << Surface(ShadowComb(HTSnum).GenSurf(NGSS)).Name << '\n';
+                        CastingSurface(ShadowComb(HTSnum).GenSurf(NGSS)) = true;
+                    }
+                    *shd_stream << "Number of back surfaces=" << ShadowComb(HTSnum).NumBackSurf << '\n';
+                    for (NGSS = 1; NGSS <= min(10, ShadowComb(HTSnum).NumBackSurf); ++NGSS) {
+                        *shd_stream << "...Surface=" << Surface(ShadowComb(HTSnum).BackSurf(NGSS)).Name << '\n';
+                    }
+                    *shd_stream << "Number of receiving sub surfaces=" << ShadowComb(HTSnum).NumSubSurf << '\n';
+                    for (NGSS = 1; NGSS <= min(10, ShadowComb(HTSnum).NumSubSurf); ++NGSS) {
+                        *shd_stream << "....Surface=" << Surface(ShadowComb(HTSnum).SubSurf(NGSS)).Name << '\n';
+                    }
                 }
             }
-        }
 
-        for (HTS = 1; HTS <= TotSurfaces; ++HTS) {
-            if (CastingSurface(HTS) && !Surface(HTS).IsConvex) {
-                if (DisplayExtraWarnings) {
-                    ShowSevereError("DetermineShadowingCombinations: Surface=\"" + Surface(HTS).Name + "\" is a casting surface and is non-convex.");
-                    ShowContinueError("...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
-                } else {
-                    ++TotalCastingNonConvexSurfaces;
+            for (HTS = 1; HTS <= TotSurfaces; ++HTS) {
+                if (CastingSurface(HTS) && !Surface(HTS).IsConvex) {
+                    if (DisplayExtraWarnings) {
+                        ShowSevereError("DetermineShadowingCombinations: Surface=\"" + Surface(HTS).Name + "\" is a casting surface and is non-convex.");
+                        ShowContinueError("...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
+                    } else {
+                        ++TotalCastingNonConvexSurfaces;
+                    }
                 }
+            }
+
+            if (TotalReceivingNonConvexSurfaces > 0) {
+                ShowWarningMessage("DetermineShadowingCombinations: There are " + TrimSigDigits(TotalReceivingNonConvexSurfaces) +
+                    " surfaces which are receiving surfaces and are non-convex.");
+                ShowContinueError("...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
+                ShowContinueError("...Add Output:Diagnostics,DisplayExtraWarnings; to see individual warnings for each surface.");
+                TotalWarningErrors += TotalReceivingNonConvexSurfaces;
+            }
+
+            if (TotalCastingNonConvexSurfaces > 0) {
+                ShowSevereMessage("DetermineShadowingCombinations: There are " + TrimSigDigits(TotalCastingNonConvexSurfaces) +
+                    " surfaces which are casting surfaces and are non-convex.");
+                ShowContinueError("...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
+                ShowContinueError("...Add Output:Diagnostics,DisplayExtraWarnings; to see individual severes for each surface.");
+                TotalSevereErrors += TotalCastingNonConvexSurfaces;
             }
         }
 
         CastingSurface.deallocate();
-
-        if (TotalReceivingNonConvexSurfaces > 0) {
-            ShowWarningMessage("DetermineShadowingCombinations: There are " + TrimSigDigits(TotalReceivingNonConvexSurfaces) +
-                               " surfaces which are receiving surfaces and are non-convex.");
-            ShowContinueError("...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
-            ShowContinueError("...Add Output:Diagnostics,DisplayExtraWarnings; to see individual warnings for each surface.");
-            TotalWarningErrors += TotalReceivingNonConvexSurfaces;
-        }
-
-        if (TotalCastingNonConvexSurfaces > 0) {
-            ShowSevereMessage("DetermineShadowingCombinations: There are " + TrimSigDigits(TotalCastingNonConvexSurfaces) +
-                              " surfaces which are casting surfaces and are non-convex.");
-            ShowContinueError("...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
-            ShowContinueError("...Add Output:Diagnostics,DisplayExtraWarnings; to see individual severes for each surface.");
-            TotalSevereErrors += TotalCastingNonConvexSurfaces;
-        }
 
 #ifndef EP_NO_OPENGL
         if (penumbra && penumbra->getNumSurfaces() > 0) {
@@ -6854,10 +6858,10 @@ namespace SolarShading {
                 // TH added 3/24/2010 while debugging CR 7872
                 if (!Surface(SurfNum).ExtSolar) continue;
                 ConstrNum = Surface(SurfNum).Construction;
-                ConstrNumSh = SurfWinShadedConstruction(SurfNum);
+                ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) {
                     ConstrNum = Surface(SurfNum).StormWinConstruction;
-                    ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
+                    ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
                 }
                 BlNum = SurfWinBlindNumber(SurfNum);
                 ScNum = SurfWinScreenNumber(SurfNum);
@@ -7959,10 +7963,10 @@ namespace SolarShading {
                                         // transmitting and back window centers
                                         CosIncBack = std::abs(ComplexWind(SurfNum).sdotN(IBack));
                                     }
-                                    ConstrNumBackSh = Surface(BackSurfNum).ShadedConstruction;
+                                    ConstrNumBackSh = Surface(BackSurfNum).activeShadedConstruction;
                                     if (SurfWinStormWinFlag(BackSurfNum) == 1) {
                                         ConstrNum = Surface(BackSurfNum).StormWinConstruction;
-                                        ConstrNumSh = Surface(BackSurfNum).StormWinShadedConstruction;
+                                        ConstrNumSh = Surface(BackSurfNum).activeStormWinShadedConstruction;
                                     }
                                     AbsBeamWin.dimension(DataHeatBalance::MaxSolidWinLayers, 0.0);
                                     TransBeamWin = 0.0;
@@ -8836,10 +8840,10 @@ namespace SolarShading {
                 // TH added 3/24/2010 while debugging CR 7872
                 if (!Surface(SurfNum).ExtSolar) continue;
                 int ConstrNum = Surface(SurfNum).Construction;
-                int ConstrNumSh = SurfWinShadedConstruction(SurfNum);
+                int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) {
                     ConstrNum = Surface(SurfNum).StormWinConstruction;
-                    ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
+                    ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
                 }
 
                 int SurfNum2 = 0;
@@ -8948,7 +8952,7 @@ namespace SolarShading {
                 Real64 SunLitFract = SunlitFrac(TimeStep, HourOfDay, SurfNum2);
 
                 int ConstrNum = Surface(SurfNum2).Construction;
-                if (SurfWinShadedConstruction(SurfNum2) > 0) ConstrNum = SurfWinShadedConstruction(SurfNum2);
+                if (Surface(SurfNum2).activeShadedConstruction > 0) ConstrNum = Surface(SurfNum2).activeShadedConstruction;
                 auto aLayer = CWindowConstructionsSimplified::instance().getEquivalentLayer(dataWindowManager, WavelengthRange::Solar, ConstrNum);
 
                 ///////////////////////////////////////////////
@@ -9853,15 +9857,15 @@ namespace SolarShading {
         //  20: window has switchable glazing that is unswitched but may be switched later
         //       to control daylight glare or daylight illuminance
         //  30: window has exterior shade that is off but may be triggered on later
-        //       to control daylaight glare or daylight illuminance
+        //       to control daylight glare or daylight illuminance
         //  60: window has interior blind that is off but may be triggered on later
-        //       to control daylaight glare or daylight illuminance
+        //       to control daylight glare or daylight illuminance
         //  70: window has exterior blind that is off but may be triggered on later
-        //       to control daylaight glare or daylight illuminance
+        //       to control daylight glare or daylight illuminance
         //  80: window has between-glass shade that is off but may be triggered on later
-        //       to control daylaight glare or daylight illuminance
+        //       to control daylight glare or daylight illuminance
         //  90: window has between-glass blind that is off but may be triggered on later
-        //       to control daylaight glare or daylight illuminance
+        //       to control daylight glare or daylight illuminance
         // A "shading device" may be an exterior, interior or between-glass shade or blind,
         // or the lower-transmitting (dark) state of switchable glazing (e.g., electrochromic).
         // In all cases, the unshaded condition is represented
@@ -9950,10 +9954,24 @@ namespace SolarShading {
                     SurfWinVisTransSelected(ISurf) = POLYF(1.0, dataConstruction.Construct(IConst).TransVisBeamCoef) *
                                                      SurfWinGlazedFrac(ISurf);
 
+ 
                 // Window has shading control
-                int IShadingCtrl = Surface(ISurf).WindowShadingControlPtr; // Pointer to a window's shading control
+                // select the active window shading control and corresponding contructions
+                size_t indexWindowShadingControl = selectActiveWindowShadingControlIndex(ISurf);
+                if (!Surface(ISurf).windowShadingControlList.empty() && indexWindowShadingControl <= Surface(ISurf).windowShadingControlList.size() - 1) {
+                    Surface(ISurf).activeWindowShadingControl = Surface(ISurf).windowShadingControlList[indexWindowShadingControl];
+                }
+                if (!Surface(ISurf).shadedConstructionList.empty() && indexWindowShadingControl <= Surface(ISurf).shadedConstructionList.size() - 1) {
+                    Surface(ISurf).activeShadedConstruction = Surface(ISurf).shadedConstructionList[indexWindowShadingControl];
+                }
+                if (!Surface(ISurf).shadedStormWinConstructionList.empty() && indexWindowShadingControl <= Surface(ISurf).shadedStormWinConstructionList.size() - 1) {
+                    Surface(ISurf).activeStormWinShadedConstruction = Surface(ISurf).shadedStormWinConstructionList[indexWindowShadingControl];
+                }
+                int IShadingCtrl = Surface(ISurf).activeWindowShadingControl;
+
                 int ShadingType = WindowShadingControl(IShadingCtrl).ShadingType; // Type of shading (interior shade, interior blind, etc.)
                 SurfWinShadingFlag(ISurf) = ShadeOff; // Initialize shading flag to off
+
                 int IZone = Surface(ISurf).Zone;
                 // Setpoint for shading
                 Real64 SetPoint = WindowShadingControl(IShadingCtrl).SetPoint; // Control setpoint
@@ -10200,7 +10218,7 @@ namespace SolarShading {
 
                     // Added TH 1/20/2010
                     // Vis trans at normal incidence of fully switched glass
-                    IConst = Surface(ISurf).ShadedConstruction;
+                    IConst = Surface(ISurf).activeShadedConstruction;
                     SurfWinVisTransSelected(ISurf) =
                             POLYF(1.0, dataConstruction.Construct(IConst).TransVisBeamCoef) * SurfWinGlazedFrac(ISurf);
                 }
@@ -10354,6 +10372,23 @@ namespace SolarShading {
 
             } // End of surface loop
         }
+    }
+
+    int selectActiveWindowShadingControlIndex(int curSurface)
+    {
+        // For a given surface, determine based on the schedules which index to the window shading control list vector should be active
+        int selected = 0; // presume it is the first shading control - even if it is not active it needs to be some shading control which is then turned off in the WindowShadingManager
+        if (Surface(curSurface).windowShadingControlList.size() > 1) {
+            for (std::size_t listIndex = 0; listIndex < Surface(curSurface).windowShadingControlList.size(); ++listIndex) {
+                int wsc = Surface(curSurface).windowShadingControlList[listIndex];
+                //pick the first WindowShadingControl that has a non-zero schedule value
+                if (ScheduleManager::GetCurrentScheduleValue(WindowShadingControl(wsc).Schedule) > 0.0) {
+                    selected = listIndex;
+                    break;
+                }
+            }
+        }
+        return (selected);
     }
 
     void WindowGapAirflowControl()
@@ -11173,10 +11208,10 @@ namespace SolarShading {
                 W = Surface(SurfNum).Width;
                 d1 = OutsReveal + 0.5 * GlazingThickness;
                 ConstrNum = Surface(SurfNum).Construction;
-                ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+                ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) {
                     ConstrNum = Surface(SurfNum).StormWinConstruction;
-                    ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
+                    ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
                 }
                 SolTransGlass = POLYF(CosIncAng(TimeStep, HourOfDay, SurfNum),
                                       dataConstruction.Construct(ConstrNum).TransSolBeamCoef);
@@ -11757,7 +11792,7 @@ namespace SolarShading {
             if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).HasShadeControl) {
-                    int WinShadeCtrlNum = Surface(SurfNum).WindowShadingControlPtr; // Window shading control number
+                    int WinShadeCtrlNum = Surface(SurfNum).activeWindowShadingControl; // Window shading control number
                     int MatNumSh = 0; // Shade layer material number
                     Real64 AbsorpEff = 0.0;    // Effective absorptance of isolated shade layer (fraction of
                     //  of incident radiation remaining after reflected portion is
@@ -11765,7 +11800,7 @@ namespace SolarShading {
                     if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade ||
                         WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade ||
                         WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {
-                        int ConstrNumSh = Surface(SurfNum).ShadedConstruction; // Window construction number with shade
+                        int ConstrNumSh = Surface(SurfNum).activeShadedConstruction; // Window construction number with shade
                         int TotLay = dataConstruction.Construct(ConstrNumSh).TotLayers; // Total layers in a construction
 
 
@@ -12003,10 +12038,10 @@ namespace SolarShading {
                         ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug [W]
                     } else { // Exterior or Interior Window
 
-                        int ConstrNumSh = Surface(HeatTransSurfNum).ShadedConstruction;
+                        int ConstrNumSh = Surface(HeatTransSurfNum).activeShadedConstruction;
                         if (SurfWinStormWinFlag(HeatTransSurfNum) == 1) {
                             ConstrNum = Surface(HeatTransSurfNum).StormWinConstruction;
-                            ConstrNumSh = Surface(HeatTransSurfNum).StormWinShadedConstruction;
+                            ConstrNumSh = Surface(HeatTransSurfNum).activeStormWinShadedConstruction;
                         }
                         int TotGlassLayers = dataConstruction.Construct(ConstrNum).TotGlassLayers;
                         int ShadeFlag = SurfWinShadingFlag(HeatTransSurfNum);
@@ -12544,10 +12579,10 @@ namespace SolarShading {
 
             } else { // Exterior or Interior Window
 
-                ConstrNumSh = Surface(HeatTransSurfNum).ShadedConstruction;
+                ConstrNumSh = Surface(HeatTransSurfNum).activeShadedConstruction;
                 if (SurfWinStormWinFlag(HeatTransSurfNum) == 1) {
                     ConstrNum = Surface(HeatTransSurfNum).StormWinConstruction;
-                    ConstrNumSh = Surface(HeatTransSurfNum).StormWinShadedConstruction;
+                    ConstrNumSh = Surface(HeatTransSurfNum).activeStormWinShadedConstruction;
                 }
                 TotGlassLayers = dataConstruction.Construct(ConstrNum).TotGlassLayers;
                 ShadeFlag = SurfWinShadingFlag(HeatTransSurfNum);

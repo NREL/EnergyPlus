@@ -1253,6 +1253,18 @@ namespace EMSManager {
                     EnergyPlus::ShowContinueError("You should take note that there is a risk of overwritting.");
                 }
                 ++EMSActuatorAvailable(ActuatorVariableNum).handleCount;
+
+                // Warn if actuator applied to an air boundary surface
+                if (UtilityRoutines::SameString(EMSActuatorUsed(ActuatorNum).ComponentTypeName, "AIRFLOW NETWORK WINDOW/DOOR OPENING")) {
+                    int actuatedSurfNum = UtilityRoutines::FindItemInList(EMSActuatorUsed(ActuatorNum).UniqueIDName, DataSurfaces::Surface);
+                    if (actuatedSurfNum > 0) {
+                        if (DataSurfaces::Surface(actuatedSurfNum).IsAirBoundarySurf) {
+                            ShowWarningError(
+                                "GetEMSInput: EnergyManagementSystem:Actuator=" + EMSActuatorUsed(ActuatorNum).Name +
+                                " actuates an opening attached to an air boundary surface.");
+                        }
+                    }
+                }
             }
         } // ActuatorNum
 
@@ -2006,7 +2018,7 @@ namespace EMSManager {
                                      DataSurfaces::SurfWinSlatAngThisTSDegEMSon(loopSurfNum),
                                      DataSurfaces::SurfWinSlatAngThisTSDegEMSValue(loopSurfNum));
                 }
-            } else if (WindowShadingControl(Surface(loopSurfNum).WindowShadingControlPtr).ShadingType == WSC_ST_ExteriorScreen) {
+            } else if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType == WSC_ST_ExteriorScreen) {
                 SetupEMSActuator("Window Shading Control",
                                  Surface(loopSurfNum).Name,
                                  "Control Status",
@@ -2014,9 +2026,9 @@ namespace EMSManager {
                                  DataSurfaces::SurfWinShadingFlagEMSOn(loopSurfNum),
                                  DataSurfaces::SurfWinShadingFlagEMSValue(loopSurfNum));
             } else {
-                if (WindowShadingControl(Surface(loopSurfNum).WindowShadingControlPtr).ShadingType != WSC_ST_SwitchableGlazing) {
+                if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WSC_ST_SwitchableGlazing) {
                     ShowSevereError("Missing shade or blind layer in window construction name = '" +
-                                    dataConstruction.Construct(DataSurfaces::SurfWinShadedConstruction(loopSurfNum)).Name + "', surface name = '" +
+                                    dataConstruction.Construct(Surface(loopSurfNum).activeShadedConstruction).Name + "', surface name = '" +
                                     Surface(loopSurfNum).Name + "'.");
                     ShowContinueError("...'Control Status' or 'Slat Angle' EMS Actuator cannot be set for a construction that does not have a shade "
                                       "or a blind layer.");
