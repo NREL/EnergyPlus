@@ -999,8 +999,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
     SetupOutputVariable("Electric Load Center Requested Electricity Rate", OutputProcessor::Unit::W, totalPowerRequest_, "System", "Average", name_);
 
     if (DataGlobals::AnyEnergyManagementSystemInModel && storagePresent_) {
-        SetupEMSActuator("Electrical Storage", name_, "Power Draw Rate", "[W]", eMSOverridePelFromStorage_, eMSValuePelFromStorage_);
-        SetupEMSActuator("Electrical Storage", name_, "Power Charge Rate", "[W]", eMSOverridePelIntoStorage_, eMSValuePelIntoStorage_);
+        SetupEMSActuator("Electrical Storage", name_, "Electricity Power Draw Rate", "[W]", eMSOverridePelFromStorage_, eMSValuePelFromStorage_);
+        SetupEMSActuator("Electrical Storage", name_, "Electricity Power Charge Rate", "[W]", eMSOverridePelIntoStorage_, eMSValuePelIntoStorage_);
     }
 
     if (errorsFound) {
