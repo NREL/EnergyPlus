@@ -3402,7 +3402,6 @@ namespace VariableSpeedCoils {
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-        using ReportSizingManager::ReportSizingOutput;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3534,7 +3533,7 @@ namespace VariableSpeedCoils {
                     if (IndexNum > 0) state.dataPlantChillers.ElectricChiller(IndexNum).NomCap = dScaleCapacity;
                 }
 
-                ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + ":DX:VARIABLESPEED",
+                BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + ":DX:VARIABLESPEED",
                                    VarSpeedCoil(DXCoilNum).Name,
                                    "Recovery unit capacity [W]",
                                    dScaleCapacity);
@@ -5259,7 +5258,7 @@ namespace VariableSpeedCoils {
                 IceThermalStorage::
                     SetIceStoreNormCapacity(VarSpeedCoil(DXCoilNum).StorageType, VarSpeedCoil(DXCoilNum).StorageName, dNormCapacity);
 
-                ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
                                    VarSpeedCoil(DXCoilNum).Name,
                                    "Storage tank capacity [GJ]",
                                    dNormCapacity);
@@ -5279,7 +5278,7 @@ namespace VariableSpeedCoils {
                 WaterThermalTanks::
                     SetTankVolume(VarSpeedCoil(DXCoilNum).StorageType, VarSpeedCoil(DXCoilNum).StorageName, dVolume);
 
-                ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
                                    VarSpeedCoil(DXCoilNum).Name,
                                    "Storage tank volume [m3]",
                                    dVolume);
