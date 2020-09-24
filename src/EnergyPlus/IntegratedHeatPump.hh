@@ -78,11 +78,19 @@ namespace IntegratedHeatPump {
         SHDWHElecHeatOnMode
     };
 
+    enum class IHPStorageType : int
+    {
+        HOTWATER,
+        LIQUIDDESICCANT,
+    };
+
     struct IntegratedHeatPumpData // variable speed coil
     {
         // Members
         std::string Name;    // Name of the  Coil
         std::string IHPtype; // type of coil
+
+        IHPStorageType StorageType; 
 
         std::string SCCoilType; // Numeric Equivalent for SC Coil Type
         std::string SCCoilName;
@@ -124,10 +132,26 @@ namespace IntegratedHeatPump {
         std::string SHDWHWHCoilName;
         int SHDWHWHCoilIndex; // Index to SHDWH coil, water heating part
 
+        std::string LDDehumCoilType; // liquid desiccant dehumidification coil type
+        std::string LDDehumCoilName;
+        int LDDehumCoilIndex; 
+
+        std::string LDRegenCoilType; // liquid desiccant regeneration coil type
+        std::string LDRegenCoilName;
+        int LDRegenCoilIndex; 
+
+        std::string EvapCoolCoilType; // evaporative cooling coil type
+        std::string EvapCoolCoilName;
+        int EvapCoolCoilIndex; 
+
+        std::string SUPHEATTYPE; // supplemental heater type
+
         int AirCoolInletNodeNum; // Node Number of the Air cooling coil Inlet
+        int AirCoolOutletNodeNum; // Node Number of the Air cooling coil Inlet
         int AirHeatInletNodeNum; // Node Number of the Air cooling coil Inlet
         int AirOutletNodeNum;    // Node Number of the Air Outlet
         int WaterInletNodeNum;   // Node Number of the Water Onlet
+        int WaterMiddleNodeNum; // middle node number entering liquid desiccant regeneration coil if any
         int WaterOutletNodeNum;  // Node Number of the Water Outlet
         int WaterTankoutNod;     // water node to monitor the supply water flow amount
 
@@ -141,6 +165,12 @@ namespace IntegratedHeatPump {
         Real64 TambientOverCoolAllow;  //- [C], ambient temperature above which indoor overcooling is allowed
         Real64 TindoorWHHighPriority;  //- [C], indoor temperature above which water heating has the higher priority
         Real64 TambientWHHighPriority; // ambient temperature above which water heating has the higher priority
+        Real64 TlimitSCWH;//temperature limit apply combined sc and wh mode
+        Real64 TlimitSCDWH;             // temperature limit apply scdwh mode
+        Real64 TlimitDWH; // temperature limit apply DWH mode
+        Real64 TregenTarget;//target regeneration temperature
+        Real64 Concen_Set;//salt concentration setting 
+        Real64 Concen_band;//salt concentration deadband
         
         Real64 EnDehumCoilSize; //sizing factor
         Real64 GridCoilSize; // sizing factor
@@ -153,6 +183,7 @@ namespace IntegratedHeatPump {
         Real64 SHDWHWHCoilSize;     // sizing factor
 
         bool bIsEnhanchedDumLastMoment; //whether the last moment dehumidification
+        bool bIsDWHSeparateunit;//whether DWH is a separate unit
 
         Real64 WaterVolSCDWH;
         // limit of water volume before switching from SCDWH to SCWH
@@ -184,6 +215,7 @@ namespace IntegratedHeatPump {
         Real64 MaxCoolAirVolFlow;
         // maximum air volume flow rate for heating mode
         bool IHPCoilsSized; // whether IHP coils have been sized
+        bool LDLoopChecked; //if liquid dessicant loop has been checked 
 
         std::string IDFanName;
         // IHP indoor fan name
@@ -225,11 +257,18 @@ namespace IntegratedHeatPump {
         Real64 EnergySource;
         // total source energy
         Real64 TotalCOP; // total COP
+        Real64 DehumLDMassFlowRate; 
+        Real64 SupHeatRate;//supplemental heating rate
+        Real64 SaltConcentration;//liquid desiccant salt concentration
+        int LDHeatMode; 
+        Real64 TankLDMass;//liquid dessicant mass in storgae tank
+        Real64 TankSaltMass;//salt mass in the tank
 
         // Default Constructor
         IntegratedHeatPumpData()
-            : SCCoilIndex(0), EnDehumCoilIndex(0), SHCoilIndex(0), SCWHCoilIndex(0), DWHCoilIndex(0), SCDWHCoolCoilIndex(0), SCDWHWHCoilIndex(0), SHDWHHeatCoilIndex(0),
-              SHDWHWHCoilIndex(0), AirCoolInletNodeNum(0), AirHeatInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
+            : SCCoilIndex(0), EnDehumCoilIndex(0), SHCoilIndex(0), SCWHCoilIndex(0), DWHCoilIndex(0), SCDWHCoolCoilIndex(0), SCDWHWHCoilIndex(0), SHDWHHeatCoilIndex(0), 
+              GridSCCoilIndex(0), SHDWHWHCoilIndex(0), AirCoolInletNodeNum(0), AirHeatInletNodeNum(0), AirOutletNodeNum(0),
+              WaterInletNodeNum(0), WaterOutletNodeNum(0),
               WaterTankoutNod(0), ModeMatchSCWH(0), MinSpedSCWH(1), MinSpedSCDWH(1), MinSpedSHDWH(1), TindoorOverCoolAllow(0.0),
               TambientOverCoolAllow(0.0), TindoorWHHighPriority(0.0), TambientWHHighPriority(0.0), WaterVolSCDWH(0.0), TimeLimitSHDWH(0.0),
               WHtankType(0), WHtankID(0), LoopNum(0), LoopSideNum(0), IsWHCallAvail(false), CheckWHCall(false), CurMode(IHPOperationMode::IdleMode),
@@ -260,7 +299,22 @@ namespace IntegratedHeatPump {
               SHDWHHeatCoilSize(0.9),
               SHDWHWHCoilSize(0.1),
               EnDehumCoilSize(0.95),
-              GridCoilSize(1.0)
+              GridCoilSize(1.0), 
+              StorageType(IHPStorageType::HOTWATER), 
+              LDDehumCoilIndex(0),
+              LDRegenCoilIndex(0), 
+              EvapCoolCoilIndex(0), 
+              bIsDWHSeparateunit(false), 
+              TlimitSCWH(110.0), // temperature limit apply combined sc and wh mode
+              TlimitSCDWH(150.0),                                 // temperature limit apply scdwh mode
+              TlimitDWH(130.0),                                   // temperature limit apply DWH mode
+              TregenTarget(180.0),                                // target regeneration temperature
+              Concen_Set(0.45),                                  // salt concentration setting
+              Concen_band(0.05),                                 // salt concentration deadband
+              AirCoolOutletNodeNum(0), 
+              DehumLDMassFlowRate(0.0), SupHeatRate(0.0), WaterMiddleNodeNum(0), 
+              LDLoopChecked(false),
+              SaltConcentration(0.0), LDHeatMode(0), TankLDMass(0.0), TankSaltMass(0.0)
         {
         }
     };
@@ -289,6 +343,24 @@ namespace IntegratedHeatPump {
                 bool const bEnhancedDehum = false           // whether it requires enhanced dehumidification
     );
 
+    void SimIHPLiquidStorage(EnergyPlusData &state,
+                int &CompIndex,                // Index for Component name
+                int const CyclingScheme,       // Continuous fan OR cycling compressor
+                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
+                Real64 &HPTimeConstant,        // Heat pump time constant [s]
+                Real64 &FanDelayTime,          // Fan delay time, time delay for the HP's fan to
+                int const CompOp,              // compressor on/off. 0 = off; 1= on
+                Real64 const PartLoadFrac,
+                int const SpeedNum,            // compressor speed number
+                Real64 const SpeedRatio,       // compressor speed ratio
+                Real64 const SensLoad,         // Sensible demand load [W]
+                Real64 const LatentLoad,       // Latent demand load [W]
+                bool const IsCallbyWH,         // whether the call from the water heating loop or air loop, true = from water heating loop
+                bool const FirstHVACIteration, // TRUE if First iteration of simulation
+                Optional<Real64 const> OnOffAirFlowRat = _, // ratio of comp on to comp off air flow rate
+                bool const bEnhancedDehum = false           // whether it requires enhanced dehumidification
+    );
+
     void GetIHPInput(EnergyPlusData &state);
 
     void SizeIHP(EnergyPlusData &state, int const CoilNum);
@@ -300,6 +372,13 @@ namespace IntegratedHeatPump {
     void DecideWorkMode(EnergyPlusData &state, int const DXCoilNum,
                         Real64 const SensLoad,  // Sensible demand load [W]
                         Real64 const LatentLoad // Latent demand load [W]
+    );
+
+    //check liquid desiccant heating call
+    bool CheckLDWHCall(EnergyPlusData &state,
+                        int const DXCoilNum,
+                       Real64 const SensLoad,  // Sensible demand load [W]
+                       Real64 const LatentLoad // Latent demand load [W]
     );
 
     IHPOperationMode GetCurWorkMode(EnergyPlusData &state, int const DXCoilNum);

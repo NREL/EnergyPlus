@@ -103,6 +103,7 @@ namespace EvaporativeCoolers {
     {
         // Members
         std::string EvapCoolerName; // Name of the EvapCooler
+        std::string Name;//name of the EvapCooler
         int EquipIndex;
         int EvapCoolerType;          // Type of the EvapCooler (parameters in DataGlobalConstants.cc
         std::string EvapControlType; // Type of Control for the EvapCooler

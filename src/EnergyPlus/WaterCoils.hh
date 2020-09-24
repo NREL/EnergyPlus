@@ -223,6 +223,7 @@ namespace WaterCoils {
         Real64 DesInletAirHumRat;   // Entering air humidity ratio at design conditions
         Real64 DesTotWaterCoilLoad; // Total heat transfer rate at Design(Watt)
         Real64 DesSenWaterCoilLoad; // Sensible heat transfer rate at Design(Watt)
+        Real64 DesRegenFanPower; 
         // BEGIN calculated parameters for Design Detailed Simple inputs model
         Real64 DesAirMassFlowRate;   // Design Air MassFlow through the WaterCoil [kg/Sec]
         Real64 UACoilTotal;          // Overall external dry UA (W/C)
@@ -233,8 +234,13 @@ namespace WaterCoils {
         Real64 DesOutletAirTemp;     // Leaving air temperature at rating(C)
         Real64 DesOutletAirHumRat;   // Humidity ratio of air leaving at design capacity.
         Real64 DesOutletWaterTemp;   // Temp of Liquid Leaving the Coil at design Capacity
+        Real64 OutdoorAirVolFlowRate; // 
         int HeatExchType;            // Heat exchanger configuration, default to Cross Flow
         int CoolingCoilAnalysisMode; // Mode Of analysis, Simple=1 and Detailed =2
+        int LiqDesiccantAirSource;   // OutdoorAirSource = 1, ZoneAirSource = 2
+        int LiqDesiccantOptMode;     // RegenerationMode = 1, DehumidificationMode = 2; 
+        Real64 DesignSlnDeltaConcentration; // Concentration deltaT for coil sizing 
+        bool UseDesignSlnDeltaConcentration;
         //    Simple= AllWet-AllDry, Detailed= PartWet-PartDry
         Real64 UACoilInternalPerUnitArea; // Internal overall heat transfer coefficient(W/m2 C)
         Real64 UAWetExtPerUnitArea;       // External overall heat transfer coefficient(W/m2 C)
@@ -278,6 +284,7 @@ namespace WaterCoils {
 
         bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
         int DesiccantDehumNum;          // index to desiccant dehumidifier object
+        Real64 DesiccantWaterLoss;      // water loss from the liquid desiccant stream the simulation period
         Real64 DesignWaterDeltaTemp;    // water deltaT for coil sizing [K]
         bool UseDesignWaterDeltaTemp;   // is true, the DesignWaterDeltaTemp is used for sizing coil design water flow rate
         std::string ControllerName;     // controller name used by water coil
@@ -300,17 +307,19 @@ namespace WaterCoils {
               NumOfTubesPerRow(0), EffectiveFinDiam(0.0), TotCoilOutsideSurfArea(0.0), CoilEffectiveInsideDiam(0.0), GeometryCoef1(0.0),
               GeometryCoef2(0.0), DryFinEfficncyCoef(5, 0.0), SatEnthlCurveConstCoef(0.0), SatEnthlCurveSlope(0.0), EnthVsTempCurveAppxSlope(0.0),
               EnthVsTempCurveConst(0.0), MeanWaterTempSaved(0.0), InWaterTempSaved(0.0), OutWaterTempSaved(0.0), SurfAreaWetSaved(0.0),
-              SurfAreaWetFraction(0.0), DesInletWaterTemp(0.0), DesInletSolnConcentration (0.0), DesAirVolFlowRate(0.0), DesInletAirTemp(0.0), DesInletAirHumRat(0.0),
-              DesTotWaterCoilLoad(0.0), DesSenWaterCoilLoad(0.0), DesAirMassFlowRate(0.0), UACoilTotal(0.0), UACoilInternal(0.0), UACoilExternal(0.0),
-              UACoilInternalDes(0.0), UACoilExternalDes(0.0), DesOutletAirTemp(0.0), DesOutletAirHumRat(0.0), DesOutletWaterTemp(0.0),
-              HeatExchType(0), CoolingCoilAnalysisMode(0), UACoilInternalPerUnitArea(0.0), UAWetExtPerUnitArea(0.0), UADryExtPerUnitArea(0.0),
+              SurfAreaWetFraction(0.0), DesInletWaterTemp(0.0), DesInletSolnConcentration (0.0), DesAirVolFlowRate(0.0), DesInletAirTemp(0.0), DesInletAirHumRat(0.0), DesTotWaterCoilLoad(0.0), DesSenWaterCoilLoad(0.0),
+              DesRegenFanPower(0.0), DesAirMassFlowRate(0.0), UACoilTotal(0.0), UACoilInternal(0.0), UACoilExternal(0.0), UACoilInternalDes(0.0),
+              UACoilExternalDes(0.0), DesOutletAirTemp(0.0), DesOutletAirHumRat(0.0), DesOutletWaterTemp(0.0), OutdoorAirVolFlowRate(0.0), HeatExchType(0),
+              CoolingCoilAnalysisMode(0), LiqDesiccantAirSource(0), LiqDesiccantOptMode(0), DesignSlnDeltaConcentration(0.0),
+              UseDesignSlnDeltaConcentration(false), UACoilInternalPerUnitArea(0.0), UAWetExtPerUnitArea(0.0), UADryExtPerUnitArea(0.0),
               SurfAreaWetFractionSaved(0.0), UACoilVariable(0.0), RatioAirSideToWaterSideConvect(1.0), AirSideNominalConvect(0.0),
               LiquidSideNominalConvect(0.0), Control(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
               WaterLoopNum(0), WaterLoopSide(0), WaterLoopBranchNum(0), WaterLoopCompNum(0), CondensateCollectMode(CondensateDiscarded),
               CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false), FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0),
               HdAvVt(1.0), MatlLiqDesiccant(0),
-              DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""),
-              ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false)
+              DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0), 
+              DesiccantWaterLoss(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""),
+              ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false) 
         {
         }
     };

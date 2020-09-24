@@ -117,6 +117,8 @@
     SCDWHWHCoil1,            !- SCDWH Water Heating Coil Name
     SHDWHHeatCoil1,          !- SHDWH Heating Coil Name
     SHDWHWHCoil1,            !- SHDWH Water Heating Coil Name
+	,						 ! - Enhanced dehumidification coil name
+	,						 ! - Grid Response Cooling coil name
     23.0,                    !- Indoor Temperature Limit for SCWH Mode {C}
     28.0,                    !- Ambient Temperature Limit for SCWH Mode {C}
     20.0,                    !- Indoor Temperature above Which WH has Higher Priority {C}
@@ -126,7 +128,16 @@
     3.0,                     !- Maximum Water Flow Volume before Switching from SCDWH to SCWH Mode {m3}
     1,                       !- Minimum Speed Level for SCDWH Mode {dimensionless}
     600,                     !- Maximum Running Time before Allowing Electric Resistance Heat Use during SHDWH Mode {s}
-    1;                       !- Minimum Speed Level for SHDWH Mode {dimensionless}
+    1,                       !- Minimum Speed Level for SHDWH Mode {dimensionless}
+	1.0,                     ! - sizing ratio of space heating coil to space cooling coil
+	1.0,                     !- sizing ratio of dedicated water heating capacity to space cooling coil
+	1.0, 					 !- sizing ratio of combined space cooling and water heating with full condensing - water heating capacity to space cooling coil
+	1.0,                     !- sizing ratio of combined space cooling and water heating with desuperheating - space cooling capacity to space cooling coil
+	0.15,                    !- sizing ratio of combined space cooling and water heating with desuperheating - water heating capacity to space cooling coil
+    1.0,                     !- sizing ratio of combined space heating and water heating with desuperheating - space heating capacity to space cooling coil
+	0.15,                    !- sizing ratio of combined space heating and water heating with desuperheating - water heating capacity to space cooling coil
+	1.0,                     ! - sizing ratio of enhanced dehumidification coil to space cooling coil
+	1.0;                     ! - sizing ratio of grid response cooling coil to space cooling coil
 
 !*********** Heat Pump Water Heater Inputs ***********************
 
@@ -233,6 +244,10 @@
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHPLFFPLR,             !- Part Load Fraction Correlation Curve Name
+	,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
     400.00,                  !- Rated Water Heating Capacity at Speed 1 {W}
     5.0,                     !- Rated Water Heating COP at Speed 1 {W/W}
     0.80,                    !- Rated Sensible Heat Ratio at Speed 1
@@ -376,6 +391,10 @@
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHPLFFPLR,             !- Part Load Fraction Correlation Curve Name
+	,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
     400.00,                  !- Rated Water Heating Capacity at Speed 1 {W}
     5.0,                     !- Rated Water Heating COP at Speed 1 {W/W}
     0.80,                    !- Rated Sensible Heat Ratio at Speed 1
@@ -519,6 +538,10 @@
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHPLFFPLR,             !- Part Load Fraction Correlation Curve Name
+	,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
     400.00,                  !- Rated Water Heating Capacity at Speed 1 {W}
     5.0,                     !- Rated Water Heating COP at Speed 1 {W/W}
     0.80,                    !- Rated Sensible Heat Ratio at Speed 1
@@ -662,6 +685,10 @@
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHPLFFPLR,             !- Part Load Fraction Correlation Curve Name
+	,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
     400.00,                  !- Rated Water Heating Capacity at Speed 1 {W}
     5.0,                     !- Rated Water Heating COP at Speed 1 {W/W}
     0.80,                    !- Rated Sensible Heat Ratio at Speed 1

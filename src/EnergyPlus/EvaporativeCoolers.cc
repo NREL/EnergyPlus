@@ -417,6 +417,7 @@ namespace EvaporativeCoolers {
                                           cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueEvapCondNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             EvapCond(EvapCoolNum).EvapCoolerName = cAlphaArgs(1);
+            EvapCond(EvapCoolNum).Name = cAlphaArgs(1);
             EvapCond(EvapCoolNum).EvapCoolerType = iEvapCoolerInDirectCELDEKPAD; //'EvaporativeCooler:Indirect:CelDekPad'
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
@@ -519,6 +520,7 @@ namespace EvaporativeCoolers {
                                           cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueEvapCondNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             EvapCond(EvapCoolNum).EvapCoolerName = cAlphaArgs(1);
+            EvapCond(EvapCoolNum).Name = cAlphaArgs(1);
             EvapCond(EvapCoolNum).EvapCoolerType = iEvapCoolerInDirectWETCOIL; //'EvaporativeCooler:Indirect:WetCoil'
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
@@ -612,6 +614,7 @@ namespace EvaporativeCoolers {
                                           cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueEvapCondNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             EvapCond(EvapCoolNum).EvapCoolerName = cAlphaArgs(1);
+            EvapCond(EvapCoolNum).Name = cAlphaArgs(1);
             EvapCond(EvapCoolNum).EvapCoolerType = iEvapCoolerInDirectRDDSpecial; //'EvaporativeCooler:Indirect:ResearchSpecial'
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
@@ -753,6 +756,7 @@ namespace EvaporativeCoolers {
                                           cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueEvapCondNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             EvapCond(EvapCoolNum).EvapCoolerName = cAlphaArgs(1);
+            EvapCond(EvapCoolNum).Name = cAlphaArgs(1);
             EvapCond(EvapCoolNum).EvapCoolerType = iEvapCoolerDirectResearchSpecial;
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
