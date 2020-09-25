@@ -3242,6 +3242,13 @@ namespace UnitarySystems {
                                 ZoneInletNodeFound = true;
                                 break;
                             }
+                        } else{
+                            // Inlet Node does not match any Exhaust Nodes
+                            ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                            ShowContinueError("Incorrect or misspelled Air Inlet Node Name = " + loc_AirInNodeName);
+                            ShowContinueError("Node name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections "
+                                              "object inputs.");
+                            errorsFound = true;
                         }
                     }
                     if (!ZoneInletNodeFound) {
@@ -3306,12 +3313,20 @@ namespace UnitarySystems {
                                 break;
                             }
                             if (ZoneEquipmentFound) {
+                                ZoneInletNodeFound = false;
                                 for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
                                      ++ZoneInletNum) {
                                     if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.AirOutNode) continue;
                                     ZoneInletNodeFound = true;
                                     break;
                                 }
+                            } else{
+                                // Inlet Node does not match any Exhaust Nodes
+                                ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                                ShowContinueError("Incorrect or misspelled Air Inlet Node Name = " + loc_AirInNodeName);
+                                ShowContinueError("Node name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections "
+                                                  "object inputs.");
+                                errorsFound = true;
                             }
                         }
                         if (!ZoneInletNodeFound) {
@@ -3382,6 +3397,13 @@ namespace UnitarySystems {
                                     ZoneInletNodeFound = true;
                                     break;
                                 }
+                            } else{
+                                // Inlet Node does not match any Exhaust Nodes
+                                ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                                ShowContinueError("Incorrect or misspelled Air Inlet Node Name = " + loc_AirInNodeName);
+                                ShowContinueError("Node name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections "
+                                                  "object inputs.");
+                                errorsFound = true;
                             }
                         }
                         if (!ZoneInletNodeFound) {
@@ -7301,7 +7323,6 @@ namespace UnitarySystems {
                                                     this->m_FanOpMode,
                                                     this->m_SuppHeatPartLoadFrac);
 
-        } else {
         }
     }
 
