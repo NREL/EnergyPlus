@@ -23,6 +23,8 @@
 
 message("PYTHON: Fixing up Python Dependencies on Mac")
 
+include(GetPrerequisites)
+
 # message("ENERGYPLUS API DYNAMIC LIB NAME: ${EPLUS_DYNAMIC_LIB_NAME}")
 # message("RESOLVED PYTHON LIB: ${RESOLVED_PYTHON_LIB}")
 
@@ -39,7 +41,6 @@ execute_process(COMMAND "chmod" "+w" "${LOCAL_PYTHON_LIBRARY}")
 execute_process(COMMAND "install_name_tool" -id "@executable_path/${PYTHON_LIB_FILENAME}" "${LOCAL_PYTHON_LIBRARY}")
 
 # changing the libpythonwrapper Python prereq is a bit funny - we should search to get the exact string original
-include(GetPrerequisites)
 get_prerequisites("${ENERGYPLUS_API_PATH}" PREREQUISITES 1 1 "" "")
 foreach(PREREQ IN LISTS PREREQUISITES)
     string(FIND "${PREREQ}" "${PYTHON_LIB_FILENAME}" PYTHON_IN_PREREQ)
@@ -54,5 +55,15 @@ foreach(PREREQ IN LISTS PREREQUISITES)
     string(FIND "${PREREQ}" "${PYTHON_LIB_FILENAME}" PYTHON_IN_PREREQ)
     if (NOT PYTHON_IN_PREREQ EQUAL -1)
         execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@executable_path/${PYTHON_LIB_FILENAME}" "${EXECUTABLE_PATH}")
+    endif()
+endforeach()
+
+# and the python library itself may depend on a gettext lib on github action apparently
+get_prerequisites("${LOCAL_PYTHON_LIBRARY}" PREREQUISITES 1 1 "" "")
+foreach(PREREQ IN LISTS PREREQUISITES)
+    string(FIND "${PREREQ}" "libint" LIBINT_IN_PREREQ)
+    if (NOT LIBINT_IN_PREREQ EQUAL -1)
+        get_filename_component(LIB_INT_FILENAME ${PREREQ} NAME)
+        execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@loader_path/${LIB_INT_FILENAME}" "${ENERGYPLUS_API_PATH}")
     endif()
 endforeach()
