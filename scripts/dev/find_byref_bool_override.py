@@ -44,10 +44,7 @@ EXPECT_MISSING_HEADER = ['src/EnergyPlus/main.cc',
                          'src/EnergyPlus/test_ep_as_library.cc',
                          'EnergyPlusPgm.cc']
 
-EXPECT_MISSING_NAMESPACE = [
-    'src/EnergyPlus/PythonLibWrapper.cc',
-    'src/EnergyPlus/PythonLibWrapper.hh'
-]
+EXPECT_MISSING_NAMESPACE = []
 
 # Finds a boolean argument passed by reference
 # Optional_bool acts like one, Array_XD_bool is another possibility

@@ -779,6 +779,9 @@ endif()
 if (WIN32)
   target_link_libraries( energypluslib Shlwapi )
 endif()
+if(LINK_WITH_PYTHON)
+  target_link_libraries( energypluslib ${PYTHON_LIBRARIES} )
+endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
 SET( API_HEADERS
@@ -825,21 +828,6 @@ install( TARGETS energyplusapi
   LIBRARY DESTINATION ./
   ARCHIVE DESTINATION ./
 )
-
-# we will build the intermediate wrapper DLL that hard links to Python DLL here
-if(LINK_WITH_PYTHON)
-  add_library( pythonwrapper SHARED
-          PythonLibWrapper.cc
-          PythonLibWrapper.hh
-          )
-  target_link_libraries( pythonwrapper ${PYTHON_LIBRARIES} )
-  add_dependencies( energyplusapi pythonwrapper)
-  install( TARGETS pythonwrapper
-          RUNTIME DESTINATION ./
-          LIBRARY DESTINATION ./
-          ARCHIVE DESTINATION ./
-          )
-endif()
 
 # now the actual E+ executable
 if (APPLE OR UNIX)

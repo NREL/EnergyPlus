@@ -7,13 +7,9 @@
 #  it will need to be changed to look for the api lib at @executable_path/libenergyplusapi.X.Y.Z.dylib
 #  this is handled separately
 # libenergyplusapi, the dynamic library
-#  now that we have detached the python dynamic lib into a lazy load, this won't have anything to change, w00t!
-# libpythonwrapper, the python wrapper/interface
-#  this library was added to detach energyplus from a hard dependency on the python dylib, and e+ now instead lazy loads this interface
-#  this wrapper depends on the core python dll at /some/path/to/Python.framework/Versions/3.7/{SomePythonLibName}
+#  this depends on the core python dll at /some/path/to/Python.framework/Versions/3.7/{SomePythonLibName}
 #  we are packing up the python lib with E+, so it just needs to look for it at @executable_path/{SomePythonLibName}
-#  we also change the -id from @rpath/libpythonwrapper to @executable_path/libpythonwrapper
-# Python, the actual python library
+# Python, or libpython3.7m.dylib, or whatever - the actual python library
 #  this is the main python dynamic library that we distribute with e+
 #  we just need to change the -id from /some/path/to/Python.framework/Versions/3.7/{SomePythonLibName} to @executable_path/{SomePythonLibName}
 
