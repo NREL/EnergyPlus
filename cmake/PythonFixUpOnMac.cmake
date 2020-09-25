@@ -44,7 +44,7 @@ get_prerequisites("${ENERGYPLUS_API_PATH}" PREREQUISITES 1 1 "" "")
 foreach(PREREQ IN LISTS PREREQUISITES)
     string(FIND "${PREREQ}" "${PYTHON_LIB_FILENAME}" PYTHON_IN_PREREQ)
     if (NOT PYTHON_IN_PREREQ EQUAL -1)
-        execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@executable_path/${PYTHON_LIB_FILENAME}" "${ENERGYPLUS_API_PATH}")
+        execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@loader_path/${PYTHON_LIB_FILENAME}" "${ENERGYPLUS_API_PATH}")
     endif()
 endforeach()
 
