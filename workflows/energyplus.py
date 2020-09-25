@@ -190,11 +190,13 @@ class EPlusRunManager(object):
                 # *.eso back to eplusout.eso
                 eso_path = os.path.join(run_directory, file_name_no_ext + '.eso')
                 eplusouteso_path = os.path.join(run_directory, 'eplusout.eso')
-                shutil.copy(eso_path, eplusouteso_path)
+                if os.path.exists(eso_path):
+                		shutil.copy(eso_path, eplusouteso_path)
                 # *.mtr back to eplusout.mtr
                 mtr_path = os.path.join(run_directory, file_name_no_ext + '.mtr')
                 eplusoutmtr_path = os.path.join(run_directory, 'eplusout.mtr')
-                shutil.copy(mtr_path, eplusoutmtr_path)
+                if os.path.exists(mtr_path):
+                		shutil.copy(mtr_path, eplusoutmtr_path)
 
                 if isIP:
                     # run the ConvertESOMTR program to create IP versions of the timestep based output files
