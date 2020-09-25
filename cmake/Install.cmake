@@ -232,7 +232,7 @@ else()
   set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}${SYSTEM_VERSION}-${TARGET_ARCH}-${CMAKE_BUILD_TYPE}")
 endif()
 
-message("Installer name is set to '${CPACK_PACKAGE_FILE_NAME}'")
+# message("Installer name is set to '${CPACK_PACKAGE_FILE_NAME}'")
 
 # Installation directory on the target system (common to all CPack Genrators)
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}")

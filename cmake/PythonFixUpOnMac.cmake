@@ -18,32 +18,29 @@
 #   EXECUTABLE_PATH points to the current energyplus executable, and
 #   RESOLVED_PYTHON_LIB points to the Python dynamic library
 
-message("Fixing up Python Dependencies on Mac")
-# message("RESOLVED PYTHON LIB: ${RESOLVED_PYTHON_LIB}")
+message("PYTHON: Fixing up Python Dependencies on Mac")
+
+message("ENERGYPLUS API DYNAMIC LIB NAME: ${EPLUS_DYNAMIC_LIB_NAME}")
+message("RESOLVED PYTHON LIB: ${RESOLVED_PYTHON_LIB}")
 
 # get the python lib filename
 get_filename_component(PYTHON_LIB_FILENAME ${RESOLVED_PYTHON_LIB} NAME)
-set(WRAPPER_FILE_NAME "libpythonwrapper.dylib")
 
 # derive a few paths from the args passed in
 get_filename_component(BASE_PATH ${EXECUTABLE_PATH} DIRECTORY)
 set(LOCAL_PYTHON_LIBRARY "${BASE_PATH}/${PYTHON_LIB_FILENAME}")
-set(PYTHON_WRAPPER_PATH "${BASE_PATH}/${WRAPPER_FILE_NAME}")
-
-# message("LOCAL PYTHON LIBRARY: ${LOCAL_PYTHON_LIBRARY}")
-# message("PYTHON WRAPPER PATH: ${PYTHON_WRAPPER_PATH}")
+set(ENERGYPLUS_API_PATH "${BASE_PATH}/${EPLUS_DYNAMIC_LIB_NAME}")
 
 # now just fix up the pieces we need to fix up
 execute_process(COMMAND "chmod" "+w" "${LOCAL_PYTHON_LIBRARY}")
 execute_process(COMMAND "install_name_tool" -id "@executable_path/${PYTHON_LIB_FILENAME}" "${LOCAL_PYTHON_LIBRARY}")
-execute_process(COMMAND "install_name_tool" -id "@executable_path/${WRAPPER_FILE_NAME}" "${PYTHON_WRAPPER_PATH}")
 
 # changing the libpythonwrapper Python prereq is a bit funny - we should search to get the exact string original
 include(GetPrerequisites)
-get_prerequisites("${PYTHON_WRAPPER_PATH}" PREREQUISITES 1 1 "" "")
+get_prerequisites("${ENERGYPLUS_API_PATH}" PREREQUISITES 1 1 "" "")
 foreach(PREREQ IN LISTS PREREQUISITES)
     string(FIND "${PREREQ}" "${PYTHON_LIB_FILENAME}" PYTHON_IN_PREREQ)
     if (NOT PYTHON_IN_PREREQ EQUAL -1)
-        execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@executable_path/${PYTHON_LIB_FILENAME}" "${PYTHON_WRAPPER_PATH}")
+        execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@executable_path/${PYTHON_LIB_FILENAME}" "${ENERGYPLUS_API_PATH}")
     endif()
 endforeach()
