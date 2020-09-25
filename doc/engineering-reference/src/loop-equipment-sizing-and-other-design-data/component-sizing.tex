@@ -649,7 +649,6 @@ Where:
   \(\dot{Q}_{fan,heat,des}\) : is the design fan heat (W) - see Section \ref{design-fan-heat}
 \end{itemize}
 
-
 \subsection{Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit Sizing}\label{coilcoolingwatertoairheatpumpvariablespeedequationfit-sizing}
 
 For the cooling coil of VS WSHP, we specify a nominal speed level. During the sizing calculation, the Rated Air Volume Flow Rate, the Rated Water Volume Flow Rate and the Rated Total Cooling Capacity at the Selected Nominal Speed Level are determined in the same way as the \emph{Coil:Cooling:WaterToAirHeatPump:EquationFit} object. The sensible heat transfer rate is not allowed for auto-sizing, instead, it is a function of the rated air and water flow rates, rated total cooling capacity and the Reference Unit SHR at the nominal speed level. The default nominal speed level is the highest speed. However, the model allows the user to select a nominal speed level rather than the highest.
@@ -717,102 +716,9 @@ The calculation is identical to that done for \emph{Coil:Cooling:Water}.
 
 The calculation is identical to that done for \emph{Coil:Cooling:Water} , which is the coil design load divided by the \emph{Loop Design Temperature Difference} user input from \emph{Sizing:Plant.} For sizing the plant loop serving this coil, only one half of this flow rate is used since both the cooling and heating coil will save a flow rate but only one of these coils will operate at a time.
 
-%\subsubsection{Rated Total Heating Capacity}\label{rated-total-heating-capacity}
-
-%The rated total heating capacity is set equal to the rated total cooling capacity.
-
 \subsubsection{Rated Total Heating Capacity}\label{rated-total-heating-capacity}
 
-The following calculations are performed to determine the rated total heating capacity.
-
-\begin{equation}
-TotHeatCapTempModFac = THCC1 + THCC2\left( {{T_{DB,ratio}}} \right) + THCC3\left( {{T_{S,ratio}}} \right) + THCC4 + THCC5
-\end{equation}
-
-where:
-
-THCC1 = user input for Total Heating Cooling Capacity Coefficient 1
-
-THCC2 = user input for Total Heating Cooling Capacity Coefficient 2
-
-THCC3 = user input for Total Heating Cooling Capacity Coefficient 3
-
-THCC4 = user input for Total Heating Cooling Capacity Coefficient 4
-
-THCC5 = user input for Total Heating Cooling Capacity Coefficient 5
-
-
-The 4\(^{th}\) and 5\(^{th}\) coefficient (THCC4 and THCC5) used in the above equation are multipliers for the load-side and source-side flow ratios, respectively. For sizing, these ratios are assumed to be 1.
-
-and,
-\begin{equation}
-  T_{DB,ratio} = \frac{T_{DB,air,in,des}+273.15C}{283.15C}
-\end{equation}
-
-\begin{equation}
-  T_{S,ratio} = \frac{29.44C+273.15C}{283.15C}
-\end{equation}
-
-where:
- 
-$T_{DB,ratio} = $ ratio of load-side inlet air dry-bulb temperature in Kelvin to a reference temperature
-
-%$T_{WB,ratio} = $ ratio of load-side inlet air wet-bulb temperature in Kelvin to a reference temperature
-
-$T_{S,ratio} = $ ratio of source-side inlet water temperature in Kelvin to a reference temperature
-
-
-\begin{equation}
-  {Rated Total Heating Capacity}   = \frac{Load Side Total Heat Transfer Rate}{TotHeatCapTempModFac} 
-\end{equation}
-
-
-\subsubsection{Rated Heating Power Consumption}\label{rated-heating-power-consumption}
-
-The following calculations are performed to determine the rated heating power consumption.
-
-\begin{equation}
-	HeatPowCoeffModFac = HPC1 + HPC2 \left(T_{DB,ratio} \right)+ HPC3 \left(T_{S,ratio} \right)+ HPC4+ HPC5
-\end{equation}
-
-where:
-
-HPC1 = user input for Heating Power Consumption Coefficient 1
-
-HPC2 = user input for Heating Power Consumption Coefficient 2
-
-HPC3 = user input for Heating Power Consumption Coefficient 3
-
-HPC4 = user input for Heating Power Consumption Coefficient 4
-
-HPC5 = user input for Heating Power Consumption Coefficient 5
-
-
-The 4\(^{th}\) and 5\(^{th}\) coefficient (HPC4 and HPC5) used in the above equation are multipliers for the load-side and source-side flow ratios, respectively. For sizing, these ratios are assumed to be 1.
-
-and, 
-
-\begin{equation}
-  T_{DB,ratio} = \frac{T_{DB,air,in,des}+273.15C}{283.15C}
-\end{equation}
-
-\begin{equation}
-  T_{S,ratio} = \frac{29.44C+273.15C}{283.15C}
-\end{equation}
-
-where:
- 
-$T_{DB,ratio} = $ ratio of load-side inlet air dry-bulb temperature in Kelvin to a reference temperature
-
-$T_{S,ratio} = $ ratio of source-side inlet water temperature in Kelvin to a reference temperature
-
-\begin{equation}
-   {Rated Heating Power Input} = \frac{{W}_{input}}{HeatPowCoeffModFac} 
-\end{equation}
-
-where:
-
-${W}_{input} =$ Power consumption, \si{W}
+The rated total heating capacity is set equal to the rated total cooling capacity.
 
 \subsection{Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit Sizing}\label{coilheatingwatertoairheatpumpvariablespeedequationfit-sizing}
 
