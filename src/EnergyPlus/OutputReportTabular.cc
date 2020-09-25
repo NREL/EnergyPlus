@@ -3592,7 +3592,7 @@ namespace OutputReportTabular {
         // create a file to hold the results
         // Use a CSV file if comma seperated but otherwise use TXT file
         // extension.
-        if (WriteTabularFiles) {
+        if (WriteTabularFiles && ioFiles.outputControl.tabular) {
             for (iStyle = 1; iStyle <= numStyles; ++iStyle) {
                 curDel = del(iStyle);
                 if (TableStyle(iStyle) == tableStyleComma) {
