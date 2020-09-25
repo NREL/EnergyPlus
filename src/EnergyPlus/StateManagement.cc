@@ -49,6 +49,7 @@
 
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -118,13 +119,11 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
-#include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
+#include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACManager.hh>
@@ -138,6 +137,8 @@
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -169,8 +170,8 @@
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
-#include <EnergyPlus/Photovoltaics.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
+#include <EnergyPlus/Photovoltaics.hh>
 #include <EnergyPlus/PipeHeatTransfer.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -179,8 +180,8 @@
 #include <EnergyPlus/PlantComponentTemperatureSources.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
-#include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
+#include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -195,7 +196,6 @@
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ResultsFramework.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
@@ -229,8 +229,8 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
-#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 #include <EnergyPlus/WaterToAirHeatPump.hh>
+#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindTurbine.hh>
 
@@ -241,6 +241,7 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     // then clear any other remaining global state, the number of these here will reduce over time
     using namespace EnergyPlus;
     // A to Z order
+    autosizing_clear_state();
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
     dataAirflowNetworkBalanceManager.clear_state();
@@ -338,7 +339,8 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HybridModel::clear_state();
     HybridUnitaryAirConditioners::clear_state();
     HysteresisPhaseChange::clear_state();
-    //EnergyPlus::inputProcessor->clear_state(); this is done by the unit test fixture, other reset approaches (API) should just get an entirely new inputprocessor instance
+    // EnergyPlus::inputProcessor->clear_state(); this is done by the unit test fixture, other reset approaches (API) should just get an entirely new
+    // inputprocessor instance
     IceThermalStorage::clear_state();
     IntegratedHeatPump::clear_state();
     InternalHeatGains::clear_state();
@@ -383,7 +385,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PVWatts::clear_state();
     clearCoilSelectionReportObj(); // ReportCoilSelection
     RefrigeratedCase::clear_state();
-    ReportSizingManager::clear_state();
     ReturnAirPathManager::clear_state();
     RoomAirModelAirflowNetwork::clear_state();
     RoomAirModelManager::clear_state();
