@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -75,7 +76,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -366,12 +366,8 @@ namespace Boilers {
                             "BOILERS",
                             _,
                             "Plant");
-        SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
-                            OutputProcessor::Unit::W,
-                            this->FuelUsed,
-                            "System",
-                            "Average",
-                            this->Name);
+        SetupOutputVariable(
+            "Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate", OutputProcessor::Unit::W, this->FuelUsed, "System", "Average", this->Name);
         SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Energy",
                             OutputProcessor::Unit::J,
                             this->FuelConsumed,
@@ -575,21 +571,21 @@ namespace Boilers {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = tmpNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("Boiler:HotWater", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput("Boiler:HotWater", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("Boiler:HotWater", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput("Boiler:HotWater", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                 } else { // Hard-sized with sizing data
                     if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
                         Real64 const NomCapUser = this->NomCap; // Hardsized nominal capacity for reporting
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("Boiler:HotWater",
-                                                                    this->Name,
-                                                                    "Design Size Nominal Capacity [W]",
-                                                                    tmpNomCap,
-                                                                    "User-Specified Nominal Capacity [W]",
-                                                                    NomCapUser);
+                            BaseSizer::reportSizerOutput("Boiler:HotWater",
+                                                         this->Name,
+                                                         "Design Size Nominal Capacity [W]",
+                                                         tmpNomCap,
+                                                         "User-Specified Nominal Capacity [W]",
+                                                         NomCapUser);
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeBoilerHotWater: Potential issue with equipment sizing for " + this->Name);
@@ -611,7 +607,7 @@ namespace Boilers {
                 ErrorsFound = true;
             }
             if (!this->NomCapWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->NomCap > 0.0)) { // Hard-sized with no sizing data
-                ReportSizingManager::ReportSizingOutput("Boiler:HotWater", this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
+                BaseSizer::reportSizerOutput("Boiler:HotWater", this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
             }
         }
 
@@ -625,23 +621,23 @@ namespace Boilers {
                 if (this->VolFlowRateWasAutoSized) {
                     this->VolFlowRate = tmpBoilerVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "Boiler:HotWater", this->Name, "Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "Boiler:HotWater", this->Name, "Initial Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate);
                     }
                 } else {
                     if (this->VolFlowRate > 0.0 && tmpBoilerVolFlowRate > 0.0) {
                         Real64 VolFlowRateUser = this->VolFlowRate; // Hardsized volume flow for reporting
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("Boiler:HotWater",
-                                                                    this->Name,
-                                                                    "Design Size Design Water Flow Rate [m3/s]",
-                                                                    tmpBoilerVolFlowRate,
-                                                                    "User-Specified Design Water Flow Rate [m3/s]",
-                                                                    VolFlowRateUser);
+                            BaseSizer::reportSizerOutput("Boiler:HotWater",
+                                                         this->Name,
+                                                         "Design Size Design Water Flow Rate [m3/s]",
+                                                         tmpBoilerVolFlowRate,
+                                                         "User-Specified Design Water Flow Rate [m3/s]",
+                                                         VolFlowRateUser);
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpBoilerVolFlowRate - VolFlowRateUser) / VolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeBoilerHotWater: Potential issue with equipment sizing for " + this->Name);
@@ -666,8 +662,7 @@ namespace Boilers {
             }
             if (!this->VolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport &&
                 (this->VolFlowRate > 0.0)) { // Hard-sized with no sizing data
-                ReportSizingManager::ReportSizingOutput(
-                    "Boiler:HotWater", this->Name, "User-Specified Design Water Flow Rate [m3/s]", this->VolFlowRate);
+                BaseSizer::reportSizerOutput("Boiler:HotWater", this->Name, "User-Specified Design Water Flow Rate [m3/s]", this->VolFlowRate);
             }
         }
 
@@ -723,7 +718,7 @@ namespace Boilers {
         Real64 BoilerNomCap = this->NomCap;                         // W - boiler nominal capacity
         Real64 const BoilerMaxPLR = this->MaxPartLoadRat;           // boiler maximum part load ratio
         Real64 const BoilerMinPLR = this->MinPartLoadRat;           // boiler minimum part load ratio
-        Real64 BoilerNomEff = this->NomEffic;                             // boiler efficiency
+        Real64 BoilerNomEff = this->NomEffic;                       // boiler efficiency
         Real64 const TempUpLimitBout = this->TempUpLimitBoilerOut;  // C - boiler high temperature limit
         Real64 const BoilerMassFlowRateMax = this->DesMassFlowRate; // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
 
@@ -825,7 +820,7 @@ namespace Boilers {
 
         // calculate theoretical fuel use based on nominal thermal efficiency
         Real64 const TheorFuelUse = this->BoilerLoad / BoilerNomEff; // Theoretical (stoichiometric) fuel use
-        Real64 EffCurveOutput = 1.0;                              // Output of boiler efficiency curve
+        Real64 EffCurveOutput = 1.0;                                 // Output of boiler efficiency curve
 
         // calculate normalized efficiency based on curve object type
         if (this->EfficiencyCurvePtr > 0) {

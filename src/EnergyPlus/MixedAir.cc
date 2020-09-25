@@ -55,6 +55,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -99,7 +100,6 @@
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -2021,10 +2021,9 @@ namespace MixedAir {
             }
 
             // write to .eio file
-            static constexpr auto Format_700(
-                "!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
-                "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
-                "Name,DSZAD Name");
+            static constexpr auto Format_700("!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
+                                             "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
+                                             "Name,DSZAD Name");
             print(state.files.eio, "{}\n", Format_700);
             for (VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum) {
                 print(state.files.eio,
@@ -4914,7 +4913,6 @@ namespace MixedAir {
         using General::TrimSigDigits;
         using HVACHXAssistedCoolingCoil::GetHXCoilType;
         using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
-        using ReportSizingManager::ReportSizingOutput;
         using WaterCoils::SetCoilDesFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -4983,7 +4981,7 @@ namespace MixedAir {
                 this->MaxOA = 0.0;
             }
 
-            ReportSizingOutput(CurrentModuleObject, this->Name, "Maximum Outdoor Air Flow Rate [m3/s]", this->MaxOA);
+            BaseSizer::reportSizerOutput(CurrentModuleObject, this->Name, "Maximum Outdoor Air Flow Rate [m3/s]", this->MaxOA);
         }
 
         if (this->MinOA == AutoSize) {
@@ -4998,7 +4996,7 @@ namespace MixedAir {
                 }
             }
 
-            ReportSizingOutput(CurrentModuleObject, this->Name, "Minimum Outdoor Air Flow Rate [m3/s]", this->MinOA);
+            BaseSizer::reportSizerOutput(CurrentModuleObject, this->Name, "Minimum Outdoor Air Flow Rate [m3/s]", this->MinOA);
 
             if (this->HumidistatZoneNum > 0 && this->FixedMin) {
                 if (this->MaxOA > 0.0) {
