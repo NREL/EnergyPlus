@@ -3512,7 +3512,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
 
-    GetInputTabularMonthly();
+    GetInputTabularMonthly(state.files);
     EXPECT_EQ(MonthlyInputCount, 1);
     InitializeTabularMonthly();
 
@@ -3587,7 +3587,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
 
-    GetInputOutputTableSummaryReports();
+    GetInputOutputTableSummaryReports(state.files);
 
     extLitUse = 1.01;
 
@@ -3789,7 +3789,7 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 
     DataGlobals::DoWeathSim = true;
 
-    GetInputTabularTimeBins();
+    GetInputTabularTimeBins(state.files);
 
     EXPECT_EQ(OutputReportTabular::OutputTableBinned.size(), 1u);
     EXPECT_EQ(OutputTableBinned(1).keyValue, "SYSTEM1");
@@ -6448,7 +6448,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
 
-    GetInputTabularMonthly();
+    GetInputTabularMonthly(state.files);
     EXPECT_EQ(MonthlyInputCount, 1);
     InitializeTabularMonthly();
 
@@ -7223,7 +7223,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     DataGlobals::DoWeathSim = true; // flag to trick tabular reports to scan meters
 
     OutputProcessor::GetReportVariableInput(state.files);
-    OutputReportTabular::GetInputOutputTableSummaryReports();
+    OutputReportTabular::GetInputOutputTableSummaryReports(state.files);
     OutputReportTabular::InitializeTabularMonthly();
 
     // We check that the Predefined Table is actually set to show
@@ -7909,7 +7909,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
 
-    GetInputOutputTableSummaryReports();
+    GetInputOutputTableSummaryReports(state.files);
 
     DataEnvironment::Month = 12;
 

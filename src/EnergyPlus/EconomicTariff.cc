@@ -2898,6 +2898,11 @@ namespace EconomicTariff {
         Real64 annualAggregate;
         int annualCnt;
 
+        if (!(ioFiles.outputControl.tabular || ioFiles.outputControl.sqlite)) {
+            WriteTabularFiles = false;
+            return;
+        }
+
         hugeValue = HUGE_(Real64());
         //  Clear the isEvaluated flags for all economics variables.
         for (nVar = 1; nVar <= numEconVar; ++nVar) {

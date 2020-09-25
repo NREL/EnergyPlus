@@ -3280,7 +3280,7 @@ namespace OutputProcessor {
         DataGlobals::DoWeathSim = true;
         DataGlobals::TimeStepZone = 0.25;
 
-        OutputReportTabular::GetInputTabularMonthly();
+        OutputReportTabular::GetInputTabularMonthly(state.files);
         EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
         OutputReportTabular::InitializeTabularMonthly();
 
@@ -3337,7 +3337,7 @@ namespace OutputProcessor {
         DataGlobals::DoWeathSim = true;
         DataGlobals::TimeStepZone = 0.25;
 
-        OutputReportTabular::GetInputTabularMonthly();
+        OutputReportTabular::GetInputTabularMonthly(state.files);
         EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
         OutputReportTabular::InitializeTabularMonthly();
 
@@ -5065,7 +5065,7 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
-        OutputReportTabular::GetInputTabularMonthly();
+        OutputReportTabular::GetInputTabularMonthly(state.files);
         OutputReportTabular::InitializeTabularMonthly();
 
         GetReportVariableInput(state.files);
