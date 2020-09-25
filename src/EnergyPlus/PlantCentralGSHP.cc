@@ -54,26 +54,26 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -165,13 +165,13 @@ namespace PlantCentralGSHP {
         this->SizeWrapper();
     }
 
-void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MinLoad = 0.0;
         MaxLoad = 0.0;
         OptLoad = 0.0;
         if (calledFromLocation.loopNum == this->CWLoopNum) { // Chilled water loop
-            if (this->ControlMode == SmartMixing) { // control mode is SmartMixing
+            if (this->ControlMode == SmartMixing) {          // control mode is SmartMixing
                 for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
                     MaxLoad += this->ChillerHeater(NumChillerHeater).RefCapCooling * this->ChillerHeater(NumChillerHeater).MaxPartLoadRatCooling;
                     OptLoad += this->ChillerHeater(NumChillerHeater).RefCapCooling * this->ChillerHeater(NumChillerHeater).OptPartLoadRatCooling;
@@ -194,7 +194,8 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         SizFac = 1.0;
     }
 
-    void WrapperSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
+    void WrapperSpecs::simulate(
+        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
     {
         if (calledFromLocation.loopNum != this->GLHELoopNum) {
 
@@ -284,16 +285,16 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                         if (this->ChillerHeater(NumChillerHeater).EvapVolFlowRateWasAutoSized) {
                             this->ChillerHeater(NumChillerHeater).EvapVolFlowRate = tmpEvapVolFlowRate;
                             if (DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Design Size Reference Chilled Water Flow Rate [m3/s]",
-                                                                        tmpEvapVolFlowRate);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Design Size Reference Chilled Water Flow Rate [m3/s]",
+                                                             tmpEvapVolFlowRate);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Initial Design Size Reference Chilled Water Flow Rate [m3/s]",
-                                                                        tmpEvapVolFlowRate);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Initial Design Size Reference Chilled Water Flow Rate [m3/s]",
+                                                             tmpEvapVolFlowRate);
                             }
                         } else {
                             if (this->ChillerHeater(NumChillerHeater).EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0 &&
@@ -301,12 +302,12 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
 
                                 // Hardsized evaporator design volume flow rate for reporting
                                 Real64 EvapVolFlowRateUser = this->ChillerHeater(NumChillerHeater).EvapVolFlowRate;
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Design Size Reference Chilled Water Flow Rate [m3/s]",
-                                                                        tmpEvapVolFlowRate,
-                                                                        "User-Specified Reference Chilled Water Flow Rate [m3/s]",
-                                                                        EvapVolFlowRateUser);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Design Size Reference Chilled Water Flow Rate [m3/s]",
+                                                             tmpEvapVolFlowRate,
+                                                             "User-Specified Reference Chilled Water Flow Rate [m3/s]",
+                                                             EvapVolFlowRateUser);
                                 tmpEvapVolFlowRate = EvapVolFlowRateUser;
                                 if (DataGlobals::DisplayExtraWarnings) {
                                     if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
@@ -332,11 +333,12 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             ErrorsFound = true;
                         }
                     } else {
-                        if (this->ChillerHeater(NumChillerHeater).EvapVolFlowRate > 0.0 && DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
-                            ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                    this->ChillerHeater(NumChillerHeater).Name,
-                                                                    "User-Specified Reference Chilled Water Flow Rate [m3/s]",
-                                                                    this->ChillerHeater(NumChillerHeater).EvapVolFlowRate);
+                        if (this->ChillerHeater(NumChillerHeater).EvapVolFlowRate > 0.0 && DataPlant::PlantFinalSizesOkayToReport &&
+                            !this->mySizesReported) {
+                            BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                         this->ChillerHeater(NumChillerHeater).Name,
+                                                         "User-Specified Reference Chilled Water Flow Rate [m3/s]",
+                                                         this->ChillerHeater(NumChillerHeater).EvapVolFlowRate);
                         }
                     }
                 }
@@ -377,16 +379,16 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                 this->ChillerHeater(NumChillerHeater).RefCapClgHtg / this->ChillerHeater(NumChillerHeater).RefPowerClgHtg;
 
                             if (DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Design Size Reference Capacity [W]",
-                                                                        tmpNomCap);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Design Size Reference Capacity [W]",
+                                                             tmpNomCap);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Initial Design Size Reference Capacity [W]",
-                                                                        tmpNomCap);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Initial Design Size Reference Capacity [W]",
+                                                             tmpNomCap);
                             }
                         } else {
                             if (this->ChillerHeater(NumChillerHeater).RefCapCooling > 0.0 && tmpNomCap > 0.0 &&
@@ -394,12 +396,12 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
 
                                 // Hardsized nominal capacity cooling power for reporting
                                 Real64 NomCapUser = this->ChillerHeater(NumChillerHeater).RefCapCooling;
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Design Size Reference Capacity [W]",
-                                                                        tmpNomCap,
-                                                                        "User-Specified Reference Capacity [W]",
-                                                                        NomCapUser);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Design Size Reference Capacity [W]",
+                                                             tmpNomCap,
+                                                             "User-Specified Reference Capacity [W]",
+                                                             NomCapUser);
                                 tmpNomCap = NomCapUser;
                                 if (DataGlobals::DisplayExtraWarnings) {
                                     if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
@@ -425,11 +427,12 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             ErrorsFound = true;
                         }
                     } else {
-                        if (this->ChillerHeater(NumChillerHeater).RefCapCooling > 0.0 && DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
-                            ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                    this->ChillerHeater(NumChillerHeater).Name,
-                                                                    "User-Specified Reference Capacity [W]",
-                                                                    this->ChillerHeater(NumChillerHeater).RefCapCooling);
+                        if (this->ChillerHeater(NumChillerHeater).RefCapCooling > 0.0 && DataPlant::PlantFinalSizesOkayToReport &&
+                            !this->mySizesReported) {
+                            BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                         this->ChillerHeater(NumChillerHeater).Name,
+                                                         "User-Specified Reference Capacity [W]",
+                                                         this->ChillerHeater(NumChillerHeater).RefCapCooling);
                         }
                     }
                 }
@@ -463,16 +466,16 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                         if (this->ChillerHeater(NumChillerHeater).CondVolFlowRateWasAutoSized) {
                             this->ChillerHeater(NumChillerHeater).CondVolFlowRate = tmpCondVolFlowRate;
                             if (DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Design Size Reference Condenser Water Flow Rate [m3/s]",
-                                                                        tmpCondVolFlowRate);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Design Size Reference Condenser Water Flow Rate [m3/s]",
+                                                             tmpCondVolFlowRate);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Initial Design Size Reference Condenser Water Flow Rate [m3/s]",
-                                                                        tmpCondVolFlowRate);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Initial Design Size Reference Condenser Water Flow Rate [m3/s]",
+                                                             tmpCondVolFlowRate);
                             }
                         } else {
                             if (this->ChillerHeater(NumChillerHeater).CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0 &&
@@ -480,12 +483,12 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
 
                                 // Hardsized condenser design volume flow rate for reporting
                                 Real64 CondVolFlowRateUser = this->ChillerHeater(NumChillerHeater).CondVolFlowRate;
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Design Size Reference Condenser Water Flow Rate [m3/s]",
-                                                                        tmpCondVolFlowRate,
-                                                                        "User-Specified Reference Condenser Water Flow Rate [m3/s]",
-                                                                        CondVolFlowRateUser);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Design Size Reference Condenser Water Flow Rate [m3/s]",
+                                                             tmpCondVolFlowRate,
+                                                             "User-Specified Reference Condenser Water Flow Rate [m3/s]",
+                                                             CondVolFlowRateUser);
                                 if (DataGlobals::DisplayExtraWarnings) {
                                     if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                         DataSizing::AutoVsHardSizingThreshold) {
@@ -512,11 +515,12 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             ErrorsFound = true;
                         }
                     } else {
-                        if (this->ChillerHeater(NumChillerHeater).CondVolFlowRate > 0.0 && DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
-                            ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                    this->ChillerHeater(NumChillerHeater).Name,
-                                                                    "User-Specified Reference Condenser Water Flow Rate [m3/s]",
-                                                                    this->ChillerHeater(NumChillerHeater).CondVolFlowRate);
+                        if (this->ChillerHeater(NumChillerHeater).CondVolFlowRate > 0.0 && DataPlant::PlantFinalSizesOkayToReport &&
+                            !this->mySizesReported) {
+                            BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                         this->ChillerHeater(NumChillerHeater).Name,
+                                                         "User-Specified Reference Condenser Water Flow Rate [m3/s]",
+                                                         this->ChillerHeater(NumChillerHeater).CondVolFlowRate);
                         }
                     }
                 }
@@ -1079,7 +1083,6 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         int NumNums;                       // Number of elements in the numeric array
         int IOStat;                        // IO Status when calling get input subroutine
         Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
-
 
         DataIPShortCuts::cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
         numChillerHeaters = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
