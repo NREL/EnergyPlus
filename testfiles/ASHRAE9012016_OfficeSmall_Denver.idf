@@ -7655,7 +7655,7 @@
     Core_ZN_Light_Actuator,  !- Name
     Core_ZN_lights,          !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Power Level; !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Core_ZN_Light_EMS_Program,  !- Name
@@ -7692,7 +7692,7 @@
     Perimeter_ZN_1_Light_Actuator,  !- Name
     Perimeter_ZN_1_lights,   !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Power Level; !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_ZN_1_Light_EMS_Program,  !- Name
@@ -7729,7 +7729,7 @@
     Perimeter_ZN_2_Light_Actuator,  !- Name
     Perimeter_ZN_2_lights,   !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Power Level; !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_ZN_2_Light_EMS_Program,  !- Name
@@ -7766,7 +7766,7 @@
     Perimeter_ZN_3_Light_Actuator,  !- Name
     Perimeter_ZN_3_lights,   !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Power Level; !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_ZN_3_Light_EMS_Program,  !- Name
@@ -7803,7 +7803,7 @@
     Perimeter_ZN_4_Light_Actuator,  !- Name
     Perimeter_ZN_4_lights,   !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Power Level; !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_ZN_4_Light_EMS_Program,  !- Name

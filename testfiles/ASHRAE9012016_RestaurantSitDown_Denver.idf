@@ -6801,7 +6801,7 @@
     Dining_Light_Actuator,   !- Name
     Dining_lights,           !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Power Level; !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Dining_Light_EMS_Program,  !- Name
@@ -6838,7 +6838,7 @@
     Kitchen_Light_Actuator,  !- Name
     Kitchen_lights,          !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Power Level; !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Kitchen_Light_EMS_Program,  !- Name

@@ -2357,7 +2357,7 @@ namespace InternalHeatGains {
                                          "[W]",
                                          ZoneGas(Loop).EMSZoneEquipOverrideOn,
                                          ZoneGas(Loop).EMSEquipPower);
-                        SetupEMSInternalVariable("Gas Process Power Design Level", ZoneGas(Loop).Name, "[W]", ZoneGas(Loop).DesignLevel);
+                        SetupEMSInternalVariable("NaturalGas Process Power Design Level", ZoneGas(Loop).Name, "[W]", ZoneGas(Loop).DesignLevel);
                     } // EMS
 
                     if (!ErrorsFound)
