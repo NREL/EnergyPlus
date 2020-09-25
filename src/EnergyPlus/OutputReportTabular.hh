@@ -706,6 +706,8 @@ namespace OutputReportTabular {
     // Functions
     void clear_state();
 
+    std::ofstream & open_tbl_stream(int const iStyle, std::string const & filename, bool output_to_file = true);
+
     void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     //======================================================================================================================
@@ -716,7 +718,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputTabularMonthly(IOFiles & ioFiles);
+    void GetInputTabularMonthly();
 
     int AddMonthlyReport(std::string const &inReportName, int const inNumDigitsShown);
 
@@ -726,7 +728,7 @@ namespace OutputReportTabular {
 
     bool isInvalidAggregationOrder();
 
-    void GetInputTabularTimeBins(IOFiles & ioFiles);
+    void GetInputTabularTimeBins();
 
     bool warningAboutKeyNotFound(int foundIndex, int inObjIndex, std::string const &moduleName);
 
@@ -734,7 +736,7 @@ namespace OutputReportTabular {
 
     int SetUnitsStyleFromString(std::string const &unitStringIn);
 
-    void GetInputOutputTableSummaryReports(IOFiles & ioFiles);
+    void GetInputOutputTableSummaryReports();
 
     bool isCompLoadRepReq();
 
@@ -754,7 +756,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void OpenOutputTabularFile();
+    void OpenOutputTabularFile(IOFiles & ioFiles);
 
     void CloseOutputTabularFile();
 
