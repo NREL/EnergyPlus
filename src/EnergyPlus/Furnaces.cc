@@ -2001,10 +2001,10 @@ namespace Furnaces {
 
             if (UtilityRoutines::SameString(CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED") ||
                 UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE")||
-                UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE:DESICCANTSTORAGE")) {
+                UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:DESICCANTSTORAGEHEATPUMP:AIRSOURCE")) {
                 Furnace(FurnaceNum).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
                 if (UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE") ||
-                    UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE:DESICCANTSTORAGE"))
+                    UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:DESICCANTSTORAGEHEATPUMP:AIRSOURCE"))
                     Furnace(FurnaceNum).bIsIHP = true;
             } else {
                 Furnace(FurnaceNum).CoolingCoilType_Num = GetCoilTypeNum(state, CoolingCoilType, CoolingCoilName, errFlag, PrintMessage);
@@ -2149,7 +2149,7 @@ namespace Furnaces {
                 //  Furnace(FurnaceNum)%DXCoolCoilType = 'COIL:COOLING:DX:VARIABLESPEED'
                 //  Furnace(FurnaceNum)%DXCoolCoilName = CoolingCoilName
                 if (UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE") ||
-                    UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE:DESICCANTSTORAGE"))
+                    UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:DESICCANTSTORAGEHEATPUMP:AIRSOURCE"))
                     Furnace(FurnaceNum).bIsIHP = true;
                 ValidateComponent(CoolingCoilType, CoolingCoilName, IsNotOK, CurrentModuleObject);
 
@@ -2999,10 +2999,10 @@ namespace Furnaces {
 
             if (UtilityRoutines::SameString(HeatingCoilType, "COIL:HEATING:DX:VARIABLESPEED") ||
                 UtilityRoutines::SameString(HeatingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE") ||
-                UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE:DESICCANTSTORAGE")) {
+                UtilityRoutines::SameString(HeatingCoilType, "COILSYSTEM:DESICCANTSTORAGEHEATPUMP:AIRSOURCE")) {
                 Furnace(FurnaceNum).HeatingCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
                 if (UtilityRoutines::SameString(HeatingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE") ||
-                    UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE:DESICCANTSTORAGE"))
+                    UtilityRoutines::SameString(HeatingCoilType, "COILSYSTEM:DESICCANTSTORAGEHEATPUMP:AIRSOURCE"))
                     Furnace(FurnaceNum).bIsIHP = true;
             } else {
                 Furnace(FurnaceNum).HeatingCoilType_Num = GetCoilTypeNum(state, HeatingCoilType, HeatingCoilName, errFlag);
@@ -3080,10 +3080,10 @@ namespace Furnaces {
 
             if (UtilityRoutines::SameString(CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED") ||
                 UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE") ||
-                UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE:DESICCANTSTORAGE")) {
+                UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:DESICCANTSTORAGEHEATPUMP:AIRSOURCE")) {
                 Furnace(FurnaceNum).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
                 if (UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE") ||
-                    UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE:DESICCANTSTORAGE"))
+                    UtilityRoutines::SameString(CoolingCoilType, "COILSYSTEM:DESICCANTSTORAGEHEATPUMP:AIRSOURCE"))
                     Furnace(FurnaceNum).bIsIHP = true;
             }
 

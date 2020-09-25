@@ -418,7 +418,6 @@ namespace EvaporativeCoolers {
                                           cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueEvapCondNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             EvapCond(EvapCoolNum).EvapCoolerName = cAlphaArgs(1);
-            EvapCond(EvapCoolNum).Name = cAlphaArgs(1);
             EvapCond(EvapCoolNum).EvapCoolerType = iEvapCoolerInDirectCELDEKPAD; //'EvaporativeCooler:Indirect:CelDekPad'
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
@@ -521,7 +520,6 @@ namespace EvaporativeCoolers {
                                           cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueEvapCondNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             EvapCond(EvapCoolNum).EvapCoolerName = cAlphaArgs(1);
-            EvapCond(EvapCoolNum).Name = cAlphaArgs(1);
             EvapCond(EvapCoolNum).EvapCoolerType = iEvapCoolerInDirectWETCOIL; //'EvaporativeCooler:Indirect:WetCoil'
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
@@ -615,7 +613,6 @@ namespace EvaporativeCoolers {
                                           cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueEvapCondNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             EvapCond(EvapCoolNum).EvapCoolerName = cAlphaArgs(1);
-            EvapCond(EvapCoolNum).Name = cAlphaArgs(1);
             EvapCond(EvapCoolNum).EvapCoolerType = iEvapCoolerInDirectRDDSpecial; //'EvaporativeCooler:Indirect:ResearchSpecial'
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
@@ -757,7 +754,6 @@ namespace EvaporativeCoolers {
                                           cNumericFieldNames);
             GlobalNames::VerifyUniqueInterObjectName(UniqueEvapCondNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             EvapCond(EvapCoolNum).EvapCoolerName = cAlphaArgs(1);
-            EvapCond(EvapCoolNum).Name = cAlphaArgs(1);
             EvapCond(EvapCoolNum).EvapCoolerType = iEvapCoolerDirectResearchSpecial;
 
             EvapCond(EvapCoolNum).Schedule = cAlphaArgs(2);
@@ -5106,6 +5102,40 @@ namespace EvaporativeCoolers {
         }
 
         return NodeNum;
+    }
+
+    int GetEvapCoolerIndex(EnergyPlusData &state, std::string const &EvapCondName, bool &ErrorsFound)
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Bo Shen
+        //       DATE WRITTEN   Sept 2020
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given EvapCond and returns it coil Index Number
+
+        // Return value
+        int IndexNum; // Index number returned
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichEvapCond;
+
+        if (GetInputEvapComponentsFlag) { // First time subroutine has been entered
+            GetEvapInput(state);
+            GetInputEvapComponentsFlag = false;
+        }
+        WhichEvapCond = UtilityRoutines::FindItemInList(EvapCondName, EvapCond, &EvapConditions::EvapCoolerName, NumEvapCool);
+        if (WhichEvapCond != 0) {
+            IndexNum = WhichEvapCond;
+        } else {
+            ShowSevereError("GetOutletNodeNum: Could not find EvaporativeCooler = \"" + EvapCondName + "\"");
+            ErrorsFound = true;
+            IndexNum = 0;
+        }
+
+        return IndexNum;
+    
     }
 
 } // namespace EvaporativeCoolers

@@ -260,7 +260,7 @@ namespace DataHVACGlobals {
                                         "Coil:Cooling:DX",
                                         "Coil:Cooling:DX:SubcoolReheat",
                                         "Coil:Cooling:DX:CurveFit:Speed",
-                                        "Coil:Dehumidification:LiquidDesiccant"});
+                                        "COIL:LIQUIDDESICCANT:SIMPLE"});
 
     Array1D_string const cCoolingCoilTypes(NumAllCoilTypes,
                                            {"Coil:Cooling:DX:SingleSpeed",
@@ -300,7 +300,7 @@ namespace DataHVACGlobals {
                                             "Coil:Cooling:DX",
                                             "Coil:Cooling:DX:SubcoolReheat",
                                             "Coil:Cooling:DX:CurveFit:Speed",
-                                            "Coil:Dehumidification:LiquidDesiccant"});
+                                            "COIL:LIQUIDDESICCANT:SIMPLE"});
 
     Array1D_string const cHeatingCoilTypes(NumAllCoilTypes,
                                            {"",

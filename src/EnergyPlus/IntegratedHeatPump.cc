@@ -2538,7 +2538,11 @@ namespace IntegratedHeatPump {
         using VariableSpeedCoils::GetCoilIndexVariableSpeed;
         using VariableSpeedCoils::VarSpeedCoil;
         using WaterCoils::WaterCoil;
+        using WaterCoils::GetWaterCoilInput;
+        using WaterCoils::GetWaterCoilIndex;
         using EvaporativeCoolers::EvapCond; 
+        using EvaporativeCoolers::GetEvapInput;
+        using EvaporativeCoolers::GetEvapCoolerIndex; 
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetIHPInput: "); // include trailing blank space
@@ -2580,7 +2584,7 @@ namespace IntegratedHeatPump {
         int ChildCoilIndex(0); // refer to a child coil
 
         NumASIHPs = inputProcessor->getNumObjectsFound("COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE");
-        NumDesIHPs = inputProcessor->getNumObjectsFound("COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE:DESICCANTSTORAGE");
+        NumDesIHPs = inputProcessor->getNumObjectsFound("COILSYSTEM:DESICCANTSTORAGEHEATPUMP:AIRSOURCE");
         DXCoilNum = 0;
 
         if ((NumASIHPs + NumDesIHPs) <= 0) return;
@@ -2593,7 +2597,7 @@ namespace IntegratedHeatPump {
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
-        inputProcessor->getObjectDefMaxArgs("COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE:DESICCANTSTORAGE", 
+        inputProcessor->getObjectDefMaxArgs("COILSYSTEM:DESICCANTSTORAGEHEATPUMP:AIRSOURCE", 
             NumParams, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -3419,8 +3423,8 @@ namespace IntegratedHeatPump {
         }
 
          // Get the data for Liquid desiccant storage IHPs
-        CurrentModuleObject = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE:DESICCANTSTORAGE"; // for reporting
-        sIHPType = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE:DESICCANTSTORAGE";            // for checking
+        CurrentModuleObject = "COILSYSTEM:DESICCANTSTORAGEHEATPUMP:AIRSOURCE"; // for reporting
+        sIHPType = "COILSYSTEM:DESICCANTSTORAGEHEATPUMP:AIRSOURCE";            // for checking
 
         for (CoilCounter = 1; CoilCounter <= NumDesIHPs; ++CoilCounter) {
 
@@ -3484,7 +3488,7 @@ namespace IntegratedHeatPump {
                 }
             }
 
-            if (!lAlphaBlanks(5)) {
+            if (!lAlphaBlanks(4)) {
                 IntegratedHeatPumps(DXCoilNum).DWHCoilType = "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED";
                 IntegratedHeatPumps(DXCoilNum).DWHCoilName = AlphArray(4);
                 Coiltype = IntegratedHeatPumps(DXCoilNum).DWHCoilType;
@@ -3636,8 +3640,10 @@ namespace IntegratedHeatPump {
                     ErrorsFound = true;
                 } else {
                     errFlag = false;
-                    IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex = 
-                        UtilityRoutines::FindItemInList(CoilName, WaterCoil);
+                    IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex =
+                        GetWaterCoilIndex(
+                            IntegratedHeatPumps(DXCoilNum).LDDehumCoilType, 
+                            IntegratedHeatPumps(DXCoilNum).LDDehumCoilName, errFlag); 
                     if (0 == IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex) {
                         ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                         ErrorsFound = true;
@@ -3657,8 +3663,10 @@ namespace IntegratedHeatPump {
                     ErrorsFound = true;
                 } else {
                     errFlag = false;
+
                     IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex = 
-                        UtilityRoutines::FindItemInList(CoilName, WaterCoil);
+                        GetWaterCoilIndex(IntegratedHeatPumps(DXCoilNum).LDRegenCoilType, 
+                            IntegratedHeatPumps(DXCoilNum).LDRegenCoilName, errFlag); 
                     if (0 == IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex) {
                         ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                         ErrorsFound = true;
@@ -3679,7 +3687,8 @@ namespace IntegratedHeatPump {
                 } else {
                     errFlag = false;
                     IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex =
-                        UtilityRoutines::FindItemInList(CoilName, EvapCond);
+                        GetEvapCoolerIndex(state, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName, errFlag); 
+
                     if (0 == IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex) {
                         ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                         ErrorsFound = true;
@@ -4618,7 +4627,7 @@ namespace IntegratedHeatPump {
 
         IntegratedHeatPumps(DXCoilNum).LDLoopChecked = true; 
 
-        if (SensLoad > SmallLoad) {//heating mode no change
+        if ((SensLoad > SmallLoad) || (IntegratedHeatPumps(DXCoilNum).TankLDMass == 0.0)) { // heating mode no change
             bWHCall = false;
         } else {
 
@@ -4668,7 +4677,6 @@ namespace IntegratedHeatPump {
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::TimeStepSys;
         using General::TrimSigDigits;
-        using WaterThermalTanks::GetWaterThermalTankInput;
         using VariableSpeedCoils::IsGridResponsiveMode;
 
         Real64 MyLoad(0.0);
@@ -4695,7 +4703,7 @@ namespace IntegratedHeatPump {
         if (IntegratedHeatPumps(DXCoilNum).WHtankID == 0)  // not initialized yet
         {
             IntegratedHeatPumps(DXCoilNum).IsWHCallAvail = false;
-        } else if (false == IntegratedHeatPumps(DXCoilNum).LDLoopChecked) {
+        } else  {
             Node(IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate =
                 GetWaterVolFlowRateIHP(state, DXCoilNum, 1.0, 1.0, true) * 987.0; // 987.0 water density at 60 C.
             Node(IntegratedHeatPumps(DXCoilNum).WaterOutletNodeNum).Temp = Node(IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).Temp;
@@ -4714,9 +4722,11 @@ namespace IntegratedHeatPump {
 
                 tank.callerLoopNum = 0;
 
-                IntegratedHeatPumps(DXCoilNum).TankLDMass = tank.Mass; 
-                IntegratedHeatPumps(DXCoilNum).TankSaltMass = tank.Mass * 
-                    IntegratedHeatPumps(DXCoilNum).Concen_Set;
+                if (false == IntegratedHeatPumps(DXCoilNum).LDLoopChecked) {//first call log tank and salt mass
+                     IntegratedHeatPumps(DXCoilNum).TankLDMass = tank.Mass; 
+                    IntegratedHeatPumps(DXCoilNum).TankSaltMass = tank.Mass * 
+                        IntegratedHeatPumps(DXCoilNum).Concen_Set;               
+                } 
 
             } else if (tankType == DataPlant::TypeOf_HeatPumpWtrHeaterPumped || tankType == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
 
@@ -4732,9 +4742,11 @@ namespace IntegratedHeatPump {
 
                 tank.callerLoopNum = 0;
 
-                IntegratedHeatPumps(DXCoilNum).TankLDMass = tank.Mass; 
-                IntegratedHeatPumps(DXCoilNum).TankSaltMass = 
-                    tank.Mass * IntegratedHeatPumps(DXCoilNum).Concen_Set;
+                if (false == IntegratedHeatPumps(DXCoilNum).LDLoopChecked) {//first call log tank and salt mass
+                    IntegratedHeatPumps(DXCoilNum).TankLDMass = tank.Mass; 
+                    IntegratedHeatPumps(DXCoilNum).TankSaltMass = 
+                        tank.Mass * IntegratedHeatPumps(DXCoilNum).Concen_Set;                
+                }
             }
         }
 

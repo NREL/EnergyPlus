@@ -978,7 +978,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:Water")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilWaterCooling;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
-                            } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Dehumidification:LiquidDesiccant")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type, "COIL:LIQUIDDESICCANT:SIMPLE")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilLiqDesiccantDehum;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,

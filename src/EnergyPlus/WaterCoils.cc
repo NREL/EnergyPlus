@@ -443,7 +443,7 @@ namespace WaterCoils {
         NumSimpHeat = inputProcessor->getNumObjectsFound("Coil:Heating:Water");
         NumFlatFin = inputProcessor->getNumObjectsFound("Coil:Cooling:Water:DetailedGeometry");
         NumCooling = inputProcessor->getNumObjectsFound("Coil:Cooling:Water");
-        NumLiqDesiccantDehum = inputProcessor->getNumObjectsFound("Coil:Dehumidification:LiquidDesiccant");
+        NumLiqDesiccantDehum = inputProcessor->getNumObjectsFound("COIL:LIQUIDDESICCANT:SIMPLE");
 
         NumWaterCoils = NumSimpHeat + NumFlatFin + NumCooling + NumLiqDesiccantDehum;
 
@@ -464,7 +464,7 @@ namespace WaterCoils {
         inputProcessor->getObjectDefMaxArgs("Coil:Cooling:Water", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Dehumidification:LiquidDesiccant", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs("COIL:LIQUIDDESICCANT:SIMPLE", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -995,7 +995,7 @@ namespace WaterCoils {
             }
         }
 
-        CurrentModuleObject = "Coil:Dehumidification:LiquidDesiccant";
+        CurrentModuleObject = "COIL:LIQUIDDESICCANT:SIMPLE";
         // Get the data for liquid desiccant dehumidification coils.
         for (LiqDesiccantDehumNum = 1; LiqDesiccantDehumNum <= NumLiqDesiccantDehum; ++LiqDesiccantDehumNum) {
 
@@ -6117,7 +6117,7 @@ namespace WaterCoils {
                                                               WaterCoil(CoilNum).MaxWaterVolFlowRate);
                     WaterCoil(CoilNum).reportCoilFinalSizes = false;
                 } else if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_DehumLiqDesiccant) {
-                    coilObjClassName = "Coil:Dehumidification:LiquidDesiccant";
+                    coilObjClassName = "COIL:LIQUIDDESICCANT:SIMPLE";
                     coilSelectionReportObj->setCoilFinalSizes(WaterCoil(CoilNum).Name,
                                                               coilObjClassName,
                                                               WaterCoil(CoilNum).DesWaterCoolingCoilRate,
@@ -7026,7 +7026,7 @@ namespace WaterCoils {
         if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") ||
             UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
             UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water") ||
-            UtilityRoutines::SameString(CoilType, "Coil:Dehumidification:LiquidDesiccant")){
+            UtilityRoutines::SameString(CoilType, "COIL:LIQUIDDESICCANT:SIMPLE")){
             WhichCoil = UtilityRoutines::FindItem(CoilName, WaterCoil);
             if (WhichCoil != 0) {
                 // coil does not specify MaxWaterFlowRate
@@ -7081,7 +7081,7 @@ namespace WaterCoils {
         if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") ||
             UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
             UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water") ||
-            UtilityRoutines::SameString(CoilType, "Coil:Dehumidification:LiquidDesiccant")) {
+            UtilityRoutines::SameString(CoilType, "COIL:LIQUIDDESICCANT:SIMPLE")) {
             WhichCoil = UtilityRoutines::FindItem(CoilName, WaterCoil);
             if (WhichCoil != 0) {
                 NodeNumber = WaterCoil(WhichCoil).AirInletNodeNum;
@@ -7134,7 +7134,7 @@ namespace WaterCoils {
         if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") ||
             UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
             UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water") ||
-            UtilityRoutines::SameString(CoilType, "Coil:Dehumidification:LiquidDesiccant")) {
+            UtilityRoutines::SameString(CoilType, "COIL:LIQUIDDESICCANT:SIMPLE")) {
             WhichCoil = UtilityRoutines::FindItem(CoilName, WaterCoil);
             if (WhichCoil != 0) {
                 NodeNumber = WaterCoil(WhichCoil).AirOutletNodeNum;
@@ -7187,7 +7187,7 @@ namespace WaterCoils {
         if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") ||
             UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
             UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water") ||
-            UtilityRoutines::SameString(CoilType, "Coil:Dehumidification:LiquidDesiccant")) {
+            UtilityRoutines::SameString(CoilType, "COIL:LIQUIDDESICCANT:SIMPLE")) {
             WhichCoil = UtilityRoutines::FindItem(CoilName, WaterCoil);
             if (WhichCoil != 0) {
                 NodeNumber = WaterCoil(WhichCoil).WaterInletNodeNum;
@@ -7239,7 +7239,7 @@ namespace WaterCoils {
         if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") ||
             UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
             UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water") ||
-            UtilityRoutines::SameString(CoilType, "Coil:Dehumidification:LiquidDesiccant")) {
+            UtilityRoutines::SameString(CoilType, "COIL:LIQUIDDESICCANT:SIMPLE")) {
             WhichCoil = UtilityRoutines::FindItem(CoilName, WaterCoil);
             if (WhichCoil != 0) {
                 NodeNumber = WaterCoil(WhichCoil).WaterOutletNodeNum;
@@ -7286,7 +7286,7 @@ namespace WaterCoils {
         if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") ||
             UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
             UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water") ||
-            UtilityRoutines::SameString(CoilType, "Coil:Dehumidification:LiquidDesiccant")) {
+            UtilityRoutines::SameString(CoilType, "COIL:LIQUIDDESICCANT:SIMPLE")) {
             WhichCoil = UtilityRoutines::FindItem(CoilName, WaterCoil);
             if (WhichCoil != 0) {
                 if (WaterCoil(WhichCoil).DesAirVolFlowRate <= 0.0) {
@@ -7483,7 +7483,7 @@ namespace WaterCoils {
                 } else if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_SimpleHeating) {
                     WaterCoilType = "Coil:Heating:Water";
                 } else if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_DehumLiqDesiccant) {
-                    WaterCoilType = "Coil:Dehumidification:LiquidDesiccant";
+                    WaterCoilType = "COIL:LIQUIDDESICCANT:SIMPLE";
                 }
                 
                 EMSSetPointErrorFlag = false;
@@ -7772,7 +7772,7 @@ namespace WaterCoils {
             IndexNum = UtilityRoutines::FindItemInList(CoilName, WaterCoil);
         } else if (CoilType == "COIL:COOLING:WATER:DETAILEDGEOMETRY") {
             IndexNum = UtilityRoutines::FindItemInList(CoilName, WaterCoil);
-        } else if (CoilType == "COIL:DEHUMIDIFICATION:LIQUIDDESICCANT") {
+        } else if (CoilType == "COIL:LIQUIDDESICCANT:SIMPLE") {
             IndexNum = UtilityRoutines::FindItemInList(CoilName, WaterCoil);
         } else {
             IndexNum = 0; 
@@ -7826,7 +7826,7 @@ namespace WaterCoils {
         } else if (CoilType == "COIL:COOLING:WATER:DETAILEDGEOMETRY") {
             IndexNum = UtilityRoutines::FindItemInList(CoilName, WaterCoil);
             Capacity = WaterCoil(IndexNum).DesWaterCoolingCoilRate;
-        } else if (CoilType == "COIL:DEHUMIDIFICATION:LIQUIDDESICCANT") {
+        } else if (CoilType == "COIL:LIQUIDDESICCANT:SIMPLE") {
             IndexNum = UtilityRoutines::FindItemInList(CoilName, WaterCoil);
             Capacity = WaterCoil(IndexNum).DesWaterCoolingCoilRate;
         } else {
@@ -7969,7 +7969,7 @@ namespace WaterCoils {
 
         if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water") ||
             UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
-            UtilityRoutines::SameString(CoilType, "Coil:Dehumidification:LiquidDesiccant")) {
+            UtilityRoutines::SameString(CoilType, "COIL:LIQUIDDESICCANT:SIMPLE")) {
             WhichCoil = UtilityRoutines::FindItem(CoilName, WaterCoil);
             if (WhichCoil != 0) {
                 AvailSchIndex = WaterCoil(WhichCoil).SchedPtr;

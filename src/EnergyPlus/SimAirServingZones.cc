@@ -1206,7 +1206,7 @@ namespace SimAirServingZones {
                                     if (UtilityRoutines::SameString(CompType, "Coil:Cooling:Water:DetailedGeometry") ||
                                         UtilityRoutines::SameString(CompType, "Coil:Heating:Water") ||
                                         UtilityRoutines::SameString(CompType, "Coil:Cooling:Water") ||
-                                        UtilityRoutines::SameString(CompType, "Coil:Dehumidification:LiquidDesiccant")) {
+                                        UtilityRoutines::SameString(CompType, "COIL:LIQUIDDESICCANT:SIMPLE")) {
                                         WaterCoilNodeNum = GetCoilWaterInletNode(
                                             CompType, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, ErrorsFound);
                                         if (WaterCoilNodeNum == ActuatorNodeNum) {
@@ -1299,7 +1299,7 @@ namespace SimAirServingZones {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = WaterCoil_DetailedCool;
                         } else if (componentType == "COIL:COOLING:WATER") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = WaterCoil_Cooling;
-                        } else if (componentType == "COIL:DEHUMIDIFICATION:LIQUIDDESICCANT") {
+                        } else if (componentType == "COIL:LIQUIDDESICCANT:SIMPLE") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = WaterCoil_DehumLiqDesiccant;
                         } else if (componentType == "COIL:HEATING:ELECTRIC") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Coil_ElectricHeat;
@@ -3652,7 +3652,7 @@ namespace SimAirServingZones {
                 if (QActual > 0.0) CoolingActive = true; // determine if coil is ON
                 
                 // stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
-            } else if (SELECT_CASE_var == WaterCoil_DehumLiqDesiccant) { // 'Coil:Dehumidification:LiquidDesiccant'
+            } else if (SELECT_CASE_var == WaterCoil_DehumLiqDesiccant) { // 'COIL:LIQUIDDESICCANT:SIMPLE'
                 SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex, QActual);
                 if (QActual > 0.0) CoolingActive = true; // determine if coil is ON
 
