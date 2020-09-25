@@ -369,16 +369,10 @@ def update_paths_to_be_from_repo_root(issues, repo_root_to_src):
     updated = []
     for issue in issues:
         update = copy.deepcopy(issue)
-        if 'locations' in update:
-            new_locs = []
-            for location in update['locations']:
-                loc = copy.deepcopy(location)
-                if 'file' in location:
-                    loc['file'] = os.path.join(
-                            repo_root_to_src,
-                            location['file'])
-                new_locs.append(loc)
-            update['locations'] = new_locs
+        if 'path' in update:
+            update['path'] = os.path.join(
+                    repo_root_to_src,
+                    update['path'])
         updated.append(update)
     return updated
 
