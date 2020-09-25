@@ -202,6 +202,10 @@
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHPLFFPLR,             !- Part Load Fraction Correlation Curve Name
+	GRIDWINTER,				 ! - grid signal schedule
+	10.0,				 	 ! - Low bound to apply grid responsive control
+	1000.0,                  ! - High bound to apply grid responsive control
+	0.0,                     ! - max speed when apply grid responsive control
     400.00,                  !- Rated Water Heating Capacity at Speed 1 {W}
     5.0,                     !- Rated Water Heating COP at Speed 1 {W/W}
     0.80,                    !- Rated Sensible Heat Ratio at Speed 1
@@ -2197,8 +2201,6 @@
     Mixed Air Node,          !- Air Inlet Node Name
     DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
-  
   Output:Variable,*,Unitary System Fan Part Load Ratio,timestep;
 
   Output:Variable,*,Unitary System Compressor Part Load Ratio,timestep;
@@ -2213,25 +2215,13 @@
 
   Output:Variable,*,Zone Air Humidity Ratio,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
   Output:Variable,*,Heating Coil Heating Energy,timestep;
 
   Output:Variable,*,Heating Coil Heating Rate,timestep;
-  
-  Output:Variable,*,Heating Coil Upper Speed Level,timestep;
-  
-  Output:Variable,*,Cooling Coil Upper Speed Level,timestep;
 
-  Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
-  
-  Output:Variable,*,Water Heater Tank Temperature,timestep;
-  
-  Output:Variable,*,Cooling Coil Water Heating Electric Power,timestep;
-  
-  Output:Variable,*,Water Heater Use Side Mass Flow Rate,timestep;
-
-  Output:Variable,*,Heating Coil Gas Rate,timestep;
+  Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
@@ -2241,9 +2231,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -2253,9 +2243,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   Output:VariableDictionary,Regular;
 
@@ -2268,4 +2258,5 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
+
 
