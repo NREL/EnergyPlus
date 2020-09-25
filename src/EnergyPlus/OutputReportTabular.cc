@@ -897,7 +897,7 @@ namespace OutputReportTabular {
             curTable = AddMonthlyReport(AlphArray(1), int(NumArray(1)));
             for (jField = 2; jField <= NumAlphas; jField += 2) {
                 if (AlphArray(jField).empty()) {
-                    ShowFatalError("Blank report name in Oputput:Table:Monthly");
+                    ShowFatalError("Blank report name in Output:Table:Monthly");
                 }
                 curAggString = AlphArray(jField + 1);
                 // set accumulator values to default as appropriate for aggregation type
@@ -5266,7 +5266,7 @@ namespace OutputReportTabular {
             ZonePreDefRep(iZone).SHGSAnLiteAdd += ZnRpt(iZone).LtsTotGain * mult * timeStepRatio;
             // HVAC Input Sensible Air Heating
             // HVAC Input Sensible Air Cooling
-            Real64 ZoneEqHeatorCool = 
+            Real64 ZoneEqHeatorCool =
                 ZnAirRpt(iZone).SumMCpDTsystem + ZnAirRpt(iZone).SumNonAirSystem * mult - ATUHeat(iZone) - ATUCool(iZone);
             if (ZoneEqHeatorCool > 0.0) {
                 ZonePreDefRep(iZone).SHGSAnZoneEqHt += ZoneEqHeatorCool * TimeStepSys * SecInHour;
@@ -5350,7 +5350,7 @@ namespace OutputReportTabular {
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             // ZonePreDefRep variables above already inlude zone list and group multipliers
             total = ZonePreDefRep(iZone).SHGSAnPeoplAdd + ZonePreDefRep(iZone).SHGSAnLiteAdd + ZonePreDefRep(iZone).SHGSAnZoneEqHt +
-                    ZonePreDefRep(iZone).SHGSAnZoneEqCl + ZonePreDefRep(iZone).SHGSAnHvacATUHt + ZonePreDefRep(iZone).SHGSAnHvacATUCl + 
+                    ZonePreDefRep(iZone).SHGSAnZoneEqCl + ZonePreDefRep(iZone).SHGSAnHvacATUHt + ZonePreDefRep(iZone).SHGSAnHvacATUCl +
                     ZonePreDefRep(iZone).SHGSAnIzaAdd + ZonePreDefRep(iZone).SHGSAnIzaRem +
                     ZonePreDefRep(iZone).SHGSAnWindAdd + ZonePreDefRep(iZone).SHGSAnWindRem + ZonePreDefRep(iZone).SHGSAnInfilAdd +
                     ZonePreDefRep(iZone).SHGSAnInfilRem + ZonePreDefRep(iZone).SHGSAnEquipAdd + ZonePreDefRep(iZone).SHGSAnEquipRem +

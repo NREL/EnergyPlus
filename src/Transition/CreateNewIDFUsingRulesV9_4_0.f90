@@ -448,6 +448,26 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with E, insert the rules here
 
+             CASE('ENERGYMANAGEMENTSYSTEM:ACTUATOR')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.true.
+                  OutArgs(1:4)=InArgs(1:4)
+                  IF (MakeUPPERCase(InArgs(4)).eq.'ELECTRIC POWER LEVEL') THEN
+                    OutArgs(4)='Electricity Rate'
+                  END IF
+
+                  IF (MakeUPPERCase(InArgs(4)).eq.'GAS POWER LEVEL') THEN
+                    OutArgs(4)='NaturalGas Rate'
+                  END IF
+
+                  IF (MakeUPPERCase(InArgs(4)).eq.'ELECTRIC POWER DRAW RATE') THEN
+                    OutArgs(4)='Draw Electricity Rate'
+                  END IF
+
+                  IF (MakeUPPERCase(InArgs(4)).eq.'ELECTRIC POWER CHARGE RATE') THEN
+                    OutArgs(4)='Charge Electricity Rate'
+                  END IF
+
               ! If your original object starts with F, insert the rules here
 
               ! If your original object starts with G, insert the rules here
@@ -725,6 +745,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   UCRepVarName=MakeUPPERCase(InArgs(Var))
                   OutArgs(CurVar)=InArgs(Var)
                   OutArgs(CurVar+1)=InArgs(Var+1)
+
+                  ! May still need some logic here for this
+                  ! CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(CurVar), NoDiff)
                   pos=INDEX(UCRepVarName,'[')
                   IF (pos > 0) THEN
                     UCRepVarName=UCRepVarName(1:pos-1)

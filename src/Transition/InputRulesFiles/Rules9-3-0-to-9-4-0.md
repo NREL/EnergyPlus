@@ -146,3 +146,15 @@ Field: Fuel Type (or similar)
 
 "Fuel Oil No 1" 
 "Fuel Oil No 2" 
+
+### EnergyManagementSystem:Actuator Actuated Component Control Type
+
+| Component Type     | Component Control Type (v9.3) | Component Control Type (v9.4) |
+|--------------------|-------------------------------|-------------------------------|
+| Lights             | Electric Power Level          | Electricity Rate              |
+| ElectricEquipment  | Electric Power Level          | Electricity Rate              |
+| GasEquipment       | Gas Power Level               | NaturalGas Rate               |
+| Electrical Storage | Electricity Power Draw Rate   | Draw Electricity Rate         |
+| Electrical Storage | Electricity Power Charge Rate | Charge Electricity Rate       |
+ 
+See [8301](https://github.com/NREL/EnergyPlus/pull/8304)
