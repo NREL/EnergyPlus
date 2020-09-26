@@ -11,7 +11,7 @@ env:
 
 jobs:
   mac_release:
-    runs-on: macos-10.13
+    runs-on: macos-10.15
 
     steps:
     - uses: actions/checkout@v2
@@ -46,7 +46,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/EnergyPlus/build
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON ..
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON ..
 
     - name: Build Package
       working-directory: ${{runner.workspace}}/EnergyPlus/build
