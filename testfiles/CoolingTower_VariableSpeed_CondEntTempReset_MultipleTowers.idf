@@ -219,7 +219,9 @@
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
 
@@ -3851,7 +3853,7 @@
 
   Output:Variable,*,Cooling Tower Basin Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Tower Basin Heater Electricity Energy,hourly;
+  Output:Variable,*,Cooling Tower Basin Heater Electric Energy,hourly;
 
   Output:Variable,*,Cooling Tower Make Up Water Volume,hourly;
 

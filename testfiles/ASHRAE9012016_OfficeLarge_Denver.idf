@@ -179,7 +179,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    YES;                     !- Run Simulation for Weather File Run Periods
+    YES,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
@@ -15650,7 +15652,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    3.42592493940282,        !- Gross Rated Cooling COP
+    3.42592493940282,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -15680,7 +15682,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    3.70227472498202,        !- Gross Rated Cooling COP
+    3.70227472498202,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -15710,7 +15712,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    3.42592493940282,        !- Gross Rated Cooling COP
+    3.42592493940282,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -15740,7 +15742,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    3.70227472498202,        !- Gross Rated Cooling COP
+    3.70227472498202,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -15771,7 +15773,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -15792,7 +15794,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -15813,7 +15815,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -15834,7 +15836,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -16452,7 +16454,7 @@
     3,                       !- Digits After Decimal
     Electricity:HVAC,        !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating:NaturalGas,             !- Variable or Meter 2 Name
+    Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
@@ -16630,9 +16632,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Electricity:Building,    !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    NaturalGas:Building,            !- Variable or Meter 3 Name
+    NaturalGas:Building,     !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    NaturalGas:Building,            !- Variable or Meter 4 Name
+    NaturalGas:Building,     !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -16670,17 +16672,17 @@
   Output:Table:Monthly,
     Building Energy Performance - Natural Gas,  !- Name
     2,                       !- Digits After Decimal
-    InteriorEquipment:NaturalGas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:NaturalGas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:NaturalGas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,      !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Cooling:NaturalGas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,      !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    WaterSystems:NaturalGas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas, !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cogeneration:NaturalGas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas, !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -16748,23 +16750,23 @@
   Output:Table:Monthly,
     Peak Gas Demand,         !- Name
     3,                       !- Digits After Decimal
-    NaturalGas:Facility,            !- Variable or Meter 1 Name
+    NaturalGas:Facility,     !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    NaturalGas:Facility,            !- Variable or Meter 2 Name
+    NaturalGas:Facility,     !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    NaturalGas:HVAC,                !- Variable or Meter 3 Name
+    NaturalGas:HVAC,         !- Variable or Meter 3 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 3
-    InteriorEquipment:NaturalGas,   !- Variable or Meter 4 Name
+    InteriorEquipment:NaturalGas,  !- Variable or Meter 4 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 4
-    MiscPlugGas:InteriorEquipment:NaturalGas,  !- Variable or Meter 5 Name
+    MiscPlugGas:InteriorEquipment:Gas,  !- Variable or Meter 5 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 5
-    NaturalGas:Plant,               !- Variable or Meter 6 Name
+    NaturalGas:Plant,        !- Variable or Meter 6 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 6
-    WaterSystems:NaturalGas,        !- Variable or Meter 7 Name
+    WaterSystems:NaturalGas, !- Variable or Meter 7 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 7
-    Water Heater:WaterSystems:NaturalGas,  !- Variable or Meter 8 Name
+    Water Heater:WaterSystems:Gas,  !- Variable or Meter 8 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 8
-    Heating:NaturalGas,             !- Variable or Meter 9 Name
+    Heating:NaturalGas,      !- Variable or Meter 9 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 9
 
 !
@@ -16844,12 +16846,12 @@
   EnergyManagementSystem:Sensor,
     Chiller1_Status,         !- Name
     CoolSys1 Chiller1,       !- Output:Variable or Output:Meter Index Key Name
-    Chiller Electricity Rate;  !- Output:Variable or Output:Meter Name
+    Chiller Electricity Rate;!- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Chiller2_Status,         !- Name
     CoolSys1 Chiller2,       !- Output:Variable or Output:Meter Index Key Name
-    Chiller Electricity Rate;  !- Output:Variable or Output:Meter Name
+    Chiller Electricity Rate;!- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     SensedCurveInput,        !- Name
@@ -17076,7 +17078,7 @@
     Basement_Light_Actuator, !- Name
     Basement_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Basement_Light_EMS_Program,  !- Name
@@ -17113,7 +17115,7 @@
     Core_bottom_Light_Actuator,  !- Name
     Core_bottom_lights,      !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Core_bottom_Light_EMS_Program,  !- Name
@@ -17150,7 +17152,7 @@
     Core_mid_Light_Actuator, !- Name
     Core_mid_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Core_mid_Light_EMS_Program,  !- Name
@@ -17187,7 +17189,7 @@
     Core_top_Light_Actuator, !- Name
     Core_top_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Core_top_Light_EMS_Program,  !- Name
@@ -17224,7 +17226,7 @@
     Perimeter_bot_ZN_3_Light_Actuator,  !- Name
     Perimeter_bot_ZN_3_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_bot_ZN_3_Light_EMS_Program,  !- Name
@@ -17261,7 +17263,7 @@
     Perimeter_bot_ZN_2_Light_Actuator,  !- Name
     Perimeter_bot_ZN_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_bot_ZN_2_Light_EMS_Program,  !- Name
@@ -17298,7 +17300,7 @@
     Perimeter_bot_ZN_1_Light_Actuator,  !- Name
     Perimeter_bot_ZN_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_bot_ZN_1_Light_EMS_Program,  !- Name
@@ -17335,7 +17337,7 @@
     Perimeter_bot_ZN_4_Light_Actuator,  !- Name
     Perimeter_bot_ZN_4_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_bot_ZN_4_Light_EMS_Program,  !- Name
@@ -17372,7 +17374,7 @@
     Perimeter_mid_ZN_3_Light_Actuator,  !- Name
     Perimeter_mid_ZN_3_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_mid_ZN_3_Light_EMS_Program,  !- Name
@@ -17409,7 +17411,7 @@
     Perimeter_mid_ZN_2_Light_Actuator,  !- Name
     Perimeter_mid_ZN_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_mid_ZN_2_Light_EMS_Program,  !- Name
@@ -17446,7 +17448,7 @@
     Perimeter_mid_ZN_1_Light_Actuator,  !- Name
     Perimeter_mid_ZN_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_mid_ZN_1_Light_EMS_Program,  !- Name
@@ -17483,7 +17485,7 @@
     Perimeter_mid_ZN_4_Light_Actuator,  !- Name
     Perimeter_mid_ZN_4_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_mid_ZN_4_Light_EMS_Program,  !- Name
@@ -17520,7 +17522,7 @@
     Perimeter_top_ZN_3_Light_Actuator,  !- Name
     Perimeter_top_ZN_3_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_top_ZN_3_Light_EMS_Program,  !- Name
@@ -17557,7 +17559,7 @@
     Perimeter_top_ZN_2_Light_Actuator,  !- Name
     Perimeter_top_ZN_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_top_ZN_2_Light_EMS_Program,  !- Name
@@ -17594,7 +17596,7 @@
     Perimeter_top_ZN_1_Light_Actuator,  !- Name
     Perimeter_top_ZN_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_top_ZN_1_Light_EMS_Program,  !- Name
@@ -17631,7 +17633,7 @@
     Perimeter_top_ZN_4_Light_Actuator,  !- Name
     Perimeter_top_ZN_4_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Perimeter_top_ZN_4_Light_EMS_Program,  !- Name

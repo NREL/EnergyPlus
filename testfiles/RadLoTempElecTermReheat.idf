@@ -140,7 +140,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -423,7 +425,7 @@
     4,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
-    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request
+    0.0,                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
     CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer
     INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2
     GYP1,                    !- Layer 3
@@ -2188,7 +2190,7 @@
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     MeanAirTemperature,      !- Temperature Control Type
-    HalfFlowPower,           !- Setpoint Type
+    HalfFlowPower,           !- Setpoint Control Type
     2.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints;  !- Heating Setpoint Temperature Schedule Name
 
@@ -2202,7 +2204,7 @@
     269.09776041774302,      !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     MeanRadiantTemperature,  !- Temperature Control Type
-    HalfFlowPower,           !- Setpoint Type
+    HalfFlowPower,           !- Setpoint Control Type
     2.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints;  !- Heating Setpoint Temperature Schedule Name
 
@@ -2216,7 +2218,7 @@
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     1.9637972000759794,      !- Fraction of Autosized Heating Design Capacity
     OperativeTemperature,    !- Temperature Control Type
-    ZeroFlowPower,           !- Setpoint Type
+    HalfFlowPower,           !- Setpoint Control Type
     2.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints;  !- Heating Setpoint Temperature Schedule Name
 

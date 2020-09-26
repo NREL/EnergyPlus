@@ -122,7 +122,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -405,7 +407,7 @@
     4,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
-    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request
+    0.0,                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
     CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer
     INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2
     GYP1,                    !- Layer 3
@@ -2062,7 +2064,7 @@
     400.0,                   !- Hydronic Tubing Length {m}
     0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
-    HalfFlowPower,           !- Setpoint Type
+    HalfFlowPower,           !- Setpoint Control Type
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
@@ -2097,7 +2099,7 @@
     400.0,                   !- Hydronic Tubing Length {m}
     0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
-    HalfFlowPower,           !- Setpoint Type
+    HalfFlowPower,           !- Setpoint Control Type
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
@@ -2105,7 +2107,7 @@
     0.00008,                 !- Maximum Hot Water Flow {m3/s}
     East Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     East Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
-    0.4,                     !- Heating Control Throttling Range {deltaC}
+    2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
     Autosize,                !- Cooling Design Capacity {W}
@@ -2114,7 +2116,7 @@
     0.0012,                  !- Maximum Cold Water Flow {m3/s}
     Zone 2 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
-    0.4,                     !- Cooling Control Throttling Range {deltaC}
+    2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
     VariableOff,             !- Condensation Control Type
     0.0,                     !- Condensation Control Dewpoint Offset {C}
@@ -2132,7 +2134,7 @@
     400.0,                   !- Hydronic Tubing Length {m}
     0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
-    HalfFlowPower,           !- Setpoint Type
+    HalfFlowPower,           !- Setpoint Control Type
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
@@ -2140,7 +2142,7 @@
     0.00010,                 !- Maximum Hot Water Flow {m3/s}
     North Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     North Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
-    0.0,                     !- Heating Control Throttling Range {deltaC}
+    2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
     Autosize,                !- Cooling Design Capacity {W}
@@ -2149,7 +2151,7 @@
     0.0015,                  !- Maximum Cold Water Flow {m3/s}
     Zone 3 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 3 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
-    0.0,                     !- Cooling Control Throttling Range {deltaC}
+    2.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
     Off,                     !- Condensation Control Type
     0.0,                     !- Condensation Control Dewpoint Offset {C}

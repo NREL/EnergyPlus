@@ -133,7 +133,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    YES;                     !- Run Simulation for Weather File Run Periods
+    YES,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -10914,7 +10916,7 @@
     3,                       !- Digits After Decimal
     Electricity:HVAC,        !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating:NaturalGas,             !- Variable or Meter 2 Name
+    Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
@@ -11076,9 +11078,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Electricity:Building,    !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    NaturalGas:Building,            !- Variable or Meter 3 Name
+    NaturalGas:Building,     !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    NaturalGas:Building,            !- Variable or Meter 4 Name
+    NaturalGas:Building,     !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -11116,17 +11118,17 @@
   Output:Table:Monthly,
     Building Energy Performance - Natural Gas,  !- Name
     2,                       !- Digits After Decimal
-    InteriorEquipment:NaturalGas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:NaturalGas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:NaturalGas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,      !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Cooling:NaturalGas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,      !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    WaterSystems:NaturalGas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas, !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cogeneration:NaturalGas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas, !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -11192,23 +11194,23 @@
   Output:Table:Monthly,
     Peak Gas Demand,         !- Name
     3,                       !- Digits After Decimal
-    NaturalGas:Facility,            !- Variable or Meter 1 Name
+    NaturalGas:Facility,     !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    NaturalGas:Facility,            !- Variable or Meter 2 Name
+    NaturalGas:Facility,     !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    NaturalGas:HVAC,                !- Variable or Meter 3 Name
+    NaturalGas:HVAC,         !- Variable or Meter 3 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 3
-    InteriorEquipment:NaturalGas,   !- Variable or Meter 4 Name
+    InteriorEquipment:NaturalGas,  !- Variable or Meter 4 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 4
     MiscPlugGas:InteriorEquipment:NaturalGas,  !- Variable or Meter 5 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 5
-    NaturalGas:Plant,               !- Variable or Meter 6 Name
+    NaturalGas:Plant,        !- Variable or Meter 6 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 6
-    WaterSystems:NaturalGas,        !- Variable or Meter 7 Name
+    WaterSystems:NaturalGas, !- Variable or Meter 7 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 7
     Water Heater:WaterSystems:NaturalGas,  !- Variable or Meter 8 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 8
-    Heating:NaturalGas,             !- Variable or Meter 9 Name
+    Heating:NaturalGas,      !- Variable or Meter 9 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 9
 
 !
@@ -13735,13 +13737,13 @@
     LGSTORE1_Light_Actuator, !- Name
     LGSTORE1_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     LGSTORE1_Light_ALLOWANCE_Actuator,  !- Name
     LGSTORE1_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_LGSTORE1_Light_EMS_Program,  !- Name
@@ -13780,13 +13782,13 @@
     SMSTORE1_Light_Actuator, !- Name
     SMSTORE1_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE1_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE1_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE1_Light_EMS_Program,  !- Name
@@ -13825,13 +13827,13 @@
     SMSTORE2_Light_Actuator, !- Name
     SMSTORE2_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE2_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE2_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE2_Light_EMS_Program,  !- Name
@@ -13870,13 +13872,13 @@
     SMSTORE3_Light_Actuator, !- Name
     SMSTORE3_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE3_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE3_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE3_Light_EMS_Program,  !- Name
@@ -13915,13 +13917,13 @@
     SMSTORE4_Light_Actuator, !- Name
     SMSTORE4_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE4_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE4_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE4_Light_EMS_Program,  !- Name
@@ -13960,13 +13962,13 @@
     SMSTORE5_Light_Actuator, !- Name
     SMSTORE5_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE5_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE5_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE5_Light_EMS_Program,  !- Name
@@ -14005,13 +14007,13 @@
     SMSTORE6_Light_Actuator, !- Name
     SMSTORE6_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE6_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE6_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE6_Light_EMS_Program,  !- Name
@@ -14050,13 +14052,13 @@
     SMSTORE7_Light_Actuator, !- Name
     SMSTORE7_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE7_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE7_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE7_Light_EMS_Program,  !- Name
@@ -14095,13 +14097,13 @@
     SMSTORE8_Light_Actuator, !- Name
     SMSTORE8_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE8_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE8_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE8_Light_EMS_Program,  !- Name
@@ -14140,13 +14142,13 @@
     LGSTORE2_Light_Actuator, !- Name
     LGSTORE2_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     LGSTORE2_Light_ALLOWANCE_Actuator,  !- Name
     LGSTORE2_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_LGSTORE2_Light_EMS_Program,  !- Name
