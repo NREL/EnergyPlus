@@ -49,7 +49,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
-
+#include <chrono>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -1092,31 +1092,16 @@ namespace General {
         // METHODOLOGY EMPLOYED:
         // Linear interpolation.
 
-        // REFERENCES:na
-
-        // Using/Aliasing
-        using DataGlobals::Pi;
-        using DataGlobals::PiOvr2;
-
         // Return value
         Real64 InterpProfAng;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
 
-        // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaAngRad(Pi / 36.0); // Profile angle increment (rad)
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 InterpFac; // Interpolation factor
-        int IAlpha;       // Profile angle index
-
-        // DeltaAng = Pi/36
-        if (ProfAng > PiOvr2 || ProfAng < -PiOvr2) {
+        if (ProfAng > DataGlobals::PiOvr2 || ProfAng < - DataGlobals::PiOvr2) {
             InterpProfAng = 0.0;
         } else {
-            IAlpha = 1 + int((ProfAng + PiOvr2) / DeltaAngRad);
-            InterpFac = (ProfAng - (-PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
+            Real64 const DeltaAngRad(DataGlobals::Pi / 36.0); // Profile angle increment (rad) // DeltaAng = Pi/36
+            Real64 IAlpha = 1 + int((ProfAng + DataGlobals::PiOvr2) / DeltaAngRad); // Interpolation factor
+            int InterpFac = (ProfAng - (- DataGlobals::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad; // Profile angle index
             InterpProfAng = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
         }
         return InterpProfAng;
@@ -1206,45 +1191,30 @@ namespace General {
 
         // METHODOLOGY EMPLOYED:
         // Linear interpolation.
-
-        // REFERENCES:na
-
-        // Using/Aliasing
-        using DataGlobals::Pi;
-        using DataSurfaces::MaxSlatAngs;
-
         // Return value
         Real64 InterpSlatAng;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        static Real64 const DeltaAng(Pi / (double(MaxSlatAngs) - 1.0));
-        static Real64 const DeltaAng_inv((double(MaxSlatAngs) - 1.0) / Pi);
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 InterpFac; // Interpolation factor
-        int IBeta;        // Slat angle index
-        Real64 SlatAng1;
-
-        if (SlatAng > Pi || SlatAng < 0.0) {
-            //  InterpSlatAng = 0.0
-            //  RETURN
-            // END IF
-            SlatAng1 = min(max(SlatAng, 0.0), Pi);
-        } else {
-            SlatAng1 = SlatAng;
-        }
-
         if (VarSlats) { // Variable-angle slats
+            static Real64 const DeltaAng(DataGlobals::Pi / (double(DataSurfaces::MaxSlatAngs) - 1.0));
+            static Real64 const DeltaAng_inv((double(DataSurfaces::MaxSlatAngs) - 1.0) / DataGlobals::Pi);
+
+            Real64 InterpFac; // Interpolation factor
+            int IBeta;        // Slat angle index
+            Real64 SlatAng1;
+            if (SlatAng > DataGlobals::Pi || SlatAng < 0.0) {
+                //  InterpSlatAng = 0.0
+                //  RETURN
+                // END IF
+                SlatAng1 = min(max(SlatAng, 0.0), DataGlobals::Pi);
+            } else {
+                SlatAng1 = SlatAng;
+            }
             IBeta = 1 + int(SlatAng1 * DeltaAng_inv);
             InterpFac = (SlatAng1 - DeltaAng * (IBeta - 1)) * DeltaAng_inv;
-            InterpSlatAng = PropArray(IBeta) + InterpFac * (PropArray(min(MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
+            InterpSlatAng = PropArray(IBeta) + InterpFac * (PropArray(min(DataSurfaces::MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
         } else { // Fixed-angle slats or shade
             InterpSlatAng = PropArray(1);
         }
-
         return InterpSlatAng;
     }
 

@@ -4024,8 +4024,8 @@ namespace HeatBalanceSurfaceManager {
                     ITABSF(SurfNum) = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum),
                                                     SurfaceWindow(SurfNum).EffShBlindEmiss) +
                                       InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum),
-                                                    SurfaceWindow(
-                                                            SurfNum).EffGlassEmiss); // For shades, following interpolation just returns value of first element in array
+                                                    SurfaceWindow(SurfNum).EffGlassEmiss);
+                    // For shades, following interpolation just returns value of first element in array
             }
         }
 
@@ -4232,7 +4232,6 @@ namespace HeatBalanceSurfaceManager {
                                     SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), dataConstruction.Construct(ConstrNumSh).BlTransDiff);
                                 DiffAbsShade = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
                                                              SurfWinMovableSlats(SurfNum),
-
                                                              dataConstruction.Construct(ConstrNumSh).AbsDiffBackBlind);
                             }
                         }
