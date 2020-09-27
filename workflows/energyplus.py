@@ -191,21 +191,24 @@ class EPlusRunManager(object):
                 eso_path = os.path.join(run_directory, file_name_no_ext + '.eso')
                 eplusouteso_path = os.path.join(run_directory, 'eplusout.eso')
                 if os.path.exists(eso_path):
-                		shutil.copy(eso_path, eplusouteso_path)
+                    shutil.copy(eso_path, eplusouteso_path)
                 # *.mtr back to eplusout.mtr
                 mtr_path = os.path.join(run_directory, file_name_no_ext + '.mtr')
                 eplusoutmtr_path = os.path.join(run_directory, 'eplusout.mtr')
                 if os.path.exists(mtr_path):
-                		shutil.copy(mtr_path, eplusoutmtr_path)
+                    shutil.copy(mtr_path, eplusoutmtr_path)
 
                 if isIP:
                     # run the ConvertESOMTR program to create IP versions of the timestep based output files
                     if platform.system() == 'Windows':
-                        convertESOMTR_binary = os.path.join(energyplus_root_folder, 'PostProcess', 'convertESOMTRpgm', 'convertESOMTR.exe')
+                        convertESOMTR_binary = os.path.join(energyplus_root_folder, 'PostProcess', 'convertESOMTRpgm',
+                                                            'convertESOMTR.exe')
                     else:
-                        convertESOMTR_binary = os.path.join(energyplus_root_folder, 'PostProcess', 'convertESOMTRpgm', 'convertESOMTR')
+                        convertESOMTR_binary = os.path.join(energyplus_root_folder, 'PostProcess', 'convertESOMTRpgm',
+                                                            'convertESOMTR')
                     if os.path.exists(convertESOMTR_binary):
-                        converttxt_orig_path = os.path.join(energyplus_root_folder, 'PostProcess', 'convertESOMTRpgm', 'convert.txt')
+                        converttxt_orig_path = os.path.join(energyplus_root_folder, 'PostProcess', 'convertESOMTRpgm',
+                                                            'convert.txt')
                         converttxt_run_path = os.path.join(run_directory, 'convert.txt')
                         shutil.copy(converttxt_orig_path, converttxt_run_path)
 
@@ -230,7 +233,7 @@ class EPlusRunManager(object):
                         if os.path.exists(ipmtr_path):
                             shutil.copy(ipmtr_path, mtr_path)
                             os.replace(ipmtr_path, eplusoutmtr_path)
-                    os.remove(converttxt_run_path)
+                        os.remove(converttxt_run_path)
 
                 # run ReadVarsESO to convert the timestep based output files to CSV files
                 if platform.system() == 'Windows':
@@ -304,19 +307,21 @@ class EPlusRunManager(object):
                     if os.path.exists(readvars_audit_path):
                         os.replace(readvars_audit_path, rv_audit_path)
 
-                # clean up
-                if os.path.exists(temp_rvi_path):
-                    os.remove(temp_rvi_path)
-                if os.path.exists(temp_mvi_path):
-                    os.remove(temp_mvi_path)
+                    # clean up things inside this IF block
+                    if os.path.exists(temp_rvi_path):
+                        os.remove(temp_rvi_path)
+                    if os.path.exists(temp_mvi_path):
+                        os.remove(temp_mvi_path)
+                    if os.path.exists(eplusout_rvi_path):
+                        os.remove(eplusout_rvi_path)
+                    if os.path.exists(eplusout_mvi_path):
+                        os.remove(eplusout_mvi_path)
+
+                # clean up more things
                 if os.path.exists(eplusouteso_path):
                     os.remove(eplusouteso_path)
                 if os.path.exists(eplusoutmtr_path):
                     os.remove(eplusoutmtr_path)
-                if os.path.exists(eplusout_rvi_path):
-                    os.remove(eplusout_rvi_path)
-                if os.path.exists(eplusout_mvi_path):
-                    os.remove(eplusout_mvi_path)
                 audit_out_path = os.path.join(run_directory, 'audit.out')
                 if os.path.exists(audit_out_path):
                     os.remove(audit_out_path)
