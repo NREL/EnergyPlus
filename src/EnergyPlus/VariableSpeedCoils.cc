@@ -3504,33 +3504,53 @@ namespace VariableSpeedCoils {
             if (!UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).RecoveryUnitType, "N")) {
 
                 double dScaleCapacity = 0.0;
+                bool bErrFind = false; 
 
                 if (UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).RecoveryUnitType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED")) {
-                    dScaleCapacity = VarSpeedCoil(DXCoilNum).RatedCapHeat * VarSpeedCoil(DXCoilNum).RecoveryCapacityRatio;
-
-                    const int IndexNum = UtilityRoutines::FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName, VarSpeedCoil);
+                    const int IndexNum =  GetCoilIndexVariableSpeed(state, VarSpeedCoil(DXCoilNum).RecoveryUnitType, 
+                            VarSpeedCoil(DXCoilNum).RecoveryUnitName, bErrFind);
 
                     if (IndexNum > 0) {
+                        dScaleCapacity = VarSpeedCoil(DXCoilNum).RatedCapHeat * VarSpeedCoil(DXCoilNum).RecoveryCapacityRatio;
                         VarSpeedCoil(IndexNum).RatedCapWH = dScaleCapacity;
                         // size again if already sized HPWH
                         if (MySizeFlag(DXCoilNum) == false) SizeVarSpeedCoil(state, IndexNum);
                     }
 
                 } else if (UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).RecoveryUnitType, "Chiller:Electric:EIR")) {
-                    dScaleCapacity = VarSpeedCoil(DXCoilNum).RatedCapCoolTotal * VarSpeedCoil(DXCoilNum).RecoveryCapacityRatio;
+                                                          
+                    int IndexNum = UtilityRoutines::
+                        FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName, state.dataChillerElectricEIR.ElectricEIRChiller);
+                                        
+                    if (IndexNum == 0){
+                        ChillerElectricEIR::ElectricEIRChillerSpecs::factory(state, VarSpeedCoil(DXCoilNum).RecoveryUnitName);
+                        IndexNum = UtilityRoutines::FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName,
+                                                                   state.dataChillerElectricEIR.ElectricEIRChiller);
+                    }
 
-                    const int IndexNum =
-                        UtilityRoutines::FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName, state.dataChillerElectricEIR.ElectricEIRChiller);
+                    if (IndexNum > 0) {
+                        dScaleCapacity = VarSpeedCoil(DXCoilNum).RatedCapCoolTotal * VarSpeedCoil(DXCoilNum).RecoveryCapacityRatio;
+                        state.dataChillerElectricEIR.ElectricEIRChiller(IndexNum).RefCap = dScaleCapacity;
+                    }
 
-                    if (IndexNum > 0) state.dataChillerElectricEIR.ElectricEIRChiller(IndexNum).RefCap = dScaleCapacity;
                 } else if (UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).RecoveryUnitType, "Chiller:Electric")) {
 
-                    dScaleCapacity = VarSpeedCoil(DXCoilNum).RatedCapCoolTotal * VarSpeedCoil(DXCoilNum).RecoveryCapacityRatio;
-
-                    const int IndexNum =
+                    int IndexNum =
                         UtilityRoutines::FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName, state.dataPlantChillers.ElectricChiller);
 
-                    if (IndexNum > 0) state.dataPlantChillers.ElectricChiller(IndexNum).NomCap = dScaleCapacity;
+                    if (IndexNum == 0){
+                        PlantChillersData chiller;
+                        PlantChillers::ElectricChillerSpecs::factory(chiller, VarSpeedCoil(DXCoilNum).RecoveryUnitName);
+
+                        IndexNum = UtilityRoutines::
+                            FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName, state.dataPlantChillers.ElectricChiller);
+                    }
+
+                    if (IndexNum > 0) {
+                        dScaleCapacity = 
+                            VarSpeedCoil(DXCoilNum).RatedCapCoolTotal * VarSpeedCoil(DXCoilNum).RecoveryCapacityRatio;
+                        state.dataPlantChillers.ElectricChiller(IndexNum).NomCap = dScaleCapacity;
+                    }
                 }
 
                 BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + ":DX:VARIABLESPEED",

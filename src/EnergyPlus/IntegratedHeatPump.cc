@@ -3006,7 +3006,7 @@ namespace IntegratedHeatPump {
                     ErrorsFound = true;
                 }
                 SetUpCompSets(CurrentModuleObject,
-                              IntegratedHeatPumps(DXCoilNum).Name + " Enhanced Dehumidification Coil",
+                              IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil",
                               IntegratedHeatPumps(DXCoilNum).EnDehumCoilType,
                               IntegratedHeatPumps(DXCoilNum).EnDehumCoilName,
                               InNodeName,
@@ -3038,7 +3038,7 @@ namespace IntegratedHeatPump {
                     ErrorsFound = true;
                 }
                 SetUpCompSets(CurrentModuleObject,
-                              IntegratedHeatPumps(DXCoilNum).Name + " Grid Response Cooling Coil",
+                              IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil",
                               IntegratedHeatPumps(DXCoilNum).GridSCCoilType,
                               IntegratedHeatPumps(DXCoilNum).GridSCCoilName,
                               InNodeName,
@@ -3170,7 +3170,7 @@ namespace IntegratedHeatPump {
                                        CurrentModuleObject,
                                        IntegratedHeatPumps(DXCoilNum).Name + " Water Coil",
                                        "Inlet",
-                                       1,
+                                       2,
                                        ObjectIsNotParent,
                                        ErrorsFound);
                 RegisterNodeConnection(OutNode,
@@ -3178,7 +3178,7 @@ namespace IntegratedHeatPump {
                                        CurrentModuleObject,
                                        IntegratedHeatPumps(DXCoilNum).Name + " Water Coil",
                                        "Outlet",
-                                       1,
+                                       2,
                                        ObjectIsNotParent,
                                        ErrorsFound);
 
@@ -3647,6 +3647,8 @@ namespace IntegratedHeatPump {
                     if (0 == IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex) {
                         ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                         ErrorsFound = true;
+                    } else { // not in plant loop
+                        WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).IsInPlantLoop = false;
                     }
                 }
             }
@@ -3670,6 +3672,8 @@ namespace IntegratedHeatPump {
                     if (0 == IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex) {
                         ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                         ErrorsFound = true;
+                    } else {//not in plant loop
+                        WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).IsInPlantLoop = false; 
                     }
                 }
             }
@@ -3709,7 +3713,7 @@ namespace IntegratedHeatPump {
             IntegratedHeatPumps(DXCoilNum).TregenTarget = NumArray(6);
             IntegratedHeatPumps(DXCoilNum).Concen_Set = NumArray(7);
             IntegratedHeatPumps(DXCoilNum).Concen_band = NumArray(8);
-            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate = NumArray(9);
+            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowSize = NumArray(9);
 
             if (UtilityRoutines::SameString(IntegratedHeatPumps(DXCoilNum).SUPHEATTYPE, "NONE"))
                 IntegratedHeatPumps(DXCoilNum).TregenTarget =  -10000.0; 
@@ -3857,7 +3861,7 @@ namespace IntegratedHeatPump {
                     ErrorsFound = true;
                 }
                 SetUpCompSets(CurrentModuleObject,
-                              IntegratedHeatPumps(DXCoilNum).Name + " Enhanced Dehumidification Coil",
+                              IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil",
                               IntegratedHeatPumps(DXCoilNum).EnDehumCoilType,
                               IntegratedHeatPumps(DXCoilNum).EnDehumCoilName,
                               InNodeName,
@@ -3889,7 +3893,7 @@ namespace IntegratedHeatPump {
                     ErrorsFound = true;
                 }
                 SetUpCompSets(CurrentModuleObject,
-                              IntegratedHeatPumps(DXCoilNum).Name + " Grid Response Cooling Coil",
+                              IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil",
                               IntegratedHeatPumps(DXCoilNum).GridSCCoilType,
                               IntegratedHeatPumps(DXCoilNum).GridSCCoilName,
                               InNodeName,
@@ -3977,12 +3981,15 @@ namespace IntegratedHeatPump {
                 InNodeName = NodeID(InNode);
                 OutNodeName = NodeID(OutNode);
                 IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum = InNode;
-                if (IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex != 0 ) IntegratedHeatPumps(DXCoilNum).WaterOutletNodeNum =
-                    WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).WaterOutletNodeNum; 
-                else 
+
+                if (IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex != 0)
+                    IntegratedHeatPumps(DXCoilNum).WaterOutletNodeNum = 
+                    WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).WaterOutletNodeNum;
+                else
                     IntegratedHeatPumps(DXCoilNum).WaterOutletNodeNum = OutNode;
 
                 IntegratedHeatPumps(DXCoilNum).WaterMiddleNodeNum = OutNode;
+                
                 if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).WaterInletNodeNum != InNode) ||
                     (VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).WaterOutletNodeNum != OutNode)) {
                     ShowContinueError("Mistaken water node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName +
@@ -3990,13 +3997,13 @@ namespace IntegratedHeatPump {
                     ErrorsFound = true;
                 }
 
-                TestCompSet(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Water Coil", InNodeName, OutNodeName, "Water Nodes");
+                //TestCompSet(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Water Coil", InNodeName, OutNodeName, "Water Nodes");
                 RegisterNodeConnection(InNode,
                                        NodeID(InNode),
                                        CurrentModuleObject,
                                        IntegratedHeatPumps(DXCoilNum).Name + " Water Coil",
                                        "Inlet",
-                                       1,
+                                       2,
                                        ObjectIsNotParent,
                                        ErrorsFound);
                 RegisterNodeConnection(OutNode,
@@ -4004,7 +4011,7 @@ namespace IntegratedHeatPump {
                                        CurrentModuleObject,
                                        IntegratedHeatPumps(DXCoilNum).Name + " Water Coil",
                                        "Outlet",
-                                       1,
+                                       2,
                                        ObjectIsNotParent,
                                        ErrorsFound);
 
@@ -4055,6 +4062,7 @@ namespace IntegratedHeatPump {
                                            ErrorsFound);
             }
 
+            
             if (IntegratedHeatPumps(DXCoilNum).DWHCoilIndex != 0) {
                 if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).WaterInletNodeNum != InNode) ||
                     (VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).WaterOutletNodeNum != OutNode)) {
@@ -4085,6 +4093,7 @@ namespace IntegratedHeatPump {
                                            ObjectIsNotParent,
                                            ErrorsFound);
             }
+
             
             // outdoor air node connections for water heating coils
             // DWH, SCDWH, SHDWH coils have the same outdoor air nodes
@@ -4166,6 +4175,240 @@ namespace IntegratedHeatPump {
                                            1,
                                            ObjectIsNotParent,
                                            ErrorsFound);
+            }
+
+             // evaportive cooling coil node connection
+            if (IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex != 0 ) {
+                ChildCoilIndex = IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex;
+                InNode = EvapCond(IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletNode;
+                OutNode = EvapCond(IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).OutletNode;
+                // VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum;
+                InNodeName = NodeID(InNode);
+                OutNodeName = NodeID(OutNode);
+
+                TestCompSet(IntegratedHeatPumps(DXCoilNum).EvapCoolCoilType,
+                            IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName,
+                            InNodeName,
+                            OutNodeName, 
+                    "Evaporative Cooling Air Nodes");
+                RegisterNodeConnection(InNode,
+                                       NodeID(InNode),
+                                       CurrentModuleObject,
+                                       IntegratedHeatPumps(DXCoilNum).Name + " Evaporative Cooling Coil",
+                                       "Inlet",
+                                       1,
+                                       ObjectIsNotParent,
+                                       ErrorsFound);
+                RegisterNodeConnection(OutNode,
+                                       NodeID(OutNode),
+                                       CurrentModuleObject,
+                                       IntegratedHeatPumps(DXCoilNum).Name + " Evaporative Cooling Coil",
+                                       "Outlet",
+                                       1,
+                                       ObjectIsNotParent,
+                                       ErrorsFound);
+
+                SetUpCompSets(CurrentModuleObject,
+                              IntegratedHeatPumps(DXCoilNum).Name,
+                              IntegratedHeatPumps(DXCoilNum).EvapCoolCoilType,
+                              IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName,
+                              InNodeName,
+                              OutNodeName);
+                OverrideNodeConnectionType(InNode,
+                                           InNodeName,
+                                           IntegratedHeatPumps(DXCoilNum).EvapCoolCoilType,
+                                           IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName,
+                                           "Internal",
+                                           1,
+                                           ObjectIsNotParent,
+                                           ErrorsFound);
+                OverrideNodeConnectionType(OutNode,
+                                           OutNodeName,
+                                           IntegratedHeatPumps(DXCoilNum).EvapCoolCoilType,
+                                           IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName,
+                                           "Internal",
+                                           1,
+                                           ObjectIsNotParent,
+                                           ErrorsFound);
+            
+            }
+
+            if (IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex != 0) {
+                ChildCoilIndex = IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex;
+                InNode = WaterCoil(ChildCoilIndex).AirInletNodeNum;
+                OutNode = WaterCoil(ChildCoilIndex).AirOutletNodeNum;
+                // VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum;
+                InNodeName = NodeID(InNode);
+                OutNodeName = NodeID(OutNode);
+
+                TestCompSet(IntegratedHeatPumps(DXCoilNum).LDRegenCoilType,
+                            IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
+                            InNodeName,
+                            OutNodeName,
+                            "Regeneration Air Nodes");
+                RegisterNodeConnection(InNode,
+                                       NodeID(InNode),
+                                       IntegratedHeatPumps(DXCoilNum).LDRegenCoilType,
+                                       IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
+                                       "Inlet",
+                                       1,
+                                       ObjectIsNotParent,
+                                       ErrorsFound);
+                RegisterNodeConnection(OutNode,
+                                       NodeID(OutNode),
+                                       IntegratedHeatPumps(DXCoilNum).LDRegenCoilType,
+                                       IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
+                                       "Outlet",
+                                       1,
+                                       ObjectIsNotParent,
+                                       ErrorsFound);
+
+                SetUpCompSets(CurrentModuleObject,
+                              IntegratedHeatPumps(DXCoilNum).Name,
+                              IntegratedHeatPumps(DXCoilNum).LDRegenCoilType,
+                              IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
+                              InNodeName,
+                              OutNodeName);
+                OverrideNodeConnectionType(InNode,
+                                           InNodeName,
+                                           IntegratedHeatPumps(DXCoilNum).LDRegenCoilType,
+                                           IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
+                                           "Internal",
+                                           1,
+                                           ObjectIsNotParent,
+                                           ErrorsFound);
+                OverrideNodeConnectionType(OutNode,
+                                           OutNodeName,
+                                           IntegratedHeatPumps(DXCoilNum).LDRegenCoilType,
+                                           IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
+                                           "Internal",
+                                           1,
+                                           ObjectIsNotParent,
+                                           ErrorsFound);
+
+                InNode = WaterCoil(ChildCoilIndex).WaterInletNodeNum;
+                OutNode = WaterCoil(ChildCoilIndex).WaterOutletNodeNum;
+                
+                InNodeName = NodeID(InNode);
+                OutNodeName = NodeID(OutNode);
+
+                 TestCompSet(IntegratedHeatPumps(DXCoilNum).LDRegenCoilType,
+                            IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
+                            InNodeName,
+                            OutNodeName,
+                            "Regeneration Water Nodes");
+                RegisterNodeConnection(InNode,
+                                       NodeID(InNode),
+                                       IntegratedHeatPumps(DXCoilNum).LDRegenCoilType,
+                                       IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
+                                       "Inlet",
+                                       2,
+                                       ObjectIsNotParent,
+                                       ErrorsFound);
+                RegisterNodeConnection(OutNode,
+                                       NodeID(OutNode),
+                                       IntegratedHeatPumps(DXCoilNum).LDRegenCoilType,
+                                       IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
+                                       "Outlet",
+                                       2,
+                                       ObjectIsNotParent,
+                                       ErrorsFound);
+
+                SetUpCompSets(CurrentModuleObject,
+                              IntegratedHeatPumps(DXCoilNum).Name,
+                              IntegratedHeatPumps(DXCoilNum).LDRegenCoilType,
+                              IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
+                              InNodeName,
+                              OutNodeName);
+            }
+            
+
+            if (IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) {
+                ChildCoilIndex = IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex;
+                InNode = WaterCoil(ChildCoilIndex).AirInletNodeNum;
+                OutNode = WaterCoil(ChildCoilIndex).AirOutletNodeNum;
+                InNodeName = NodeID(InNode);
+                OutNodeName = NodeID(OutNode);
+
+                TestCompSet(IntegratedHeatPumps(DXCoilNum).LDDehumCoilType,
+                            IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
+                            InNodeName,
+                            OutNodeName,
+                            "Dehumidification Coil Air Nodes");
+                RegisterNodeConnection(InNode,
+                                       NodeID(InNode),
+                                       IntegratedHeatPumps(DXCoilNum).LDDehumCoilType,
+                                       IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
+                                       "Inlet",
+                                       1,
+                                       ObjectIsNotParent,
+                                       ErrorsFound);
+                RegisterNodeConnection(OutNode,
+                                       NodeID(OutNode),
+                                       IntegratedHeatPumps(DXCoilNum).LDDehumCoilType,
+                                       IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
+                                       "Outlet",
+                                       1,
+                                       ObjectIsNotParent,
+                                       ErrorsFound);
+
+                SetUpCompSets(CurrentModuleObject,
+                              IntegratedHeatPumps(DXCoilNum).Name,
+                              IntegratedHeatPumps(DXCoilNum).LDDehumCoilType,
+                              IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
+                              InNodeName,
+                              OutNodeName);
+                OverrideNodeConnectionType(InNode,
+                                           InNodeName,
+                                           IntegratedHeatPumps(DXCoilNum).LDDehumCoilType,
+                                           IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
+                                           "Internal",
+                                           1,
+                                           ObjectIsNotParent,
+                                           ErrorsFound);
+                OverrideNodeConnectionType(OutNode,
+                                           OutNodeName,
+                                           IntegratedHeatPumps(DXCoilNum).LDDehumCoilType,
+                                           IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
+                                           "Internal",
+                                           1,
+                                           ObjectIsNotParent,
+                                           ErrorsFound);
+
+                InNode = WaterCoil(ChildCoilIndex).WaterInletNodeNum;
+                OutNode = WaterCoil(ChildCoilIndex).WaterOutletNodeNum;
+                
+                InNodeName = NodeID(InNode);
+                OutNodeName = NodeID(OutNode);
+
+                TestCompSet(IntegratedHeatPumps(DXCoilNum).LDDehumCoilType,
+                            IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
+                            InNodeName,
+                            OutNodeName,
+                            "Dehumidification Coil Water Nodes");
+                RegisterNodeConnection(InNode,
+                                       NodeID(InNode),
+                                       IntegratedHeatPumps(DXCoilNum).LDDehumCoilType,
+                                       IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
+                                       "Inlet",
+                                       2,
+                                       ObjectIsNotParent,
+                                       ErrorsFound);
+                RegisterNodeConnection(OutNode,
+                                       NodeID(OutNode),
+                                       IntegratedHeatPumps(DXCoilNum).LDDehumCoilType,
+                                       IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
+                                       "Outlet",
+                                       2,
+                                       ObjectIsNotParent,
+                                       ErrorsFound);
+
+                SetUpCompSets(CurrentModuleObject,
+                              IntegratedHeatPumps(DXCoilNum).Name,
+                              IntegratedHeatPumps(DXCoilNum).LDDehumCoilType,
+                              IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
+                              InNodeName,
+                              OutNodeName);
             }
 
             IntegratedHeatPumps(DXCoilNum).IHPCoilsSized = false;
@@ -4289,6 +4532,10 @@ namespace IntegratedHeatPump {
         using VariableSpeedCoils::SimVariableSpeedCoils;
         using VariableSpeedCoils::SizeVarSpeedCoil;
         using VariableSpeedCoils::VarSpeedCoil;
+        using WaterCoils::WaterCoil;
+        using WaterCoils::SizeWaterCoil_NotInPlant;
+        using EvaporativeCoolers::EvapCond; 
+        using EvaporativeCoolers::SizeEvapCooler;
 
         static bool ErrorsFound(false); // If errors detected in input
         Real64 RatedCapacity(0.0);      // rated building cooling load
@@ -4463,6 +4710,48 @@ namespace IntegratedHeatPump {
         };
 
         IntegratedHeatPumps(DXCoilNum).IHPCoilsSized = true;
+
+        if (IntegratedHeatPumps(DXCoilNum).DWHCoilIndex != 0) {
+            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate = 
+                IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowSize *
+                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).DesignWaterMassFlowRate;
+        }
+        else if (IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex != 0) {
+            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate = 
+                IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowSize *
+                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).DesignWaterMassFlowRate;
+        }
+
+        int iCoilID = IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex;
+        if (iCoilID != 0) {
+            WaterCoil(iCoilID).DesAirMassFlowRate = 
+                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).DesignAirMassFlowRate;    
+            WaterCoil(iCoilID).DesAirVolFlowRate = 
+                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).DesignAirVolFlowRate; 
+            WaterCoil(iCoilID).InletWaterMassFlowRate = 
+                IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate; 
+
+            SizeWaterCoil_NotInPlant(state, iCoilID); 
+        }
+
+        iCoilID = IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex;
+        if (iCoilID != 0) {
+            WaterCoil(iCoilID).DesAirMassFlowRate = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).DesignAirMassFlowRate;
+            WaterCoil(iCoilID).DesAirVolFlowRate = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).DesignAirVolFlowRate;
+            WaterCoil(iCoilID).InletWaterMassFlowRate = 
+                IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate;
+
+            SizeWaterCoil_NotInPlant(state, iCoilID);
+        }
+
+        iCoilID = IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex;
+        if (iCoilID != 0) {
+            EvapCond(iCoilID).IndirectVolFlowRate = 
+                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).DesignAirVolFlowRate;
+
+            SizeEvapCooler(iCoilID);
+        }
+
     }
 
     void InitializeIHP(EnergyPlusData &state, int const DXCoilNum)

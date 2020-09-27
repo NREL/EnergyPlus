@@ -1096,6 +1096,8 @@ namespace WaterThermalTanks {
 
     bool getHPWaterHeaterInput(EnergyPlusData &state)
     {
+        using IntegratedHeatPump::IntegratedHeatPumps; 
+
         bool ErrorsFound = false;
 
         int const NumPumpedCondenser =
@@ -1436,7 +1438,12 @@ namespace WaterThermalTanks {
                 bIsVScoil = true;
                 HPWH.DXCoilTypeNum = 0;
                 if (HPWH.bIsIHP) {
-                    HPWH.DXCoilType = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE";
+                    if (IntegratedHeatPump::IHPStorageType::LIQUIDDESICCANT 
+                        == IntegratedHeatPumps(HPWH.DXCoilNum).StorageType)
+                        HPWH.DXCoilType = "COILSYSTEM:DESICCANTSTORAGEHEATPUMP:AIRSOURCE";
+                    else 
+                        HPWH.DXCoilType = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE";
+                    
                 } else {
                     HPWH.DXCoilType = VariableSpeedCoils::VarSpeedCoil(HPWH.DXCoilNum).VarSpeedCoilType;
                 }
@@ -4128,7 +4135,9 @@ namespace WaterThermalTanks {
                             ErrorsFound = true;
                         } else {
                             if (!HPWH.StandAlone) {
-                                BranchNodeConnections::TestCompSet(HPWH.Type, HPWH.Name, Tank.InletNodeName1, Tank.OutletNodeName1, "Water Nodes");
+                                if (HPWH.DXCoilType != "COILSYSTEM:DESICCANTSTORAGEHEATPUMP:AIRSOURCE") {
+                                    BranchNodeConnections::TestCompSet(HPWH.Type, HPWH.Name, Tank.InletNodeName1, Tank.OutletNodeName1, "Water Nodes");
+                                }                                
                             }
                         }
 
