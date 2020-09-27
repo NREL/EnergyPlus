@@ -102,7 +102,7 @@
 
   Version,9.4;
 
-  Timestep,12;
+  Timestep,60;
 
   ConvergenceLimits,
     5,                       !- Minimum System Timestep {minutes}
@@ -1507,4 +1507,3 @@
     Shade_Status_Interior_Blind_On,  !- Variable Name 2
     Zn001_Wall001_Win001_Shading_Deploy_Status,  !- Variable Name 3
     IncidentAngle;           !- Variable Name 4
-
