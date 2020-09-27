@@ -2105,7 +2105,7 @@
     400.0,                   !- Hydronic Tubing Length {m}
     0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     OperativeTemperature,    !- Temperature Control Type
-    HalfFlowPower,           !- Setpoint Control Type
+    ZeroFlowPower,           !- Setpoint Control Type
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
@@ -2364,4 +2364,3 @@
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
     Until: 24:00,26.00;      !- Field 3
-

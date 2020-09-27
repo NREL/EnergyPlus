@@ -1300,7 +1300,7 @@
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     OperativeTemperature,    !- Temperature Control Type
-    HalfFlowPower,           !- Setpoint Control Type
+    ZeroFlowPower,           !- Setpoint Control Type
     2.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints;  !- Heating Setpoint Temperature Schedule Name
 
@@ -2572,4 +2572,3 @@
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
-
