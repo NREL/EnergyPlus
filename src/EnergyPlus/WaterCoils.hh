@@ -281,6 +281,7 @@ namespace WaterCoils {
         Real64 OriginalUACoilInternal;
         Real64 HdAvVt;
         int MatlLiqDesiccant; // materials of liquid desiccant
+        bool IsInPlantLoop; 
 
         bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
         int DesiccantDehumNum;          // index to desiccant dehumidifier object
@@ -291,6 +292,7 @@ namespace WaterCoils {
         int ControllerIndex;            // controller index used by water coil
         bool reportCoilFinalSizes;      // one time report of sizes to coil summary report
         bool AirLoopDOASFlag;           // True when this coil is used AirLoopDOAS
+        bool GetSizeNotInPlant;         //size not in plant water coils
 
         // Default Constructor
         WaterCoilEquipConditions()
@@ -315,11 +317,11 @@ namespace WaterCoils {
               SurfAreaWetFractionSaved(0.0), UACoilVariable(0.0), RatioAirSideToWaterSideConvect(1.0), AirSideNominalConvect(0.0),
               LiquidSideNominalConvect(0.0), Control(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
               WaterLoopNum(0), WaterLoopSide(0), WaterLoopBranchNum(0), WaterLoopCompNum(0), CondensateCollectMode(CondensateDiscarded),
-              CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false), FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0),
-              HdAvVt(1.0), MatlLiqDesiccant(0),
+              CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false), 
+              FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0), HdAvVt(1.0), MatlLiqDesiccant(0), IsInPlantLoop(true),
               DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0), 
-              DesiccantWaterLoss(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""),
-              ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false) 
+              DesiccantWaterLoss(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""), ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false),
+              GetSizeNotInPlant(true)
         {
         }
     };
@@ -361,11 +363,12 @@ namespace WaterCoils {
     //******************************************************************************
 
     void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration);
+    void InitWaterCoil_NotInPlant(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration);
 
-    void                                   // refactor for coil report
-    CalcAdjustedCoilUA(int const CoilNum); // refactor for coil report
+    void CalcAdjustedCoilUA(int const CoilNum); // refactor for coil report
 
     void SizeWaterCoil(EnergyPlusData &state, int const CoilNum);
+    void SizeWaterCoil_NotInPlant(EnergyPlusData &state, int const CoilNum);
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -416,7 +419,8 @@ namespace WaterCoils {
                              Real64 &OutletSolnEnthaly,       // Leaving solution enthalpy
                              Real64 &InletSolnEnthaly,        // Leaving solution enthalpy
                              Real64 &TotWaterCoilLoad,        // Total heat transfer rate(W)
-                             Real64 &SenWaterCoilLoad         // Total sensiable heat transfer rate(W)
+                             Real64 &SenWaterCoilLoad,
+                             Real64 &DesiccantWaterLoss // Total sensiable heat transfer rate(W)
    );
     // End Algorithm Section of the Module
 

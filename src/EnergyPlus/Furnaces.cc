@@ -10326,6 +10326,7 @@ namespace Furnaces {
         using VariableSpeedCoils::GRID_LATENT;
         using VariableSpeedCoils::GRID_SENLAT;
         using VariableSpeedCoils::GRID_SENSIBLE;
+        using VariableSpeedCoils::CompareGridSpeed;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500); // maximum number of iterations
@@ -10541,6 +10542,7 @@ namespace Furnaces {
 
                         if (!Furnace(FurnaceNum).bIsIHP) {
                             MaxSpeedNum = Furnace(FurnaceNum).NumOfSpeedCooling;
+                            MaxSpeedNum = CompareGridSpeed(Furnace(FurnaceNum).CoolingCoilIndex, MaxSpeedNum); 
                         }
 
                         for (i = 2; i <= MaxSpeedNum; ++i) {
@@ -10566,6 +10568,7 @@ namespace Furnaces {
                     } else {
                         if (!Furnace(FurnaceNum).bIsIHP) {
                             MaxSpeedNum = Furnace(FurnaceNum).NumOfSpeedHeating;
+                            MaxSpeedNum = CompareGridSpeed(Furnace(FurnaceNum).HeatingCoilIndex, MaxSpeedNum);
                         }
 
                         for (i = 2; i <= MaxSpeedNum; ++i) {
@@ -10644,6 +10647,7 @@ namespace Furnaces {
 
             if (!Furnace(FurnaceNum).bIsIHP) {
                 MaxSpeedNum = Furnace(FurnaceNum).NumOfSpeedCooling;
+                MaxSpeedNum = CompareGridSpeed(Furnace(FurnaceNum).CoolingCoilIndex, MaxSpeedNum);
             }
 
             for (i = SpeedNum; i <= MaxSpeedNum; ++i) {
@@ -10841,19 +10845,30 @@ namespace Furnaces {
             if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad)))) { // cooling or dehumidification
                 FanSpeed = CompareGridSpeed(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSCCoilIndex, 
                     SpeedNum);
-                if (FanSpeed == 0) FanSpeed = SpeedNum; // compressor off, allow maximum fan flow speed
+                if ((FanSpeed == 0) && (SpeedNum > 0) ){
+                    FanSpeed = 
+                        VarSpeedCoil(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSCCoilIndex)
+                        .NormSpedLevel; // compressor off, allow maximum fan flow speed
+                }
             } else {                                    // heating
-                FanSpeed = CompareGridSpeed(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).SHCoilIndex, 
+                FanSpeed = CompareGridSpeed(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSHCoilIndex, 
                     SpeedNum);
-                if (FanSpeed == 0) FanSpeed = SpeedNum; // compressor off, allow maximum fan flow speed
+                if ((FanSpeed == 0) && (SpeedNum > 0)) {
+                    FanSpeed = VarSpeedCoil(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSHCoilIndex)
+                                   .NormSpedLevel; // compressor off, allow maximum fan flow speed
+                }
             }
         } else {
             if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad)))) {//cooling or dehumidification
                 FanSpeed = CompareGridSpeed(Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum);
-                if (FanSpeed == 0) FanSpeed = SpeedNum; // compressor off, allow maximum fan flow speed            
+                if ((FanSpeed == 0) && (SpeedNum > 0)) {
+                    FanSpeed = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).NormSpedLevel;
+                }             
             } else {//heating
                 FanSpeed = CompareGridSpeed(Furnace(FurnaceNum).HeatingCoilIndex, SpeedNum);
-                if (FanSpeed == 0) FanSpeed = SpeedNum; // compressor off, allow maximum fan flow speed            
+                if ((FanSpeed == 0) && (SpeedNum > 0)) {
+                    FanSpeed = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).NormSpedLevel;
+                }           
             }
         }
 

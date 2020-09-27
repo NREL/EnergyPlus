@@ -345,6 +345,21 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
+                if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex)
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
+                                          IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex,
+                                          CyclingScheme,
+                                          MaxONOFFCyclesperHour,
+                                          HPTimeConstant,
+                                          FanDelayTime,
+                                          CompOp,
+                                          0.0,
+                                          1,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                          OnOffAirFlowRat);
 
                 IntegratedHeatPumps(DXCoilNum).AirFlowSavInAirLoop = airMassFlowRate;
             }
@@ -482,8 +497,25 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                if (IntegratedHeatPumps(DXCoilNum).SHCoilIndex != 0)
-                SimVariableSpeedCoils(state, BlankString,
+
+                if (true == IsGridResponsiveMode(IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex)) {
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
+                                          IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex,
+                                          CyclingScheme,
+                                          MaxONOFFCyclesperHour,
+                                          HPTimeConstant,
+                                          FanDelayTime,
+                                          CompOp,
+                                          PartLoadFrac,
+                                          SpeedNum,
+                                          SpeedRatio,
+                                          SensLoad,
+                                          LatentLoad,
+                                          OnOffAirFlowRat);
+                }
+                else if (IntegratedHeatPumps(DXCoilNum).SHCoilIndex != 0) {
+                    SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -495,7 +527,9 @@ namespace IntegratedHeatPump {
                                       SpeedRatio,
                                       SensLoad,
                                       LatentLoad,
-                                      OnOffAirFlowRat);
+                                      OnOffAirFlowRat);                
+                }
+
 
                 IntegratedHeatPumps(DXCoilNum).AirFlowSavInAirLoop = airMassFlowRate;
             }
@@ -632,6 +666,22 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
+                if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex)
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
+                                          IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex,
+                                          CyclingScheme,
+                                          MaxONOFFCyclesperHour,
+                                          HPTimeConstant,
+                                          FanDelayTime,
+                                          CompOp,
+                                          0.0,
+                                          1,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                          OnOffAirFlowRat);
+
                 if (IntegratedHeatPumps(DXCoilNum).DWHCoilIndex != 0)
                 SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).DWHCoilIndex,
@@ -797,6 +847,21 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
+                if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex)
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
+                                          IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex,
+                                          CyclingScheme,
+                                          MaxONOFFCyclesperHour,
+                                          HPTimeConstant,
+                                          FanDelayTime,
+                                          CompOp,
+                                          0.0,
+                                          1,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                          OnOffAirFlowRat);
 
                 IntegratedHeatPumps(DXCoilNum).AirFlowSavInAirLoop = airMassFlowRate;
             }
@@ -950,6 +1015,22 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       OnOffAirFlowRat);
 
+                 if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex)
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
+                                          IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex,
+                                          CyclingScheme,
+                                          MaxONOFFCyclesperHour,
+                                          HPTimeConstant,
+                                          FanDelayTime,
+                                          CompOp,
+                                          0.0,
+                                          1,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                          OnOffAirFlowRat);
+
                 IntegratedHeatPumps(DXCoilNum).AirFlowSavInWaterLoop = airMassFlowRate;
             }
 
@@ -1101,6 +1182,22 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       OnOffAirFlowRat);
 
+                if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex)
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
+                                          IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex,
+                                          CyclingScheme,
+                                          MaxONOFFCyclesperHour,
+                                          HPTimeConstant,
+                                          FanDelayTime,
+                                          CompOp,
+                                          0.0,
+                                          1,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                          OnOffAirFlowRat);
+
                 IntegratedHeatPumps(DXCoilNum).AirFlowSavInAirLoop = airMassFlowRate;
             }
 
@@ -1210,6 +1307,22 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
+               if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex)
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
+                                          IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex,
+                                          CyclingScheme,
+                                          MaxONOFFCyclesperHour,
+                                          HPTimeConstant,
+                                          FanDelayTime,
+                                          CompOp,
+                                          0.0,
+                                          1,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                          OnOffAirFlowRat);
+
                 if (IntegratedHeatPumps(DXCoilNum).DWHCoilIndex != 0)
                 SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).DWHCoilIndex,
@@ -1388,6 +1501,23 @@ namespace IntegratedHeatPump {
                                   0.0,
                                   0.0,
                                   OnOffAirFlowRat);
+
+             if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex)
+                SimVariableSpeedCoils(state,
+                                      BlankString,
+                                      IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex,
+                                      CyclingScheme,
+                                      MaxONOFFCyclesperHour,
+                                      HPTimeConstant,
+                                      FanDelayTime,
+                                      CompOp,
+                                      0.0,
+                                      1,
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      OnOffAirFlowRat);
+
             if (IntegratedHeatPumps(DXCoilNum).DWHCoilIndex != 0)
             SimVariableSpeedCoils(state, BlankString,
                                   IntegratedHeatPumps(DXCoilNum).DWHCoilIndex,
@@ -1646,6 +1776,22 @@ namespace IntegratedHeatPump {
                                           0.0,
                                           OnOffAirFlowRat);
 
+                 if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex)
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
+                                          IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex,
+                                          CyclingScheme,
+                                          MaxONOFFCyclesperHour,
+                                          HPTimeConstant,
+                                          FanDelayTime,
+                                          CompOp,
+                                          0.0,
+                                          1,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                          OnOffAirFlowRat);
+
                 IntegratedHeatPumps(DXCoilNum).AirFlowSavInAirLoop = airMassFlowRate;
             }
 
@@ -1790,7 +1936,23 @@ namespace IntegratedHeatPump {
                                                 0.0);
                 }
 
-                if (IntegratedHeatPumps(DXCoilNum).SHCoilIndex != 0)
+                 if (true == IsGridResponsiveMode(IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex)) {
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
+                                          IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex,
+                                          CyclingScheme,
+                                          MaxONOFFCyclesperHour,
+                                          HPTimeConstant,
+                                          FanDelayTime,
+                                          CompOp,
+                                          PartLoadFrac,
+                                          SpeedNum,
+                                          SpeedRatio,
+                                          SensLoad,
+                                          LatentLoad,
+                                          OnOffAirFlowRat);
+                }
+                else if (IntegratedHeatPumps(DXCoilNum).SHCoilIndex != 0) {
                     SimVariableSpeedCoils(state,
                                           BlankString,
                                           IntegratedHeatPumps(DXCoilNum).SHCoilIndex,
@@ -1804,7 +1966,9 @@ namespace IntegratedHeatPump {
                                           SpeedRatio,
                                           SensLoad,
                                           LatentLoad,
-                                          OnOffAirFlowRat);
+                                          OnOffAirFlowRat);                 
+                 }
+
 
                 IntegratedHeatPumps(DXCoilNum).AirFlowSavInAirLoop = airMassFlowRate;
             }
@@ -1926,6 +2090,22 @@ namespace IntegratedHeatPump {
                     SimVariableSpeedCoils(state,
                                           BlankString,
                                           IntegratedHeatPumps(DXCoilNum).SHCoilIndex,
+                                          CyclingScheme,
+                                          MaxONOFFCyclesperHour,
+                                          HPTimeConstant,
+                                          FanDelayTime,
+                                          CompOp,
+                                          0.0,
+                                          1,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                          OnOffAirFlowRat);
+
+                 if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex)
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
+                                          IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex,
                                           CyclingScheme,
                                           MaxONOFFCyclesperHour,
                                           HPTimeConstant,
@@ -2174,6 +2354,22 @@ namespace IntegratedHeatPump {
                                           0.0,
                                           OnOffAirFlowRat);
 
+                if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex)
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
+                                          IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex,
+                                          CyclingScheme,
+                                          MaxONOFFCyclesperHour,
+                                          HPTimeConstant,
+                                          FanDelayTime,
+                                          CompOp,
+                                          0.0,
+                                          1,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                          OnOffAirFlowRat);
+
                 IntegratedHeatPumps(DXCoilNum).AirFlowSavInAirLoop = airMassFlowRate;
             }
 
@@ -2343,6 +2539,22 @@ namespace IntegratedHeatPump {
                                           0.0,
                                           OnOffAirFlowRat);
 
+                if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex)
+                    SimVariableSpeedCoils(state,
+                                          BlankString,
+                                          IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex,
+                                          CyclingScheme,
+                                          MaxONOFFCyclesperHour,
+                                          HPTimeConstant,
+                                          FanDelayTime,
+                                          CompOp,
+                                          0.0,
+                                          1,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                          OnOffAirFlowRat);
+
                 IntegratedHeatPumps(DXCoilNum).AirFlowSavInAirLoop = airMassFlowRate;
             }
 
@@ -2466,6 +2678,22 @@ namespace IntegratedHeatPump {
                 SimVariableSpeedCoils(state,
                                       BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHCoilIndex,
+                                      CyclingScheme,
+                                      MaxONOFFCyclesperHour,
+                                      HPTimeConstant,
+                                      FanDelayTime,
+                                      CompOp,
+                                      0.0,
+                                      1,
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      OnOffAirFlowRat);
+
+             if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex)
+                SimVariableSpeedCoils(state,
+                                      BlankString,
+                                      IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
                                       HPTimeConstant,
@@ -2850,6 +3078,32 @@ namespace IntegratedHeatPump {
                 IntegratedHeatPumps(DXCoilNum).GridSCCoilIndex = IntegratedHeatPumps(DXCoilNum).SCCoilIndex;
             }
 
+            if (!lAlphaBlanks(13)) {
+                IntegratedHeatPumps(DXCoilNum).GridSHCoilType = "COIL:HEATING:DX:VARIABLESPEED";
+                IntegratedHeatPumps(DXCoilNum).GridSHCoilName = AlphArray(13);
+                Coiltype = IntegratedHeatPumps(DXCoilNum).GridSHCoilType;
+                CoilName = IntegratedHeatPumps(DXCoilNum).GridSHCoilName;
+
+                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                if (IsNotOK) {
+                    ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                    ErrorsFound = true;
+                } else {
+                    errFlag = false;
+                    IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
+                    if (errFlag) {
+                        ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                        ErrorsFound = true;
+                    }
+                }
+            } else {
+                IntegratedHeatPumps(DXCoilNum).GridSHCoilType = "COIL:HEATING:DX:VARIABLESPEED";
+                IntegratedHeatPumps(DXCoilNum).GridSHCoilName = IntegratedHeatPumps(DXCoilNum).SHCoilName;
+                Coiltype = IntegratedHeatPumps(DXCoilNum).GridSHCoilType;
+                CoilName = IntegratedHeatPumps(DXCoilNum).GridSHCoilName;
+                IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex = IntegratedHeatPumps(DXCoilNum).SHCoilIndex;
+            }
+
             IntegratedHeatPumps(DXCoilNum).TindoorOverCoolAllow = NumArray(1);
             IntegratedHeatPumps(DXCoilNum).TambientOverCoolAllow = NumArray(2);
             IntegratedHeatPumps(DXCoilNum).TindoorWHHighPriority = NumArray(3);
@@ -2869,7 +3123,8 @@ namespace IntegratedHeatPump {
             if (!lNumericBlanks(16)) IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilSize = NumArray(16); // 0.9
             if (!lNumericBlanks(17)) IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilSize = NumArray(17);   // 0.1
             if (!lNumericBlanks(18)) IntegratedHeatPumps(DXCoilNum).EnDehumCoilSize = NumArray(18);   // 0.5
-            if (!lNumericBlanks(19)) IntegratedHeatPumps(DXCoilNum).GridCoilSize = NumArray(19);      // 0.9
+            if (!lNumericBlanks(19)) IntegratedHeatPumps(DXCoilNum).GridSCCoilSize = NumArray(19);      // 0.9
+            if (!lNumericBlanks(20)) IntegratedHeatPumps(DXCoilNum).GridSHCoilSize = NumArray(20);    // 0.9
 
             // Due to the overlapping coil objects, compsets and node registrations are handled as follows:
             //  1. The ASIHP coil object is registered as four different coils, Name+" Cooling Coil", Name+" Heating Coil",
@@ -3114,6 +3369,37 @@ namespace IntegratedHeatPump {
                                        1,
                                        ObjectIsNotParent,
                                        ErrorsFound);
+
+            if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex) {
+                if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex).AirInletNodeNum != InNode) ||
+                    (VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex).AirOutletNodeNum != OutNode)) {
+                    ShowContinueError("Mistaken air node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).GridSHCoilName +
+                                      "-wrong coil node names.");
+                    ErrorsFound = true;
+                }
+                SetUpCompSets(CurrentModuleObject,
+                              IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil",
+                              IntegratedHeatPumps(DXCoilNum).GridSHCoilType,
+                              IntegratedHeatPumps(DXCoilNum).GridSHCoilName,
+                              InNodeName,
+                              OutNodeName);
+                OverrideNodeConnectionType(InNode,
+                                           InNodeName,
+                                           IntegratedHeatPumps(DXCoilNum).GridSHCoilType,
+                                           IntegratedHeatPumps(DXCoilNum).GridSHCoilName,
+                                           "Internal",
+                                           1,
+                                           ObjectIsNotParent,
+                                           ErrorsFound);
+                OverrideNodeConnectionType(OutNode,
+                                           OutNodeName,
+                                           IntegratedHeatPumps(DXCoilNum).GridSHCoilType,
+                                           IntegratedHeatPumps(DXCoilNum).GridSHCoilName,
+                                           "Internal",
+                                           1,
+                                           ObjectIsNotParent,
+                                           ErrorsFound);
+            }
 
             if (IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex != 0) {
                 if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex).AirInletNodeNum != InNode) ||
@@ -3700,8 +3986,34 @@ namespace IntegratedHeatPump {
                 }
             }
 
+            if (!lAlphaBlanks(17)) {
+                IntegratedHeatPumps(DXCoilNum).GridSHCoilType = "COIL:HEATING:DX:VARIABLESPEED";
+                IntegratedHeatPumps(DXCoilNum).GridSHCoilName = AlphArray(17);
+                Coiltype = IntegratedHeatPumps(DXCoilNum).GridSHCoilType;
+                CoilName = IntegratedHeatPumps(DXCoilNum).GridSHCoilName;
+
+                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                if (IsNotOK) {
+                    ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                    ErrorsFound = true;
+                } else {
+                    errFlag = false;
+                    IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
+                    if (errFlag) {
+                        ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                        ErrorsFound = true;
+                    }
+                }
+            } else {
+                IntegratedHeatPumps(DXCoilNum).GridSHCoilType = "COIL:HEATING:DX:VARIABLESPEED";
+                IntegratedHeatPumps(DXCoilNum).GridSHCoilName = IntegratedHeatPumps(DXCoilNum).SHCoilName;
+                Coiltype = IntegratedHeatPumps(DXCoilNum).GridSHCoilType;
+                CoilName = IntegratedHeatPumps(DXCoilNum).GridSHCoilName;
+                IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex = IntegratedHeatPumps(DXCoilNum).SHCoilIndex;
+            }
+
             //supplemental heater type
-            if (!lAlphaBlanks(17)) IntegratedHeatPumps(DXCoilNum).SUPHEATTYPE = AlphArray(17);
+            if (!lAlphaBlanks(18)) IntegratedHeatPumps(DXCoilNum).SUPHEATTYPE = AlphArray(18);
             else IntegratedHeatPumps(DXCoilNum).SUPHEATTYPE = "NONE";
 
             IntegratedHeatPumps(DXCoilNum).MinSpedSCWH = int(NumArray(1));
@@ -3718,13 +4030,14 @@ namespace IntegratedHeatPump {
             if (UtilityRoutines::SameString(IntegratedHeatPumps(DXCoilNum).SUPHEATTYPE, "NONE"))
                 IntegratedHeatPumps(DXCoilNum).TregenTarget =  -10000.0; 
 
-            if (!lNumericBlanks(11)) IntegratedHeatPumps(DXCoilNum).SHCoilSize = NumArray(10);        // 1.0
-            if (!lNumericBlanks(12)) IntegratedHeatPumps(DXCoilNum).DWHCoilSize = NumArray(11);       // 1.0
-            if (!lNumericBlanks(13)) IntegratedHeatPumps(DXCoilNum).SCWHCoilSize = NumArray(12);      // 1.0
-            if (!lNumericBlanks(14)) IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilSize = NumArray(13); // 1.0
-            if (!lNumericBlanks(15)) IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilSize = NumArray(14);   // 0.13
-            if (!lNumericBlanks(18)) IntegratedHeatPumps(DXCoilNum).EnDehumCoilSize = NumArray(15);   // 0.5
-            if (!lNumericBlanks(19)) IntegratedHeatPumps(DXCoilNum).GridCoilSize = NumArray(16);      // 0.9
+            if (!lNumericBlanks(10)) IntegratedHeatPumps(DXCoilNum).SHCoilSize = NumArray(10);        // 1.0
+            if (!lNumericBlanks(11)) IntegratedHeatPumps(DXCoilNum).DWHCoilSize = NumArray(11);       // 1.0
+            if (!lNumericBlanks(12)) IntegratedHeatPumps(DXCoilNum).SCWHCoilSize = NumArray(12);      // 1.0
+            if (!lNumericBlanks(13)) IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilSize = NumArray(13); // 1.0
+            if (!lNumericBlanks(14)) IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilSize = NumArray(14);   // 0.13
+            if (!lNumericBlanks(15)) IntegratedHeatPumps(DXCoilNum).EnDehumCoilSize = NumArray(15);   // 0.5
+            if (!lNumericBlanks(16)) IntegratedHeatPumps(DXCoilNum).GridSCCoilSize = NumArray(16);      // 0.9
+            if (!lNumericBlanks(17)) IntegratedHeatPumps(DXCoilNum).GridSCCoilSize = NumArray(17);      // 0.9
 
             // Due to the overlapping coil objects, compsets and node registrations are handled as follows:
             //  1. The ASIHP coil object is registered as four different coils, Name+" Cooling Coil", Name+" Heating Coil",
@@ -3971,6 +4284,36 @@ namespace IntegratedHeatPump {
                                        ObjectIsNotParent,
                                        ErrorsFound);
 
+             if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex) {
+                if ((VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex).AirInletNodeNum != InNode) ||
+                    (VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex).AirOutletNodeNum != OutNode)) {
+                    ShowContinueError("Mistaken air node connection: " + CurrentModuleObject + IntegratedHeatPumps(DXCoilNum).GridSHCoilName +
+                                      "-wrong coil node names.");
+                    ErrorsFound = true;
+                }
+                SetUpCompSets(CurrentModuleObject,
+                              IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil",
+                              IntegratedHeatPumps(DXCoilNum).GridSHCoilType,
+                              IntegratedHeatPumps(DXCoilNum).GridSHCoilName,
+                              InNodeName,
+                              OutNodeName);
+                OverrideNodeConnectionType(InNode,
+                                           InNodeName,
+                                           IntegratedHeatPumps(DXCoilNum).GridSHCoilType,
+                                           IntegratedHeatPumps(DXCoilNum).GridSHCoilName,
+                                           "Internal",
+                                           1,
+                                           ObjectIsNotParent,
+                                           ErrorsFound);
+                OverrideNodeConnectionType(OutNode,
+                                           OutNodeName,
+                                           IntegratedHeatPumps(DXCoilNum).GridSHCoilType,
+                                           IntegratedHeatPumps(DXCoilNum).GridSHCoilName,
+                                           "Internal",
+                                           1,
+                                           ObjectIsNotParent,
+                                           ErrorsFound);
+            }
 
             if (IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex != 0) {
                 // water node connections
@@ -4581,8 +4924,7 @@ namespace IntegratedHeatPump {
         }
 
         // pass SC coil capacity to enhanced dehumidification coil
-        if ((IntegratedHeatPumps(DXCoilNum).EnDehumCoilIndex != 0) && 
-            (IntegratedHeatPumps(DXCoilNum).EnDehumCoilIndex != IntegratedHeatPumps(DXCoilNum).SCCoilIndex)) {
+        if (IntegratedHeatPumps(DXCoilNum).EnDehumCoilIndex != IntegratedHeatPumps(DXCoilNum).SCCoilIndex) {
             if (VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).EnDehumCoilIndex).RatedCapCoolTotal == AutoSize) {
                 VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).EnDehumCoilIndex).RatedCapCoolTotal =
                     RatedCapacity * IntegratedHeatPumps(DXCoilNum).EnDehumCoilSize; // 0.9
@@ -4597,11 +4939,10 @@ namespace IntegratedHeatPump {
         }
 
         // pass SC coil capacity to grid responsive cooling coil
-        if ((IntegratedHeatPumps(DXCoilNum).GridSCCoilIndex != 0) && 
-            (IntegratedHeatPumps(DXCoilNum).GridSCCoilIndex != IntegratedHeatPumps(DXCoilNum).SCCoilIndex)){
+        if (IntegratedHeatPumps(DXCoilNum).GridSCCoilIndex != IntegratedHeatPumps(DXCoilNum).SCCoilIndex){
             if (VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).GridSCCoilIndex).RatedCapCoolTotal == AutoSize) {
                 VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).GridSCCoilIndex).RatedCapCoolTotal =
-                    RatedCapacity * IntegratedHeatPumps(DXCoilNum).GridCoilSize; // 0.9
+                    RatedCapacity * IntegratedHeatPumps(DXCoilNum).GridSCCoilSize; // 0.9
             };
 
             // size SCDWH air coil
@@ -4695,62 +5036,100 @@ namespace IntegratedHeatPump {
                     IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilSize; // 0.1
             }
 
-            SizeVarSpeedCoil(state, IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex);       
+            SizeVarSpeedCoil(state, IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex);      
+
+            
+            if (ErrorsFound) {
+                ShowSevereError("SizeIHP: failed to size SHDWH water heating coil\"" + IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName + "\"");
+                ErrorsFound = false;
+            };
         }
 
-        if (IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate == AutoSize) {
-            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate =
-                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).RatedAirVolFlowRate * 1.225 * 10.0; 
-            //standard air density
+        // pass SH coil capacity to grid responsive heating coil
+        if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex) {
+
+             // associate SC coil with SH coil
+            SetVarSpeedCoilData(state, IntegratedHeatPumps(DXCoilNum).GridSCCoilIndex, ErrorsFound, _, 
+                IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex);
+            if (ErrorsFound) {
+                ShowSevereError("SizeIHP: Could not match cooling coil\"" + IntegratedHeatPumps(DXCoilNum).GridSCCoilName + "\" with heating coil=\"" +
+                                IntegratedHeatPumps(DXCoilNum).GridSHCoilName + "\"");
+                ErrorsFound = false;
+            };
+
+            if (VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex).RatedCapHeat == AutoSize) {
+                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex).RatedCapHeat =
+                    RatedCapacity * IntegratedHeatPumps(DXCoilNum).GridSHCoilSize; // 0.9
+            };
+
+            // size SCDWH air coil
+            SizeVarSpeedCoil(state, IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex);
+            if (ErrorsFound) {
+                ShowSevereError("SizeIHP: failed to size grid responsive cooling coil\"" + IntegratedHeatPumps(DXCoilNum).GridSHCoilName + "\"");
+                ErrorsFound = false;
+            };
         }
-
-        if (ErrorsFound) {
-            ShowSevereError("SizeIHP: failed to size SHDWH water heating coil\"" + IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName + "\"");
-            ErrorsFound = false;
-        };
-
-        IntegratedHeatPumps(DXCoilNum).IHPCoilsSized = true;
 
         if (IntegratedHeatPumps(DXCoilNum).DWHCoilIndex != 0) {
-            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate = 
-                IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowSize *
-                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).DesignWaterMassFlowRate;
-        }
-        else if (IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex != 0) {
-            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate = 
-                IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowSize *
-                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).DesignWaterMassFlowRate;
+            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowSize *
+                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex)
+                    .MSRatedWaterMassFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).NormSpedLevel);
+        } else if (IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex != 0) {
+            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowSize *
+                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex)
+                    .MSRatedWaterMassFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).NormSpedLevel);
         }
 
         int iCoilID = IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex;
         if (iCoilID != 0) {
-            WaterCoil(iCoilID).DesAirMassFlowRate = 
-                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).DesignAirMassFlowRate;    
-            WaterCoil(iCoilID).DesAirVolFlowRate = 
-                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).DesignAirVolFlowRate; 
-            WaterCoil(iCoilID).InletWaterMassFlowRate = 
-                IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate; 
+            WaterCoil(iCoilID).DesAirMassFlowRate =
+                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex)
+                    .MSRatedAirMassFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NormSpedLevel);
+            WaterCoil(iCoilID).DesAirVolFlowRate =
+                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex)
+                    .MSRatedAirVolFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NormSpedLevel);
 
-            SizeWaterCoil_NotInPlant(state, iCoilID); 
+            WaterCoil(iCoilID).InletWaterMassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate;
+            WaterCoil(iCoilID).DesInletSolnConcentration = IntegratedHeatPumps(DXCoilNum).Concen_Set; 
+            WaterCoil(iCoilID).MaxWaterMassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate;
+            WaterCoil(iCoilID).DesInletAirTemp = 13.8; 
+            WaterCoil(iCoilID).DesInletAirHumRat = 0.00788862; // 
+            WaterCoil(iCoilID).DesOutletAirTemp = 19.0;
+            WaterCoil(iCoilID).DesOutletAirHumRat = 0.00668435; // 
+            WaterCoil(iCoilID).DesInletWaterTemp = 20.0;
+
+            SizeWaterCoil_NotInPlant(state, iCoilID);
         }
 
         iCoilID = IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex;
         if (iCoilID != 0) {
-            WaterCoil(iCoilID).DesAirMassFlowRate = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).DesignAirMassFlowRate;
-            WaterCoil(iCoilID).DesAirVolFlowRate = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).DesignAirVolFlowRate;
-            WaterCoil(iCoilID).InletWaterMassFlowRate = 
-                IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate;
+            WaterCoil(iCoilID).DesAirMassFlowRate =
+                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex)
+                    .MSRatedAirMassFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NormSpedLevel);
+            WaterCoil(iCoilID).DesAirVolFlowRate = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex)
+                                                       .MSRatedAirVolFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NormSpedLevel);
+
+            WaterCoil(iCoilID).InletWaterMassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate;
+            WaterCoil(iCoilID).DesInletSolnConcentration = IntegratedHeatPumps(DXCoilNum).Concen_Set;
+            WaterCoil(iCoilID).MaxWaterMassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate;
+            WaterCoil(iCoilID).DesInletAirTemp = 13.8;
+            WaterCoil(iCoilID).DesInletAirHumRat = 0.00788862; // 
+            WaterCoil(iCoilID).DesOutletAirTemp = 19.0;
+            WaterCoil(iCoilID).DesOutletAirHumRat = 0.00668435; // 
+            WaterCoil(iCoilID).DesInletWaterTemp = 20.0;
 
             SizeWaterCoil_NotInPlant(state, iCoilID);
         }
 
         iCoilID = IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex;
         if (iCoilID != 0) {
-            EvapCond(iCoilID).IndirectVolFlowRate = 
-                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).DesignAirVolFlowRate;
+            EvapCond(iCoilID).IndirectVolFlowRate = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).DesignAirVolFlowRate;
 
             SizeEvapCooler(iCoilID);
         }
+
+
+        IntegratedHeatPumps(DXCoilNum).IHPCoilsSized = true;
 
     }
 
@@ -4943,6 +5322,12 @@ namespace IntegratedHeatPump {
             if (IntegratedHeatPumps(DXCoilNum).LDHeatMode == HeatOn) bWHCall = true;  
             else bWHCall = false;  
         }
+
+        WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).DesInletSolnConcentration = 
+            IntegratedHeatPumps(DXCoilNum).SaltConcentration;
+
+        WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).DesInletSolnConcentration = 
+            IntegratedHeatPumps(DXCoilNum).SaltConcentration; 
 
         return (bWHCall); 
     }
@@ -5216,6 +5601,10 @@ namespace IntegratedHeatPump {
         if (IntegratedHeatPumps(DXCoilNum).SHCoilIndex != 0)
         SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).SHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+
+        if (IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex != IntegratedHeatPumps(DXCoilNum).SHCoilIndex)
+            SimVariableSpeedCoils(
+                state, BlankString, IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 
         if (IntegratedHeatPumps(DXCoilNum).DWHCoilIndex != 0)
         SimVariableSpeedCoils(state,
@@ -5587,6 +5976,7 @@ namespace IntegratedHeatPump {
         using General::TrimSigDigits;
         using VariableSpeedCoils::VarSpeedCoil;
         using VariableSpeedCoils::IsGridResponsiveMode;
+        using VariableSpeedCoils::CompareGridSpeed; 
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
@@ -5607,14 +5997,21 @@ namespace IntegratedHeatPump {
             SpeedNum = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NumOfSpeeds;
             break;
         case IHPOperationMode::SCMode:
-            if(true == IsGridResponsiveMode(IntegratedHeatPumps(DXCoilNum).GridSCCoilIndex))
+            if(true == IsGridResponsiveMode(IntegratedHeatPumps(DXCoilNum).GridSCCoilIndex)) {
                 SpeedNum = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).GridSCCoilIndex).NumOfSpeeds;
+                SpeedNum = CompareGridSpeed(IntegratedHeatPumps(DXCoilNum).GridSCCoilIndex, SpeedNum); 
+            }                
             else if (IntegratedHeatPumps(DXCoilNum).bIsEnhanchedDumLastMoment == true)
                 SpeedNum = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).EnDehumCoilIndex).NumOfSpeeds;
             else SpeedNum = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NumOfSpeeds;
             break;
         case IHPOperationMode::SHMode:
-            SpeedNum = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHCoilIndex).NumOfSpeeds;
+            if (true == IsGridResponsiveMode(IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex)) {
+                SpeedNum = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex).NumOfSpeeds;
+                SpeedNum = CompareGridSpeed(IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex, SpeedNum);            
+            }
+            else SpeedNum = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHCoilIndex).NumOfSpeeds;
+
             break;
         case IHPOperationMode::DWHMode:
             SpeedNum = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).NumOfSpeeds;
@@ -5684,7 +6081,9 @@ namespace IntegratedHeatPump {
 
             break;
         case IHPOperationMode::SHMode:
-            IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).SHCoilIndex;
+            if (true == IsGridResponsiveMode(IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex))
+                IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex;
+            else IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).SHCoilIndex;
             if (!IsCallbyWH) // call from air loop
             {
                 FlowScale = IntegratedHeatPumps(DXCoilNum).HeatVolFlowScale;
@@ -5738,7 +6137,15 @@ namespace IntegratedHeatPump {
         }
 
         if (!IsResultFlow) {
-            if (1 == SpeedNum)
+            if (SpeedNum == 0) {
+                if (true == IsGridResponsiveMode(IHPCoilIndex)) {
+                    AirVolFlowRate = 
+                        VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(VarSpeedCoil(IHPCoilIndex).NormSpedLevel);
+                } else {
+                    AirVolFlowRate = 0.0;
+                }
+            }
+            else if (1 == SpeedNum)
                 AirVolFlowRate = VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(SpeedNum);
             else
                 AirVolFlowRate = SpeedRatio * VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(SpeedNum) +
@@ -5880,7 +6287,10 @@ namespace IntegratedHeatPump {
             }
             break;
         case IHPOperationMode::SHMode:
-            IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).SHCoilIndex;
+            if (true == IsGridResponsiveMode(IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex))
+                IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex;
+            else IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).SHCoilIndex;
+
             if (!IsCallbyWH) {
                 FlowScale = IntegratedHeatPumps(DXCoilNum).HeatVolFlowScale;
             } else {
@@ -5941,7 +6351,19 @@ namespace IntegratedHeatPump {
         }
 
         if (!IsResultFlow) {
-            if (SpeedNum == 1) {
+
+            if (SpeedNum == 0) {
+                if (true == IsGridResponsiveMode(IHPCoilIndex)) 
+                {
+                    AirMassFlowRate = 
+                        VarSpeedCoil(IHPCoilIndex).MSRatedAirMassFlowRate(VarSpeedCoil(IHPCoilIndex).NormSpedLevel);
+                } 
+                else
+                {
+                    AirMassFlowRate = 0.0; 
+                }
+            }
+            else if (SpeedNum == 1) {
                 AirMassFlowRate = VarSpeedCoil(IHPCoilIndex).MSRatedAirMassFlowRate(SpeedNum);
             } else {
                 AirMassFlowRate = SpeedRatio * VarSpeedCoil(IHPCoilIndex).MSRatedAirMassFlowRate(SpeedNum) +

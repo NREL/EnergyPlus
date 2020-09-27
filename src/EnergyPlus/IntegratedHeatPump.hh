@@ -108,6 +108,10 @@ namespace IntegratedHeatPump {
         std::string SHCoilName;
         int SHCoilIndex; // Index to SH coil
 
+        std::string GridSHCoilType; // Numeric Equivalent for grid SH Coil Type
+        std::string GridSHCoilName;
+        int GridSHCoilIndex; // Index to grid SH coil
+
         std::string SCWHCoilType; // Numeric Equivalent for SCWH Coil Type
         std::string SCWHCoilName;
         int SCWHCoilIndex; // Index to SCWH coil
@@ -173,7 +177,8 @@ namespace IntegratedHeatPump {
         Real64 Concen_band;//salt concentration deadband
         
         Real64 EnDehumCoilSize; //sizing factor
-        Real64 GridCoilSize; // sizing factor
+        Real64 GridSCCoilSize; // sizing factor
+        Real64 GridSHCoilSize;    // sizing factor
         Real64 SCWHCoilSize;    // sizing factor
         Real64 SHCoilSize; // sizing factor
         Real64 DWHCoilSize; // sizing factor
@@ -300,7 +305,8 @@ namespace IntegratedHeatPump {
               SHDWHHeatCoilSize(0.9),
               SHDWHWHCoilSize(0.1),
               EnDehumCoilSize(0.95),
-              GridCoilSize(1.0), 
+              GridSCCoilSize(1.0), 
+              GridSHCoilSize(1.0), 
               StorageType(IHPStorageType::HOTWATER), 
               LDDehumCoilIndex(0),
               LDRegenCoilIndex(0), 
@@ -316,7 +322,7 @@ namespace IntegratedHeatPump {
               DehumLDMassFlowRate(0.0), SupHeatRate(0.0), WaterMiddleNodeNum(0), 
               LDLoopChecked(false),
               SaltConcentration(0.0), LDHeatMode(0), TankLDMass(0.0), TankSaltMass(0.0), 
-              DehumLDMassFlowSize(1.0)
+              DehumLDMassFlowSize(1.0), GridSHCoilIndex(0)
         {
         }
     };

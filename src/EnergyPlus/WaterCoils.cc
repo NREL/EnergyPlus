@@ -341,7 +341,12 @@ namespace WaterCoils {
         }
 
         // With the correct CoilNum Initialize
-        InitWaterCoil(state, CoilNum, FirstHVACIteration); // Initialize all WaterCoil related parameters
+        if (WaterCoil(CoilNum).IsInPlantLoop) {
+            InitWaterCoil(state, CoilNum, FirstHVACIteration); // Initialize all WaterCoil related parameters
+        } else {
+            InitWaterCoil_NotInPlant(state, CoilNum, FirstHVACIteration); // Initialize all WaterCoil related parameters
+        }
+        
 
         if (present(FanOpMode)) {
             OpMode = FanOpMode;
@@ -1369,6 +1374,7 @@ namespace WaterCoils {
             PlantLoopScanFlag = true;
 
             for (tempCoilNum = 1; tempCoilNum <= NumWaterCoils; ++tempCoilNum) {
+
                 GetControllerNameAndIndex(state,
                                           WaterCoil(tempCoilNum).WaterInletNodeNum,
                                           WaterCoil(tempCoilNum).ControllerName,
@@ -1407,6 +1413,7 @@ namespace WaterCoils {
                     }
                 }
             }
+            
             WaterCoilControllerCheckOneTimeFlag = false;
             if (ErrorsFound) {
                 ShowFatalError("Program terminated for previous condition.");
@@ -1428,11 +1435,16 @@ namespace WaterCoils {
                                     _,
                                     _,
                                     _);
+            
             if (errFlag) {
                 ShowFatalError("InitWaterCoil: Program terminated for previous conditions.");
             }
             PlantLoopScanFlag(CoilNum) = false;
         }
+
+
+
+
         if (!SysSizingCalc && MySizeFlag(CoilNum)) {
             // for each coil, do the sizing once.
             SizeWaterCoil(state, CoilNum);
@@ -2250,6 +2262,252 @@ namespace WaterCoils {
         WaterCoil(CoilNum).TotWaterCoolingCoilRate = 0.0;
         WaterCoil(CoilNum).SenWaterCoolingCoilRate = 0.0;
     }
+ 
+    void InitWaterCoil_NotInPlant(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Richard J. Liesen
+        //       DATE WRITTEN   February 1998
+        //       MODIFIED       April 2004: Rahul Chillar
+        //                      November 2013: XP, Tianzhen Hong to handle fouling coils
+        //                      August 2020: Jian Sun to add the dehumidification liquid desiccant coil
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine is for initializations of the WaterCoil Components.
+
+        // METHODOLOGY EMPLOYED:
+        // Uses the status flags to trigger initializations.
+
+        // REFERENCES:
+
+        // Using/Aliasing
+        using General::Iterate;
+        using General::RoundSigDigits;
+        using General::SafeDivide;
+        using General::SolveRoot;
+        using namespace OutputReportPredefined;
+        using PlantUtilities::InitComponentNodes;
+        using PlantUtilities::RegisterPlantCompDesignFlow;
+        using PlantUtilities::ScanPlantLoopsForObject;
+        using namespace FaultsManager;
+        using HVACControllers::GetControllerNameAndIndex;
+        using SimAirServingZones::CheckWaterCoilIsOnAirLoop;
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        Real64 const SmallNo(1.e-9); // SmallNo number in place of zero
+        int const itmax(10);
+        int const MaxIte(500); // Maximum number of iterations
+        static std::string const RoutineName("InitWaterCoil");
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 CapacitanceAir;             // Air-side capacity rate(W/C)
+       
+        int AirInletNode;
+        int WaterInletNode;
+        int WaterOutletNode;
+
+        static Array1D<Real64> DesCpAir;        // CpAir at Design Inlet Air Temp
+        static Array1D<Real64> DesUARangeCheck; // Value for range check based on Design Inlet Air Humidity Ratio
+        /////////// hoisted into namespace InitWaterCoilOneTimeFlag
+        // static bool MyOneTimeFlag( true );
+        /////////////////////////
+        static Array1D_bool MyEnvrnFlag;
+        static Array1D_bool MyCoilReportFlag;
+        static Array1D_bool PlantLoopScanFlag;
+
+        static Array1D<Real64> CoefSeries(5); // Tuned Changed to static: High call count: Set before use
+        Real64 FinDiamVar;
+        Real64 TubeToFinDiamRatio;
+
+        Real64 CpAirStd; // specific heat of air at std conditions
+        int SolFla;      // Flag of solver
+        Real64 UA0;      // lower bound for UA
+        Real64 UA1;      // upper bound for UA
+        Real64 UA;
+        static Array1D<Real64> Par(4); // Tuned Changed to static: High call count: Set before use
+
+        static bool NoSatCurveIntersect(false); // TRUE if failed to find appatatus dew-point
+        static bool BelowInletWaterTemp(false); // TRUE if apparatus dew-point below design inlet water temperature
+        static bool CBFTooLarge(false);         // TRUE if the coil bypass factor is unrealistically large
+        static bool NoExitCondReset(false);     // TRUE if exit condition reset is not to be done
+
+        static Real64 RatedLatentCapacity(0.0); // latent cooling capacity at the rating point [W]
+        static Real64 RatedSHR(0.0);            // sensible heat ratio at the rating point
+        static Real64 CapacitanceWater(0.0);    // capacitance of the water stream [W/K]
+        static Real64 CMin(0.0);                // minimum capacitance of 2 streams [W/K]
+        static Real64 CoilEffectiveness(0.0);   // effectiveness of the coil (rated)
+        static Real64 SurfaceArea(0.0);         // heat exchanger surface area, [m2]
+        static Real64 UATotal(0.0);             // heat exchanger UA total, [W/C]
+        static Array1D_bool RptCoilHeaderFlag(2, true);
+
+        Real64 DesUACoilExternalEnth; // enthalpy based UAExternal for wet coil surface {kg/s}
+        Real64 LogMeanEnthDiff;       // long mean enthalpy difference {J/kg}
+        Real64 LogMeanTempDiff;       // long mean temperature difference {C}
+
+        Real64 DesOutletWaterTemp;
+        Real64 DesSatEnthAtWaterOutTemp;
+        Real64 DesEnthAtWaterOutTempAirInHumRat;
+        Real64 DesEnthWaterOut;
+        Real64 Cp;  // local fluid specific heat
+        Real64 rho; // local fluid density
+        bool errFlag;
+        static Real64 EnthCorrFrac(0.0); // enthalpy correction factor
+        static Real64 TempCorrFrac(0.0); // temperature correction factor
+
+        // Variables for liquid desiccant dehumidification coil
+        Real64 CpAirDes; // specific heat of air at design conditions
+        Real64 DesSenCoilLoad;
+        Real64 DesLatCoilLoad;
+        Real64 DesHdAvVt;
+        Real64 Qlat; // Coil latent load
+        Real64 msi;  // Solution mass flow rate IN to this function(kg/s)
+        Real64 Tsi;  // Solution temperature IN to this function (C)
+        Real64 Xsi;  // Solution concentration IN to this function (weight fraction)
+        Real64 Tso;  // Solution temperature IN to this function (C)
+        Real64 ma;   // Air mass flow rate IN to this function(kg/s)
+        Real64 Tai;  // Air dry bulb temperature IN to this function(C)
+        Real64 Wai;  // Air Humidity Ratio IN to this funcation (C)
+        Real64 Tao;  // Air dry bulb temperature OUT to this function(C)
+        Real64 Wao;  // Air Humidity Ratio OUT to this funcation (C)
+
+        // FLOW:
+
+        if (InitWaterCoilOneTimeFlag) {
+            // initialize the environment and sizing flags
+            MyEnvrnFlag.allocate(NumWaterCoils);
+            MySizeFlag.allocate(NumWaterCoils);
+            CoilWarningOnceFlag.allocate(NumWaterCoils);
+            DesCpAir.allocate(NumWaterCoils);
+            MyUAAndFlowCalcFlag.allocate(NumWaterCoils);
+            MyCoilDesignFlag.allocate(NumWaterCoils);
+            MyCoilReportFlag.allocate(NumWaterCoils);
+            DesUARangeCheck.allocate(NumWaterCoils);
+            PlantLoopScanFlag.allocate(NumWaterCoils);
+
+            DesCpAir = 0.0;
+            DesUARangeCheck = 0.0;
+            MyEnvrnFlag = true;
+            MySizeFlag = true;
+            CoilWarningOnceFlag = true;
+            MyUAAndFlowCalcFlag = true;
+            MyCoilDesignFlag = true;
+            MyCoilReportFlag = true;
+            InitWaterCoilOneTimeFlag = false;
+            PlantLoopScanFlag = true;
+
+        }   // end if (InitWaterCoilOneTimeFlag)
+
+       
+        
+        if (!SysSizingCalc && MySizeFlag(CoilNum)) {
+            // for each coil, do the sizing once.
+            SizeWaterCoil_NotInPlant(state, CoilNum); //SizeWaterCoil(state, CoilNum);
+            MySizeFlag(CoilNum) = false;
+        }
+
+        // Do the Begin Environment initializations
+        if (BeginEnvrnFlag && MyEnvrnFlag(CoilNum)) {
+            rho = 1000; // GetDensityGlycol(PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                        //           InitConvTemp,
+                        //           PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                        //           RoutineName);
+            // Initialize all report variables to a known state at beginning of simulation
+            WaterCoil(CoilNum).TotWaterHeatingCoilEnergy = 0.0;
+            WaterCoil(CoilNum).TotWaterCoolingCoilEnergy = 0.0;
+            WaterCoil(CoilNum).SenWaterCoolingCoilEnergy = 0.0;
+            WaterCoil(CoilNum).TotWaterHeatingCoilRate = 0.0;
+            WaterCoil(CoilNum).TotWaterCoolingCoilRate = 0.0;
+            WaterCoil(CoilNum).SenWaterCoolingCoilRate = 0.0;
+
+            // The rest of the one time initializations
+            AirInletNode = WaterCoil(CoilNum).AirInletNodeNum;
+            WaterInletNode = WaterCoil(CoilNum).WaterInletNodeNum;
+            WaterOutletNode = WaterCoil(CoilNum).WaterOutletNodeNum;
+
+            DesCpAir(CoilNum) = PsyCpAirFnW(0.0);
+            DesUARangeCheck(CoilNum) = (-1568.6 * WaterCoil(CoilNum).DesInletAirHumRat + 20.157);
+
+            if (WaterCoil(CoilNum).WaterCoilType == CoilType_Dehumidification) { // 'LiqDesiccant'
+                Node(WaterInletNode).Temp = 5.0;
+
+                // Cp = GetSpecificHeatGlycol(PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                //                           Node(WaterInletNode).Temp,
+                //                           PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                //                           RoutineName);
+
+                Node(WaterInletNode).Enthalpy = SolnHFnTX(WaterCoil(CoilNum).MatlLiqDesiccant,
+                                                          Node(WaterInletNode).Temp * 1.8 + 32,
+                                                          WaterCoil(CoilNum).DesInletSolnConcentration); // Cp *Node(WaterInletNode).Temp;
+                Node(WaterInletNode).Quality = 0.0;
+                Node(WaterInletNode).Press = 0.0;
+                Node(WaterInletNode).HumRat = 0.0;
+            }
+
+
+            WaterCoil(CoilNum).MaxWaterMassFlowRate = rho * WaterCoil(CoilNum).MaxWaterVolFlowRate;
+
+            WaterCoil(CoilNum).InletAirEnthalpy = PsyHFnTdbW(WaterCoil(CoilNum).InletAirTemp, WaterCoil(CoilNum).InletAirHumRat);
+            WaterCoil(CoilNum).InletWaterMassFlowRate = WaterCoil(CoilNum).MaxWaterMassFlowRate;
+            WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * WaterCoil(CoilNum).DesAirVolFlowRate;
+            CapacitanceAir = WaterCoil(CoilNum).InletAirMassFlowRate * PsyCpAirFnW(WaterCoil(CoilNum).InletAirHumRat);
+
+            Cp = 4120.0; // GetSpecificHeatGlycol(PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                       //                WaterCoil(CoilNum).InletWaterTemp,
+                       //                PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                       //                RoutineName);
+
+            CapacitanceWater = WaterCoil(CoilNum).InletWaterMassFlowRate * Cp;
+            CMin = min(CapacitanceAir, CapacitanceWater);
+            if (CMin > 0.0) {
+                if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_DehumLiqDesiccant) {
+                    CalcLiqDesiccantDehumCoil(CoilNum, FirstHVACIteration, DesignCalc, ContFanCycCoil, 1.0);
+                }
+            } else {
+                CoilEffectiveness = 0.0;
+                WaterCoil(CoilNum).TotWaterHeatingCoilRate = 0.0;
+                WaterCoil(CoilNum).TotWaterCoolingCoilRate = 0.0;
+                WaterCoil(CoilNum).SenWaterCoolingCoilRate = 0.0;
+                RatedLatentCapacity = 0.0;
+                RatedSHR = 0.0;
+            }
+            MyEnvrnFlag(CoilNum) = false;
+
+        } // End If for the Begin Environment initializations
+
+
+        if (!BeginEnvrnFlag) {
+            MyEnvrnFlag(CoilNum) = true;
+        }
+
+        
+        // Do the begin HVAC time step initializations
+        // NONE
+
+        // Do the following initializations (every time step): This should be the info from
+        // the previous components outlets or the node data in this section.
+        // First set the conditions for the air into the coil model
+        AirInletNode = WaterCoil(CoilNum).AirInletNodeNum;
+        WaterInletNode = WaterCoil(CoilNum).WaterInletNodeNum;
+        WaterCoil(CoilNum).InletAirMassFlowRate = Node(AirInletNode).MassFlowRate;
+        WaterCoil(CoilNum).InletAirTemp = Node(AirInletNode).Temp;
+        WaterCoil(CoilNum).InletAirHumRat = Node(AirInletNode).HumRat;
+        WaterCoil(CoilNum).InletAirEnthalpy = Node(AirInletNode).Enthalpy;
+
+        WaterCoil(CoilNum).InletWaterMassFlowRate = Node(WaterInletNode).MassFlowRate;
+        WaterCoil(CoilNum).InletWaterTemp = Node(WaterInletNode).Temp;
+        WaterCoil(CoilNum).InletWaterEnthalpy = Node(WaterInletNode).Enthalpy;
+
+        WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
+
+        //CalcAdjustedCoilUA(CoilNum);
+
+        WaterCoil(CoilNum).TotWaterHeatingCoilRate = 0.0;
+        WaterCoil(CoilNum).TotWaterCoolingCoilRate = 0.0;
+        WaterCoil(CoilNum).SenWaterCoolingCoilRate = 0.0;
+    }
+ 
 
     // refactor coilUA adjustment into separate routine, for use with rating calc
     void CalcAdjustedCoilUA(int const CoilNum)
@@ -3159,6 +3417,94 @@ namespace WaterCoils {
             ShowFatalError("Preceding water coil sizing errors cause program termination");
         }
     }
+ 
+    void SizeWaterCoil_NotInPlant(EnergyPlusData &state, int const CoilNum)
+    {
+
+        bool ErrorsFound = false;
+        std::string CompName = WaterCoil(CoilNum).Name;
+
+        Real64 DesInletAirEnth;  // Entering air enthalpy at rating (J/kg)
+        Real64 DesOutletAirEnth; // Leaving air enthalpy at rating(J/kg)
+        // Variables for liquid desiccant dehumidification coil
+        Real64 CpAirDes; // specific heat of air at design conditions
+        Real64 DesSenCoilLoad;
+        Real64 DesLatCoilLoad;
+        Real64 DesHdAvVt;
+        Real64 Qlat; // Coil latent load
+        Real64 msi;  // Solution mass flow rate IN to this function(kg/s)
+        Real64 Tsi;  // Solution temperature IN to this function (C)
+        Real64 Xsi;  // Solution concentration IN to this function (weight fraction)
+        Real64 Tso;  // Solution temperature IN to this function (C)
+        Real64 ma;   // Air mass flow rate IN to this function(kg/s)
+        Real64 Tai;  // Air dry bulb temperature IN to this function(C)
+        Real64 Wai;  // Air Humidity Ratio IN to this funcation (C)
+        Real64 Tao;  // Air dry bulb temperature OUT to this function(C)
+        Real64 Wao;  // Air Humidity Ratio OUT to this funcation (C)
+
+        int AirInletNode;
+        int WaterInletNode;
+        int WaterOutletNode;
+
+        AirInletNode = WaterCoil(CoilNum).AirInletNodeNum;
+        WaterInletNode = WaterCoil(CoilNum).WaterInletNodeNum;
+        WaterOutletNode = WaterCoil(CoilNum).WaterOutletNodeNum;
+
+        if (false == WaterCoil(CoilNum).GetSizeNotInPlant) return; 
+        else
+            WaterCoil(CoilNum).GetSizeNotInPlant = false; 
+
+        WaterCoil(CoilNum).WaterCoilModel = CoilModel_LiqDesiccantDehum;
+
+        // Caculate the liquid desiccant coil HdAvVt at design conditions
+        if ((WaterCoil(CoilNum).DesAirVolFlowRate > 0.0) && (WaterCoil(CoilNum).MaxWaterMassFlowRate > 0.0)) {
+
+            // Caculate the liquid desiccant coil HdAvVt at design conditions
+
+            // Enthalpy of Air at Inlet design conditions
+            DesInletAirEnth = PsyHFnTdbW(WaterCoil(CoilNum).DesInletAirTemp, WaterCoil(CoilNum).DesInletAirHumRat);
+
+            // Enthalpy of Air at outlet at design conditions
+            DesOutletAirEnth = PsyHFnTdbW(WaterCoil(CoilNum).DesOutletAirTemp, WaterCoil(CoilNum).DesOutletAirHumRat);
+
+            // Total Coil Load from Inlet and Outlet Air States (which include fan heat as appropriate).
+            WaterCoil(CoilNum).DesTotWaterCoilLoad = WaterCoil(CoilNum).DesAirMassFlowRate * (DesInletAirEnth - DesOutletAirEnth);
+
+            CpAirDes = PsyCpAirFnW(WaterCoil(CoilNum).DesInletAirHumRat);
+            DesSenCoilLoad =
+                WaterCoil(CoilNum).DesAirMassFlowRate * CpAirDes * (WaterCoil(CoilNum).DesInletAirTemp - WaterCoil(CoilNum).DesOutletAirTemp);
+            DesLatCoilLoad = WaterCoil(CoilNum).DesTotWaterCoilLoad - DesSenCoilLoad;
+
+            Qlat = DesLatCoilLoad;
+            msi = WaterCoil(CoilNum).MaxWaterMassFlowRate;
+            Tsi = WaterCoil(CoilNum).DesInletWaterTemp;
+            Xsi = WaterCoil(CoilNum).DesInletSolnConcentration;
+            ma = WaterCoil(CoilNum).DesAirMassFlowRate;
+            Tai = WaterCoil(CoilNum).DesInletAirTemp;
+            Wai = WaterCoil(CoilNum).DesInletAirHumRat;
+            Tao = WaterCoil(CoilNum).DesOutletAirTemp;
+            Wao = WaterCoil(CoilNum).DesOutletAirHumRat;
+            DesHdAvVt = CalculateDesHdAvVt(Qlat, // Coil latent load
+                                           msi,  // Solution mass flow rate IN to this function(kg/s)
+                                           Tsi,  // Solution temperature IN to this function (C)
+                                           Xsi,  // Solution concentration IN to this function (weight fraction)
+                                           ma,   // Air mass flow rate IN to this function(kg/s)
+                                           Tai,  // Air dry bulb temperature IN to this function(C)
+                                           Wai,  // Air Humidity Ratio IN to this funcation (C)
+                                           Tao,  // Air dry bulb temperature OUT to this function(C)
+                                           Wao); // Air Humidity Ratio OUT to this funcation (C)
+
+            WaterCoil(CoilNum).HdAvVt = DesHdAvVt;
+        }
+
+        WaterCoil(CoilNum).InletAirMassFlowRate =
+            Node(AirInletNode).MassFlowRate; 
+
+        if (ErrorsFound ) {
+            ShowFatalError("Preceding water coil sizing errors cause program termination");
+        }
+    }
+
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -4252,6 +4598,7 @@ namespace WaterCoils {
         Real64 SenWaterCoilLoad = 0.0;       // Total water evaporate (kg)
         Real64 OutletSolnEnthaly = 0.0;      // Leaving  solution enthalpy
         Real64 InletSolnEnthaly = 0.0;       //  Entering solution enthalpy
+        Real64 DesiccantWaterLoss = 0.0; 
 
         if (WaterCoil(CoilNum).LiqDesiccantAirSource == ZoneAirSource) { // Zone air source
 
@@ -4299,7 +4646,8 @@ namespace WaterCoils {
                                          OutletSolnEnthaly,      // Leaving solution enthalpy
                                          InletSolnEnthaly,       // Entering solution enthalpy
                                          TotWaterCoilLoad,       // Total heat transfer rate(W)
-                                         SenWaterCoilLoad);      // Total water evaporate (kg)
+                                         SenWaterCoilLoad,       // Total water evaporate (kg)
+                                         DesiccantWaterLoss); 
 
                     if (((WaterCoil(CoilNum).LiqDesiccantOptMode == DehumidificationMode) && (OutletAirHumRat < AirHumRat)) ||
                         ((WaterCoil(CoilNum).LiqDesiccantOptMode == RegenerationMode) && (OutletSolnConc > SolnConcIn))) {
@@ -4317,6 +4665,7 @@ namespace WaterCoils {
                         WaterCoil(CoilNum).OutletWaterEnthalpy = OutletSolnEnthaly;
                         // WaterCoil(CoilNum).InletWaterEnthalpy + SafeDivide(WaterCoil(CoilNum).TotWaterCoolingCoilRate,
                         // WaterCoil(CoilNum).InletWaterMassFlowRate);
+                        WaterCoil(CoilNum).DesiccantWaterLoss = DesiccantWaterLoss;
                     } else {
                         WaterCoil(CoilNum).OutletWaterTemp = WaterCoil(CoilNum).InletWaterTemp;
                         WaterCoil(CoilNum).OutletAirTemp = WaterCoil(CoilNum).InletAirTemp;
@@ -4389,7 +4738,8 @@ namespace WaterCoils {
                                          OutletSolnEnthaly,      // Leaving solution enthalpy
                                          InletSolnEnthaly,       // Entering solution enthalpy
                                          TotWaterCoilLoad,       // Total heat transfer rate(W)
-                                         SenWaterCoilLoad);      // Total water evaporate (kg)
+                                         SenWaterCoilLoad,       // Total water evaporate (kg)
+                                         DesiccantWaterLoss); 
                     
                     if (((WaterCoil(CoilNum).LiqDesiccantOptMode == DehumidificationMode) && (OutletAirHumRat < AirHumRat)) ||
                         ((WaterCoil(CoilNum).LiqDesiccantOptMode == RegenerationMode) && (OutletSolnConc > SolnConcIn))) {
@@ -4407,6 +4757,7 @@ namespace WaterCoils {
                         WaterCoil(CoilNum).OutletWaterEnthalpy = OutletSolnEnthaly;
                         // WaterCoil(CoilNum).InletWaterEnthalpy + SafeDivide(WaterCoil(CoilNum).TotWaterCoolingCoilRate,
                         // WaterCoil(CoilNum).InletWaterMassFlowRate);
+                        WaterCoil(CoilNum).DesiccantWaterLoss = DesiccantWaterLoss;
                     } else {
                         WaterCoil(CoilNum).OutletWaterTemp = WaterCoil(CoilNum).InletWaterTemp;
                         WaterCoil(CoilNum).OutletAirTemp = WaterCoil(CoilNum).InletAirTemp;
@@ -4455,7 +4806,8 @@ namespace WaterCoils {
                                    Real64 &OutletSolnEnthaly,        // Leaving solution enthalpy
                                    Real64 &InletSolnEnthaly,       // Leaving solution enthalpy
                                    Real64 &TotWaterCoilLoad,        // Total heat transfer rate(W)
-                                   Real64 &SenWaterCoilLoad         // Total sensiable heat transfer rate(W)
+                                   Real64 &SenWaterCoilLoad,         // Total sensiable heat transfer rate(W)
+                                   Real64 &DesiccantWaterLoss     // Total sensiable heat transfer rate(W)                           
     )
     {
         // FUNCTION INFORMATION:
@@ -4678,6 +5030,7 @@ namespace WaterCoils {
         TotWaterCoilLoad = Qtot;      // J
         SenWaterCoilLoad = QSen;      // J
         InletSolnEnthaly = Hsi;       // J/kg
+        DesiccantWaterLoss = Wevaprate; 
     }
     
 
@@ -5495,7 +5848,7 @@ namespace WaterCoils {
         Hao = PsyHFnTdbRhPb(Tao, RHao, Patm); // per lb dry air  Hai
         HSSo = LDSatEnthalpy(MatlOfLiqDesiccant, Tso, Xso, Patm); // H_Ts.sat.i
 
-        LogMeanEnthDiff = ((Hai - HSSo) - (Hao - HSSi)) / std::log((Hai - HSSo) / (Hao - HSSi));
+        LogMeanEnthDiff = fabs((Hai - HSSo) - (Hao - HSSi)) / std::log(fabs((Hai - HSSo) / (Hao - HSSi)));
 
         DesUACoilEnth = (Qlat) / LogMeanEnthDiff;
         DesHdAvVt = DesUACoilEnth; // / mcp_min;
