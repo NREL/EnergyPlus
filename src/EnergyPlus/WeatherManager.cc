@@ -3210,20 +3210,20 @@ namespace WeatherManager {
             if (!LastHourSet) {
                 // For first day of weather, all time steps of the first hour will be
                 // equal to the first hour's value.
-                LastHrOutDryBulbTemp = Wthr.OutDryBulbTemp(24);
-                LastHrOutDewPointTemp = Wthr.OutDewPointTemp(24);
-                LastHrOutBaroPress = Wthr.OutBaroPress(24);
-                LastHrOutRelHum = Wthr.OutRelHum(24);
-                LastHrWindSpeed = Wthr.WindSpeed(24);
-                LastHrWindDir = Wthr.WindDir(24);
-                LastHrSkyTemp = Wthr.SkyTemp(24);
-                LastHrHorizIRSky = Wthr.HorizIRSky(24);
-                LastHrBeamSolarRad = Wthr.BeamSolarRad(24);
-                LastHrDifSolarRad = Wthr.DifSolarRad(24);
-                LastHrAlbedo = Wthr.Albedo(24);
-                LastHrLiquidPrecip = Wthr.LiquidPrecip(24);
-                LastHrTotalSkyCover = Wthr.TotalSkyCover(24);
-                LastHrOpaqueSkyCover = Wthr.OpaqueSkyCover(24);
+                LastHrOutDryBulbTemp = Wthr.OutDryBulbTemp(1);
+                LastHrOutDewPointTemp = Wthr.OutDewPointTemp(1);
+                LastHrOutBaroPress = Wthr.OutBaroPress(1);
+                LastHrOutRelHum = Wthr.OutRelHum(1);
+                LastHrWindSpeed = Wthr.WindSpeed(1);
+                LastHrWindDir = Wthr.WindDir(1);
+                LastHrSkyTemp = Wthr.SkyTemp(1);
+                LastHrHorizIRSky = Wthr.HorizIRSky(1);
+                LastHrBeamSolarRad = Wthr.BeamSolarRad(1);
+                LastHrDifSolarRad = Wthr.DifSolarRad(1);
+                LastHrAlbedo = Wthr.Albedo(1);
+                LastHrLiquidPrecip = Wthr.LiquidPrecip(1);
+                LastHrTotalSkyCover = Wthr.TotalSkyCover(1);
+                LastHrOpaqueSkyCover = Wthr.OpaqueSkyCover(1);
 
                 LastHourSet = true;
             }
