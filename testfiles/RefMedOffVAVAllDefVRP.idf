@@ -221,6 +221,21 @@
     For: AllDays,            !- Field 2
     Until: 24:00,1;          !- Field 3
 
+  Schedule:Compact,
+    MinOA_MotorizedDamper_Sched,  !- Name
+    fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 06:00,0.0,        !- Field 3
+    Until: 22:00,1.0,        !- Field 5
+    Until: 24:00,0.0,        !- Field 7
+    For: Saturday WinterDesignDay, !- Field 9
+    Until: 06:00,0.0,        !- Field 10
+    Until: 18:00,1.0,        !- Field 12
+    Until: 24:00,0.0,        !- Field 14
+    For: Sunday Holidays AllOtherDays, !- Field 16
+    Until: 24:00,0.0;        !- Field 17
+
 ! ***MISC SIMULATION PARAMETERS***
 
   SurfaceConvectionAlgorithm:Inside,TARP;
@@ -8050,4 +8065,3 @@
     0,                       !- Nuclear High Level Emission Factor {g/MJ}
     ,                        !- Nuclear High Level Emission Factor Schedule Name
     0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
-

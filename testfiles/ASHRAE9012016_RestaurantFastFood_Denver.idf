@@ -6803,7 +6803,7 @@
     Dining_Light_Actuator,   !- Name
     Dining_lights,           !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Dining_Light_EMS_Program,  !- Name
@@ -6840,7 +6840,7 @@
     Kitchen_Light_Actuator,  !- Name
     Kitchen_lights,          !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Kitchen_Light_EMS_Program,  !- Name
@@ -6855,4 +6855,3 @@
     SET_Kitchen_Light_EMS_Program_Prog_Manager,  !- Name
     BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
     SET_Kitchen_Light_EMS_Program;  !- Program Name 1
-

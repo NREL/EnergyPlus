@@ -8482,7 +8482,7 @@
     Back_Space_Light_Actuator,  !- Name
     Back_Space_lights,       !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Back_Space_Light_EMS_Program,  !- Name
@@ -8519,7 +8519,7 @@
     Core_Retail_Light_Actuator,  !- Name
     Core_Retail_lights,      !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Core_Retail_Light_EMS_Program,  !- Name
@@ -8556,7 +8556,7 @@
     Point_Of_Sale_Light_Actuator,  !- Name
     Point_Of_Sale_lights,    !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Point_Of_Sale_Light_EMS_Program,  !- Name
@@ -8593,7 +8593,7 @@
     Front_Retail_Light_Actuator,  !- Name
     Front_Retail_lights,     !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Front_Retail_Light_EMS_Program,  !- Name
@@ -8630,7 +8630,7 @@
     Front_Entry_Light_Actuator,  !- Name
     Front_Entry_lights,      !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Front_Entry_Light_EMS_Program,  !- Name
@@ -8645,4 +8645,3 @@
     SET_Front_Entry_Light_EMS_Program_Prog_Manager,  !- Name
     BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
     SET_Front_Entry_Light_EMS_Program;  !- Program Name 1
-

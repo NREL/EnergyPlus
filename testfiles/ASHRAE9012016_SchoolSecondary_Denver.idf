@@ -30657,7 +30657,7 @@
     cCL1_Pod_1_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_1_Pod_1_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL1_Pod_1_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30694,7 +30694,7 @@
     mCl1_Pod_1_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_1_Pod_1_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl1_Pod_1_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30731,7 +30731,7 @@
     cPOD1_ZN_1_FLR_1_LAr,    !- Name
     Corridor_Pod_1_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPOD1_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30768,7 +30768,7 @@
     cCL2_Pod_1_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_2_Pod_1_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL2_Pod_1_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30805,7 +30805,7 @@
     mCl2_Pod_1_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_2_Pod_1_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl2_Pod_1_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30842,7 +30842,7 @@
     cCL1_Pod_2_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_1_Pod_2_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL1_Pod_2_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30879,7 +30879,7 @@
     mCl1_Pod_2_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_1_Pod_2_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl1_Pod_2_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30916,7 +30916,7 @@
     cPOD2_ZN_1_FLR_1_LAr,    !- Name
     Corridor_Pod_2_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPOD2_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30953,7 +30953,7 @@
     cCL2_Pod_2_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_2_Pod_2_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL2_Pod_2_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30990,7 +30990,7 @@
     mCl2_Pod_2_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_2_Pod_2_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl2_Pod_2_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31027,7 +31027,7 @@
     cCL1_Pod_3_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_1_Pod_3_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL1_Pod_3_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31064,7 +31064,7 @@
     mCl1_Pod_3_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_1_Pod_3_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl1_Pod_3_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31101,7 +31101,7 @@
     cPOD3_ZN_1_FLR_1_LAr,    !- Name
     Corridor_Pod_3_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPOD3_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31138,7 +31138,7 @@
     cCL2_Pod_3_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_2_Pod_3_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL2_Pod_3_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31175,7 +31175,7 @@
     mCl2_Pod_3_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_2_Pod_3_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl2_Pod_3_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31212,7 +31212,7 @@
     AUX_GYM_ZN_1_FLR_1_LAr,  !- Name
     AUX_GYM_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_AUX_GYM_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31249,7 +31249,7 @@
     AUDITORIUM_ZN_1_FLR_1_LAr,  !- Name
     AUDITORIUM_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_AUDITORIUM_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31286,7 +31286,7 @@
     Main_Corridor_ZN_1_FLR_1_LAr,  !- Name
     Main_Corridor_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Main_Corridor_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31323,7 +31323,7 @@
     Lobby_ZN_1_FLR_1_LAr,    !- Name
     Lobby_ZN_1_FLR_1_lights, !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Lobby_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31360,7 +31360,7 @@
     Mech_ZN_1_FLR_1_LAr,     !- Name
     Mech_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Mech_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31397,7 +31397,7 @@
     BATHROOMS_ZN_1_FLR_1_LAr,!- Name
     BATHROOMS_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_BATHROOMS_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31434,7 +31434,7 @@
     Offices_ZN_1_FLR_1_LAr,  !- Name
     Offices_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Offices_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31471,7 +31471,7 @@
     Gym_ZN_1_FLR_1_LAr,      !- Name
     Gym_ZN_1_FLR_1_lights,   !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Gym_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31508,7 +31508,7 @@
     Kitchen_ZN_1_FLR_1_LAr,  !- Name
     Kitchen_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Kitchen_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31545,7 +31545,7 @@
     Cafeteria_ZN_1_FLR_1_LAr,!- Name
     Cafeteria_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Cafeteria_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31583,7 +31583,7 @@
     cCL1_Pod_1_ZN_1_FLR_2_LAr,  !- Name
     Corner_Class_1_Pod_1_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL1_Pod_1_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31620,7 +31620,7 @@
     mCl1_Pod_1_ZN_1_FLR_2_LAr,  !- Name
     Mult_Class_1_Pod_1_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl1_Pod_1_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31657,7 +31657,7 @@
     cPOD1_ZN_1_FLR_2_LAr,    !- Name
     Corridor_Pod_1_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPOD1_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31694,7 +31694,7 @@
     cCL2_Pod_1_ZN_1_FLR_2_LAr,  !- Name
     Corner_Class_2_Pod_1_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL2_Pod_1_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31731,7 +31731,7 @@
     mCl2_Pod_1_ZN_1_FLR_2_LAr,  !- Name
     Mult_Class_2_Pod_1_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl2_Pod_1_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31768,7 +31768,7 @@
     cCL1_Pod_2_ZN_1_FLR_2_LAr,  !- Name
     Corner_Class_1_Pod_2_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL1_Pod_2_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31805,7 +31805,7 @@
     mCl1_Pod_2_ZN_1_FLR_2_LAr,  !- Name
     Mult_Class_1_Pod_2_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl1_Pod_2_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31842,7 +31842,7 @@
     cPOD2_ZN_1_FLR_2_LAr,    !- Name
     Corridor_Pod_2_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPOD2_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31879,7 +31879,7 @@
     cCL2_Pod_2_ZN_1_FLR_2_LAr,  !- Name
     Corner_Class_2_Pod_2_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL2_Pod_2_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31916,7 +31916,7 @@
     mCl2_Pod_2_ZN_1_FLR_2_LAr,  !- Name
     Mult_Class_2_Pod_2_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl2_Pod_2_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31953,7 +31953,7 @@
     cCL1_Pod_3_ZN_1_FLR_2_LAr,  !- Name
     Corner_Class_1_Pod_3_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL1_Pod_3_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31990,7 +31990,7 @@
     mCl1_Pod_3_ZN_1_FLR_2_LAr,  !- Name
     Mult_Class_1_Pod_3_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl1_Pod_3_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32027,7 +32027,7 @@
     cPOD3_ZN_1_FLR_2_LAr,    !- Name
     Corridor_Pod_3_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPOD3_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32064,7 +32064,7 @@
     cCL2_Pod_3_ZN_1_FLR_2_LAr,  !- Name
     Corner_Class_2_Pod_3_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL2_Pod_3_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32101,7 +32101,7 @@
     mCl2_Pod_3_ZN_1_FLR_2_LAr,  !- Name
     Mult_Class_2_Pod_3_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl2_Pod_3_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32138,7 +32138,7 @@
     Main_Corridor_ZN_1_FLR_2_LAr,  !- Name
     Main_Corridor_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Main_Corridor_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32175,7 +32175,7 @@
     Lobby_ZN_1_FLR_2_LAr,    !- Name
     Lobby_ZN_1_FLR_2_lights, !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Lobby_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32212,7 +32212,7 @@
     Mech_ZN_1_FLR_2_LAr,     !- Name
     Mech_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Mech_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32249,7 +32249,7 @@
     BATHROOMS_ZN_1_FLR_2_LAr,!- Name
     BATHROOMS_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_BATHROOMS_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32286,7 +32286,7 @@
     Offices_ZN_1_FLR_2_LAr,  !- Name
     Offices_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Offices_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32323,7 +32323,7 @@
     LMC_ZN_1_FLR_2_LAr,      !- Name
     Library_Media_Center_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_LMC_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32338,4 +32338,3 @@
     SET_LMC_ZN_1_FLR_2_Light_EMS_Program_Prog_Manager,  !- Name
     BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
     SET_LMC_ZN_1_FLR_2_Light_EMS_Program;  !- Program Name 1
-

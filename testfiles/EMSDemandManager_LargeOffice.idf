@@ -12048,7 +12048,7 @@
     Set_Basement_Lights,     !- Name
     Basement_Lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Basement_Lights,         !- Name
@@ -12059,7 +12059,7 @@
     Set_Core_bottom_Lights,  !- Name
     Core_bottom_Lights,      !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Core_bottom_Lights,      !- Name
@@ -12070,7 +12070,7 @@
     Set_Core_mid_Lights,     !- Name
     Core_mid_Lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Core_mid_Lights,         !- Name
@@ -12081,7 +12081,7 @@
     Set_Core_top_Lights,     !- Name
     Core_top_Lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Core_top_Lights,         !- Name
@@ -12092,7 +12092,7 @@
     Set_Perimeter_bot_ZN_3_Lights,  !- Name
     Perimeter_bot_ZN_3_Lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Perimeter_bot_ZN_3_Lights,  !- Name
@@ -12103,7 +12103,7 @@
     Set_Perimeter_bot_ZN_2_Lights,  !- Name
     Perimeter_bot_ZN_2_Lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Perimeter_bot_ZN_2_Lights,  !- Name
@@ -12114,7 +12114,7 @@
     Set_Perimeter_bot_ZN_1_Lights,  !- Name
     Perimeter_bot_ZN_1_Lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Perimeter_bot_ZN_1_Lights,  !- Name
@@ -12125,7 +12125,7 @@
     Set_Perimeter_bot_ZN_4_Lights,  !- Name
     Perimeter_bot_ZN_4_Lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Perimeter_bot_ZN_4_Lights,  !- Name
@@ -12136,7 +12136,7 @@
     Set_Perimeter_mid_ZN_3_Lights,  !- Name
     Perimeter_mid_ZN_3_Lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Perimeter_mid_ZN_3_Lights,  !- Name
@@ -12147,7 +12147,7 @@
     Set_Perimeter_mid_ZN_2_Lights,  !- Name
     Perimeter_mid_ZN_2_Lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Perimeter_mid_ZN_2_Lights,  !- Name
@@ -12158,7 +12158,7 @@
     Set_Perimeter_mid_ZN_1_Lights,  !- Name
     Perimeter_mid_ZN_1_Lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Perimeter_mid_ZN_1_Lights,  !- Name
@@ -12169,7 +12169,7 @@
     Set_Perimeter_mid_ZN_4_Lights,  !- Name
     Perimeter_mid_ZN_4_Lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Perimeter_mid_ZN_4_Lights,  !- Name
@@ -12180,7 +12180,7 @@
     Set_Perimeter_top_ZN_3_Lights,  !- Name
     Perimeter_top_ZN_3_Lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Perimeter_top_ZN_3_Lights,  !- Name
@@ -12191,7 +12191,7 @@
     Set_Perimeter_top_ZN_2_Lights,  !- Name
     Perimeter_top_ZN_2_Lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Perimeter_top_ZN_2_Lights,  !- Name
@@ -12202,7 +12202,7 @@
     Set_Perimeter_top_ZN_1_Lights,  !- Name
     Perimeter_top_ZN_1_Lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Perimeter_top_ZN_1_Lights,  !- Name
@@ -12213,10 +12213,9 @@
     Set_Perimeter_top_ZN_4_Lights,  !- Name
     Perimeter_top_ZN_4_Lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electricity Rate;        !- Actuated Component Control Type
+    Electric Power Level;    !- Actuated Component Control Type
 
   EnergyManagementSystem:InternalVariable,
     Perimeter_top_ZN_4_Lights,  !- Name
     Perimeter_top_ZN_4_Lights,  !- Internal Data Index Key Name
     Lighting Power Design Level;  !- Internal Data Type
-
