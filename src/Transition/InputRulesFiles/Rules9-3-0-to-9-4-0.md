@@ -154,7 +154,5 @@ Field: Fuel Type (or similar)
 | Lights             | Electric Power Level          | Electricity Rate              |
 | ElectricEquipment  | Electric Power Level          | Electricity Rate              |
 | GasEquipment       | Gas Power Level               | NaturalGas Rate               |
-| Electrical Storage | Electricity Power Draw Rate   | Draw Electricity Rate         |
-| Electrical Storage | Electricity Power Charge Rate | Charge Electricity Rate       |
  
 See [8301](https://github.com/NREL/EnergyPlus/pull/8304)

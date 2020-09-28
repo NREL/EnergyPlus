@@ -460,13 +460,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     OutArgs(4)='NaturalGas Rate'
                   END IF
 
-                  IF (MakeUPPERCase(InArgs(4)).eq.'ELECTRIC POWER DRAW RATE') THEN
-                    OutArgs(4)='Draw Electricity Rate'
-                  END IF
-
-                  IF (MakeUPPERCase(InArgs(4)).eq.'ELECTRIC POWER CHARGE RATE') THEN
-                    OutArgs(4)='Charge Electricity Rate'
-                  END IF
+! Decided not to transition these at the last minute
+!                  IF (MakeUPPERCase(InArgs(4)).eq.'ELECTRIC POWER DRAW RATE') THEN
+!                    OutArgs(4)='Draw Electricity Rate'
+!                  END IF
+!
+!                  IF (MakeUPPERCase(InArgs(4)).eq.'ELECTRIC POWER CHARGE RATE') THEN
+!                    OutArgs(4)='Charge Electricity Rate'
+!                  END IF
 
               ! If your original object starts with F, insert the rules here
 

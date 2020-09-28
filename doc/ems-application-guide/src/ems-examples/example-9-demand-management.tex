@@ -60,7 +60,7 @@ Control State & Lighting Power Ahjustment Factor & Cooling Thermostat Offset \ta
 
 For control state level 0, the actuators are all set to Null so they stop overriding controls and return the model to normal operation.
 
-To alter the lighting power density with EMS, you could use either a direct method that employs a Lights actuator or an indirect method that modifies the lighting schedule. For this example we use the direct method with EnergyManagementSystem:Actuator input objects that enable you to override the ``Electricity Power Level" for each zone's lights. We also set up internal variables to obtain the Lighting Power Design Level for each Lights object.~ Finally, we set up an EMS sensor to obtain the lighting schedule value to use in Erl programs. If the demand management control state is 1, 2, or 3, we use the following model to determine a new lighting power level:
+To alter the lighting power density with EMS, you could use either a direct method that employs a Lights actuator or an indirect method that modifies the lighting schedule. For this example we use the direct method with EnergyManagementSystem:Actuator input objects that enable you to override the ``Electricity Rate" for each zone's lights. We also set up internal variables to obtain the Lighting Power Design Level for each Lights object.~ Finally, we set up an EMS sensor to obtain the lighting schedule value to use in Erl programs. If the demand management control state is 1, 2, or 3, we use the following model to determine a new lighting power level:
 
 Power = (Adjustment Factor) $\times$ (Lighting Power Design Level) $\times$ (Schedule Value)
 
