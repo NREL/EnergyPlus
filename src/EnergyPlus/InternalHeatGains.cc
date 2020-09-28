@@ -1533,7 +1533,7 @@ namespace InternalHeatGains {
 
                     if (AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator(
-                            "Lights", Lights(Loop).Name, "Electric Power Level", "[W]", Lights(Loop).EMSLightsOn, Lights(Loop).EMSLightingPower);
+                            "Lights", Lights(Loop).Name, "Electricity Rate", "[W]", Lights(Loop).EMSLightsOn, Lights(Loop).EMSLightingPower);
                         SetupEMSInternalVariable("Lighting Power Design Level", Lights(Loop).Name, "[W]", Lights(Loop).DesignLevel);
                     } // EMS
                     // setup internal gains
@@ -1957,7 +1957,7 @@ namespace InternalHeatGains {
                     if (AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator("ElectricEquipment",
                                          ZoneElectric(Loop).Name,
-                                         "Electric Power Level",
+                                         "Electricity Rate",
                                          "[W]",
                                          ZoneElectric(Loop).EMSZoneEquipOverrideOn,
                                          ZoneElectric(Loop).EMSEquipPower);
@@ -2353,7 +2353,7 @@ namespace InternalHeatGains {
                     if (AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator("GasEquipment",
                                          ZoneGas(Loop).Name,
-                                         "Gas Power Level",
+                                         "NaturalGas Rate",
                                          "[W]",
                                          ZoneGas(Loop).EMSZoneEquipOverrideOn,
                                          ZoneGas(Loop).EMSEquipPower);
