@@ -1120,8 +1120,8 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
     ReadWeatherForDay(state.files, 1, 1, true);
 
     // Test the feature of interpolating some weather inputs to calc sky temp
-    Real64 expected_SkyTemp = -20.8188538296;
-    EXPECT_NEAR(TomorrowSkyTemp(2, 1), expected_SkyTemp, 1e-6);
+    Real64 expected_SkyTemp = -22.8763495; // 08518445;
+    EXPECT_NEAR(TomorrowSkyTemp(2, 2), expected_SkyTemp, 1e-6);
 }
 
 // Test for fixing the first sub-hour weather data interpolation
