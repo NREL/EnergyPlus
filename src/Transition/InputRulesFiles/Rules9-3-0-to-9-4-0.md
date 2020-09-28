@@ -155,4 +155,4 @@ Field: Fuel Type (or similar)
 | ElectricEquipment  | Electric Power Level          | Electricity Rate              |
 | GasEquipment       | Gas Power Level               | NaturalGas Rate               |
  
-See [8301](https://github.com/NREL/EnergyPlus/pull/8304)
+See [8304](https://github.com/NREL/EnergyPlus/pull/8304)
