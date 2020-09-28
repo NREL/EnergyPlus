@@ -2086,3 +2086,170 @@ And one includes it in the IDF using the following.
 \begin{lstlisting}
 Output:SQLite, Simple;
 \end{lstlisting}
+
+\subsection{OutputControl:Files}\label{outputcontrolfiles}
+
+This object controls the output of various files in a central location.~ This object overrides other output objects in the input file.~ This object is for advanced users who understand their workflows well since this object can have unintended consequences for external programs.
+
+\subsubsection{Inputs}\label{outputcontrolfiles-inputs}
+
+\paragraph{Field: CSV}\label{field-csv}
+
+When this field is ``\textbf{Yes}'', EnergyPlus will output the Output:Variables and Output:Meters as CSV files using native EnergyPlus.~ This functionality is equivalent to the external ReadVarsESO program, however, it does not use RVI or MVI files to filter or sort output variables.~ The native EnergyPlus CSV output has significantly higher performance than ReadVarsESO, especially for large number of output variables.~ If the ``-r'' command line flag is used to request ReadVarsESO and ``\textbf{Yes}'' is selected for native CSV, ReadVarsESO will be run instead and a warning message will be given.
+
+\paragraph{Field: MTR}\label{field-mtr}
+
+Conditionally turn on or off MTR file output.~ This could have unintended consequences for other programs that assume an MTR file is always generated.
+
+\paragraph{Field: ESO}\label{field-eso}
+
+Conditionally turn on or off ESO file output.~ This could have unintended consequences for other programs that assume an ESO file is always generated.
+
+\paragraph{Field: EIO}\label{field-eio}
+
+Conditionally turn on or off EIO file output.
+
+\paragraph{Field: Tabular}\label{field-tabular}
+
+Conditionally turn on or off all tabular output file(s).
+
+\paragraph{Field: SQLite}\label{field-sqlite}
+
+Conditionally turn on or off SQLite file output.~ If tabular output objects are in the input file, ``\textbf{SimpleAndTabular}'' is selected for SQLite output, Tabular output control is ``\textbf{No}'', and SQLite output control is ``\textbf{Yes}'', there will still be tabular outputs in the SQLite output file.
+
+\paragraph{Field: JSON}\label{field-json}
+
+Conditionally turn on or off JSON output file(s).
+
+\paragraph{Field: AUDIT}\label{field-audit}
+
+Conditionally turn on or off Audit file output.
+
+\paragraph{Field: Zone Sizing}\label{field-zone-sizing}
+
+Conditionally turn on or off Zone Sizing file output.
+
+\paragraph{Field: System Sizing}\label{field-system-sizing}
+
+Conditionally turn on or off System Sizing file output.
+
+\paragraph{Field: DXF}\label{field-dxf}
+
+Conditionally turn on or off DXF file output.
+
+\paragraph{Field: BND}\label{field-bnd}
+
+Conditionally turn on or off BND file output.
+
+\paragraph{Field: RDD}\label{field-rdd}
+
+Conditionally turn on or off RDD file output.
+
+\paragraph{Field: MDD}\label{field-mdd}
+
+Conditionally turn on or off MDD file output.
+
+\paragraph{Field: MTD}\label{field-mtd}
+
+Conditionally turn on or off MTD file output.
+
+\paragraph{Field: END}\label{field-end}
+
+Conditionally turn on or off END file output.~ This could have unintended consequences for other programs that assume an END file is always generated.
+
+\paragraph{Field: SHD}\label{field-shd}
+
+Conditionally turn on or off SHD file output.
+
+\paragraph{Field: DFS}\label{field-dfs}
+
+Conditionally turn on or off DFS file output.
+
+\paragraph{Field: GLHE}\label{field-glhe}
+
+Conditionally turn on or off GLHE file output.
+
+\paragraph{Field: DelightIn}\label{field-delight-in}
+
+Conditionally turn on or off DelightIn file output.
+
+\paragraph{Field: DelightELdmp}\label{field-delight-el-dmp}
+
+Conditionally turn on or off DelightELdmp file output.
+
+\paragraph{Field: DelightDFdmp}\label{field-delight-df-dmp}
+
+Conditionally turn on or off DelightDFdmp file output.
+
+\paragraph{Field: EDD}\label{field-edd}
+
+Conditionally turn on or off EDD file output.
+
+\paragraph{Field: DBG}\label{field-dbg}
+
+Conditionally turn on or off Debug file output.
+
+\paragraph{Field: PerfLog}\label{field-perf-log}
+
+Conditionally turn on or off PerfLog file output.
+
+\paragraph{Field: SLN}\label{field-sln}
+
+Conditionally turn on or off SLN file output.
+
+\paragraph{Field: SCI}\label{field-sci}
+
+Conditionally turn on or off SCI file output.
+
+\paragraph{Field: WRL}\label{field-wrl}
+
+Conditionally turn on or off WRL file output.
+
+\paragraph{Field: Screen}\label{field-screen}
+
+Conditionally turn on or off Screen file output.
+
+\paragraph{Field: ExtShd}\label{field-ext-shd}
+
+Conditionally turn on or off ExtShd file output.
+
+\paragraph{Field: Tarcog}\label{field-tarcog}
+
+Conditionally turn on or off Tarcog file output.
+
+An example of this object follows.
+
+\begin{lstlisting}
+OutputControl:Files,
+  Yes, ! CSV
+  Yes, ! MTR
+  Yes, ! ESO
+  No , ! EIO
+  No , ! Tabular
+  No , ! SQLite
+  No , ! JSON
+  No , ! AUDIT
+  No , ! Zone Sizing
+  No , ! System Sizing
+  No , ! DXF
+  No , ! BND
+  No , ! RDD
+  No , ! MDD
+  No , ! MTD
+  Yes, ! END
+  No , ! SHD
+  No , ! DFS
+  No , ! GLHE
+  No , ! DelightIn
+  No , ! DelightELdmp
+  No , ! DelightDFdmp
+  No , ! EDD
+  No , ! DBG
+  No , ! PerfLog
+  No , ! SLN
+  No , ! SCI
+  No , ! WRL
+  No , ! Screen
+  No , ! ExtShd
+  No ; ! Tarcog
+\end{lstlisting}
