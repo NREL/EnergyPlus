@@ -15,7 +15,7 @@ As of version 9.3, a proper API has been developed, which builds on a number of 
 
 As of version 9.4, the API has been improved, as well as the ability to more reliably ``reset'' the simulation state.
 After 9.3 was released and users began toying with the API usage, it was revealed that many (most?) files would not actually run well during series runs of EnergyPlus via API in the same thread because the simulation state was not fully ``cleared''.
-Although the simulation state is still not guaranteed to be fully cleared, we are now seeing greater than 95% pass rate on our example files when running them serially multiple times.
+Although the simulation state is still not guaranteed to be fully cleared, we are now seeing greater than 95\% pass rate on our example files when running them serially multiple times.
 This situation will make it much more suited for integrating into workflows as the Python thread does not have to be destroyed to get a clean EnergyPlus state for the next run.
 Work is continuing to get the state of the simulation completely managed, and will be completed prior to the next release, ensuring this situation continues improving.
 
