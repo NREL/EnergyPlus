@@ -2014,6 +2014,8 @@
   Output:Variable,*,Surface Internal User Specified Location Temperature,timestep;
 
   Output:Variable,*,HVAC System Solver Iteration Count,timestep;
+ 
+  Output:Variable,HW Supply Inlet Node,System Node Mass Flow Rate,timestep;
 
   Output:VariableDictionary,Regular;
 
