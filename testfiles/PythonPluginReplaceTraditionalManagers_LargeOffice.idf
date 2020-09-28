@@ -7957,11 +7957,11 @@
 !  Seasonal-Reset-Supply-Air-Temp-Sch,  !- Schedule Name
 !  VAV_5 Supply Equipment Outlet Node;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_5_SAT_setpoint,      !- Name
-    VAV_5 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_5_SAT_setpoint,      !- Name
+!    VAV_5 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV_5_SchedSetpoint,     !- Name
@@ -7989,17 +7989,17 @@
 !    VAV_5 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
 !    System Node Temperature; !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_5_CoolC_Setpoint,    !- Name
-    VAV_5_CoolC-VAV_5_HeatCNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_5_CoolC_Setpoint,    !- Name
+!    VAV_5_CoolC-VAV_5_HeatCNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Actuator,
-    VAV_5_HeatC_Setpoint,    !- Name
-    VAV_5_HeatC-VAV_5_FanNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_5_HeatC_Setpoint,    !- Name
+!    VAV_5_HeatC-VAV_5_FanNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV5MixedAirManagers,    !- Name
@@ -8159,11 +8159,11 @@
 !  VAV_5 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_5_OA-VAV_5_CoolCNode;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_5_OA_Setpoint,       !- Name
-    VAV_5_OA-VAV_5_CoolCNode,!- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_5_OA_Setpoint,       !- Name
+!    VAV_5_OA-VAV_5_CoolCNode,!- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
   Controller:OutdoorAir,
     VAV_5_OA_Controller,     !- Name
@@ -8316,11 +8316,11 @@
 !  Seasonal-Reset-Supply-Air-Temp-Sch,  !- Schedule Name
 !  VAV_1_CoolC-VAV_1_HeatCNode;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_1_SAT_setpoint,      !- Name
-    VAV_1 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_1_SAT_setpoint,      !- Name
+!    VAV_1 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV_1_SchedSetpoint,     !- Name
@@ -8348,17 +8348,17 @@
 !    VAV_1 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
 !    System Node Temperature; !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_1_CoolC_Setpoint,    !- Name
-    VAV_1_CoolC-VAV_1_HeatCNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_1_CoolC_Setpoint,    !- Name
+!    VAV_1_CoolC-VAV_1_HeatCNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Actuator,
-    VAV_1_HeatC_Setpoint,    !- Name
-    VAV_1_HeatC-VAV_1_FanNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_1_HeatC_Setpoint,    !- Name
+!    VAV_1_HeatC-VAV_1_FanNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV1MixedAirManagers,    !- Name
@@ -8535,11 +8535,11 @@
 !  VAV_1 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_1_OA-VAV_1_CoolCNode;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_1_OA_Setpoint,       !- Name
-    VAV_1_OA-VAV_1_CoolCNode,!- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_1_OA_Setpoint,       !- Name
+!    VAV_1_OA-VAV_1_CoolCNode,!- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
   Controller:OutdoorAir,
     VAV_1_OA_Controller,     !- Name
@@ -8695,11 +8695,11 @@
 !  Seasonal-Reset-Supply-Air-Temp-Sch,  !- Schedule Name
 !  VAV_2 Supply Equipment Outlet Node;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_2_SAT_setpoint,      !- Name
-    VAV_2 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_2_SAT_setpoint,      !- Name
+!    VAV_2 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV_2_SchedSetpoint,     !- Name
@@ -8727,17 +8727,17 @@
 !    VAV_2 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
 !    System Node Temperature; !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_2_CoolC_Setpoint,    !- Name
-    VAV_2_CoolC-VAV_2_HeatCNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_2_CoolC_Setpoint,    !- Name
+!    VAV_2_CoolC-VAV_2_HeatCNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Actuator,
-    VAV_2_HeatC_Setpoint,    !- Name
-    VAV_2_HeatC-VAV_2_FanNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_2_HeatC_Setpoint,    !- Name
+!    VAV_2_HeatC-VAV_2_FanNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV2MixedAirManagers,    !- Name
@@ -8914,11 +8914,11 @@
 !  VAV_2 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_2_OA-VAV_2_CoolCNode;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_2_OA_Setpoint,       !- Name
-    VAV_2_OA-VAV_2_CoolCNode,!- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_2_OA_Setpoint,       !- Name
+!    VAV_2_OA-VAV_2_CoolCNode,!- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
   Controller:OutdoorAir,
     VAV_2_OA_Controller,     !- Name
@@ -9074,11 +9074,11 @@
 !  Seasonal-Reset-Supply-Air-Temp-Sch,  !- Schedule Name
 !  VAV_3 Supply Equipment Outlet Node;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_3_SAT_setpoint,      !- Name
-    VAV_3 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_3_SAT_setpoint,      !- Name
+!    VAV_3 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV_3_SchedSetpoint,     !- Name
@@ -9106,17 +9106,17 @@
 !    VAV_3 Supply Equipment Outlet Node,  !- Output:Variable or Output:Meter Index Key Name
 !    System Node Temperature; !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_3_CoolC_Setpoint,    !- Name
-    VAV_3_CoolC-VAV_3_HeatCNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_3_CoolC_Setpoint,    !- Name
+!    VAV_3_CoolC-VAV_3_HeatCNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
-  EnergyManagementSystem:Actuator,
-    VAV_3_HeatC_Setpoint,    !- Name
-    VAV_3_HeatC-VAV_3_FanNode,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_3_HeatC_Setpoint,    !- Name
+!    VAV_3_HeatC-VAV_3_FanNode,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    VAV3MixedAirManagers,    !- Name
@@ -9293,11 +9293,11 @@
 !  VAV_3 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
 !  VAV_3_OA-VAV_3_CoolCNode;  !- Setpoint Node or NodeList Name
 
-  EnergyManagementSystem:Actuator,
-    VAV_3_OA_Setpoint,       !- Name
-    VAV_3_OA-VAV_3_CoolCNode,!- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    VAV_3_OA_Setpoint,       !- Name
+!    VAV_3_OA-VAV_3_CoolCNode,!- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
   Controller:OutdoorAir,
     VAV_3_OA_Controller,     !- Name
@@ -9443,11 +9443,11 @@
 !    SHWSys1-Loop-Temp-Schedule,  !- Output:Variable or Output:Meter Index Key Name
 !    Schedule Value;          !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    SHWSys1_Loop_Setpoint,   !- Name
-    SHWSys1 Supply Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    SHWSys1_Loop_Setpoint,   !- Name
+!    SHWSys1 Supply Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    SHWSys1_SchedSetpoint,   !- Name
@@ -9752,11 +9752,11 @@
 !    HW-Loop-Temp-Schedule,   !- Output:Variable or Output:Meter Index Key Name
 !    Schedule Value;          !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    HeatSys1_Loop_Setpoint,  !- Name
-    HeatSys1 Supply Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    HeatSys1_Loop_Setpoint,  !- Name
+!    HeatSys1 Supply Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    HeatSys1_SchedSetpoint,  !- Name
@@ -9856,11 +9856,11 @@
     0.0000,                  !- Parasitic Electric Load {W}
     1.0000;                  !- Sizing Factor
 
-  EnergyManagementSystem:Actuator,
-    HeatSys1_Boiler_Setpoint,!- Name
-    HeatSys1 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    HeatSys1_Boiler_Setpoint,!- Name
+!    HeatSys1 Supply Equipment Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
   Branch,
     HeatSys1 Supply Equipment Bypass Branch,  !- Name
@@ -10209,11 +10209,11 @@
 !    CW-Loop-Temp-Schedule,   !- Output:Variable or Output:Meter Index Key Name
 !    Schedule Value;          !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    CoolSys1_Loop_Setpoint,  !- Name
-    CoolSys1 Supply Outlet Node,  !- Actuated Component Unique Name
-    System Node Setpoint,    !- Actuated Component Type
-    Temperature Setpoint;    !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    CoolSys1_Loop_Setpoint,  !- Name
+!    CoolSys1 Supply Outlet Node,  !- Actuated Component Unique Name
+!    System Node Setpoint,    !- Actuated Component Type
+!    Temperature Setpoint;    !- Actuated Component Control Type
 
 !  EnergyManagementSystem:Program,
 !    CoolSys1_SchedSetpoint,  !- Name

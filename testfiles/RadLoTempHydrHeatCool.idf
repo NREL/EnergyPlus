@@ -2116,7 +2116,7 @@
     0.0012,                  !- Maximum Cold Water Flow {m3/s}
     Zone 2 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
-    2.0,                     !- Cooling Control Throttling Range {deltaC}
+    0.4,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
     VariableOff,             !- Condensation Control Type
     0.0,                     !- Condensation Control Dewpoint Offset {C}
@@ -2142,7 +2142,7 @@
     0.00010,                 !- Maximum Hot Water Flow {m3/s}
     North Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     North Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
-    0.4,                     !- Heating Control Throttling Range {deltaC}
+    0.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
     Autosize,                !- Cooling Design Capacity {W}
@@ -2151,7 +2151,7 @@
     0.0015,                  !- Maximum Cold Water Flow {m3/s}
     Zone 3 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 3 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
-    0.4,                     !- Cooling Control Throttling Range {deltaC}
+    0.0,                     !- Cooling Control Throttling Range {deltaC}
     Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
     Off,                     !- Condensation Control Type
     0.0,                     !- Condensation Control Dewpoint Offset {C}
