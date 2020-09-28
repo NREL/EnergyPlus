@@ -3862,7 +3862,7 @@
 
   Output:Variable,*,Cooling Tower Basin Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Tower Basin Heater Electric Energy,hourly;
+  Output:Variable,*,Cooling Tower Basin Heater Electricity Energy,hourly;
 
   Output:Variable,*,Cooling Tower Make Up Water Volume,hourly;
 
