@@ -10806,6 +10806,7 @@ namespace Furnaces {
         using VariableSpeedCoils::CompareGridSpeed;
         using VariableSpeedCoils::SimVariableSpeedCoils;
         using VariableSpeedCoils::VarSpeedCoil;
+        using VariableSpeedCoils::IsGridResponsiveMode; 
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10831,6 +10832,7 @@ namespace Furnaces {
         bool SuppHeatingCoilFlag; // whether to turn on the supplemental heater
         Real64 HeatCoilLoad;      // REQUIRED HEAT COIL LOAD
         int FanSpeed = SpeedNum;  // speed level to drive fan flow
+        bool GridOnOff = false;  // grid mode fan on/off mode
 
         // FLOW
         InletNode = Furnace(FurnaceNum).FurnaceInletNodeNum;
@@ -10845,35 +10847,41 @@ namespace Furnaces {
             if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad)))) { // cooling or dehumidification
                 FanSpeed = CompareGridSpeed(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSCCoilIndex, 
                     SpeedNum);
-                if ((FanSpeed == 0) && (SpeedNum > 0) ){
+                if ((FanSpeed == 0) && 
+                    (IsGridResponsiveMode(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSCCoilIndex))) {
                     FanSpeed = 
                         VarSpeedCoil(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSCCoilIndex)
                         .NormSpedLevel; // compressor off, allow maximum fan flow speed
+                    GridOnOff = true; 
                 }
             } else {                                    // heating
                 FanSpeed = CompareGridSpeed(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSHCoilIndex, 
                     SpeedNum);
-                if ((FanSpeed == 0) && (SpeedNum > 0)) {
+                if ((FanSpeed == 0) && 
+                    (IsGridResponsiveMode(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSHCoilIndex))) {
                     FanSpeed = VarSpeedCoil(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSHCoilIndex)
                                    .NormSpedLevel; // compressor off, allow maximum fan flow speed
+                    GridOnOff = true; 
                 }
             }
         } else {
             if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad)))) {//cooling or dehumidification
                 FanSpeed = CompareGridSpeed(Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum);
-                if ((FanSpeed == 0) && (SpeedNum > 0)) {
+                if ((FanSpeed == 0) && (IsGridResponsiveMode(Furnace(FurnaceNum).CoolingCoilIndex))) {
                     FanSpeed = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).NormSpedLevel;
+                    GridOnOff = true; 
                 }             
             } else {//heating
                 FanSpeed = CompareGridSpeed(Furnace(FurnaceNum).HeatingCoilIndex, SpeedNum);
-                if ((FanSpeed == 0) && (SpeedNum > 0)) {
+                if ((FanSpeed == 0) && (IsGridResponsiveMode(Furnace(FurnaceNum).HeatingCoilIndex))) {
                     FanSpeed = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).NormSpedLevel;
+                    GridOnOff = true; 
                 }           
             }
         }
 
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
-        SetVSHPAirFlow(state, FurnaceNum, PartLoadFrac, OnOffAirFlowRatio, FanSpeed, SpeedRatio);
+        SetVSHPAirFlow(state, FurnaceNum, PartLoadFrac, OnOffAirFlowRatio, FanSpeed, SpeedRatio, GridOnOff);
 
         if ((SupHeaterLoad > 1.0e-10) && (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool) &&
             (Furnace(FurnaceNum).SuppHeatCoilIndex == 0)) {
@@ -11664,7 +11672,8 @@ namespace Furnaces {
                         Real64 const PartLoadRatio,       // unit part load ratio
                         Real64 &OnOffAirFlowRatio,        // ratio of compressor ON airflow to average airflow over timestep
                         Optional_int_const SpeedNum,      // Speed number
-                        Optional<Real64 const> SpeedRatio // Speed ratio
+                        Optional<Real64 const> SpeedRatio, // Speed ratio
+                        bool const GridOnOff //grid On/Off signal
     )
     {
 
@@ -11884,6 +11893,9 @@ namespace Furnaces {
             Node(InletNode).MassFlowRate = 0.0;
             OnOffAirFlowRatio = 0.0;
         } else {
+
+            if (GridOnOff == true) AverageUnitMassFlow = AverageUnitMassFlow * PartLoadRatio; 
+
             Node(InletNode).MassFlowRate = AverageUnitMassFlow;
             Node(InletNode).MassFlowRateMaxAvail = AverageUnitMassFlow;
             if (AverageUnitMassFlow > 0.0) {

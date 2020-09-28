@@ -263,7 +263,12 @@ namespace IntegratedHeatPump {
         // total source energy
         Real64 TotalCOP; // total COP
         Real64 DehumLDMassFlowRate; 
+        Real64 RegenLDMassFlowRate;
         Real64 DehumLDMassFlowSize; 
+        Real64 DehumAirMasslowRate;
+        Real64 DehumAirMasslowSize; 
+        Real64 RegenAirMasslowRate;
+        Real64 RegenAirMasslowSize; 
         Real64 SupHeatRate;//supplemental heating rate
         Real64 SaltConcentration;//liquid desiccant salt concentration
         int LDHeatMode; 
@@ -322,7 +327,9 @@ namespace IntegratedHeatPump {
               DehumLDMassFlowRate(0.0), SupHeatRate(0.0), WaterMiddleNodeNum(0), 
               LDLoopChecked(false),
               SaltConcentration(0.0), LDHeatMode(0), TankLDMass(0.0), TankSaltMass(0.0), 
-              DehumLDMassFlowSize(1.0), GridSHCoilIndex(0)
+              DehumLDMassFlowSize(1.0), GridSHCoilIndex(0),
+              DehumAirMasslowRate(0.0), DehumAirMasslowSize(1.0), RegenAirMasslowRate(0.0), 
+              RegenAirMasslowSize(1.0), RegenLDMassFlowRate(0.0)
         {
         }
     };

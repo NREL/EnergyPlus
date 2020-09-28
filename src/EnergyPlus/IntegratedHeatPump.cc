@@ -1658,7 +1658,7 @@ namespace IntegratedHeatPump {
                                           OnOffAirFlowRat);
 
                  if (IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex != 0) {
-                    WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).InletWaterMassFlowRate = 0.0;
+                    Node(IntegratedHeatPumps(DXCoilNum).WaterMiddleNodeNum).MassFlowRate = 0.0;
                     SimulateWaterCoilComponents(state,
                                                 IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
                                                 FirstHVACIteration,
@@ -1666,6 +1666,7 @@ namespace IntegratedHeatPump {
                                                 0.0,
                                                 CyclingScheme,
                                                 0.0);
+                    Node(IntegratedHeatPumps(DXCoilNum).WaterMiddleNodeNum).MassFlowRate = waterMassFlowRate; 
                 }
 
                 if (true == IsGridResponsiveMode(IntegratedHeatPumps(DXCoilNum).GridSCCoilIndex)) {
@@ -1723,8 +1724,19 @@ namespace IntegratedHeatPump {
                     //only apply desiccant and evaporative cool during grid response
                 {
                     if (IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) {
+                        int iWNod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
+                        int iANod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
+
                         WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate =
-                            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate;
+                            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate;    
+                        WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).MaxWaterMassFlowRate =
+                            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate; 
+                        Node(iWNod).MassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate; 
+                        Node(iWNod).MassFlowRateMax = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate; 
+
+                        Node(iANod).MassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumAirMasslowRate;                        
+                        Node(iANod).MassFlowRateMax = IntegratedHeatPumps(DXCoilNum).DehumAirMasslowRate; 
+                        
                         SimulateWaterCoilComponents(state,
                                                     IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
                                                     FirstHVACIteration,
@@ -1743,6 +1755,13 @@ namespace IntegratedHeatPump {
                 } else {
                     if (IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) {
                         WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
+                        int iWNod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
+                        int iANod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
+                        Node(iWNod).MassFlowRate = 0.0;
+                        Node(iWNod).MassFlowRateMax = 0.0;
+                        Node(iANod).MassFlowRate = 0.0;
+                        Node(iANod).MassFlowRateMax = 0.0;
+
                         SimulateWaterCoilComponents(state,
                                                     IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
                                                     FirstHVACIteration,
@@ -1753,9 +1772,10 @@ namespace IntegratedHeatPump {
                     }
 
                     if (IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex != 0) {
-                        EvapCond(IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletMassFlowRate = 0.0;
+                        Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate = 0.0; 
                         SimEvapCooler(state, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName, 
                             IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex, 0.0);
+                        Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate = airMassFlowRate;
                         Node(IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum).MassFlowRate = airMassFlowRate;
                     }                
                 }
@@ -1894,6 +1914,13 @@ namespace IntegratedHeatPump {
 
                  if (IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) {
                     WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
+                    int iWNod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
+                    int iANod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
+                    Node(iWNod).MassFlowRate = 0.0;
+                    Node(iWNod).MassFlowRateMax = 0.0;
+                    Node(iANod).MassFlowRate = 0.0;
+                    Node(iANod).MassFlowRateMax = 0.0;
+
                     SimulateWaterCoilComponents(state,
                                                 IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
                                                 FirstHVACIteration,
@@ -1903,10 +1930,11 @@ namespace IntegratedHeatPump {
                                                 0.0);
                 }
                 if (IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex != 0) {
-                    EvapCond(IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletMassFlowRate = 0.0;
-                    SimEvapCooler(
-                        state, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex, 0.0);
-                    Node(IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum).MassFlowRate = airMassFlowRate; 
+                    Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate = 0.0;
+                    SimEvapCooler(state, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName, 
+                        IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex, 0.0);
+                    Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate = airMassFlowRate;
+                    Node(IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum).MassFlowRate = airMassFlowRate;
                 }
 
                 if (IntegratedHeatPumps(DXCoilNum).DWHCoilIndex != 0)
@@ -1926,7 +1954,7 @@ namespace IntegratedHeatPump {
                                           OnOffAirFlowRat);
 
                 if (IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex != 0) {
-                    WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).InletWaterMassFlowRate = 0.0;
+                    Node(IntegratedHeatPumps(DXCoilNum).WaterMiddleNodeNum).MassFlowRate = 0.0;
                     SimulateWaterCoilComponents(state,
                                                 IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
                                                 FirstHVACIteration,
@@ -1934,6 +1962,7 @@ namespace IntegratedHeatPump {
                                                 0.0,
                                                 CyclingScheme,
                                                 0.0);
+                    Node(IntegratedHeatPumps(DXCoilNum).WaterMiddleNodeNum).MassFlowRate = waterMassFlowRate; 
                 }
 
                  if (true == IsGridResponsiveMode(IntegratedHeatPumps(DXCoilNum).GridSHCoilIndex)) {
@@ -2072,6 +2101,13 @@ namespace IntegratedHeatPump {
 
                 if (IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) {
                     WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
+                    int iWNod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
+                    int iANod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
+                    Node(iWNod).MassFlowRate = 0.0;
+                    Node(iWNod).MassFlowRateMax = 0.0;
+                    Node(iANod).MassFlowRate = 0.0;
+                    Node(iANod).MassFlowRateMax = 0.0;
+
                     SimulateWaterCoilComponents(state,
                                                 IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
                                                 FirstHVACIteration,
@@ -2081,8 +2117,9 @@ namespace IntegratedHeatPump {
                                                 0.0);
                 }
                 if (IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex != 0) {
-                    EvapCond(IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletMassFlowRate = 0.0;
+                    Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate = 0.0;
                     SimEvapCooler(state, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex, 0.0);
+                    Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate = airMassFlowRate;
                     Node(IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum).MassFlowRate = airMassFlowRate;
                 }
 
@@ -2159,7 +2196,10 @@ namespace IntegratedHeatPump {
                 }
 
                 if (IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex != 0) {
-                    WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).InletWaterMassFlowRate = waterMassFlowRate;
+                    int iANod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).AirInletNodeNum;                  
+                    Node(iANod).MassFlowRate = IntegratedHeatPumps(DXCoilNum).RegenAirMasslowRate;
+                    Node(iANod).MassFlowRateMax = IntegratedHeatPumps(DXCoilNum).RegenAirMasslowRate; 
+
                     SimulateWaterCoilComponents(state,
                                                 IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
                                                 FirstHVACIteration,
@@ -2310,7 +2350,10 @@ namespace IntegratedHeatPump {
                 }
 
                 if (IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex != 0) {
-                    WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).InletWaterMassFlowRate = waterMassFlowRate;
+                    int iANod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).AirInletNodeNum;
+                    Node(iANod).MassFlowRate = IntegratedHeatPumps(DXCoilNum).RegenAirMasslowRate;
+                    Node(iANod).MassFlowRateMax = IntegratedHeatPumps(DXCoilNum).RegenAirMasslowRate; 
+
                     SimulateWaterCoilComponents(state,
                                                 IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
                                                 FirstHVACIteration,
@@ -2322,6 +2365,13 @@ namespace IntegratedHeatPump {
 
                 if (IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) {
                     WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
+                    int iWNod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
+                    int iANod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
+                    Node(iWNod).MassFlowRate = 0.0;
+                    Node(iWNod).MassFlowRateMax = 0.0;
+                    Node(iANod).MassFlowRate = 0.0;
+                    Node(iANod).MassFlowRateMax = 0.0;
+
                     SimulateWaterCoilComponents(state,
                                                 IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
                                                 FirstHVACIteration,
@@ -2332,9 +2382,9 @@ namespace IntegratedHeatPump {
                 }
 
                 if (IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex != 0) {
-                    EvapCond(IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletMassFlowRate = 0.0;
-                    SimEvapCooler(state, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName, 
-                        IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex, 0.0);
+                    Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate = 0.0;
+                    SimEvapCooler(state, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex, 0.0);
+                    Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate = airMassFlowRate;
                     Node(IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum).MassFlowRate = airMassFlowRate;
                 }
 
@@ -2495,7 +2545,10 @@ namespace IntegratedHeatPump {
                 }
 
                 if (IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex != 0) {
-                    WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).InletWaterMassFlowRate = waterMassFlowRate;
+                    int iANod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).AirInletNodeNum;
+                    Node(iANod).MassFlowRate = IntegratedHeatPumps(DXCoilNum).RegenAirMasslowRate;
+                    Node(iANod).MassFlowRateMax = IntegratedHeatPumps(DXCoilNum).RegenAirMasslowRate; 
+
                     SimulateWaterCoilComponents(state,
                                                 IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
                                                 FirstHVACIteration,
@@ -2507,6 +2560,13 @@ namespace IntegratedHeatPump {
 
                 if (IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) {
                     WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
+                    int iWNod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
+                    int iANod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
+                    Node(iWNod).MassFlowRate = 0.0;
+                    Node(iWNod).MassFlowRateMax = 0.0;
+                    Node(iANod).MassFlowRate = 0.0;
+                    Node(iANod).MassFlowRateMax = 0.0;
+
                     SimulateWaterCoilComponents(state,
                                                 IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
                                                 FirstHVACIteration,
@@ -2517,9 +2577,9 @@ namespace IntegratedHeatPump {
                 }
 
                 if (IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex != 0) {
-                    EvapCond(IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletMassFlowRate = 0.0;
-                    SimEvapCooler(state, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName, 
-                        IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex, 0.0);
+                    Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate = 0.0;
+                    SimEvapCooler(state, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex, 0.0);
+                    Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate = airMassFlowRate;
                     Node(IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum).MassFlowRate = airMassFlowRate;
                 }
 
@@ -2658,6 +2718,13 @@ namespace IntegratedHeatPump {
 
             if (IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) {
                 WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
+                int iWNod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
+                int iANod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
+                Node(iWNod).MassFlowRate = 0.0;
+                Node(iWNod).MassFlowRateMax = 0.0;
+                Node(iANod).MassFlowRate = 0.0;
+                Node(iANod).MassFlowRateMax = 0.0;
+
                 SimulateWaterCoilComponents(state,
                                             IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
                                             FirstHVACIteration,
@@ -2668,9 +2735,9 @@ namespace IntegratedHeatPump {
             }
 
             if (IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex != 0) {
-                EvapCond(IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletMassFlowRate = 0.0;
-                SimEvapCooler(state, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName, 
-                    IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex, 0.0);
+                Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate = 0.0;
+                SimEvapCooler(state, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex, 0.0);
+                Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate = airMassFlowRate;
                 Node(IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum).MassFlowRate = airMassFlowRate;
             }
 
@@ -2723,7 +2790,10 @@ namespace IntegratedHeatPump {
                                       OnOffAirFlowRat);
 
             if (IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex != 0) {
-                WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).InletWaterMassFlowRate = 0.0;
+                int iANod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).AirInletNodeNum;
+                Node(iANod).MassFlowRate = 0.0;
+                Node(iANod).MassFlowRateMax = 0.0; 
+
                 SimulateWaterCoilComponents(state,
                                             IntegratedHeatPumps(DXCoilNum).LDRegenCoilName,
                                             FirstHVACIteration,
@@ -3146,6 +3216,7 @@ namespace IntegratedHeatPump {
             OutNodeName = NodeID(OutNode);
 
             IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum = InNode;
+            IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum = OutNode;
             IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum = OutNode;
 
             TestCompSet(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil", InNodeName, OutNodeName, "Cooling Air Nodes");
@@ -4026,18 +4097,20 @@ namespace IntegratedHeatPump {
             IntegratedHeatPumps(DXCoilNum).Concen_Set = NumArray(7);
             IntegratedHeatPumps(DXCoilNum).Concen_band = NumArray(8);
             IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowSize = NumArray(9);
+            IntegratedHeatPumps(DXCoilNum).DehumAirMasslowSize = NumArray(10);
+            IntegratedHeatPumps(DXCoilNum).RegenAirMasslowSize = NumArray(11);
 
             if (UtilityRoutines::SameString(IntegratedHeatPumps(DXCoilNum).SUPHEATTYPE, "NONE"))
                 IntegratedHeatPumps(DXCoilNum).TregenTarget =  -10000.0; 
 
-            if (!lNumericBlanks(10)) IntegratedHeatPumps(DXCoilNum).SHCoilSize = NumArray(10);        // 1.0
-            if (!lNumericBlanks(11)) IntegratedHeatPumps(DXCoilNum).DWHCoilSize = NumArray(11);       // 1.0
-            if (!lNumericBlanks(12)) IntegratedHeatPumps(DXCoilNum).SCWHCoilSize = NumArray(12);      // 1.0
-            if (!lNumericBlanks(13)) IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilSize = NumArray(13); // 1.0
-            if (!lNumericBlanks(14)) IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilSize = NumArray(14);   // 0.13
-            if (!lNumericBlanks(15)) IntegratedHeatPumps(DXCoilNum).EnDehumCoilSize = NumArray(15);   // 0.5
-            if (!lNumericBlanks(16)) IntegratedHeatPumps(DXCoilNum).GridSCCoilSize = NumArray(16);      // 0.9
-            if (!lNumericBlanks(17)) IntegratedHeatPumps(DXCoilNum).GridSCCoilSize = NumArray(17);      // 0.9
+            if (!lNumericBlanks(12)) IntegratedHeatPumps(DXCoilNum).SHCoilSize = NumArray(12);        // 1.0
+            if (!lNumericBlanks(13)) IntegratedHeatPumps(DXCoilNum).DWHCoilSize = NumArray(13);       // 1.0
+            if (!lNumericBlanks(14)) IntegratedHeatPumps(DXCoilNum).SCWHCoilSize = NumArray(14);      // 1.0
+            if (!lNumericBlanks(15)) IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilSize = NumArray(15); // 1.0
+            if (!lNumericBlanks(16)) IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilSize = NumArray(16);   // 0.13
+            if (!lNumericBlanks(17)) IntegratedHeatPumps(DXCoilNum).EnDehumCoilSize = NumArray(17);   // 0.5
+            if (!lNumericBlanks(18)) IntegratedHeatPumps(DXCoilNum).GridSCCoilSize = NumArray(18);      // 0.9
+            if (!lNumericBlanks(19)) IntegratedHeatPumps(DXCoilNum).GridSCCoilSize = NumArray(19);      // 0.9
 
             // Due to the overlapping coil objects, compsets and node registrations are handled as follows:
             //  1. The ASIHP coil object is registered as four different coils, Name+" Cooling Coil", Name+" Heating Coil",
@@ -4060,6 +4133,7 @@ namespace IntegratedHeatPump {
             OutNodeName = NodeID(OutNode);
 
             IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum = InNode;
+            IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum = EvapCond(IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletNode; 
             IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum = EvapCond(IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).OutletNode; 
 
             TestCompSet(CurrentModuleObject, IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil", InNodeName, OutNodeName, "Cooling Air Nodes");
@@ -5071,27 +5145,33 @@ namespace IntegratedHeatPump {
         }
 
         if (IntegratedHeatPumps(DXCoilNum).DWHCoilIndex != 0) {
-            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowSize *
-                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex)
-                    .MSRatedWaterMassFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).NormSpedLevel);
+            IntegratedHeatPumps(DXCoilNum).RegenLDMassFlowRate = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex)
+                    .MSRatedWaterMassFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).NormSpedLevel); 
+            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowSize 
+                * IntegratedHeatPumps(DXCoilNum).RegenLDMassFlowRate;
         } else if (IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex != 0) {
-            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowSize *
+            IntegratedHeatPumps(DXCoilNum).RegenLDMassFlowRate =
                 VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex)
-                    .MSRatedWaterMassFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).NormSpedLevel);
+                    .MSRatedWaterMassFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).NormSpedLevel); 
+            IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowSize 
+                * IntegratedHeatPumps(DXCoilNum).RegenLDMassFlowRate;
         }
+
+        IntegratedHeatPumps(DXCoilNum).RegenAirMasslowRate =
+            IntegratedHeatPumps(DXCoilNum).RegenAirMasslowSize *
+            VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex)
+                .MSRatedAirMassFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NormSpedLevel);
 
         int iCoilID = IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex;
         if (iCoilID != 0) {
-            WaterCoil(iCoilID).DesAirMassFlowRate =
-                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex)
-                    .MSRatedAirMassFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NormSpedLevel);
-            WaterCoil(iCoilID).DesAirVolFlowRate =
+            WaterCoil(iCoilID).DesAirMassFlowRate = IntegratedHeatPumps(DXCoilNum).RegenAirMasslowRate; 
+            WaterCoil(iCoilID).DesAirVolFlowRate = IntegratedHeatPumps(DXCoilNum).RegenAirMasslowSize *
                 VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex)
                     .MSRatedAirVolFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NormSpedLevel);
 
-            WaterCoil(iCoilID).InletWaterMassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate;
+            WaterCoil(iCoilID).InletWaterMassFlowRate = IntegratedHeatPumps(DXCoilNum).RegenLDMassFlowRate;
             WaterCoil(iCoilID).DesInletSolnConcentration = IntegratedHeatPumps(DXCoilNum).Concen_Set; 
-            WaterCoil(iCoilID).MaxWaterMassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate;
+            WaterCoil(iCoilID).MaxWaterMassFlowRate = IntegratedHeatPumps(DXCoilNum).RegenLDMassFlowRate;
             WaterCoil(iCoilID).DesInletAirTemp = 13.8; 
             WaterCoil(iCoilID).DesInletAirHumRat = 0.00788862; // 
             WaterCoil(iCoilID).DesOutletAirTemp = 19.0;
@@ -5101,12 +5181,17 @@ namespace IntegratedHeatPump {
             SizeWaterCoil_NotInPlant(state, iCoilID);
         }
 
+        IntegratedHeatPumps(DXCoilNum).DehumAirMasslowRate =
+            IntegratedHeatPumps(DXCoilNum).DehumAirMasslowSize *
+            VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex)
+                .MSRatedAirMassFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NormSpedLevel);
+
+        
         iCoilID = IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex;
         if (iCoilID != 0) {
-            WaterCoil(iCoilID).DesAirMassFlowRate =
+            WaterCoil(iCoilID).DesAirMassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumAirMasslowRate;
+            WaterCoil(iCoilID).DesAirVolFlowRate = IntegratedHeatPumps(DXCoilNum).DehumAirMasslowSize *
                 VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex)
-                    .MSRatedAirMassFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NormSpedLevel);
-            WaterCoil(iCoilID).DesAirVolFlowRate = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex)
                                                        .MSRatedAirVolFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NormSpedLevel);
 
             WaterCoil(iCoilID).InletWaterMassFlowRate = IntegratedHeatPumps(DXCoilNum).DehumLDMassFlowRate;
@@ -5123,7 +5208,9 @@ namespace IntegratedHeatPump {
 
         iCoilID = IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex;
         if (iCoilID != 0) {
-            EvapCond(iCoilID).IndirectVolFlowRate = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).DesignAirVolFlowRate;
+            EvapCond(iCoilID).IndirectVolFlowRate = IntegratedHeatPumps(DXCoilNum).DehumAirMasslowSize *
+                VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex)
+                    .MSRatedAirVolFlowRate(VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NormSpedLevel);
 
             SizeEvapCooler(iCoilID);
         }
@@ -5580,7 +5667,10 @@ namespace IntegratedHeatPump {
                 state, BlankString, IntegratedHeatPumps(DXCoilNum).GridSCCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
         
         if (IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex != 0) {
-            WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).InletWaterMassFlowRate = 0.0;
+            int iANod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).AirInletNodeNum;
+            Node(iANod).MassFlowRate = 0.0;
+            Node(iANod).MassFlowRateMax = 0.0; 
+
             SimulateWaterCoilComponents(
                 state, IntegratedHeatPumps(DXCoilNum).LDRegenCoilName, false, IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex, 
                 0.0, CycFanCycCoil, 0.0); 
@@ -5588,13 +5678,20 @@ namespace IntegratedHeatPump {
 
         if (IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) {
             WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
+            int iWNod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
+            int iANod = WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
+            Node(iWNod).MassFlowRate = 0.0;
+            Node(iWNod).MassFlowRateMax = 0.0;
+            Node(iANod).MassFlowRate = 0.0;
+            Node(iANod).MassFlowRateMax = 0.0;
+
             SimulateWaterCoilComponents(
                 state, IntegratedHeatPumps(DXCoilNum).LDDehumCoilName, false, IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex,
                                         0.0, CycFanCycCoil, 0.0);
         }
 
         if (IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex != 0) {
-            EvapCond(IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletMassFlowRate = 0.0;
+            Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate = 0.0;
             SimEvapCooler(state, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex, 0.0);
         }
                            
