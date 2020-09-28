@@ -2898,7 +2898,7 @@ namespace EconomicTariff {
         Real64 annualAggregate;
         int annualCnt;
 
-        if (!ioFiles.outputControl.tabular) {
+        if (!(ioFiles.outputControl.tabular || ioFiles.outputControl.sqlite)) {
             WriteTabularFiles = false;
             return;
         }
