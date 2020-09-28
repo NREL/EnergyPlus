@@ -51,7 +51,7 @@
                 heating, cooling, lighting, ventilating, and other energy flows. EnergyPlus is a stand-alone simulation engine
                 without a ‘user friendly’ graphical interface.  EnergyPlus reads input and writes output as text files...
                 <hr>
-                ...<b>although</b>, as of 9.3, EnergyPlus is starting to become a library.
+                ...<b>although</b>, as of 9.3, EnergyPlus started becoming a library.
             </div>
             <div class="col-md-2"></div>
         </div>
@@ -77,27 +77,24 @@
     <h2>Using EnergyPlus</h2>
     <p>
         Utilities and tools for creating, editing, and running input files that come with EnergyPlus include IDF Editor
-        and
-        EP-Launch. Many graphical user interfaces for EnergyPlus are available or under development. For the latest
-        tools,
-        please see
+        and EP-Launch. Many graphical user interfaces for EnergyPlus are available or under development. For the latest
+        tools, please see
         <a href="https://www.buildingenergysoftwaretools.com/?capabilities=Whole-building+Energy+Simulation&keywords=EnergyPlus">
             this website for third party interfaces</a>. A completely new cross-platform version of EP-Launch has been
-        developed
-        and is available separate from the EnergyPlus install; see the <a
+        developed and is available separate from the EnergyPlus install; see the <a
             href="https://ep-launch.readthedocs.io/en/latest/intro.html#ep-launch">documentation</a> for more
-        information.
-        Some tools may produce out of date IDF files; you can then use the IDFVersionUpdater program to convert older
-        files to current EnergyPlus version (you may need to use the Multiple Version Conversions set – see below).
+        information.  Some tools may produce out of date IDF files; you can then use the IDFVersionUpdater program to
+        convert older files to current EnergyPlus version (you may need to use the Multiple Version Conversions
+        set – see below).
     </p>
 
-    <h2><a id="Whats_going_on"></a>What’s going on in V9.3?</h2>
+    <h2><a id="Whats_going_on"></a>What’s going on in V9.4?</h2>
     <div class="row">
         <div class="col-md-12">
             <a class="btn btn-primary margin-bottom-6" data-toggle="collapse" href="#cDifferent" role="button"
                aria-expanded="false"
                aria-controls="cDifferent">
-                Is 9.3 different from 9.2? (Wait, did you say EnergyPlus is a library?)
+                Is 9.4 different from 9.3? (What's up with this library stuff?)
             </a>
             <div class="collapse" id="cDifferent">
                 <div class="card card-body">
@@ -108,13 +105,14 @@
                         improvements.  Running EnergyPlus can still be accomplished the same way, by creating an input
                         file in IDF or EpJSON syntax, running the EnergyPlus(.exe) binary, and gathering results of
                         interest.  All this power is still available.  &#128077; <br>
-                        However, for advanced usage, there are two significant changes that should be noted.  The first
-                        is that user-defined EMS scripts can now be written as Python "plugins" that are executed by
-                        EnergyPlus at runtime.  The second is that EnergyPlus can now be treated as a library, where a
+                        As of EnergyPlus 9.3, EnergyPlus started becoming a bit more flexible thanks to the addition of
+                        a formal C API with Python Bindings, as well as the ability to execute user-defined Python
+                        "plugins" in lieu of writing user-defined Erl code.  In the library mode, a
                         client can make function calls to setup and execute a simulation, as well as interact with
                         simulation results <b>during</b> a simulation. &#128077; &#128077; &#128077;<br>
-                        Details of these major changes along with other significant features for this version (hint:
-                        there are a bunch!) are listed below in this readme.  Also, see the full
+                        With version 9.4 the library APIs heavily changed, so scripts will need to be updated. (Don't
+                        worry we won't make a habit of that!).  Details of these major changes along with other
+                        significant features for this version are listed below in this readme.  Also, see the full
                         <a href="https://github.com/NREL/EnergyPlus/releases/latest" class="card-link">ChangeLog</a>
                         for a complete list of new features added in this and previous versions.
                     </p>
@@ -128,13 +126,13 @@
             <a class="btn btn-primary margin-bottom-6" data-toggle="collapse" href="#collapseIDDIDF" role="button"
                aria-expanded="false"
                aria-controls="collapseIDDIDF">
-                Are 9.3 and 9.2 IDD and IDF files the same?
+                Are 9.4 and 9.3 IDD and IDF files the same?
             </a>
             <div class="collapse" id="collapseIDDIDF">
                 <div class="card card-body">
                     <h5 class="card-title">No, they are different</h5>
-                    <p class="card-text">There are a few key changes in the V9.3 IDD. For best results, use the transition program to
-                    transfer from the earlier V9.2 files. Use the IDFVersionUpdater program for best results.</p>
+                    <p class="card-text">There are a few key changes in the V9.4 IDD. For best results, use the transition program to
+                    transfer from the earlier V9.3 files. Use the IDFVersionUpdater program for best results.</p>
                 </div>
             </div>
         </div>
@@ -145,7 +143,7 @@
             <a class="btn btn-primary margin-bottom-6" data-toggle="collapse" href="#collapseCompatible" role="button"
                aria-expanded="false"
                aria-controls="collapseCompatible">
-                Is version 9.3 backward compatible? Can I run v9.2 file in v9.3?
+                Is version 9.4 backward compatible? Can I run v9.3 file in v9.4?
             </a>
             <div class="collapse" id="collapseCompatible">
                 <div class="card card-body">
@@ -153,39 +151,17 @@
                     There have been changes in the following objects which require conversion. Either read and follow
                     the Rules document or use the IDFVersionUpdater utility. The “Rules” document contains information on
                     exact object changes that you can do by hand. The updater program is described more fully in the Auxiliary
-                    Programs document. For the v9.3 release, the following objects require conversion (from V9.2):
+                    Programs document. For the v9.4 release, the following objects require conversion (from V9.3):
                     <ul class="list-group">
-                        <li class="list-group-item transition-object-name">AirConditioner:VariableRefrigerantFlow</li>
-                        <li class="list-group-item transition-object-name">AirTerminal:SingleDuct:Uncontrolled <i>(spoiler...it's gone!)</i></li>
-                        <li class="list-group-item transition-object-name">Boiler:HotWater</li>
-                        <li class="list-group-item transition-object-name">Boiler:Steam</li>
-                        <li class="list-group-item transition-object-name">Chiller:EngineDriven</li>
-                        <li class="list-group-item transition-object-name">Chiller:CombustionTurbine</li>
-                        <li class="list-group-item transition-object-name">ChillerHeater:Absorption:DirectFired</li>
-                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:MultiSpeed</li>
-                        <li class="list-group-item transition-object-name">Coil:Heating:Fuel</li>
-                        <li class="list-group-item transition-object-name">Coil:Heating:DX:MultiSpeed</li>
-                        <li class="list-group-item transition-object-name">EnergyManagementSystem:Program</li>
-                        <li class="list-group-item transition-object-name">EnergyManagementSystem:Subroutine</li>
-                        <li class="list-group-item transition-object-name">EnergyManagementSystem:MeteredOutputVariable</li>
-                        <li class="list-group-item transition-object-name">Exterior:FuelEquipment</li>
-                        <li class="list-group-item transition-object-name">FuelFactors</li>
-                        <li class="list-group-item transition-object-name">Generator:CombustionTurbine</li>
-                        <li class="list-group-item transition-object-name">Generator:InternalCombustionEngine</li>
-                        <li class="list-group-item transition-object-name">Generator:MicroTurbine</li>
-                        <li class="list-group-item transition-object-name">GlobalGeometryRules</li>
-                        <li class="list-group-item transition-object-name">HeatPump:WaterToWater:EIR:Heating</li>
-                        <li class="list-group-item transition-object-name">HeatPump:WaterToWater:EIR:Cooling</li>
-                        <li class="list-group-item transition-object-name">HVACTemplate:System:VRF</li>
-                        <li class="list-group-item transition-object-name">HVACTemplate:Plant:Boiler</li>
-                        <li class="list-group-item transition-object-name">LifeCycleCost:UsePriceEscalation</li>
-                        <li class="list-group-item transition-object-name">LifeCycleCost:UseAdjustment</li>
-                        <li class="list-group-item transition-object-name">OtherEquipment</li>
-                        <li class="list-group-item transition-object-name">Output:Table:SummaryReports</li>
-                        <li class="list-group-item transition-object-name">ShadowCalculation</li>
-                        <li class="list-group-item transition-object-name">WaterHeater:Mixed</li>
-                        <li class="list-group-item transition-object-name">WaterHeater:Stratified</li>
+                        <li class="list-group-item transition-object-name">Construction:InternalSource</li>
                         <li class="list-group-item transition-object-name">ZoneHVAC:HybridUnitaryHVAC</li>
+                        <li class="list-group-item transition-object-name">Output:DebuggingData</li>
+                        <li class="list-group-item transition-object-name">Output:Diagnostics</li>
+                        <li class="list-group-item transition-object-name">ZoneHVAC:LowTemperatureRadiant:VariableFlow</li>
+                        <li class="list-group-item transition-object-name">ZoneHVAC:LowTemperatureRadiant:VariableFlow</li>
+                        <li class="list-group-item transition-object-name">ZoneHVAC:LowTemperatureRadiant:Electric</li>
+                        <li class="list-group-item transition-object-name">ZoneHVAC:LowTemperatureRadiant:ConstantFlow</li>
+                        <li class="list-group-item transition-object-name">Multiple Objects Affected with Fuel type Synonym Unification</li>
                     </ul>
                 </div>
             </div>
@@ -214,7 +190,8 @@
     <p>
         The install includes the IDFVersionUpdater program and the necessary programs to convert from the previous
         version (including .rvi and .mvi files) to the current version. The install also includes the necessary programs
-        to convert from older versions back to v7.2.0. For versions older than v7.2.0, you will need to visit the
+        to convert from older versions back to v7.2.0.  For versions older than v7.2.0, first we applaud your dedication
+        to EnergyPlus that stretches for quite some time, and second you will need to visit the
         helpdesk and download the multiple conversion set of programs. The helpdesk downloads area:
         <a href="http://energyplus.helpserve.com/Knowledgebase/List/Index/46/converting-older-version-files">
             Converting Older Files</a>
@@ -229,7 +206,6 @@
         guide called the EnergyPlus Essentials was developed and is available with the installed pdf documentation.
         Big Ladder Software is also hosting html versions of the
         EnergyPlus Documentation <a href="http://bigladdersoftware.com/epx/docs/">online</a>.
-
     </p>
     <p>There are some other documents of interest available on the EnergyPlus web site including:</p>
     <div class="list-group">
@@ -238,6 +214,11 @@
         <a href="https://energyplus.net/testing" class="list-group-item list-group-item-action">Testing and Validation
             Reports</a>
     </div>
+    <p>
+        In addition, we are working to make our API documentation dynamic and hosted on ReadTheDocs.  The
+        <a href="https://github.com/NREL/EnergyPlus/blob/develop/README.md">README</a> on our Github Repo will be kept
+        up to date with links to our documentation sources as we get things settled there.
+    </p>
 
     <h2><a id="Weather_Data_63"></a>Weather Data</h2>
     <p>A small subset of weather files that are available on the web site are also installed in the WeatherData folder.
@@ -247,76 +228,18 @@
         about the included (or other) files. Weather data for more than 2100 locations in more than 100 countries can be
         downloaded on the <a href="https://energyplus.net/weather">EnergyPlus Weather Page</a>.</p>
 
-    <h2>Important Changes (OK, back to this library thing...)</h2>
-    <p>There are three changes in this release of EnergyPlus which rely on different software dependencies.</p>
-    <dl>
-        <dt>C/Python API</dt>
-        <dd>
-            A significant change to this release is the ability to call EnergyPlus as a library.  Up until now, the way almost all
-            users interacted with EnergyPlus has always been to setup an input file, and call the EnergyPlus(.exe) binary to run
-            the file, then gather results as needed from output files.  (ExternalInterface being one exception).
-            While this traditional method is still available, a new approach has been
-            added.  The simulation code has been refactored to allow a C API to be created, exposing functions that enable users
-            to register callback functions, call functional methods and interact with the simulation state.  Through this C API,
-            a user may create a small C program that includes a callback function registered for each time step.  Then at each
-            time step, this callback function then evaluates fluid property methods also via the API.  The function can also
-            get access to instantaneous variable and meter data in the running simulation, and modify subsequent time steps
-            by actuating controls and other aspects.  This unlocks the door for a whole new set of possible workflows.
-            To link against this API, just point builds to the EnergyPlus install directory, which has a new "includes"
-            directory with headers, and the EnergyPlus DLL right in the install root.
-            Then, on top of the C API, a matching Python API was built that will allow this same functionality, but through
-            Python scripts, further reducing the burden needed to create a workflow on top of EnergyPlus.  The functional
-            API that exposes fluid property methods will be expanded over time to allow more and more access to internal
-            calculations in EnergyPlus.  To link against this API, just point scripts into the EnergyPlus install directory
-            and access API files from the pyenergyplus package in there.  More information about the API will be provided in
-            a supplemental documentation source -- initially a PDF -- posted on the release page on GitHub.
-            <b>Note that the API is in a preliminary state and is subject to break for the next release.  Subsequent
-            releases will be more stable.</b>
-        </dd>
-        <dt>Python Plugins (Python EMS)</dt>
-        <dd>
-            The next change is the ability to use Python to write EMS scripts.  These scripts are currently nicknamed
-            "plugins", as they are actually quite similar to the design of plugins for other software tools.  In these
-            scripts, the user will write custom Python classes that override a predefined EnergyPlusPlugin base class.
-            The user will then declare the plugin in their input file, along with some other plugin-related inputs
-            (variables that can be shared between plugins, custom output variables, etc.).
-            Based on which functions the user overrides, the functions will be called at specific points during a
-            simulation.  The calling points are the same as those exposed for regular EMS functions.
-            Once inside the called function, the plugin can then leverage the Python API discussed in the
-            previous paragraph to read data, write actuators, and evaluate fluid/refrigerant properties.  In order to
-            execute Python scripts at runtime, this EnergyPlus version includes a Python library with it, which can be seen
-            if the install package is inspected.  Users should not need to mess around with this; this note is merely a tip
-            for power users or people who do unusual things with the install package, that they need to watch this closer.
-            Details about this new Python Plugin approach are found in the EMSApplicationGuide, InputOutputReference, and
-            in the example files named PythonPlugin*.idf.
-        </dd>
-        <dt>GPU Calculations</dt>
-        <dd>
-            Another high impact change with this release is the ability to leverage GPU calculations to improve runtime
-            performance of the simulation.  The documentation contains plenty of information to let users take
-            advantage of this new feature, which has the potential to drastically speed up simulation runtime, however,
-            a few notes provide high level tips for this new capability:
-            <ul class="list-group">
-                <li class="list-group-item">
-                    There is a performance overhead associated with passing calculations between the GPU and the CPU, with the
-                    GPU becoming noticeably more efficient in models with more than around 200 shadow-casting surfaces. The
-                    actual number where the GPU becomes more efficient will depend on the specs of the respective hardware.
-                </li>
-                <li class="list-group-item">
-                    Some machines (mostly server machines) do not have GPU hardware or the required graphics drivers to utilize
-                    this capability. If this scenario is detected on a computer, EnergyPlus will issue a warning and proceed
-                    with the simulation using the calculations on the CPU.
-                </li>
-                <li class="list-group-item">
-                    Some computers have multiple GPUs. In this case, the highest performance GPU is not always used by default.
-                    You may want to select which GPU is used when running EnergyPlus by setting the graphics performance
-                    preferences on your computer.
-                </li>
-            </ul>
-        </dd>
-    </dl>
+    <h2>An Important Note About the API</h2>
+    <p>
+        Under normal circumstances, we intend on providing a very stable API for clients to access EnergyPlus.
+        However, as somewhat expected (see 9.3 README), the first release of the API was always likely to expose
+        some cases that would require a change in the API.  Indeed it did.  The change is pretty widespread through the
+        API, but quite an easy change to make.  In summary - a new argument is needed in most functions, including
+        Python Plugin method overrides and user-defined runtime API callback functions.  The client merely needs to
+        accept this argument in functions and pass it back in to the API methods.  More information can be found in the
+        input-output reference document.
+    </p>
 
-    <h2>Highlights of this release (V9.3.0)</h2>
+    <h2>Highlights of this release (V9.4.0)</h2>
     <h3><a id="Highlights_of_this_release"></a>New Features</h3>
     <table class="table table-striped table-bordered">
         <tr>
@@ -324,36 +247,28 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7489">7489</a></td>
-            <td>Extend EIR WWHP to Air-source</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8100">8100</a></td>
+            <td>Resilience Metrics Reporting</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7562">7562</a></td>
-            <td>Add Three Alternative Models for Clear Sky Emissivity Calculation</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8113">8113</a></td>
+            <td>Implementation of On-Off Control Capabilities for the Variable Flow and Electric Low Temperature Radiant Systems</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7603">7603</a></td>
-            <td>Input file conversion utility IDF->epJSON and reverse</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8170">8170</a></td>
+            <td>Enhancement of Low Temperature Radiant Models to Allow Multi-Zone Systems</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7605">7605</a></td>
-            <td>Allow ZoneHVAC:TerminalUnit:VariableRefrigerantFlow to connect to AirloopHVAC and AirLoopHVAC:OutdoorAirSystem:EquipmentList</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8183">8183</a></td>
+            <td>Implement Changeover Delay for Hydronic Low Temperature Radiant Systems</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7643">7643</a></td>
-            <td>New Schedule for Minimum Airflow for VAV Boxes</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8269">8269</a></td>
+            <td>Allow Multiple Scheduled Shades to Reference a Single Window</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7776">7776</a></td>
-            <td>C API, Python API, and Python Plugins</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7792">7792</a></td>
-            <td>DX Cooling Coil Refactor</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7834">7834</a></td>
-            <td>Scheduling min air flow for vav boxes follow up</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/7821">7821</a></td>
+            <td>Add Report of SEER calculated using the user specified PLF curve and default AHRI curve and C_D</td>
         </tr>
     </table>
     <h3><a id="PerformanceFeatures"></a>Runtime Performance Enhancing Developments</h3>
@@ -363,24 +278,20 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7302">7302</a></td>
-            <td>Allow GPU-based shading calculations</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/7904">7904</a></td>
+            <td>Native E+ CSV output and conditional output file selection</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7534">7534</a></td>
-            <td>Implement Carroll method for Interior Radiant Heat Exchange</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/7963">7963</a></td>
+            <td>Skip interzone diffuse solar exchange factors calculations when no interzone window exists</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7567">7567</a></td>
-            <td>Sizing speed up related to reducing the number of warmup days for design days</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8141">8141</a></td>
+            <td>SurfaceWindow struct refactoring</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7574">7574</a></td>
-            <td>A new algorithm for polygon clipping in solar calculations for rectangular surfaces</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7761">7761</a></td>
-            <td>Add Performance Overrides and Reporting</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8182">8182</a></td>
+            <td>Bypass interior solar distribution calculation at night</td>
         </tr>
     </table>
     <h3><a id="RefactoringEfforts"></a>Targeted Refactoring Efforts</h3>
@@ -390,61 +301,50 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7479">7479</a></td>
-            <td>Simplify the moist air specific heat capacity psychrometric function</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8157">8157</a></td>
+            <td>WeatherManager clean up</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7668">7668</a></td>
-            <td>Begin removing objexx gio (a total of 5 different PRs)</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8173">8173</a></td>
+            <td>Fix State confusion around API</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7734">7734</a></td>
-            <td>Make HeatPump:* Output Variable Names Consistent</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/8211">8211</a></td>
+            <td>Global Pointer-to-Implementation Redesign</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7772">7772</a></td>
-            <td>Redefine Trim* and Round* functions in terms of {fmt}</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7813">7813</a></td>
-            <td>Reduce use of Array1S objects</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7825">7825</a></td>
-            <td>Make EnergyPlus suitable as a cmake subproject</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7840">7840</a></td>
-            <td>Eliminating Reference variables</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/7841">7841</a></td>
-            <td>Reduce Array1A and Array1 usage</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>(~30 different PRs) Refactoring plant models into a uniform PlantComponent interface base class</td>
+            <td>(MANY)</td>
+            <td>Many refactoring efforts to clean up global variable usage in EnergyPlus</td>
         </tr>
     </table>
 
     <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-8">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
             <blockquote class="blockquote text-center">
                 <p class="mb-0">
-                    <b>A complete list of addressed issues may be found in the installed <a href="changelog.html" >changelog</a>.</b>
+                    The changelog is no longer packaged with EnergyPlus, but can be found on the <a href="https://github.com/NREL/EnergyPlus/releases/latest">release page</a>.
                 </p>
             </blockquote>
         </div>
-        <div class="col-md-2"></div>
+        <div class="col-md-1"></div>
     </div>
 
     <h2><a id="Platforms_90"></a>Platforms</h2>
+    <p>
+        Packages changed slightly with 9.4.  We are now building our packages on a new system which adds better support
+        for some platforms.  During the change, we are stepping away from some older OS versions.  For example, we are
+        not testing on Windows 7 or 8, only 10.  However, both our 32-bit and 64-bit packages now include the new
+        Python plugin system, rather than just the 64-bit as previously.  We have also added packaging and testing
+        with Ubuntu 20.04 <i>in addition to</i> Ubuntu 18.04.  On Mac, we are officially releasing an installer for
+        OSX 10.15, although we will make an effort to offer a package for an older version.  (Though 10.15 has been
+        out for a while now...)
+    </p>
     <ul class="list-group">
-        <li class="list-group-item">Windows 7, 8 &amp; 10</li>
-        <li class="list-group-item">Linux (Ubuntu 18.04 and compatible) 64 bit versions</li>
-        <li class="list-group-item">Mac OSX 10.13 64 bit versions</li>
-        <li class="list-group-item">EnergyPlus V9.3 has been tested on all of these platforms</li>
+        <li class="list-group-item">Windows 10</li>
+        <li class="list-group-item">Linux (Ubuntu 18.04 and 20.04) 64 bit versions</li>
+        <li class="list-group-item">Mac OSX 10.15 64 bit versions</li>
+        <li class="list-group-item">EnergyPlus V9.4 has been tested on all of these platforms</li>
         <li class="list-group-item"><em>EnergyPlus does intensive computations, and based on configuration, can write
             massive amounts of data to
             disk. For best performance, computers should have a substantial amount of memory and high speed hard
@@ -508,7 +408,7 @@
             <blockquote class="blockquote text-center">
                 <p class="mb-0">
                     Thanks for downloading EnergyPlus.
-                    Special thanks to our beta testers for this release.
+                    Special thanks to our early testers for this release.
                     If you did not download the previous version, we welcome you.
                     If you are a returning customer, we hope you find the latest release exceeding your expectations.
                     We look forward to serving you!

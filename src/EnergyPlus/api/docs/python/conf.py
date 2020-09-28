@@ -27,7 +27,7 @@ author = u'National Renewable Energy Laboratory for the United States Department
 # The short X.Y version
 version = u''
 # The full version, including alpha/beta/rc tags
-release = u'0.1'
+release = u'0.2'
 
 extra_nav_links = {
     'Blah': 'https://energyplus.net'

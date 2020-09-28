@@ -515,6 +515,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     OutArgs(3) = 'Mode06'
                   ENDIF
 
+              CASE('PYTHONPLUGIN:INSTANCE')
+                CALL writePreprocessorObject(DifLfn,PrognameConversion, 'Warning', 'PythonPlugin:Instance found -- note the API changed from v9.3 and v9.4 -- check docs and update with new state argument.')
 
               ! If your original object starts with R, insert the rules here
 
