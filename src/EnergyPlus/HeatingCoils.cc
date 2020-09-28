@@ -1371,6 +1371,11 @@ namespace HeatingCoils {
             MySPTestFlag(CoilNum) = false;
         }
 
+        // If the coil is temperature controlled, reset the desired outlet temperature so the temperature setpoint at the oulet node won't be used
+        if (ControlNode > 0 && (Node(ControlNode).TempSetPoint != SensedNodeFlagValue)) {
+            HeatingCoil(CoilNum).DesiredOutletTemp = 0.0;
+        }
+
         // delay fatal error until all coils are called
         if (!FirstHVACIteration && HeatingCoilFatalError) {
             ShowFatalError("... errors found in heating coil input.");
