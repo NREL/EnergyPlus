@@ -318,8 +318,8 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
 
     // Checking the first day against manually calculated value from EPW (24-hour averages for Jan 1)
     auto &firstDay = thisModel->weatherDataArray(1);
-    EXPECT_DOUBLE_EQ(firstDay.dryBulbTemp, -5.4);
-    EXPECT_NEAR(firstDay.relativeHumidity, 0.7083, 0.005);
+    EXPECT_DOUBLE_EQ(firstDay.dryBulbTemp, -5.5640625000000048);
+    EXPECT_NEAR(firstDay.relativeHumidity, 0.7072, 0.005);
     EXPECT_NEAR(firstDay.windSpeed, 2.8083, 0.001);
     // Sum of (BeamSolarRad + DifSolarRad)/24
     EXPECT_NEAR(firstDay.horizontalRadiation, 140, 2);
