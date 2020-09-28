@@ -13737,13 +13737,13 @@
     LGSTORE1_Light_Actuator, !- Name
     LGSTORE1_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     LGSTORE1_Light_ALLOWANCE_Actuator,  !- Name
     LGSTORE1_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_LGSTORE1_Light_EMS_Program,  !- Name
@@ -13782,13 +13782,13 @@
     SMSTORE1_Light_Actuator, !- Name
     SMSTORE1_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE1_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE1_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE1_Light_EMS_Program,  !- Name
@@ -13827,13 +13827,13 @@
     SMSTORE2_Light_Actuator, !- Name
     SMSTORE2_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE2_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE2_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE2_Light_EMS_Program,  !- Name
@@ -13872,13 +13872,13 @@
     SMSTORE3_Light_Actuator, !- Name
     SMSTORE3_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE3_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE3_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE3_Light_EMS_Program,  !- Name
@@ -13917,13 +13917,13 @@
     SMSTORE4_Light_Actuator, !- Name
     SMSTORE4_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE4_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE4_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE4_Light_EMS_Program,  !- Name
@@ -13962,13 +13962,13 @@
     SMSTORE5_Light_Actuator, !- Name
     SMSTORE5_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE5_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE5_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE5_Light_EMS_Program,  !- Name
@@ -14007,13 +14007,13 @@
     SMSTORE6_Light_Actuator, !- Name
     SMSTORE6_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE6_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE6_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE6_Light_EMS_Program,  !- Name
@@ -14052,13 +14052,13 @@
     SMSTORE7_Light_Actuator, !- Name
     SMSTORE7_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE7_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE7_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE7_Light_EMS_Program,  !- Name
@@ -14097,13 +14097,13 @@
     SMSTORE8_Light_Actuator, !- Name
     SMSTORE8_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     SMSTORE8_Light_ALLOWANCE_Actuator,  !- Name
     SMSTORE8_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_SMSTORE8_Light_EMS_Program,  !- Name
@@ -14142,13 +14142,13 @@
     LGSTORE2_Light_Actuator, !- Name
     LGSTORE2_lights,         !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
     LGSTORE2_Light_ALLOWANCE_Actuator,  !- Name
     LGSTORE2_lights_ALLOWANCE,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_LGSTORE2_Light_EMS_Program,  !- Name

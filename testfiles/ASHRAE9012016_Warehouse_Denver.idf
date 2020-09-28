@@ -8097,7 +8097,7 @@
     Zone1_Office_Light_Actuator,  !- Name
     Office Lights,           !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Zone1_Office_Light_EMS_Program,  !- Name
@@ -8131,7 +8131,7 @@
     Zone2_Fine_Storage_Light_Actuator,  !- Name
     Fine Storage Area Lights,!- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Zone2_Fine_Storage_Light_EMS_Program,  !- Name
@@ -8165,7 +8165,7 @@
     Zone3_Bulk_Storage_Light_Actuator,  !- Name
     Bulk Storage Area Lights,!- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Zone3_Bulk_Storage_Light_EMS_Program,  !- Name
