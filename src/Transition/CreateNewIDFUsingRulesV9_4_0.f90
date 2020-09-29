@@ -134,6 +134,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER numMeterCustom
   CHARACTER(len=MaxNameLength) :: MeterCustomName
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: MeterCustomNames
+  LOGICAL :: throwPythonWarning = .TRUE.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
@@ -537,7 +538,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   ENDIF
 
               CASE('PYTHONPLUGIN:INSTANCE')
-                CALL writePreprocessorObject(DifLfn,PrognameConversion, 'Warning', 'PythonPlugin:Instance found -- note the API changed from v9.3 and v9.4 -- check docs and update with new state argument.')
+                IF (throwPythonWarning) THEN
+                  CALL ShowWarningError('PythonPlugin:Instance found -- note the API changed from v9.3 and v9.4 -- check docs and update with new state argument.',Auditf)
+                  CALL writePreprocessorObject(DifLfn,PrognameConversion, 'Warning', 'PythonPlugin:Instance found -- note the API changed from v9.3 and v9.4 -- check docs and update with new state argument.')
+                  throwPythonWarning = .false.
+                END IF
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
 
               ! If your original object starts with R, insert the rules here
 
