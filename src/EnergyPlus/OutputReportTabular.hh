@@ -61,6 +61,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -706,6 +707,8 @@ namespace OutputReportTabular {
     // Functions
     void clear_state();
 
+    std::ofstream & open_tbl_stream(int const iStyle, std::string const & filename, bool output_to_file = true);
+
     void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     //======================================================================================================================
@@ -754,7 +757,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void OpenOutputTabularFile();
+    void OpenOutputTabularFile(IOFiles & ioFiles);
 
     void CloseOutputTabularFile();
 
@@ -896,7 +899,7 @@ namespace OutputReportTabular {
                                         Array3D<Real64> const &feneCondInstantSeqLoc,
                                         Array2D<Real64> const &surfDelaySeq);
 
-    void CollectPeakZoneConditions(
+    void CollectPeakZoneConditions(EnergyPlusData &state,
         CompLoadTablesType &compLoad, int const &desDaySelected, int const &timeOfMax, int const &zoneIndex, bool const &isCooling);
 
     void ComputeEngineeringChecks(CompLoadTablesType &compLoad);

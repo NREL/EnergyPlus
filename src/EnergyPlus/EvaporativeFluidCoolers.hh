@@ -249,7 +249,7 @@ namespace EvaporativeFluidCoolers {
         {
         }
 
-        static PlantComponent *factory(int objectType, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
 
         void setupOutputVars();
 
@@ -283,7 +283,7 @@ namespace EvaporativeFluidCoolers {
     // Object Data
     extern Array1D<EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
 
-    void GetEvapFluidCoolerInput();
+    void GetEvapFluidCoolerInput(EnergyPlusData &state);
 
     void clear_state();
 

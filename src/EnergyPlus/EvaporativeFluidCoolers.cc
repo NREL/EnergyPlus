@@ -53,28 +53,28 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
@@ -104,11 +104,11 @@ namespace EvaporativeFluidCoolers {
     Array1D<EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
     std::unordered_map<std::string, std::string> UniqueSimpleEvapFluidCoolerNames;
 
-    PlantComponent *EvapFluidCoolerSpecs::factory(int objectType, std::string const &objectName)
+    PlantComponent *EvapFluidCoolerSpecs::factory(EnergyPlusData &state, int objectType, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
         if (GetEvapFluidCoolerInputFlag) {
-            GetEvapFluidCoolerInput();
+            GetEvapFluidCoolerInput(state);
             GetEvapFluidCoolerInputFlag = false;
         }
 
@@ -124,7 +124,7 @@ namespace EvaporativeFluidCoolers {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void GetEvapFluidCoolerInput()
+    void GetEvapFluidCoolerInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -342,7 +342,7 @@ namespace EvaporativeFluidCoolers {
             if (AlphArray(10).empty()) {
                 thisEFC.SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                WaterManager::SetupTankDemandComponent(AlphArray(1),
+                WaterManager::SetupTankDemandComponent(state, AlphArray(1),
                                                        DataIPShortCuts::cCurrentModuleObject,
                                                        AlphArray(10),
                                                        ErrorsFound,
@@ -623,7 +623,7 @@ namespace EvaporativeFluidCoolers {
             if (DataIPShortCuts::lAlphaFieldBlanks(9)) {
                 thisEFC.SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                WaterManager::SetupTankDemandComponent(AlphArray(1),
+                WaterManager::SetupTankDemandComponent(state, AlphArray(1),
                                                        DataIPShortCuts::cCurrentModuleObject,
                                                        AlphArray(9),
                                                        ErrorsFound,
@@ -988,7 +988,8 @@ namespace EvaporativeFluidCoolers {
         }
     }
 
-    void EvapFluidCoolerSpecs::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void EvapFluidCoolerSpecs::simulate(EnergyPlusData &state,
+                                        const PlantLocation &EP_UNUSED(calledFromLocation),
                                         bool EP_UNUSED(FirstHVACIteration),
                                         Real64 &EP_UNUSED(CurLoad),
                                         bool RunFlag)
@@ -1070,7 +1071,18 @@ namespace EvaporativeFluidCoolers {
         if (this->OneTimeFlagForEachEvapFluidCooler) {
             // Locate the tower on the plant loops for later usage
             PlantUtilities::ScanPlantLoopsForObject(state,
-                this->Name, this->TypeOf_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
+                                                    this->Name,
+                                                    this->TypeOf_Num,
+                                                    this->LoopNum,
+                                                    this->LoopSideNum,
+                                                    this->BranchNum,
+                                                    this->CompNum,
+                                                    ErrorsFound,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _);
 
             if (ErrorsFound) {
                 ShowFatalError("InitEvapFluidCooler: Program terminated due to previous condition(s).");
@@ -1209,11 +1221,11 @@ namespace EvaporativeFluidCoolers {
                 }
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             this->EvapFluidCoolerType, this->Name, "Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             this->EvapFluidCoolerType, this->Name, "Initial Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                     }
                 }
@@ -1267,14 +1279,13 @@ namespace EvaporativeFluidCoolers {
                 this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                 if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_SingleSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
-                            cEvapFluidCooler_SingleSpeed,
-                            this->Name,
-                            "Design Water Flow Rate based on evaporative fluid cooler Standard Design Capacity [m3/s]",
-                            this->DesignWaterFlowRate);
+                        BaseSizer::reportSizerOutput(cEvapFluidCooler_SingleSpeed,
+                                                     this->Name,
+                                                     "Design Water Flow Rate based on evaporative fluid cooler Standard Design Capacity [m3/s]",
+                                                     this->DesignWaterFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             cEvapFluidCooler_SingleSpeed,
                             this->Name,
                             "Initial Design Water Flow Rate based on evaporative fluid cooler Standard Design Capacity [m3/s]",
@@ -1282,14 +1293,14 @@ namespace EvaporativeFluidCoolers {
                     }
                 } else if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_TwoSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             cEvapFluidCooler_TwoSpeed,
                             this->Name,
                             "Design Water Flow Rate based on evaporative fluid cooler high-speed Standard Design Capacity [m3/s]",
                             this->DesignWaterFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             cEvapFluidCooler_TwoSpeed,
                             this->Name,
                             "Initial Design Water Flow Rate based on evaporative fluid cooler high-speed Standard Design Capacity [m3/s]",
@@ -1340,20 +1351,20 @@ namespace EvaporativeFluidCoolers {
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_SingleSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             cEvapFluidCooler_SingleSpeed, this->Name, "Fan Power at Design Air Flow Rate [W]", this->HighSpeedFanPower);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             cEvapFluidCooler_SingleSpeed, this->Name, "Initial Fan Power at Design Air Flow Rate [W]", this->HighSpeedFanPower);
                     }
                 } else if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_TwoSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             cEvapFluidCooler_TwoSpeed, this->Name, "Fan Power at High Fan Speed [W]", this->HighSpeedFanPower);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             cEvapFluidCooler_TwoSpeed, this->Name, "Initial Fan Power at High Fan Speed [W]", this->HighSpeedFanPower);
                     }
                 }
@@ -1369,20 +1380,20 @@ namespace EvaporativeFluidCoolers {
 
                 if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_SingleSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             cEvapFluidCooler_SingleSpeed, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             cEvapFluidCooler_SingleSpeed, this->Name, "Initial Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                     }
                 } else if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_TwoSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             cEvapFluidCooler_TwoSpeed, this->Name, "Air Flow Rate at High Fan Speed [m3/s]", this->HighSpeedAirFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             cEvapFluidCooler_TwoSpeed, this->Name, "Initial Air Flow Rate at High Fan Speed [m3/s]", this->HighSpeedAirFlowRate);
                     }
                 }
@@ -1485,29 +1496,29 @@ namespace EvaporativeFluidCoolers {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_SingleSpd) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_SingleSpeed,
-                                                                    this->Name,
-                                                                    "U-Factor Times Area Value at Design Air Flow Rate [W/C]",
-                                                                    this->HighSpeedEvapFluidCoolerUA);
+                            BaseSizer::reportSizerOutput(cEvapFluidCooler_SingleSpeed,
+                                                         this->Name,
+                                                         "U-Factor Times Area Value at Design Air Flow Rate [W/C]",
+                                                         this->HighSpeedEvapFluidCoolerUA);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_SingleSpeed,
-                                                                    this->Name,
-                                                                    "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
-                                                                    this->HighSpeedEvapFluidCoolerUA);
+                            BaseSizer::reportSizerOutput(cEvapFluidCooler_SingleSpeed,
+                                                         this->Name,
+                                                         "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
+                                                         this->HighSpeedEvapFluidCoolerUA);
                         }
                     } else if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_TwoSpd) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_TwoSpeed,
-                                                                    this->Name,
-                                                                    "U-Factor Times Area Value at High Fan Speed [W/C]",
-                                                                    this->HighSpeedEvapFluidCoolerUA);
+                            BaseSizer::reportSizerOutput(cEvapFluidCooler_TwoSpeed,
+                                                         this->Name,
+                                                         "U-Factor Times Area Value at High Fan Speed [W/C]",
+                                                         this->HighSpeedEvapFluidCoolerUA);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_TwoSpeed,
-                                                                    this->Name,
-                                                                    "Initial U-Factor Times Area Value at High Fan Speed [W/C]",
-                                                                    this->HighSpeedEvapFluidCoolerUA);
+                            BaseSizer::reportSizerOutput(cEvapFluidCooler_TwoSpeed,
+                                                         this->Name,
+                                                         "Initial U-Factor Times Area Value at High Fan Speed [W/C]",
+                                                         this->HighSpeedEvapFluidCoolerUA);
                         }
                     }
                 }
@@ -1559,29 +1570,29 @@ namespace EvaporativeFluidCoolers {
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_SingleSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_SingleSpeed,
-                                                                this->Name,
-                                                                "U-Factor Times Area Value at Design Air Flow Rate [W/C]",
-                                                                this->HighSpeedEvapFluidCoolerUA);
+                        BaseSizer::reportSizerOutput(cEvapFluidCooler_SingleSpeed,
+                                                     this->Name,
+                                                     "U-Factor Times Area Value at Design Air Flow Rate [W/C]",
+                                                     this->HighSpeedEvapFluidCoolerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_SingleSpeed,
-                                                                this->Name,
-                                                                "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
-                                                                this->HighSpeedEvapFluidCoolerUA);
+                        BaseSizer::reportSizerOutput(cEvapFluidCooler_SingleSpeed,
+                                                     this->Name,
+                                                     "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
+                                                     this->HighSpeedEvapFluidCoolerUA);
                     }
                 } else if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_TwoSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_TwoSpeed,
-                                                                this->Name,
-                                                                "U-Factor Times Area Value at High Fan Speed [W/C]",
-                                                                this->HighSpeedEvapFluidCoolerUA);
+                        BaseSizer::reportSizerOutput(cEvapFluidCooler_TwoSpeed,
+                                                     this->Name,
+                                                     "U-Factor Times Area Value at High Fan Speed [W/C]",
+                                                     this->HighSpeedEvapFluidCoolerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_TwoSpeed,
-                                                                this->Name,
-                                                                "Initial U-Factor Times Area Value at High Fan Speed [W/C]",
-                                                                this->HighSpeedEvapFluidCoolerUA);
+                        BaseSizer::reportSizerOutput(cEvapFluidCooler_TwoSpeed,
+                                                     this->Name,
+                                                     "Initial U-Factor Times Area Value at High Fan Speed [W/C]",
+                                                     this->HighSpeedEvapFluidCoolerUA);
                     }
                 }
             }
@@ -1661,29 +1672,29 @@ namespace EvaporativeFluidCoolers {
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_SingleSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_SingleSpeed,
-                                                                this->Name,
-                                                                "U-Factor Times Area Value at Design Air Flow Rate [W/C]",
-                                                                this->HighSpeedEvapFluidCoolerUA);
+                        BaseSizer::reportSizerOutput(cEvapFluidCooler_SingleSpeed,
+                                                     this->Name,
+                                                     "U-Factor Times Area Value at Design Air Flow Rate [W/C]",
+                                                     this->HighSpeedEvapFluidCoolerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_SingleSpeed,
-                                                                this->Name,
-                                                                "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
-                                                                this->HighSpeedEvapFluidCoolerUA);
+                        BaseSizer::reportSizerOutput(cEvapFluidCooler_SingleSpeed,
+                                                     this->Name,
+                                                     "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
+                                                     this->HighSpeedEvapFluidCoolerUA);
                     }
                 } else if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_TwoSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_TwoSpeed,
-                                                                this->Name,
-                                                                "U-Factor Times Area Value at High Fan Speed [W/C]",
-                                                                this->HighSpeedEvapFluidCoolerUA);
+                        BaseSizer::reportSizerOutput(cEvapFluidCooler_TwoSpeed,
+                                                     this->Name,
+                                                     "U-Factor Times Area Value at High Fan Speed [W/C]",
+                                                     this->HighSpeedEvapFluidCoolerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_TwoSpeed,
-                                                                this->Name,
-                                                                "Initial U-Factor Times Area Value at High Fan Speed [W/C]",
-                                                                this->HighSpeedEvapFluidCoolerUA);
+                        BaseSizer::reportSizerOutput(cEvapFluidCooler_TwoSpeed,
+                                                     this->Name,
+                                                     "Initial U-Factor Times Area Value at High Fan Speed [W/C]",
+                                                     this->HighSpeedEvapFluidCoolerUA);
                     }
                 }
             }
@@ -1692,11 +1703,11 @@ namespace EvaporativeFluidCoolers {
         if (this->LowSpeedAirFlowRateWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
             this->LowSpeedAirFlowRate = this->LowSpeedAirFlowRateSizingFactor * this->HighSpeedAirFlowRate;
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(
+                BaseSizer::reportSizerOutput(
                     this->EvapFluidCoolerType, this->Name, "Air Flow Rate at Low Fan Speed [m3/s]", this->LowSpeedAirFlowRate);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(
+                BaseSizer::reportSizerOutput(
                     this->EvapFluidCoolerType, this->Name, "Initial Air Flow Rate at Low Fan Speed [m3/s]", this->LowSpeedAirFlowRate);
             }
         }
@@ -1704,26 +1715,24 @@ namespace EvaporativeFluidCoolers {
         if (this->LowSpeedFanPowerWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
             this->LowSpeedFanPower = this->LowSpeedFanPowerSizingFactor * this->HighSpeedFanPower;
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(
-                    this->EvapFluidCoolerType, this->Name, "Fan Power at Low Fan Speed [W]", this->LowSpeedFanPower);
+                BaseSizer::reportSizerOutput(this->EvapFluidCoolerType, this->Name, "Fan Power at Low Fan Speed [W]", this->LowSpeedFanPower);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(
-                    this->EvapFluidCoolerType, this->Name, "Initial Fan Power at Low Fan Speed [W]", this->LowSpeedFanPower);
+                BaseSizer::reportSizerOutput(this->EvapFluidCoolerType, this->Name, "Initial Fan Power at Low Fan Speed [W]", this->LowSpeedFanPower);
             }
         }
 
         if (this->LowSpeedEvapFluidCoolerUAWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
             this->LowSpeedEvapFluidCoolerUA = this->LowSpeedEvapFluidCoolerUASizingFactor * this->HighSpeedEvapFluidCoolerUA;
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(
+                BaseSizer::reportSizerOutput(
                     this->EvapFluidCoolerType, this->Name, "U-Factor Times Area Value at Low Fan Speed [W/C]", this->LowSpeedEvapFluidCoolerUA);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->EvapFluidCoolerType,
-                                                        this->Name,
-                                                        "Initial U-Factor Times Area Value at Low Fan Speed [W/C]",
-                                                        this->LowSpeedEvapFluidCoolerUA);
+                BaseSizer::reportSizerOutput(this->EvapFluidCoolerType,
+                                             this->Name,
+                                             "Initial U-Factor Times Area Value at Low Fan Speed [W/C]",
+                                             this->LowSpeedEvapFluidCoolerUA);
             }
         }
 
@@ -1768,14 +1777,14 @@ namespace EvaporativeFluidCoolers {
             }
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         this->EvapFluidCoolerType, this->Name, "U-Factor Times Area Value at Low Fan Speed [W/C]", this->LowSpeedEvapFluidCoolerUA);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->EvapFluidCoolerType,
-                                                            this->Name,
-                                                            "Initial U-Factor Times Area Value at Low Fan Speed [W/C]",
-                                                            this->LowSpeedEvapFluidCoolerUA);
+                    BaseSizer::reportSizerOutput(this->EvapFluidCoolerType,
+                                                 this->Name,
+                                                 "Initial U-Factor Times Area Value at Low Fan Speed [W/C]",
+                                                 this->LowSpeedEvapFluidCoolerUA);
                 }
             }
         }
@@ -1843,14 +1852,14 @@ namespace EvaporativeFluidCoolers {
             }
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         this->EvapFluidCoolerType, this->Name, "U-Factor Times Area Value at Low Fan Speed [W/C]", this->LowSpeedEvapFluidCoolerUA);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->EvapFluidCoolerType,
-                                                            this->Name,
-                                                            "Initial U-Factor Times Area Value at Low Fan Speed [W/C]",
-                                                            this->LowSpeedEvapFluidCoolerUA);
+                    BaseSizer::reportSizerOutput(this->EvapFluidCoolerType,
+                                                 this->Name,
+                                                 "Initial U-Factor Times Area Value at Low Fan Speed [W/C]",
+                                                 this->LowSpeedEvapFluidCoolerUA);
                 }
             }
         }
@@ -2434,7 +2443,6 @@ namespace EvaporativeFluidCoolers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for passing results to the outlet water node.
 
-
         Real64 const TempAllowance(0.02); // Minimum difference b/w fluid cooler water outlet temp and
         std::string CharErrOut;
         std::string CharLowOutletTemp;
@@ -2471,7 +2479,10 @@ namespace EvaporativeFluidCoolers {
             ++this->OutletWaterTempErrorCount;
             if (this->OutletWaterTempErrorCount < 2) {
                 ShowWarningError(this->EvapFluidCoolerType + " \"" + this->Name + "\"");
-                ShowContinueError(format("Evaporative fluid cooler water outlet temperature ({:6.2F} C) is below the specified minimum condenser loop temp of {:6.2F} C", this->OutletWaterTemp, LoopMinTemp));
+                ShowContinueError(format(
+                    "Evaporative fluid cooler water outlet temperature ({:6.2F} C) is below the specified minimum condenser loop temp of {:6.2F} C",
+                    this->OutletWaterTemp,
+                    LoopMinTemp));
                 ShowContinueErrorTimeStamp("");
             } else {
                 ShowRecurringWarningErrorAtEnd(

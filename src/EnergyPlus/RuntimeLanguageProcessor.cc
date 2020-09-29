@@ -62,6 +62,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -952,7 +953,7 @@ namespace RuntimeLanguageProcessor {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
                     WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                    ReturnValue = EvaluateStack(state,ioFiles, ErlStack(StackNum).Instruction(InstructionNum).Argument1);
+                    ReturnValue = EvaluateStack(state, ioFiles, ErlStack(StackNum).Instruction(InstructionNum).Argument1);
 
                 } else if ((SELECT_CASE_var == KeywordIf) || (SELECT_CASE_var == KeywordElse)) { // same???
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
@@ -2458,88 +2459,88 @@ namespace RuntimeLanguageProcessor {
 
                     } else if (SELECT_CASE_var == FuncTodayIsRain) {
                         TodayTomorrowWeather(
-                            FuncTodayIsRain, Operand(1).Number, Operand(2).Number, WeatherManager::TodayIsRain, ReturnValue);
+                            FuncTodayIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsRain, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayIsSnow) {
                         TodayTomorrowWeather(
-                            FuncTodayIsSnow, Operand(1).Number, Operand(2).Number, WeatherManager::TodayIsSnow, ReturnValue);
+                            FuncTodayIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsSnow, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayOutDryBulbTemp) {
                         TodayTomorrowWeather(
-                            FuncTodayOutDryBulbTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutDryBulbTemp, ReturnValue);
+                            FuncTodayOutDryBulbTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutDryBulbTemp, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayOutDewPointTemp) {
                         TodayTomorrowWeather(
-                            FuncTodayOutDewPointTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutDewPointTemp, ReturnValue);
+                            FuncTodayOutDewPointTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutDewPointTemp, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayOutBaroPress) {
                         TodayTomorrowWeather(
-                            FuncTodayOutBaroPress, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutBaroPress, ReturnValue);
+                            FuncTodayOutBaroPress, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutBaroPress, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayOutRelHum) {
                         TodayTomorrowWeather(
-                            FuncTodayOutRelHum, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutRelHum, ReturnValue);
+                            FuncTodayOutRelHum, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutRelHum, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayWindSpeed) {
                         TodayTomorrowWeather(
-                            FuncTodayWindSpeed, Operand(1).Number, Operand(2).Number, WeatherManager::TodayWindSpeed, ReturnValue);
+                            FuncTodayWindSpeed, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayWindSpeed, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayWindDir) {
                         TodayTomorrowWeather(
-                            FuncTodayWindDir, Operand(1).Number, Operand(2).Number, WeatherManager::TodayWindDir, ReturnValue);
+                            FuncTodayWindDir, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayWindDir, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodaySkyTemp) {
                         TodayTomorrowWeather(
-                            FuncTodaySkyTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TodaySkyTemp, ReturnValue);
+                            FuncTodaySkyTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodaySkyTemp, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayHorizIRSky) {
                         TodayTomorrowWeather(
-                            FuncTodayHorizIRSky, Operand(1).Number, Operand(2).Number, WeatherManager::TodayHorizIRSky, ReturnValue);
+                            FuncTodayHorizIRSky, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayHorizIRSky, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayBeamSolarRad) {
                         TodayTomorrowWeather(
-                            FuncTodayBeamSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TodayBeamSolarRad, ReturnValue);
+                            FuncTodayBeamSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayBeamSolarRad, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayDifSolarRad) {
                         TodayTomorrowWeather(
-                            FuncTodayDifSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TodayDifSolarRad, ReturnValue);
+                            FuncTodayDifSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayDifSolarRad, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayAlbedo) {
                         TodayTomorrowWeather(
-                            FuncTodayAlbedo, Operand(1).Number, Operand(2).Number, WeatherManager::TodayAlbedo, ReturnValue);
+                            FuncTodayAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayAlbedo, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayLiquidPrecip) {
                         TodayTomorrowWeather(
-                            FuncTodayLiquidPrecip, Operand(1).Number, Operand(2).Number, WeatherManager::TodayLiquidPrecip, ReturnValue);
+                            FuncTodayLiquidPrecip, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayLiquidPrecip, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowIsRain) {
                         TodayTomorrowWeather(
-                            FuncTomorrowIsRain, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowIsRain, ReturnValue);
+                            FuncTomorrowIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowIsRain, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowIsSnow) {
                         TodayTomorrowWeather(
-                            FuncTomorrowIsSnow, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowIsSnow, ReturnValue);
+                            FuncTomorrowIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowIsSnow, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowOutDryBulbTemp) {
                         TodayTomorrowWeather(
-                            FuncTomorrowOutDryBulbTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutDryBulbTemp, ReturnValue);
+                            FuncTomorrowOutDryBulbTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowOutDryBulbTemp, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowOutDewPointTemp) {
                         TodayTomorrowWeather(
-                            FuncTomorrowOutDewPointTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutDewPointTemp, ReturnValue);
+                            FuncTomorrowOutDewPointTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowOutDewPointTemp, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowOutBaroPress) {
                         TodayTomorrowWeather(
-                            FuncTomorrowOutBaroPress, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutBaroPress, ReturnValue);
+                            FuncTomorrowOutBaroPress, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowOutBaroPress, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowOutRelHum) {
                         TodayTomorrowWeather(
-                            FuncTomorrowOutRelHum, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutRelHum, ReturnValue);
+                            FuncTomorrowOutRelHum, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowOutRelHum, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowWindSpeed) {
                         TodayTomorrowWeather(
-                            FuncTomorrowWindSpeed, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowWindSpeed, ReturnValue);
+                            FuncTomorrowWindSpeed, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowWindSpeed, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowWindDir) {
                         TodayTomorrowWeather(
-                            FuncTomorrowWindDir, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowWindDir, ReturnValue);
+                            FuncTomorrowWindDir, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowWindDir, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowSkyTemp) {
                         TodayTomorrowWeather(
-                            FuncTomorrowSkyTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowSkyTemp, ReturnValue);
+                            FuncTomorrowSkyTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowSkyTemp, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowHorizIRSky) {
                         TodayTomorrowWeather(
-                            FuncTomorrowHorizIRSky, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowHorizIRSky, ReturnValue);
+                            FuncTomorrowHorizIRSky, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowHorizIRSky, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowBeamSolarRad) {
                         TodayTomorrowWeather(
-                            FuncTomorrowBeamSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowBeamSolarRad, ReturnValue);
+                            FuncTomorrowBeamSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowBeamSolarRad, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowDifSolarRad) {
                         TodayTomorrowWeather(
-                            FuncTomorrowDifSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowDifSolarRad, ReturnValue);
+                            FuncTomorrowDifSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowDifSolarRad, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowAlbedo) {
                         TodayTomorrowWeather(
-                            FuncTomorrowAlbedo, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowAlbedo, ReturnValue);
+                            FuncTomorrowAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowAlbedo, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowLiquidPrecip) {
                         TodayTomorrowWeather(
-                            FuncTomorrowLiquidPrecip, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowLiquidPrecip, ReturnValue);
+                            FuncTomorrowLiquidPrecip, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowLiquidPrecip, ReturnValue);
                     } else {
                         // throw Error!
                         ShowFatalError("caught unexpected Expression(ExpressionNum)%Operator in EvaluateExpression");

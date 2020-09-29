@@ -12,7 +12,7 @@
 ! EnergyPlus Version 6.0
 ! ASHRAE Standards 90.1-2004 and 62-1999
 !
-! Description:  12 story plus basement, office building. Demonstrates use of Carroll MRT radiant exchange method. 
+! Description:  12 story plus basement, office building. Demonstrates use of Carroll MRT radiant exchange method.
 !               Compare to RefBldgLargeOfficeNew2004_Chicago.idf
 ! Form:         Area = 46,320 m2 (498,588 ft2); Number of Stories = 12; Shape = rectangle, Aspect ratio = 1.5
 ! Envelope:     Envelope thermal properties vary with climate according to ASHRAE Standard 90.1-2004.
@@ -96,8 +96,8 @@
     6;                       !- Minimum Number of Warmup Days
 
   PerformancePrecisionTradeoffs,
-    No,                       !- Use Coil Direct Solutions
-    CarrollMRT;               !- Zone Radiant Exchange Algorithm
+    No,                      !- Use Coil Direct Solutions
+    CarrollMRT;              !- Zone Radiant Exchange Algorithm
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -9284,7 +9284,7 @@
 
   UtilityCost:Tariff,
     IN_EIAMonthlyRateGas,    !- Name
-    NaturalGas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,     !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -9510,9 +9510,9 @@
   Output:Table:Monthly,
     Fan Part Load Performance,  !- Name
     0,                       !- Digits After Decimal
-    Fan Electricity Rate,      !- Variable or Meter 1 Name
+    Fan Electricity Rate,    !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Fan Electricity Rate,      !- Variable or Meter 2 Name
+    Fan Electricity Rate,    !- Variable or Meter 2 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 2
 
   Output:Table:TimeBins,

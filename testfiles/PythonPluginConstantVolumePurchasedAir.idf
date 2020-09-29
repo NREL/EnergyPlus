@@ -129,7 +129,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -1465,8 +1467,8 @@
   PythonPlugin:Instance,
     Window Shading Device EMS Controller,  !- Name
     Yes,                     !- Run During Warmup Days
-    PythonPluginConstantVolumePurchasedAir, !- Python Module Name
-    Set_Shade_Control_State;        !- Plugin Class Name
+    PythonPluginConstantVolumePurchasedAir,  !- Python Module Name
+    Set_Shade_Control_State; !- Plugin Class Name
 
   Output:Variable,Zn001:Wall001:Win001,Surface Outside Face Beam Solar Incident Angle Cosine Value,Timestep;
 
@@ -1477,37 +1479,31 @@
 
   PythonPlugin:OutputVariable,
     Erl Shading Control Status,  !- Name
-    Zn001_Wall001_Win001_Shading_Deploy_Status,     !- PythonPlugin:Variable Name
+    Zn001_Wall001_Win001_Shading_Deploy_Status,  !- Python Plugin Variable Name
     Averaged,                !- Type of Data in Variable
     ZoneTimestep,            !- Update Frequency
     ;                        !- Units
 
-  Output:Variable,
-    Erl Shading Control Status,
-    PythonPlugin:OutputVariable,
-    Timestep;
+  Output:Variable,Erl Shading Control Status,PythonPlugin:OutputVariable,Timestep;
 
   PythonPlugin:OutputVariable,
     Erl Zn001:Wall001:Win001 Incident Angle,  !- Name
-    IncidentAngle,     !- PythonPlugin:Variable Name
+    IncidentAngle,           !- Python Plugin Variable Name
     Averaged,                !- Type of Data in Variable
     ZoneTimestep,            !- Update Frequency
     ;                        !- Units
 
-  Output:Variable,
-    Erl Zn001:Wall001:Win001 Incident Angle,
-    PythonPlugin:OutputVariable,
-    Timestep;
+  Output:Variable,Erl Zn001:Wall001:Win001 Incident Angle,PythonPlugin:OutputVariable,Timestep;
 
   PythonPlugin:Instance,
     Init Window Shading Device Control Constants,  !- Name
     Yes,                     !- Run During Warmup Days
-    PythonPluginConstantVolumePurchasedAir, !- Python Module Name
-    InitializeShadeControlFlags;        !- Plugin Class Name
+    PythonPluginConstantVolumePurchasedAir,  !- Python Module Name
+    InitializeShadeControlFlags;  !- Plugin Class Name
 
   PythonPlugin:Variables,
-    ShadeStatusVars,
-    Shade_Status_Off,
-    Shade_Status_Interior_Blind_On,
-    Zn001_Wall001_Win001_Shading_Deploy_Status,
-    IncidentAngle;
+    ShadeStatusVars,         !- Name
+    Shade_Status_Off,        !- Variable Name 1
+    Shade_Status_Interior_Blind_On,  !- Variable Name 2
+    Zn001_Wall001_Win001_Shading_Deploy_Status,  !- Variable Name 3
+    IncidentAngle;           !- Variable Name 4
