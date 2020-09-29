@@ -51,7 +51,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Jan,                     !- Name
@@ -1111,7 +1113,7 @@
   EnergyManagementSystem:Sensor,
     Power_SupplyFan_Elec,    !- Name
     EC Plug Fan 1,           !- Output:Variable or Output:Meter Index Key Name
-    Fan Electricity Rate;      !- Output:Variable or Output:Meter Name
+    Fan Electricity Rate;    !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     DeltaT_SupplyFan,        !- Name
@@ -1222,3 +1224,4 @@
     ENDIF;                   !- <none>
 
   Output:Variable,*,PUE,Hourly;
+

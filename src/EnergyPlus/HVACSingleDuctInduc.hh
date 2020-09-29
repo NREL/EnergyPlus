@@ -171,14 +171,14 @@ namespace HVACSingleDuctInduc {
                     int &CompIndex                 // which terminal unit in data structure
     );
 
-    void GetIndUnits();
+    void GetIndUnits(EnergyPlusData &state);
 
     void InitIndUnit(EnergyPlusData &state,
                      int const IUNum,              // number of the current induction unit being simulated
                      bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     );
 
-    void SizeIndUnit(int const IUNum);
+    void SizeIndUnit(EnergyPlusData &state, int const IUNum);
 
     void SimFourPipeIndUnit(EnergyPlusData &state, int const IUNum,              // number of the current unit being simulated
                             int const ZoneNum,            // number of zone being served
@@ -204,7 +204,7 @@ namespace HVACSingleDuctInduc {
 
     // ========================= Utilities =======================
 
-    bool FourPipeInductionUnitHasMixer(std::string const &CompName); // component (mixer) name
+    bool FourPipeInductionUnitHasMixer(EnergyPlusData &state, std::string const &CompName); // component (mixer) name
 
 } // namespace HVACSingleDuctInduc
 

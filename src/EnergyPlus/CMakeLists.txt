@@ -4,7 +4,7 @@ if(WIN32)
 endif()
 
 set(PYTHON_API_VERSION_MAJOR 0)
-set(PYTHON_API_VERSION_MINOR 1)
+set(PYTHON_API_VERSION_MINOR 2)
 configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
 configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
@@ -779,6 +779,9 @@ endif()
 if (WIN32)
   target_link_libraries( energypluslib Shlwapi )
 endif()
+if(LINK_WITH_PYTHON)
+  target_link_libraries( energypluslib ${PYTHON_LIBRARIES} )
+endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
 SET( API_HEADERS
@@ -825,21 +828,6 @@ install( TARGETS energyplusapi
   LIBRARY DESTINATION ./
   ARCHIVE DESTINATION ./
 )
-
-# we will build the intermediate wrapper DLL that hard links to Python DLL here
-if(LINK_WITH_PYTHON)
-  add_library( pythonwrapper SHARED
-          PythonLibWrapper.cc
-          PythonLibWrapper.hh
-          )
-  target_link_libraries( pythonwrapper ${PYTHON_LIBRARIES} )
-  add_dependencies( energyplusapi pythonwrapper)
-  install( TARGETS pythonwrapper
-          RUNTIME DESTINATION ./
-          LIBRARY DESTINATION ./
-          ARCHIVE DESTINATION ./
-          )
-endif()
 
 # now the actual E+ executable
 if (APPLE OR UNIX)
@@ -903,6 +891,7 @@ if(LINK_WITH_PYTHON)
       "execute_process(
         COMMAND ${CMAKE_COMMAND}
         -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
+        -DEPLUS_DYNAMIC_LIB_NAME=libenergyplusapi.${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}.dylib
         -DEXECUTABLE_PATH=\${CMAKE_INSTALL_PREFIX}/energyplus${CMAKE_EXECUTABLE_SUFFIX}
         -P ${PROJECT_SOURCE_DIR}/cmake/PythonFixUpOnMac.cmake
       )"

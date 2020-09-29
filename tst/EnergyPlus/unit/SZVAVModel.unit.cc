@@ -431,7 +431,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
 
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
-    WaterCoils::GetWaterCoilsInputFlag = true;
+    state.dataWaterCoils->GetWaterCoilsInputFlag = true;
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
@@ -558,7 +558,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
 
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
-    WaterCoils::GetWaterCoilsInputFlag = true;
+    state.dataWaterCoils->GetWaterCoilsInputFlag = true;
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
@@ -594,7 +594,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     DataLoopNode::Node(MixerOA.InletNode).Enthalpy = 18000;
     DataLoopNode::Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(DataLoopNode::Node(MixerOA.InletNode).Temp, DataLoopNode::Node(MixerOA.InletNode).Enthalpy);
     // chilled water coil
-    auto &CWCoil(WaterCoil(1));
+    auto &CWCoil(state.dataWaterCoils->WaterCoil(1));
     CWCoil.UACoilTotal = 470.0;
     CWCoil.UACoilExternal = 611.0;
     CWCoil.UACoilInternal = 2010.0;
@@ -633,12 +633,12 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     CWLoop.FluidIndex = 1;
     CWLoop.FluidName = "WATER";
     CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = WaterCoil_Cooling;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state.dataWaterCoils->WaterCoil_Cooling;
     CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
     CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
 
-    MyUAAndFlowCalcFlag.allocate(1);
-    MyUAAndFlowCalcFlag(1) = true;
+    state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
+    state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
     DataGlobals::DoingSizing = true;
     state.fans.LocalTurnFansOff = false;
     state.fans.LocalTurnFansOn = true;

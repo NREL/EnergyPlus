@@ -440,7 +440,7 @@ namespace CondenserLoopTowers {
             if (AlphArray(9).empty()) {
                 dataCondenserLoopTowers.towers(TowerNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                WaterManager::SetupTankDemandComponent(AlphArray(1),
+                WaterManager::SetupTankDemandComponent(state, AlphArray(1),
                                                        cCurrentModuleObject,
                                                        AlphArray(9),
                                                        ErrorsFound,
@@ -860,7 +860,7 @@ namespace CondenserLoopTowers {
             if (lAlphaFieldBlanks(9)) {
                 dataCondenserLoopTowers.towers(TowerNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                WaterManager::SetupTankDemandComponent(AlphArray(1),
+                WaterManager::SetupTankDemandComponent(state, AlphArray(1),
                                                        cCurrentModuleObject,
                                                        AlphArray(9),
                                                        ErrorsFound,
@@ -1484,7 +1484,7 @@ namespace CondenserLoopTowers {
             if (lAlphaFieldBlanks(11)) {
                 dataCondenserLoopTowers.towers(TowerNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                WaterManager::SetupTankDemandComponent(AlphArray(1),
+                WaterManager::SetupTankDemandComponent(state, AlphArray(1),
                                                        cCurrentModuleObject,
                                                        AlphArray(11),
                                                        ErrorsFound,
@@ -1779,7 +1779,7 @@ namespace CondenserLoopTowers {
             if (lAlphaFieldBlanks(13)) {
                 dataCondenserLoopTowers.towers(TowerNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                WaterManager::SetupTankDemandComponent(AlphArray(1),
+                WaterManager::SetupTankDemandComponent(state, AlphArray(1),
                                                        cCurrentModuleObject,
                                                        AlphArray(13),
                                                        ErrorsFound,

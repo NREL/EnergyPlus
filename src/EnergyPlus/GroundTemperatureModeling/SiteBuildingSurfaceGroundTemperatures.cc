@@ -49,6 +49,7 @@
 #include <memory>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -141,7 +142,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(IOFiles &ioFiles, int 
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp()
+Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp(EnergyPlusData &EP_UNUSED(state))
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -157,7 +158,7 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp()
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(Real64 const EP_UNUSED(_depth), Real64 const _seconds)
+Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const EP_UNUSED(_depth), Real64 const _seconds)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -170,10 +171,9 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(Real64 const
 
     // USE STATEMENTS:
     using DataGlobals::SecsInDay;
-    using WeatherManager::NumDaysInYear;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secPerMonth = NumDaysInYear * SecsInDay / 12;
+    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * SecsInDay / 12;
 
     // Convert secs to months
     int month = ceil(_seconds / secPerMonth);
@@ -185,12 +185,12 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(Real64 const
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(Real64 const EP_UNUSED(_depth), int const _month)
+Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const EP_UNUSED(_depth), int const _month)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -209,7 +209,7 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(Real64 const 
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************

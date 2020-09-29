@@ -5446,13 +5446,13 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
 
     // simulate to determine HW coil design capacity
     SimDesiccantDehumidifier(state, CompName, FirstHVACIteration, CompIndex);
-    for (loop = 1; loop <= NumWaterCoils; ++loop) {
-        if (WaterCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+    for (loop = 1; loop <= state.dataWaterCoils->NumWaterCoils; ++loop) {
+        if (state.dataWaterCoils->WaterCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
             CoilIndex = loop;
         }
     }
     // verify results
-    EXPECT_EQ(RegCoilCapacity, WaterCoil(CoilIndex).DesWaterHeatingCoilRate);
+    EXPECT_EQ(RegCoilCapacity, state.dataWaterCoils->WaterCoil(CoilIndex).DesWaterHeatingCoilRate);
 }
 
 TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)

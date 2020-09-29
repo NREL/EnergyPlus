@@ -181,7 +181,7 @@
     ,                          ! - load matched during grid responsive operation
     1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     0.26,                    !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -191,7 +191,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
     1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.30,                    !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -201,7 +201,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
     2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.33,                    !- Speed 3 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -211,7 +211,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
     2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.38,                    !- Speed 4 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -221,7 +221,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
     3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {W/W}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.44,                    !- Speed 5 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -231,7 +231,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
     4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {W/W}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.50,                    !- Speed 6 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -241,7 +241,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
     4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {W/W}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.57,                    !- Speed 7 Reference Unit Condenser Flow Rate {m3/s}
     ,                        !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -251,7 +251,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
     5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {W/W}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.63,                    !- Speed 8 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -261,7 +261,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
     6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {W/W}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.69,                    !- Speed 9 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -271,7 +271,7 @@
     FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
     6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.74,                    !- Speed 10 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -309,7 +309,7 @@
     ,                          ! - load matched during grid responsive operation
     1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     0.26,                    !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -319,7 +319,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
     1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.30,                    !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -329,7 +329,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
     2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.33,                    !- Speed 3 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -339,7 +339,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
     2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.38,                    !- Speed 4 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -349,7 +349,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
     3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {W/W}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.44,                    !- Speed 5 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -359,7 +359,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
     4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {W/W}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.50,                    !- Speed 6 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -369,7 +369,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
     4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {W/W}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.57,                    !- Speed 7 Reference Unit Condenser Flow Rate {m3/s}
     ,                        !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -379,7 +379,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
     5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {W/W}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.63,                    !- Speed 8 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -389,7 +389,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
     6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {W/W}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.69,                    !- Speed 9 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -399,7 +399,7 @@
     FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
     6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.74,                    !- Speed 10 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -437,7 +437,7 @@
     ,                          ! - load matched during grid responsive operation
     1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     0.26,                    !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -447,7 +447,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
     1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.30,                    !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -457,7 +457,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
     2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.33,                    !- Speed 3 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -467,7 +467,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
     2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.38,                    !- Speed 4 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -477,7 +477,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
     3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {W/W}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.44,                    !- Speed 5 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -487,7 +487,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
     4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {W/W}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.50,                    !- Speed 6 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -497,7 +497,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
     4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {W/W}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.57,                    !- Speed 7 Reference Unit Condenser Flow Rate {m3/s}
     ,                        !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -507,7 +507,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
     5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {W/W}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.63,                    !- Speed 8 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -517,7 +517,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
     6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {W/W}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.69,                    !- Speed 9 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -527,7 +527,7 @@
     FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
     6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.74,                    !- Speed 10 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -565,7 +565,7 @@
     ,                          ! - load matched during grid responsive operation
     1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     0.26,                    !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -575,7 +575,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
     1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
     0.30,                    !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -585,7 +585,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
     2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
     0.33,                    !- Speed 3 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -595,7 +595,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
     2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
     0.38,                    !- Speed 4 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -605,7 +605,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
     3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {W/W}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
     0.44,                    !- Speed 5 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -615,7 +615,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
     4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {W/W}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
     0.50,                    !- Speed 6 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -625,7 +625,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
     4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {W/W}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
     0.57,                    !- Speed 7 Reference Unit Condenser Flow Rate {m3/s}
     ,                        !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -635,7 +635,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
     5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {W/W}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
     0.63,                    !- Speed 8 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -645,7 +645,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
     6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {W/W}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
     0.69,                    !- Speed 9 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -655,7 +655,7 @@
     FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
     6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
     0.74,                    !- Speed 10 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
@@ -697,7 +697,9 @@
     yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   ConvergenceLimits,
     0,                       !- Minimum System Timestep {minutes}
