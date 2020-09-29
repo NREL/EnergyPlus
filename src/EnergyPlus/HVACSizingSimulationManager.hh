@@ -89,14 +89,14 @@ public:
     SizingLoggerFramework sizingLogger;
 
     void DetermineSizingAnalysesNeeded();
-    void SetupSizingAnalyses();
+    void SetupSizingAnalyses(EnergyPlusData &state);
 
     void RedoKickOffAndResize(EnergyPlusData &state);
     void PostProcessLogs();
-    void ProcessCoincidentPlantSizeAdjustments(IOFiles &ioFiles, int const HVACSizingIterCount);
+    void ProcessCoincidentPlantSizeAdjustments(EnergyPlusData &state, IOFiles &ioFiles, int const HVACSizingIterCount);
 
-    void UpdateSizingLogsZoneStep();
-    void UpdateSizingLogsSystemStep();
+    void UpdateSizingLogsZoneStep(EnergyPlusData &state);
+    void UpdateSizingLogsSystemStep(EnergyPlusData &state);
 
 private:
     void CreateNewCoincidentPlantAnalysisObject(std::string const &PlantLoopName, int const PlantSizingIndex);

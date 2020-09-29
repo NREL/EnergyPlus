@@ -208,7 +208,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    YES;                     !- Run Simulation for Weather File Run Periods
+    YES,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -17733,7 +17735,7 @@
     3,                       !- Digits After Decimal
     Electricity:HVAC,        !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating:NaturalGas,             !- Variable or Meter 2 Name
+    Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
@@ -17895,9 +17897,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Electricity:Building,    !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    NaturalGas:Building,            !- Variable or Meter 3 Name
+    NaturalGas:Building,     !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    NaturalGas:Building,            !- Variable or Meter 4 Name
+    NaturalGas:Building,     !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -17935,17 +17937,17 @@
   Output:Table:Monthly,
     Building Energy Performance - Natural Gas,  !- Name
     2,                       !- Digits After Decimal
-    InteriorEquipment:NaturalGas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:NaturalGas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:NaturalGas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,      !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Cooling:NaturalGas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,      !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    WaterSystems:NaturalGas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas, !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cogeneration:NaturalGas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas, !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -18032,23 +18034,23 @@
   Output:Table:Monthly,
     Peak Gas Demand,         !- Name
     3,                       !- Digits After Decimal
-    NaturalGas:Facility,            !- Variable or Meter 1 Name
+    NaturalGas:Facility,     !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    NaturalGas:Facility,            !- Variable or Meter 2 Name
+    NaturalGas:Facility,     !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    NaturalGas:HVAC,                !- Variable or Meter 3 Name
+    NaturalGas:HVAC,         !- Variable or Meter 3 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 3
-    InteriorEquipment:NaturalGas,   !- Variable or Meter 4 Name
+    InteriorEquipment:NaturalGas,  !- Variable or Meter 4 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 4
     MiscPlugGas:InteriorEquipment:NaturalGas,  !- Variable or Meter 5 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 5
-    NaturalGas:Plant,               !- Variable or Meter 6 Name
+    NaturalGas:Plant,        !- Variable or Meter 6 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 6
-    WaterSystems:NaturalGas,        !- Variable or Meter 7 Name
+    WaterSystems:NaturalGas, !- Variable or Meter 7 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 7
     Water Heater:WaterSystems:NaturalGas,  !- Variable or Meter 8 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 8
-    Heating:NaturalGas,             !- Variable or Meter 9 Name
+    Heating:NaturalGas,      !- Variable or Meter 9 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 9
 
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:MECHANICALVENTILATION ===========
@@ -19214,7 +19216,7 @@
     cCL1_Pod_1_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_1_Pod_1_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL1_Pod_1_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19251,7 +19253,7 @@
     mCl1_Pod_1_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_1_Pod_1_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl1_Pod_1_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19288,7 +19290,7 @@
     cPOD1_ZN_1_FLR_1_LAr,    !- Name
     Corridor_Pod_1_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPOD1_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19325,7 +19327,7 @@
     cCL2_Pod_1_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_2_Pod_1_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL2_Pod_1_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19362,7 +19364,7 @@
     mCl2_Pod_1_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_2_Pod_1_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl2_Pod_1_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19399,7 +19401,7 @@
     cCL1_Pod_2_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_1_Pod_2_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL1_Pod_2_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19436,7 +19438,7 @@
     mCl1_Pod_2_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_1_Pod_2_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl1_Pod_2_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19473,7 +19475,7 @@
     cPOD2_ZN_1_FLR_1_LAr,    !- Name
     Corridor_Pod_2_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPOD2_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19510,7 +19512,7 @@
     cCL2_Pod_2_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_2_Pod_2_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL2_Pod_2_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19547,7 +19549,7 @@
     mCl2_Pod_2_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_2_Pod_2_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl2_Pod_2_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19584,7 +19586,7 @@
     cCL1_Pod_3_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_1_Pod_3_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL1_Pod_3_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19621,7 +19623,7 @@
     mCl1_Pod_3_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_1_Pod_3_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl1_Pod_3_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19658,7 +19660,7 @@
     cPOD3_ZN_1_FLR_1_LAr,    !- Name
     Corridor_Pod_3_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPOD3_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19695,7 +19697,7 @@
     cCL2_Pod_3_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_2_Pod_3_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL2_Pod_3_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19732,7 +19734,7 @@
     mCl2_Pod_3_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_2_Pod_3_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl2_Pod_3_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19769,7 +19771,7 @@
     cPCLZN_1_FLR_1_LAr,      !- Name
     Computer_Class_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPCLZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19806,7 +19808,7 @@
     Main_Corridor_ZN_1_FLR_1_LAr,  !- Name
     Main_Corridor_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Main_Corridor_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19843,7 +19845,7 @@
     Lobby_ZN_1_FLR_1_LAr,    !- Name
     Lobby_ZN_1_FLR_1_lights, !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Lobby_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19880,7 +19882,7 @@
     Mech_ZN_1_FLR_1_LAr,     !- Name
     Mech_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Mech_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19917,7 +19919,7 @@
     Bath_ZN_1_FLR_1_LAr,     !- Name
     Bath_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Bath_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19954,7 +19956,7 @@
     Offices_ZN_1_FLR_1_LAr,  !- Name
     Offices_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Offices_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -19991,7 +19993,7 @@
     Gym_ZN_1_FLR_1_LAr,      !- Name
     Gym_ZN_1_FLR_1_lights,   !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Gym_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -20028,7 +20030,7 @@
     Kitchen_ZN_1_FLR_1_LAr,  !- Name
     Kitchen_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Kitchen_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -20065,7 +20067,7 @@
     Cafeteria_ZN_1_FLR_1_LAr,!- Name
     Cafeteria_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Cafeteria_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -20102,7 +20104,7 @@
     LMC_ZN_1_FLR_1_LAr,      !- Name
     Library_Media_Center_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_LMC_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -20117,4 +20119,3 @@
     SET_LMC_ZN_1_FLR_1_Light_EMS_Program_Prog_Manager,  !- Name
     BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
     SET_LMC_ZN_1_FLR_1_Light_EMS_Program;  !- Program Name 1
-

@@ -77,6 +77,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -4234,7 +4235,7 @@ namespace HeatBalanceAirManager {
     void initializeForExternalHVACManager(EnergyPlusData &state) {
         // this function will ultimately provide a nice series of calls that initialize all the hvac stuff needed
         // to allow an external hvac manager to play nice with E+
-        EnergyPlus::ZoneTempPredictorCorrector::InitZoneAirSetPoints(state.dataZoneTempPredictorCorrector);
+        EnergyPlus::ZoneTempPredictorCorrector::InitZoneAirSetPoints(*state.dataZoneTempPredictorCorrector);
         if (!EnergyPlus::DataZoneEquipment::ZoneEquipInputsFilled) {
             EnergyPlus::DataZoneEquipment::GetZoneEquipmentData(state);
             EnergyPlus::DataZoneEquipment::ZoneEquipInputsFilled = true;

@@ -3732,7 +3732,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    Chiller Electricity Rate,  !- Variable Name
+    Chiller Electricity Rate,!- Variable Name
     0,                       !- Interval Start
     1000,                    !- Interval Size
     10,                      !- Interval Count
@@ -3740,7 +3740,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    Chiller Electricity Rate,  !- Variable Name
+    Chiller Electricity Rate,!- Variable Name
     0,                       !- Interval Start
     1000,                    !- Interval Size
     10,                      !- Interval Count

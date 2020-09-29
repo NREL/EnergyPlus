@@ -257,7 +257,7 @@ namespace SingleDuct {
 
         void InitSys(EnergyPlusData &state, bool const FirstHVACIteration);
 
-        void SizeSys();
+        void SizeSys(EnergyPlusData &state);
 
         void SimVAV(EnergyPlusData &state, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
 
@@ -378,7 +378,7 @@ namespace SingleDuct {
     void UpdateATMixer(int const SysNum);
 
     void GetATMixer(EnergyPlusData &state,
-                    ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, std::string const &ZoneEquipName, // zone unit name name
+                    std::string const &ZoneEquipName, // zone unit name name
                     std::string &ATMixerName,         // air terminal mixer name
                     int &ATMixerNum,                  // air terminal mixer index
                     int &ATMixerType,                 // air teminal mixer type

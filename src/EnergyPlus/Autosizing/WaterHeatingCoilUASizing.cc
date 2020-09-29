@@ -46,8 +46,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/WaterHeatingCoilUASizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
@@ -77,7 +79,7 @@ Real64 WaterHeatingCoilUASizer::size(EnergyPlusData &state, Real64 _originalValu
                 Real64 UA1 = this->dataCapacityUsedForSizing;
                 // Invert the simple heating coil model: given the design inlet conditions and the design load,
                 // find the design UA.
-                General::SolveRoot(Acc, MaxIte, SolFla, this->autoSizedValue, WaterCoils::SimpleHeatingCoilUAResidual, UA0, UA1, Par);
+                TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, this->autoSizedValue, WaterCoils::SimpleHeatingCoilUAResidual, UA0, UA1, Par);
                 if (SolFla == -1) {
                     errorsFound = true;
                     std::string msg = "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + this->compName + "\"";
@@ -256,7 +258,7 @@ Real64 WaterHeatingCoilUASizer::size(EnergyPlusData &state, Real64 _originalValu
                 Real64 UA1 = this->dataCapacityUsedForSizing;
                 // Invert the simple heating coil model: given the design inlet conditions and the design load,
                 // find the design UA.
-                General::SolveRoot(Acc, MaxIte, SolFla, this->autoSizedValue, WaterCoils::SimpleHeatingCoilUAResidual, UA0, UA1, Par);
+                TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, this->autoSizedValue, WaterCoils::SimpleHeatingCoilUAResidual, UA0, UA1, Par);
                 if (SolFla == -1) {
                     errorsFound = true;
                     std::string msg = "Autosizing of heating coil UA failed for Coil:Heating:Water \"" + this->compName + "\"";
