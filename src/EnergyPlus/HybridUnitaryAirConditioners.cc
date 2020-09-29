@@ -470,7 +470,7 @@ namespace HybridUnitaryAirConditioners {
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using namespace DataLoopNode;
         using DataSizing::OARequirements; // to find DesignSpecification:OutdoorAir pointer
-        std::string CurrentModuleObject;  // Object type for getting and error messages
+        std::string cCurrentModuleObject;  // Object type for getting and error messages
         Array1D_string Alphas;            // Alpha items for object
         Array1D<Real64> Numbers;          // Numeric items for object
         Array1D_string cAlphaFields;      // Alpha field names
@@ -488,9 +488,9 @@ namespace HybridUnitaryAirConditioners {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetInputZoneHybridUnitaryAirConditioners: ");
-        CurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
-        NumZoneHybridEvap = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        cCurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
+        NumZoneHybridEvap = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         int MaxNumbers = max(0, NumNumbers); // Maximum number of numeric fields in all objects
         int MaxAlphas = max(0, NumAlphas);   // Maximum number of alpha fields in all objects
         Alphas.allocate(MaxAlphas);
@@ -507,7 +507,7 @@ namespace HybridUnitaryAirConditioners {
             ZoneHybridUnitaryAirConditioner.allocate(NumZoneHybridEvap);
 
             for (UnitLoop = 1; UnitLoop <= NumZoneHybridEvap; ++UnitLoop) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(cCurrentModuleObject,
                                               UnitLoop,
                                               Alphas,
                                               NumAlphas,
@@ -522,7 +522,7 @@ namespace HybridUnitaryAirConditioners {
                 IsNotOK = false;
                 IsBlank = false;
                 UtilityRoutines::VerifyName(
-                    Alphas(1), ZoneHybridUnitaryAirConditioner, UnitLoop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+                    Alphas(1), ZoneHybridUnitaryAirConditioner, UnitLoop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name");
 
                 // A1, \field Name
                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name = Alphas(1);
@@ -579,21 +579,21 @@ namespace HybridUnitaryAirConditioners {
                 // A11, \field Supply Air Node Name
                 // A12, \field Relief Node Name
                 ZoneHybridUnitaryAirConditioner(UnitLoop).InletNode = GetOnlySingleNode(
-                    Alphas(9), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                    Alphas(9), ErrorsFound, cCurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
                 ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode = GetOnlySingleNode(Alphas(10),
                                                                                                  ErrorsFound,
-                                                                                                 CurrentModuleObject,
+                                                                                                 cCurrentModuleObject,
                                                                                                  Alphas(1),
                                                                                                  NodeType_Air,
                                                                                                  NodeConnectionType_OutsideAirReference,
                                                                                                  1,
                                                                                                  ObjectIsNotParent);
                 ZoneHybridUnitaryAirConditioner(UnitLoop).OutletNode = GetOnlySingleNode(
-                    Alphas(11), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                    Alphas(11), ErrorsFound, cCurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
                 ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryOutletNode = GetOnlySingleNode(
-                    Alphas(12), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent);
-                TestCompSet(CurrentModuleObject, Alphas(1), Alphas(9), Alphas(11), "Hybrid Evap Air Zone Nodes");
-                TestCompSet(CurrentModuleObject, Alphas(1), Alphas(10), Alphas(12), "Hybrid Evap Air Zone Secondary Nodes");
+                    Alphas(12), ErrorsFound, cCurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent);
+                TestCompSet(cCurrentModuleObject, Alphas(1), Alphas(9), Alphas(11), "Hybrid Evap Air Zone Nodes");
+                TestCompSet(cCurrentModuleObject, Alphas(1), Alphas(10), Alphas(12), "Hybrid Evap Air Zone Secondary Nodes");
 
                 // N1, \field System Maximum Supply AirFlow Rate
                 ZoneHybridUnitaryAirConditioner(UnitLoop).SystemMaximumSupplyAirFlowRate = Numbers(1);
@@ -674,7 +674,7 @@ namespace HybridUnitaryAirConditioners {
                     }
                 }
                 // add the ZoneHVAC:HybridUnitaryHVAC Scaled Maximum Supply Air Volume Flow Rate to the Component Sizing Report Summary
-                BaseSizer::reportSizerOutput(CurrentModuleObject,
+                BaseSizer::reportSizerOutput(cCurrentModuleObject,
                                              ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
                                              "Scaled Maximum Supply Air Volume Flow Rate [m3/s]",
                                              ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate);
@@ -684,16 +684,16 @@ namespace HybridUnitaryAirConditioners {
         // setup output variables
         for (UnitLoop = 1; UnitLoop <= NumZoneHybridEvap; ++UnitLoop) {
 
-            SetUpCompSets(CurrentModuleObject,
+            SetUpCompSets(cCurrentModuleObject,
                           ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                          CurrentModuleObject,
+                          cCurrentModuleObject,
                           ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
                           NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).InletNode),
                           NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).OutletNode));
 
-            SetUpCompSets(CurrentModuleObject,
+            SetUpCompSets(cCurrentModuleObject,
                           ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                          CurrentModuleObject,
+                          cCurrentModuleObject,
                           ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
                           NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode),
                           NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryOutletNode));
