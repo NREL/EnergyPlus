@@ -217,7 +217,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const Dat
             this->wasteHeatRate = this->normalMode.OpModeWasteHeat;
         }
 
-        if ((PLR != 0.0) || (LoadSHR != 0.0)) {
+        if ((PLR != 0.0) && (LoadSHR != 0.0)) {
             if (totalCoolingRate == 0.0) {
                 SysNorSHR = 1.0;
             } else {
