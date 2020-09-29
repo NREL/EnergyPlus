@@ -57,6 +57,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
@@ -137,7 +138,7 @@ public:
 
     void developMesh();
 
-    void performSimulation();
+    void performSimulation(EnergyPlusData& state);
 
     void updateSurfaceCellTemperature();
 
@@ -145,7 +146,7 @@ public:
 
     void updateBottomCellTemperature();
 
-    void initDomain();
+    void initDomain(EnergyPlusData& state);
 
     bool checkFinalTemperatureConvergence();
 
@@ -157,11 +158,11 @@ public:
 
     void doStartOfTimeStepInits();
 
-    Real64 getGroundTemp() override;
+    Real64 getGroundTemp(EnergyPlusData& state) override;
 
-    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim) override;
+    Real64 getGroundTempAtTimeInSeconds(EnergyPlusData& state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim) override;
+    Real64 getGroundTempAtTimeInMonths(EnergyPlusData& state, Real64 const depth, int const monthOfSim) override;
 
     void evaluateSoilRhoCp(Optional<int const> cell = _, Optional_bool_const InitOnly = _);
 

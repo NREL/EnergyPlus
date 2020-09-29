@@ -78,18 +78,6 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
-#include <EnergyPlus/WaterUse.hh>
-#include <EnergyPlus/WindowAC.hh>
-#include <EnergyPlus/WindowComplexManager.hh>
-#include <EnergyPlus/WindowEquivalentLayer.hh>
-#include <EnergyPlus/WindowManager.hh>
-#include <EnergyPlus/WindTurbine.hh>
-#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
-#include <EnergyPlus/ZoneDehumidifier.hh>
-#include <EnergyPlus/ZoneEquipmentManager.hh>
-#include <EnergyPlus/ZonePlenum.hh>
-#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include <unordered_map>
 #include <memory>
@@ -102,6 +90,27 @@ namespace EnergyPlus {
     struct AirLoopHVACDOASData;
     struct BaseboardRadiatorData;
     struct BaseboardElectricData;
+    struct CurveManagerData;
+    struct DataAirLoopData;
+
+    struct WaterCoilsData;
+    struct WaterManagerData;
+    struct WaterThermalTanksData;
+    struct WaterToAirHeatPumpData;
+    struct WaterToAirHeatPumpSimpleData;
+    struct WaterUseData;
+    struct WeatherManagerData;
+    struct WindowACData;
+    struct WindowComplexManagerData;
+    struct WindowEquivalentLayerData;
+    struct WindowManagerData;
+    struct WindTurbineData;
+    struct ZoneAirLoopEquipmentManagerData;
+    struct ZoneContaminantPredictorCorrectorData;
+    struct ZoneDehumidifierData;
+    struct ZoneEquipmentManagerData;
+    struct ZonePlenumData;
+    struct ZoneTempPredictorCorrectorData;
 
     struct EnergyPlusData : BaseGlobalStruct {
         // module globals
@@ -109,6 +118,8 @@ namespace EnergyPlus {
         std::unique_ptr<AirLoopHVACDOASData> dataAirLoopHVACDOAS;
         std::unique_ptr<BaseboardRadiatorData> dataBaseboardRadiator;
         std::unique_ptr<BaseboardElectricData> dataBaseboardElectric;
+        std::unique_ptr<CurveManagerData> dataCurveManager;
+        std::unique_ptr<DataAirLoopData> dataAirLoop;
         BoilersData dataBoilers;
         BoilerSteamData dataSteamBoilers;
         BranchInputManagerData dataBranchInputManager;
@@ -135,18 +146,24 @@ namespace EnergyPlus {
 
         IOFiles files;
 
-        WaterUseData dataWaterUse;
-        WindowACData dataWindowAC;
-        WindowComplexManagerData dataWindowComplexManager;
-        WindowEquivalentLayerData dataWindowEquivalentLayer;
-        WindowManagerData dataWindowManager;
-        WindTurbineData dataWindTurbine;
-        ZoneAirLoopEquipmentManagerData dataZoneAirLoopEquipmentManager;
-        ZoneContaminantPredictorCorrectorData dataZoneContaminantPredictorCorrector;
-        ZoneDehumidifierData dataZoneDehumidifier;
-        ZoneEquipmentManagerData dataZoneEquipmentManager;
-        ZonePlenumData dataZonePlenum;
-        ZoneTempPredictorCorrectorData dataZoneTempPredictorCorrector;
+        std::unique_ptr<WaterCoilsData> dataWaterCoils;
+        std::unique_ptr<WaterManagerData> dataWaterManager;
+        std::unique_ptr<WaterThermalTanksData> dataWaterThermalTanks;
+        std::unique_ptr<WaterToAirHeatPumpData> dataWaterToAirHeatPump;
+        std::unique_ptr<WaterToAirHeatPumpSimpleData> dataWaterToAirHeatPumpSimple;
+        std::unique_ptr<WaterUseData> dataWaterUse;
+        std::unique_ptr<WeatherManagerData> dataWeatherManager;
+        std::unique_ptr<WindowACData> dataWindowAC;
+        std::unique_ptr<WindowComplexManagerData> dataWindowComplexManager;
+        std::unique_ptr<WindowEquivalentLayerData> dataWindowEquivalentLayer;
+        std::unique_ptr<WindowManagerData> dataWindowManager;
+        std::unique_ptr<WindTurbineData> dataWindTurbine;
+        std::unique_ptr<ZoneAirLoopEquipmentManagerData> dataZoneAirLoopEquipmentManager;
+        std::unique_ptr<ZoneContaminantPredictorCorrectorData> dataZoneContaminantPredictorCorrector;
+        std::unique_ptr<ZoneDehumidifierData> dataZoneDehumidifier;
+        std::unique_ptr<ZoneEquipmentManagerData> dataZoneEquipmentManager;
+        std::unique_ptr<ZonePlenumData> dataZonePlenum;
+        std::unique_ptr<ZoneTempPredictorCorrectorData> dataZoneTempPredictorCorrector;
 
         EnergyPlusData();
 

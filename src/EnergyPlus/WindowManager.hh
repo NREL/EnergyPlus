@@ -82,9 +82,9 @@ namespace WindowManager {
     //   Optical Calculation Routines
     //   Heat Balance Routines
 
-    void InitWindowOpticalCalculations(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
+    void InitWindowOpticalCalculations(EnergyPlusData &state, IOFiles &ioFiles);
 
-    void InitGlassOpticalCalculations(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
+    void InitGlassOpticalCalculations(EnergyPlusData &state, IOFiles &ioFiles);
 
     //*****************************************************************************************
 
@@ -133,13 +133,13 @@ namespace WindowManager {
     // Window Thermal Calculation Subroutines
     //***********************************************************************************
 
-    void CalcWindowHeatBalance(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
+    void CalcWindowHeatBalance(EnergyPlusData &state, int const SurfNum,          // Surface number
                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                Real64 &SurfInsideTemp,     // Inside window surface temperature
                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     );
 
-    void CalcWindowHeatBalanceInternalRoutines(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
+    void CalcWindowHeatBalanceInternalRoutines(EnergyPlusData &state, int const SurfNum,          // Surface number
                                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                                Real64 &SurfInsideTemp,     // Inside window surface temperature
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
@@ -339,7 +339,7 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void ReportGlass(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
+    void ReportGlass(EnergyPlusData &state, IOFiles &ioFiles);
 
     //*************************************************************************************
 
@@ -673,11 +673,11 @@ namespace WindowManager {
 
         // Default Constructor
         WindowManagerData() : sigma(5.6697e-8), TKelvin(DataGlobals::KelvinConv), nume(107), numt3(81),
-            gcon(3, 5, 5, 0.0), gvis(3, 5, 5, 0.0), gcp(3, 5, 5, 0.0), gwght(5, 5, 0.0), gfract(5, 5, 0.0), 
-            gnmix(5, 0), gap(5, 0.0), thick(5, 0.0), scon(5, 0.0), tir(10, 0.0), emis(10, 0.0), rir(10, 0.0), 
-            AbsRadGlassFace(10, 0.0), thetas(10, 0.0), thetasPrev(10, 0.0), fvec(10, 0.0), fjac(10, 10, 0.0), 
-            dtheta(5, 0.0), zir(10, 10, 0.0), ziri(10, 10, 0.0), ddeldt(10, 10, 0.0), dtddel(10, 10, 0.0), 
-            qf(10, 0.0), hf(10, 0.0), der(5, 10, 0.0), dhf(5, 10, 0.0), sour(10, 0.0), delta(5, 0.0), 
+            gcon(3, 5, 5, 0.0), gvis(3, 5, 5, 0.0), gcp(3, 5, 5, 0.0), gwght(5, 5, 0.0), gfract(5, 5, 0.0),
+            gnmix(5, 0), gap(5, 0.0), thick(5, 0.0), scon(5, 0.0), tir(10, 0.0), emis(10, 0.0), rir(10, 0.0),
+            AbsRadGlassFace(10, 0.0), thetas(10, 0.0), thetasPrev(10, 0.0), fvec(10, 0.0), fjac(10, 10, 0.0),
+            dtheta(5, 0.0), zir(10, 10, 0.0), ziri(10, 10, 0.0), ddeldt(10, 10, 0.0), dtddel(10, 10, 0.0),
+            qf(10, 0.0), hf(10, 0.0), der(5, 10, 0.0), dhf(5, 10, 0.0), sour(10, 0.0), delta(5, 0.0),
             hcgap(5, 0.0), hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0), arhs(6, 0.0), MaxNumOfIncidentAngles(20), MaxSpectralDataElements(800)
         {
             AirProps.allocate(8);

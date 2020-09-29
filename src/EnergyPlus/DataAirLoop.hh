@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -59,31 +60,6 @@
 namespace EnergyPlus {
 
 namespace DataAirLoop {
-
-    // Using/Aliasing
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumOASystems;         // Number of Outdoor Air Systems
-    extern bool AirLoopInputsFilled; // Set to TRUE after first pass through air loop
-
-    // Variables specific to AirflowNetwork simulations.
-    // Avoid using these for other purposes since these variables are only reset to 0 within AirflowNetworkBalanceManager, line 322.
-    // Non-AFN simulations may have multiple air loops and use of these variables may yield unintended results.
-    extern Real64 LoopDXCoilRTF; // OnOff fan run time fraction in an HVAC Air Loop
-
-    // Types
 
     struct AirLoopZoneEquipConnectData
     {
@@ -300,21 +276,37 @@ namespace DataAirLoop {
         }
     };
 
-    // Object Data
-    extern Array1D<AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
-    extern Array1D<AirLoopOutsideAirConnectData> AirToOANodeInfo;
-    extern Array1D<DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
-    extern Array1D<AirLooptoZoneData> AirLoopZoneInfo;
-    extern Array1D<AirLoopControlData> AirLoopControlInfo;
-    extern Array1D<AirLoopFlowData> AirLoopFlow;
-    extern Array1D<OutsideAirSysProps> OutsideAirSys;
-    extern Array1D<AirLoopAFNData> AirLoopAFNInfo;
-
-    // Clears the global data in DataAirLoop.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
 } // namespace DataAirLoop
+
+struct DataAirLoopData : BaseGlobalStruct {
+
+    int NumOASystems = 0;               // Number of Outdoor Air Systems
+    bool AirLoopInputsFilled = false;   // Set to TRUE after first pass through air loop
+    Real64 LoopDXCoilRTF = 0.0;         // OnOff fan run time fraction in an HVAC Air Loop
+
+    Array1D<DataAirLoop::AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
+    Array1D<DataAirLoop::AirLoopOutsideAirConnectData> AirToOANodeInfo;
+    Array1D<DataAirLoop::DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
+    Array1D<DataAirLoop::AirLooptoZoneData> AirLoopZoneInfo;
+    Array1D<DataAirLoop::AirLoopControlData> AirLoopControlInfo;
+    Array1D<DataAirLoop::AirLoopFlowData> AirLoopFlow;
+    Array1D<DataAirLoop::OutsideAirSysProps> OutsideAirSys;
+    Array1D<DataAirLoop::AirLoopAFNData> AirLoopAFNInfo;
+
+    void clear_state() override {
+        NumOASystems = 0;
+        LoopDXCoilRTF = 0.0;
+        AirLoopInputsFilled = false;
+        AirLoopAFNInfo.deallocate();
+        AirToZoneNodeInfo.deallocate();
+        AirToOANodeInfo.deallocate();
+        PriAirSysAvailMgr.deallocate();
+        AirLoopZoneInfo.deallocate();
+        AirLoopControlInfo.deallocate();
+        AirLoopFlow.deallocate();
+        OutsideAirSys.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

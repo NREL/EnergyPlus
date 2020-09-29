@@ -55,6 +55,7 @@
 #include <nlohmann/json.hpp>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
@@ -64,7 +65,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
     namespace GroundHeatExchangers {
 
@@ -297,7 +297,7 @@ struct BranchInputManagerData;
 
             virtual Real64 getGFunc(Real64) = 0;
 
-            virtual void initGLHESimVars(BranchInputManagerData &dataBranchInputManager) = 0;
+            virtual void initGLHESimVars(EnergyPlusData &state) = 0;
 
             virtual Real64 calcHXResistance() = 0;
 
@@ -349,7 +349,7 @@ struct BranchInputManagerData;
 
             Real64 calcHXResistance();
 
-            void initGLHESimVars(BranchInputManagerData &dataBranchInputManager);
+            void initGLHESimVars(EnergyPlusData &state);
 
             void getAnnualTimeConstant();
 
@@ -411,7 +411,7 @@ struct BranchInputManagerData;
 
             void calcGFunctions(IOFiles &ioFiles);
 
-            void initGLHESimVars(BranchInputManagerData &dataBranchInputManager);
+            void initGLHESimVars(EnergyPlusData &state);
 
             void getAnnualTimeConstant();
 

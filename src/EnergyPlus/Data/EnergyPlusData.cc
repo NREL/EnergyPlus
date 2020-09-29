@@ -58,12 +58,36 @@ namespace EnergyPlus {
         this->dataAirLoopHVACDOAS = std::unique_ptr<AirLoopHVACDOASData>(new AirLoopHVACDOASData);
         this->dataBaseboardRadiator = std::unique_ptr<BaseboardRadiatorData>(new BaseboardRadiatorData);
         this->dataBaseboardElectric =  std::unique_ptr<BaseboardElectricData>(new BaseboardElectricData);
+        this->dataCurveManager = std::unique_ptr<CurveManagerData>(new CurveManagerData);
+        this->dataAirLoop = std::unique_ptr<DataAirLoopData>(new DataAirLoopData);
+
+        this->dataWaterCoils =  std::unique_ptr<WaterCoilsData>(new WaterCoilsData);
+        this->dataWaterManager =  std::unique_ptr<WaterManagerData>(new WaterManagerData);
+        this->dataWaterThermalTanks =  std::unique_ptr<WaterThermalTanksData>(new WaterThermalTanksData);
+        this->dataWaterToAirHeatPump =  std::unique_ptr<WaterToAirHeatPumpData>(new WaterToAirHeatPumpData);
+        this->dataWaterToAirHeatPumpSimple =  std::unique_ptr<WaterToAirHeatPumpSimpleData>(new WaterToAirHeatPumpSimpleData);
+        this->dataWaterUse =  std::unique_ptr<WaterUseData>(new WaterUseData);
+        this->dataWeatherManager =  std::unique_ptr<WeatherManagerData>(new WeatherManagerData);
+        this->dataWindowAC =  std::unique_ptr<WindowACData>(new WindowACData);
+        this->dataWindowComplexManager =  std::unique_ptr<WindowComplexManagerData>(new WindowComplexManagerData);
+        this->dataWindowEquivalentLayer =  std::unique_ptr<WindowEquivalentLayerData>(new WindowEquivalentLayerData);
+        this->dataWindowManager =  std::unique_ptr<WindowManagerData>(new WindowManagerData);
+        this->dataWindTurbine =  std::unique_ptr<WindTurbineData>(new WindTurbineData);
+        this->dataZoneAirLoopEquipmentManager =  std::unique_ptr<ZoneAirLoopEquipmentManagerData>(new ZoneAirLoopEquipmentManagerData);
+        this->dataZoneContaminantPredictorCorrector =  std::unique_ptr<ZoneContaminantPredictorCorrectorData>(new ZoneContaminantPredictorCorrectorData);
+        this->dataZoneDehumidifier =  std::unique_ptr<ZoneDehumidifierData>(new ZoneDehumidifierData);
+        this->dataZoneEquipmentManager =  std::unique_ptr<ZoneEquipmentManagerData>(new ZoneEquipmentManagerData);
+        this->dataZonePlenum =  std::unique_ptr<ZonePlenumData>(new ZonePlenumData);
+        this->dataZoneTempPredictorCorrector =  std::unique_ptr<ZoneTempPredictorCorrectorData>(new ZoneTempPredictorCorrectorData);
     }
 
     void EnergyPlusData::clear_state() {
-        dataAirLoopHVACDOAS->clear_state();
-        dataBaseboardElectric->clear_state();
-        dataBaseboardRadiator->clear_state();
+        this->dataAirLoopHVACDOAS->clear_state();
+        this->dataBaseboardElectric->clear_state();
+        this->dataBaseboardRadiator->clear_state();
+        this->dataCurveManager->clear_state();
+        this->dataAirLoop->clear_state();
+
         dataBoilers.clear_state();
         dataBranchInputManager.clear_state();
         dataSteamBoilers.clear_state();
@@ -86,18 +110,25 @@ namespace EnergyPlus {
         //outputReportTabular.clear_state();
         pipes.clear_state();
         dataPlantChillers.clear_state();
-        dataWaterUse.clear_state();
-        dataWindowAC.clear_state();
-        dataWindowComplexManager.clear_state();
-        dataWindowEquivalentLayer.clear_state();
-        dataWindowManager.clear_state();
-        dataWindTurbine.clear_state();
-        dataZoneAirLoopEquipmentManager.clear_state();
-        dataZoneContaminantPredictorCorrector.clear_state();
-        dataZoneDehumidifier.clear_state();
-        dataZoneEquipmentManager.clear_state();
-        dataZonePlenum.clear_state();
-        dataZoneTempPredictorCorrector.clear_state();
+
+        dataWaterCoils->clear_state();
+        dataWaterManager->clear_state();
+        dataWaterThermalTanks->clear_state();
+        dataWaterToAirHeatPump->clear_state();
+        dataWaterToAirHeatPumpSimple->clear_state();
+        dataWaterUse->clear_state();
+        dataWeatherManager->clear_state();
+        dataWindowAC->clear_state();
+        dataWindowComplexManager->clear_state();
+        dataWindowEquivalentLayer->clear_state();
+        dataWindowManager->clear_state();
+        dataWindTurbine->clear_state();
+        dataZoneAirLoopEquipmentManager->clear_state();
+        dataZoneContaminantPredictorCorrector->clear_state();
+        dataZoneDehumidifier->clear_state();
+        dataZoneEquipmentManager->clear_state();
+        dataZonePlenum->clear_state();
+        dataZoneTempPredictorCorrector->clear_state();
     }
 
 }

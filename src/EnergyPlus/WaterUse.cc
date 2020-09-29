@@ -85,7 +85,7 @@ namespace WaterUse {
     //       RE-ENGINEERED  na
 
 
-    void SimulateWaterUse(BranchInputManagerData &dataBranchInputManager, WaterUseData &dataWaterUse, bool FirstHVACIteration)
+    void SimulateWaterUse(EnergyPlusData &state, bool FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -105,14 +105,14 @@ namespace WaterUse {
         int WaterConnNum;
         int NumIteration;
 
-        if (dataWaterUse.getWaterUseInputFlag) {
-            GetWaterUseInput(dataWaterUse);
-            dataWaterUse.getWaterUseInputFlag = false;
+        if (state.dataWaterUse->getWaterUseInputFlag) {
+            GetWaterUseInput(state, *state.dataWaterUse);
+            state.dataWaterUse->getWaterUseInputFlag = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && dataWaterUse.MyEnvrnFlagLocal) {
-            if (dataWaterUse.numWaterEquipment > 0) {
-                for (auto &e : dataWaterUse.WaterEquipment) {
+        if (DataGlobals::BeginEnvrnFlag && state.dataWaterUse->MyEnvrnFlagLocal) {
+            if (state.dataWaterUse->numWaterEquipment > 0) {
+                for (auto &e : state.dataWaterUse->WaterEquipment) {
                     e.SensibleRate = 0.0;
                     e.SensibleEnergy = 0.0;
                     e.LatentRate = 0.0;
@@ -123,71 +123,71 @@ namespace WaterUse {
                 }
             }
 
-            if (dataWaterUse.numWaterConnections > 0) {
-                for (auto &e : dataWaterUse.WaterConnections)
+            if (state.dataWaterUse->numWaterConnections > 0) {
+                for (auto &e : state.dataWaterUse->WaterConnections)
                     e.TotalMassFlowRate = 0.0;
             }
 
-            dataWaterUse.MyEnvrnFlagLocal = false;
+            state.dataWaterUse->MyEnvrnFlagLocal = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) dataWaterUse.MyEnvrnFlagLocal = true;
+        if (!DataGlobals::BeginEnvrnFlag) state.dataWaterUse->MyEnvrnFlagLocal = true;
 
         // Simulate all unconnected WATER USE EQUIPMENT objects
-        for (WaterEquipNum = 1; WaterEquipNum <= dataWaterUse.numWaterEquipment; ++WaterEquipNum) {
-            if (dataWaterUse.WaterEquipment(WaterEquipNum).Connections == 0) {
-                dataWaterUse.WaterEquipment(WaterEquipNum).CalcEquipmentFlowRates(dataWaterUse);
-                dataWaterUse.WaterEquipment(WaterEquipNum).CalcEquipmentDrainTemp();
+        for (WaterEquipNum = 1; WaterEquipNum <= state.dataWaterUse->numWaterEquipment; ++WaterEquipNum) {
+            if (state.dataWaterUse->WaterEquipment(WaterEquipNum).Connections == 0) {
+                state.dataWaterUse->WaterEquipment(WaterEquipNum).CalcEquipmentFlowRates(*state.dataWaterUse);
+                state.dataWaterUse->WaterEquipment(WaterEquipNum).CalcEquipmentDrainTemp();
             }
         } // WaterEquipNum
 
-        ReportStandAloneWaterUse(dataWaterUse);
+        ReportStandAloneWaterUse(*state.dataWaterUse);
 
         // Simulate WATER USE CONNECTIONS objects and connected WATER USE EQUIPMENT objects
-        for (WaterConnNum = 1; WaterConnNum <= dataWaterUse.numWaterConnections; ++WaterConnNum) {
+        for (WaterConnNum = 1; WaterConnNum <= state.dataWaterUse->numWaterConnections; ++WaterConnNum) {
 
-            if (!dataWaterUse.WaterConnections(WaterConnNum).StandAlone) continue; // only model non plant connections here
+            if (!state.dataWaterUse->WaterConnections(WaterConnNum).StandAlone) continue; // only model non plant connections here
 
-            dataWaterUse.WaterConnections(WaterConnNum).InitConnections(dataBranchInputManager, dataWaterUse);
+            state.dataWaterUse->WaterConnections(WaterConnNum).InitConnections(state, *state.dataWaterUse);
 
             NumIteration = 0;
 
             while (true) {
                 ++NumIteration;
 
-                dataWaterUse.WaterConnections(WaterConnNum).CalcConnectionsFlowRates(dataWaterUse, FirstHVACIteration);
-                dataWaterUse.WaterConnections(WaterConnNum).CalcConnectionsDrainTemp(dataWaterUse);
-                dataWaterUse.WaterConnections(WaterConnNum).CalcConnectionsHeatRecovery();
+                state.dataWaterUse->WaterConnections(WaterConnNum).CalcConnectionsFlowRates(*state.dataWaterUse, FirstHVACIteration);
+                state.dataWaterUse->WaterConnections(WaterConnNum).CalcConnectionsDrainTemp(*state.dataWaterUse);
+                state.dataWaterUse->WaterConnections(WaterConnNum).CalcConnectionsHeatRecovery();
 
-                if (dataWaterUse.WaterConnections(WaterConnNum).TempError < Tolerance) {
+                if (state.dataWaterUse->WaterConnections(WaterConnNum).TempError < Tolerance) {
                     break;
                 } else if (NumIteration > MaxIterations) {
                     if (!DataGlobals::WarmupFlag) {
-                        if (dataWaterUse.WaterConnections(WaterConnNum).MaxIterationsErrorIndex == 0) {
-                            ShowWarningError("WaterUse:Connections = " + dataWaterUse.WaterConnections(WaterConnNum).Name +
+                        if (state.dataWaterUse->WaterConnections(WaterConnNum).MaxIterationsErrorIndex == 0) {
+                            ShowWarningError("WaterUse:Connections = " + state.dataWaterUse->WaterConnections(WaterConnNum).Name +
                                              ":  Heat recovery temperature did not converge");
                             ShowContinueErrorTimeStamp("");
                         }
-                        ShowRecurringWarningErrorAtEnd("WaterUse:Connections = " + dataWaterUse.WaterConnections(WaterConnNum).Name +
+                        ShowRecurringWarningErrorAtEnd("WaterUse:Connections = " + state.dataWaterUse->WaterConnections(WaterConnNum).Name +
                                                            ":  Heat recovery temperature did not converge",
-                                                       dataWaterUse.WaterConnections(WaterConnNum).MaxIterationsErrorIndex);
+                                                       state.dataWaterUse->WaterConnections(WaterConnNum).MaxIterationsErrorIndex);
                     }
                     break;
                 }
 
             } // WHILE
 
-            dataWaterUse.WaterConnections(WaterConnNum).UpdateWaterConnections();
-            dataWaterUse.WaterConnections(WaterConnNum).ReportWaterUse(dataWaterUse);
+            state.dataWaterUse->WaterConnections(WaterConnNum).UpdateWaterConnections();
+            state.dataWaterUse->WaterConnections(WaterConnNum).ReportWaterUse(*state.dataWaterUse);
 
         } // WaterConnNum
     }
 
-    PlantComponent *WaterConnectionsType::factory(WaterUseData &dataWaterUse, std::string const &objectName)
+    PlantComponent *WaterConnectionsType::factory(EnergyPlusData &state, WaterUseData &dataWaterUse, std::string const &objectName)
     {
         // Process the input data
         if (dataWaterUse.getWaterUseInputFlag) {
-            GetWaterUseInput(dataWaterUse);
+            GetWaterUseInput(state, dataWaterUse);
             dataWaterUse.getWaterUseInputFlag = false;
         }
 
@@ -222,19 +222,19 @@ namespace WaterUse {
         Real64 const Tolerance(0.1); // Make input?
 
         if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
-            if (state.dataWaterUse.numWaterEquipment > 0) {
-                for (int i = state.dataWaterUse.WaterEquipment.l(), e = state.dataWaterUse.WaterEquipment.u(); i <= e; ++i) {
-                    state.dataWaterUse.WaterEquipment(i).reset();
+            if (state.dataWaterUse->numWaterEquipment > 0) {
+                for (int i = state.dataWaterUse->WaterEquipment.l(), e = state.dataWaterUse->WaterEquipment.u(); i <= e; ++i) {
+                    state.dataWaterUse->WaterEquipment(i).reset();
 
-                    if (state.dataWaterUse.WaterEquipment(i).setupMyOutputVars) {
-                        state.dataWaterUse.WaterEquipment(i).setupOutputVars(state.dataWaterUse);
-                        state.dataWaterUse.WaterEquipment(i).setupMyOutputVars = false;
+                    if (state.dataWaterUse->WaterEquipment(i).setupMyOutputVars) {
+                        state.dataWaterUse->WaterEquipment(i).setupOutputVars(*state.dataWaterUse);
+                        state.dataWaterUse->WaterEquipment(i).setupMyOutputVars = false;
                     }
                 }
             }
 
-            if (state.dataWaterUse.numWaterConnections > 0) {
-                for (auto &e : state.dataWaterUse.WaterConnections)
+            if (state.dataWaterUse->numWaterConnections > 0) {
+                for (auto &e : state.dataWaterUse->WaterConnections)
                     e.TotalMassFlowRate = 0.0;
             }
 
@@ -243,15 +243,15 @@ namespace WaterUse {
 
         if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlag = true;
 
-        this->InitConnections(state.dataBranchInputManager, state.dataWaterUse);
+        this->InitConnections(state, *state.dataWaterUse);
 
         int NumIteration = 0;
 
         while (true) {
             ++NumIteration;
 
-            this->CalcConnectionsFlowRates(state.dataWaterUse, FirstHVACIteration);
-            this->CalcConnectionsDrainTemp(state.dataWaterUse);
+            this->CalcConnectionsFlowRates(*state.dataWaterUse, FirstHVACIteration);
+            this->CalcConnectionsDrainTemp(*state.dataWaterUse);
             this->CalcConnectionsHeatRecovery();
 
             if (this->TempError < Tolerance) {
@@ -270,10 +270,10 @@ namespace WaterUse {
         } // WHILE
 
         this->UpdateWaterConnections();
-        this->ReportWaterUse(state.dataWaterUse);
+        this->ReportWaterUse(*state.dataWaterUse);
     }
 
-    void GetWaterUseInput(WaterUseData &dataWaterUse)
+    void GetWaterUseInput(EnergyPlusData &state, WaterUseData &dataWaterUse)
     {
 
         // SUBROUTINE INFORMATION:
@@ -443,7 +443,7 @@ namespace WaterUse {
                 }
 
                 if (!DataIPShortCuts::lAlphaFieldBlanks(4)) {
-                    WaterManager::SetupTankDemandComponent(dataWaterUse.WaterConnections(WaterConnNum).Name,
+                    WaterManager::SetupTankDemandComponent(state, dataWaterUse.WaterConnections(WaterConnNum).Name,
                                                            DataIPShortCuts::cCurrentModuleObject,
                                                            DataIPShortCuts::cAlphaArgs(4),
                                                            ErrorsFound,
@@ -452,7 +452,7 @@ namespace WaterUse {
                 }
 
                 if (!DataIPShortCuts::lAlphaFieldBlanks(5)) {
-                    WaterManager::SetupTankSupplyComponent(dataWaterUse.WaterConnections(WaterConnNum).Name,
+                    WaterManager::SetupTankSupplyComponent(state, dataWaterUse.WaterConnections(WaterConnNum).Name,
                                                            DataIPShortCuts::cCurrentModuleObject,
                                                            DataIPShortCuts::cAlphaArgs(5),
                                                            ErrorsFound,
@@ -959,7 +959,7 @@ namespace WaterUse {
         }
     }
 
-    void WaterConnectionsType::InitConnections(BranchInputManagerData &dataBranchInputManager, WaterUseData &dataWaterUse)
+    void WaterConnectionsType::InitConnections(EnergyPlusData &state, WaterUseData &dataWaterUse)
     {
 
         // SUBROUTINE INFORMATION:
@@ -975,7 +975,7 @@ namespace WaterUse {
 
         if (this->plantScanFlag && allocated(DataPlant::PlantLoop) && !this->StandAlone) {
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_WaterUseConnection,
                                                     this->PlantLoopNum,

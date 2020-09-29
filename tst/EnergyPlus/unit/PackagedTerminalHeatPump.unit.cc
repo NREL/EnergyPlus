@@ -802,7 +802,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
@@ -1154,7 +1154,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 

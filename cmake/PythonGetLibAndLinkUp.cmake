@@ -1,29 +1,14 @@
 # Linking up to Python is not necessarily complex, but it is tricky to get right.
 # Our goal here is to provide a fully packaged embedded Python interpreter and Python 3.5+ standard library
-# This file's job is to copy over the required Python DLL and fixup the EnergyPlus binary on Mac to find on it locally
-# To accomplish this, we need to know which EnergyPlus binary to fixup, and some info about the Python library
-# The steps we follow are:
-#  Use finder to get Python library and include paths
-#  Add Python include path to include_directories
-#  Link E+ against Python library
-#  At install time find the Python library and copy it into the install tree
-#  At install time find the Python site-packages folder and copy it into the install tree
-#  In E+ need to setPath before calling PyInitialize so we can get all the site_packages
-# Now we should also consider whether we want to try to build *without* Python
-#  I can imagine doing this on the 32 bit Windows, for example.
-#  And this would *not* exclude calling E+ as a library from C or Python -- it would just disable Python Plugins
-#  If we don't do this then we'll need to install both 32 and 64 bit Python on Windows and get the right one
+# During build time, the built EnergyPlus executable tree stays linked against the Python wherever it is installed on the system.
+# During install time, this file is used to copy over the Python dynamic library into the install tree
+# In addition, on Windows, the proper Python filename is fixed up prior to copying.
 
-# We need to connect up to python for a couple reasons.
-# 1. We use Python in our testing scripts
-# 2. We link EnergyPlus up against the Python lib for Python Plugin work
-# 3. We use Python for our Python API runs
-# We are going to create a local virtual environment that is portable so we can package it and install it
-# Users will not need to have Python installed, and it will come with a Python.exe and a Pip.exe for installing libraries
+# Prior to calling, set:
+#  RESOLVED_PYTHON_LIB to the Python library file found through CMake's usual finder
+#  EXECUTABLE_PATH which will be the executable directory in the INSTALL TREE, thus you need to use a generator expression
 
-# set RESOLVED_PYTHON_LIB, and EXECUTABLE_PATH when calling
-
-message("Collecting Python dynamic library")
+message("PYTHON: Collecting Python dynamic library")
 
 # get some path info things
 get_filename_component(BASE_PATH ${EXECUTABLE_PATH} DIRECTORY)

@@ -57,6 +57,9 @@
 
 namespace EnergyPlus {
 
+    // Forward declarations
+    struct EnergyPlusData;
+
 namespace Humidifiers {
 
     // Using/Aliasing
@@ -164,7 +167,7 @@ namespace Humidifiers {
         void CalcElecSteamHumidifier(Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
         );
 
-        void CalcGasSteamHumidifier(Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
+        void CalcGasSteamHumidifier(EnergyPlusData &state, Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
         );
 
         void UpdateReportWaterSystem(); // number of the current humidifier being simulated
@@ -183,18 +186,19 @@ namespace Humidifiers {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SimHumidifier(std::string const &CompName,   // name of the humidifier unit
+    void SimHumidifier(EnergyPlusData &state,
+                       std::string const &CompName,   // name of the humidifier unit
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                        int &CompIndex                 // Pointer to Humidifier Unit
     );
 
-    void GetHumidifierInput();
+    void GetHumidifierInput(EnergyPlusData &state);
 
-    int GetAirInletNodeNum(std::string const &HumidifierName,
+    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &HumidifierName,
         bool &ErrorsFound
     );
 
-    int GetAirOutletNodeNum(std::string const &HumidifierName,
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &HumidifierName,
         bool &ErrorsFound
     );
 

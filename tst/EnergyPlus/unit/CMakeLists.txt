@@ -17,6 +17,30 @@ set( test_src
   AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  Autosizing/AutosizingFixture.hh
+  Autosizing/All_Simple_Sizing.unit.cc
+  Autosizing/BaseClassSizing.unit.cc
+  Autosizing/CoolingAirFlowSizing.unit.cc
+  Autosizing/CoolingCapacitySizing.unit.cc
+  Autosizing/CoolingSHRSizing.unit.cc
+  Autosizing/CoolingWaterDesAirInletHumRatSizing.unit.cc
+  Autosizing/CoolingWaterDesAirInletTempSizing.unit.cc
+  Autosizing/CoolingWaterDesAirOutletHumRatSizing.unit.cc
+  Autosizing/CoolingWaterDesAirOutletTempSizing.unit.cc
+  Autosizing/CoolingWaterDesWaterInletTempSizing.unit.cc
+  Autosizing/CoolingWaterflowSizing.unit.cc
+  Autosizing/CoolingWaterNumofTubesPerRowSizing.unit.cc
+  Autosizing/HeatingAirFlowSizing.unit.cc
+  Autosizing/HeatingAirflowUASizing.unit.cc
+  Autosizing/HeatingCapacitySizing.unit.cc
+  Autosizing/HeatingWaterDesAirInletHumRatSizing.unit.cc
+  Autosizing/HeatingWaterDesAirInletTempSizing.unit.cc
+  Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.unit.cc
+  Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.unit.cc
+  Autosizing/HeatingWaterflowSizing.unit.cc
+  Autosizing/SystemAirFlowSizing.unit.cc
+  Autosizing/WaterHeatingCapacitySizing.unit.cc
+  Autosizing/WaterHeatingCoilUASizing.unit.cc
   BaseboardRadiator.unit.cc
   BoilerHotWater.unit.cc
   BoilerSteam.unit.cc
@@ -149,7 +173,6 @@ set( test_src
   PurchasedAirManager.unit.cc
   PVWatts.unit.cc
   ReportCoilSelection.unit.cc
-  ReportSizingManager.unit.cc
   ResultsFramework.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc

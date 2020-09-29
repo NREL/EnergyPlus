@@ -569,13 +569,13 @@ namespace RefrigeratedCase {
 
         if (HaveRefrigRacks) {
             for (int RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
-                RefrigRack(RackNum).CalcRackSystem();
+                RefrigRack(RackNum).CalcRackSystem(state);
                 RefrigRack(RackNum).ReportRackSystem(RackNum);
             }
         }
 
-        if (HaveDetailedRefrig) SimulateDetailedRefrigerationSystems();
-        if (HaveDetailedTransRefrig) SimulateDetailedTransRefrigSystems();
+        if (HaveDetailedRefrig) SimulateDetailedRefrigerationSystems(state);
+        if (HaveDetailedTransRefrig) SimulateDetailedTransRefrigSystems(state);
     }
 
     void GetRefrigerationInput(EnergyPlusData &state)
@@ -945,14 +945,14 @@ namespace RefrigeratedCase {
                     ErrorsFound = true;
                 }
 
-                RefrigCase(CaseNum).LatCapCurvePtr = CurveManager::GetCurveIndex(Alphas(5)); // convert curve name to number
+                RefrigCase(CaseNum).LatCapCurvePtr = CurveManager::GetCurveIndex(state, Alphas(5)); // convert curve name to number
                 if (RefrigCase(CaseNum).LatCapCurvePtr == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(5) +
                                     " not found:" + Alphas(5));
                     ErrorsFound = true;
                 }
 
-                ErrorsFound |= CurveManager::CheckCurveDims(RefrigCase(CaseNum).LatCapCurvePtr, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, RefrigCase(CaseNum).LatCapCurvePtr, // Curve index
                     {1},                            // Valid dimensions
                     RoutineName,                    // Routine name
                     CurrentModuleObject,            // Object Type
@@ -1273,7 +1273,7 @@ namespace RefrigeratedCase {
                     ErrorsFound = true;
                 }
 
-                RefrigCase(CaseNum).DefCapCurvePtr = CurveManager::GetCurveIndex(Alphas(12)); // convert curve name to number
+                RefrigCase(CaseNum).DefCapCurvePtr = CurveManager::GetCurveIndex(state, Alphas(12)); // convert curve name to number
                 if ((RefrigCase(CaseNum).DefrostType == DefElectricTerm || RefrigCase(CaseNum).DefrostType == DefHotFluidTerm) &&
                     (RefrigCase(CaseNum).DefCapCurvePtr == 0)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(12) +
@@ -1282,7 +1282,7 @@ namespace RefrigeratedCase {
                 }
 
                 if (RefrigCase(CaseNum).DefCapCurvePtr > 0) {
-                    ErrorsFound |= CurveManager::CheckCurveDims(RefrigCase(CaseNum).DefCapCurvePtr, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, RefrigCase(CaseNum).DefCapCurvePtr, // Curve index
                         {1},                            // Valid dimensions
                         RoutineName,                    // Routine name
                         CurrentModuleObject,            // Object Type
@@ -2235,10 +2235,10 @@ namespace RefrigeratedCase {
                                              cNumericFieldNames(NumNum) + " must be between 1 and 1.67, 1.00 will be used.");
                         }
                     } else if (SELECT_CASE_var == European) {
-                        // WarehouseCoil(CoilID)%SHRCorrectionCurvePtr = CurveManager::GetCurveIndex('ChillerEuropeanWetCoilFactor')
+                        // WarehouseCoil(CoilID)%SHRCorrectionCurvePtr = CurveManager::GetCurveIndex(state, 'ChillerEuropeanWetCoilFactor')
                         // This is a place holder, currently use embedded constants for European ratings, future may want a curve
                     } else if (SELECT_CASE_var == QuadraticSHR) {
-                        WarehouseCoil(CoilID).SHRCorrectionCurvePtr = CurveManager::GetCurveIndex(Alphas(AlphaNum)); // convert curve name to number
+                        WarehouseCoil(CoilID).SHRCorrectionCurvePtr = CurveManager::GetCurveIndex(state, Alphas(AlphaNum)); // convert curve name to number
                         if (lAlphaBlanks(AlphaNum)) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", invalid  " +
                                             cAlphaFieldNames(AlphaNum) + " is blank, required.");
@@ -2249,14 +2249,14 @@ namespace RefrigeratedCase {
                             ErrorsFound = true;
                         }
                         // error checks for curve type entered and curve name
-                        ErrorsFound |= CurveManager::CheckCurveDims(WarehouseCoil(CoilID).SHRCorrectionCurvePtr, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state, WarehouseCoil(CoilID).SHRCorrectionCurvePtr, // Curve index
                             {1},                            // Valid dimensions
                             RoutineName,                    // Routine name
                             CurrentModuleObject,            // Object Type
                             WarehouseCoil(CoilID).Name,     // Object Name
                             cAlphaFieldNames(AlphaNum));    // Field Name
                     } else if (SELECT_CASE_var == TabularRH_DT1_TRoom) {
-                        WarehouseCoil(CoilID).SHRCorrectionCurvePtr = CurveManager::GetCurveIndex(Alphas(AlphaNum)); // convert curve name to number
+                        WarehouseCoil(CoilID).SHRCorrectionCurvePtr = CurveManager::GetCurveIndex(state, Alphas(AlphaNum)); // convert curve name to number
                         if (lAlphaBlanks(AlphaNum)) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", invalid  " +
                                             cAlphaFieldNames(AlphaNum) + " is blank, required.");
@@ -2266,7 +2266,7 @@ namespace RefrigeratedCase {
                             ShowContinueError("...invalid curve " + cAlphaFieldNames(AlphaNum) + "=\"" + Alphas(AlphaNum) + "\".");
                             ErrorsFound = true;
                         }
-                        ErrorsFound |= CurveManager::CheckCurveDims(WarehouseCoil(CoilID).SHRCorrectionCurvePtr, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state, WarehouseCoil(CoilID).SHRCorrectionCurvePtr, // Curve index
                             {3},                            // Valid dimensions
                             RoutineName,                    // Routine name
                             CurrentModuleObject,            // Object Type
@@ -2687,14 +2687,14 @@ namespace RefrigeratedCase {
                     ErrorsFound = true;
                 }
 
-                RefrigRack(RackNum).COPFTempPtr = CurveManager::GetCurveIndex(Alphas(3)); // convert curve name to number
+                RefrigRack(RackNum).COPFTempPtr = CurveManager::GetCurveIndex(state, Alphas(3)); // convert curve name to number
                 if (RefrigRack(RackNum).COPFTempPtr == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " + cAlphaFieldNames(3) +
                                     " not found:" + Alphas(3));
                     ErrorsFound = true;
                 }
 
-                ErrorsFound |= CurveManager::CheckCurveDims(RefrigRack(RackNum).COPFTempPtr, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, RefrigRack(RackNum).COPFTempPtr, // Curve index
                     {1},                            // Valid dimensions
                     RoutineName,                    // Routine name
                     CurrentModuleObject,            // Object Type
@@ -2708,7 +2708,7 @@ namespace RefrigeratedCase {
                     ErrorsFound = true;
                 }
 
-                RefrigRack(RackNum).TotCondFTempPtr = CurveManager::GetCurveIndex(Alphas(4)); // convert curve name to number
+                RefrigRack(RackNum).TotCondFTempPtr = CurveManager::GetCurveIndex(state, Alphas(4)); // convert curve name to number
                 if ((!lAlphaBlanks(4)) && RefrigRack(RackNum).TotCondFTempPtr == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " + cAlphaFieldNames(4) +
                                     " not found:" + Alphas(4));
@@ -2716,7 +2716,7 @@ namespace RefrigeratedCase {
                 }
 
                 if (!lAlphaBlanks(4)) {
-                    ErrorsFound |= CurveManager::CheckCurveDims(RefrigRack(RackNum).TotCondFTempPtr, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, RefrigRack(RackNum).TotCondFTempPtr, // Curve index
                         {1},                            // Valid dimensions
                         RoutineName,                    // Routine name
                         CurrentModuleObject,            // Object Type
@@ -2875,7 +2875,7 @@ namespace RefrigeratedCase {
                     RefrigRack(RackNum).EvapWaterSupplyMode = WaterSupplyFromMains;
                 } else {
                     RefrigRack(RackNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                    WaterManager::SetupTankDemandComponent(RefrigRack(RackNum).Name,
+                    WaterManager::SetupTankDemandComponent(state, RefrigRack(RackNum).Name,
                                              CurrentModuleObject,
                                              RefrigRack(RackNum).SupplyTankName,
                                              ErrorsFound,
@@ -3101,7 +3101,7 @@ namespace RefrigeratedCase {
                     GlobalNames::VerifyUniqueInterObjectName(UniqueCondenserNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                     Condenser(CondNum).Name = Alphas(1);
                     DataHeatBalance::HeatReclaimRefrigCondenser(CondNum).Name = Alphas(1);
-                    Condenser(CondNum).CapCurvePtr = CurveManager::GetCurveIndex(Alphas(2)); // convert curve name to number
+                    Condenser(CondNum).CapCurvePtr = CurveManager::GetCurveIndex(state, Alphas(2)); // convert curve name to number
                     if (Condenser(CondNum).CapCurvePtr == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", invalid  " + cAlphaFieldNames(2) +
                                         " not found:" + Alphas(2));
@@ -3118,15 +3118,15 @@ namespace RefrigeratedCase {
                     Condenser(CondNum).RatedDelT = CondARI460DelT; //= 16.7d0 ,Rated sat cond temp - dry bulb air T for air-cooled Condensers, ARI460
                     Condenser(CondNum).RatedTCondense = CondARI460Tcond;
                     if (Condenser(CondNum).CapCurvePtr > 0) {
-                        Condenser(CondNum).RatedCapacity = CurveManager::CurveValue(Condenser(CondNum).CapCurvePtr, CondARI460DelT);
+                        Condenser(CondNum).RatedCapacity = CurveManager::CurveValue(state, Condenser(CondNum).CapCurvePtr, CondARI460DelT);
                     }
                     // elevation capacity correction on air-cooled condensers, Carrier correlation more conservative than Trane
                     Condenser(CondNum).RatedCapacity *= (1.0 - 7.17e-5 * DataEnvironment::Elevation);
                     if (Condenser(CondNum).RatedCapacity > 0.0) {
-                        CurveManager::GetCurveMinMaxValues(Condenser(CondNum).CapCurvePtr, DelTempMin, DelTempMax);
-                        Real64 Capmin = CurveManager::CurveValue(Condenser(CondNum).CapCurvePtr, DelTempMin) *
+                        CurveManager::GetCurveMinMaxValues(state,Condenser(CondNum).CapCurvePtr, DelTempMin, DelTempMax);
+                        Real64 Capmin = CurveManager::CurveValue(state, Condenser(CondNum).CapCurvePtr, DelTempMin) *
                                         (1.0 - 7.17e-5 * DataEnvironment::Elevation); // Mar 2011 bug fix
-                        Real64 Capmax = CurveManager::CurveValue(Condenser(CondNum).CapCurvePtr, DelTempMax) *
+                        Real64 Capmax = CurveManager::CurveValue(state, Condenser(CondNum).CapCurvePtr, DelTempMax) *
                                         (1.0 - 7.17e-5 * DataEnvironment::Elevation); // Mar 2011 bug
                         Condenser(CondNum).TempSlope =
                             (DelTempMax - DelTempMin) / ((Capmax - Capmin)); // * ( 1.0 - 7.17e-5 * DataEnvironment::Elevation ) ) //Mar 2011 bug fix
@@ -3391,7 +3391,7 @@ namespace RefrigeratedCase {
                         Condenser(CondNum).EvapWaterSupplyMode = WaterSupplyFromMains;
                     } else {
                         Condenser(CondNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                        WaterManager::SetupTankDemandComponent(Condenser(CondNum).Name,
+                        WaterManager::SetupTankDemandComponent(state, Condenser(CondNum).Name,
                                                  CurrentModuleObject,
                                                  Condenser(CondNum).SupplyTankName,
                                                  ErrorsFound,
@@ -3698,7 +3698,7 @@ namespace RefrigeratedCase {
                     UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
                     GasCooler(GCNum).Name = Alphas(1);
 
-                    GasCooler(GCNum).CapCurvePtr = CurveManager::GetCurveIndex(Alphas(2)); // convert curve name to number
+                    GasCooler(GCNum).CapCurvePtr = CurveManager::GetCurveIndex(state, Alphas(2)); // convert curve name to number
                     if (GasCooler(GCNum).CapCurvePtr == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + GasCooler(GCNum).Name + "\", invalid " + cAlphaFieldNames(2) +
                                         " not found:" + Alphas(2));
@@ -3711,16 +3711,16 @@ namespace RefrigeratedCase {
 
                     GasCooler(GCNum).RatedApproachT = 3.0; // rated CO2 gas cooler approach temperature
                     if (GasCooler(GCNum).CapCurvePtr > 0) {
-                        GasCooler(GCNum).RatedCapacity = CurveManager::CurveValue(GasCooler(GCNum).CapCurvePtr, GasCooler(GCNum).RatedApproachT);
+                        GasCooler(GCNum).RatedCapacity = CurveManager::CurveValue(state, GasCooler(GCNum).CapCurvePtr, GasCooler(GCNum).RatedApproachT);
                     }
                     // elevation capacity correction on air-cooled condensers, Carrier correlation more conservative than Trane
                     GasCooler(GCNum).RatedCapacity *= (1.0 - 7.17e-5 * DataEnvironment::Elevation);
                     if (GasCooler(GCNum).RatedCapacity > 0.0) {
-                        CurveManager::GetCurveMinMaxValues(GasCooler(GCNum).CapCurvePtr, DelTempMin, DelTempMax);
+                        CurveManager::GetCurveMinMaxValues(state,GasCooler(GCNum).CapCurvePtr, DelTempMin, DelTempMax);
                         Real64 Capmin =
-                            CurveManager::CurveValue(GasCooler(GCNum).CapCurvePtr, DelTempMin) * (1.0 - 7.17e-5 * DataEnvironment::Elevation);
+                            CurveManager::CurveValue(state, GasCooler(GCNum).CapCurvePtr, DelTempMin) * (1.0 - 7.17e-5 * DataEnvironment::Elevation);
                         Real64 Capmax =
-                            CurveManager::CurveValue(GasCooler(GCNum).CapCurvePtr, DelTempMax) * (1.0 - 7.17e-5 * DataEnvironment::Elevation);
+                            CurveManager::CurveValue(state, GasCooler(GCNum).CapCurvePtr, DelTempMax) * (1.0 - 7.17e-5 * DataEnvironment::Elevation);
                         GasCooler(GCNum).TempSlope = (DelTempMax - DelTempMin) / ((Capmax - Capmin));
                         GasCooler(GCNum).MinCondLoad = Capmax - DelTempMax / GasCooler(GCNum).TempSlope;
                     } else {
@@ -4237,13 +4237,13 @@ namespace RefrigeratedCase {
                         Secondary(SecondaryNum).PumpIncrementPower = Secondary(SecondaryNum).PumpTotRatedPower / NumPumps;
                     } else { // Variable speed drive need to read in power curve
                         AlphaNum = 6;
-                        Secondary(SecondaryNum).VarSpeedCurvePtr = CurveManager::GetCurveIndex(Alphas(AlphaNum)); // convert curve name to number
+                        Secondary(SecondaryNum).VarSpeedCurvePtr = CurveManager::GetCurveIndex(state, Alphas(AlphaNum)); // convert curve name to number
                         if (Secondary(SecondaryNum).VarSpeedCurvePtr == 0) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", invalid  " +
                                             cAlphaFieldNames(AlphaNum) + " not found:" + Alphas(AlphaNum));
                             ErrorsFound = true;
                         }
-                        ErrorsFound |= CurveManager::CheckCurveDims(Secondary(SecondaryNum).VarSpeedCurvePtr, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state, Secondary(SecondaryNum).VarSpeedCurvePtr, // Curve index
                             {1},                            // Valid dimensions
                             RoutineName,                    // Routine name
                             CurrentModuleObject,            // Object Type
@@ -4452,14 +4452,14 @@ namespace RefrigeratedCase {
 
                 Compressor(CompNum).Name = Alphas(1);
 
-                Compressor(CompNum).ElecPowerCurvePtr = CurveManager::GetCurveIndex(Alphas(2)); // convert curve name to number
+                Compressor(CompNum).ElecPowerCurvePtr = CurveManager::GetCurveIndex(state, Alphas(2)); // convert curve name to number
                 if ((!lAlphaBlanks(2)) && Compressor(CompNum).ElecPowerCurvePtr == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Compressor(CompNum).Name + "\", invalid  " + cAlphaFieldNames(2) +
                                     " not found = " + Alphas(2));
                     ErrorsFound = true;
                 }
 
-                Compressor(CompNum).CapacityCurvePtr = CurveManager::GetCurveIndex(Alphas(3)); // convert curve name to number
+                Compressor(CompNum).CapacityCurvePtr = CurveManager::GetCurveIndex(state, Alphas(3)); // convert curve name to number
                 if ((!lAlphaBlanks(3)) && Compressor(CompNum).CapacityCurvePtr == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Compressor(CompNum).Name + "\", invalid  " + cAlphaFieldNames(3) +
                                     " not found = " + Alphas(3));
@@ -4500,13 +4500,13 @@ namespace RefrigeratedCase {
                 //  If the compressor is a transcritical CO compressor, get transcritical power and capacity curves
                 if (UtilityRoutines::SameString(Alphas(5), "Transcritical")) { // Mode of Operation = Transcritical
                     Compressor(CompNum).TransFlag = true;
-                    Compressor(CompNum).TransElecPowerCurvePtr = CurveManager::GetCurveIndex(Alphas(6)); // convert curve name to number
+                    Compressor(CompNum).TransElecPowerCurvePtr = CurveManager::GetCurveIndex(state, Alphas(6)); // convert curve name to number
                     if (lAlphaBlanks(6) && Compressor(CompNum).TransElecPowerCurvePtr == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + '=' + Compressor(CompNum).Name + ": " + cAlphaFieldNames(6) +
                                         " not found.");
                         ErrorsFound = true;
                     }
-                    Compressor(CompNum).TransCapacityCurvePtr = CurveManager::GetCurveIndex(Alphas(7)); // convert curve name to number
+                    Compressor(CompNum).TransCapacityCurvePtr = CurveManager::GetCurveIndex(state, Alphas(7)); // convert curve name to number
                     if (lAlphaBlanks(7) && Compressor(CompNum).TransCapacityCurvePtr == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + '=' + Compressor(CompNum).Name + ": " + cAlphaFieldNames(7) +
                                         " not found.");
@@ -5356,13 +5356,13 @@ namespace RefrigeratedCase {
                     int CompNum = System(RefrigSysNum).CompressorNum(CompIndex);
                     if (!Compressor(CompNum).TransFlag) {          //  Subcritical Compressor
                         if (System(RefrigSysNum).NumStages == 1) { //  Single-stage compression
-                            Compressor(CompNum).NomCap = CurveManager::CurveValue(Compressor(CompNum).CapacityCurvePtr,
+                            Compressor(CompNum).NomCap = CurveManager::CurveValue(state, Compressor(CompNum).CapacityCurvePtr,
                                                                     System(RefrigSysNum).TEvapDesign,
                                                                     Condenser(System(RefrigSysNum).CondenserNum(1)).RatedTCondense);
                             NominalTotalCompCap += Compressor(CompNum).NomCap;
                             ++Compressor(CompNum).NumSysAttach;
                         } else { //  Two-stage compression, low-stage compressors
-                            Compressor(CompNum).NomCap = CurveManager::CurveValue(
+                            Compressor(CompNum).NomCap = CurveManager::CurveValue(state,
                                 Compressor(CompNum).CapacityCurvePtr, System(RefrigSysNum).TEvapDesign, System(RefrigSysNum).TIntercooler);
                             NominalTotalCompCap += Compressor(CompNum).NomCap;
                             ++Compressor(CompNum).NumSysAttach;
@@ -5383,7 +5383,7 @@ namespace RefrigeratedCase {
                     for (int CompIndex = 1; CompIndex <= NumHiStageCompressorsSys; ++CompIndex) {
                         int CompNum = System(RefrigSysNum).HiStageCompressorNum(CompIndex);
                         if (!Compressor(CompNum).TransFlag) { //  Subcritical Compressor
-                            Compressor(CompNum).NomCap = CurveManager::CurveValue(Compressor(CompNum).CapacityCurvePtr,
+                            Compressor(CompNum).NomCap = CurveManager::CurveValue(state, Compressor(CompNum).CapacityCurvePtr,
                                                                     System(RefrigSysNum).TIntercooler,
                                                                     Condenser(System(RefrigSysNum).CondenserNum(1)).RatedTCondense);
                             NominalTotalHiStageCompCap += Compressor(CompNum).NomCap;
@@ -5882,7 +5882,7 @@ namespace RefrigeratedCase {
                                                                  GasCooler(TransSystem(TransRefrigSysNum).GasCoolerNum(1)).RatedOutletP,
                                                                  RefrigIndex,
                                                                  RoutineNameNoColon);
-                            Compressor(CompNum).NomCap = CurveManager::CurveValue(
+                            Compressor(CompNum).NomCap = CurveManager::CurveValue(state,
                                 Compressor(CompNum).TransCapacityCurvePtr, TransSystem(TransRefrigSysNum).TEvapDesignMT, GCOutletH);
                             NominalTotalCompCapHP += Compressor(CompNum).NomCap;
                             ++Compressor(CompNum).NumSysAttach;
@@ -5942,7 +5942,7 @@ namespace RefrigeratedCase {
                     for (int CompIndex = 1; CompIndex <= NumCompressorsSys; ++CompIndex) {
                         CompNum = TransSystem(TransRefrigSysNum).CompressorNumLP(CompIndex);
                         if (TransSystem(TransRefrigSysNum).TransSysType == 2) { //  Calculate capacity of LP compressors
-                            Compressor(CompNum).NomCap = CurveManager::CurveValue(Compressor(CompNum).CapacityCurvePtr,
+                            Compressor(CompNum).NomCap = CurveManager::CurveValue(state, Compressor(CompNum).CapacityCurvePtr,
                                                                     TransSystem(TransRefrigSysNum).TEvapDesignLT,
                                                                     TransSystem(TransRefrigSysNum).TEvapDesignMT);
                             NominalTotalCompCapLP += Compressor(CompNum).NomCap;
@@ -9217,7 +9217,7 @@ namespace RefrigeratedCase {
         }
     }
 
-    void InitRefrigerationPlantConnections(BranchInputManagerData &dataBranchInputManager)
+    void InitRefrigerationPlantConnections(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9238,7 +9238,7 @@ namespace RefrigeratedCase {
                 if (Condenser(RefCondLoop).CondenserType != DataHeatBalance::RefrigCondenserTypeWater) continue;
 
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         Condenser(RefCondLoop).Name,
                                                         DataPlant::TypeOf_RefrigSystemWaterCondenser,
                                                         Condenser(RefCondLoop).PlantLoopNum,
@@ -9271,7 +9271,7 @@ namespace RefrigeratedCase {
                 if (RefrigRack(RefCompRackLoop).CondenserType != DataHeatBalance::RefrigCondenserTypeWater) continue;
 
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         RefrigRack(RefCompRackLoop).Name,
                                                         DataPlant::TypeOf_RefrigerationWaterCoolRack,
                                                         RefrigRack(RefCompRackLoop).PlantLoopNum,
@@ -9363,7 +9363,7 @@ namespace RefrigeratedCase {
         if (!DataGlobals::BeginEnvrnFlag) InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = true;
     }
 
-    void RefrigRackData::CalcRackSystem()
+    void RefrigRackData::CalcRackSystem(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9423,7 +9423,7 @@ namespace RefrigeratedCase {
         // that's why important where init goes, don't want to zero out data should keep
         if (UseSysTimeStep) {
             for (int CoilSetIndex = 1; CoilSetIndex <= DataHeatBalance::NumRefrigChillerSets; ++CoilSetIndex) {
-                AirChillerSet(CoilSetIndex).CalculateAirChillerSets();
+                AirChillerSet(CoilSetIndex).CalculateAirChillerSets(state);
             }
         }
 
@@ -9440,7 +9440,7 @@ namespace RefrigeratedCase {
         if (this->NumCases > 0) {
             for (int caseNum = 1; caseNum <= this->NumCases; ++caseNum) {
                 int CaseID = this->CaseNum(caseNum);
-                RefrigCase(CaseID).CalculateCase();
+                RefrigCase(CaseID).CalculateCase(state);
 
                 //   add evaporator load for all cases connected to rack
                 TotalRackDeliveredCapacity += RefrigCase(CaseID).TotalCoolingLoad;
@@ -9479,7 +9479,7 @@ namespace RefrigeratedCase {
         }         // NumWalkIns>0
 
         if (this->HeatRejectionLocation == LocationZone) {
-            COPFTempOutput = CurveManager::CurveValue(this->COPFTempPtr, DataLoopNode::Node(HeatRejectZoneNodeNum).Temp);
+            COPFTempOutput = CurveManager::CurveValue(state, this->COPFTempPtr, DataLoopNode::Node(HeatRejectZoneNodeNum).Temp);
             EvapAvail = false;
         } else {
             if (this->OutsideAirNodeNum != 0) {
@@ -9531,7 +9531,7 @@ namespace RefrigeratedCase {
                 } // InletTempMin
             }     // DataHeatBalance::RefrigCondenserTypeWater
 
-            COPFTempOutput = CurveManager::CurveValue(this->COPFTempPtr, EffectTemp);
+            COPFTempOutput = CurveManager::CurveValue(state, this->COPFTempPtr, EffectTemp);
         } // Location Zone
 
         CompressorCOPactual = this->RatedCOP * COPFTempOutput;
@@ -9554,11 +9554,11 @@ namespace RefrigeratedCase {
             if (this->TotCondFTempPtr != 0) {
                 if (this->HeatRejectionLocation == LocationZone) {
                     CondenserFrac =
-                        max(0.0, min(1.0, CurveManager::CurveValue(this->TotCondFTempPtr, DataLoopNode::Node(HeatRejectZoneNodeNum).Temp)));
+                        max(0.0, min(1.0, CurveManager::CurveValue(state, this->TotCondFTempPtr, DataLoopNode::Node(HeatRejectZoneNodeNum).Temp)));
                     TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
                     DataHeatBalance::RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToZone += this->CondenserFanPower * CondenserFrac;
                 } else {
-                    CondenserFrac = max(0.0, min(1.0, CurveManager::CurveValue(this->TotCondFTempPtr, EffectTemp)));
+                    CondenserFrac = max(0.0, min(1.0, CurveManager::CurveValue(state, this->TotCondFTempPtr, EffectTemp)));
                     TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
                 } // location zone
             } else {
@@ -9669,7 +9669,7 @@ namespace RefrigeratedCase {
         SumZoneImpacts();
     }
 
-    void RefrigCaseData::CalculateCase() // Absolute pointer to refrigerated case
+    void RefrigCaseData::CalculateCase(EnergyPlusData &state) // Absolute pointer to refrigerated case
     {
 
         // SUBROUTINE INFORMATION:
@@ -9847,12 +9847,12 @@ namespace RefrigeratedCase {
         {
             auto const SELECT_CASE_var(this->LatentEnergyCurveType);
             if (SELECT_CASE_var == CaseTemperatureMethod) {
-                Real64 LatCapModFrac = CurveManager::CurveValue(this->LatCapCurvePtr, TCase);
+                Real64 LatCapModFrac = CurveManager::CurveValue(state, this->LatCapCurvePtr, TCase);
                 LatentRatio = max(0.0, (1.0 - (this->RatedAmbientRH - ZoneRHPercent) * LatCapModFrac));
             } else if (SELECT_CASE_var == RHCubic) {
-                LatentRatio = max(0.0, CurveManager::CurveValue(this->LatCapCurvePtr, ZoneRHPercent));
+                LatentRatio = max(0.0, CurveManager::CurveValue(state, this->LatCapCurvePtr, ZoneRHPercent));
             } else if (SELECT_CASE_var == DPCubic) {
-                LatentRatio = max(0.0, CurveManager::CurveValue(this->LatCapCurvePtr, ZoneDewPoint));
+                LatentRatio = max(0.0, CurveManager::CurveValue(state, this->LatCapCurvePtr, ZoneDewPoint));
             }
         }
 
@@ -9903,12 +9903,12 @@ namespace RefrigeratedCase {
                     {
                         auto const SELECT_CASE_var(this->DefrostEnergyCurveType);
                         if (SELECT_CASE_var == CaseTemperatureMethod) {
-                            Real64 DefCapModFrac = CurveManager::CurveValue(this->DefCapCurvePtr, TCase);
+                            Real64 DefCapModFrac = CurveManager::CurveValue(state, this->DefCapCurvePtr, TCase);
                             DefrostRatio = max(0.0, (1.0 - (this->RatedAmbientRH - ZoneRHPercent) * DefCapModFrac));
                         } else if (SELECT_CASE_var == RHCubic) {
-                            DefrostRatio = max(0.0, CurveManager::CurveValue(this->DefCapCurvePtr, ZoneRHPercent));
+                            DefrostRatio = max(0.0, CurveManager::CurveValue(state, this->DefCapCurvePtr, ZoneRHPercent));
                         } else if (SELECT_CASE_var == DPCubic) {
-                            DefrostRatio = max(0.0, CurveManager::CurveValue(this->DefCapCurvePtr, ZoneDewPoint));
+                            DefrostRatio = max(0.0, CurveManager::CurveValue(state, this->DefCapCurvePtr, ZoneDewPoint));
                         } else if (SELECT_CASE_var == None) {
                             DefrostRatio = 1.0;
                         }
@@ -10144,7 +10144,7 @@ namespace RefrigeratedCase {
     void RefrigCondenserData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         InitRefrigeration();
-        InitRefrigerationPlantConnections(state.dataBranchInputManager);
+        InitRefrigerationPlantConnections(state);
     }
 
     void RefrigCondenserData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
@@ -10179,7 +10179,7 @@ namespace RefrigeratedCase {
         int PlantBranchIndex(0);
         int PlantCompIndex(0);
 
-        InitRefrigerationPlantConnections(state.dataBranchInputManager);
+        InitRefrigerationPlantConnections(state);
 
         std::string TypeName;
         std::string ErrIntro;
@@ -10301,7 +10301,7 @@ namespace RefrigeratedCase {
     void RefrigRackData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
             InitRefrigeration();
-            InitRefrigerationPlantConnections(state.dataBranchInputManager);
+            InitRefrigerationPlantConnections(state);
         }
 
     void RefrigRackData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
@@ -10336,7 +10336,7 @@ namespace RefrigeratedCase {
         int PlantBranchIndex(0);
         int PlantCompIndex(0);
 
-        InitRefrigerationPlantConnections(state.dataBranchInputManager);
+        InitRefrigerationPlantConnections(state);
 
         std::string TypeName;
         std::string ErrIntro;
@@ -10474,7 +10474,7 @@ namespace RefrigeratedCase {
         DataLoopNode::Node(this->OutletNode).Temp = this->OutletTemp;
         }
 
-    void SimulateDetailedRefrigerationSystems()
+    void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10515,7 +10515,7 @@ namespace RefrigeratedCase {
         // that's why important where init goes, don't want to zero out data should keep
         if (UseSysTimeStep) {
             for (int CoilSetIndex = 1; CoilSetIndex <= DataHeatBalance::NumRefrigChillerSets; ++CoilSetIndex) {
-                AirChillerSet(CoilSetIndex).CalculateAirChillerSets();
+                AirChillerSet(CoilSetIndex).CalculateAirChillerSets(state);
             }
         }
 
@@ -10528,7 +10528,7 @@ namespace RefrigeratedCase {
                 if (System(SysNum).NumCases > 0) {
                     for (int CaseIndex = 1; CaseIndex <= System(SysNum).NumCases; ++CaseIndex) {
                         int CaseID = System(SysNum).CaseNum(CaseIndex);
-                        RefrigCase(CaseID).CalculateCase();
+                        RefrigCase(CaseID).CalculateCase(state);
                         //  TevapDesign calc in Get Input to meet lowest evap temp of any load on the system.
                         //  Tevap needed is either fixed at this design value,
                         //  or allowed to float to meet lowest T needed among all loads served by the system
@@ -10596,7 +10596,7 @@ namespace RefrigeratedCase {
                 if (System(SysNum).NumSecondarys > 0) {
                     for (int SecondIndex = 1; SecondIndex <= System(SysNum).NumSecondarys; ++SecondIndex) {
                         int SecondID = System(SysNum).SecondaryNum(SecondIndex);
-                        Secondary(SecondID).CalculateSecondary(SecondID);
+                        Secondary(SecondID).CalculateSecondary(state, SecondID);
                         if (System(SysNum).CompSuctControl == ConstantSuctionTemperature) {
                             System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                         } else { // check for lowest T evap design among the secondary systems and
@@ -10759,7 +10759,7 @@ namespace RefrigeratedCase {
                             System(SysNum).RefMassFlowHiStageComps = System(SysNum).RefMassFlowComps / 0.65;
                         }
 
-                        System(SysNum).CalcDetailedSystem(SysNum);
+                        System(SysNum).CalcDetailedSystem(state, SysNum);
 
                         bool DeRate; // If true, need to derate aircoils because load can't be met by system
 
@@ -10897,7 +10897,7 @@ namespace RefrigeratedCase {
         SumZoneImpacts();
     }
 
-    void SimulateDetailedTransRefrigSystems()
+    void SimulateDetailedTransRefrigSystems(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10929,7 +10929,7 @@ namespace RefrigeratedCase {
             if (TransSystem(SysNum).NumCasesMT > 0) {
                 for (int CaseIndex = 1; CaseIndex <= TransSystem(SysNum).NumCasesMT; ++CaseIndex) {
                     int CaseID = TransSystem(SysNum).CaseNumMT(CaseIndex);
-                    RefrigCase(CaseID).CalculateCase();
+                    RefrigCase(CaseID).CalculateCase(state);
                     //  TEvapDesignMT calc in Get Input to meet lowest evap temp of any MT load on the system.
                     //  TEvapNeededMT is fixed at this design value.
                     TransSystem(SysNum).TEvapNeededMT = TransSystem(SysNum).TEvapDesignMT;
@@ -10942,7 +10942,7 @@ namespace RefrigeratedCase {
             if (TransSystem(SysNum).NumCasesLT > 0) {
                 for (int CaseIndex = 1; CaseIndex <= TransSystem(SysNum).NumCasesLT; ++CaseIndex) {
                     int CaseID = TransSystem(SysNum).CaseNumLT(CaseIndex);
-                    RefrigCase(CaseID).CalculateCase();
+                    RefrigCase(CaseID).CalculateCase(state);
                     //  TEvapDesignLT calc in Get Input to meet lowest evap temp of any LT load on the system.
                     //  TEvapNeededLT is fixed at this design value.
                     TransSystem(SysNum).TEvapNeededLT = TransSystem(SysNum).TEvapDesignLT;
@@ -11068,7 +11068,7 @@ namespace RefrigeratedCase {
                         TransSystem(SysNum).TotalSystemLoadMT / (TransSystem(SysNum).HCaseOutMT - TransSystem(SysNum).HCaseInMT);
                     TransSystem(SysNum).RefMassFlowCompsHP = TransSystem(SysNum).RefMassFlowtoLTLoads + TransSystem(SysNum).RefMassFlowtoMTLoads;
 
-                    TransSystem(SysNum).CalcDetailedTransSystem(SysNum);
+                    TransSystem(SysNum).CalcDetailedTransSystem(state, SysNum);
                     //       TransCritSysFlag = .FALSE.
 
                 } // TransSystem(SysNum)%TotalSystemLoad > 0
@@ -11119,7 +11119,7 @@ namespace RefrigeratedCase {
         SumZoneImpacts();
     }
 
-    void RefrigSystemData::CalcDetailedSystem(int const SysNum)
+    void RefrigSystemData::CalcDetailedSystem(EnergyPlusData &state, int const SysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11173,8 +11173,8 @@ namespace RefrigeratedCase {
             }
 
             if (this->NumSubcoolers > 0) this->CalculateSubcoolers();
-            this->CalculateCompressors();
-            this->CalculateCondensers(SysNum);
+            this->CalculateCompressors(state);
+            this->CalculateCondensers(state, SysNum);
             this->RefMassFlowtoLoads = this->TotalSystemLoad / (this->HCaseOut - this->HCaseIn);
             if (NumIter < 2) continue;
             // Previously did error check on calculated Tcondense, but not sensitive enough
@@ -11197,7 +11197,7 @@ namespace RefrigeratedCase {
         } // error check
     }
 
-    void TransRefrigSystemData::CalcDetailedTransSystem(int const SysNum)
+    void TransRefrigSystemData::CalcDetailedTransSystem(EnergyPlusData &state, int const SysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11230,7 +11230,7 @@ namespace RefrigeratedCase {
             ++NumIter;
 
             if (this->NumGasCoolers >= 1) this->CalcGasCooler(SysNum);
-            this->CalculateTransCompressors();
+            this->CalculateTransCompressors(state);
             if (NumIter < 2) continue;
             if ((this->RefMassFlowReceiverBypass == 0.0) || (MassFlowStart == 0.0)) {
                 ShowSevereError("Refrigeration:TranscriticalSystem: " + this->Name + " showing zero refrigerant flow through receiver bypass.");
@@ -11245,7 +11245,7 @@ namespace RefrigeratedCase {
         } // error check
     }
 
-    void RefrigSystemData::CalculateCondensers(int const SysNum)
+    void RefrigSystemData::CalculateCondensers(EnergyPlusData &state, int const SysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11504,7 +11504,7 @@ namespace RefrigeratedCase {
                 // recalculate CapFac at current delta T
                 if (condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeAir) {
                     // current maximum condenser capacity at delta T present for minimum condensing temperature [W]
-                    Real64 CurMaxCapacity = CurveManager::CurveValue(condenser.CapCurvePtr, (this->TCondenseMin - OutDbTemp));
+                    Real64 CurMaxCapacity = CurveManager::CurveValue(state, condenser.CapCurvePtr, (this->TCondenseMin - OutDbTemp));
                     CapFac = TotalCondenserHeat / CurMaxCapacity;
                     AirVolRatio = max(FanMinAirFlowRatio, std::pow(CapFac, CondAirVolExponentDry)); // Fans limited by minimum air flow ratio
                     AirVolRatio = min(AirVolRatio, 1.0);
@@ -11817,7 +11817,7 @@ namespace RefrigeratedCase {
         this->NetHeatRejectEnergy = this->NetHeatRejectLoad * LocalTimeStep * DataGlobals::SecInHour;
     }
 
-    void RefrigSystemData::CalculateCompressors()
+    void RefrigSystemData::CalculateCompressors(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -12080,9 +12080,9 @@ namespace RefrigeratedCase {
                 //  the increase in capacity due to extra subcooling
                 MassCorrection = DensityActual / DensityRated;
                 CapacityCorrection = MassCorrection * TotalEnthalpyChangeActual / CaseEnthalpyChangeRated;
-                Compressor_CompID.Power = CurveManager::CurveValue(Compressor_CompID.ElecPowerCurvePtr, TsatforPsuct, TsatforPdisch);
+                Compressor_CompID.Power = CurveManager::CurveValue(state, Compressor_CompID.ElecPowerCurvePtr, TsatforPsuct, TsatforPdisch);
                 Compressor_CompID.Capacity =
-                    CapacityCorrection * CurveManager::CurveValue(Compressor_CompID.CapacityCurvePtr, TsatforPsuct, TsatforPdisch);
+                    CapacityCorrection * CurveManager::CurveValue(state, Compressor_CompID.CapacityCurvePtr, TsatforPsuct, TsatforPdisch);
                 Compressor_CompID.MassFlow = Compressor_CompID.Capacity / TotalEnthalpyChangeActual;
 
                 // calculate load factor for last compressor addded
@@ -12164,7 +12164,7 @@ namespace RefrigeratedCase {
         this->TotHiStageCompCoolingEnergy = this->TotHiStageCompCapacity * LocalTimeStepSec;
     }
 
-    void TransRefrigSystemData::CalculateTransCompressors()
+    void TransRefrigSystemData::CalculateTransCompressors(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -12338,9 +12338,9 @@ namespace RefrigeratedCase {
                 MassCorrectionLT = DensityActualLT / DensityRatedLP;
                 // Capacity at existing subcool/superheat over cap at rated conditions for LT loads
                 Real64 CapacityCorrectionLT = MassCorrectionLT * TotalEnthalpyChangeActualLT / CaseEnthalpyChangeRatedLT;
-                Compressor(CompID).Power = CurveManager::CurveValue(Compressor(CompID).ElecPowerCurvePtr, TsatforPsucLT, TsatforPdisLT);
+                Compressor(CompID).Power = CurveManager::CurveValue(state, Compressor(CompID).ElecPowerCurvePtr, TsatforPsucLT, TsatforPdisLT);
                 Compressor(CompID).Capacity =
-                    CapacityCorrectionLT * CurveManager::CurveValue(Compressor(CompID).CapacityCurvePtr, TsatforPsucLT, TsatforPdisLT);
+                    CapacityCorrectionLT * CurveManager::CurveValue(state, Compressor(CompID).CapacityCurvePtr, TsatforPsucLT, TsatforPdisLT);
                 Compressor(CompID).MassFlow = Compressor(CompID).Capacity / TotalEnthalpyChangeActualLT;
                 Compressor(CompID).ElecConsumption = Compressor(CompID).Power * LocalTimeStep * DataGlobals::SecInHour;
                 Compressor(CompID).CoolingEnergy = Compressor(CompID).Capacity * LocalTimeStep * DataGlobals::SecInHour;
@@ -12525,13 +12525,13 @@ namespace RefrigeratedCase {
             CapacityCorrectionMT = MassCorrectionMT * TotalEnthalpyChangeActualMT / CaseEnthalpyChangeRatedMT;
 
             if (GasCooler(this->GasCoolerNum(1)).TransOpFlag) { // System is operating in transcritical region
-                Compressor(CompID).Power = CurveManager::CurveValue(Compressor(CompID).TransElecPowerCurvePtr, TsatforPsucMT, PGCOutlet);
+                Compressor(CompID).Power = CurveManager::CurveValue(state, Compressor(CompID).TransElecPowerCurvePtr, TsatforPsucMT, PGCOutlet);
                 Compressor(CompID).Capacity =
-                    CapacityCorrectionMT * CurveManager::CurveValue(Compressor(CompID).TransCapacityCurvePtr, TsatforPsucMT, HGCOutlet);
+                    CapacityCorrectionMT * CurveManager::CurveValue(state, Compressor(CompID).TransCapacityCurvePtr, TsatforPsucMT, HGCOutlet);
             } else { // System is operating in subcritical region
-                Compressor(CompID).Power = CurveManager::CurveValue(Compressor(CompID).ElecPowerCurvePtr, TsatforPsucMT, TsatforPdisMT);
+                Compressor(CompID).Power = CurveManager::CurveValue(state, Compressor(CompID).ElecPowerCurvePtr, TsatforPsucMT, TsatforPdisMT);
                 Compressor(CompID).Capacity =
-                    CapacityCorrectionMT * CurveManager::CurveValue(Compressor(CompID).CapacityCurvePtr, TsatforPsucMT, TsatforPdisMT);
+                    CapacityCorrectionMT * CurveManager::CurveValue(state, Compressor(CompID).CapacityCurvePtr, TsatforPsucMT, TsatforPdisMT);
             } // (GasCooler(SysNum)%TransOpFlag)
             //  Mass flow through HP compressors is HP compressor refrigerating capacity divided by MT load, LT load and LP compressor power
             Compressor(CompID).MassFlow =
@@ -13838,7 +13838,7 @@ namespace RefrigeratedCase {
         }
     }
 
-    void SecondaryLoopData::CalculateSecondary(int const SecondaryNum)
+    void SecondaryLoopData::CalculateSecondary(EnergyPlusData &state, int const SecondaryNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Therese Stovall, ORNL
@@ -13943,7 +13943,7 @@ namespace RefrigeratedCase {
         if (this->NumCases > 0) {
             for (int caseNum = 1; caseNum <= this->NumCases; ++caseNum) {
                 int CaseID = this->CaseNum(caseNum);
-                RefrigCase(CaseID).CalculateCase();
+                RefrigCase(CaseID).CalculateCase(state);
                 // increment TotalCoolingLoad Hot gas/brine defrost credits for each secondary loop
                 RefrigerationLoad += RefrigCase(CaseID).TotalCoolingLoad;
                 TotalHotDefrostCondCredit += RefrigCase(CaseID).HotDefrostCondCredit;
@@ -14031,7 +14031,7 @@ namespace RefrigeratedCase {
                         } // fluid type              >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                     }     // Dispatching pumps until fluid flow need is met
                 } else {  // pump type variable
-                    VarFrac = max(0.1, CurveManager::CurveValue(this->VarSpeedCurvePtr, PartLdFrac));
+                    VarFrac = max(0.1, CurveManager::CurveValue(state, this->VarSpeedCurvePtr, PartLdFrac));
                     TotalPumpPower = this->PumpTotRatedPower * VarFrac;
                     VolFlowRate = this->MaxVolFlow * PartLdFrac;
                 } // pump type
@@ -14283,7 +14283,7 @@ namespace RefrigeratedCase {
         SysOutputProvided = CoilSysCredit(ZoneNum).SenCreditToZoneRate;
     }
 
-    void AirChillerSetData::CalculateAirChillerSets()
+    void AirChillerSetData::CalculateAirChillerSets(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -14317,7 +14317,7 @@ namespace RefrigeratedCase {
         for (int CoilIndex = 1; CoilIndex <= this->NumCoils; ++CoilIndex) {
             int CoilID = this->CoilNum(CoilIndex);
 
-            WarehouseCoil(CoilID).CalculateCoil(RemainQZNReqSens);
+            WarehouseCoil(CoilID).CalculateCoil(state, RemainQZNReqSens);
             RemainQZNReqSens += WarehouseCoil(CoilID).SensCreditRate;
             // should be a negative minus a negative, so a smaller negative, that is, going toward zero, but senscoolingenergyrate expressed as
             // positive  Need to go over all the coils so that the defrosts occur on schedule, even when the chiller isn't called for at that
@@ -14404,7 +14404,7 @@ namespace RefrigeratedCase {
         } // DeRate == true
     }
 
-    void WarehouseCoilData::CalculateCoil(Real64 const QZnReq)
+    void WarehouseCoilData::CalculateCoil(EnergyPlusData &state, Real64 const QZnReq)
     {
 
         // SUBROUTINE INFORMATION:
@@ -14533,7 +14533,7 @@ namespace RefrigeratedCase {
                 //    In the table, X1== inlet air dry bulb temperature
                 //                  X2== Difference between inlet T and evap T
                 //                  X3== RH expressed as decimal
-                CoilCapTotEstimate = CurveManager::CurveValue(this->SHRCorrectionCurvePtr, CoilInletTemp, TemperatureDif, CoilInletRHFrac) *
+                CoilCapTotEstimate = CurveManager::CurveValue(state, this->SHRCorrectionCurvePtr, CoilInletTemp, TemperatureDif, CoilInletRHFrac) *
                                      this->RatedCapTotal * (1.0 - DefrostDripDownSchedule) * CoilSchedule;
 
             } else { // work with unit load factor (sensible only), function of DT1 (Tair in drybulb-Tevap)
@@ -14573,7 +14573,7 @@ namespace RefrigeratedCase {
                             Real64 Yint = this->SHRCorrection60 - (Slope * 0.6);        // Part of linear SHR60 correction factor, dimensionless
                             SHRCorrection = Slope * SHR + Yint;
                         } else if (SELECT_CASE_var == QuadraticSHR) {
-                            SHRCorrection = CurveManager::CurveValue(this->SHRCorrectionCurvePtr, SHR);
+                            SHRCorrection = CurveManager::CurveValue(state, this->SHRCorrectionCurvePtr, SHR);
                         } else if (SELECT_CASE_var == European) {
                             // With European ratings, either start with rated total sensible capacity or rated total capacity
                             //    If rated total capacity is used, 'get input'

@@ -62,8 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
-struct ChillerReformulatedEIRData;
 
 namespace ChillerReformulatedEIR {
 
@@ -251,7 +249,7 @@ namespace ChillerReformulatedEIR {
         {
         }
 
-        static PlantComponent *factory(ChillerReformulatedEIRData &chillers, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -263,26 +261,26 @@ namespace ChillerReformulatedEIR {
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad);
+        void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
         void setupOutputVars();
 
-        void size(IOFiles &ioFiles);
+        void size(EnergyPlusData &state, IOFiles &ioFiles);
 
-        void control(Real64 &MyLoad, bool RunFlag, bool FirstIteration);
+        void control(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, bool FirstIteration);
 
-        void calculate(Real64 &MyLoad, bool RunFlag, Real64 FalsiCondOutTemp);
+        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, Real64 FalsiCondOutTemp);
 
         void calcHeatRecovery(Real64 &QCond, Real64 CondMassFlow, Real64 condInletTemp, Real64 &QHeatRec);
 
         void update(Real64 MyLoad, bool RunFlag);
 
-        void checkMinMaxCurveBoundaries(bool FirstIteration);
+        void checkMinMaxCurveBoundaries(EnergyPlusData &state, bool FirstIteration);
 
-        Real64 condOutTempResidual(Real64 FalsiCondOutTemp, Array1D<Real64> const &Par);
+        Real64 condOutTempResidual(EnergyPlusData &state, Real64 FalsiCondOutTemp, Array1D<Real64> const &Par);
     };
 
-    void GetElecReformEIRChillerInput(ChillerReformulatedEIRData &chillers);
+    void GetElecReformEIRChillerInput(EnergyPlusData &state);
 
 } // namespace ChillerReformulatedEIR
 

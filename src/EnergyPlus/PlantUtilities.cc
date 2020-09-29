@@ -1728,7 +1728,7 @@ namespace PlantUtilities {
         }
     }
 
-    void ScanPlantLoopsForObject(BranchInputManagerData &dataBranchInputManager,
+    void ScanPlantLoopsForObject(EnergyPlusData &state,
                                  std::string const &CompName,
                                  int const CompType,
                                  int &LoopNum,
@@ -1834,7 +1834,7 @@ namespace PlantUtilities {
                 if (!present(SingleLoopSearch)) {
                     ShowSevereError("Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + CompName +
                                     "\" was not found on any plant loops.");
-                    AuditBranches(dataBranchInputManager, true, DataPlant::ccSimPlantEquipTypes(CompType), CompName);
+                    AuditBranches(state, true, DataPlant::ccSimPlantEquipTypes(CompType), CompName);
                 } else {
                     ShowSevereError("Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + CompName +
                                     "\" was not found on plant loop=\"" + DataPlant::PlantLoop(SingleLoopSearch).Name + "\".");

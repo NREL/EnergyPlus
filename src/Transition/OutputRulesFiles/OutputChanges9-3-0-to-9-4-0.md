@@ -159,8 +159,6 @@ See [8121](https://github.com/NREL/EnergyPlus/pull/8121)
 
 (a) From "FuelOil#1" in 9.3 to "FuelOilNo1" in 9.4
 (b) From "FuelOil#2" in 9.3 to "FuelOilNo2" in 9.4
-
- 
 (c) From "Fuel Oil #1" in 9.3 to "FuelOilNo1" in 9.4
 (d) From "Fuel Oil #2" in 9.3 to "FuelOilNo2" in 9.4
 
@@ -168,4 +166,4 @@ See [8121](https://github.com/NREL/EnergyPlus/pull/8121)
  (a) "Fuel Oil #1" in 9.3 to "Fuel Oil No 1" in 9.4
  (b) "Fuel Oil #2" in 9.3 to "Fuel Oil No 2" in 9.4
  
-
+See [8301](https://github.com/NREL/EnergyPlus/pull/8304)

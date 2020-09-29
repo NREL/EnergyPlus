@@ -410,7 +410,7 @@ namespace GroundHeatExchangers {
 
     void GLHEBase::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initGLHESimVars(state.dataBranchInputManager);
+        this->initGLHESimVars(state);
     }
 
     //******************************************************************************
@@ -422,9 +422,9 @@ namespace GroundHeatExchangers {
     {
 
         if (DataGlobals::KickOffSimulation) {
-            this->initGLHESimVars(state.dataBranchInputManager);
+            this->initGLHESimVars(state);
         } else {
-            this->initGLHESimVars(state.dataBranchInputManager);
+            this->initGLHESimVars(state);
             this->calcGroundHeatExchanger(state.files);
             this->updateGHX();
         }
@@ -3283,7 +3283,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEVert::initGLHESimVars(BranchInputManagerData &dataBranchInputManager)
+    void GLHEVert::initGLHESimVars(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -3331,7 +3331,7 @@ namespace GroundHeatExchangers {
         if (myFlag) {
             // Locate the hx on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(dataBranchInputManager, name, TypeOf_GrndHtExchgSystem, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
+            ScanPlantLoopsForObject(state, name, TypeOf_GrndHtExchgSystem, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("initGLHESimVars: Program terminated due to previous condition(s).");
             }
@@ -3372,11 +3372,11 @@ namespace GroundHeatExchangers {
 
         tempGround = 0;
 
-        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(minDepth, currTime);
-        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(maxDepth, currTime);
-        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(oneQuarterDepth, currTime);
-        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(halfDepth, currTime);
-        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(threeQuarterDepth, currTime);
+        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(state, minDepth, currTime);
+        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(state, maxDepth, currTime);
+        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(state, oneQuarterDepth, currTime);
+        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(state, halfDepth, currTime);
+        tempGround += this->groundTempModel->getGroundTempAtTimeInSeconds(state, threeQuarterDepth, currTime);
 
         tempGround /= 5;
 
@@ -3390,7 +3390,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHESlinky::initGLHESimVars(BranchInputManagerData &dataBranchInputManager)
+    void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -3440,7 +3440,7 @@ namespace GroundHeatExchangers {
         if (myFlag) {
             // Locate the hx on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(dataBranchInputManager, name, TypeOf_GrndHtExchgSlinky, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
+            ScanPlantLoopsForObject(state, name, TypeOf_GrndHtExchgSlinky, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("initGLHESimVars: Program terminated due to previous condition(s).");
             }
@@ -3456,8 +3456,8 @@ namespace GroundHeatExchangers {
             InitComponentNodes(0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
             lastQnSubHr = 0.0;
-            Node(inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(coilDepth, CurTime);
-            Node(outletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(coilDepth, CurTime);
+            Node(inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, coilDepth, CurTime);
+            Node(outletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, coilDepth, CurTime);
 
             // zero out all history arrays
 
@@ -3471,7 +3471,7 @@ namespace GroundHeatExchangers {
             prevHour = 1;
         }
 
-        tempGround = this->groundTempModel->getGroundTempAtTimeInSeconds(coilDepth, CurTime);
+        tempGround = this->groundTempModel->getGroundTempAtTimeInSeconds(state, coilDepth, CurTime);
 
         massFlowRate = RegulateCondenserCompFlowReqOp(loopNum, loopSideNum, branchNum, compNum, designMassFlow);
 

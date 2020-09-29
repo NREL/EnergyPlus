@@ -53,15 +53,14 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
-#include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -73,10 +72,10 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Pumps.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -190,7 +189,7 @@ namespace Pumps {
         PumpUniqueNames.clear();
     }
 
-    void SimPumps(BranchInputManagerData &dataBranchInputManager,
+    void SimPumps(EnergyPlusData &state,
                   std::string const &PumpName, // Name of pump to be managed
                   int const LoopNum,           // Plant loop number
                   Real64 const FlowRequest,    // requested flow from adjacent demand side
@@ -222,7 +221,7 @@ namespace Pumps {
 
         // Get input from IDF one time
         if (GetInputFlag) {
-            GetPumpInput();
+            GetPumpInput(state);
             GetInputFlag = false;
         }
 
@@ -255,11 +254,11 @@ namespace Pumps {
         }
 
         // Perform one-time and begin-environment initialization
-        InitializePumps(dataBranchInputManager, PumpNum);
+        InitializePumps(state, PumpNum);
 
         // If all we need is to set outlet min/max avail, then just do it and get out.  Also, we only do min/max avail on flow query
         if (PlantLoop(LoopNum).LoopSide(PumpEquip(PumpNum).LoopSideNum).FlowLock == FlowPumpQuery) {
-            SetupPumpMinMaxFlows(LoopNum, PumpNum);
+            SetupPumpMinMaxFlows(state, LoopNum, PumpNum);
             return;
         }
 
@@ -277,7 +276,7 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void GetPumpInput()
+    void GetPumpInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -439,15 +438,13 @@ namespace Pumps {
             PumpEquip(PumpNum).MinVolFlowRate = rNumericArgs(10);
             if (PumpEquip(PumpNum).MinVolFlowRate == AutoSize) {
                 PumpEquip(PumpNum).minVolFlowRateWasAutosized = true;
-            } else if (!PumpEquip(PumpNum).NomVolFlowRateWasAutoSized &&
-                       (PumpEquip(PumpNum).MinVolFlowRate > PumpEquip(PumpNum).NomVolFlowRate)) {
+            } else if (!PumpEquip(PumpNum).NomVolFlowRateWasAutoSized && (PumpEquip(PumpNum).MinVolFlowRate > PumpEquip(PumpNum).NomVolFlowRate)) {
                 // Check that the minimum isn't greater than the maximum
-                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name
-                        + "\", Invalid '" + cNumericFieldNames(10) +"'");
-                ShowContinueError("Entered Value=[" + General::TrimSigDigits(PumpEquip(PumpNum).MinVolFlowRate, 5) + "] is above the "
-                        + cNumericFieldNames(1) + "=["
-                        + General::TrimSigDigits(PumpEquip(PumpNum).NomVolFlowRate, 5) + "].");
-                ShowContinueError("Reseting value of '" + cNumericFieldNames(10) + "' to the value of '" + cNumericFieldNames(1) +"'.");
+                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid '" + cNumericFieldNames(10) +
+                                 "'");
+                ShowContinueError("Entered Value=[" + General::TrimSigDigits(PumpEquip(PumpNum).MinVolFlowRate, 5) + "] is above the " +
+                                  cNumericFieldNames(1) + "=[" + General::TrimSigDigits(PumpEquip(PumpNum).NomVolFlowRate, 5) + "].");
+                ShowContinueError("Reseting value of '" + cNumericFieldNames(10) + "' to the value of '" + cNumericFieldNames(1) + "'.");
                 // Set min to roughly max, but not quite, otherwise it can't turn on, ever
                 PumpEquip(PumpNum).MinVolFlowRate = 0.99 * PumpEquip(PumpNum).NomVolFlowRate;
             }
@@ -461,11 +458,11 @@ namespace Pumps {
             if (PumpEquip(PumpNum).PressureCurve_Name == "") {
                 PumpEquip(PumpNum).PressureCurve_Index = -1;
             } else {
-                TempCurveIndex = GetCurveIndex(PumpEquip(PumpNum).PressureCurve_Name);
+                TempCurveIndex = GetCurveIndex(state, PumpEquip(PumpNum).PressureCurve_Name);
                 if (TempCurveIndex == 0) {
                     PumpEquip(PumpNum).PressureCurve_Index = -1;
                 } else {
-                    ErrorsFound |= CurveManager::CheckCurveDims(TempCurveIndex,          // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, TempCurveIndex,          // Curve index
                                                                 {1},                     // Valid dimensions
                                                                 RoutineName,             // Routine name
                                                                 cCurrentModuleObject,    // Object Type
@@ -474,7 +471,7 @@ namespace Pumps {
 
                     if (!ErrorsFound) {
                         PumpEquip(PumpNum).PressureCurve_Index = TempCurveIndex;
-                        GetCurveMinMaxValues(TempCurveIndex, PumpEquip(PumpNum).MinPhiValue, PumpEquip(PumpNum).MaxPhiValue);
+                        GetCurveMinMaxValues(state,TempCurveIndex, PumpEquip(PumpNum).MinPhiValue, PumpEquip(PumpNum).MaxPhiValue);
                     }
                 }
             }
@@ -656,11 +653,11 @@ namespace Pumps {
             if (PumpEquip(PumpNum).PressureCurve_Name == "") {
                 PumpEquip(PumpNum).PressureCurve_Index = -1;
             } else {
-                TempCurveIndex = GetCurveIndex(PumpEquip(PumpNum).PressureCurve_Name);
+                TempCurveIndex = GetCurveIndex(state, PumpEquip(PumpNum).PressureCurve_Name);
                 if (TempCurveIndex == 0) {
                     PumpEquip(PumpNum).PressureCurve_Index = -1;
                 } else {
-                    ErrorsFound |= CurveManager::CheckCurveDims(TempCurveIndex,          // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, TempCurveIndex,          // Curve index
                                                                 {1},                     // Valid dimensions
                                                                 RoutineName,             // Routine name
                                                                 cCurrentModuleObject,    // Object Type
@@ -669,7 +666,7 @@ namespace Pumps {
 
                     if (!ErrorsFound) {
                         PumpEquip(PumpNum).PressureCurve_Index = TempCurveIndex;
-                        GetCurveMinMaxValues(TempCurveIndex, PumpEquip(PumpNum).MinPhiValue, PumpEquip(PumpNum).MaxPhiValue);
+                        GetCurveMinMaxValues(state,TempCurveIndex, PumpEquip(PumpNum).MinPhiValue, PumpEquip(PumpNum).MaxPhiValue);
                     }
                 }
             }
@@ -718,7 +715,6 @@ namespace Pumps {
             } else {
                 PumpEquip(PumpNum).EndUseSubcategoryName = "General";
             }
-
         }
 
         // pumps for steam system pumping condensate
@@ -1270,7 +1266,7 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void InitializePumps(BranchInputManagerData &dataBranchInputManager, int const PumpNum)
+    void InitializePumps(EnergyPlusData &state, int const PumpNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1331,7 +1327,7 @@ namespace Pumps {
         if (PumpEquip(PumpNum).PumpOneTimeFlag) {
 
             errFlag = false;
-            ScanPlantLoopsForObject(dataBranchInputManager,
+            ScanPlantLoopsForObject(state,
                                     PumpEquip(PumpNum).Name,
                                     PumpEquip(PumpNum).TypeOf_Num,
                                     PumpEquip(PumpNum).LoopNum,
@@ -1516,7 +1512,7 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void SetupPumpMinMaxFlows(int const LoopNum, int const PumpNum)
+    void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const PumpNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1632,7 +1628,8 @@ namespace Pumps {
                                 PlantLoop(PumpEquip(PumpNum).LoopNum).PressureSimType == Press_FlowCorrection &&
                                 PlantLoop(PumpEquip(PumpNum).LoopNum).PressureDrop > 0.0) {
 
-                                PumpMassFlowRate = ResolveLoopFlowVsPressure(PumpEquip(PumpNum).LoopNum,
+                                PumpMassFlowRate = ResolveLoopFlowVsPressure(state,
+                                                                             PumpEquip(PumpNum).LoopNum,
                                                                              Node(PumpEquip(PumpNum).InletNodeNum).MassFlowRate,
                                                                              PumpEquip(PumpNum).PressureCurve_Index,
                                                                              PumpEquip(PumpNum).RotSpeed,
@@ -1650,7 +1647,8 @@ namespace Pumps {
                                 PlantLoop(PumpEquip(PumpNum).LoopNum).PressureSimType == Press_FlowCorrection &&
                                 PlantLoop(PumpEquip(PumpNum).LoopNum).PressureDrop > 0.0) {
 
-                                GetRequiredMassFlowRate(LoopNum,
+                                GetRequiredMassFlowRate(state,
+                                                        LoopNum,
                                                         PumpNum,
                                                         Node(PumpEquip(PumpNum).InletNodeNum).MassFlowRate,
                                                         PumpMassFlowRate,
@@ -1677,7 +1675,8 @@ namespace Pumps {
                     if (PlantLoop(PumpEquip(PumpNum).LoopNum).UsePressureForPumpCalcs &&
                         PlantLoop(PumpEquip(PumpNum).LoopNum).PressureSimType == Press_FlowCorrection &&
                         PlantLoop(PumpEquip(PumpNum).LoopNum).PressureDrop > 0.0) {
-                        PumpMassFlowRate = ResolveLoopFlowVsPressure(PumpEquip(PumpNum).LoopNum,
+                        PumpMassFlowRate = ResolveLoopFlowVsPressure(state,
+                                                                     PumpEquip(PumpNum).LoopNum,
                                                                      Node(PumpEquip(PumpNum).InletNodeNum).MassFlowRate,
                                                                      PumpEquip(PumpNum).PressureCurve_Index,
                                                                      PumpEquip(PumpNum).RotSpeed,
@@ -2016,7 +2015,6 @@ namespace Pumps {
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSatDensityRefrig;
         using General::RoundSigDigits;
-        using ReportSizingManager::ReportSizingOutput;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2130,16 +2128,16 @@ namespace Pumps {
                     }
                 }
                 if (PlantFinalSizesOkayToReport) {
-                    ReportSizingOutput(cPumpTypes(PumpEquip(PumpNum).PumpType),
-                                       PumpEquip(PumpNum).Name,
-                                       "Design Flow Rate [m3/s]",
-                                       PumpEquip(PumpNum).NomVolFlowRate);
+                    BaseSizer::reportSizerOutput(cPumpTypes(PumpEquip(PumpNum).PumpType),
+                                                 PumpEquip(PumpNum).Name,
+                                                 "Design Flow Rate [m3/s]",
+                                                 PumpEquip(PumpNum).NomVolFlowRate);
                 }
                 if (PlantFirstSizesOkayToReport) {
-                    ReportSizingOutput(cPumpTypes(PumpEquip(PumpNum).PumpType),
-                                       PumpEquip(PumpNum).Name,
-                                       "Initial Design Flow Rate [m3/s]",
-                                       PumpEquip(PumpNum).NomVolFlowRate);
+                    BaseSizer::reportSizerOutput(cPumpTypes(PumpEquip(PumpNum).PumpType),
+                                                 PumpEquip(PumpNum).Name,
+                                                 "Initial Design Flow Rate [m3/s]",
+                                                 PumpEquip(PumpNum).NomVolFlowRate);
                 }
             } else {
                 if (PlantFinalSizesOkayToReport) {
@@ -2172,30 +2170,30 @@ namespace Pumps {
                 PumpEquip(PumpNum).NomPowerUse = 0.0;
             }
             if (PlantFinalSizesOkayToReport) {
-                ReportSizingOutput(
+                BaseSizer::reportSizerOutput(
                     cPumpTypes(PumpEquip(PumpNum).PumpType), PumpEquip(PumpNum).Name, "Design Power Consumption [W]", PumpEquip(PumpNum).NomPowerUse);
             }
             if (PlantFirstSizesOkayToReport) {
-                ReportSizingOutput(cPumpTypes(PumpEquip(PumpNum).PumpType),
-                                   PumpEquip(PumpNum).Name,
-                                   "Initial Design Power Consumption [W]",
-                                   PumpEquip(PumpNum).NomPowerUse);
+                BaseSizer::reportSizerOutput(cPumpTypes(PumpEquip(PumpNum).PumpType),
+                                             PumpEquip(PumpNum).Name,
+                                             "Initial Design Power Consumption [W]",
+                                             PumpEquip(PumpNum).NomPowerUse);
             }
         }
 
         if (PumpEquip(PumpNum).minVolFlowRateWasAutosized) {
             PumpEquip(PumpNum).MinVolFlowRate = PumpEquip(PumpNum).NomVolFlowRate * PumpEquip(PumpNum).MinVolFlowRateFrac;
             if (PlantFinalSizesOkayToReport) {
-                ReportSizingOutput(cPumpTypes(PumpEquip(PumpNum).PumpType),
-                                   PumpEquip(PumpNum).Name,
-                                   "Design Minimum Flow Rate [m3/s]",
-                                   PumpEquip(PumpNum).MinVolFlowRate);
+                BaseSizer::reportSizerOutput(cPumpTypes(PumpEquip(PumpNum).PumpType),
+                                             PumpEquip(PumpNum).Name,
+                                             "Design Minimum Flow Rate [m3/s]",
+                                             PumpEquip(PumpNum).MinVolFlowRate);
             }
             if (PlantFirstSizesOkayToReport) {
-                ReportSizingOutput(cPumpTypes(PumpEquip(PumpNum).PumpType),
-                                   PumpEquip(PumpNum).Name,
-                                   "Initial Design Minimum Flow Rate [m3/s]",
-                                   PumpEquip(PumpNum).MinVolFlowRate);
+                BaseSizer::reportSizerOutput(cPumpTypes(PumpEquip(PumpNum).PumpType),
+                                             PumpEquip(PumpNum).Name,
+                                             "Initial Design Minimum Flow Rate [m3/s]",
+                                             PumpEquip(PumpNum).MinVolFlowRate);
             }
         }
 
@@ -2354,7 +2352,8 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void GetRequiredMassFlowRate(int const LoopNum,
+    void GetRequiredMassFlowRate(EnergyPlusData &state,
+                                 int const LoopNum,
                                  int const PumpNum,
                                  Real64 const InletNodeMassFlowRate,
                                  Real64 &ActualFlowRate,
@@ -2410,14 +2409,14 @@ namespace Pumps {
             if (PlantLoop(PumpEquip(PumpNum).LoopNum).UsePressureForPumpCalcs &&
                 PlantLoop(PumpEquip(PumpNum).LoopNum).PressureSimType == Press_FlowCorrection &&
                 PlantLoop(PumpEquip(PumpNum).LoopNum).PressureDrop > 0.0) {
-                PumpEquip(PumpNum).PumpMassFlowRateMaxRPM = ResolveLoopFlowVsPressure(PumpEquip(PumpNum).LoopNum,
+                PumpEquip(PumpNum).PumpMassFlowRateMaxRPM = ResolveLoopFlowVsPressure(state, PumpEquip(PumpNum).LoopNum,
                                                                                       InletNodeMassFlowRate,
                                                                                       PumpEquip(PumpNum).PressureCurve_Index,
                                                                                       RotSpeed_Max,
                                                                                       PumpEquip(PumpNum).ImpellerDiameter,
                                                                                       PumpEquip(PumpNum).MinPhiValue,
                                                                                       PumpEquip(PumpNum).MaxPhiValue); // DSU? Is this still valid?
-                PumpEquip(PumpNum).PumpMassFlowRateMinRPM = ResolveLoopFlowVsPressure(PumpEquip(PumpNum).LoopNum,
+                PumpEquip(PumpNum).PumpMassFlowRateMinRPM = ResolveLoopFlowVsPressure(state, PumpEquip(PumpNum).LoopNum,
                                                                                       InletNodeMassFlowRate,
                                                                                       PumpEquip(PumpNum).PressureCurve_Index,
                                                                                       RotSpeed_Min,

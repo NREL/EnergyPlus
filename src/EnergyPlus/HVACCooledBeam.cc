@@ -53,7 +53,9 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
@@ -61,8 +63,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -73,9 +73,9 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -109,7 +109,6 @@ namespace HVACCooledBeam {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::NumOfZones;
@@ -147,17 +146,18 @@ namespace HVACCooledBeam {
 
     // Object Data
     Array1D<CoolBeamData> CoolBeam;
-    bool GetInputFlag(true); // First time, input is "gotten"
+    bool GetInputFlag(true);              // First time, input is "gotten"
     bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
 
-    void clear_state() {
+    void clear_state()
+    {
         CheckEquipName.clear();
         GetInputFlag = true;
         NumCB = true;
         ZoneEquipmentListChecked = false;
     }
 
-    void SimCoolBeam(BranchInputManagerData &dataBranchInputManager,
+    void SimCoolBeam(EnergyPlusData &state,
                      std::string const &CompName,   // name of the cooled beam unit
                      bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                      int const ZoneNum,             // index of zone served by the unit
@@ -181,7 +181,7 @@ namespace HVACCooledBeam {
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int CBNum;                      // index of cooled beam unit being simulated
+        int CBNum; // index of cooled beam unit being simulated
 
         // First time SimIndUnit is called, get the input for all the cooled beam units
         if (GetInputFlag) {
@@ -216,7 +216,7 @@ namespace HVACCooledBeam {
 
         DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(CoolBeam(CBNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
-        InitCoolBeam(dataBranchInputManager, CBNum, FirstHVACIteration);
+        InitCoolBeam(state, CBNum, FirstHVACIteration);
 
         ControlCoolBeam(CBNum, ZoneNum, ZoneNodeNum, FirstHVACIteration, NonAirSysOutput);
 
@@ -224,7 +224,7 @@ namespace HVACCooledBeam {
         UpdateCoolBeam(CBNum);
 
         // Fill the report variables. There are no report variables
-        ReportCoolBeam(CBNum);
+        ReportCoolBeam(state, CBNum);
     }
 
     void GetCoolBeams()
@@ -510,7 +510,7 @@ namespace HVACCooledBeam {
         }
     }
 
-    void InitCoolBeam(BranchInputManagerData &dataBranchInputManager,
+    void InitCoolBeam(EnergyPlusData &state,
                       int const CBNum,              // number of the current cooled beam unit being simulated
                       bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     )
@@ -548,8 +548,8 @@ namespace HVACCooledBeam {
         int InWaterNode;  // unit inlet chilled water node
         int OutWaterNode; // unit outlet chilled water node
         Real64 RhoAir;    // air density at outside pressure and standard temperature and humidity
-        Real64 rho;                                  // local fluid density
-        int Loop;                                    // Loop checking control variable
+        Real64 rho;       // local fluid density
+        int Loop;         // Loop checking control variable
         std::string CurrentModuleObject;
         bool errFlag;
 
@@ -557,7 +557,7 @@ namespace HVACCooledBeam {
 
         if (CoolBeam(CBNum).PlantLoopScanFlag && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(dataBranchInputManager,
+            ScanPlantLoopsForObject(state,
                                     CoolBeam(CBNum).Name,
                                     TypeOf_CooledBeamAirTerminal,
                                     CoolBeam(CBNum).CWLoopNum,
@@ -590,7 +590,7 @@ namespace HVACCooledBeam {
 
         if (!SysSizingCalc && CoolBeam(CBNum).MySizeFlag && !CoolBeam(CBNum).PlantLoopScanFlag) {
 
-            SizeCoolBeam( CBNum);
+            SizeCoolBeam(CBNum);
 
             InWaterNode = CoolBeam(CBNum).CWInNode;
             OutWaterNode = CoolBeam(CBNum).CWOutNode;
@@ -641,11 +641,11 @@ namespace HVACCooledBeam {
                 }
             }
 
-            CoolBeam(CBNum).MyEnvrnFlag= false;
+            CoolBeam(CBNum).MyEnvrnFlag = false;
         } // end one time inits
 
         if (!BeginEnvrnFlag) {
-            CoolBeam(CBNum).MyEnvrnFlag= true;
+            CoolBeam(CBNum).MyEnvrnFlag = true;
         }
 
         InAirNode = CoolBeam(CBNum).AirInNode;
@@ -706,7 +706,6 @@ namespace HVACCooledBeam {
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
-        using ReportSizingManager::ReportSizingOutput;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("SizeCoolBeam");
@@ -748,7 +747,7 @@ namespace HVACCooledBeam {
             } else {
                 CoolBeam(CBNum).Kin = 2.0;
             }
-            ReportSizingOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Coefficient of Induction Kin", CoolBeam(CBNum).Kin);
+            BaseSizer::reportSizerOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Coefficient of Induction Kin", CoolBeam(CBNum).Kin);
         }
 
         if (CoolBeam(CBNum).MaxAirVolFlow == AutoSize) {
@@ -761,7 +760,8 @@ namespace HVACCooledBeam {
                 if (CoolBeam(CBNum).MaxAirVolFlow < SmallAirVolFlow) {
                     CoolBeam(CBNum).MaxAirVolFlow = 0.0;
                 }
-                ReportSizingOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Supply Air Flow Rate [m3/s]", CoolBeam(CBNum).MaxAirVolFlow);
+                BaseSizer::reportSizerOutput(
+                    CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Supply Air Flow Rate [m3/s]", CoolBeam(CBNum).MaxAirVolFlow);
             }
         }
 
@@ -808,10 +808,10 @@ namespace HVACCooledBeam {
                         CoolBeam(CBNum).MaxCoolWaterVolFlow = 0.0;
                     }
 
-                    ReportSizingOutput(CoolBeam(CBNum).UnitType,
-                                       CoolBeam(CBNum).Name,
-                                       "Maximum Total Chilled Water Flow Rate [m3/s]",
-                                       CoolBeam(CBNum).MaxCoolWaterVolFlow);
+                    BaseSizer::reportSizerOutput(CoolBeam(CBNum).UnitType,
+                                                 CoolBeam(CBNum).Name,
+                                                 "Maximum Total Chilled Water Flow Rate [m3/s]",
+                                                 CoolBeam(CBNum).MaxCoolWaterVolFlow);
                 } else {
                     ShowSevereError("Autosizing of water flow requires a cooling loop Sizing:Plant object");
                     ShowContinueError("Occurs in" + CoolBeam(CBNum).UnitType + " Object=" + CoolBeam(CBNum).Name);
@@ -828,7 +828,7 @@ namespace HVACCooledBeam {
 
             NumBeams = int(CoolBeam(CBNum).MaxCoolWaterVolFlow * rho / NomMassFlowPerBeam) + 1;
             CoolBeam(CBNum).NumBeams = double(NumBeams);
-            ReportSizingOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Number of Beams", CoolBeam(CBNum).NumBeams);
+            BaseSizer::reportSizerOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Number of Beams", CoolBeam(CBNum).NumBeams);
         }
 
         if (CoolBeam(CBNum).BeamLength == AutoSize) {
@@ -890,7 +890,7 @@ namespace HVACCooledBeam {
                     }
                     CoolBeam(CBNum).BeamLength = Length;
                     CoolBeam(CBNum).BeamLength = max(CoolBeam(CBNum).BeamLength, 1.0);
-                    ReportSizingOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Beam Length [m]", CoolBeam(CBNum).BeamLength);
+                    BaseSizer::reportSizerOutput(CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Beam Length [m]", CoolBeam(CBNum).BeamLength);
                 } else {
                     ShowSevereError("Autosizing of cooled beam length requires a cooling loop Sizing:Plant object");
                     ShowContinueError("Occurs in" + CoolBeam(CBNum).UnitType + " Object=" + CoolBeam(CBNum).Name);
@@ -1336,7 +1336,7 @@ namespace HVACCooledBeam {
         }
     }
 
-    void ReportCoolBeam(int const CBNum)
+    void ReportCoolBeam(EnergyPlusData &state, int const CBNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1379,14 +1379,14 @@ namespace HVACCooledBeam {
         CoolBeam(CBNum).SupAirHeatingEnergy = CoolBeam(CBNum).SupAirHeatingRate * ReportingConstant;
 
         // set zone OA volume flow rate report variable
-        CoolBeam(CBNum).CalcOutdoorAirVolumeFlowRate();
+        CoolBeam(CBNum).CalcOutdoorAirVolumeFlowRate(state);
     }
 
-    void CoolBeamData::CalcOutdoorAirVolumeFlowRate()
+    void CoolBeamData::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->AirOutNode).MassFlowRate / DataEnvironment::StdRhoAir) * DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->AirOutNode).MassFlowRate / DataEnvironment::StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

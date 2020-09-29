@@ -52,10 +52,13 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+    // Forward declarations
     class IOFiles;
     struct EnergyPlusData;
 
@@ -105,9 +108,9 @@ namespace SizingManager {
 
     void ManageSystemSizingAdjustments(EnergyPlusData &state);
 
-    void ManageSystemVentilationAdjustments();
+    void ManageSystemVentilationAdjustments(EnergyPlusData &state);
 
-    void DetermineSystemPopulationDiversity();
+    void DetermineSystemPopulationDiversity(EnergyPlusData &state);
 
     void GetOARequirements();
 

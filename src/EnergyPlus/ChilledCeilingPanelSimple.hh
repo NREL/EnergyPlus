@@ -60,7 +60,6 @@ namespace EnergyPlus {
 
     // Forward Declarations
     struct EnergyPlusData;
-    struct ChilledCeilingPanelSimpleData;
     struct WindowManagerData;
     struct ZoneTempPredictorCorrectorData;
 
@@ -184,18 +183,18 @@ namespace CoolingPanelSimple {
                          Real64 &PowerMet,
                          int &CompIndex);
 
-    void GetCoolingPanelInput(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple);
+    void GetCoolingPanelInput(EnergyPlusData &state);
 
     void InitCoolingPanel(EnergyPlusData &state, int CoolingPanelNum, int ControlledZoneNumSub, bool FirstHVACIteration);
 
     void SizeCoolingPanel(EnergyPlusData &state, int CoolingPanelNum);
 
-    void UpdateCoolingPanel(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple, int CoolingPanelNum);
+    void UpdateCoolingPanel(EnergyPlusData &state, int CoolingPanelNum);
 
-    void UpdateCoolingPanelSourceValAvg(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple,
+    void UpdateCoolingPanelSourceValAvg(EnergyPlusData &state,
                                         bool &CoolingPanelSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    void DistributeCoolingPanelRadGains(ChilledCeilingPanelSimpleData &dataChilledCeilingPanelSimple);
+    void DistributeCoolingPanelRadGains(EnergyPlusData &state);
 
     Real64 SumHATsurf(int ZoneNum); // Zone number
 

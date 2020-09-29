@@ -3957,7 +3957,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -3972,7 +3972,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     SurfaceGeometry::SinZoneRelNorth = 0.0;
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ZoneEquipmentManager::GetZoneEquipment(state);
@@ -4262,9 +4262,9 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
 
     AirLoopHVACDOAS::AirLoopDOAS::getAirLoopDOASInput(state);
 
-    EXPECT_EQ(DataAirLoop::OutsideAirSys(1).ComponentType(2), "HUMIDIFIER:STEAM:ELECTRIC");
-    EXPECT_EQ(DataAirLoop::OutsideAirSys(1).InletNodeNum(2), 2);
-    EXPECT_EQ(DataAirLoop::OutsideAirSys(1).OutletNodeNum(2), 23);
+    EXPECT_EQ(state.dataAirLoop->OutsideAirSys(1).ComponentType(2), "HUMIDIFIER:STEAM:ELECTRIC");
+    EXPECT_EQ(state.dataAirLoop->OutsideAirSys(1).InletNodeNum(2), 2);
+    EXPECT_EQ(state.dataAirLoop->OutsideAirSys(1).OutletNodeNum(2), 23);
 }
 
 } // namespace EnergyPlus

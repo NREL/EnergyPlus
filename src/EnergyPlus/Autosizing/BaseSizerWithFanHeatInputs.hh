@@ -45,65 +45,62 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef ReportSizingManager_hh_INCLUDED
-#define ReportSizingManager_hh_INCLUDED
+#ifndef BaseSizerWithFanHeatInputs_hh_INCLUDED
+#define BaseSizerWithFanHeatInputs_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Optional.hh>
-
-// EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/api/TypeDefs.h>
+#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
+#include <string>
 
 namespace EnergyPlus {
-    class IOFiles;
+
     struct EnergyPlusData;
 
-namespace ReportSizingManager {
+struct BaseSizerWithFanHeatInputs : BaseSizer {
 
-    // Functions
+    // fan data
+    Real64 deltaP = 0.0;
+    Real64 motEff = 0.0;
+    Real64 totEff = 0.0;
+    Real64 motInAirFrac = 0.0;
+    bool fanCompModel = false;
+    Real64 fanShaftPow = 0.0;
+    Real64 motInPower = 0.0;
 
-    void clear_state();
+    void getFanInputsForDesHeatGain(EnergyPlusData &state,
+                                    int const &fanEnumType,
+                                    int const &fanIndex,
+                                    Real64 &deltaP,
+                                    Real64 &motEff,
+                                    Real64 &totEff,
+                                    Real64 &motInAirFrac,
+                                    Real64 &fanShaftPow,
+                                    Real64 &motInPower,
+                                    bool &fanCompModel);
 
-    void ReportSizingOutput(std::string const &CompType,        // the type of the component
-                            std::string const &CompName,        // the name of the component
-                            std::string const &VarDesc,         // the description of the input variable
-                            Real64 const VarValue,              // the value from the sizing calculation
-                            Optional_string_const UsrDesc = _,  // the description of a user-specified variable
-                            Optional<Real64 const> UsrValue = _ // the value from the user for the desc item
-    );
+    Real64 calcFanDesHeatGain(Real64 &airVolFlow);
 
-    void RequestSizing(EnergyPlusData &state, std::string const &CompType,      // type of component
-                       std::string const &CompName,      // name of component
-                       int const SizingType,             // integerized type of sizing requested (see DataHVACGlobals, e.g. CoolingCapacitySizing)
-                       std::string const &SizingString,  // string containing info for eio report
-                       Real64 &SizingResult,             // result of the sizing procedure
-                       bool const PrintWarningFlag,      // TRUE when requesting output (eio) reporting
-                       std::string const &CallingRoutine, // name of calling rotuine for warning messages
-                       Real64 const fraction = 1.0
-    );
+    void initializeWithinEP(EnergyPlusData &state,
+                            std::string const &_compType,
+                            std::string const &_compName,
+                            bool const &_printWarningFlag,
+                            std::string const &_callingRoutine) override;
 
-    void GetCoilDesFlowT(int SysNum,           // central air system index
-                         Real64 CpAir,         // specific heat to be used in calculations [J/kgC]
-                         Real64 &DesFlow,      // returned design mass flow [kg/s]
-                         Real64 &DesExitTemp,  // returned design coil exit temperature [kg/s]
-                         Real64 &DesExitHumRat // returned design coil exit humidity ratio [kg/kg]
-    );
+    void setDataDesAccountForFanHeat(bool flag);
+    
+    void clearState() {
+        BaseSizer::clearState();
+        deltaP = 0.0;
+        motEff = 0.0;
+        totEff = 0.0;
+        motInAirFrac = 0.0;
+        fanCompModel = false;
+        fanShaftPow = 0.0;
+        motInPower = 0.0;
+    }
 
-    Real64 setOAFracForZoneEqSizing(Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
-    Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
-                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
-                                               DataSizing::ZoneSizingData const &finalZoneSizing);
-    Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
-                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
-                                                 DataSizing::ZoneSizingData const &finalZoneSizing);
-    Real64 setCoolCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
-                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
-                                               DataSizing::ZoneSizingData const &finalZoneSizing);
-    Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
-                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
-                                                 DataSizing::ZoneSizingData const &finalZoneSizing);
-
-} // namespace ReportSizingManager
+};
 
 } // namespace EnergyPlus
 

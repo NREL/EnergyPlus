@@ -88,44 +88,17 @@ namespace DataHVACGlobals {
     Real64 const DesCoilHWInletTempMin(46.0); // minimum heating water coil water inlet temp for UA sizing only. [deg C]
 
     // Number of Sizing types from list below
-    int const NumOfSizingTypes(33); // number of sizing types
+    int const NumOfSizingTypes(35); // number of sizing types, should be paired with the list in Autosizing/Base.hh
 
     // Sizing types
     int const CoolingAirflowSizing(1);                               // request sizing for cooling air flow rate
-    int const CoolingWaterflowSizing(2);                             // request sizing for cooling water flow rate
-    int const HeatingWaterflowSizing(3);                             // request sizing for heating coil water flow rate
-    int const CoolingWaterDesAirInletTempSizing(4);                  // request sizing for cooling water coil inlet air temp
-    int const CoolingWaterDesAirInletHumRatSizing(5);                // request sizing for cooling water coil inlet air humidity ratio
     int const CoolingWaterDesWaterInletTempSizing(6);                // request sizing for cooling water coil inlet water temp
-    int const CoolingWaterDesAirOutletTempSizing(7);                 // request sizing for cooling water coil outlet air temp
-    int const CoolingWaterDesAirOutletHumRatSizing(8);               // request sizing for cooling water coil outlet air humidity ratio
-    int const CoolingWaterNumofTubesPerRowSizing(9);                 // request sizing for cooling water coil number of tubes per row
-    int const HeatingWaterDesAirInletTempSizing(10);                 // request sizing for heating water coil inlet air temp
-    int const HeatingWaterDesAirInletHumRatSizing(11);               // request sizing for heating water coil inlet air humidity ratio
-    int const HeatingWaterDesCoilLoadUsedForUASizing(12);            // request sizing for heating water coil capacity used for UA sizing
-    int const HeatingWaterDesCoilWaterVolFlowUsedForUASizing(13);    // request sizing for heating water coil volume flow rate used for UA sizing
     int const HeatingAirflowSizing(14);                              // request sizing for heating air flow rate
-    int const HeatingAirflowUASizing(15);                            // request sizing for heating air flow rate
     int const SystemAirflowSizing(16);                               // request sizing for system air flow rate
     int const CoolingCapacitySizing(17);                             // request sizing for cooling capacity
     int const HeatingCapacitySizing(18);                             // request sizing for heating capacity
-    int const WaterHeatingCapacitySizing(19);                        // request sizing for water-side heating capacity
-    int const WaterHeatingCoilUASizing(20);                          // request sizing for heating coil UA
     int const SystemCapacitySizing(21);                              // request sizing for system capacity
-    int const CoolingSHRSizing(22);                                  // request sizing for cooling SHR
-    int const HeatingDefrostSizing(23);                              // request sizing for heating defrost capacity
-    int const MaxHeaterOutletTempSizing(24);                         // request sizing for heating coil maximum outlet temperature
     int const AutoCalculateSizing(25);                               // identifies an autocalulate input
-    int const ZoneCoolingLoadSizing(26);                             // zone cooling sensible load (zsz file)
-    int const ZoneHeatingLoadSizing(27);                             // zome heating sensible load (zsz file)
-    int const MinSATempCoolingSizing(28);                            // minimum SA temperature in cooling
-    int const MaxSATempHeatingSizing(29);                            // maximum SA temperature in heating
-    int const ASHRAEMinSATCoolingSizing(30);                         // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
-    int const ASHRAEMaxSATHeatingSizing(31);                         // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
-    int const HeatingCoilDesAirInletTempSizing(32);                  // design inlet air temperature for heating coil
-    int const HeatingCoilDesAirOutletTempSizing(33);                 // design outlet air temperature for heating coil
-    int const HeatingCoilDesAirInletHumRatSizing(34);                // design inlet air humidity ratio for heating coil
-    int const DesiccantDehumidifierBFPerfDataFaceVelocitySizing(35); // identifies desiccant performance data face velocity autosisizing input
 
     // Condenser Type (using same numbering scheme as for chillers)
     int const AirCooled(1);   // Air-cooled condenser
@@ -197,7 +170,7 @@ namespace DataHVACGlobals {
                                         "AirLoopHVAC:UnitarySystem"});
 
     // parameters describing coil types
-    int const NumAllCoilTypes(35);
+    int const NumAllCoilTypes(37);
 
     int const CoilDX_CoolingSingleSpeed(1);
     int const CoilDX_HeatingEmpirical(2);
@@ -241,7 +214,12 @@ namespace DataHVACGlobals {
     int const CoilVRF_FluidTCtrl_Heating(34);
 
     int const CoilDX_Cooling(35);
-    int const CoilDX_SubcoolReheat(36);
+//    int const CoilDX_SubcoolReheat(36);
+    int const CoilDX_CurveFit_Speed(37);
+
+    int const coilNormalMode = 0;        // Normal operation mode
+    int const coilEnhancedMode = 1;      // Enhanced operation mode
+    int const coilSubcoolReheatMode = 2; // SubcoolReheat operation mode
 
     Array1D_string const cAllCoilTypes(NumAllCoilTypes,
                                        {"Coil:Cooling:DX:SingleSpeed",
@@ -278,7 +256,9 @@ namespace DataHVACGlobals {
                                         "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed",
                                         "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl",
                                         "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl",
-                                        "Coil:Cooling:DX"});
+                                        "Coil:Cooling:DX",
+                                        "Coil:Cooling:DX:SubcoolReheat",
+                                        "Coil:Cooling:DX:CurveFit:Speed"});
 
     Array1D_string const cCoolingCoilTypes(NumAllCoilTypes,
                                            {"Coil:Cooling:DX:SingleSpeed",
@@ -315,7 +295,9 @@ namespace DataHVACGlobals {
                                             "",
                                             "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl",
                                             "",
-                                            "Coil:Cooling:DX"});
+                                            "Coil:Cooling:DX",
+                                            "Coil:Cooling:DX:SubcoolReheat",
+                                            "Coil:Cooling:DX:CurveFit:Speed"});
 
     Array1D_string const cHeatingCoilTypes(NumAllCoilTypes,
                                            {"",
@@ -352,6 +334,8 @@ namespace DataHVACGlobals {
                                             "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed",
                                             "",
                                             "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl",
+                                            "",
+                                            "",
                                             ""});
 
     // Water to air HP coil types

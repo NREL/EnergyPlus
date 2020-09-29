@@ -58,6 +58,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 // define this variable to get new code, commenting should yield original
 #define SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
 
@@ -84,9 +87,10 @@ namespace AirflowNetwork {
         void allocate();
         void initialize();
         void setsky();
-        void airmov();
-        void solvzp(int &ITER);  // number of iterations
-        void filjac(int const NNZE,  // number of nonzero entries in the "AU" array.
+        void airmov(EnergyPlusData &state);
+        void solvzp(EnergyPlusData &state, int &ITER);  // number of iterations
+        void filjac(EnergyPlusData &state,
+                    int const NNZE,  // number of nonzero entries in the "AU" array.
                     bool const LFLAG // if = 1, use laminar relationship (initialization).
         );
 

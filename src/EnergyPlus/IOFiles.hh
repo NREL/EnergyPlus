@@ -97,10 +97,15 @@ public:
     std::istream::iostate rdstate() const noexcept;
 
     std::string fileName;
-    void open(bool = true);
+    void open(bool = false, bool = true);
     std::fstream::pos_type position() const noexcept;
 
-    void rewind() noexcept { if (is) { is->seekg(0); } }
+    void rewind() noexcept {
+        if (is) {
+            is->clear(); // clear eofbit and potentially failbit
+            is->seekg(0, std::ios::beg);
+        }
+    }
 
     ReadResult<std::string> readLine() noexcept;
 
@@ -165,7 +170,7 @@ template <typename FileType> struct IOFileName
     FileType try_open(bool output_to_file = true)
     {
         FileType file{fileName};
-        file.open(output_to_file);
+        file.open(false, output_to_file);
         return file;
     }
 };

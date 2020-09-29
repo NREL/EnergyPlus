@@ -284,7 +284,6 @@ namespace SimulationManager {
         using PlantPipingSystemsManager::SimulateGroundDomains;
         using Psychrometrics::InitializePsychRoutines;
         using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
-        using WeatherManager::CheckIfAnyUnderwaterBoundaries;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -353,7 +352,7 @@ namespace SimulationManager {
         createFacilityElectricPowerServiceObject();
         createCoilSelectionReportObj();
 
-        ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+        ManageBranchInput(state); // just gets input and returns.
 
         // Create a new plugin manager which starts up the Python interpreter
         // Note this cannot be done if we are running within the library environment, nor would you really to do so
@@ -394,17 +393,17 @@ namespace SimulationManager {
         SizingManager::ManageSystemSizingAdjustments(state);
 
         DisplayString("Adjusting Standard 62.1 Ventilation Sizing");
-        SizingManager::ManageSystemVentilationAdjustments();
+        SizingManager::ManageSystemVentilationAdjustments(state);
 
         DisplayString("Initializing Simulation");
         KickOffSimulation = true;
 
-        ResetEnvironmentCounter();
+        ResetEnvironmentCounter(state);
         SetupSimulation(state, ErrorsFound);
 
         CheckAndReadFaults(state);
 
-        InitCurveReporting();
+        InitCurveReporting(state);
 
         AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
         KickOffSimulation = false;
@@ -430,7 +429,7 @@ namespace SimulationManager {
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations(state.files);
             InitDemandManagers(state);
-            TestBranchIntegrity(state.dataBranchInputManager, state.files, ErrFound);
+            TestBranchIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
@@ -444,8 +443,8 @@ namespace SimulationManager {
             if (ErrFound) TerminalError = true;
 
             if (DoDesDaySim || DoWeathSim) {
-                ReportLoopConnections(state.files);
-                ReportAirLoopConnections(state.files);
+                ReportLoopConnections(state, state.files);
+                ReportAirLoopConnections(state, state.files);
                 ReportNodeConnections(state.files);
                 // Debug reports
                 //      CALL ReportCompSetMeterVariables
@@ -487,7 +486,7 @@ namespace SimulationManager {
         ShowMessage("Beginning Simulation");
         DisplayString("Beginning Primary Simulation");
 
-        ResetEnvironmentCounter();
+        ResetEnvironmentCounter(state);
 
         EnvCount = 0;
         WarmupFlag = true;
@@ -518,7 +517,7 @@ namespace SimulationManager {
             DisplayString("Initializing New Environment Parameters");
 
             BeginEnvrnFlag = true;
-            if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+            if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                 // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                 // easily converge fewer warmup days are allowed
                 DisplayString("Design Day Fast Warmup Mode: Suppressing Initialization of New Environment Parameters");
@@ -604,7 +603,7 @@ namespace SimulationManager {
                         }
 
                         if (AnyUnderwaterBoundaries) {
-                            WeatherManager::UpdateUnderwaterBoundaries();
+                            WeatherManager::UpdateUnderwaterBoundaries(state);
                         }
 
                         if (DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0 ||
@@ -639,7 +638,7 @@ namespace SimulationManager {
                         ManageHeatBalance(state);
 
                         if (oneTimeUnderwaterBoundaryCheck) {
-                            AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
+                            AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries(state);
                             oneTimeUnderwaterBoundaryCheck = false;
                         }
 
@@ -688,10 +687,11 @@ namespace SimulationManager {
         ComputeTariff(state.files); //     Compute the utility bills
 
         EMSManager::checkForUnusedActuatorsAtEnd();
+        EMSManager::checkSetpointNodesAtEnd();
 
         ReportForTabularReports(); // For Energy Meters (could have other things that need to be pushed to after simulation)
 
-        OpenOutputTabularFile();
+        OpenOutputTabularFile(state.files);
 
         WriteTabularReports(state); //     Create the tabular reports at completion of each
 
@@ -1243,7 +1243,7 @@ namespace SimulationManager {
                 bool overrideMaxAllowedDelTemp(false);
                 // ZoneTempPredictorCorrector::OscillationVariablesNeeded = true;
                 // dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
-                state.dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
+                state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
                     overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
                     if (overrideModeValue == "NORMAL") {
@@ -2303,7 +2303,7 @@ namespace SimulationManager {
         NonConnectedNodes.deallocate();
     }
 
-    void ReportLoopConnections(IOFiles &ioFiles)
+    void ReportLoopConnections(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2811,7 +2811,7 @@ namespace SimulationManager {
         }
 
         // Report Dual Duct Dampers to BND File
-        ReportDualDuctConnections(ioFiles);
+        ReportDualDuctConnections(state, ioFiles);
 
         if (NumNodeConnectionErrors == 0) {
             ShowMessage("No node connection errors were found.");
@@ -3168,7 +3168,7 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
     if (ResimHB) {
         // Surface simulation
         InitSurfaceHeatBalance(state);
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
         // Air simulation
