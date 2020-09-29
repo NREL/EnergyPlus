@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -61,60 +62,12 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+struct WaterToAirHeatPumpSimpleData;
 
 namespace WaterToAirHeatPumpSimple {
 
     // Using/Aliasing
     using DataHVACGlobals::WaterCycling;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern Real64 const CelsiustoKelvin; // Conversion from Celsius to Kelvin
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumWatertoAirHPs; // The Number of Water to Air Heat Pumps found in the Input
-    // INTEGER        :: WaterIndex = 0                   ! Water index
-    // INTEGER        :: Count = 0
-    extern bool GetCoilsInputFlag; // Flag set to make sure you get input once
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool SimpleHPTimeStepFlag; // determines whether the previous operating mode for the coil and it's partner has been initialized
-
-    extern Real64 SourceSideMassFlowRate; // Source Side Mass flow rate [Kg/s]
-    extern Real64 SourceSideInletTemp;    // Source Side Inlet Temperature [C]
-    extern Real64 SourceSideInletEnth;    // Source Side Inlet Enthalpy [J/kg]
-    extern Real64 LoadSideMassFlowRate;   // Load Side Mass flow rate [Kg/s]
-    extern Real64 LoadSideInletDBTemp;    // Load Side Inlet Dry Bulb Temp [C]
-    extern Real64 LoadSideInletWBTemp;    // Load Side Inlet Wet Bulb Temp [C]
-    extern Real64 LoadSideInletHumRat;    // Load Side Outlet Humidity ratio
-    extern Real64 LoadSideInletEnth;      // Load Side Inlet Enthalpy [J/kg]
-    extern Real64 LoadSideOutletDBTemp;   // Load Side Outlet Dry Bulb Temp [C]
-    extern Real64 LoadSideOutletHumRat;   // Load Side Outlet Humidity ratio
-    extern Real64 LoadSideOutletEnth;     // Load Side Outlet Enthalpy [J/kg]
-    extern Real64 QSensible;              // Load side sensible heat transfer rate [W]
-    extern Real64 QLoadTotal;             // Load side total heat transfer rate [W]
-    extern Real64 QLatRated;              // Latent Capacity [W] rated at entering air conditions [Tdb=26.7C Twb=19.4C]
-    extern Real64 QLatActual;             // Actual Latent Capacity [W]
-    extern Real64 QSource;                // Source side heat transfer rate [W]
-    extern Real64 Winput;                 // Power Consumption [W]
-    extern Real64 PLRCorrLoadSideMdot;    // Load Side Mdot corrected for Part Load Ratio of the unit
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine
-
-    // Utility routines
-
-    // Types
 
     struct SimpleWatertoAirHPConditions
     {
@@ -232,12 +185,6 @@ namespace WaterToAirHeatPumpSimple {
         }
     };
 
-    // Object Data
-    extern Array1D<SimpleWatertoAirHPConditions> SimpleWatertoAirHP;
-
-    // Functions
-    void clear_state();
-
     void SimWatertoAirHPSimple(EnergyPlusData &state, std::string const &CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                Real64 const SensLoad,         // Sensible demand load [W]
@@ -256,7 +203,7 @@ namespace WaterToAirHeatPumpSimple {
     // MODULE SUBROUTINES:
     //*************************************************************************
 
-    void GetSimpleWatertoAirHPInput();
+    void GetSimpleWatertoAirHPInput(EnergyPlusData &state);
 
     // Beginning Initialization Section of the Module
     //******************************************************************************
@@ -274,7 +221,7 @@ namespace WaterToAirHeatPumpSimple {
 
     void SizeHVACWaterToAir(EnergyPlusData &state, int const HPNum);
 
-    void CalcHPCoolingSimple(int const HPNum,               // Heat Pump Number
+    void CalcHPCoolingSimple(EnergyPlusData &state, int const HPNum,               // Heat Pump Number
                              int const CyclingScheme,       // Fan/Compressor cycling scheme indicator
                              Real64 const RuntimeFrac,      // Runtime Fraction of compressor or percent on time (on-time/cycle time)
                              Real64 const SensDemand,       // Cooling Sensible Demand [W] !unused1208
@@ -284,7 +231,7 @@ namespace WaterToAirHeatPumpSimple {
                              Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     );
 
-    void CalcHPHeatingSimple(int const HPNum,               // Heat Pump Number
+    void CalcHPHeatingSimple(EnergyPlusData &state, int const HPNum,               // Heat Pump Number
                              int const CyclingScheme,       // Fan/Compressor cycling scheme indicator
                              Real64 const RuntimeFrac,      // Runtime Fraction of compressor
                              Real64 const SensDemand,       // Cooling Sensible Demand [W] !unused1208
@@ -293,12 +240,12 @@ namespace WaterToAirHeatPumpSimple {
                              Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     );
 
-    void UpdateSimpleWatertoAirHP(int const HPNum);
+    void UpdateSimpleWatertoAirHP(EnergyPlusData &state, int const HPNum);
 
     //        End of Update subroutines for the WatertoAirHP Module
     // *****************************************************************************
 
-    Real64 CalcEffectiveSHR(int const HPNum,         // Index number for cooling coil
+    Real64 CalcEffectiveSHR(EnergyPlusData &state, int const HPNum,         // Index number for cooling coil
                             Real64 const SHRss,      // Steady-state sensible heat ratio
                             int const CyclingScheme, // Fan/compressor cycling scheme indicator
                             Real64 const RTF,        // Compressor run-time fraction
@@ -308,32 +255,32 @@ namespace WaterToAirHeatPumpSimple {
                             Real64 const EnteringWB  // Entering air wet-bulb temperature
     );
 
-    int GetCoilIndex(std::string const &CoilType, // must match coil types in this module
+    int GetCoilIndex(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                      std::string const &CoilName, // must match coil names for the coil type
                      bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilAirFlowRate(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilAirFlowRate(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
 
-    void SetSimpleWSHPData(int const SimpleWSHPNum,                  // Number of OA Controller
+    void SetSimpleWSHPData(EnergyPlusData &state, int const SimpleWSHPNum,                  // Number of OA Controller
                            bool &ErrorsFound,                        // Set to true if certain errors found
                            int const WaterCyclingMode,               // the coil water flow mode (cycling, constant or constantondemand)
                            Optional_int CompanionCoolingCoilNum = _, // Index to cooling coil for heating coil = SimpleWSHPNum
@@ -341,6 +288,63 @@ namespace WaterToAirHeatPumpSimple {
     );
 
 } // namespace WaterToAirHeatPumpSimple
+
+    struct WaterToAirHeatPumpSimpleData : BaseGlobalStruct {
+
+        Real64 const CelsiustoKelvin; // Conversion from Celsius to Kelvin
+
+        int NumWatertoAirHPs; // The Number of Water to Air Heat Pumps found in the Input
+                                 // INTEGER        :: WaterIndex = 0                   ! Water index
+                                 // INTEGER        :: Count = 0
+        bool GetCoilsInputFlag; // Flag set to make sure you get input once
+        Array1D_bool MySizeFlag;
+        Array1D_bool SimpleHPTimeStepFlag; // determines whether the previous operating mode for the coil and it's partner has been initialized
+
+        Real64 SourceSideMassFlowRate; // Source Side Mass flow rate [Kg/s]
+        Real64 SourceSideInletTemp;    // Source Side Inlet Temperature [C]
+        Real64 SourceSideInletEnth;    // Source Side Inlet Enthalpy [J/kg]
+        Real64 LoadSideMassFlowRate;   // Load Side Mass flow rate [Kg/s]
+        Real64 LoadSideInletDBTemp;    // Load Side Inlet Dry Bulb Temp [C]
+        Real64 LoadSideInletWBTemp;    // Load Side Inlet Wet Bulb Temp [C]
+        Real64 LoadSideInletHumRat;    // Load Side Outlet Humidity ratio
+        Real64 LoadSideInletEnth;      // Load Side Inlet Enthalpy [J/kg]
+        Real64 LoadSideOutletDBTemp;   // Load Side Outlet Dry Bulb Temp [C]
+        Real64 LoadSideOutletHumRat;   // Load Side Outlet Humidity ratio
+        Real64 LoadSideOutletEnth;     // Load Side Outlet Enthalpy [J/kg]
+        Real64 QSensible;              // Load side sensible heat transfer rate [W]
+        Real64 QLoadTotal;             // Load side total heat transfer rate [W]
+        Real64 QLatRated;              // Latent Capacity [W] rated at entering air conditions [Tdb=26.7C Twb=19.4C]
+        Real64 QLatActual;             // Actual Latent Capacity [W]
+        Real64 QSource;                // Source side heat transfer rate [W]
+        Real64 Winput;                 // Power Consumption [W]
+        Real64 PLRCorrLoadSideMdot;    // Load Side Mdot corrected for Part Load Ratio of the unit
+        bool MyOneTimeFlag;           // one time allocation flag
+        bool firstTime;
+
+        Array1D<WaterToAirHeatPumpSimple::SimpleWatertoAirHPConditions> SimpleWatertoAirHP;
+
+        void clear_state() override
+        {
+            NumWatertoAirHPs = 0;
+            MyOneTimeFlag = true;
+            GetCoilsInputFlag = true;
+            MySizeFlag.clear();
+            SimpleHPTimeStepFlag.clear();
+            SimpleWatertoAirHP.deallocate();
+            firstTime = true;
+        }
+
+        // Default Constructor
+        WaterToAirHeatPumpSimpleData()
+            : CelsiustoKelvin(DataGlobals::KelvinConv), NumWatertoAirHPs(0), GetCoilsInputFlag(true),
+              SourceSideMassFlowRate(0.0), SourceSideInletTemp(0.0), SourceSideInletEnth(0.0), LoadSideMassFlowRate(0.0),
+              LoadSideInletDBTemp(0.0), LoadSideInletWBTemp(0.0), LoadSideInletHumRat(0.0), LoadSideInletEnth(0.0),
+              LoadSideOutletDBTemp(0.0), LoadSideOutletHumRat(0.0), LoadSideOutletEnth(0.0), QSensible(0.0),
+              QLoadTotal(0.0), QLatRated(0.0), QLatActual(0.0), QSource(0.0), Winput(0.0), PLRCorrLoadSideMdot(0.0),
+              MyOneTimeFlag(true), firstTime(true)
+        {
+        }
+    };
 
 } // namespace EnergyPlus
 

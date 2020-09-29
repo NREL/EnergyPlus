@@ -112,17 +112,17 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     // reset eio stream
     has_eio_output(true);
 
-    WaterCoils::WaterCoil.allocate(1);
-    WaterCoils::WaterCoil(1).InletAirTemp = 21.0;
-    WaterCoils::WaterCoil(1).InletAirHumRat = 0.006;
-    WaterCoils::WaterCoil(1).Control = WaterCoils::DesignCalc;
-    WaterCoils::WaterCoil(1).InletWaterTemp = 60.0;
-    WaterCoils::WaterCoil(1).InletAirMassFlowRate = 0.2;
-    WaterCoils::WaterCoil(1).InletWaterMassFlowRate = 0.8;
-    WaterCoils::WaterCoil(1).WaterLoopNum = 1;
-    WaterCoils::WaterCoil(1).SchedPtr = -1;
-    WaterCoils::MyUAAndFlowCalcFlag.allocate(1);
-    WaterCoils::MySizeFlag.allocate(1);
+    state.dataWaterCoils->WaterCoil.allocate(1);
+    state.dataWaterCoils->WaterCoil(1).InletAirTemp = 21.0;
+    state.dataWaterCoils->WaterCoil(1).InletAirHumRat = 0.006;
+    state.dataWaterCoils->WaterCoil(1).Control = state.dataWaterCoils->DesignCalc;
+    state.dataWaterCoils->WaterCoil(1).InletWaterTemp = 60.0;
+    state.dataWaterCoils->WaterCoil(1).InletAirMassFlowRate = 0.2;
+    state.dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = 0.8;
+    state.dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
+    state.dataWaterCoils->WaterCoil(1).SchedPtr = -1;
+    state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
+    state.dataWaterCoils->MySizeFlag.allocate(1);
     ScheduleManager::Schedule.allocate(1);
 
     // now allocate sizing arrays for testing autosized field
@@ -166,7 +166,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 2 - Zone Equipment, UA sizing fails
-    WaterCoils::WaterCoil(1).InletAirTemp = 61.0;
+    state.dataWaterCoils->WaterCoil(1).InletAirTemp = 61.0;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
@@ -180,7 +180,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::ErrorType1, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(3.0, sizedValue, 0.01); // 0.1% of 3000 W capacity
-    WaterCoils::WaterCoil(1).InletAirTemp = 21.0;
+    state.dataWaterCoils->WaterCoil(1).InletAirTemp = 21.0;
     DataSizing::DataErrorsFound = false;
     sizer.dataErrorsFound = false;
     errorsFound = false;
@@ -257,7 +257,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 5 - Airloop Equipment, failed UA sizing
-    WaterCoils::WaterCoil(1).InletAirTemp = 61.0;
+    state.dataWaterCoils->WaterCoil(1).InletAirTemp = 61.0;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
 
@@ -272,7 +272,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     EXPECT_TRUE(DataSizing::DataErrorsFound);
     EXPECT_TRUE(sizer.dataErrorsFound);
     EXPECT_NEAR(3.0, sizedValue, 0.01); // 0.1% of 3000 W capacity
-    WaterCoils::WaterCoil(1).InletAirTemp = 21.0;
+    state.dataWaterCoils->WaterCoil(1).InletAirTemp = 21.0;
     DataSizing::DataErrorsFound = false;
     sizer.dataErrorsFound = false;
     errorsFound = false;

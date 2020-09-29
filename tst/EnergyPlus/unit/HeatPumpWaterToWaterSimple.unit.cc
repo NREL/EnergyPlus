@@ -726,7 +726,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
@@ -1476,7 +1476,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 

@@ -128,34 +128,34 @@ namespace WindTurbine {
         int WindTurbineNum;
         // Obtains and allocates heat balance related parameters from input
 
-        if (state.dataWindTurbine.GetInputFlag) {
-            GetWindTurbineInput(state.dataWindTurbine);
-            state.dataWindTurbine.GetInputFlag = false;
+        if (state.dataWindTurbine->GetInputFlag) {
+            GetWindTurbineInput(*state.dataWindTurbine);
+            state.dataWindTurbine->GetInputFlag = false;
         }
 
         if (GeneratorIndex == 0) {
-            WindTurbineNum = UtilityRoutines::FindItemInList(GeneratorName, state.dataWindTurbine.WindTurbineSys);
+            WindTurbineNum = UtilityRoutines::FindItemInList(GeneratorName, state.dataWindTurbine->WindTurbineSys);
             if (WindTurbineNum == 0) {
                 ShowFatalError("SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators " + GeneratorName);
             }
             GeneratorIndex = WindTurbineNum;
         } else {
             WindTurbineNum = GeneratorIndex;
-            if (WindTurbineNum > state.dataWindTurbine.NumWindTurbines || WindTurbineNum < 1) {
+            if (WindTurbineNum > state.dataWindTurbine->NumWindTurbines || WindTurbineNum < 1) {
                 ShowFatalError("SimWindTurbine: Invalid GeneratorIndex passed=" + TrimSigDigits(WindTurbineNum) +
-                               ", Number of Wind Turbine Generators=" + TrimSigDigits(state.dataWindTurbine.NumWindTurbines) + ", Generator name=" + GeneratorName);
+                               ", Number of Wind Turbine Generators=" + TrimSigDigits(state.dataWindTurbine->NumWindTurbines) + ", Generator name=" + GeneratorName);
             }
-            if (GeneratorName != state.dataWindTurbine.WindTurbineSys(WindTurbineNum).Name) {
+            if (GeneratorName != state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name) {
                 ShowFatalError("SimMWindTurbine: Invalid GeneratorIndex passed=" + TrimSigDigits(WindTurbineNum) +
-                               ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + state.dataWindTurbine.WindTurbineSys(WindTurbineNum).Name);
+                               ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
             }
         }
 
         InitWindTurbine(state, WindTurbineNum);
 
-        CalcWindTurbine(state.dataWindTurbine, WindTurbineNum, RunFlag);
+        CalcWindTurbine(*state.dataWindTurbine, WindTurbineNum, RunFlag);
 
-        ReportWindTurbine(state.dataWindTurbine, WindTurbineNum);
+        ReportWindTurbine(*state.dataWindTurbine, WindTurbineNum);
     }
 
     void GetWTGeneratorResults(WindTurbineData &dataWindTurbine, int const EP_UNUSED(GeneratorType), // Type of Generator
@@ -641,7 +641,7 @@ namespace WindTurbine {
         Real64 LocalTMYWS;              // Annual average wind speed at the rotor height
 
         // Estimate average annual wind speed once
-        if (state.dataWindTurbine.MyOneTimeFlag) {
+        if (state.dataWindTurbine->MyOneTimeFlag) {
             wsStatFound = false;
 
             if (FileSystem::fileExists(state.files.inStatFileName.fileName)) {
@@ -700,33 +700,33 @@ namespace WindTurbine {
                 ShowWarningError("InitWindTurbine: stat file missing. TMY Wind Speed adjusted at the height is used.");
             }
 
-            state.dataWindTurbine.MyOneTimeFlag = false;
+            state.dataWindTurbine->MyOneTimeFlag = false;
         }
 
-        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).AnnualTMYWS = AnnualTMYWS;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).AnnualTMYWS = AnnualTMYWS;
 
         // Factor differences between TMY wind data and local wind data once
-        if (AnnualTMYWS > 0.0 && state.dataWindTurbine.WindTurbineSys(WindTurbineNum).WSFactor == 0.0 && state.dataWindTurbine.WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS > 0) {
+        if (AnnualTMYWS > 0.0 && state.dataWindTurbine->WindTurbineSys(WindTurbineNum).WSFactor == 0.0 && state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS > 0) {
             // Convert the annual wind speed to the local wind speed at the height of the local station, then factor
             LocalTMYWS =
-                AnnualTMYWS * WeatherFileWindModCoeff * std::pow(state.dataWindTurbine.WindTurbineSys(WindTurbineNum).HeightForLocalWS / SiteWindBLHeight, SiteWindExp);
-            state.dataWindTurbine.WindTurbineSys(WindTurbineNum).WSFactor = LocalTMYWS / state.dataWindTurbine.WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS;
+                AnnualTMYWS * WeatherFileWindModCoeff * std::pow(state.dataWindTurbine->WindTurbineSys(WindTurbineNum).HeightForLocalWS / SiteWindBLHeight, SiteWindExp);
+            state.dataWindTurbine->WindTurbineSys(WindTurbineNum).WSFactor = LocalTMYWS / state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS;
         }
         // Assign factor of 1.0 if no stat file or no input of local average wind speed
-        if (state.dataWindTurbine.WindTurbineSys(WindTurbineNum).WSFactor == 0.0) state.dataWindTurbine.WindTurbineSys(WindTurbineNum).WSFactor = 1.0;
+        if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).WSFactor == 0.0) state.dataWindTurbine->WindTurbineSys(WindTurbineNum).WSFactor = 1.0;
 
         // Do every time step initialization
-        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).Power = 0.0;
-        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).TotPower = 0.0;
-        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).PowerCoeff = 0.0;
-        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).TipSpeedRatio = 0.0;
-        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).ChordalVel = 0.0;
-        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).NormalVel = 0.0;
-        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).RelFlowVel = 0.0;
-        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).AngOfAttack = 0.0;
-        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).TanForce = 0.0;
-        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).NorForce = 0.0;
-        state.dataWindTurbine.WindTurbineSys(WindTurbineNum).TotTorque = 0.0;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Power = 0.0;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).TotPower = 0.0;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeff = 0.0;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).TipSpeedRatio = 0.0;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).ChordalVel = 0.0;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NormalVel = 0.0;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RelFlowVel = 0.0;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).AngOfAttack = 0.0;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).TanForce = 0.0;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NorForce = 0.0;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).TotTorque = 0.0;
     }
 
     void CalcWindTurbine(WindTurbineData &dataWindTurbine, int const WindTurbineNum,     // System is on

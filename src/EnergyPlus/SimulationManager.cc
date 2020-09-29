@@ -285,7 +285,6 @@ namespace SimulationManager {
         using PlantPipingSystemsManager::SimulateGroundDomains;
         using Psychrometrics::InitializePsychRoutines;
         using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
-        using WeatherManager::CheckIfAnyUnderwaterBoundaries;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -400,7 +399,7 @@ namespace SimulationManager {
         DisplayString("Initializing Simulation");
         KickOffSimulation = true;
 
-        ResetEnvironmentCounter();
+        ResetEnvironmentCounter(state);
         SetupSimulation(state, ErrorsFound);
 
         CheckAndReadFaults(state);
@@ -488,7 +487,7 @@ namespace SimulationManager {
         ShowMessage("Beginning Simulation");
         DisplayString("Beginning Primary Simulation");
 
-        ResetEnvironmentCounter();
+        ResetEnvironmentCounter(state);
 
         EnvCount = 0;
         WarmupFlag = true;
@@ -519,7 +518,7 @@ namespace SimulationManager {
             DisplayString("Initializing New Environment Parameters");
 
             BeginEnvrnFlag = true;
-            if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+            if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                 // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                 // easily converge fewer warmup days are allowed
                 DisplayString("Design Day Fast Warmup Mode: Suppressing Initialization of New Environment Parameters");
@@ -605,7 +604,7 @@ namespace SimulationManager {
                         }
 
                         if (AnyUnderwaterBoundaries) {
-                            WeatherManager::UpdateUnderwaterBoundaries();
+                            WeatherManager::UpdateUnderwaterBoundaries(state);
                         }
 
                         if (DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0 ||
@@ -640,7 +639,7 @@ namespace SimulationManager {
                         ManageHeatBalance(state);
 
                         if (oneTimeUnderwaterBoundaryCheck) {
-                            AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
+                            AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries(state);
                             oneTimeUnderwaterBoundaryCheck = false;
                         }
 
@@ -1245,7 +1244,7 @@ namespace SimulationManager {
                 bool overrideMaxAllowedDelTemp(false);
                 // ZoneTempPredictorCorrector::OscillationVariablesNeeded = true;
                 // dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
-                state.dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
+                state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
                     overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
                     if (overrideModeValue == "NORMAL") {

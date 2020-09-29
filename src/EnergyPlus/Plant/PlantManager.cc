@@ -974,7 +974,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "WaterUse:Connections")) {
                                 this_comp.TypeOf_Num = TypeOf_WaterUseConnection;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
-                                this_comp.compPtr = WaterUse::WaterConnectionsType::factory(state.dataWaterUse, CompNames(CompNum));
+                                this_comp.compPtr = WaterUse::WaterConnectionsType::factory(state, *state.dataWaterUse, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:Water")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilWaterCooling;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
@@ -1275,11 +1275,11 @@ namespace EnergyPlus {
                                         TypeOf_FluidCooler_TwoSpd, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "EvaporativeFluidCooler:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_EvapFluidCooler_SingleSpd;
-                                this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(
+                                this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(state,
                                         TypeOf_EvapFluidCooler_SingleSpd, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "EvaporativeFluidCooler:TwoSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_EvapFluidCooler_TwoSpd;
-                                this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(
+                                this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(state,
                                         TypeOf_EvapFluidCooler_TwoSpd, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "SolarCollector:FlatPlate:PhotovoltaicThermal")) {
@@ -1369,7 +1369,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "PlantComponent:UserDefined")) {
                                 this_comp.TypeOf_Num = TypeOf_PlantComponentUserDefined;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
-                                this_comp.compPtr = UserDefinedComponents::UserPlantComponentStruct::factory(CompNames(CompNum));
+                                this_comp.compPtr = UserDefinedComponents::UserPlantComponentStruct::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:UserDefined")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilUserDefined;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;

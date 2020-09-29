@@ -51,8 +51,8 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -128,7 +128,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
                     GetGroundTempModelAndInit(state, CurrentModuleObjects(objectType_SiteShallowGroundTemp), "");
 
                 for (int monthIndex = 1; monthIndex <= 12; ++monthIndex) {
-                    Real64 currMonthTemp = shallowObj->getGroundTempAtTimeInMonths(0.0, monthIndex);
+                    Real64 currMonthTemp = shallowObj->getGroundTempAtTimeInMonths(state, 0.0, monthIndex);
 
                     // Calculate Average Ground Temperature for all 12 months of the year:
                     averageGroundTemp += currMonthTemp;
@@ -172,7 +172,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
 
 //******************************************************************************
 
-Real64 KusudaGroundTempsModel::getGroundTemp()
+Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData& state)
 {
     // AUTHOR         Matt Mitchell
     // DATE WRITTEN   June 2015
@@ -188,7 +188,6 @@ Real64 KusudaGroundTempsModel::getGroundTemp()
     // Using/Aliasing
     using DataGlobals::Pi;
     using DataGlobals::SecsInDay;
-    using WeatherManager::NumDaysInYear;
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 term1;
@@ -196,7 +195,7 @@ Real64 KusudaGroundTempsModel::getGroundTemp()
     Real64 secsInYear;
     Real64 retVal;
 
-    secsInYear = SecsInDay * NumDaysInYear;
+    secsInYear = SecsInDay * state.dataWeatherManager->NumDaysInYear;
 
     term1 = -depth * std::sqrt(Pi / (secsInYear * groundThermalDiffisivity));
     term2 = (2 * Pi / secsInYear) * (simTimeInSeconds - phaseShiftInSecs - (depth / 2) * std::sqrt(secsInYear / (Pi * groundThermalDiffisivity)));
@@ -208,7 +207,7 @@ Real64 KusudaGroundTempsModel::getGroundTemp()
 
 //******************************************************************************
 
-Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(Real64 const _depth, Real64 const _seconds)
+Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData& state, Real64 const _depth, Real64 const _seconds)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -221,10 +220,9 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(Real64 const _depth,
 
     // Using/Aliasing
     using DataGlobals::SecsInDay;
-    using WeatherManager::NumDaysInYear;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secondsInYear = NumDaysInYear * SecsInDay;
+    Real64 secondsInYear = state.dataWeatherManager->NumDaysInYear * SecsInDay;
 
     depth = _depth;
 
@@ -235,12 +233,12 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(Real64 const _depth,
     }
 
     // Get and return ground temperature
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************
 
-Real64 KusudaGroundTempsModel::getGroundTempAtTimeInMonths(Real64 const _depth, int const _month)
+Real64 KusudaGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData& state, Real64 const _depth, int const _month)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -250,14 +248,13 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInMonths(Real64 const _depth, 
 
     // Using/Aliasing
     using DataGlobals::SecsInDay;
-    using WeatherManager::NumDaysInYear;
 
     // PURPOSE OF THIS SUBROUTINE:
     // Returns the ground temperature when input time is in months
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 const aveSecondsInMonth = (NumDaysInYear / 12) * SecsInDay;
-    Real64 const secondsPerYear = NumDaysInYear * SecsInDay;
+    Real64 const aveSecondsInMonth = (state.dataWeatherManager->NumDaysInYear / 12) * SecsInDay;
+    Real64 const secondsPerYear = state.dataWeatherManager->NumDaysInYear * SecsInDay;
 
     depth = _depth;
 
@@ -268,7 +265,7 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInMonths(Real64 const _depth, 
     }
 
     // Get and return ground temperature
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************

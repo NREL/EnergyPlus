@@ -54,11 +54,13 @@
 #include <libkiva/Instance.hpp>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 
 namespace EnergyPlus {
     class IOFiles;
+    struct EnergyPlusData;
     struct ZoneTempPredictorCorrectorData;
 
 namespace HeatBalanceKivaManager {
@@ -106,7 +108,7 @@ namespace HeatBalanceKivaManager {
         int zoneControlType; // Uncontrolled=0, Temperature=1, Operative=2, Comfort=3, HumidityAndTemperature=4
         int zoneControlNum;
         Real64 zoneAssumedTemperature;
-        void initGround(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather);
+        void initGround(EnergyPlusData &state, const KivaWeatherData &kivaWeather);
         void setInitialBoundaryConditions(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
         void setBoundaryConditions();
         void plotDomain();
@@ -127,9 +129,9 @@ namespace HeatBalanceKivaManager {
     public:
         KivaManager();
         virtual ~KivaManager();
-        void readWeatherData(IOFiles &ioFiles);
-        bool setupKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles);
-        void initKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
+        void readWeatherData(EnergyPlusData &state, IOFiles &ioFiles);
+        bool setupKivaInstances(EnergyPlusData &state, IOFiles &ioFiles);
+        void initKivaInstances(EnergyPlusData &state);
         void calcKivaInstances();
         void defineDefaultFoundation();
         void addDefaultFoundation();

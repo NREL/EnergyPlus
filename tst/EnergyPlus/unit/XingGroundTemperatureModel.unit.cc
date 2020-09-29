@@ -81,15 +81,15 @@ TEST_F(EnergyPlusFixture, XingGroundTempsModelTest)
 
     auto thisModel = GetGroundTempModelAndInit(state, CurrentModuleObject, "TEST");
 
-    EXPECT_NEAR(-1.43, thisModel->getGroundTempAtTimeInSeconds(0.0, 0.0), 0.01);
-    EXPECT_NEAR(2.15, thisModel->getGroundTempAtTimeInSeconds(0.0, 6393600), 0.1);   // March 15
-    EXPECT_NEAR(19.74, thisModel->getGroundTempAtTimeInSeconds(0.0, 22291200), 0.1); // Sept 15
-    EXPECT_NEAR(-2.03, thisModel->getGroundTempAtTimeInSeconds(0.0, 35510400), 0.1); // Feb 15 of next year
+    EXPECT_NEAR(-1.43, thisModel->getGroundTempAtTimeInSeconds(state, 0.0, 0.0), 0.01);
+    EXPECT_NEAR(2.15, thisModel->getGroundTempAtTimeInSeconds(state, 0.0, 6393600), 0.1);   // March 15
+    EXPECT_NEAR(19.74, thisModel->getGroundTempAtTimeInSeconds(state, 0.0, 22291200), 0.1); // Sept 15
+    EXPECT_NEAR(-2.03, thisModel->getGroundTempAtTimeInSeconds(state, 0.0, 35510400), 0.1); // Feb 15 of next year
 
-    EXPECT_NEAR(-2.71, thisModel->getGroundTempAtTimeInMonths(0.0, 1), 0.1);  // January
-    EXPECT_NEAR(23.61, thisModel->getGroundTempAtTimeInMonths(0.0, 7), 0.1);  // July
-    EXPECT_NEAR(1.62, thisModel->getGroundTempAtTimeInMonths(0.0, 12), 0.1);  // December
-    EXPECT_NEAR(-2.12, thisModel->getGroundTempAtTimeInMonths(0.0, 14), 0.1); // Feb of next year
+    EXPECT_NEAR(-2.71, thisModel->getGroundTempAtTimeInMonths(state, 0.0, 1), 0.1);  // January
+    EXPECT_NEAR(23.61, thisModel->getGroundTempAtTimeInMonths(state, 0.0, 7), 0.1);  // July
+    EXPECT_NEAR(1.62, thisModel->getGroundTempAtTimeInMonths(state, 0.0, 12), 0.1);  // December
+    EXPECT_NEAR(-2.12, thisModel->getGroundTempAtTimeInMonths(state, 0.0, 14), 0.1); // Feb of next year
 
-    EXPECT_NEAR(11.1, thisModel->getGroundTempAtTimeInMonths(100.0, 1), 0.1); // January--deep
+    EXPECT_NEAR(11.1, thisModel->getGroundTempAtTimeInMonths(state, 100.0, 1), 0.1); // January--deep
 }
