@@ -51,27 +51,27 @@
 #include <vector>
 
 // EnergyPlus headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -87,7 +87,8 @@ namespace EIRPlantLoopHeatPumps {
         heatPumps.clear();
     }
 
-    void EIRPlantLoopHeatPump::simulate(EnergyPlusData &state, const EnergyPlus::PlantLocation &calledFromLocation,
+    void EIRPlantLoopHeatPump::simulate(EnergyPlusData &state,
+                                        const EnergyPlus::PlantLocation &calledFromLocation,
                                         bool const FirstHVACIteration,
                                         Real64 &CurLoad,
                                         bool const RunFlag)
@@ -610,10 +611,10 @@ namespace EIRPlantLoopHeatPumps {
                     // if auto-sized, we just need to store the sized value and then report out the capacity when plant is ready
                     this->referenceCapacity = tmpCapacity;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(typeName, this->name, "Design Size Nominal Capacity [W]", tmpCapacity);
+                        BaseSizer::reportSizerOutput(typeName, this->name, "Design Size Nominal Capacity [W]", tmpCapacity);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(typeName, this->name, "Initial Design Size Nominal Capacity [W]", tmpCapacity);
+                        BaseSizer::reportSizerOutput(typeName, this->name, "Initial Design Size Nominal Capacity [W]", tmpCapacity);
                     }
                 } else {
                     // this blocks means the capacity value was hard-sized
@@ -622,15 +623,14 @@ namespace EIRPlantLoopHeatPumps {
                         Real64 hardSizedCapacity = this->referenceCapacity;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             if (DataGlobals::DoPlantSizing) {
-                                ReportSizingManager::ReportSizingOutput(typeName,
-                                                                        this->name,
-                                                                        "Design Size Nominal Capacity [W]",
-                                                                        tmpCapacity,
-                                                                        "User-Specified Nominal Capacity [W]",
-                                                                        hardSizedCapacity);
+                                BaseSizer::reportSizerOutput(typeName,
+                                                             this->name,
+                                                             "Design Size Nominal Capacity [W]",
+                                                             tmpCapacity,
+                                                             "User-Specified Nominal Capacity [W]",
+                                                             hardSizedCapacity);
                             } else {
-                                ReportSizingManager::ReportSizingOutput(
-                                    typeName, this->name, "User-Specified Nominal Capacity [W]", hardSizedCapacity);
+                                BaseSizer::reportSizerOutput(typeName, this->name, "User-Specified Nominal Capacity [W]", hardSizedCapacity);
                             }
                             // we can warn here if there is a bit mismatch between hard- and auto-sized
                             if (DataGlobals::DisplayExtraWarnings) {
@@ -652,26 +652,24 @@ namespace EIRPlantLoopHeatPumps {
                 if (this->loadSideDesignVolFlowRateWasAutoSized) {
                     this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
-                            typeName, this->name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
+                        BaseSizer::reportSizerOutput(typeName, this->name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
-                            typeName, this->name, "Initial Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
+                        BaseSizer::reportSizerOutput(typeName, this->name, "Initial Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
                     }
                 } else {
                     if (this->loadSideDesignVolFlowRate > 0.0 && tmpLoadVolFlow > 0.0) {
                         Real64 hardSizedLoadSideFlow = this->loadSideDesignVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             if (DataGlobals::DoPlantSizing) {
-                                ReportSizingManager::ReportSizingOutput(typeName,
-                                                                        this->name,
-                                                                        "Design Size Load Side Volume Flow Rate [m3/s]",
-                                                                        tmpLoadVolFlow,
-                                                                        "User-Specified Load Side Volume Flow Rate [m3/s]",
-                                                                        hardSizedLoadSideFlow);
+                                BaseSizer::reportSizerOutput(typeName,
+                                                             this->name,
+                                                             "Design Size Load Side Volume Flow Rate [m3/s]",
+                                                             tmpLoadVolFlow,
+                                                             "User-Specified Load Side Volume Flow Rate [m3/s]",
+                                                             hardSizedLoadSideFlow);
                             } else {
-                                ReportSizingManager::ReportSizingOutput(
+                                BaseSizer::reportSizerOutput(
                                     typeName, this->name, "User-Specified Load Side Volume Flow Rate [m3/s]", hardSizedLoadSideFlow);
                             }
                             if (DataGlobals::DisplayExtraWarnings) {
@@ -700,11 +698,10 @@ namespace EIRPlantLoopHeatPumps {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(
-                                typeName, this->name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
+                            BaseSizer::reportSizerOutput(typeName, this->name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(
+                            BaseSizer::reportSizerOutput(
                                 typeName, this->name, "Initial Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
                         }
                     }
@@ -714,10 +711,10 @@ namespace EIRPlantLoopHeatPumps {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->referenceCapacity = tmpCapacity;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(typeName, this->name, "Design Size Nominal Capacity [W]", tmpCapacity);
+                            BaseSizer::reportSizerOutput(typeName, this->name, "Design Size Nominal Capacity [W]", tmpCapacity);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(typeName, this->name, "Initial Design Size Nominal Capacity [W]", tmpCapacity);
+                            BaseSizer::reportSizerOutput(typeName, this->name, "Initial Design Size Nominal Capacity [W]", tmpCapacity);
                         }
                     }
                 }
@@ -731,11 +728,10 @@ namespace EIRPlantLoopHeatPumps {
                 }
             }
             if (!this->loadSideDesignVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(
-                    typeName, this->name, "User-Specified Load Side Flow Rate [m3/s]", this->loadSideDesignVolFlowRate);
+                BaseSizer::reportSizerOutput(typeName, this->name, "User-Specified Load Side Flow Rate [m3/s]", this->loadSideDesignVolFlowRate);
             }
             if (!this->referenceCapacityWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(typeName, this->name, "User-Specified Nominal Capacity [W]", this->referenceCapacity);
+                BaseSizer::reportSizerOutput(typeName, this->name, "User-Specified Nominal Capacity [W]", this->referenceCapacity);
             }
         }
         if (errorsFound) {
@@ -791,11 +787,10 @@ namespace EIRPlantLoopHeatPumps {
         if (this->sourceSideDesignVolFlowRateWasAutoSized) {
             this->sourceSideDesignVolFlowRate = tmpSourceVolFlow;
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(typeName, this->name, "Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
+                BaseSizer::reportSizerOutput(typeName, this->name, "Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(
-                    typeName, this->name, "Initial Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
+                BaseSizer::reportSizerOutput(typeName, this->name, "Initial Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
             }
         } else {
             // source design flow was hard-sized
@@ -803,14 +798,14 @@ namespace EIRPlantLoopHeatPumps {
                 Real64 const hardSizedSourceSideFlow = this->sourceSideDesignVolFlowRate;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     if (DataGlobals::DoPlantSizing) {
-                        ReportSizingManager::ReportSizingOutput(typeName,
-                                                                this->name,
-                                                                "Design Size Source Side Volume Flow Rate [m3/s]",
-                                                                tmpSourceVolFlow,
-                                                                "User-Specified Source Side Volume Flow Rate [m3/s]",
-                                                                hardSizedSourceSideFlow);
+                        BaseSizer::reportSizerOutput(typeName,
+                                                     this->name,
+                                                     "Design Size Source Side Volume Flow Rate [m3/s]",
+                                                     tmpSourceVolFlow,
+                                                     "User-Specified Source Side Volume Flow Rate [m3/s]",
+                                                     hardSizedSourceSideFlow);
                     } else {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             typeName, this->name, "User-Specified Source Side Volume Flow Rate [m3/s]", hardSizedSourceSideFlow);
                     }
                     if (DataGlobals::DisplayExtraWarnings) {

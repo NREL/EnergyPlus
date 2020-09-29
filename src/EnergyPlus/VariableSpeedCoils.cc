@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -78,7 +79,6 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
@@ -3821,7 +3821,6 @@ namespace VariableSpeedCoils {
         using General::TrimSigDigits;
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
-        using ReportSizingManager::ReportSizingOutput;
         using namespace OutputReportPredefined;
         using CurveManager::CurveValue;
         using FluidProperties::GetDensityGlycol;
@@ -3988,10 +3987,10 @@ namespace VariableSpeedCoils {
             if (!RatedAirFlowAutoSized && !SizingDesRunThisAirSys) { // Simulation continue
                 HardSizeNoDesRunAirFlow = true;
                 if (VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate > 0.0) {
-                    ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
-                                       VarSpeedCoil(DXCoilNum).Name,
-                                       "User-Specified Rated Air Flow Rate [m3/s]",
-                                       VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate);
+                    BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                                 VarSpeedCoil(DXCoilNum).Name,
+                                                 "User-Specified Rated Air Flow Rate [m3/s]",
+                                                 VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate);
                 }
             } else {
                 CheckSysSizing("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix, VarSpeedCoil(DXCoilNum).Name);
@@ -4007,10 +4006,10 @@ namespace VariableSpeedCoils {
             if (!RatedAirFlowAutoSized && !SizingDesRunThisZone) { // Simulation continue
                 HardSizeNoDesRunAirFlow = true;
                 if (VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate > 0.0) {
-                    ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
-                                       VarSpeedCoil(DXCoilNum).Name,
-                                       "User-Specified Rated Air Flow Rate [m3/s]",
-                                       VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate);
+                    BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                                 VarSpeedCoil(DXCoilNum).Name,
+                                                 "User-Specified Rated Air Flow Rate [m3/s]",
+                                                 VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate);
                 }
             } else {
                 CheckZoneSizing("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix, VarSpeedCoil(DXCoilNum).Name);
@@ -4022,7 +4021,7 @@ namespace VariableSpeedCoils {
         }
 
         if (RatedAirFlowAutoSized) VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = RatedAirVolFlowRateDes;
-        //    CALL ReportSizingOutput('COIL:'//TRIM(VarSpeedCoil(DXCoilNum)%CoolHeatType)//TRIM(CurrentObjSubfix), &
+        //    CALL BaseSizer::reportSizerOutput('COIL:'//TRIM(VarSpeedCoil(DXCoilNum)%CoolHeatType)//TRIM(CurrentObjSubfix), &
         //                             VarSpeedCoil(DXCoilNum)%Name, &
         //                            'Rated Air Flow Rate [m3/s]', &
         //                             VarSpeedCoil(DXCoilNum)%RatedAirVolFlowRate)
@@ -4042,10 +4041,10 @@ namespace VariableSpeedCoils {
             if (!RatedCapCoolTotalAutoSized && !SizingDesRunThisAirSys) { // Simulation continue
                 HardSizeNoDesRun = true;
                 if (VarSpeedCoil(DXCoilNum).RatedCapCoolTotal > 0.0) {
-                    ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
-                                       VarSpeedCoil(DXCoilNum).Name,
-                                       "User-Specified Rated Total Cooling Capacity [W]",
-                                       VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
+                    BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                                 VarSpeedCoil(DXCoilNum).Name,
+                                                 "User-Specified Rated Total Cooling Capacity [W]",
+                                                 VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
                 }
             } else {
                 CheckSysSizing("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix, VarSpeedCoil(DXCoilNum).Name);
@@ -4121,10 +4120,10 @@ namespace VariableSpeedCoils {
             if (!RatedCapCoolTotalAutoSized && !SizingDesRunThisZone) { // Simulation continue
                 HardSizeNoDesRun = true;
                 if (VarSpeedCoil(DXCoilNum).RatedCapCoolTotal > 0.0) {
-                    ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
-                                       VarSpeedCoil(DXCoilNum).Name,
-                                       "User-Specified Rated Total Cooling Capacity [W]",
-                                       VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
+                    BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                                 VarSpeedCoil(DXCoilNum).Name,
+                                                 "User-Specified Rated Total Cooling Capacity [W]",
+                                                 VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
                 }
             } else {
                 CheckZoneSizing("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix, VarSpeedCoil(DXCoilNum).Name);
@@ -4200,10 +4199,10 @@ namespace VariableSpeedCoils {
         if (!HardSizeNoDesRun) {
             if (RatedCapCoolTotalAutoSized) {
                 VarSpeedCoil(DXCoilNum).RatedCapCoolTotal = RatedCapCoolTotalDes;
-                ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
-                                   VarSpeedCoil(DXCoilNum).Name,
-                                   "Design Size Rated Total Cooling Capacity [W]",
-                                   VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
+                BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                             VarSpeedCoil(DXCoilNum).Name,
+                                             "Design Size Rated Total Cooling Capacity [W]",
+                                             VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
                 PreDefTableEntry(pdchCoolCoilTotCap, VarSpeedCoil(DXCoilNum).Name, VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
                 PreDefTableEntry(pdchCoolCoilLatCap,
                                  VarSpeedCoil(DXCoilNum).Name,
@@ -4223,12 +4222,12 @@ namespace VariableSpeedCoils {
             } else {
                 if (VarSpeedCoil(DXCoilNum).RatedCapCoolTotal > 0.0 && RatedCapCoolTotalDes > 0.0) {
                     RatedCapCoolTotalUser = VarSpeedCoil(DXCoilNum).RatedCapCoolTotal;
-                    ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
-                                       VarSpeedCoil(DXCoilNum).Name,
-                                       "Design Size Rated Total Cooling Capacity [W]",
-                                       RatedCapCoolTotalDes,
-                                       "User-Specified Rated Total Cooling Capacity [W]",
-                                       RatedCapCoolTotalUser);
+                    BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                                 VarSpeedCoil(DXCoilNum).Name,
+                                                 "Design Size Rated Total Cooling Capacity [W]",
+                                                 RatedCapCoolTotalDes,
+                                                 "User-Specified Rated Total Cooling Capacity [W]",
+                                                 RatedCapCoolTotalUser);
                     if (DisplayExtraWarnings) {
                         if ((std::abs(RatedCapCoolTotalDes - RatedCapCoolTotalUser) / RatedCapCoolTotalUser) > AutoVsHardSizingThreshold) {
                             ShowMessage("SizeVarSpeedCoil: Potential issue with equipment sizing for " + VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
@@ -4309,10 +4308,10 @@ namespace VariableSpeedCoils {
         }
         if (RatedCapHeatAutoSized) {
             VarSpeedCoil(DXCoilNum).RatedCapHeat = RatedCapHeatDes;
-            ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
-                               VarSpeedCoil(DXCoilNum).Name,
-                               "Design Size Nominal Heating Capacity [W]",
-                               RatedCapHeatDes);
+            BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                         VarSpeedCoil(DXCoilNum).Name,
+                                         "Design Size Nominal Heating Capacity [W]",
+                                         RatedCapHeatDes);
             PreDefTableEntry(pdchHeatCoilNomCap, VarSpeedCoil(DXCoilNum).Name, VarSpeedCoil(DXCoilNum).RatedCapHeat);
             if (VarSpeedCoil(DXCoilNum).RatedCapHeat != 0.0) {
                 PreDefTableEntry(pdchHeatCoilNomEff, VarSpeedCoil(DXCoilNum).Name, VarSpeedCoil(DXCoilNum).MSRatedCOP(NormSpeed));
@@ -4324,12 +4323,12 @@ namespace VariableSpeedCoils {
         } else {
             if (VarSpeedCoil(DXCoilNum).RatedCapHeat > 0.0 && RatedCapHeatDes > 0.0) {
                 RatedCapHeatUser = VarSpeedCoil(DXCoilNum).RatedCapHeat;
-                ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
-                                   VarSpeedCoil(DXCoilNum).Name,
-                                   "Design Size Nominal Heating Capacity [W]",
-                                   RatedCapHeatDes,
-                                   "User-Specified Nominal Heating Capacity [W]",
-                                   RatedCapHeatUser);
+                BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                             VarSpeedCoil(DXCoilNum).Name,
+                                             "Design Size Nominal Heating Capacity [W]",
+                                             RatedCapHeatDes,
+                                             "User-Specified Nominal Heating Capacity [W]",
+                                             RatedCapHeatUser);
                 if (DisplayExtraWarnings) {
                     if ((std::abs(RatedCapHeatDes - RatedCapHeatUser) / RatedCapHeatUser) > AutoVsHardSizingThreshold) {
                         ShowMessage("SizeVarSpeedCoil: Potential issue with equipment sizing for " + VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
@@ -4356,19 +4355,19 @@ namespace VariableSpeedCoils {
             // write the air flow sizing output
             if (RatedAirFlowAutoSized) {
                 VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = RatedAirVolFlowRateDes;
-                ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
-                                   VarSpeedCoil(DXCoilNum).Name,
-                                   "Design Size Rated Air Flow Rate [m3/s]",
-                                   RatedAirVolFlowRateDes);
+                BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                             VarSpeedCoil(DXCoilNum).Name,
+                                             "Design Size Rated Air Flow Rate [m3/s]",
+                                             RatedAirVolFlowRateDes);
             } else {
                 if (VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate > 0.0 && RatedAirVolFlowRateDes > 0.0) {
                     RatedAirVolFlowRateUser = VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate;
-                    ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
-                                       VarSpeedCoil(DXCoilNum).Name,
-                                       "Design Size Rated Air Flow Rate [m3/s]",
-                                       RatedAirVolFlowRateDes,
-                                       "User-Specified Rated Air Flow Rate [m3/s]",
-                                       RatedAirVolFlowRateUser);
+                    BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                                 VarSpeedCoil(DXCoilNum).Name,
+                                                 "Design Size Rated Air Flow Rate [m3/s]",
+                                                 RatedAirVolFlowRateDes,
+                                                 "User-Specified Rated Air Flow Rate [m3/s]",
+                                                 RatedAirVolFlowRateUser);
                     if (DisplayExtraWarnings) {
                         if ((std::abs(RatedAirVolFlowRateDes - RatedAirVolFlowRateUser) / RatedAirVolFlowRateUser) > AutoVsHardSizingThreshold) {
                             ShowMessage("SizeVarSpeedCoil: Potential issue with equipment sizing for" + VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
@@ -4549,7 +4548,7 @@ namespace VariableSpeedCoils {
 
                     RatedWaterVolFlowRateDes = VarSpeedCoil(DXCoilNum).RatedCapHeat / (PlantSizData(PltSizNum).DeltaT * cp * rho);
 
-                    //        CALL ReportSizingOutput('COIL:'//TRIM(VarSpeedCoil(DXCoilNum)%CoolHeatType)//&
+                    //        CALL BaseSizer::reportSizerOutput('COIL:'//TRIM(VarSpeedCoil(DXCoilNum)%CoolHeatType)//&
                     //                                TRIM(CurrentObjSubfix), &
                     //                                  VarSpeedCoil(DXCoilNum)%Name, &
                     //                                  'Rated Water Flow Rate [m3/s]', VarSpeedCoil(DXCoilNum)%RatedWaterVolFlowRate)
@@ -4569,7 +4568,7 @@ namespace VariableSpeedCoils {
 
                     RatedWaterVolFlowRateDes = SystemCapacity / (PlantSizData(PltSizNum).DeltaT * cp * rho);
 
-                    //        CALL ReportSizingOutput('COIL:'//TRIM(VarSpeedCoil(DXCoilNum)%CoolHeatType)&
+                    //        CALL BaseSizer::reportSizerOutput('COIL:'//TRIM(VarSpeedCoil(DXCoilNum)%CoolHeatType)&
                     //                                //TRIM(CurrentObjSubfix), &
                     //                                  VarSpeedCoil(DXCoilNum)%Name, &
                     //                                  'Rated Water Flow Rate [m3/s]', VarSpeedCoil(DXCoilNum)%RatedWaterVolFlowRate)
@@ -4613,10 +4612,10 @@ namespace VariableSpeedCoils {
                                                              VarSpeedCoil(DXCoilNum).WaterOutletNodeNum,
                                                              VarSpeedCoil(DXCoilNum).LoopNum);
             VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate = RatedWaterVolFlowRateDes;
-            ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
-                               VarSpeedCoil(DXCoilNum).Name,
-                               "Design Size Rated Water Flow Rate [m3/s]",
-                               RatedWaterVolFlowRateDes);
+            BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                         VarSpeedCoil(DXCoilNum).Name,
+                                         "Design Size Rated Water Flow Rate [m3/s]",
+                                         RatedWaterVolFlowRateDes);
             // Ensure water flow rate at lower speed must be lower or
             // equal to the flow rate at higher speed. Otherwise, a severe error is isssued.
             for (Mode = 1; Mode <= VarSpeedCoil(DXCoilNum).NumOfSpeeds - 1; ++Mode) {
@@ -4632,12 +4631,12 @@ namespace VariableSpeedCoils {
         } else {
             if (VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate > 0.0 && RatedWaterVolFlowRateDes > 0.0) {
                 RatedWaterVolFlowRateUser = VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate;
-                ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
-                                   VarSpeedCoil(DXCoilNum).Name,
-                                   "Design Size Rated Water Flow Rate [m3/s]",
-                                   RatedWaterVolFlowRateDes,
-                                   "User-Specified Rated Water Flow Rate [m3/s]",
-                                   RatedWaterVolFlowRateUser);
+                BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                             VarSpeedCoil(DXCoilNum).Name,
+                                             "Design Size Rated Water Flow Rate [m3/s]",
+                                             RatedWaterVolFlowRateDes,
+                                             "User-Specified Rated Water Flow Rate [m3/s]",
+                                             RatedWaterVolFlowRateUser);
                 if (DisplayExtraWarnings) {
                     if ((std::abs(RatedWaterVolFlowRateDes - RatedWaterVolFlowRateUser) / RatedWaterVolFlowRateUser) > AutoVsHardSizingThreshold) {
                         ShowMessage("SizeVarSpeedCoil: Potential issue with equipment sizing for" + VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
@@ -4857,19 +4856,19 @@ namespace VariableSpeedCoils {
         if (VarSpeedCoil(DXCoilNum).CoolHeatType == "COOLING") { // always report for cooling mode
             if (RatedCapCoolTotalAutoSized) {
                 VarSpeedCoil(DXCoilNum).RatedCapCoolSens = RatedCapCoolSensDes;
-                ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
-                                   VarSpeedCoil(DXCoilNum).Name,
-                                   "Design Size Rated Sensible Cooling Capacity [W]",
-                                   VarSpeedCoil(DXCoilNum).RatedCapCoolSens);
+                BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                             VarSpeedCoil(DXCoilNum).Name,
+                                             "Design Size Rated Sensible Cooling Capacity [W]",
+                                             VarSpeedCoil(DXCoilNum).RatedCapCoolSens);
 
             } else {
                 // sensible capacity does not have an input field
                 if (RatedCapCoolSensDes > 0.0) {
                     VarSpeedCoil(DXCoilNum).RatedCapCoolSens = RatedCapCoolSensDes;
-                    ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
-                                       VarSpeedCoil(DXCoilNum).Name,
-                                       "Design Size Rated Sensible Cooling Capacity [W]",
-                                       RatedCapCoolSensDes); //, &
+                    BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                                 VarSpeedCoil(DXCoilNum).Name,
+                                                 "Design Size Rated Sensible Cooling Capacity [W]",
+                                                 RatedCapCoolSensDes); //, &
                 }
             }
             PreDefTableEntry(pdchCoolCoilTotCap, VarSpeedCoil(DXCoilNum).Name, VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
@@ -4900,19 +4899,19 @@ namespace VariableSpeedCoils {
             EvapCondPumpElecNomPowerDes = VarSpeedCoil(DXCoilNum).RatedCapCoolTotal * 0.004266;
             if (IsAutoSize) {
                 VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower = EvapCondPumpElecNomPowerDes;
-                ReportSizingOutput("AS VS COOLING COIL",
-                                   VarSpeedCoil(DXCoilNum).Name,
-                                   "Design Size Evaporative Condenser Pump Rated Power Consumption [W]",
-                                   EvapCondPumpElecNomPowerDes);
+                BaseSizer::reportSizerOutput("AS VS COOLING COIL",
+                                             VarSpeedCoil(DXCoilNum).Name,
+                                             "Design Size Evaporative Condenser Pump Rated Power Consumption [W]",
+                                             EvapCondPumpElecNomPowerDes);
             } else {
                 if (VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower > 0.0 && EvapCondPumpElecNomPowerDes > 0.0) {
                     EvapCondPumpElecNomPowerUser = VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower;
-                    ReportSizingOutput("AS VS COOLING COIL",
-                                       VarSpeedCoil(DXCoilNum).Name,
-                                       "Design Size Evaporative Condenser Pump Rated Power Consumption [W]",
-                                       EvapCondPumpElecNomPowerDes,
-                                       "User-Specified Evaporative Condenser Pump Rated Power Consumption [W]",
-                                       EvapCondPumpElecNomPowerUser);
+                    BaseSizer::reportSizerOutput("AS VS COOLING COIL",
+                                                 VarSpeedCoil(DXCoilNum).Name,
+                                                 "Design Size Evaporative Condenser Pump Rated Power Consumption [W]",
+                                                 EvapCondPumpElecNomPowerDes,
+                                                 "User-Specified Evaporative Condenser Pump Rated Power Consumption [W]",
+                                                 EvapCondPumpElecNomPowerUser);
                     if (DisplayExtraWarnings) {
                         if ((std::abs(EvapCondPumpElecNomPowerDes - EvapCondPumpElecNomPowerUser) / EvapCondPumpElecNomPowerUser) >
                             AutoVsHardSizingThreshold) {
@@ -4947,17 +4946,17 @@ namespace VariableSpeedCoils {
             }
             if (IsAutoSize) {
                 VarSpeedCoil(DXCoilNum).DefrostCapacity = DefrostCapacityDes;
-                ReportSizingOutput(
+                BaseSizer::reportSizerOutput(
                     "AS VS HEATING COIL", VarSpeedCoil(DXCoilNum).Name, "Design Size Resistive Defrost Heater Capacity [W]", DefrostCapacityDes);
             } else {
                 if (VarSpeedCoil(DXCoilNum).DefrostCapacity > 0.0 && DefrostCapacityDes > 0.0 && !HardSizeNoDesRun) {
                     DefrostCapacityUser = VarSpeedCoil(DXCoilNum).DefrostCapacity;
-                    ReportSizingOutput("AS VS HEATING COIL",
-                                       VarSpeedCoil(DXCoilNum).Name,
-                                       "Design Size Resistive Defrost Heater Capacity [W]",
-                                       DefrostCapacityDes,
-                                       "User-Specified Resistive Defrost Heater Capacity [W]",
-                                       DefrostCapacityUser);
+                    BaseSizer::reportSizerOutput("AS VS HEATING COIL",
+                                                 VarSpeedCoil(DXCoilNum).Name,
+                                                 "Design Size Resistive Defrost Heater Capacity [W]",
+                                                 DefrostCapacityDes,
+                                                 "User-Specified Resistive Defrost Heater Capacity [W]",
+                                                 DefrostCapacityUser);
                     if (DisplayExtraWarnings) {
                         if ((std::abs(DefrostCapacityDes - DefrostCapacityUser) / DefrostCapacityUser) > AutoVsHardSizingThreshold) {
                             ShowMessage("SizeVarSpeedCoil: Potential issue with equipment sizing for " + VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +

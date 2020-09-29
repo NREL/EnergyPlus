@@ -46,8 +46,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -62,7 +64,6 @@
 #include <EnergyPlus/Fans.hh> // used for fault model routine CalFaultyFanAirFlowReduction
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -70,7 +71,6 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <ObjexxFCL/Optional.hh>
 
@@ -121,7 +121,8 @@ namespace HVACFan {
         }
     }
 
-    void FanSystem::simulate(EnergyPlusData &state,
+    void FanSystem::simulate(
+        EnergyPlusData &state,
         Optional<Real64 const> flowFraction, // when used, this directs the fan to set the flow at this flow fraction = current flow/ max design flow
                                              // rate.  It is not exactly the same as the legacy speed ratio that was used with SimulateFanComponents.
         Optional_bool_const zoneCompTurnFansOn,  // can be used as turn fans ON signal from ZoneHVAC component
@@ -238,10 +239,13 @@ namespace HVACFan {
         DataSizing::DataAutosizable = true;
         DataSizing::DataEMSOverrideON = m_maxAirFlowRateEMSOverrideOn;
         DataSizing::DataEMSOverride = m_maxAirFlowRateEMSOverrideValue;
-        ReportSizingManager::RequestSizing(state,
-            m_fanType, name, DataHVACGlobals::SystemAirflowSizing, "Design Maximum Air Flow Rate [m3/s]", tempFlow, bPRINT, routineName);
-        designAirVolFlowRate = tempFlow;
-        DataSizing::DataAutosizable = true;
+
+        bool errorsFound = false;
+        SystemAirFlowSizer sizerSystemAirFlow;
+        sizerSystemAirFlow.initializeWithinEP(state, m_fanType, name, bPRINT, routineName);
+        designAirVolFlowRate = sizerSystemAirFlow.size(state, tempFlow, errorsFound);
+
+        DataSizing::DataAutosizable = true; // should be false?
         DataSizing::DataEMSOverrideON = false;
         DataSizing::DataEMSOverride = 0.0;
 
@@ -269,7 +273,7 @@ namespace HVACFan {
             } // end switch
 
             // report design power
-            ReportSizingManager::ReportSizingOutput(m_fanType, name, "Design Electric Power Consumption [W]", designElecPower);
+            BaseSizer::reportSizerOutput(m_fanType, name, "Design Electric Power Consumption [W]", designElecPower);
 
         } // end if power was autosized
 
@@ -279,7 +283,7 @@ namespace HVACFan {
         // calculate total fan system efficiency at design, else set to 1 to avoid div by zero
         if (designElecPower > 0.0) {
             m_fanTotalEff = designAirVolFlowRate * deltaPress / designElecPower;
-        } else{
+        } else {
             m_fanTotalEff = 1.0;
         }
 
@@ -292,8 +296,7 @@ namespace HVACFan {
                     if (designElecPower > 0.0) {
                         m_totEfficAtSpeed[loop] =
                             m_flowFractionAtSpeed[loop] * designAirVolFlowRate * deltaPress / (designElecPower * m_powerFractionAtSpeed[loop]);
-                    }
-                    else {
+                    } else {
                         m_totEfficAtSpeed[loop] = 1.0;
                     }
                 } else { // use power curve
@@ -1121,6 +1124,24 @@ namespace HVACFan {
             Real64 fanPowerTot = (FanVolFlow * deltaPress) / m_fanTotalEff;
             Real64 designHeatGain = m_motorEff * fanPowerTot + (fanPowerTot - m_motorEff * fanPowerTot) * m_motorInAirFrac;
             return designHeatGain;
+        }
+    }
+
+    void FanSystem::FanInputsForDesignHeatGain(EnergyPlusData &state, Real64 &deltaP, Real64 &motEff, Real64 &totEff, Real64 &motInAirFrac)
+    {
+        if (!m_objSizingFlag) {
+            deltaP = deltaPress;
+            motEff = m_motorEff;
+            totEff = m_fanTotalEff;
+            motInAirFrac = m_motorInAirFrac;
+            return;
+        } else {
+            set_size(state);
+            deltaP = deltaPress;
+            motEff = m_motorEff;
+            totEff = m_fanTotalEff;
+            motInAirFrac = m_motorInAirFrac;
+            return;
         }
     }
 

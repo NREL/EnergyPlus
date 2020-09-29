@@ -692,7 +692,7 @@ namespace SimulationManager {
 
         ReportForTabularReports(); // For Energy Meters (could have other things that need to be pushed to after simulation)
 
-        OpenOutputTabularFile();
+        OpenOutputTabularFile(state.files);
 
         WriteTabularReports(state); //     Create the tabular reports at completion of each
 

@@ -64,6 +64,7 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -1133,6 +1134,8 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     DataHeatBalFanSys::MAT = 23.0;
     DataHeatBalFanSys::ZoneAirHumRat = 0.01;
     DataEnvironment::OutBaroPress = 101325.0;
+    StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
+
     DataHeatBalFanSys::MCPThermChim.allocate(DataGlobals::NumOfZones);
     DataHeatBalFanSys::ThermChimAMFL.allocate(DataGlobals::NumOfZones);
     DataHeatBalFanSys::MCPTThermChim.allocate(DataGlobals::NumOfZones);

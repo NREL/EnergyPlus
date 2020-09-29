@@ -525,7 +525,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
 
     // OutputProcessor::TimeValue.allocate(2); //
     SimulationManager::ManageSimulation(state);
-    // re-set the hour of the day to mide day
+    // re-set the hour of the day to mid-day
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 12;
     DataGlobals::CurrentTime = 12.0;

@@ -150,7 +150,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     int PurchAirNum = 1;
     ZoneEqSizing.allocate(1);
     CurZoneEqNum = 1;
-    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
+    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in Sizer
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(24);
     CurSysNum = 0;
 
@@ -204,7 +204,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test2)
     int PurchAirNum = 1;
     ZoneEqSizing.allocate(1);
     CurZoneEqNum = 1;
-    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
+    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in Sizer
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(24);
     CurSysNum = 0;
 
