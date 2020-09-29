@@ -200,7 +200,9 @@
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
@@ -2383,7 +2385,7 @@
     Sys 1 Furnace DX Cool Cooling Coil,  !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- Minimum Supply Air Temperature {C}
-    LatentWithSensibleLoadControl, !- Latent Load Control
+    LatentWithSensibleLoadControl,  !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
@@ -2446,7 +2448,7 @@
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
     Sys 1 Furnace DX Cool Cooling Coil Normal Operating Mode,  !- Base Operating Mode
-    Sys 1 Furnace DX Cool Cooling Coil Dehumidification Operating Mode;  !- Alternative Operating Mode
+    Sys 1 Furnace DX Cool Cooling Coil Dehumidification Operating Mode;  !- Alternative Operating Mode 1
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 1 Furnace DX Cool Cooling Coil Normal Operating Mode,  !- Name
@@ -2882,7 +2884,7 @@
     Sys 2 Furnace DX Cool Cooling Coil,  !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- Minimum Supply Air Temperature {C}
-    LatentWithSensibleLoadControl, !- Latent Load Control
+    LatentWithSensibleLoadControl,  !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
@@ -2945,7 +2947,7 @@
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
     Sys 2 Furnace DX Cool Cooling Coil Normal Operating Mode,  !- Base Operating Mode
-    Sys 2 Furnace DX Cool Cooling Coil Dehumidification Operating Mode;  !- Alternative Operating Mode
+    Sys 2 Furnace DX Cool Cooling Coil Dehumidification Operating Mode;  !- Alternative Operating Mode 1
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 2 Furnace DX Cool Cooling Coil Normal Operating Mode,  !- Name
@@ -3368,7 +3370,7 @@
     Sys 3 Heat Pump Air Source Cooling Coil,  !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- Minimum Supply Air Temperature {C}
-    LatentWithSensibleLoadControl, !- Latent Load Control
+    LatentWithSensibleLoadControl,  !- Latent Load Control
     Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
     Sys 3 Heat Pump Air Source Supp Heat or Reheat Coil,  !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
@@ -3431,7 +3433,7 @@
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
     Sys 3 Heat Pump Air Source Cooling Coil Normal Operating Mode,  !- Base Operating Mode
-    Sys 3 Heat Pump Air Source Cooling Coil Dehumidification Operating Mode;  !- Alternative Operating Mode
+    Sys 3 Heat Pump Air Source Cooling Coil Dehumidification Operating Mode;  !- Alternative Operating Mode 1
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 3 Heat Pump Air Source Cooling Coil Normal Operating Mode,  !- Name
@@ -3935,7 +3937,7 @@
     Sys 4 Heat Pump Air Source Cooling Coil,  !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- Minimum Supply Air Temperature {C}
-    LatentWithSensibleLoadControl, !- Latent Load Control
+    LatentWithSensibleLoadControl,  !- Latent Load Control
     Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
     Sys 4 Heat Pump Air Source Supp Heat or Reheat Coil,  !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
@@ -3998,7 +4000,7 @@
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
     Sys 4 Heat Pump Air Source Cooling Coil Normal Operating Mode,  !- Base Operating Mode
-    Sys 4 Heat Pump Air Source Cooling Coil Dehumidification Operating Mode;  !- Alternative Operating Mode
+    Sys 4 Heat Pump Air Source Cooling Coil Dehumidification Operating Mode;  !- Alternative Operating Mode 1
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 4 Heat Pump Air Source Cooling Coil Normal Operating Mode,  !- Name
@@ -4559,7 +4561,7 @@
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
     Sys 5 Furnace DX Cool Cooling Coil Normal Operating Mode,  !- Base Operating Mode
-    Sys 5 Furnace DX Cool Cooling Coil Dehumidification Operating Mode;  !- Alternative Operating Mode
+    Sys 5 Furnace DX Cool Cooling Coil Dehumidification Operating Mode;  !- Alternative Operating Mode 1
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 5 Furnace DX Cool Cooling Coil Normal Operating Mode,  !- Name
@@ -4871,3 +4873,4 @@
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     ;                        !- Mechanical Ventilation Controller Name
+
