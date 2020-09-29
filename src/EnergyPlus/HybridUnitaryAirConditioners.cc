@@ -646,7 +646,7 @@ namespace HybridUnitaryAirConditioners {
                 // A19, \ OA requirement pointer
                 ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(19), OARequirements);
                 if (ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + Alphas(1) + " invalid data");
+                    ShowSevereError(RoutineName + cCurrentModuleObject + " = " + Alphas(1) + " invalid data");
                     ShowContinueError("Invalid-not found" + cAlphaFieldNames(19) + "=\"" + Alphas(19) + "\".");
                     ErrorsFound = true;
                 } else {
