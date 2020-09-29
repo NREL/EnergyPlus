@@ -2075,8 +2075,8 @@ namespace PurchasedAirManager {
         Real64 SupplyHumRatOrig; // Supply inlet to zone humidity ratio before saturation check [kgWater/kgDryAir]
         Real64 SupplyHumRatSat;  // Supply inlet to zone humidity ratio saturation at SupplyTemp [kgWater/kgDryAir]
         Real64 SupplyEnthalpy;   // Supply inlet to zone enthalpy [J/kg]
-        Real64 MixedAirTemp;     // Mixed air dry bulb temperature [C]
-        Real64 MixedAirHumRat;   // Mixed air humidity ratio [kgWater/kgDryAir]
+        
+        
         Real64 MixedAirEnthalpy; // Mixed air enthalpy [J/kg]
         Real64 CpAir;            // Specific heat [J/kg-C] reused in multiple places
         //         REAL(r64) :: SpecHumOut   ! Specific humidity ratio of outlet air (kg moisture / kg moist air)
@@ -2273,7 +2273,13 @@ namespace PurchasedAirManager {
                 if (SupplyMassFlowRate <= VerySmallMassFlow) SupplyMassFlowRate = 0.0;
 
                 // Calculate mixed air conditions
-                CalcPurchAirMixedAir(PurchAirNum, OAMassFlowRate, SupplyMassFlowRate, MixedAirTemp, MixedAirHumRat, MixedAirEnthalpy, OperatingMode);
+                CalcPurchAirMixedAir(PurchAirNum,
+                                     OAMassFlowRate,
+                                     SupplyMassFlowRate,
+                                     PurchAir(PurchAirNum).MixedAirTemp,
+                                     PurchAir(PurchAirNum).MixedAirHumRat,
+                                     MixedAirEnthalpy,
+                                     OperatingMode);
 
                 // Calculate supply air conditions using final massflow rate, imposing capacity limits if specified
                 // If capacity limits are exceeded, keep massflow rate where it is and adjust supply temp
@@ -2284,35 +2290,35 @@ namespace PurchasedAirManager {
                     PurchAir(PurchAirNum).SupplyTemp = QZnCoolSP / (CpAir * SupplyMassFlowRate) + Node(ZoneNodeNum).Temp;
                     PurchAir(PurchAirNum).SupplyTemp = max(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MinCoolSuppAirTemp);
                     // This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
-                    PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, MixedAirTemp);
-                    PurchAir(PurchAirNum).SupplyHumRat = MixedAirHumRat;
+                    PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MixedAirTemp);
+                    PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
                     SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
 
                     // Check sensible load vs max total cooling capacity, if specified, and adjust supply temp before applying humidity controls
                     // Will check again later, too
                     if ((PurchAir(PurchAirNum).CoolingLimit == LimitCapacity) || (PurchAir(PurchAirNum).CoolingLimit == LimitFlowRateAndCapacity)) {
-                        CpAir = PsyCpAirFnW(MixedAirHumRat);
+                        CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
                         CoolSensOutput = SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy);
                         if (CoolSensOutput >= PurchAir(PurchAirNum).MaxCoolTotCap) {
                             CoolSensOutput = PurchAir(PurchAirNum).MaxCoolTotCap;
                             SupplyEnthalpy = MixedAirEnthalpy - CoolSensOutput / SupplyMassFlowRate;
                             PurchAir(PurchAirNum).SupplyTemp = PsyTdbFnHW(SupplyEnthalpy, PurchAir(PurchAirNum).SupplyHumRat);
                             // This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
-                            PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, MixedAirTemp);
+                            PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MixedAirTemp);
                         } // Capacity limit exceeded
                     }
 
                     // Set supply humidity ratio for cooling/dehumidification
-                    PurchAir(PurchAirNum).SupplyHumRat = MixedAirHumRat;
+                    PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
                     {
                         auto const SELECT_CASE_var(PurchAir(PurchAirNum).DehumidCtrlType);
                         if (SELECT_CASE_var == None) {
-                            PurchAir(PurchAirNum).SupplyHumRat = MixedAirHumRat;
+                            PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
                         } else if (SELECT_CASE_var == ConstantSensibleHeatRatio) {
                             // SHR = CoolSensOutput/CoolTotOutput
                             // CoolTotOutput = CoolSensOutput/SHR
-                            CpAir = PsyCpAirFnW(MixedAirHumRat);
-                            CoolSensOutput = SupplyMassFlowRate * CpAir * (MixedAirTemp - PurchAir(PurchAirNum).SupplyTemp);
+                            CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
+                            CoolSensOutput = SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).MixedAirTemp - PurchAir(PurchAirNum).SupplyTemp);
                             CoolTotOutput = CoolSensOutput / PurchAir(PurchAirNum).CoolSHR;
                             SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;
                             //  Limit for overdrying (avoid Pysch errors which occur if SupplyEnthalpy is too low for SupplyTemp)
@@ -2322,16 +2328,16 @@ namespace PurchasedAirManager {
                             // Apply min cooling humidity ratio limit
                             PurchAir(PurchAirNum).SupplyHumRat = max(PurchAir(PurchAirNum).SupplyHumRat, PurchAir(PurchAirNum).MinCoolSuppAirHumRat);
                             // But don't let it be higher than incoming MixedAirHumRat
-                            PurchAir(PurchAirNum).SupplyHumRat = min(PurchAir(PurchAirNum).SupplyHumRat, MixedAirHumRat);
+                            PurchAir(PurchAirNum).SupplyHumRat = min(PurchAir(PurchAirNum).SupplyHumRat, PurchAir(PurchAirNum).MixedAirHumRat);
                         } else if (SELECT_CASE_var == Humidistat) {
                             MdotZnDehumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
                             SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + Node(ZoneNodeNum).HumRat;
                             SupplyHumRatForDehum = min(SupplyHumRatForDehum, PurchAir(PurchAirNum).MinCoolSuppAirHumRat);
-                            PurchAir(PurchAirNum).SupplyHumRat = min(MixedAirHumRat, SupplyHumRatForDehum);
+                            PurchAir(PurchAirNum).SupplyHumRat = min(PurchAir(PurchAirNum).MixedAirHumRat, SupplyHumRatForDehum);
                         } else if (SELECT_CASE_var == ConstantSupplyHumidityRatio) {
                             PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MinCoolSuppAirHumRat;
                         } else {
-                            PurchAir(PurchAirNum).SupplyHumRat = MixedAirHumRat;
+                            PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
                         }
                     }
 
@@ -2358,7 +2364,7 @@ namespace PurchasedAirManager {
                     // Check max total Cooling capacity, if specified
                     if ((PurchAir(PurchAirNum).CoolingLimit == LimitCapacity) || (PurchAir(PurchAirNum).CoolingLimit == LimitFlowRateAndCapacity)) {
                         // If dehumidifying, compare total cooling to the limit
-                        if (PurchAir(PurchAirNum).SupplyHumRat < MixedAirHumRat) { // Dehumidifying
+                        if (PurchAir(PurchAirNum).SupplyHumRat < PurchAir(PurchAirNum).MixedAirHumRat) { // Dehumidifying
                             CoolTotOutput = SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy);
                             if ((CoolTotOutput) > PurchAir(PurchAirNum).MaxCoolTotCap) {
                                 CoolTotOutput = PurchAir(PurchAirNum).MaxCoolTotCap;
@@ -2370,11 +2376,12 @@ namespace PurchasedAirManager {
                                         // Adjust both supply temp and humidity ratio to maintain SHR
                                         // SHR = CoolSensOutput/CoolTotOutput
                                         // CoolSensOutput = SHR*CoolTotOutput
-                                        CpAir = PsyCpAirFnW(MixedAirHumRat);
+                                        CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
                                         CoolSensOutput = CoolTotOutput * PurchAir(PurchAirNum).CoolSHR;
-                                        PurchAir(PurchAirNum).SupplyTemp = MixedAirTemp - CoolSensOutput / (CpAir * SupplyMassFlowRate);
+                                        PurchAir(PurchAirNum).SupplyTemp =
+                                            PurchAir(PurchAirNum).MixedAirTemp - CoolSensOutput / (CpAir * SupplyMassFlowRate);
                                         // This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
-                                        PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, MixedAirTemp);
+                                        PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MixedAirTemp);
                                         //  Limit for overdrying (avoid Pysch errors which occur if SupplyEnthalpy is too low for SupplyTemp)
                                         SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, 0.00001));
                                         PurchAir(PurchAirNum).SupplyHumRat =
@@ -2386,18 +2393,20 @@ namespace PurchasedAirManager {
                                     } else if ((SELECT_CASE_var == None) || (SELECT_CASE_var == ConstantSupplyHumidityRatio)) {
                                         // Keep humidity ratio and adjust supply temp
                                         // Check if latent output exceeds capacity
-                                        CpAir = PsyCpAirFnW(MixedAirHumRat);
-                                        CoolSensOutput = SupplyMassFlowRate * CpAir * (MixedAirTemp - PurchAir(PurchAirNum).SupplyTemp);
+                                        CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
+                                        CoolSensOutput =
+                                            SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).MixedAirTemp - PurchAir(PurchAirNum).SupplyTemp);
                                         CoolLatOutput = CoolTotOutput - CoolSensOutput;
                                         if (CoolLatOutput >= PurchAir(PurchAirNum).MaxCoolTotCap) {
-                                            PurchAir(PurchAirNum).SupplyTemp = MixedAirTemp;
+                                            PurchAir(PurchAirNum).SupplyTemp = PurchAir(PurchAirNum).MixedAirTemp;
                                             PurchAir(PurchAirNum).SupplyHumRat =
                                                 PsyWFnTdbH(PurchAir(PurchAirNum).SupplyTemp, SupplyEnthalpy, RoutineName);
                                             CoolLatOutput = PurchAir(PurchAirNum).MaxCoolTotCap;
                                         } else {
                                             PurchAir(PurchAirNum).SupplyTemp = PsyTdbFnHW(SupplyEnthalpy, PurchAir(PurchAirNum).SupplyHumRat);
                                             // This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
-                                            PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, MixedAirTemp);
+                                            PurchAir(PurchAirNum).SupplyTemp =
+                                                min(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MixedAirTemp);
                                         }
                                     }
                                 }
@@ -2408,7 +2417,7 @@ namespace PurchasedAirManager {
                                 if (SupplyHumRatSat < SupplyHumRatOrig) {
                                     PurchAir(PurchAirNum).SupplyTemp = PsyTsatFnHPb(SupplyEnthalpy, OutBaroPress, RoutineName);
                                     // This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
-                                    PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, MixedAirTemp);
+                                    PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MixedAirTemp);
                                     PurchAir(PurchAirNum).SupplyHumRat = PsyWFnTdbH(PurchAir(PurchAirNum).SupplyTemp, SupplyEnthalpy, RoutineName);
                                     SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
                                     // CpAir = PsyCpAirFnW(MixedAirHumRat)
@@ -2419,19 +2428,19 @@ namespace PurchasedAirManager {
                         } else { // Not dehumidifying
                             // If not dehumidifying, compare sensible cooling to the limit
                             // This section will only increase supply temp, so no need to recheck for super-saturation
-                            CpAir = PsyCpAirFnW(MixedAirHumRat);
-                            CoolSensOutput = SupplyMassFlowRate * CpAir * (MixedAirTemp - PurchAir(PurchAirNum).SupplyTemp);
+                            CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
+                            CoolSensOutput = SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).MixedAirTemp - PurchAir(PurchAirNum).SupplyTemp);
                             if (CoolSensOutput >= PurchAir(PurchAirNum).MaxCoolTotCap) {
                                 CoolSensOutput = PurchAir(PurchAirNum).MaxCoolTotCap;
-                                PurchAir(PurchAirNum).SupplyTemp = MixedAirTemp - CoolSensOutput / (SupplyMassFlowRate * CpAir);
+                                PurchAir(PurchAirNum).SupplyTemp = PurchAir(PurchAirNum).MixedAirTemp - CoolSensOutput / (SupplyMassFlowRate * CpAir);
                             } // Capacity limit exceeded
                         }     // Dehumidifying or not
                     }         // Capacity limit active
 
                 } else { // SupplyMassFlowRate is zero
                     SupplyEnthalpy = MixedAirEnthalpy;
-                    PurchAir(PurchAirNum).SupplyHumRat = MixedAirHumRat;
-                    PurchAir(PurchAirNum).SupplyTemp = MixedAirTemp;
+                    PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
+                    PurchAir(PurchAirNum).SupplyTemp = PurchAir(PurchAirNum).MixedAirTemp;
                     CoolSensOutput = 0.0;
                     CoolTotOutput = 0.0;
                 }
@@ -2528,7 +2537,13 @@ namespace PurchasedAirManager {
                 if (SupplyMassFlowRate <= VerySmallMassFlow) SupplyMassFlowRate = 0.0;
 
                 // Calculate mixed air conditions
-                CalcPurchAirMixedAir(PurchAirNum, OAMassFlowRate, SupplyMassFlowRate, MixedAirTemp, MixedAirHumRat, MixedAirEnthalpy, OperatingMode);
+                CalcPurchAirMixedAir(PurchAirNum,
+                                     OAMassFlowRate,
+                                     SupplyMassFlowRate,
+                                     PurchAir(PurchAirNum).MixedAirTemp,
+                                     PurchAir(PurchAirNum).MixedAirHumRat,
+                                     MixedAirEnthalpy,
+                                     OperatingMode);
 
                 // Calculate supply air conditions using final massflow rate, imposing capacity limits if specified
                 // If capacity limits are exceeded, keep massflow rate where it is and adjust supply temp
@@ -2539,27 +2554,28 @@ namespace PurchasedAirManager {
                         PurchAir(PurchAirNum).SupplyTemp = QZnHeatSP / (CpAir * SupplyMassFlowRate) + Node(ZoneNodeNum).Temp;
                         PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MaxHeatSuppAirTemp);
                         // This is the heating mode, so SupplyTemp can't be less than MixedAirTemp
-                        PurchAir(PurchAirNum).SupplyTemp = max(PurchAir(PurchAirNum).SupplyTemp, MixedAirTemp);
+                        PurchAir(PurchAirNum).SupplyTemp = max(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MixedAirTemp);
                         // Check max heating capacity, if specified
                         if ((PurchAir(PurchAirNum).HeatingLimit == LimitCapacity) ||
                             (PurchAir(PurchAirNum).HeatingLimit == LimitFlowRateAndCapacity)) {
-                            CpAir = PsyCpAirFnW(MixedAirHumRat);
-                            HeatSensOutput = SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).SupplyTemp - MixedAirTemp);
+                            CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
+                            HeatSensOutput = SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).SupplyTemp - PurchAir(PurchAirNum).MixedAirTemp);
                             if (HeatSensOutput > PurchAir(PurchAirNum).MaxHeatSensCap) {
-                                PurchAir(PurchAirNum).SupplyTemp = PurchAir(PurchAirNum).MaxHeatSensCap / (SupplyMassFlowRate * CpAir) + MixedAirTemp;
+                                PurchAir(PurchAirNum).SupplyTemp =
+                                    PurchAir(PurchAirNum).MaxHeatSensCap / (SupplyMassFlowRate * CpAir) + PurchAir(PurchAirNum).MixedAirTemp;
                                 HeatSensOutput = PurchAir(PurchAirNum).MaxHeatSensCap;
                             }
                         }
                     } else { // Heat is off or operating mode is deadband (i.e. don't do any heating)
-                        PurchAir(PurchAirNum).SupplyTemp = MixedAirTemp;
+                        PurchAir(PurchAirNum).SupplyTemp = PurchAir(PurchAirNum).MixedAirTemp;
                     }
 
                     // Set supply humidity ratio first for heating/humidification
-                    PurchAir(PurchAirNum).SupplyHumRat = MixedAirHumRat;
+                    PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
                     {
                         auto const SELECT_CASE_var(PurchAir(PurchAirNum).HumidCtrlType);
                         if (SELECT_CASE_var == None) {
-                            PurchAir(PurchAirNum).SupplyHumRat = MixedAirHumRat;
+                            PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
                         } else if (SELECT_CASE_var == Humidistat) {
                             MdotZnHumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
                             SupplyHumRatForHumid = MdotZnHumidSP / SupplyMassFlowRate + Node(ZoneNodeNum).HumRat;
@@ -2568,14 +2584,15 @@ namespace PurchasedAirManager {
                         } else if (SELECT_CASE_var == ConstantSupplyHumidityRatio) {
                             if (OperatingMode == Heat) {
                                 // If this results in dehumidification, must check cooling capacity limit
-                                if (MixedAirHumRat > PurchAir(PurchAirNum).MaxHeatSuppAirHumRat) {
+                                if (PurchAir(PurchAirNum).MixedAirHumRat > PurchAir(PurchAirNum).MaxHeatSuppAirHumRat) {
                                     if ((PurchAir(PurchAirNum).CoolingLimit == LimitCapacity) ||
                                         (PurchAir(PurchAirNum).CoolingLimit == LimitFlowRateAndCapacity)) {
                                         PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MaxHeatSuppAirHumRat;
                                         SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
                                         CoolTotOutput = SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy);
-                                        CpAir = PsyCpAirFnW(MixedAirHumRat);
-                                        CoolSensOutput = SupplyMassFlowRate * CpAir * (MixedAirTemp - PurchAir(PurchAirNum).SupplyTemp);
+                                        CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
+                                        CoolSensOutput =
+                                            SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).MixedAirTemp - PurchAir(PurchAirNum).SupplyTemp);
                                         CoolLatOutput = CoolTotOutput - CoolSensOutput;
                                         if (CoolLatOutput >= PurchAir(PurchAirNum).MaxCoolTotCap) {
                                             CoolLatOutput = PurchAir(PurchAirNum).MaxCoolTotCap;
@@ -2591,10 +2608,10 @@ namespace PurchasedAirManager {
                                     PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MaxHeatSuppAirHumRat;
                                 }
                             } else {
-                                PurchAir(PurchAirNum).SupplyHumRat = MixedAirHumRat;
+                                PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
                             }
                         } else {
-                            PurchAir(PurchAirNum).SupplyHumRat = MixedAirHumRat;
+                            PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
                         }
                     }
                     SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
@@ -2612,10 +2629,10 @@ namespace PurchasedAirManager {
                                 SupplyHumRatForDehum = max(SupplyHumRatForDehum, PurchAir(PurchAirNum).MinCoolSuppAirHumRat);
                                 PurchAir(PurchAirNum).SupplyHumRat = min(PurchAir(PurchAirNum).SupplyHumRat, SupplyHumRatForDehum);
                                 SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
-                                if (PurchAir(PurchAirNum).SupplyHumRat < MixedAirHumRat) {
+                                if (PurchAir(PurchAirNum).SupplyHumRat < PurchAir(PurchAirNum).MixedAirHumRat) {
                                     // At this point, the system is heating or deadband but dehumidifying, check max cooling cap limit
-                                    CpAir = PsyCpAirFnW(MixedAirHumRat);
-                                    SensOutput = SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).SupplyTemp - MixedAirTemp);
+                                    CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
+                                    SensOutput = SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).SupplyTemp - PurchAir(PurchAirNum).MixedAirTemp);
                                     LatOutput = SupplyMassFlowRate * (SupplyEnthalpy - MixedAirEnthalpy) - SensOutput;
                                     if ((PurchAir(PurchAirNum).CoolingLimit == LimitCapacity) ||
                                         (PurchAir(PurchAirNum).CoolingLimit == LimitFlowRateAndCapacity)) {
@@ -2639,8 +2656,8 @@ namespace PurchasedAirManager {
 
                 } else { // SupplyMassFlowRate is zero
                     SupplyEnthalpy = MixedAirEnthalpy;
-                    PurchAir(PurchAirNum).SupplyHumRat = MixedAirHumRat;
-                    PurchAir(PurchAirNum).SupplyTemp = MixedAirTemp;
+                    PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
+                    PurchAir(PurchAirNum).SupplyTemp = PurchAir(PurchAirNum).MixedAirTemp;
                     HeatSensOutput = 0.0;
                 }
 
@@ -2655,20 +2672,23 @@ namespace PurchasedAirManager {
             }
 
             if (SupplyMassFlowRate > 0.0) {
-                PurchAir(PurchAirNum).FinalMixedAirTemp = MixedAirTemp;
-                PurchAir(PurchAirNum).FinalMixedAirHumRat = MixedAirHumRat;
+                PurchAir(PurchAirNum).FinalMixedAirTemp = PurchAir(PurchAirNum).MixedAirTemp;
+                PurchAir(PurchAirNum).FinalMixedAirHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
                 // compute coil loads
-                if ((PurchAir(PurchAirNum).SupplyHumRat == MixedAirHumRat) && (PurchAir(PurchAirNum).SupplyTemp == MixedAirTemp)) {
+                if ((PurchAir(PurchAirNum).SupplyHumRat == PurchAir(PurchAirNum).MixedAirHumRat) &&
+                    (PurchAir(PurchAirNum).SupplyTemp == PurchAir(PurchAirNum).MixedAirTemp)) {
                     // If no change in humrat or temp, then set loads to zero
                     PurchAir(PurchAirNum).SenCoilLoad = 0.0;
                     PurchAir(PurchAirNum).LatCoilLoad = 0.0;
-                } else if ((PurchAir(PurchAirNum).SupplyHumRat == MixedAirHumRat) && (PurchAir(PurchAirNum).SupplyTemp != MixedAirTemp)) {
+                } else if ((PurchAir(PurchAirNum).SupplyHumRat == PurchAir(PurchAirNum).MixedAirHumRat) &&
+                           (PurchAir(PurchAirNum).SupplyTemp != PurchAir(PurchAirNum).MixedAirTemp)) {
                     // If no change in humrat, then set latent load to zero and use enthalpies to calculate sensible load
                     PurchAir(PurchAirNum).SenCoilLoad = SupplyMassFlowRate * (SupplyEnthalpy - MixedAirEnthalpy);
                     PurchAir(PurchAirNum).LatCoilLoad = 0.0;
                 } else {
-                    CpAir = PsyCpAirFnW(MixedAirHumRat);
-                    PurchAir(PurchAirNum).SenCoilLoad = SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).SupplyTemp - MixedAirTemp);
+                    CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
+                    PurchAir(PurchAirNum).SenCoilLoad =
+                        SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).SupplyTemp - PurchAir(PurchAirNum).MixedAirTemp);
                     PurchAir(PurchAirNum).LatCoilLoad = SupplyMassFlowRate * (SupplyEnthalpy - MixedAirEnthalpy) - PurchAir(PurchAirNum).SenCoilLoad;
                 }
 
@@ -2676,14 +2696,14 @@ namespace PurchasedAirManager {
                 if (((PurchAir(PurchAirNum).SenCoilLoad > 0.0) && !HeatOn) || ((PurchAir(PurchAirNum).SenCoilLoad < 0.0) && !CoolOn)) {
                     // Coil is off
                     PurchAir(PurchAirNum).SenCoilLoad = 0.0;
-                    PurchAir(PurchAirNum).SupplyTemp = MixedAirTemp;
+                    PurchAir(PurchAirNum).SupplyTemp = PurchAir(PurchAirNum).MixedAirTemp;
                 }
 
                 // Apply heating and cooling availability schedules to latent load
                 if (((PurchAir(PurchAirNum).LatCoilLoad > 0.0) && !HeatOn) || ((PurchAir(PurchAirNum).LatCoilLoad < 0.0) && !CoolOn)) {
                     // Coil is off
                     PurchAir(PurchAirNum).LatCoilLoad = 0.0;
-                    PurchAir(PurchAirNum).SupplyHumRat = MixedAirHumRat;
+                    PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
                 }
 
                 // Double-check if saturation exceeded, then thow warning, shouldn't happen here, don't reset, just warn
