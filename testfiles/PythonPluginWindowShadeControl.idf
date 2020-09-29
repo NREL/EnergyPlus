@@ -104,7 +104,7 @@
     NONE,                    !- Name
     0.0000000E+00,           !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     0.4000000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -121,7 +121,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -1101,8 +1103,8 @@
     Zone1Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -1111,8 +1113,8 @@
     Zone2Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -1121,8 +1123,8 @@
     Zone3Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     Zone1Air,                !- Name
@@ -1293,30 +1295,31 @@
   PythonPlugin:Instance,
     Window Shading Device Controller,  !- Name
     Yes,                     !- Run During Warmup Days
-    PythonPluginWindowShadeControl, !- Python Module Name
+    PythonPluginWindowShadeControl,  !- Python Module Name
     SetShadeControlState;    !- Plugin Class Name
 
   PythonPlugin:Variables,
     MyGlobalVariables,       !- Name
     IncidentAngle,           !- Variable Name 1
-    Zn001_Wall001_Win001_Shading_Deploy_Status;
+    Zn001_Wall001_Win001_Shading_Deploy_Status;  !- Variable Name 2
 
   PythonPlugin:OutputVariable,
     Shading Control Status,  !- Name
-    Zn001_Wall001_Win001_Shading_Deploy_Status,     !- PythonPlugin:Variable Name
+    Zn001_Wall001_Win001_Shading_Deploy_Status,  !- Python Plugin Variable Name
     Averaged,                !- Type of Data in Variable
     ZoneTimestep,            !- Update Frequency
     ;                        !- Units
 
   PythonPlugin:OutputVariable,
     Erl Zn001:Wall001:Win001 Incident Angle,  !- Name
-    IncidentAngle,           !- PythonPlugin:Variable Name
+    IncidentAngle,           !- Python Plugin Variable Name
     Averaged,                !- Type of Data in Variable
     ZoneTimestep,            !- Update Frequency
     deg;                     !- Units
 
-  Output:Variable, Shading Control Status, PythonPlugin:OutputVariable, Timestep;
+  Output:Variable,Shading Control Status,PythonPlugin:OutputVariable,Timestep;
 
-  Output:Variable, Shading Control Status, PythonPlugin:OutputVariable, Timestep;
+  Output:Variable,Shading Control Status,PythonPlugin:OutputVariable,Timestep;
 
   Output:Variable,Zn001:Wall001:Win001,Surface Outside Face Beam Solar Incident Angle Cosine Value,Timestep;
+
