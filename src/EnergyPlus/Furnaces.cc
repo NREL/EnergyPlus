@@ -10126,7 +10126,7 @@ namespace Furnaces {
                 }
             }
 
-            if (PartLoadFrac == 1.0 && SaveCompressorPLR < 1.0) {
+            if ((PartLoadFrac == 1.0) && (SaveCompressorPLR < 1.0) && (SpeedNum > 0)) {
                 PartLoadFrac = SaveCompressorPLR;
             }
         }
@@ -10948,7 +10948,9 @@ namespace Furnaces {
                 SavePartloadRatio = PartLoadFrac;
                 SaveSpeedRatio = SpeedRatio;
 
-                SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
+                if (Furnace(FurnaceNum).bIsIHP)
+                    SaveCompressorPLR = IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).CompressorPartLoadRatio; 
+                else SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
             } else {
                 if (Furnace(FurnaceNum).bIsIHP) {
                     SimIHP(state,
@@ -11023,7 +11025,9 @@ namespace Furnaces {
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
 
-                    SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
+                    if (Furnace(FurnaceNum).bIsIHP)
+                        SaveCompressorPLR = IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).CompressorPartLoadRatio;
+                    else SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
                 } else {
                     if (Furnace(FurnaceNum).bIsIHP) {
                         SimIHP(state,
@@ -11114,7 +11118,9 @@ namespace Furnaces {
 
                 SavePartloadRatio = PartLoadFrac;
                 SaveSpeedRatio = SpeedRatio;
-                SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
+                if (Furnace(FurnaceNum).bIsIHP) 
+                    SaveCompressorPLR = IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).CompressorPartLoadRatio;
+                else SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
             } else {
 
                 if (Furnace(FurnaceNum).bIsIHP) {
@@ -11190,7 +11196,9 @@ namespace Furnaces {
 
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
-                    SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
+                    if (Furnace(FurnaceNum).bIsIHP)
+                        SaveCompressorPLR = IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).CompressorPartLoadRatio;
+                    else SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
                 } else {
                     if (Furnace(FurnaceNum).bIsIHP) {
                         SimIHP(state,
@@ -11286,8 +11294,9 @@ namespace Furnaces {
 
                 SavePartloadRatio = PartLoadFrac;
                 SaveSpeedRatio = SpeedRatio;
-
-                SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
+                if (Furnace(FurnaceNum).bIsIHP) 
+                    SaveCompressorPLR = IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).CompressorPartLoadRatio;
+                else SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
             } else {
                 if (Furnace(FurnaceNum).bIsIHP) {
                     SimIHP(state,
@@ -11363,7 +11372,9 @@ namespace Furnaces {
 
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
-                    SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
+                    if (Furnace(FurnaceNum).bIsIHP)
+                        SaveCompressorPLR = IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).CompressorPartLoadRatio;
+                    else SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
                 } else {
                     if (Furnace(FurnaceNum).bIsIHP) {
                         SimIHP(state,

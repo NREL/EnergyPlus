@@ -1439,7 +1439,7 @@ namespace WaterThermalTanks {
                 HPWH.DXCoilTypeNum = 0;
                 if (HPWH.bIsIHP) {
                     if (IntegratedHeatPump::IHPStorageType::LIQUIDDESICCANT 
-                        == IntegratedHeatPumps(HPWH.DXCoilNum).StorageType)
+                        == IntegratedHeatPumps(HPWH.DXCoilNum).StorageType) 
                         HPWH.DXCoilType = "COILSYSTEM:DESICCANTSTORAGEHEATPUMP:AIRSOURCE";
                     else 
                         HPWH.DXCoilType = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE";
@@ -5547,7 +5547,7 @@ namespace WaterThermalTanks {
             }
 
             // Clear node initial conditions
-            if (this->UseInletNode > 0 && this->UseOutletNode > 0) {
+            if (this->UseInletNode > 0 && this->UseOutletNode > 0 && (!this->IsLiquidDesiccantHP)) {
                 DataLoopNode::Node(this->UseInletNode).Temp = 0.0;
                 Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                                DataGlobals::InitConvTemp,
@@ -5822,7 +5822,7 @@ namespace WaterThermalTanks {
 
         } // first HVAC Iteration
 
-        if (this->UseInletNode > 0 && !this->SetLoopIndexFlag) { // setup mass flows for plant connections
+        if (this->UseInletNode > 0 && !this->SetLoopIndexFlag && (!this->IsLiquidDesiccantHP)) { // setup mass flows for plant connections
             Real64 DeadBandTemp;
             if (this->IsChilledWaterTank) {
                 DeadBandTemp = this->SetPointTemp + this->DeadBandDeltaTemp;
@@ -6280,7 +6280,8 @@ namespace WaterThermalTanks {
             DataLoopNode::NodeData const &HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
             HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
         }
-        assert(HPWHCondenserDeltaT >= 0);
+
+        if (!this->IsLiquidDesiccantHP) assert(HPWHCondenserDeltaT >= 0);
 
         Real64 Qheatpump;
         Real64 Qsource;

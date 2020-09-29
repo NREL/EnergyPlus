@@ -196,6 +196,7 @@ namespace IntegratedHeatPump {
 
         int WHtankType;
         std::string WHtankName;
+        std::string WHHPType;
         int WHtankID;
         int LoopNum;
         int LoopSideNum;
@@ -274,6 +275,7 @@ namespace IntegratedHeatPump {
         int LDHeatMode; 
         Real64 TankLDMass;//liquid dessicant mass in storgae tank
         Real64 TankSaltMass;//salt mass in the tank
+        Real64 CompressorPartLoadRatio;//compressor part load ratio
 
         // Default Constructor
         IntegratedHeatPumpData()
@@ -329,7 +331,8 @@ namespace IntegratedHeatPump {
               SaltConcentration(0.0), LDHeatMode(0), TankLDMass(0.0), TankSaltMass(0.0), 
               DehumLDMassFlowSize(1.0), GridSHCoilIndex(0),
               DehumAirMasslowRate(0.0), DehumAirMasslowSize(1.0), RegenAirMasslowRate(0.0), 
-              RegenAirMasslowSize(1.0), RegenLDMassFlowRate(0.0)
+              RegenAirMasslowSize(1.0), RegenLDMassFlowRate(0.0),
+              CompressorPartLoadRatio(0.0)
         {
         }
     };
