@@ -15559,28 +15559,16 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_CheckBadInputOutputNodes)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-
-    //HeatBalanceManager::GetZoneData(ErrorsFound);
-    //ASSERT_FALSE(ErrorsFound);
-    //DataZoneEquipment::GetZoneEquipmentData1(state);
-    //ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
-
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     UnitarySys mySys;
     mySys.Name ="Bath_ZN_1_FLR_1 ZN-PTAC Unitary";
     unitarySys.push_back(mySys);
-    DataZoneEquipment::ZoneEquipInputsFilled = true;                                 // indicate zone data is available
+    DataZoneEquipment::ZoneEquipInputsFilled = true;
     DataGlobals::NumOfZones =1;
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(1);
     mySys.getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound);
     ASSERT_EQ(ErrorsFound, true);
-    /*
-    ASSERT_THROW(
-        mySys.getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound),
-        "Input and exhaust names for unitary system do not match"
-    );
-     */
 }
