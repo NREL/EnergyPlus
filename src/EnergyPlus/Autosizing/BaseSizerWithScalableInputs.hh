@@ -45,67 +45,88 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef ReportSizingManager_hh_INCLUDED
-#define ReportSizingManager_hh_INCLUDED
+#ifndef BaseSizerWithScalableInputs_hh_INCLUDED
+#define BaseSizerWithScalableInputs_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Optional.hh>
-
-// EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/api/TypeDefs.h>
+//#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
+#include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
+#include <string>
 
 namespace EnergyPlus {
 
-// Forward declarations
-class IOFiles;
 struct EnergyPlusData;
 
-namespace ReportSizingManager {
+struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs {
 
-    // Functions
+    bool zoneCoolingOnlyFan = false;
+    bool zoneHeatingOnlyFan = false;
+    bool dataHRFlowSizingFlag = false;
+    Real64 dataFracOfAutosizedCoolingAirflow = 0.0;
+    Real64 dataFracOfAutosizedHeatingAirflow = 0.0;
+    Real64 dataFlowPerCoolingCapacity = 0.0;
+    Real64 dataAutosizedCoolingCapacity = 0.0;
+    Real64 dataFlowPerHeatingCapacity = 0.0;
+    Real64 dataAutosizedHeatingCapacity = 0.0;
 
-    void clear_state();
+    // capacity sizing
+    Real64 dataCoilSizingAirInTemp = 0.0;
+    Real64 dataCoilSizingAirInHumRat = 0.0;
+    Real64 dataCoilSizingAirOutTemp = 0.0;
+    Real64 dataCoilSizingAirOutHumRat = 0.0;
+    Real64 dataCoilSizingFanCoolLoad = 0.0;
+    Real64 dataCoilSizingCapFT = 0.0;
+    Real64 dataTotCapCurveIndex = 0.0;
+    Real64 dataTotCapCurveValue = 0.0;
+    Real64 dataFracOfAutosizedCoolingCapacity = 0.0;
+    Real64 dataFracOfAutosizedHeatingCapacity = 0.0;
+    Real64 dataCoolCoilCap = 0.0;
+    Real64 dataCoilIsSuppHeater = false;
+    Real64 suppHeatCap = 0.0;
+    Real64 unitaryHeatCap = 0.0;
 
-    void ReportSizingOutput(std::string const &CompType,        // the type of the component
-                            std::string const &CompName,        // the name of the component
-                            std::string const &VarDesc,         // the description of the input variable
-                            Real64 const VarValue,              // the value from the sizing calculation
-                            Optional_string_const UsrDesc = _,  // the description of a user-specified variable
-                            Optional<Real64 const> UsrValue = _ // the value from the user for the desc item
-    );
+    int zoneHVACSizingIndex = 0;
+    Array1D<DataSizing::ZoneHVACSizingData> zoneHVACSizing;
 
-    void RequestSizing(EnergyPlusData &state, std::string const &CompType,      // type of component
-                       std::string const &CompName,      // name of component
-                       int const SizingType,             // integerized type of sizing requested (see DataHVACGlobals, e.g. CoolingCapacitySizing)
-                       std::string const &SizingString,  // string containing info for eio report
-                       Real64 &SizingResult,             // result of the sizing procedure
-                       bool const PrintWarningFlag,      // TRUE when requesting output (eio) reporting
-                       std::string const &CallingRoutine, // name of calling rotuine for warning messages
-                       Real64 const fraction = 1.0
-    );
+    void initializeWithinEP(EnergyPlusData &state,
+                            std::string const &_compType,
+                            std::string const &_compName,
+                            bool const &_printWarningFlag,
+                            std::string const &_callingRoutine) override;
 
-    void GetCoilDesFlowT(int SysNum,           // central air system index
-                         Real64 CpAir,         // specific heat to be used in calculations [J/kgC]
-                         Real64 &DesFlow,      // returned design mass flow [kg/s]
-                         Real64 &DesExitTemp,  // returned design coil exit temperature [kg/s]
-                         Real64 &DesExitHumRat // returned design coil exit humidity ratio [kg/kg]
-    );
+    void clearState() {
+        BaseSizerWithFanHeatInputs::clearState();
+        zoneCoolingOnlyFan = false;
+        zoneHeatingOnlyFan = false;
+        dataHRFlowSizingFlag = false;
+        dataFracOfAutosizedCoolingAirflow = 0.0;
+        dataFracOfAutosizedHeatingAirflow = 0.0;
+        dataFlowPerCoolingCapacity = 0.0;
+        dataAutosizedCoolingCapacity = 0.0;
+        dataFlowPerHeatingCapacity = 0.0;
+        dataAutosizedHeatingCapacity = 0.0;
+        dataCoilSizingAirInTemp = 0.0;
+        dataCoilSizingAirInHumRat = 0.0;
+        dataCoilSizingAirOutTemp = 0.0;
+        dataCoilSizingAirOutHumRat = 0.0;
+        dataCoilSizingFanCoolLoad = 0.0;
+        dataCoilSizingCapFT = 0.0;
+        dataTotCapCurveIndex = 0.0;
+        dataTotCapCurveValue = 0.0;
+        dataFracOfAutosizedCoolingCapacity = 0.0;
+        dataFracOfAutosizedHeatingCapacity = 0.0;
+        dataCoolCoilCap = 0.0;
+        dataCoilIsSuppHeater = false;
+        suppHeatCap = 0.0;
+        unitaryHeatCap = 0.0;
+        zoneHVACSizingIndex = 0;
+        zoneHVACSizing.clear();
+    }
 
-    Real64 setOAFracForZoneEqSizing(Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
-    Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
-                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
-                                               DataSizing::ZoneSizingData const &finalZoneSizing);
-    Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
-                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
-                                                 DataSizing::ZoneSizingData const &finalZoneSizing);
-    Real64 setCoolCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
-                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
-                                               DataSizing::ZoneSizingData const &finalZoneSizing);
-    Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
-                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
-                                                 DataSizing::ZoneSizingData const &finalZoneSizing);
+    void setHVACSizingIndexData(int const index);
 
-} // namespace ReportSizingManager
+};
 
 } // namespace EnergyPlus
 

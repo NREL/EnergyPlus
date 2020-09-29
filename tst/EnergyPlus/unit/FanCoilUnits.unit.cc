@@ -2087,8 +2087,8 @@ namespace EnergyPlus {
         UpdateScheduleValues();
 
         ZoneEqSizing.allocate(1);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(16);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod(16) = 0;
+        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+        ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
         CurDeadBandOrSetback.allocate(1);
         CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
@@ -2797,8 +2797,8 @@ namespace EnergyPlus {
         UpdateScheduleValues();
 
         ZoneEqSizing.allocate(1);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(16);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod(16) = 0;
+        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+        ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
         CurDeadBandOrSetback.allocate(1);
         CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
@@ -3210,8 +3210,8 @@ namespace EnergyPlus {
         UpdateScheduleValues();
 
         ZoneEqSizing.allocate(1);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(16);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod(16) = 0;
+        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+        ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
         CurDeadBandOrSetback.allocate(1);
         CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
@@ -3572,8 +3572,8 @@ namespace EnergyPlus {
         DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
         UpdateScheduleValues();
         ZoneEqSizing.allocate(1);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(16);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod(16) = 0;
+        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+        ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
         CurDeadBandOrSetback.allocate(1);
         CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
@@ -3939,8 +3939,8 @@ namespace EnergyPlus {
         DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
         UpdateScheduleValues();
         ZoneEqSizing.allocate(1);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(16);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod(16) = 0;
+        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+        ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
         CurDeadBandOrSetback.allocate(1);
         CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
@@ -4306,8 +4306,8 @@ namespace EnergyPlus {
         DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
         UpdateScheduleValues();
         ZoneEqSizing.allocate(1);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(16);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod(16) = 0;
+        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+        ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
         CurDeadBandOrSetback.allocate(1);
         CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);

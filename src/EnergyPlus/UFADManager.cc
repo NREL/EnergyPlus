@@ -54,6 +54,7 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -72,7 +73,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UFADManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -140,7 +140,8 @@ namespace UFADManager {
     Real64 HeightIntMassDefault(2.0);    // Default height of internal mass surfaces
     bool MyOneTimeFlag(true);
 
-    void clear_state() {
+    void clear_state()
+    {
         MyOneTimeFlag = true;
     }
 
@@ -320,7 +321,6 @@ namespace UFADManager {
 
         // Using/Aliasing
         using DataSizing::AutoSize;
-        using ReportSizingManager::ReportSizingOutput;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -367,10 +367,10 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUI(UINum).DiffArea = 0.0075;
                 }
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
-                                   ZoneUCSDUI(UINum).ZoneName,
-                                   "Design effective area of diffuser",
-                                   ZoneUCSDUI(UINum).DiffArea);
+                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
+                                             ZoneUCSDUI(UINum).ZoneName,
+                                             "Design effective area of diffuser",
+                                             ZoneUCSDUI(UINum).DiffArea);
             }
             if (ZoneUCSDUI(UINum).DiffAngle == AutoSize) {
                 if (ZoneUCSDUI(UINum).DiffuserType == Swirl) {
@@ -384,10 +384,10 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUI(UINum).DiffAngle = 28.0;
                 }
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
-                                   ZoneUCSDUI(UINum).ZoneName,
-                                   "Angle between diffuser slots and the vertical",
-                                   ZoneUCSDUI(UINum).DiffAngle);
+                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
+                                             ZoneUCSDUI(UINum).ZoneName,
+                                             "Angle between diffuser slots and the vertical",
+                                             ZoneUCSDUI(UINum).DiffAngle);
             }
             if (ZoneUCSDUI(UINum).TransHeight == AutoSize) {
                 ZoneUCSDUI(UINum).CalcTransHeight = true;
@@ -489,10 +489,10 @@ namespace UFADManager {
                 }
                 ZoneUCSDUI(UINum).PowerPerPlume =
                     (NumberOfOccupants * 73.0 + ZoneElecConv + ZoneGasConv + ZoneOthEqConv + ZoneHWEqConv + ZoneSteamEqConv) / NumberOfPlumes;
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
-                                   ZoneUCSDUI(UINum).ZoneName,
-                                   "Power per plume [W]",
-                                   ZoneUCSDUI(UINum).PowerPerPlume);
+                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
+                                             ZoneUCSDUI(UINum).ZoneName,
+                                             "Power per plume [W]",
+                                             ZoneUCSDUI(UINum).PowerPerPlume);
             }
             if (ZoneUCSDUI(UINum).DiffusersPerZone == AutoSize) {
                 if (NumberOfOccupants > 0.0) {
@@ -500,10 +500,10 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUI(UINum).DiffusersPerZone = 1.0;
                 }
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
-                                   ZoneUCSDUI(UINum).ZoneName,
-                                   "Number of diffusers per zone",
-                                   ZoneUCSDUI(UINum).DiffusersPerZone);
+                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionInterior",
+                                             ZoneUCSDUI(UINum).ZoneName,
+                                             "Number of diffusers per zone",
+                                             ZoneUCSDUI(UINum).DiffusersPerZone);
             }
         }
 
@@ -543,10 +543,10 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUE(UINum).DiffArea = 0.0075;
                 }
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
-                                   ZoneUCSDUE(UINum).ZoneName,
-                                   "Design effective area of diffuser",
-                                   ZoneUCSDUE(UINum).DiffArea);
+                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
+                                             ZoneUCSDUE(UINum).ZoneName,
+                                             "Design effective area of diffuser",
+                                             ZoneUCSDUE(UINum).DiffArea);
             }
             if (ZoneUCSDUE(UINum).DiffAngle == AutoSize) {
                 if (ZoneUCSDUE(UINum).DiffuserType == Swirl) {
@@ -560,10 +560,10 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUE(UINum).DiffAngle = 28.0;
                 }
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
-                                   ZoneUCSDUE(UINum).ZoneName,
-                                   "Angle between diffuser slots and the vertical",
-                                   ZoneUCSDUE(UINum).DiffAngle);
+                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
+                                             ZoneUCSDUE(UINum).ZoneName,
+                                             "Angle between diffuser slots and the vertical",
+                                             ZoneUCSDUE(UINum).DiffAngle);
             }
             if (ZoneUCSDUE(UINum).TransHeight == AutoSize) {
                 ZoneUCSDUE(UINum).CalcTransHeight = true;
@@ -664,10 +664,10 @@ namespace UFADManager {
                 }
                 ZoneUCSDUE(UINum).PowerPerPlume =
                     (NumberOfOccupants * 73.0 + ZoneElecConv + ZoneGasConv + ZoneOthEqConv + ZoneHWEqConv + ZoneSteamEqConv) / NumberOfPlumes;
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
-                                   ZoneUCSDUE(UINum).ZoneName,
-                                   "Power per plume [W]",
-                                   ZoneUCSDUE(UINum).PowerPerPlume);
+                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
+                                             ZoneUCSDUE(UINum).ZoneName,
+                                             "Power per plume [W]",
+                                             ZoneUCSDUE(UINum).PowerPerPlume);
             }
             if (ZoneUCSDUE(UINum).DiffusersPerZone == AutoSize) {
                 if (NumberOfOccupants > 0.0) {
@@ -675,10 +675,10 @@ namespace UFADManager {
                 } else {
                     ZoneUCSDUE(UINum).DiffusersPerZone = 1.0;
                 }
-                ReportSizingOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
-                                   ZoneUCSDUE(UINum).ZoneName,
-                                   "Number of diffusers per zone",
-                                   ZoneUCSDUE(UINum).DiffusersPerZone);
+                BaseSizer::reportSizerOutput("RoomAirSettings:UnderFloorAirDistributionExterior",
+                                             ZoneUCSDUE(UINum).ZoneName,
+                                             "Number of diffusers per zone",
+                                             ZoneUCSDUE(UINum).DiffusersPerZone);
             }
         }
     }

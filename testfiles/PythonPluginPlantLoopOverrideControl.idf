@@ -91,7 +91,9 @@
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     first part of Feb,       !- Name
@@ -7160,7 +7162,7 @@
 
   UtilityCost:Tariff,
     FL_EIAMonthlyRateGas,    !- Name
-    NaturalGas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,     !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -7830,7 +7832,7 @@
     3,                       !- Digits After Decimal
     Cooling:Electricity,     !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating:NaturalGas,             !- Variable or Meter 2 Name
+    Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Variable,*,Pump Electricity Rate,hourly;
@@ -7856,26 +7858,23 @@
 ! Begin demo of using PythonPlugin to replace EMS
 
   PythonPlugin:Instance,
-    Condenser OnOff Management,             !- Name
-    Yes,                                    !- Run During Warmup Days
-    PythonPluginPlantLoopOverrideControl,   !- Python Module Name
-    TowerControl;                           !- Plugin Class Name
+    Condenser OnOff Management,  !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginPlantLoopOverrideControl,  !- Python Module Name
+    TowerControl;            !- Plugin Class Name
 
   PythonPlugin:Variables,
-    PythonGlobalVars,           !- Name
-    PumpFlowOverrideReport;     !- Variable Name 1
+    PythonGlobalVars,        !- Name
+    PumpFlowOverrideReport;  !- Variable Name 1
 
   PythonPlugin:OutputVariable,
-    PythonPlugin Condenser Flow Override On,     !- Name
-    PumpFlowOverrideReport,             !- PythonPlugin:Variable Name
-    Averaged,                           !- Type of Data in Variable
-    SystemTimestep,                     !- Update Frequency
-    On/Off;                             !- Units
+    PythonPlugin Condenser Flow Override On,  !- Name
+    PumpFlowOverrideReport,  !- Python Plugin Variable Name
+    Averaged,                !- Type of Data in Variable
+    SystemTimestep,          !- Update Frequency
+    On/Off;                  !- Units
 
-  Output:Variable,
-    PythonPlugin Condenser Flow Override On,
-    PythonPlugin:OutputVariable,
-    Hourly;
+  Output:Variable,PythonPlugin Condenser Flow Override On,PythonPlugin:OutputVariable,Hourly;
 
   Output:SQLite,
     SimpleAndTabular;        !- Option Type

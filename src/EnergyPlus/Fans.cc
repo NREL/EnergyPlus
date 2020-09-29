@@ -53,8 +53,10 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -67,14 +69,12 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -174,7 +174,8 @@ namespace Fans {
     // MODULE SUBROUTINES:
     //*************************************************************************
 
-    void SimulateFanComponents(EnergyPlusData &state, std::string const &CompName,
+    void SimulateFanComponents(EnergyPlusData &state,
+                               std::string const &CompName,
                                bool const FirstHVACIteration,
                                int &CompIndex,
                                Optional<Real64 const> SpeedRatio,
@@ -313,7 +314,7 @@ namespace Fans {
         int NumNums;
         int checkNum;
         int IOStat;
-        bool ErrorsFound(false);                        // If errors detected in input
+        bool ErrorsFound(false);                               // If errors detected in input
         static std::string const RoutineName("GetFanInput: "); // include trailing blank space
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
@@ -1003,7 +1004,8 @@ namespace Fans {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitFan(EnergyPlusData &state, int const FanNum,
+    void InitFan(EnergyPlusData &state,
+                 int const FanNum,
                  bool const EP_UNUSED(FirstHVACIteration) // unused1208
     )
     {
@@ -1188,8 +1190,6 @@ namespace Fans {
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
         using General::RoundSigDigits;
-        using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1238,15 +1238,21 @@ namespace Fans {
         } else {
             FieldNum = 3;
         }
+        SizingString = FanNumericFields(FanNum).FieldNames(FieldNum) + " [m3/s]";
+
         TempFlow = Fan(FanNum).MaxAirFlowRate;
         DataAutosizable = Fan(FanNum).MaxAirFlowRateIsAutosizable;
-        SizingString = FanNumericFields(FanNum).FieldNames(FieldNum) + " [m3/s]";
         CompType = Fan(FanNum).FanType;
         CompName = Fan(FanNum).FanName;
         DataEMSOverrideON = Fan(FanNum).MaxAirFlowRateEMSOverrideOn;
         DataEMSOverride = Fan(FanNum).MaxAirFlowRateEMSOverrideValue;
-        RequestSizing(state, CompType, CompName, SystemAirflowSizing, SizingString, TempFlow, bPRINT, RoutineName);
-        Fan(FanNum).MaxAirFlowRate = TempFlow;
+
+        bool errorsFound = false;
+        SystemAirFlowSizer sizerSystemAirFlow;
+        sizerSystemAirFlow.overrideSizingString(SizingString);
+        sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+        Fan(FanNum).MaxAirFlowRate = sizerSystemAirFlow.size(state, TempFlow, errorsFound);
+
         DataAutosizable = true;
         DataEMSOverrideON = false;
         DataEMSOverride = 0.0;
@@ -1436,21 +1442,21 @@ namespace Fans {
             Fan(FanNum).FanEff = Fan(FanNum).FanWheelEff * Fan(FanNum).BeltEff * Fan(FanNum).MotEff * Fan(FanNum).VFDEff;
 
             // Report fan, belt, motor, and VFD characteristics at design condition to .eio file cpw14Sep2010
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Airflow [m3/s]", FanVolFlow);
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Static Pressure Rise [Pa]", Fan(FanNum).DeltaPress);
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Shaft Power [W]", Fan(FanNum).FanShaftPower);
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Motor Output Power [W]", Fan(FanNum).MotorMaxOutPwr);
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design VFD Output Power [W]", Fan(FanNum).VFDMaxOutPwr);
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Rated Power [W]", RatedPower);
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Drive Ratio []", Fan(FanNum).PulleyDiaRatio);
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Belt Output Torque [Nm]", Fan(FanNum).BeltMaxTorque);
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Efficiency  []", Fan(FanNum).FanWheelEff);
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Maximum Belt Efficiency []", Fan(FanNum).BeltMaxEff);
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Belt Efficiency []", Fan(FanNum).BeltEff);
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Maximum Motor Efficiency []", Fan(FanNum).MotorMaxEff);
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Motor Efficiency []", Fan(FanNum).MotEff);
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design VFD Efficiency []", Fan(FanNum).VFDEff);
-            ReportSizingOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Combined Efficiency []", Fan(FanNum).FanEff);
+            BaseSizer::reportSizerOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Airflow [m3/s]", FanVolFlow);
+            BaseSizer::reportSizerOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Static Pressure Rise [Pa]", Fan(FanNum).DeltaPress);
+            BaseSizer::reportSizerOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Shaft Power [W]", Fan(FanNum).FanShaftPower);
+            BaseSizer::reportSizerOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Motor Output Power [W]", Fan(FanNum).MotorMaxOutPwr);
+            BaseSizer::reportSizerOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design VFD Output Power [W]", Fan(FanNum).VFDMaxOutPwr);
+            BaseSizer::reportSizerOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Rated Power [W]", RatedPower);
+            BaseSizer::reportSizerOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Drive Ratio []", Fan(FanNum).PulleyDiaRatio);
+            BaseSizer::reportSizerOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Belt Output Torque [Nm]", Fan(FanNum).BeltMaxTorque);
+            BaseSizer::reportSizerOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Fan Efficiency  []", Fan(FanNum).FanWheelEff);
+            BaseSizer::reportSizerOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Maximum Belt Efficiency []", Fan(FanNum).BeltMaxEff);
+            BaseSizer::reportSizerOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Belt Efficiency []", Fan(FanNum).BeltEff);
+            BaseSizer::reportSizerOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Maximum Motor Efficiency []", Fan(FanNum).MotorMaxEff);
+            BaseSizer::reportSizerOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Motor Efficiency []", Fan(FanNum).MotEff);
+            BaseSizer::reportSizerOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design VFD Efficiency []", Fan(FanNum).VFDEff);
+            BaseSizer::reportSizerOutput(Fan(FanNum).FanType, Fan(FanNum).FanName, "Design Combined Efficiency []", Fan(FanNum).FanEff);
 
             // cpw31Aug2010 Temporary code for debugging fan component model
             //    WRITE(300,*) TRIM(RoundSigDigits(RhoAir,4))//','//TRIM(RoundSigDigits(FanVolFlow,4)) &
@@ -1512,8 +1518,9 @@ namespace Fans {
 
             // Check fault availability schedules
             if (!FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve(state)) {
-                ShowSevereError("FaultModel:Fouling:AirFilter = \"" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).Name  + "\"");
-                ShowContinueError("Invalid Fan Curve Name = \"" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurve + "\" does not cover ");
+                ShowSevereError("FaultModel:Fouling:AirFilter = \"" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).Name + "\"");
+                ShowContinueError("Invalid Fan Curve Name = \"" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurve +
+                                  "\" does not cover ");
                 ShowContinueError("the operational point of Fan " + Fan(FanNum).FanName);
                 ShowFatalError("SizeFan: Invalid FaultModel:Fouling:AirFilter=" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).Name);
             }
@@ -3231,7 +3238,8 @@ namespace Fans {
         return FanDesignAirFlowRate - FanFaultyAirFlowRate;
     }
 
-    Real64 FanDesHeatGain(EnergyPlusData &state, int const FanNum,       // index of fan in Fan array
+    Real64 FanDesHeatGain(EnergyPlusData &state,
+                          int const FanNum,       // index of fan in Fan array
                           Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     )
     {
@@ -3283,6 +3291,42 @@ namespace Fans {
         return DesignHeatGain;
 
     } // FanDesHeatGain
+
+    void FanInputsForDesHeatGain(EnergyPlusData &state,
+                                 int const &fanIndex,
+                                 Real64 &deltaP,
+                                 Real64 &motEff,
+                                 Real64 &totEff,
+                                 Real64 &motInAirFrac,
+                                 Real64 &fanShaftPow,
+                                 Real64 &motInPower,
+                                 bool &fanCompModel)
+    {
+        deltaP = 0.0;
+        motEff = 0.0;
+        totEff = 0.0;
+        motInAirFrac = 0.0;
+        fanShaftPow = 0.0;
+        motInPower = 0.0;
+        fanCompModel = false;
+        if (fanIndex <= 0) {
+            return;
+        } else if (Fan(fanIndex).FanType_Num != FanType_ComponentModel) {
+            deltaP = Fan(fanIndex).DeltaPress;
+            motEff = Fan(fanIndex).MotEff;
+            totEff = Fan(fanIndex).FanEff;
+            motInAirFrac = Fan(fanIndex).MotInAirFrac;
+        } else {
+            if (!SysSizingCalc && MySizeFlag(fanIndex)) {
+                SizeFan(state, fanIndex);
+                MySizeFlag(fanIndex) = false;
+            }
+            fanCompModel = true;
+            fanShaftPow = Fan(fanIndex).FanShaftPower;
+            motInPower = Fan(fanIndex).MotorInputPower;
+            motInAirFrac = Fan(fanIndex).MotInAirFrac;
+        }
+    }
 
     // Clears the global data in Fans.
     // Needed for unit tests, should not be normally called.

@@ -83,7 +83,6 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -112,7 +111,6 @@ using namespace EnergyPlus::GlobalNames;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::MixedAir;
 using namespace EnergyPlus::Psychrometrics;
-using namespace EnergyPlus::ReportSizingManager;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::SizingManager;
 using namespace EnergyPlus::WaterCoils;

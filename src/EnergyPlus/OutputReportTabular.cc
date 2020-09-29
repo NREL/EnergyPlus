@@ -735,6 +735,21 @@ namespace OutputReportTabular {
         numPeopleAdaptive = 0;
     }
 
+    std::ofstream & open_tbl_stream(int const iStyle, std::string const & filename, bool output_to_file)
+    {
+        std::ofstream &tbl_stream(*TabularOutputFile(iStyle));
+        if (output_to_file) {
+            tbl_stream.open(filename);
+            if (!tbl_stream) {
+                ShowFatalError("OpenOutputTabularFile: Could not open file \"" + filename +
+                               "\" for output (write).");
+            }
+        } else {
+            tbl_stream.setstate(std::ios_base::badbit);
+        }
+        return tbl_stream;
+    }
+
     void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
@@ -869,7 +884,7 @@ namespace OutputReportTabular {
         int IOStat;               // IO Status when calling get input subroutine
         static bool ErrorsFound(false);
 
-        if (!ioFiles.outputControl.tabular) {
+        if (!(ioFiles.outputControl.tabular || ioFiles.outputControl.sqlite)) {
             WriteTabularFiles = false;
             return;
         }
@@ -900,7 +915,7 @@ namespace OutputReportTabular {
             curTable = AddMonthlyReport(AlphArray(1), int(NumArray(1)));
             for (jField = 2; jField <= NumAlphas; jField += 2) {
                 if (AlphArray(jField).empty()) {
-                    ShowFatalError("Blank report name in Oputput:Table:Monthly");
+                    ShowFatalError("Blank report name in Output:Table:Monthly");
                 }
                 curAggString = AlphArray(jField + 1);
                 // set accumulator values to default as appropriate for aggregation type
@@ -1592,7 +1607,7 @@ namespace OutputReportTabular {
         Array1D_string objNames;
         Array1D_int objVarIDs;
 
-        if (!ioFiles.outputControl.tabular) {
+        if (!(ioFiles.outputControl.tabular || ioFiles.outputControl.sqlite)) {
             WriteTabularFiles = false;
             return;
         }
@@ -2006,7 +2021,7 @@ namespace OutputReportTabular {
         bool nameFound;
         bool ErrorsFound;
 
-        if (!ioFiles.outputControl.tabular) {
+        if (!(ioFiles.outputControl.tabular || ioFiles.outputControl.sqlite)) {
             WriteTabularFiles = false;
             return;
         }
@@ -3535,7 +3550,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void OpenOutputTabularFile()
+    void OpenOutputTabularFile(IOFiles & ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -3580,17 +3595,12 @@ namespace OutputReportTabular {
         // create a file to hold the results
         // Use a CSV file if comma seperated but otherwise use TXT file
         // extension.
-        if (WriteTabularFiles) {
+        if (WriteTabularFiles && ioFiles.outputControl.tabular) {
             for (iStyle = 1; iStyle <= numStyles; ++iStyle) {
-                std::ofstream &tbl_stream(*TabularOutputFile(iStyle));
                 curDel = del(iStyle);
                 if (TableStyle(iStyle) == tableStyleComma) {
                     DisplayString("Writing tabular output file results using comma format.");
-                    tbl_stream.open(DataStringGlobals::outputTblCsvFileName);
-                    if (!tbl_stream) {
-                        ShowFatalError("OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblCsvFileName +
-                                       "\" for output (write).");
-                    }
+                    std::ofstream & tbl_stream = open_tbl_stream(iStyle, DataStringGlobals::outputTblCsvFileName, ioFiles.outputControl.tabular);
                     tbl_stream << "Program Version:" << curDel << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
                     tbl_stream << '\n';
@@ -3603,11 +3613,7 @@ namespace OutputReportTabular {
                     tbl_stream << '\n';
                 } else if (TableStyle(iStyle) == tableStyleTab) {
                     DisplayString("Writing tabular output file results using tab format.");
-                    tbl_stream.open(DataStringGlobals::outputTblTabFileName);
-                    if (!tbl_stream) {
-                        ShowFatalError("OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblTabFileName +
-                                       "\" for output (write).");
-                    }
+                    std::ofstream & tbl_stream = open_tbl_stream(iStyle, DataStringGlobals::outputTblTabFileName, ioFiles.outputControl.tabular);
                     tbl_stream << "Program Version" << curDel << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
                     tbl_stream << '\n';
@@ -3620,11 +3626,7 @@ namespace OutputReportTabular {
                     tbl_stream << '\n';
                 } else if (TableStyle(iStyle) == tableStyleHTML) {
                     DisplayString("Writing tabular output file results using HTML format.");
-                    tbl_stream.open(DataStringGlobals::outputTblHtmFileName);
-                    if (!tbl_stream) {
-                        ShowFatalError("OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblHtmFileName +
-                                       "\" for output (write).");
-                    }
+                    std::ofstream & tbl_stream = open_tbl_stream(iStyle, DataStringGlobals::outputTblHtmFileName, ioFiles.outputControl.tabular);
                     tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
                     tbl_stream << "<html>\n";
                     tbl_stream << "<head>\n";
@@ -3657,11 +3659,7 @@ namespace OutputReportTabular {
                                << "</b></p>\n";
                 } else if (TableStyle(iStyle) == tableStyleXML) {
                     DisplayString("Writing tabular output file results using XML format.");
-                    tbl_stream.open(DataStringGlobals::outputTblXmlFileName);
-                    if (!tbl_stream) {
-                        ShowFatalError("OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblXmlFileName +
-                                       "\" for output (write).");
-                    }
+                    std::ofstream & tbl_stream = open_tbl_stream(iStyle, DataStringGlobals::outputTblXmlFileName, ioFiles.outputControl.tabular);
                     tbl_stream << "<?xml version=\"1.0\"?>\n";
                     tbl_stream << "<EnergyPlusTabularReports>\n";
                     tbl_stream << "  <BuildingName>" << BuildingName << "</BuildingName>\n";
@@ -3681,11 +3679,7 @@ namespace OutputReportTabular {
                     tbl_stream << '\n';
                 } else {
                     DisplayString("Writing tabular output file results using text format.");
-                    tbl_stream.open(DataStringGlobals::outputTblTxtFileName);
-                    if (!tbl_stream) {
-                        ShowFatalError("OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblTxtFileName +
-                                       "\" for output (write).");
-                    }
+                    std::ofstream & tbl_stream = open_tbl_stream(iStyle, DataStringGlobals::outputTblTxtFileName, ioFiles.outputControl.tabular);
                     tbl_stream << "Program Version: " << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
                     tbl_stream << '\n';
@@ -5268,7 +5262,7 @@ namespace OutputReportTabular {
             ZonePreDefRep(iZone).SHGSAnLiteAdd += ZnRpt(iZone).LtsTotGain * mult * timeStepRatio;
             // HVAC Input Sensible Air Heating
             // HVAC Input Sensible Air Cooling
-            Real64 ZoneEqHeatorCool = 
+            Real64 ZoneEqHeatorCool =
                 ZnAirRpt(iZone).SumMCpDTsystem + ZnAirRpt(iZone).SumNonAirSystem * mult - ATUHeat(iZone) - ATUCool(iZone);
             if (ZoneEqHeatorCool > 0.0) {
                 ZonePreDefRep(iZone).SHGSAnZoneEqHt += ZoneEqHeatorCool * TimeStepSys * SecInHour;
@@ -5352,7 +5346,7 @@ namespace OutputReportTabular {
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             // ZonePreDefRep variables above already inlude zone list and group multipliers
             total = ZonePreDefRep(iZone).SHGSAnPeoplAdd + ZonePreDefRep(iZone).SHGSAnLiteAdd + ZonePreDefRep(iZone).SHGSAnZoneEqHt +
-                    ZonePreDefRep(iZone).SHGSAnZoneEqCl + ZonePreDefRep(iZone).SHGSAnHvacATUHt + ZonePreDefRep(iZone).SHGSAnHvacATUCl + 
+                    ZonePreDefRep(iZone).SHGSAnZoneEqCl + ZonePreDefRep(iZone).SHGSAnHvacATUHt + ZonePreDefRep(iZone).SHGSAnHvacATUCl +
                     ZonePreDefRep(iZone).SHGSAnIzaAdd + ZonePreDefRep(iZone).SHGSAnIzaRem +
                     ZonePreDefRep(iZone).SHGSAnWindAdd + ZonePreDefRep(iZone).SHGSAnWindRem + ZonePreDefRep(iZone).SHGSAnInfilAdd +
                     ZonePreDefRep(iZone).SHGSAnInfilRem + ZonePreDefRep(iZone).SHGSAnEquipAdd + ZonePreDefRep(iZone).SHGSAnEquipRem +
@@ -11716,7 +11710,7 @@ namespace OutputReportTabular {
         //   Create arrays for the call to WriteTable and then call it.
         //   The tables created do not have known headers for rows or
         //   columns so those are determined based on what calls have
-        //   been made to the ReportSizingOutput routine.  A table
+        //   been made to the Sizer routine.  A table
         //   is created for each type of component. Columns are created
         //   for each description within that table. Rows are created
         //   for each named object.

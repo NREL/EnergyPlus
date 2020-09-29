@@ -705,6 +705,8 @@ namespace OutputReportTabular {
     // Functions
     void clear_state();
 
+    std::ofstream & open_tbl_stream(int const iStyle, std::string const & filename, bool output_to_file = true);
+
     void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     //======================================================================================================================
@@ -753,7 +755,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void OpenOutputTabularFile();
+    void OpenOutputTabularFile(IOFiles & ioFiles);
 
     void CloseOutputTabularFile();
 

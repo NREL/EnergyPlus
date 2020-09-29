@@ -6482,7 +6482,6 @@ namespace WindowManager {
         // by LU decomposition.
 
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-        // unused0909  USE DataEnvironment, ONLY: StdBaroPress
 
         // Argument array dimensioning
         hgap.dim(5);
