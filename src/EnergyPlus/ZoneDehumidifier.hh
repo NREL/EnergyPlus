@@ -137,7 +137,8 @@ namespace ZoneDehumidifier {
     // Functions
 
     void SimZoneDehumidifier(EnergyPlusData &state,
-                             ZoneDehumidifierData &dataZoneDehumidifier, std::string const &CompName,   // Name of the zone dehumidifier
+                             ZoneDehumidifierData &dataZoneDehumidifier,
+                             std::string const &CompName,   // Name of the zone dehumidifier
                              int const ZoneNum,             // Number of zone being served
                              bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                              Real64 &QSensOut,              // Sensible capacity delivered to zone (W)

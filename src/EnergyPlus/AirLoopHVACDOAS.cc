@@ -468,7 +468,7 @@ namespace AirLoopHVACDOAS {
                             SELECT_CASE_var, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = WaterCoils::GetCoilOutletNode(state,
                             SELECT_CASE_var, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
-                        thisDOAS.CWCtrlNodeNum = WaterCoils::GetCoilWaterInletNode("COIL:COOLING:WATER", CompName, errorsFound);
+                        thisDOAS.CWCtrlNodeNum = WaterCoils::GetCoilWaterInletNode(state, "COIL:COOLING:WATER", CompName, errorsFound);
                         if (errorsFound) {
                             ShowContinueError("The control node number is not found in " + CurrentModuleObject + " = " +
                                               state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
@@ -494,7 +494,7 @@ namespace AirLoopHVACDOAS {
                             SELECT_CASE_var, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = WaterCoils::GetCoilOutletNode(state,
                             SELECT_CASE_var, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
-                        thisDOAS.HWCtrlNodeNum = WaterCoils::GetCoilWaterInletNode("Coil:Heating:Water", CompName, errorsFound);
+                        thisDOAS.HWCtrlNodeNum = WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", CompName, errorsFound);
                         if (errorsFound) {
                             ShowContinueError("The control node number is not found in " + CurrentModuleObject + " = " +
                                               state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
@@ -526,7 +526,7 @@ namespace AirLoopHVACDOAS {
                             SELECT_CASE_var, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = WaterCoils::GetCoilOutletNode(state,
                             SELECT_CASE_var, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
-                        thisDOAS.CWCtrlNodeNum = WaterCoils::GetCoilWaterInletNode("Coil:Cooling:Water:DetailedGeometry", CompName, errorsFound);
+                        thisDOAS.CWCtrlNodeNum = WaterCoils::GetCoilWaterInletNode(state, "Coil:Cooling:Water:DetailedGeometry", CompName, errorsFound);
                         if (errorsFound) {
                             ShowContinueError("The control node number is not found in " + CurrentModuleObject + " = " +
                                               state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
@@ -810,7 +810,7 @@ namespace AirLoopHVACDOAS {
 
                 if (UtilityRoutines::SameString(CompType, "COIL:HEATING:WATER")) {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_HeatCoilNum);
-                    Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", CompName, ErrorsFound);
+                    Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HWLoopNum).FluidName,
                                                             DataGlobals::HWInitConvTemp,
                                                             DataPlant::PlantLoop(this->HWLoopNum).FluidIndex,
@@ -826,7 +826,7 @@ namespace AirLoopHVACDOAS {
                 }
                 if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER")) {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
-                    Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate("Coil:Cooling:Water", CompName, ErrorsFound);
+                    Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                                             DataGlobals::CWInitConvTemp,
                                                             DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
@@ -842,7 +842,7 @@ namespace AirLoopHVACDOAS {
                 }
                 if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
-                    Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate("Coil:Cooling:Water:DetailedGeometry", CompName, ErrorsFound);
+                    Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water:DetailedGeometry", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                                             DataGlobals::CWInitConvTemp,
                                                             DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
@@ -923,7 +923,7 @@ namespace AirLoopHVACDOAS {
             }
         }
         this->SizingMassFlow = sizingMassFlow;
-        this->GetDesignDayConditions();
+        this->GetDesignDayConditions(state);
 
         if (this->m_FanIndex > -1 && this->m_FanTypeNum == SimAirServingZones::Fan_System_Object) {
             HVACFan::fanObjs[this->m_FanIndex]->designAirVolFlowRate = sizingMassFlow / DataEnvironment::StdRhoAir;
@@ -954,40 +954,38 @@ namespace AirLoopHVACDOAS {
         }
     }
 
-    void AirLoopDOAS::GetDesignDayConditions()
+    void AirLoopDOAS::GetDesignDayConditions(EnergyPlusData &state)
     {
-        // Using/Aliasing
-        using WeatherManager::DesDayInput;
 
         int const summerDesignDayTypeIndex(9);
         int const winterDesignDayTypeIndex(10);
         bool static SummerDesignDayFlag = true;
         bool static WinterDesignDayFlag = true;
 
-        for (size_t i = 1; i <= DesDayInput.size(); i++) {
+        for (size_t i = 1; i <= state.dataWeatherManager->DesDayInput.size(); i++) {
             // Summer design day
-            if (DesDayInput(i).DayType == summerDesignDayTypeIndex && SummerDesignDayFlag) {
-                this->SizingCoolOATemp = DesDayInput(i).MaxDryBulb;
-                if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
+            if (state.dataWeatherManager->DesDayInput(i).DayType == summerDesignDayTypeIndex && SummerDesignDayFlag) {
+                this->SizingCoolOATemp = state.dataWeatherManager->DesDayInput(i).MaxDryBulb;
+                if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
                     this->SizingCoolOAHumRat =
-                        Psychrometrics::PsyWFnTdbTwbPb(this->SizingCoolOATemp, DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::DewPoint) { // dewpoint
-                    this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdpPb(DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::HumRatio) {
-                    this->SizingCoolOAHumRat = DesDayInput(i).HumIndValue;
+                        Psychrometrics::PsyWFnTdbTwbPb(this->SizingCoolOATemp, state.dataWeatherManager->DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                } else if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::DewPoint) { // dewpoint
+                    this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdpPb(state.dataWeatherManager->DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                } else if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::HumRatio) {
+                    this->SizingCoolOAHumRat = state.dataWeatherManager->DesDayInput(i).HumIndValue;
                 } // else { // What about other cases?
                 SummerDesignDayFlag = false;
             }
             // Winter design day
-            if (DesDayInput(i).DayType == winterDesignDayTypeIndex && WinterDesignDayFlag) {
-                this->HeatOutTemp = DesDayInput(i).MaxDryBulb;
-                if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
+            if (state.dataWeatherManager->DesDayInput(i).DayType == winterDesignDayTypeIndex && WinterDesignDayFlag) {
+                this->HeatOutTemp = state.dataWeatherManager->DesDayInput(i).MaxDryBulb;
+                if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
                     this->HeatOutHumRat =
-                        Psychrometrics::PsyWFnTdbTwbPb(this->HeatOutTemp, DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::DewPoint) { // dewpoint
-                    this->HeatOutHumRat = Psychrometrics::PsyWFnTdpPb(DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::HumRatio) {
-                    this->HeatOutHumRat = DesDayInput(i).HumIndValue;
+                        Psychrometrics::PsyWFnTdbTwbPb(this->HeatOutTemp, state.dataWeatherManager->DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                } else if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::DewPoint) { // dewpoint
+                    this->HeatOutHumRat = Psychrometrics::PsyWFnTdpPb(state.dataWeatherManager->DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
+                } else if (state.dataWeatherManager->DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::HumRatio) {
+                    this->HeatOutHumRat = state.dataWeatherManager->DesDayInput(i).HumIndValue;
                 } // else { // What about other cases?
                 WinterDesignDayFlag = false;
             }

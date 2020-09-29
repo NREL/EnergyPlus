@@ -84,11 +84,11 @@ TEST_F(EnergyPlusFixture, SiteDeepGroundTempTest)
 
     auto thisModel = GetGroundTempModelAndInit(state, CurrentModuleObject, "TEST");
 
-    EXPECT_NEAR(21.0, thisModel->getGroundTempAtTimeInMonths(0.0, 1), 0.1);  // January
-    EXPECT_NEAR(32.0, thisModel->getGroundTempAtTimeInMonths(0.0, 12), 0.1); // December
-    EXPECT_NEAR(22.0, thisModel->getGroundTempAtTimeInMonths(0.0, 14), 0.1); // Feb of next year
+    EXPECT_NEAR(21.0, thisModel->getGroundTempAtTimeInMonths(state, 0.0, 1), 0.1);  // January
+    EXPECT_NEAR(32.0, thisModel->getGroundTempAtTimeInMonths(state, 0.0, 12), 0.1); // December
+    EXPECT_NEAR(22.0, thisModel->getGroundTempAtTimeInMonths(state, 0.0, 14), 0.1); // Feb of next year
 
-    EXPECT_NEAR(23.0, thisModel->getGroundTempAtTimeInSeconds(0.0, 6393600), 0.1);  // March 15
-    EXPECT_NEAR(29.0, thisModel->getGroundTempAtTimeInSeconds(0.0, 22291200), 0.1); // Sept 15
-    EXPECT_NEAR(22.0, thisModel->getGroundTempAtTimeInSeconds(0.0, 35510400), 0.1); // Feb 15 of next year
+    EXPECT_NEAR(23.0, thisModel->getGroundTempAtTimeInSeconds(state, 0.0, 6393600), 0.1);  // March 15
+    EXPECT_NEAR(29.0, thisModel->getGroundTempAtTimeInSeconds(state, 0.0, 22291200), 0.1); // Sept 15
+    EXPECT_NEAR(22.0, thisModel->getGroundTempAtTimeInSeconds(state, 0.0, 35510400), 0.1); // Feb 15 of next year
 }

@@ -54,9 +54,12 @@
 #include <vector>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+    struct EnergyPlusData;
 
     void SizingAnalysisObjects_clear_state();
 
@@ -144,15 +147,15 @@ class SizingLoggerFramework
 public:
     std::vector<SizingLog> logObjs;
 
-    int SetupVariableSizingLog(Real64 &rVariable, int stepsInAverage);
+    int SetupVariableSizingLog(EnergyPlusData& state, Real64 &rVariable, int stepsInAverage);
 
-    ZoneTimestepObject PrepareZoneTimestepStamp();
+    ZoneTimestepObject PrepareZoneTimestepStamp(EnergyPlusData& state);
 
-    void UpdateSizingLogValuesZoneStep();
+    void UpdateSizingLogValuesZoneStep(EnergyPlusData& state);
 
-    void UpdateSizingLogValuesSystemStep();
+    void UpdateSizingLogValuesSystemStep(EnergyPlusData& state);
 
-    void SetupSizingLogsNewEnvironment();
+    void SetupSizingLogsNewEnvironment(EnergyPlusData& state);
 
     void IncrementSizingPeriodSet();
 
@@ -184,7 +187,7 @@ public:
 
     PlantCoinicidentAnalysis(std::string loopName, int loopIndex, int nodeNum, Real64 density, Real64 cp, int numStepsInAvg, int sizingIndex);
 
-    void ResolveDesignFlowRate(IOFiles &ioFiles, int const HVACSizingIterCount);
+    void ResolveDesignFlowRate(EnergyPlusData& state, IOFiles &ioFiles, int const HVACSizingIterCount);
 
 private:
     std::string name = "";                // name of analysis object

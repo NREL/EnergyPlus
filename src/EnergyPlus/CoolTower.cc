@@ -89,7 +89,7 @@ namespace CoolTower {
     using namespace DataGlobals;
     using namespace DataHeatBalance;
 
-    void ManageCoolTower(CoolTowerData &dataCoolTower)
+    void ManageCoolTower(EnergyPlusData &state, CoolTowerData &dataCoolTower)
     {
 
         // SUBROUTINE INFORMATION:
@@ -106,7 +106,7 @@ namespace CoolTower {
 
         // Obtains and allocates heat balance related parameters from input
         if (dataCoolTower.GetInputFlag) {
-            GetCoolTower(dataCoolTower);
+            GetCoolTower(state, dataCoolTower);
             dataCoolTower.GetInputFlag = false;
         }
 
@@ -119,7 +119,7 @@ namespace CoolTower {
         ReportCoolTower(dataCoolTower);
     }
 
-    void GetCoolTower(CoolTowerData &dataCoolTower)
+    void GetCoolTower(EnergyPlusData &state, CoolTowerData &dataCoolTower)
     {
 
         // SUBROUTINE INFORMATION:
@@ -220,7 +220,7 @@ namespace CoolTower {
             if (lAlphaBlanks(4)) {
                 dataCoolTower.CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode =  WaterSupplyMode::FromMains;
             } else if (dataCoolTower.CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
-                SetupTankDemandComponent(dataCoolTower.CoolTowerSys(CoolTowerNum).Name,
+                SetupTankDemandComponent(state, dataCoolTower.CoolTowerSys(CoolTowerNum).Name,
                                          CurrentModuleObject,
                                          dataCoolTower.CoolTowerSys(CoolTowerNum).CoolTWaterSupplyName,
                                          ErrorsFound,

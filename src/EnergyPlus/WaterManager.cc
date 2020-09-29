@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -80,39 +81,9 @@ namespace WaterManager {
     //       MODIFIED       DJS to add ecoroof irrigation Jan 2007
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS MODULE:
-
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-    // <use statements for data only modules>
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::BigNumber;
     using namespace DataWater;
-
-    // <use statements for access to subroutines in other modules>
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    bool MyOneTimeFlag(true);
-    bool GetInputFlag(true); // First time, input is "gotten"
-    bool MyEnvrnFlag(true);   // flag for init once at start of environment
-    bool MyWarmupFlag(false); // flag for init after warmup complete
-    bool MyTankDemandCheckFlag(true);
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE WaterManager:
     // pointers for water storage tanks and their supply arrays
@@ -120,16 +91,7 @@ namespace WaterManager {
 
     // Functions
 
-    void clear_state()
-    {
-        MyOneTimeFlag = true;
-        GetInputFlag = true;
-        MyEnvrnFlag = true;
-        MyWarmupFlag = false;
-        MyTankDemandCheckFlag = true;
-    }
-
-    void ManageWater()
+    void ManageWater(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -156,32 +118,14 @@ namespace WaterManager {
         //   demands
         //  IF first/last timestep, then do an update.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RainColNum(0);
         int TankNum(0);
         int WellNum(0);
-
-        if (GetInputFlag) {
-            GetWaterManagerInput();
-            GetInputFlag = false;
+        
+        if (state.dataWaterManager->GetInputFlag) {
+            GetWaterManagerInput(state);
+            state.dataWaterManager->GetInputFlag = false;
         }
 
         if (!(AnyWaterSystemsInModel)) return;
@@ -209,7 +153,7 @@ namespace WaterManager {
         ReportWaterManager();
     }
 
-    void ManageWaterInits()
+    void ManageWaterInits(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -223,13 +167,13 @@ namespace WaterManager {
 
         if (!(AnyWaterSystemsInModel)) return;
 
-        UpdateWaterManager();
+        UpdateWaterManager(state);
 
         UpdatePrecipitation();
         UpdateIrrigation();
     }
 
-    void GetWaterManagerInput()
+    void GetWaterManagerInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -279,7 +223,7 @@ namespace WaterManager {
         int NumIrrigation;
         int Dummy;
 
-        if ((MyOneTimeFlag) && (!(WaterSystemGetInputCalled))) { // big block for entire subroutine
+        if ((state.dataWaterManager->MyOneTimeFlag) && (!(WaterSystemGetInputCalled))) { // big block for entire subroutine
 
             cCurrentModuleObject = "WaterUse:Storage";
             inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
@@ -309,7 +253,7 @@ namespace WaterManager {
             rNumericArgs.dimension(MaxNumNumbers, 0.0);
             lNumericFieldBlanks.dimension(MaxNumNumbers, false);
 
-            MyOneTimeFlag = false;
+            state.dataWaterManager->MyOneTimeFlag = false;
             cCurrentModuleObject = "WaterUse:Storage";
             NumWaterStorageTanks = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             if (NumWaterStorageTanks > 0) {
@@ -784,7 +728,7 @@ namespace WaterManager {
 
             AnyWaterSystemsInModel = true;
             WaterSystemGetInputCalled = true;
-            MyOneTimeFlag = false;
+            state.dataWaterManager->MyOneTimeFlag = false;
 
             cAlphaFieldNames.deallocate();
             cAlphaArgs.deallocate();
@@ -1308,7 +1252,7 @@ namespace WaterManager {
         }
     }
 
-    void SetupTankSupplyComponent(std::string const &CompName,
+    void SetupTankSupplyComponent(EnergyPlusData &state, std::string const &CompName,
                                   std::string const &CompType,
                                   std::string const &TankName,
                                   bool &ErrorsFound,
@@ -1331,29 +1275,8 @@ namespace WaterManager {
         // METHODOLOGY EMPLOYED:
         // push the VdotAvailToTank array and return
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (!(WaterSystemGetInputCalled)) {
-            GetWaterManagerInput();
+            GetWaterManagerInput(state);
         }
 
         InternalSetupTankSupplyComponent(CompName, CompType, TankName, ErrorsFound, TankIndex, WaterSupplyIndex);
@@ -1437,7 +1360,7 @@ namespace WaterManager {
         }
     }
 
-    void SetupTankDemandComponent(std::string const &CompName,
+    void SetupTankDemandComponent(EnergyPlusData &state, std::string const &CompName,
                                   std::string const &CompType,
                                   std::string const &TankName,
                                   bool &ErrorsFound,
@@ -1460,29 +1383,8 @@ namespace WaterManager {
         // METHODOLOGY EMPLOYED:
         // push the VdotAvailToTank array and return
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (!(WaterSystemGetInputCalled)) {
-            GetWaterManagerInput();
+            GetWaterManagerInput(state);
         }
 
         InternalSetupTankDemandComponent(CompName, CompType, TankName, ErrorsFound, TankIndex, WaterDemandIndex);
@@ -1731,7 +1633,7 @@ namespace WaterManager {
         GroundwaterWell(WellNum).PumpEnergy = PumpPower * TimeStepSys * SecInHour;
     }
 
-    void UpdateWaterManager()
+    void UpdateWaterManager(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1747,43 +1649,24 @@ namespace WaterManager {
         //  this routine updates variables
         // that hold the value of the Last Timestep
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TankNum;
         int RainColNum;
         int WellNum;
 
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
+        if (BeginEnvrnFlag && state.dataWaterManager->MyEnvrnFlag) {
             for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
 
                 WaterStorage(TankNum).LastTimeStepVolume = WaterStorage(TankNum).InitialVolume;
                 WaterStorage(TankNum).ThisTimeStepVolume = WaterStorage(TankNum).InitialVolume;
             }
-            if ((!DoingSizing) && (!KickOffSimulation) && MyTankDemandCheckFlag) {
+            if ((!DoingSizing) && (!KickOffSimulation) && state.dataWaterManager->MyTankDemandCheckFlag) {
                 if (NumWaterStorageTanks > 0) {
                     for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
                         if (WaterStorage(TankNum).NumWaterDemands == 0) {
@@ -1793,23 +1676,23 @@ namespace WaterManager {
                         }
                     }
                 }
-                MyTankDemandCheckFlag = false;
+                state.dataWaterManager->MyTankDemandCheckFlag = false;
             }
 
-            MyEnvrnFlag = false;
-            MyWarmupFlag = true;
+            state.dataWaterManager->MyEnvrnFlag = false;
+            state.dataWaterManager->MyWarmupFlag = true;
         } // end environmental inits
         if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            state.dataWaterManager->MyEnvrnFlag = true;
         }
 
-        if (MyWarmupFlag && (!WarmupFlag)) { // do environment inits.  just went out of warmup mode
+        if (state.dataWaterManager->MyWarmupFlag && (!WarmupFlag)) { // do environment inits.  just went out of warmup mode
             for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
                 WaterStorage(TankNum).LastTimeStepVolume = WaterStorage(TankNum).InitialVolume;
                 WaterStorage(TankNum).ThisTimeStepVolume = WaterStorage(TankNum).InitialVolume;
                 WaterStorage(TankNum).LastTimeStepTemp = WaterStorage(TankNum).InitialTankTemp;
             }
-            MyWarmupFlag = false;
+            state.dataWaterManager->MyWarmupFlag = false;
         }
 
         for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
