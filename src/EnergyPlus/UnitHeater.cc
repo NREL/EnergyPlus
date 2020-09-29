@@ -512,7 +512,7 @@ namespace UnitHeater {
                         errFlag = false;
                         if (UnitHeat(UnitHeatNum).HCoilType == WaterHeatingCoil) {
                             UnitHeat(UnitHeatNum).HotControlNode =
-                                GetCoilWaterInletNode("Coil:Heating:Water", UnitHeat(UnitHeatNum).HCoilName, errFlag);
+                                GetCoilWaterInletNode(state, "Coil:Heating:Water", UnitHeat(UnitHeatNum).HCoilName, errFlag);
                         } else { // its a steam coil
                             UnitHeat(UnitHeatNum).HCoil_Index = GetSteamCoilIndex("COIL:HEATING:STEAM", UnitHeat(UnitHeatNum).HCoilName, errFlag);
                             UnitHeat(UnitHeatNum).HotControlNode =
@@ -985,11 +985,6 @@ namespace UnitHeater {
         using Psychrometrics::CPHW;
         using SteamCoils::GetCoilSteamInletNode;
         using SteamCoils::GetCoilSteamOutletNode;
-        using WaterCoils::GetCoilWaterInletNode;
-        using WaterCoils::GetCoilWaterOutletNode;
-        using WaterCoils::GetWaterCoilIndex;
-        using WaterCoils::SetCoilDesFlow;
-        using WaterCoils::WaterCoil;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeUnitHeater");
@@ -1157,14 +1152,14 @@ namespace UnitHeater {
                 } else {
                     CheckZoneSizing("ZoneHVAC:UnitHeater", UnitHeat(UnitHeatNum).Name);
 
-                    CoilWaterInletNode = GetCoilWaterInletNode("Coil:Heating:Water", UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
-                    CoilWaterOutletNode = GetCoilWaterOutletNode("Coil:Heating:Water", UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
+                    CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
+                    CoilWaterOutletNode = WaterCoils::GetCoilWaterOutletNode(state, "Coil:Heating:Water", UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum = MyPlantSizingIndex(
                             "Coil:Heating:Water", UnitHeat(UnitHeatNum).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
-                        CoilNum = GetWaterCoilIndex("COIL:HEATING:WATER", UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
-                        if (WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
-                            WaterCoilSizDeltaT = WaterCoil(CoilNum).DesignWaterDeltaTemp;
+                        CoilNum = WaterCoils::GetWaterCoilIndex(state, "COIL:HEATING:WATER", UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
+                        if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
+                            WaterCoilSizDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
                             DoWaterCoilSizing = true;
                         } else {
                             if (PltSizHeatNum > 0) {
@@ -1388,7 +1383,7 @@ namespace UnitHeater {
 
         // set the design air flow rate for the heating coil
 
-        SetCoilDesFlow(UnitHeat(UnitHeatNum).HCoilTypeCh, UnitHeat(UnitHeatNum).HCoilName, UnitHeat(UnitHeatNum).MaxAirVolFlow, ErrorsFound);
+        WaterCoils::SetCoilDesFlow(state, UnitHeat(UnitHeatNum).HCoilTypeCh, UnitHeat(UnitHeatNum).HCoilName, UnitHeat(UnitHeatNum).MaxAirVolFlow, ErrorsFound);
         if (CurZoneEqNum > 0) {
             ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow = UnitHeat(UnitHeatNum).MaxVolHotWaterFlow;
         }

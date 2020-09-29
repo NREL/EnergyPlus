@@ -64,6 +64,7 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDElight.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDaylightingDevices.hh>
@@ -273,7 +274,7 @@ namespace HeatBalanceSurfaceManager {
         // Solve the zone heat balance 'Detailed' solution
         // Call the outside and inside surface heat balances
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Calculate Outside Surface Heat Balance");
-        CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files);
+        CalcHeatBalanceOutsideSurf(state, state.files);
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Calculate Inside Surface Heat Balance");
         CalcHeatBalanceInsideSurf(state);
 
@@ -302,7 +303,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        ManageThermalComfort(state.dataZoneTempPredictorCorrector, state.files, false); // "Record keeping" for the zone
+        ManageThermalComfort(state, state.files, false); // "Record keeping" for the zone
 
         ReportSurfaceHeatBalance();
         if (ZoneSizingCalc) GatherComponentLoadsSurface();
@@ -527,7 +528,7 @@ namespace HeatBalanceSurfaceManager {
 
         // Need to be called each timestep in order to check if surface points to new construction (EMS) and if does then
         // complex fenestration needs to be initialized for additional states
-        TimestepInitComplexFenestration(state.dataWindowComplexManager);
+        TimestepInitComplexFenestration(state);
 
         // Calculate exterior-surface multipliers that account for anisotropy of
         // sky radiance
@@ -541,7 +542,7 @@ namespace HeatBalanceSurfaceManager {
         // window construction (unshaded or shaded) to be used in heat balance calculation
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Window Shading");
 
-        WindowShadingManager(state.dataWindowEquivalentLayer);
+        WindowShadingManager(state);
 
         // Calculate factors that are used to determine how much long-wave radiation from internal
         // gains is absorbed by interior surfaces
@@ -736,9 +737,7 @@ namespace HeatBalanceSurfaceManager {
         // The order of these initializations is important currently.  Over time we hope to
         //  take the appropriate parts of these inits to the other heat balance managers
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Solar Heat Gains");
-
-        InitSolarHeatGains(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager);
-
+        InitSolarHeatGains(state);
         if (SunIsUp && (BeamSolarRad + GndSolarRad + DifSolarRad > 0.0)) {
             for (int NZ = 1; NZ <= NumOfZones; ++NZ) {
                 if (ZoneDaylight(NZ).TotalDaylRefPoints > 0) {
@@ -762,13 +761,13 @@ namespace HeatBalanceSurfaceManager {
         InitIntSolarDistribution();
 
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Convection Coefficients");
-        InitInteriorConvectionCoeffs(state, state.dataConvectionCoefficients, state.files, TempSurfInTmp);
+        InitInteriorConvectionCoeffs(state, state.files, TempSurfInTmp);
 
         if (BeginSimFlag) { // Now's the time to report surfaces, if desired
             //    if (firstTime) CALL DisplayString('Reporting Surfaces')
             //    CALL ReportSurfaces
             if (InitSurfaceHeatBalancefirstTime) DisplayString("Gathering Information for Predefined Reporting");
-            GatherForPredefinedReport(state.dataWindowManager);
+            GatherForPredefinedReport(state);
         }
 
         // Initialize the temperature history terms for conduction through the surfaces
@@ -896,7 +895,7 @@ namespace HeatBalanceSurfaceManager {
         InitSurfaceHeatBalancefirstTime = false;
     }
 
-    void GatherForPredefinedReport(WindowManagerData &dataWindowManager)
+    void GatherForPredefinedReport(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1059,7 +1058,7 @@ namespace HeatBalanceSurfaceManager {
                         } else {
                             // must calculate Summer SHGC
                             if (!dataConstruction.Construct(curCons).WindowTypeEQL) {
-                                CalcNominalWindowCond(dataWindowManager, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
+                                CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
                             }
                         }
                         PreDefTableEntry(pdchFenSHGC, surfName, SHGCSummer, 3);
@@ -1265,7 +1264,7 @@ namespace HeatBalanceSurfaceManager {
                         } else {
                             // must calculate Summer SHGC
                             if (!dataConstruction.Construct(curCons).WindowTypeEQL) {
-                                CalcNominalWindowCond(dataWindowManager, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
+                                CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
                             }
                         }
                         PreDefTableEntry(pdchIntFenSHGC, surfName, SHGCSummer, 3);
@@ -2310,9 +2309,7 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void InitSolarHeatGains(WindowComplexManagerData &dataWindowComplexManager,
-                            WindowEquivalentLayerData &dataWindowEquivalentLayer,
-                            WindowManagerData &dataWindowManager)
+    void InitSolarHeatGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2708,10 +2705,10 @@ namespace HeatBalanceSurfaceManager {
 
             if (CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface();
 
-            if (dataWindowManager.inExtWindowModel->isExternalLibraryModel() && dataWindowManager.winOpticalModel->isSimplifiedModel()) {
-                CalcInteriorSolarDistributionWCE(dataWindowComplexManager, dataWindowManager);
+            if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() && state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
+                CalcInteriorSolarDistributionWCE(state);
             } else {
-                CalcInteriorSolarDistribution(dataWindowEquivalentLayer);
+                CalcInteriorSolarDistribution(state);
             }
 
             for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
@@ -2912,8 +2909,8 @@ namespace HeatBalanceSurfaceManager {
                             } else { // Exterior window
 
                                 if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel &&
-                                    SurfWinWindowModelType(SurfNum) != WindowEQLModel && !dataWindowManager.inExtWindowModel->isExternalLibraryModel()) {
-
+                                    SurfWinWindowModelType(SurfNum) != WindowEQLModel &&
+                                    !state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
                                     TotGlassLay = dataConstruction.Construct(ConstrNum).TotGlassLayers;
                                     for (Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                         AbsDiffWin(Lay) = dataConstruction.Construct(ConstrNum).AbsDiff(Lay);
@@ -3072,14 +3069,14 @@ namespace HeatBalanceSurfaceManager {
                                         QRadSWwinAbsTot(SurfNum) += QRadSWwinAbsLayer(Lay, SurfNum);
                                     }
                                     QRadSWwinAbsTotEnergy(SurfNum) = QRadSWwinAbsTot(SurfNum) * TimeStepZoneSec;
-                                } else if (dataWindowManager.inExtWindowModel->isExternalLibraryModel()) {
+                                } else if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
                                     std::pair<Real64, Real64> incomingAngle =
-                                        getSunWCEAngles(dataWindowComplexManager, SurfNum2, BSDFHemisphere::Incoming);
+                                        getSunWCEAngles(state, SurfNum2, BSDFHemisphere::Incoming);
                                     Real64 Theta = incomingAngle.first;
                                     Real64 Phi = incomingAngle.second;
 
                                     std::shared_ptr<CMultiLayerScattered> aLayer = CWindowConstructionsSimplified::instance().getEquivalentLayer(
-                                        dataWindowManager, WavelengthRange::Solar, ConstrNum);
+                                        state, WavelengthRange::Solar, ConstrNum);
 
                                     size_t totLayers = aLayer->getNumOfLayers();
                                     for (size_t Lay = 1; Lay <= totLayers; ++Lay) {
@@ -4662,7 +4659,7 @@ namespace HeatBalanceSurfaceManager {
             SwimmingPoolOn) {
             // Solve the zone heat balance 'Detailed' solution
             // Call the outside and inside surface heat balances
-            CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files);
+            CalcHeatBalanceOutsideSurf(state, state.files);
             CalcHeatBalanceInsideSurf(state);
         }
     }
@@ -5582,7 +5579,6 @@ namespace HeatBalanceSurfaceManager {
     // Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) now moved into namespace
 
     void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
-                                    ConvectionCoefficientsData &dataConvectionCoefficients,
                                     IOFiles &ioFiles,
                                     Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
     {
@@ -5978,7 +5974,7 @@ namespace HeatBalanceSurfaceManager {
                             Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
 
                             if (Surface(SurfNum).ExtCavityPresent) {
-                                CalcExteriorVentedCavity(state, dataConvectionCoefficients, ioFiles, SurfNum);
+                                CalcExteriorVentedCavity(state, ioFiles, SurfNum);
                             }
 
                             CalcOutsideSurfTemp(SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
@@ -5988,7 +5984,7 @@ namespace HeatBalanceSurfaceManager {
                         } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
                                    Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
                             if (Surface(SurfNum).ExtCavityPresent) {
-                                CalcExteriorVentedCavity(state, dataConvectionCoefficients, ioFiles, SurfNum);
+                                CalcExteriorVentedCavity(state, ioFiles, SurfNum);
                             }
                         }
 
@@ -6001,7 +5997,7 @@ namespace HeatBalanceSurfaceManager {
                         Real64 TempExt;
 
                         if (Surface(SurfNum).ExtEcoRoof) {
-                            CalcEcoRoof(state, dataConvectionCoefficients, ioFiles, SurfNum, zoneNum, ConstrNum, TempExt);
+                            CalcEcoRoof(state, ioFiles, SurfNum, zoneNum, ConstrNum, TempExt);
                             continue;
                         }
 
@@ -6025,7 +6021,7 @@ namespace HeatBalanceSurfaceManager {
                         if (Surface(SurfNum).ExtWind) {
 
                             // Calculate exterior heat transfer coefficients with windspeed (windspeed is calculated internally in subroutine)
-                            InitExteriorConvectionCoeff(state, dataConvectionCoefficients, ioFiles, SurfNum, HMovInsul,
+                            InitExteriorConvectionCoeff(state, ioFiles, SurfNum, HMovInsul,
                                                         RoughSurf, AbsThermSurf, TH(1, 1, SurfNum), HcExtSurf(SurfNum),
                                                         HSkyExtSurf(SurfNum), HGrdExtSurf(SurfNum),
                                                         HAirExtSurf(SurfNum));
@@ -6035,7 +6031,7 @@ namespace HeatBalanceSurfaceManager {
                                 if (Surface(SurfNum).ExtConvCoeff <= 0) { // Reset HcExtSurf because of wetness
                                     HcExtSurf(SurfNum) = 1000.0;
                                 } else { // User set
-                                    HcExtSurf(SurfNum) = SetExtConvectionCoeff(state, dataConvectionCoefficients, SurfNum);
+                                    HcExtSurf(SurfNum) = SetExtConvectionCoeff(state, SurfNum);
                                 }
 
                                 TempExt = Surface(SurfNum).OutWetBulbTemp;
@@ -6108,7 +6104,7 @@ namespace HeatBalanceSurfaceManager {
                         } else { // No wind
 
                             // Calculate exterior heat transfer coefficients for windspeed = 0
-                            InitExteriorConvectionCoeff(state, dataConvectionCoefficients, ioFiles, SurfNum, HMovInsul,
+                            InitExteriorConvectionCoeff(state, ioFiles, SurfNum, HMovInsul,
                                                         RoughSurf, AbsThermSurf, TH(1, 1, SurfNum), HcExtSurf(SurfNum),
                                                         HSkyExtSurf(SurfNum), HGrdExtSurf(SurfNum),
                                                         HAirExtSurf(SurfNum));
@@ -6163,7 +6159,7 @@ namespace HeatBalanceSurfaceManager {
                                 dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
 
                         // Set Kiva exterior convection algorithms
-                        InitExteriorConvectionCoeff(state, dataConvectionCoefficients, ioFiles, SurfNum, HMovInsul, RoughSurf,
+                        InitExteriorConvectionCoeff(state, ioFiles, SurfNum, HMovInsul, RoughSurf,
                                                     AbsThermSurf, TH(1, 1, SurfNum), HcExtSurf(SurfNum),
                                                     HSkyExtSurf(SurfNum), HGrdExtSurf(SurfNum), HAirExtSurf(SurfNum));
 
@@ -6287,7 +6283,7 @@ namespace HeatBalanceSurfaceManager {
 
             // Initialize Kiva instances ground temperatures
             if (DataHeatBalance::AnyKiva) {
-                SurfaceGeometry::kivaManager.initKivaInstances(state.dataZoneTempPredictorCorrector);
+                SurfaceGeometry::kivaManager.initKivaInstances(state);
             }
         }
         if (!BeginEnvrnFlag) {
@@ -6306,13 +6302,9 @@ namespace HeatBalanceSurfaceManager {
             ZoneWinHeatLossRepEnergy = 0.0;
 
             if (AllCTF) {
-                CalcHeatBalanceInsideSurf2CTFOnly(state, state.dataConvectionCoefficients, state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files, 1, NumOfZones, DataSurfaces::AllIZSurfaceList);
+                CalcHeatBalanceInsideSurf2CTFOnly(state, state.files, 1, NumOfZones, DataSurfaces::AllIZSurfaceList);
             } else {
                 CalcHeatBalanceInsideSurf2(state,
-                                           state.dataConvectionCoefficients,
-                                           state.dataWindowComplexManager,
-                                           state.dataWindowEquivalentLayer,
-                                           state.dataWindowManager,
                                            state.files,
                                            DataSurfaces::AllHTSurfaceList,
                                            DataSurfaces::AllIZSurfaceList,
@@ -6342,8 +6334,8 @@ namespace HeatBalanceSurfaceManager {
             auto const &zoneHTNonWindowSurfList(Zone(ZoneToResimulate).ZoneHTNonWindowSurfaceList);
             auto const &zoneHTWindowSurfList(Zone(ZoneToResimulate).ZoneHTWindowSurfaceList);
             // Cannot use CalcHeatBalanceInsideSurf2CTFOnly because resimulated zone includes adjacent interzone surfaces
-            CalcHeatBalanceInsideSurf2(state,
-                state.dataConvectionCoefficients, state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
+            CalcHeatBalanceInsideSurf2(
+                state, state.files, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
             // Sort window heat gain/loss
             if (ZoneWinHeatGain(ZoneToResimulate) >= 0.0) {
                 ZoneWinHeatGainRep(ZoneToResimulate) = ZoneWinHeatGain(ZoneToResimulate);
@@ -6356,10 +6348,6 @@ namespace HeatBalanceSurfaceManager {
     }
 
     void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
-                                    ConvectionCoefficientsData &dataConvectionCoefficients,
-                                    WindowComplexManagerData &dataWindowComplexManager,
-                                    WindowEquivalentLayerData &dataWindowEquivalentLayer,
-                                    WindowManagerData &dataWindowManager,
                                     IOFiles &ioFiles,
                                     const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
                                     const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
@@ -6529,7 +6517,7 @@ namespace HeatBalanceSurfaceManager {
             // The choice of 30 is not significant--just want to do this a couple of
             // times before the iteration limit is hit.
             if ((InsideSurfIterations > 0) && (mod(InsideSurfIterations, ItersReevalConvCoeff) == 0)) {
-                ConvectionCoefficients::InitInteriorConvectionCoeffs(state, dataConvectionCoefficients, ioFiles, TempSurfIn, ZoneToResimulate);
+                ConvectionCoefficients::InitInteriorConvectionCoeffs(state, ioFiles, TempSurfIn, ZoneToResimulate);
             }
 
             if (DataHeatBalance::AnyEMPD || DataHeatBalance::AnyHAMT) {
@@ -6916,14 +6904,13 @@ namespace HeatBalanceSurfaceManager {
                             // Set Exterior Convection Coefficient...
                             if (surface.ExtConvCoeff > 0) {
 
-                                HcExtSurf(SurfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, dataConvectionCoefficients, SurfNum);
+                                HcExtSurf(SurfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, SurfNum);
 
                             } else if (surface.ExtWind) { // Window is exposed to wind (and possibly rain)
 
                                 // Calculate exterior heat transfer coefficients with windspeed (windspeed is calculated internally in
                                 // subroutine)
                                 ConvectionCoefficients::InitExteriorConvectionCoeff(state,
-                                                                                    dataConvectionCoefficients,
                                                                                     ioFiles,
                                                                                     SurfNum,
                                                                                     0.0,
@@ -6943,7 +6930,6 @@ namespace HeatBalanceSurfaceManager {
 
                                 // Calculate exterior heat transfer coefficients for windspeed = 0
                                 ConvectionCoefficients::InitExteriorConvectionCoeff(state,
-                                                                                    dataConvectionCoefficients,
                                                                                     ioFiles,
                                                                                     SurfNum,
                                                                                     0.0,
@@ -6958,7 +6944,7 @@ namespace HeatBalanceSurfaceManager {
                         } else { // Interior Surface
 
                             if (surface.ExtConvCoeff > 0) {
-                                HcExtSurf(SurfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, dataConvectionCoefficients, SurfNum);
+                                HcExtSurf(SurfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, SurfNum);
                             } else {
                                 // Exterior Convection Coefficient for the Interior or Interzone Window is the Interior Convection Coeff of
                                 // same
@@ -6968,9 +6954,7 @@ namespace HeatBalanceSurfaceManager {
 
                         // Following call determines inside surface temperature of glazing, and of
                         // frame and/or divider, if present
-                        CalcWindowHeatBalance(dataWindowComplexManager,
-                                              dataWindowEquivalentLayer,
-                                              dataWindowManager,
+                        CalcWindowHeatBalance(state,
                                               SurfNum,
                                               HcExtSurf(SurfNum),
                                               TempSurfInTmp(SurfNum),
@@ -7202,10 +7186,6 @@ namespace HeatBalanceSurfaceManager {
     }
 
     void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
-                                           ConvectionCoefficientsData &dataConvectionCoefficients,
-                                           WindowComplexManagerData &dataWindowComplexManager,
-                                           WindowEquivalentLayerData &dataWindowEquivalentLayer,
-                                           WindowManagerData &dataWindowManager,
                                            IOFiles &ioFiles,
                                            const int FirstZone,             // First zone to simulate
                                            const int LastZone,              // Last zone to simulate
@@ -7399,7 +7379,7 @@ namespace HeatBalanceSurfaceManager {
             // The choice of 30 is not significant--just want to do this a couple of
             // times before the iteration limit is hit.
             if ((InsideSurfIterations > 0) && (mod(InsideSurfIterations, ItersReevalConvCoeff) == 0)) {
-                ConvectionCoefficients::InitInteriorConvectionCoeffs(state, dataConvectionCoefficients, ioFiles, TempSurfIn, ZoneToResimulate);
+                ConvectionCoefficients::InitInteriorConvectionCoeffs(state, ioFiles, TempSurfIn, ZoneToResimulate);
                 // Since HConvIn has changed re-calculate a few terms - non-window surfaces
                 for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
                     int const firstSurf = Zone(zoneNum).NonWindowSurfaceFirst;
@@ -7634,14 +7614,13 @@ namespace HeatBalanceSurfaceManager {
                                 // Set Exterior Convection Coefficient...
                                 if (surface.ExtConvCoeff > 0) {
 
-                                    HcExtSurf(surfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, dataConvectionCoefficients, surfNum);
+                                    HcExtSurf(surfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, surfNum);
 
                                 } else if (surface.ExtWind) { // Window is exposed to wind (and possibly rain)
 
                                     // Calculate exterior heat transfer coefficients with windspeed (windspeed is calculated internally in
                                     // subroutine)
                                     ConvectionCoefficients::InitExteriorConvectionCoeff(state,
-                                                                                        dataConvectionCoefficients,
                                                                                         ioFiles,
                                                                                         surfNum,
                                                                                         0.0,
@@ -7661,7 +7640,6 @@ namespace HeatBalanceSurfaceManager {
 
                                     // Calculate exterior heat transfer coefficients for windspeed = 0
                                     ConvectionCoefficients::InitExteriorConvectionCoeff(state,
-                                                                                        dataConvectionCoefficients,
                                                                                         ioFiles,
                                                                                         surfNum,
                                                                                         0.0,
@@ -7676,7 +7654,7 @@ namespace HeatBalanceSurfaceManager {
                             } else { // Interior Surface
 
                                 if (surface.ExtConvCoeff > 0) {
-                                    HcExtSurf(surfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, dataConvectionCoefficients, surfNum);
+                                    HcExtSurf(surfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, surfNum);
                                 } else {
                                     // Exterior Convection Coefficient for the Interior or Interzone Window is the Interior Convection Coeff of
                                     // same
@@ -7686,9 +7664,7 @@ namespace HeatBalanceSurfaceManager {
 
                             // Following call determines inside surface temperature of glazing, and of
                             // frame and/or divider, if present
-                            CalcWindowHeatBalance(dataWindowComplexManager,
-                                                  dataWindowEquivalentLayer,
-                                                  dataWindowManager,
+                            CalcWindowHeatBalance(state,
                                                   surfNum,
                                                   HcExtSurf(surfNum),
                                                   TempSurfInTmp(surfNum),
@@ -8324,7 +8300,7 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void CalcExteriorVentedCavity(EnergyPlusData &state,ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const SurfNum) // index of surface
+    void CalcExteriorVentedCavity(EnergyPlusData &state, IOFiles &ioFiles, int const SurfNum) // index of surface
     {
 
         // SUBROUTINE INFORMATION:
@@ -8406,7 +8382,6 @@ namespace HeatBalanceSurfaceManager {
         for (iter = 1; iter <= 3; ++iter) { // this is a sequential solution approach.
 
             CalcPassiveExteriorBaffleGap(state,
-                                         dataConvectionCoefficients,
                                          ioFiles,
                                          ExtVentedCavity(CavNum).SurfPtrs,
                                          holeArea,

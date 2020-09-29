@@ -242,10 +242,11 @@ namespace ChillerGasAbsorption {
     struct ChillerGasAbsorptionData : BaseGlobalStruct {
         bool getGasAbsorberInputs = true;
         Array1D<ChillerGasAbsorption::GasAbsorberSpecs> GasAbsorber;
+
         void clear_state() override
         {
-            getGasAbsorberInputs = true;
-            GasAbsorber.deallocate();
+            this->getGasAbsorberInputs = true;
+            this->GasAbsorber.deallocate();
         }
     };
 

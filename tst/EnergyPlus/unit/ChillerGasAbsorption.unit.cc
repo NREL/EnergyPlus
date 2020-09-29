@@ -142,31 +142,31 @@ TEST_F(EnergyPlusFixture, GasAbsorption_GetInput_Test)
 
     GetGasAbsorberInput(state);
 
-    EXPECT_EQ(1u, state.dataChillerGasAbsorption.GasAbsorber.size());
-    EXPECT_EQ("BIG CHILLER", state.dataChillerGasAbsorption.GasAbsorber(1).Name);
-    EXPECT_EQ(100000., state.dataChillerGasAbsorption.GasAbsorber(1).NomCoolingCap);
-    EXPECT_EQ(0.8, state.dataChillerGasAbsorption.GasAbsorber(1).NomHeatCoolRatio);
+    EXPECT_EQ(1u, state.dataChillerGasAbsorption->GasAbsorber.size());
+    EXPECT_EQ("BIG CHILLER", state.dataChillerGasAbsorption->GasAbsorber(1).Name);
+    EXPECT_EQ(100000., state.dataChillerGasAbsorption->GasAbsorber(1).NomCoolingCap);
+    EXPECT_EQ(0.8, state.dataChillerGasAbsorption->GasAbsorber(1).NomHeatCoolRatio);
 
-    EXPECT_EQ(0.97, state.dataChillerGasAbsorption.GasAbsorber(1).FuelCoolRatio);
-    EXPECT_EQ(1.25, state.dataChillerGasAbsorption.GasAbsorber(1).FuelHeatRatio);
-    EXPECT_EQ(0.01, state.dataChillerGasAbsorption.GasAbsorber(1).ElecCoolRatio);
-    EXPECT_EQ(0.005, state.dataChillerGasAbsorption.GasAbsorber(1).ElecHeatRatio);
+    EXPECT_EQ(0.97, state.dataChillerGasAbsorption->GasAbsorber(1).FuelCoolRatio);
+    EXPECT_EQ(1.25, state.dataChillerGasAbsorption->GasAbsorber(1).FuelHeatRatio);
+    EXPECT_EQ(0.01, state.dataChillerGasAbsorption->GasAbsorber(1).ElecCoolRatio);
+    EXPECT_EQ(0.005, state.dataChillerGasAbsorption->GasAbsorber(1).ElecHeatRatio);
 
-    EXPECT_EQ(0.000001, state.dataChillerGasAbsorption.GasAbsorber(1).MinPartLoadRat);
-    EXPECT_EQ(1.0, state.dataChillerGasAbsorption.GasAbsorber(1).MaxPartLoadRat);
-    EXPECT_EQ(0.6, state.dataChillerGasAbsorption.GasAbsorber(1).OptPartLoadRat);
+    EXPECT_EQ(0.000001, state.dataChillerGasAbsorption->GasAbsorber(1).MinPartLoadRat);
+    EXPECT_EQ(1.0, state.dataChillerGasAbsorption->GasAbsorber(1).MaxPartLoadRat);
+    EXPECT_EQ(0.6, state.dataChillerGasAbsorption->GasAbsorber(1).OptPartLoadRat);
 
-    EXPECT_EQ(29., state.dataChillerGasAbsorption.GasAbsorber(1).TempDesCondReturn);
-    EXPECT_EQ(7., state.dataChillerGasAbsorption.GasAbsorber(1).TempDesCHWSupply);
-    EXPECT_EQ(0.0011, state.dataChillerGasAbsorption.GasAbsorber(1).EvapVolFlowRate);
-    EXPECT_EQ(0.0043, state.dataChillerGasAbsorption.GasAbsorber(1).HeatVolFlowRate);
+    EXPECT_EQ(29., state.dataChillerGasAbsorption->GasAbsorber(1).TempDesCondReturn);
+    EXPECT_EQ(7., state.dataChillerGasAbsorption->GasAbsorber(1).TempDesCHWSupply);
+    EXPECT_EQ(0.0011, state.dataChillerGasAbsorption->GasAbsorber(1).EvapVolFlowRate);
+    EXPECT_EQ(0.0043, state.dataChillerGasAbsorption->GasAbsorber(1).HeatVolFlowRate);
 
-    EXPECT_TRUE(state.dataChillerGasAbsorption.GasAbsorber(1).isEnterCondensTemp);
-    EXPECT_FALSE(state.dataChillerGasAbsorption.GasAbsorber(1).isWaterCooled);
+    EXPECT_TRUE(state.dataChillerGasAbsorption->GasAbsorber(1).isEnterCondensTemp);
+    EXPECT_FALSE(state.dataChillerGasAbsorption->GasAbsorber(1).isWaterCooled);
 
-    EXPECT_EQ(2., state.dataChillerGasAbsorption.GasAbsorber(1).CHWLowLimitTemp);
-    EXPECT_EQ("NaturalGas", state.dataChillerGasAbsorption.GasAbsorber(1).FuelType);
+    EXPECT_EQ(2., state.dataChillerGasAbsorption->GasAbsorber(1).CHWLowLimitTemp);
+    EXPECT_EQ("NaturalGas", state.dataChillerGasAbsorption->GasAbsorber(1).FuelType);
 
     // Additional tests for fuel type input
-    EXPECT_EQ(state.dataChillerGasAbsorption.GasAbsorber(1).FuelType, "NaturalGas");
+    EXPECT_EQ(state.dataChillerGasAbsorption->GasAbsorber(1).FuelType, "NaturalGas");
 }

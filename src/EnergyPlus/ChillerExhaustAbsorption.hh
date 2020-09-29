@@ -248,10 +248,11 @@ namespace ChillerExhaustAbsorption {
     struct ChillerExhaustAbsorptionData : BaseGlobalStruct {
         bool Sim_GetInput = true;
         Array1D<ChillerExhaustAbsorption::ExhaustAbsorberSpecs> ExhaustAbsorber;
+
         void clear_state() override
         {
-            Sim_GetInput = true;
-            ExhaustAbsorber.deallocate();
+            this->Sim_GetInput = true;
+            this->ExhaustAbsorber.deallocate();
         }
     };
 

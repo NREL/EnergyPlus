@@ -14,10 +14,10 @@ Cat Diesel,Generator Diesel Mass Flow Rate
 Cat Diesel,Generator Exhaust Air Temperature
 Solar Turbine,Generator Produced AC Electricity Rate
 Solar Turbine,Generator NaturalGas Rate
-Solar Turbine,Generator Gas Mass Flow Rate
+Solar Turbine,Generator NaturalGas Mass Flow Rate
 Solar Turbine,Generator Exhaust Air Temperature
 Capstone C65,Generator Produced AC Electricity Rate
-Capstone C65,Generator Gas HHV Basis Rate
-Capstone C65,Generator Gas Mass Flow Rate
+Capstone C65,Generator NaturalGas HHV Basis Rate
+Capstone C65,Generator NaturalGas Mass Flow Rate
 Capstone C65,Generator LHV Basis Electric Efficiency
 0

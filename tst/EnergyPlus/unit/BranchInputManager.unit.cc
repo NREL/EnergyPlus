@@ -102,8 +102,8 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
     int IOStat; // Could be used in the Get Routines, not currently checked
 
     if (NumOfBranches > 0) {
-        state.dataBranchInputManager.Branch.allocate(NumOfBranches);
-        for (auto &e : state.dataBranchInputManager.Branch)
+        state.dataBranchInputManager->Branch.allocate(NumOfBranches);
+        for (auto &e : state.dataBranchInputManager->Branch)
             e.AssignedLoopName.clear();
         inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNumbers);
         NodeNums.dimension(NumParams, 0);
@@ -121,7 +121,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
                                           cAlphaFields, cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(Alphas(1), state.dataBranchInputManager.Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(Alphas(1), state.dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
                 if (IsBlank) {
                     continue;
@@ -258,8 +258,8 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
     int IOStat; // Could be used in the Get Routines, not currently checked
 
     if (NumOfBranches > 0) {
-        state.dataBranchInputManager.Branch.allocate(NumOfBranches);
-        for (auto &e : state.dataBranchInputManager.Branch)
+        state.dataBranchInputManager->Branch.allocate(NumOfBranches);
+        for (auto &e : state.dataBranchInputManager->Branch)
             e.AssignedLoopName.clear();
         inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNumbers);
         NodeNums.dimension(NumParams, 0);
@@ -277,7 +277,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
                                           cAlphaFields, cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(Alphas(1), state.dataBranchInputManager.Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(Alphas(1), state.dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
                 if (IsBlank) {
                     continue;
