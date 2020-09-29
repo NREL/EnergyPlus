@@ -127,13 +127,13 @@ TEST_F(AutoSizingFixture, HeatingAirFlowSizingGauntlet)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     DataEnvironment::TotDesDays = 2;
-    WeatherManager::DesDayInput.allocate(2);
-    WeatherManager::DesDayInput(1).Month = 7;
-    WeatherManager::DesDayInput(1).DayOfMonth = 7;
-    WeatherManager::DesDayInput(2).Month = 1;
-    WeatherManager::DesDayInput(2).DayOfMonth = 1;
-    WeatherManager::DesDayInput(1).Title = "CoolingDD";
-    WeatherManager::DesDayInput(2).Title = "HeatingDD";
+    state.dataWeatherManager->DesDayInput.allocate(2);
+    state.dataWeatherManager->DesDayInput(1).Month = 7;
+    state.dataWeatherManager->DesDayInput(1).DayOfMonth = 7;
+    state.dataWeatherManager->DesDayInput(2).Month = 1;
+    state.dataWeatherManager->DesDayInput(2).DayOfMonth = 1;
+    state.dataWeatherManager->DesDayInput(1).Title = "CoolingDD";
+    state.dataWeatherManager->DesDayInput(2).Title = "HeatingDD";
 
     // Test 2 - Zone Equipment, sizes to greater of zone cooling and heating flow
     // start with an auto-sized value as the user input

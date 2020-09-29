@@ -416,12 +416,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     UtilityRoutines::clear_state();
     VariableSpeedCoils::clear_state();
     VentilatedSlab::clear_state();
-    WaterCoils::clear_state();
-    WaterManager::clear_state();
-    WaterThermalTanks::clear_state();
-    WaterToAirHeatPump::clear_state();
-    WaterToAirHeatPumpSimple::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
-    WeatherManager::clear_state();
     ResultsFramework::clear_state();
 }

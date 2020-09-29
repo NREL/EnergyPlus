@@ -613,8 +613,6 @@ namespace MixedAir {
         using SteamCoils::SimulateSteamCoilComponents;
         using TranspiredCollector::SimTranspiredCollector;
         using UserDefinedComponents::SimCoilUserDefined;
-        using WaterCoils::SimulateWaterCoilComponents;
-        using WaterCoils::WaterCoil;
         // Locals
         // SUBROUTINE ARGUMENTS:
 
@@ -667,35 +665,35 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == WaterCoil_Cooling) { // 'Coil:Cooling:Water'
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
+                    if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                     // iterate on OA sys controller and water coil at the same time
                     SolveWaterCoilController(state,
                                              FirstHVACIteration,
                                              AirLoopNum,
                                              CompName,
                                              CompIndex,
-                                             WaterCoil(CompIndex).ControllerName,
-                                             WaterCoil(CompIndex).ControllerIndex,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerName,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
                                              false);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
+                    if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                     // iterate on OA sys controller and water coil at the same time
                     SolveWaterCoilController(state,
                                              FirstHVACIteration,
                                              AirLoopNum,
                                              CompName,
                                              CompIndex,
-                                             WaterCoil(CompIndex).ControllerName,
-                                             WaterCoil(CompIndex).ControllerIndex,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerName,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
                                              false);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OAHeatingCoil = true;
             } else if (SELECT_CASE_var == SteamCoil_AirHeat) { // 'Coil:Heating:Steam'
@@ -706,18 +704,18 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == WaterCoil_DetailedCool) { // 'Coil:Cooling:Water:DetailedGeometry'
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
+                    if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                     // iterate on OA sys controller and water coil at the same time
                     SolveWaterCoilController(state,
                                              FirstHVACIteration,
                                              AirLoopNum,
                                              CompName,
                                              CompIndex,
-                                             WaterCoil(CompIndex).ControllerName,
-                                             WaterCoil(CompIndex).ControllerIndex,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerName,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
                                              false);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == Coil_ElectricHeat) { // 'Coil:Heating:Electric'
@@ -5030,7 +5028,7 @@ namespace MixedAir {
                         CoilName = CompName;
                         CoilType = CompType;
                     }
-                    SetCoilDesFlow(CoilType, CoilName, this->MinOA, ErrorsFound);
+                    SetCoilDesFlow(state, CoilType, CoilName, this->MinOA, ErrorsFound);
                 }
             } // End of component loop
         }

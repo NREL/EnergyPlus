@@ -59,6 +59,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -72,7 +73,6 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
@@ -187,7 +187,7 @@ namespace EnergyPlus {
             thisDomain.InitPipingSystems(state, this);
 
             // Update the temperature field
-            thisDomain.PerformIterationLoop(this);
+            thisDomain.PerformIterationLoop(state, this);
 
             // Update outlet nodes, etc.
             thisDomain.UpdatePipingSystems(this);
@@ -234,7 +234,7 @@ namespace EnergyPlus {
                 if ((DataGlobals::BeginSimFlag && thisDomain.BeginSimInit) ||
                     (DataGlobals::BeginEnvrnFlag && thisDomain.BeginSimEnvironment)) {
 
-                    thisDomain.DoOneTimeInitializations(nullptr);
+                    thisDomain.DoOneTimeInitializations(state, nullptr);
 
                     if (thisDomain.HasZoneCoupledSlab) {
                         int Xmax = ubound(thisDomain.Cells, 1);
@@ -384,7 +384,7 @@ namespace EnergyPlus {
                         thisDomain.ShiftTemperaturesForNewTimeStep();
                         thisDomain.DomainNeedsSimulation = true;
                     }
-                    thisDomain.PerformIterationLoop();
+                    thisDomain.PerformIterationLoop(state);
                 }
             }
 
@@ -2192,7 +2192,7 @@ namespace EnergyPlus {
                 thisCircuit->CurCircuitInletTemp = DataLoopNode::Node(thisCircuit->InletNodeNum).Temp;
                 thisCircuit->InletTemperature = thisCircuit->CurCircuitInletTemp;
 
-                this->DoOneTimeInitializations(thisCircuit);
+                this->DoOneTimeInitializations(state, thisCircuit);
 
                 this->BeginSimInit = false;
                 this->BeginSimEnvironment = false;
@@ -4119,7 +4119,7 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::PerformIterationLoop() {
+        void Domain::PerformIterationLoop(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4133,7 +4133,7 @@ namespace EnergyPlus {
             // Begin iterating for this time step
             for (int IterationIndex = 1; IterationIndex <= this->SimControls.MaxIterationsPerTS; ++IterationIndex) {
                 this->ShiftTemperaturesForNewIteration();
-                if (this->DomainNeedsSimulation) this->PerformTemperatureFieldUpdate();
+                if (this->DomainNeedsSimulation) this->PerformTemperatureFieldUpdate(state);
                 bool FinishedIterationLoop = false;
                 this->DoEndOfIterationOperations(FinishedIterationLoop);
                 if (FinishedIterationLoop) break;
@@ -4150,7 +4150,7 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::PerformIterationLoop(Circuit * thisCircuit) {
+        void Domain::PerformIterationLoop(EnergyPlusData &state, Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4175,7 +4175,7 @@ namespace EnergyPlus {
                     this->PerformPipeCircuitSimulation(thisCircuit);
                 }
 
-                if (this->DomainNeedsSimulation) this->PerformTemperatureFieldUpdate();
+                if (this->DomainNeedsSimulation) this->PerformTemperatureFieldUpdate(state);
                 bool FinishedIterationLoop = false;
                 this->DoEndOfIterationOperations(FinishedIterationLoop);
 
@@ -4193,7 +4193,7 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::PerformTemperatureFieldUpdate() {
+        void Domain::PerformTemperatureFieldUpdate(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4217,10 +4217,10 @@ namespace EnergyPlus {
                                 cell.Temperature = this->EvaluateFieldCellTemperature(cell);
                                 break;
                             case CellType::GroundSurface:
-                                cell.Temperature = this->EvaluateGroundSurfaceTemperature(cell);
+                                cell.Temperature = this->EvaluateGroundSurfaceTemperature(state, cell);
                                 break;
                             case CellType::FarfieldBoundary:
-                                cell.Temperature = this->EvaluateFarfieldBoundaryTemperature(cell);
+                                cell.Temperature = this->EvaluateFarfieldBoundaryTemperature(state, cell);
                                 break;
                             case CellType::BasementWall:
                             case CellType::BasementCorner:
@@ -4286,7 +4286,7 @@ namespace EnergyPlus {
             return Numerator / Denominator;
         }
 
-        Real64 Domain::EvaluateGroundSurfaceTemperature(CartesianCell &cell) {
+        Real64 Domain::EvaluateGroundSurfaceTemperature(EnergyPlusData &state, CartesianCell &cell) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4398,7 +4398,7 @@ namespace EnergyPlus {
                     //+y will always be the outdoor air
                     if (CurDirection == Direction::NegativeX || CurDirection == Direction::NegativeZ) {
                         // always farfield
-                        this->EvaluateFarfieldCharacteristics(cell, CurDirection, NeighborTemp, Resistance,
+                        this->EvaluateFarfieldCharacteristics(state, cell, CurDirection, NeighborTemp, Resistance,
                                                               AdiabaticMultiplier);
                         Numerator += (Beta / Resistance) * NeighborTemp;
                         Denominator += (Beta / Resistance);
@@ -4420,7 +4420,7 @@ namespace EnergyPlus {
                     //+y will always be the outdoor air
                     if ((CurDirection == Direction::PositiveX) || (CurDirection == Direction::NegativeX)) {
                         // always farfield
-                        this->EvaluateFarfieldCharacteristics(cell, CurDirection, NeighborTemp, Resistance,
+                        this->EvaluateFarfieldCharacteristics(state, cell, CurDirection, NeighborTemp, Resistance,
                                                               AdiabaticMultiplier);
                         Numerator += (Beta / Resistance) * NeighborTemp;
                         Denominator += (Beta / Resistance);
@@ -4670,7 +4670,7 @@ namespace EnergyPlus {
             return Numerator / Denominator;
         }
 
-        Real64 Domain::EvaluateFarfieldBoundaryTemperature(CartesianCell &cell) {
+        Real64 Domain::EvaluateFarfieldBoundaryTemperature(EnergyPlusData &state, CartesianCell &cell) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4707,7 +4707,7 @@ namespace EnergyPlus {
             for (int DirectionCounter = 0; DirectionCounter <= NumBoundaryCells; ++DirectionCounter) {
                 Direction CurDirection = this->NeighborBoundaryCells[DirectionCounter];
                 Real64 NeighborTemp = 0.0;
-                this->EvaluateFarfieldCharacteristics(cell, CurDirection, NeighborTemp, Resistance,
+                this->EvaluateFarfieldCharacteristics(state, cell, CurDirection, NeighborTemp, Resistance,
                                                       AdiabaticMultiplier);
                 Numerator += AdiabaticMultiplier * (Beta / Resistance) * NeighborTemp;
                 Denominator += AdiabaticMultiplier * (Beta / Resistance);
@@ -4942,7 +4942,7 @@ namespace EnergyPlus {
         }
 
         void
-        Domain::EvaluateFarfieldCharacteristics(CartesianCell &cell, Direction const direction, Real64 &neighbortemp,
+        Domain::EvaluateFarfieldCharacteristics(EnergyPlusData &state, CartesianCell &cell, Direction const direction, Real64 &neighbortemp,
                                                 Real64 &resistance, Real64 &adiabaticMultiplier) {
 
             // SUBROUTINE INFORMATION:
@@ -4970,12 +4970,12 @@ namespace EnergyPlus {
             }
 
             resistance = (distance / 2.0) / (cell.Properties.Conductivity * cell.normalArea(direction));
-            neighbortemp = this->GetFarfieldTemp(cell);
+            neighbortemp = this->GetFarfieldTemp(state, cell);
 
             adiabaticMultiplier = cell.NeighborInfo[direction].adiabaticMultiplier;
         }
 
-        Real64 Domain::GetFarfieldTemp(CartesianCell const &cell) {
+        Real64 Domain::GetFarfieldTemp(EnergyPlusData &state, CartesianCell const &cell) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -4985,7 +4985,7 @@ namespace EnergyPlus {
 
             Real64 CurTime = this->Cur.CurSimTimeSeconds;
             Real64 z = this->Extents.yMax - cell.Centroid.Y;
-            return this->groundTempModel->getGroundTempAtTimeInSeconds(z, CurTime);
+            return this->groundTempModel->getGroundTempAtTimeInSeconds(state, z, CurTime);
         }
 
         void Domain::PreparePipeCircuitSimulation(Circuit * thisCircuit) {
@@ -5587,7 +5587,7 @@ namespace EnergyPlus {
             cell.PipeCellData.Fluid.Temperature = Numerator / Denominator;
         }
 
-        void Domain::DoOneTimeInitializations(Circuit * thisCircuit) {
+        void Domain::DoOneTimeInitializations(EnergyPlusData &state, Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -5681,7 +5681,7 @@ namespace EnergyPlus {
                         auto &cell(this->Cells(X, Y, Z));
 
                         // On OneTimeInit, the cur sim time should be zero, so this will be OK
-                        Real64 ThisCellTemp = this->GetFarfieldTemp(cell);
+                        Real64 ThisCellTemp = this->GetFarfieldTemp(state, cell);
                         cell.Temperature = ThisCellTemp;
                         cell.Temperature_PrevIteration = ThisCellTemp;
                         cell.Temperature_PrevTimeStep = ThisCellTemp;
