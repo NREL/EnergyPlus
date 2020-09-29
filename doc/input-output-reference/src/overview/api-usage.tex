@@ -10,8 +10,19 @@ As of version 9.3, a proper API has been developed, which builds on a number of 
 
 \begin{itemize}
  \item The Energy Management System, which was the first method to allow reading and writing simulation data while a simulation was running, and allowing user-defined scripts to be executed to alter simulation data.
- \item The EnergyPlus unit test structure, which has, as a side-effect, enabled the ability to "reset" the state of a simulation, and re-run another, in the same memory space.
+ \item The EnergyPlus unit test structure, which has, as a side-effect, enabled the ability to ``reset'' the state of a simulation, and re-run another, in the same memory space.
 \end{itemize}
+
+As of version 9.4, the API has been improved, as well as the ability to more reliably ``reset'' the simulation state.
+After 9.3 was released and users began toying with the API usage, it was revealed that many (most?) files would not actually run well during series runs of EnergyPlus via API in the same thread because the simulation state was not fully ``cleared''.
+Although the simulation state is still not guaranteed to be fully cleared, we are now seeing greater than 95\% pass rate on our example files when running them serially multiple times.
+This situation will make it much more suited for integrating into workflows as the Python thread does not have to be destroyed to get a clean EnergyPlus state for the next run.
+Work is continuing to get the state of the simulation completely managed, and will be completed prior to the next release, ensuring this situation continues improving.
+
+Note that the effort to improve the simulation state for the API resulted in a break in many API functions.
+It was expected that in this first release of the API, issues would be identified that would cause breaks in the API.
+Moving forward, it is not expected that API endpoints will change, at least not often.
+As the API gains more adoption, EnergyPlus may adopt a more semantic versioning approach where the API is only broken in major version number changes.
 
 Interface developers that have been building on top of EnergyPlus have primarily interacted with the simulation in the traditional manner.
 The interface would create an input file in a directory, copy in weather data and any other supporting data, and then kick off a simulation in that directory.
@@ -19,13 +30,55 @@ The interface could grab output messages from the simulation, but that was essen
 The interface just had to wait until EnergyPlus completed, check data in the output files, and decide what to do next.
 Grabbing any sort of data from the simulation during a run, even just progress, was highly difficult.
 
-As of version 9.3, a new API has been created that will change all that.
-A new formal EnergyPlus API is implemented that allows three categories of interaction with the simulation.
-Technically speaking, the three categories are not different, as they operate using the same API mechanics.
+The EnergyPlus API has been created to change that situation and open new doors into the simulation program and the opportunity to embed EnergyPlus into vastly more workflows and applications.
+A new formal EnergyPlus API is implemented that allows interacting with different ``categories'' of the simulation.
+Technically speaking, the categories are not different, as they operate using the same API mechanics.
 The categorization is purely organizational.
 In the following subsections, the API is laid out with examples in both C and Python.
 Full API documentation will be provided separate from this document.
 Check the release notes for your specific release for more information.
+
+\subsection{State API}\label{subsec:state-api}
+
+The state of an EnergyPlus represents the entire contents of a running simulation.
+Everything from the current time step to the water side economizer operating part load ratio is tracked in the state of a running simulation.
+Since the birth of EnergyPlus, the state of the simulation was hung on the global program state, with no explicit object owning and managing the data.
+This was perfectly acceptable because the only real use of EnergyPlus was to execute the binary (energyplus.exe) and wait for it to finish and inspect the outputs.
+However, this has proved to be a burden when trying to push EnergyPlus into new applications, and as such, the team has worked to move much of the global state into a state class which can then manage the data on itself.
+From an internal-to-EnergyPlus perspective, this means that functions will access variables on a class that is passed around throughout the program.
+From an API-client perspective, this means that the client will need to create a state instance and pass it into the simulation when asking the simulation to do most operations.
+
+Prior to calling into most of the API functions, the API client must create a new state instance.
+This state instance is not to be directly accessed by the client, but instead the client must simply be a courier of this state instance and pass it in and out of the API calls.
+Whenever the client is done with that instance, the instance can be reset to be prepped for another run of EnergyPlus, or destroyed if the client is done with it.
+
+An example of this in C is listed here:
+
+\begin{lstlisting}
+#include <EnergyPlus/api/state.h>
+
+int main(int argc, const char * argv[]) {
+  EnergyPlusState state = stateNew();
+  stateReset(state);
+  stateDelete(state);
+  printf("Wow this was a boring use case\n");
+}
+\end{lstlisting}
+
+That does not do much.
+But moving through the rest of the API functions, it will become clear that this is at the core of an EnergyPlus API workflow.
+
+In Python, that same example is similar:
+
+\begin{lstlisting}
+from pyenergyplus.api import EnergyPlusAPI
+
+api = EnergyPlusAPI()
+state = api.state_manager.new_state()
+api.state_manager.reset_state(state)
+api.state_manager.delete_state(state)
+print("Wow even boring in Python!?")
+\end{lstlisting}
 
 \subsection{Functional API}\label{subsec:functional-api}
 
@@ -37,25 +90,29 @@ Once an instance is available, the user will call methods on that instance.
 To interact with the refrigerant property data, the user will also create a refrigerant class and access data through methods.
 For psychrometrics, in C the function calls do not need to create an instance, however, in Python, a small class captures the psychrometric functions for organization.
 
+While some of the functionality in these property routines are stateless from the perspective of the EnergyPlus simulation engine, an instance of the EnergyPlus ``state'' class is required to be passed in.
+
 An example of exercising the functional API in C is listed here:
 
 \begin{lstlisting}
  #include <EnergyPlus/api/func.h>
+ #include <EnergyPlus/api/state.h>
 
  int main(int argc, const char * argv[]) {
-  initializeFunctionalAPI();
+  EnergyPlusState state = stateNew();
+  initializeFunctionalAPI(state);
 
   Glycol glycol = NULL;
-  glycol = glycolNew("WatEr");
-  Real64 specificHeat = glycolSpecificHeat(glycol, 35.0);
-  glycolDelete(glycol);
+  glycol = glycolNew(state, "WatEr");
+  Real64 specificHeat = glycolSpecificHeat(state, glycol, 35.0);
+  glycolDelete(state, glycol);
 
   Refrigerant refrig = NULL;
-  refrig = refrigerantNew("SteaM");
-  Real64 satPress = refrigerantSaturationPressure(refrig, 100.0);
-  refrigerantDelete(refrig);
+  refrig = refrigerantNew(state, "SteaM");
+  Real64 satPress = refrigerantSaturationPressure(state, refrig, 100.0);
+  refrigerantDelete(state, refrig);
 
-  Real64 rh = psyRhFnTdbWPb(24, 0.009, 101325); // psychrometrics are evaluated directly
+  Real64 rh = psyRhFnTdbWPb(state, 24, 0.009, 101325); // psychrometrics are evaluated directly
  }
 \end{lstlisting}
 
@@ -68,16 +125,18 @@ The same operations, but in Python are listed here:
 
 \begin{lstlisting}
  from pyenergyplus.api import EnergyPlusAPI
+
  api = EnergyPlusAPI()
+ state = api.state_manager.new_state()
 
- glycol = api.functional.glycol(u"water")
- cp = glycol.specific_heat(35.0)
+ glycol = api.functional.glycol(state, u"water")
+ cp = glycol.specific_heat(state, 35.0)
 
- refrigerant = api.functional.refrigerant("steam")
- satPress = refrigerant.saturation_pressure(100.0)
+ refrigerant = api.functional.refrigerant(state, "steam")
+ satPress = refrigerant.saturation_pressure(state, 100.0)
 
- psychrometrics = api.functional.psychrometrics()
- rh = psychrometrics.relative_humidity_b(24, 0.009, 101325)
+ psychrometrics = api.functional.psychrometrics(state, )
+ rh = psychrometrics.relative_humidity_b(state, 24, 0.009, 101325)
 \end{lstlisting}
 
 Some subtle differences are present.
@@ -89,7 +148,7 @@ Note that in Python, in contrast to C, the psychrometric functions also live on 
 
 The ``Runtime'' API allows for users to hook into a running simulation.
 The client creates functions, and using this runtime API, they can register these functions to be called back at specific points in a simulation.
-Once registered, this API includes a function to start the simulation, as well as a function to clear the simulation state so that another simulation can be performed.
+Once registered, this API includes a function to start the simulation.
 There are a number of calling points available to hook in a callback function.
 For information on the different available calling points, see the EMSApplicationGuide documentation packaged with EnergyPlus.
 For exact naming conventions on the C and Python registration functions, see either the C header or Python API file, or the API documentation that will be made available separate from the installer.
@@ -97,28 +156,37 @@ See the release notes for information on subsequent documentation.
 
 A minimal approach demonstrating the runtime API in C would be the following:
 
+Note that as of EnergyPlus 9.4, due to the change in handling simulation state, the form of the callback function has changed.
+While a simulation is running, there is a matched state object that must be passed in and out of the program to perform operations.
+This has already been demonstrated in the above functional API example, but in this case, the state change is more pronounced because the callback function must accept a state argument.
+The reason the callback must accept the state argument is because while inside a callback, it is expected that the client code will then call into EnergyPlus to read/write data, and the state must be passed back in.
+Basically, the client must be a reliable courier of the state object.
+
 \begin{lstlisting}
  #include <EnergyPlus/api/runtime.h>
+ #include <EnergyPlus/api/state.h>
 
- void dummyCallbackFunction() {}
+ void dummyCallbackFunction(EnergyPlusState state) {
+   printf("Hmm I could use my state argument to call back into EnergyPlus to do stuff, great!\n");
+ }
 
  int main(int argc, const char * argv[]) {
-  callbackAfterNewEnvironmentWarmupComplete(dummyCallbackFunction);
-  energyplus(argc, argv);
-  cClearAllStates();
-  callbackAfterNewEnvironmentWarmupComplete(dummyCallbackFunction);
-  energyplus(argc, argv);
+  callbackAfterNewEnvironmentWarmupComplete(state, dummyCallbackFunction);
+  energyplus(state, argc, argv);
+  stateReset(state); // note previously registered callbacks are cleared here
+  callbackAfterNewEnvironmentWarmupComplete(state, dummyCallbackFunction);
+  energyplus(state, argc, argv);
  }
 \end{lstlisting}
 
 The code is straightforward, though excessively minimal.
-A blank function is created, which accepts no arguments, and does nothing.
+A minimal function is created, which accepts one argument - a state object, and does nothing.
 This function is then passed to a callback registration function via the runtime API.
 EnergyPlus is executed, passing along any command line arguments that are received by the test program.
 This is a convenience because the energyplus function expects arguments just like the EnergyPlus(.exe) program, so the test script would have the same command line capabilities as EnergyPlus itself.
 For this code, it could be executed with something like: \verb=program.exe -D /path/to/input.idf=.
-Once EnergyPlus is complete, the memory state is cleared, the callback is re-registered, and EnergyPlus is run again.
-Since the test script is complete at this point, there is no need to clear the memory state again.
+Once EnergyPlus is complete, the state object is reset, the callback is re-registered, and EnergyPlus is run again.
+Since the test script is complete at this point, there is no need to reset the state again.
 
 The code is strikingly similar in Python:
 
@@ -126,18 +194,21 @@ The code is strikingly similar in Python:
  import sys
  from pyenergyplus.api import EnergyPlusAPI
 
- def dummy_callback_function():
- pass
+ def dummy_callback_function(state_argument):
+   print("My argument is called state_argument to avoid duplicating the outer variable below called state")
 
  api = EnergyPlusAPI()
- api.runtime.callback_begin_new_environment(dummy_callback_function)
- api.runtime.run_energyplus(sys.argv[1:])
- api.runtime.clear_all_states()
- api.runtime.callback_begin_new_environment(dummy_callback_function)
- api.runtime.run_energyplus(sys.argv[1:])
+ state = api.state_manager.new_state()
+ api.runtime.callback_begin_new_environment(state, dummy_callback_function)
+ api.runtime.run_energyplus(state, sys.argv[1:])
+ api.state_manager.reset_state(state)
+ api.runtime.callback_begin_new_environment(state, dummy_callback_function)
+ api.runtime.run_energyplus(state, sys.argv[1:])
 \end{lstlisting}
 
-Once again, a dummy function is created, then registered, followed by a call to run EnergyPlus (passing along the relevant command line arguments), the state is cleared, then the function is registered again and EnergyPlus is run a second time.  For those command line arguments, when calling EnergyPlus as a library, you should just pass the arguments, not the filename itself.  In Python, the argv variable will have the filename as the first item in the list, so this syntax trims that off.
+Once again, a dummy function is created, then registered, followed by a call to run EnergyPlus (passing along the relevant command line arguments), the state is cleared, then the function is registered again and EnergyPlus is run a second time.
+Note that when calling EnergyPlus as a library, you should just pass the arguments, not the filename itself.
+In Python, the argv variable will have the filename as the first item in the list, so this example trims that off.
 
 \subsection{Data Exchange API}\label{subsec:data-exchange-api}
 
@@ -180,7 +251,7 @@ However, much more power comes with the addition of actuators, described next.
                   Instead, a specific set of items are available to actuate, primarily control functions, flow requests, and environmental boundary conditions.
                   These actuators, when used in conjunction with the runtime API and data exchange variables, allow a user to read data, make decisions and perform calculations, then actuate control strategies for subsequent time steps.
 
- Actuator functions are similar, but not exactly the same as for variables.
+ Actuator functions are similar, but not exactly the same, as for variables.
  An actuator handle/ID is still looked up, but it takes the actuator type, component name, and control type, since components may have more than one control type available for actuation.
  The actuator can then be ``actuated'' by calling a set-value function, which overrides an internal value, and informs EnergyPlus that this value is currently being externally controlled.
  To allow EnergyPlus to resume controlling that value, there is an actuator reset function as well.
@@ -202,33 +273,34 @@ Minimal examples that tie the runtime and data exchange APIs together are shown 
 \begin{lstlisting}
  #include <EnergyPlus/api/datatransfer.h>
  #include <EnergyPlus/api/runtime.h>
+ #include <EnergyPlus/api/state.h>
 
  int outdoorDewPointActuator = -1;
  int outdoorTempSensor = -1;
  int handlesRetrieved = 0;
 
- void afterZoneTimeStepHandler()
+ void afterZoneTimeStepHandler(EnergyPlusState state)
  {
   if (handlesRetrieved == 0) {
-    if (!apiDataFullyReady()) return;
-    outdoorDewPointActuator = getActuatorHandle("Weather Data", "Outdoor Dew Point", "Environment");
-    outdoorTempSensor = getVariableHandle("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
+    if (!apiDataFullyReady(state)) return;
+    outdoorDewPointActuator = getActuatorHandle(state, "Weather Data", "Outdoor Dew Point", "Environment");
+    outdoorTempSensor = getVariableHandle(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
     handlesRetrieved = 1;
   }
-  Real64 oa_temp = getVariableValue(outdoorTempSensor);
-  setActuatorValue(outdoorDewPointActuator, oa_temp - 4);
+  Real64 oa_temp = getVariableValue(state, outdoorTempSensor);
+  setActuatorValue(state, outdoorDewPointActuator, oa_temp - 4);
  }
 
-
  int main(int argc, const char * argv[]) {
-  callbackEndOfZoneTimeStepAfterZoneReporting(afterZoneTimeStepHandler);
-  requestVariable("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
-  energyplus(argc, argv);
+  callbackEndOfZoneTimeStepAfterZoneReporting(state, afterZoneTimeStepHandler);
+  requestVariable(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
+  energyplus(state, argc, argv);
  }
 \end{lstlisting}
 
 The actual operations happening in this example are completely fictional, but nevertheless demonstrate a possible minimal case.
 Note that the variable to be used is requested, and if the api data is not fully ready in the callback, it simply returns and waits.
+
 And now in Python:
 
 \begin{lstlisting}
@@ -238,25 +310,26 @@ And now in Python:
  outdoor_temp_sensor = 0
  outdoor_dew_point_actuator = 0
 
- def time_step_handler():
+ def time_step_handler(state):
    global one_time, outdoor_temp_sensor, outdoor_dew_point_sensor, outdoor_dew_point_actuator
    if one_time:
-     if not api.exchange.api_data_fully_ready():
+     if not api.exchange.api_data_fully_ready(state):
        return
      outdoor_temp_sensor = api.exchange.get_variable_handle(
-       u"SITE OUTDOOR AIR DRYBULB TEMPERATURE", u"ENVIRONMENT"
+       state, u"SITE OUTDOOR AIR DRYBULB TEMPERATURE", u"ENVIRONMENT"
      )
      outdoor_dew_point_actuator = api.exchange.get_actuator_handle(
-       "Weather Data", "Outdoor Dew Point", "Environment"
+       state, "Weather Data", "Outdoor Dew Point", "Environment"
      )
      one_time = False
-   oa_temp = api.exchange.get_variable_value(outdoor_temp_sensor)
-   api.exchange.set_actuator_value(outdoor_dew_point_actuator, oa_temp-4)
+   oa_temp = api.exchange.get_variable_value(state, outdoor_temp_sensor)
+   api.exchange.set_actuator_value(state, outdoor_dew_point_actuator, oa_temp-4)
 
  api = EnergyPlusAPI()
- api.runtime.callback_end_zone_timestep_after_zone_reporting(time_step_handler)
- api.exchange.request_variable("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT")
- api.runtime.run_energyplus(sys.argv[1:])
+ state = api.state_manager.new_state()
+ api.runtime.callback_end_zone_timestep_after_zone_reporting(state, time_step_handler)
+ api.exchange.request_variable(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT")
+ api.runtime.run_energyplus(state, sys.argv[1:])
 \end{lstlisting}
 
 Note that when strings are passed through the Python API, they are both case-insensitive, and type-insensitive.
@@ -269,6 +342,7 @@ Demonstrations of these APIs are available on the EnergyPlus repository in both 
 For the latest development version, they are at \href{https://github.com/NREL/EnergyPlus/tree/develop/tst/EnergyPlus/api}{this page}.
 
 \subsection{Building and Linking}\label{subsec:building-and-linking}
+
 Once you have your C or Python code scripted up, you need to actually link that code to the EnergyPlus library.
 The EnergyPlus install includes several relevant pieces:
 
@@ -281,14 +355,15 @@ EnergyPlusInstallRoot
          - EnergyPlusAPI.h
          - func.h
          - runtime.h
+         - state.h
  - libenergyplusapi.so
  - pyenergyplus
-    - api.py
+ - api.py
 \end{lstlisting}
 
 When building C applications, the build should include the EnergyPlusInstallRoot path in your include path, so that when the client has an \verb=#include<EnergyPlus/api/func.h>=, it will be able to find it relative to the EnergyPlus install root path.
 Once the code is compiled, it should be linked to the EnergyPlus shared library, which also lives in the root of the EnergyPlus install.
-The actual command will be different based on your compiler, but for gcc, as example, the command passed to the linker would be \verb=-l/path/to/libenergyplusapi.so=.
+The actual command will be different based on your system and compiler, but using gcc on Linux, for example, the command passed to the linker would be \verb=-l/path/to/libenergyplusapi.so=.
 
 When building Python applications, the EnergyPlusInstallRoot should be added to the search path prior to trying to import anything else.
 This can be accomplished through the use of environment variables, but it is also easy to do at the beginning of scripts, for example:
