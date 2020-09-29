@@ -1734,7 +1734,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state);
     TestAirPathIntegrity(state, state.files, ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
     SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
@@ -3308,7 +3308,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state);
 
     ASSERT_ANY_THROW(SimulationManager::SetupSimulation(state, ErrorsFound));
 }

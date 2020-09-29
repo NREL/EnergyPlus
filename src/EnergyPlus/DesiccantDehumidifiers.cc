@@ -491,7 +491,7 @@ namespace DesiccantDehumidifiers {
                     ErrorsFound = true;
                 } else { // mine data from heating coil object
                     errFlag = false;
-                    DesicDehum(DesicDehumNum).RegenCoilIndex = GetWaterCoilIndex("COIL:HEATING:WATER", RegenCoilName, errFlag);
+                    DesicDehum(DesicDehumNum).RegenCoilIndex = GetWaterCoilIndex(state, "COIL:HEATING:WATER", RegenCoilName, errFlag);
                     if (DesicDehum(DesicDehumNum).RegenCoilIndex == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " illegal " + cAlphaFields(9) + " = " + RegenCoilName);
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
@@ -500,7 +500,7 @@ namespace DesiccantDehumidifiers {
 
                     // Get the Heating Coil Hot water Inlet or control Node number
                     errFlag = false;
-                    DesicDehum(DesicDehumNum).CoilControlNode = GetCoilWaterInletNode("Coil:Heating:Water", RegenCoilName, errFlag);
+                    DesicDehum(DesicDehumNum).CoilControlNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", RegenCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
                         ErrorsFound = true;
@@ -508,7 +508,7 @@ namespace DesiccantDehumidifiers {
 
                     // Get the Regeneration Heating Coil hot water max volume flow rate
                     errFlag = false;
-                    DesicDehum(DesicDehumNum).MaxCoilFluidFlow = GetCoilMaxWaterFlowRate("Coil:Heating:Water", RegenCoilName, errFlag);
+                    DesicDehum(DesicDehumNum).MaxCoilFluidFlow = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", RegenCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
                         ErrorsFound = true;
@@ -1020,7 +1020,7 @@ namespace DesiccantDehumidifiers {
                         ErrorsFound = true;
                     } else { // mine data from heating coil object
                         errFlag = false;
-                        DesicDehum(DesicDehumNum).RegenCoilIndex = GetWaterCoilIndex("COIL:HEATING:WATER", RegenCoilName, errFlag);
+                        DesicDehum(DesicDehumNum).RegenCoilIndex = GetWaterCoilIndex(state, "COIL:HEATING:WATER", RegenCoilName, errFlag);
                         if (DesicDehum(DesicDehumNum).RegenCoilIndex == 0) {
                             ShowSevereError(CurrentModuleObject + " illegal " + cAlphaFields(9) + " = " + RegenCoilName);
                             ShowContinueError("Occurs in " + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
@@ -1035,7 +1035,7 @@ namespace DesiccantDehumidifiers {
 
                         // Get the Heating Coil Hot water Inlet or control Node number
                         errFlag = false;
-                        DesicDehum(DesicDehumNum).CoilControlNode = GetCoilWaterInletNode("Coil:Heating:Water", RegenCoilName, errFlag);
+                        DesicDehum(DesicDehumNum).CoilControlNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", RegenCoilName, errFlag);
                         if (errFlag) {
                             ShowContinueError("Occurs in " + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
                             ErrorsFound = true;
@@ -1043,7 +1043,7 @@ namespace DesiccantDehumidifiers {
 
                         // Get the Regeneration Heating Coil hot water max volume flow rate
                         errFlag = false;
-                        DesicDehum(DesicDehumNum).MaxCoilFluidFlow = GetCoilMaxWaterFlowRate("Coil:Heating:Water", RegenCoilName, errFlag);
+                        DesicDehum(DesicDehumNum).MaxCoilFluidFlow = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", RegenCoilName, errFlag);
                         if (errFlag) {
                             ShowContinueError("Occurs in " + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
                             ErrorsFound = true;
@@ -1068,7 +1068,7 @@ namespace DesiccantDehumidifiers {
                         }
 
                         RegairHeatingCoilFlag = true;
-                        SetWaterCoilData(DesicDehum(DesicDehumNum).RegenCoilIndex, ErrorsFound2, RegairHeatingCoilFlag, DesicDehumNum);
+                        SetWaterCoilData(state, DesicDehum(DesicDehumNum).RegenCoilIndex, ErrorsFound2, RegairHeatingCoilFlag, DesicDehumNum);
                         if (ErrorsFound2) {
                             ShowContinueError("...occurs in " + DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).Name + "\"");
                             ErrorsFoundGeneric = true;
@@ -1712,7 +1712,6 @@ namespace DesiccantDehumidifiers {
         // Using/Aliasing
         using DataHVACGlobals::DoSetPointTest;
         using DataHVACGlobals::SetPointErrorFlag;
-        // unused  USE DataEnvironment, ONLY: StdBaroPress
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iHumidityRatioMaxSetPoint;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -1784,7 +1783,7 @@ namespace DesiccantDehumidifiers {
 
                     ErrorFlag = false;
                     DesicDehum(DesicDehumNum).MaxCoilFluidFlow =
-                        GetCoilMaxWaterFlowRate("Coil:Heating:Water", DesicDehum(DesicDehumNum).RegenCoilName, ErrorFlag);
+                        GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", DesicDehum(DesicDehumNum).RegenCoilName, ErrorFlag);
                     if (DesicDehum(DesicDehumNum).MaxCoilFluidFlow > 0.0) {
                         FluidDensity = GetDensityGlycol(PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidName,
                                                         DataGlobals::HWInitConvTemp,
@@ -1905,7 +1904,7 @@ namespace DesiccantDehumidifiers {
                                     DesicDehum(DesicDehumNum).RegenCoilName, FirstHVACIteration, DesicDehum(DesicDehumNum).RegenCoilIndex);
                                 ErrorFlag = false;
                                 CoilMaxVolFlowRate =
-                                    GetCoilMaxWaterFlowRate("Coil:Heating:Water", DesicDehum(DesicDehumNum).RegenCoilName, ErrorFlag);
+                                    GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", DesicDehum(DesicDehumNum).RegenCoilName, ErrorFlag);
                                 if (ErrorFlag) {
                                     ErrorsFound = true;
                                 }
@@ -2163,7 +2162,6 @@ namespace DesiccantDehumidifiers {
         // Using/Aliasing
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-        // unused  USE DataEnvironment, ONLY: StdBaroPress
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2581,7 +2579,6 @@ namespace DesiccantDehumidifiers {
         // Using/Aliasing
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-        // unused  USE DataEnvironment, ONLY: StdBaroPress
         using DXCoils::DXCoilFanOpMode;
         using DXCoils::DXCoilPartLoadRatio;
         using HeatRecovery::SimHeatRecovery;

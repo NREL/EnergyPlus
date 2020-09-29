@@ -45,17 +45,18 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
+#include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
+#include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
@@ -158,43 +159,53 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     std::string CompType = this->object_name;
     std::string CompName = this->name;
     bool PrintFlag = true;
+    bool errorsFound = false;
 
-    int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
-    std::string SizingString = "Rated Evaporator Air Flow Rate [m3/s]";
     Real64 TempSize = this->original_input_specs.rated_evaporator_air_flow_rate;
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-    this->ratedEvapAirFlowRate = TempSize;
-    Real64 const ratedInletAirTemp(26.6667);        // 26.6667C or 80F
-    Real64 const ratedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-    this->ratedEvapAirMassFlowRate = this->ratedEvapAirFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(
-            DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);
+    CoolingAirFlowSizer sizingCoolingAirFlow;
+    std::string stringOverride = "Rated Evaporator Air Flow Rate [m3/s]";
+    if (DataGlobals::isEpJSON) stringOverride = "rated_evaporator_air_flow_rate";
+    sizingCoolingAirFlow.overrideSizingString(stringOverride);
+    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    this->ratedEvapAirFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
-    SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
-    SizingString = "Rated Gross Total Cooling Capacity [W]";
+    Real64 const ratedInletAirTemp(26.6667);     // 26.6667C or 80F
+    Real64 const ratedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    this->ratedEvapAirMassFlowRate =
+        this->ratedEvapAirFlowRate *
+        Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);
+
+    std::string SizingString = "Rated Gross Total Cooling Capacity [W]";
     DataSizing::DataFlowUsedForSizing = this->ratedEvapAirFlowRate; // TODO: This is volume flow, right?
     TempSize = this->original_input_specs.gross_rated_total_cooling_capacity;
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-    this->ratedGrossTotalCap = TempSize;
+    CoolingCapacitySizer sizerCoolingCapacity;
+    sizerCoolingCapacity.overrideSizingString(SizingString);
+    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    this->ratedGrossTotalCap = sizerCoolingCapacity.size(state, TempSize, errorsFound);
 
-    SizingMethod = DataHVACGlobals::AutoCalculateSizing;
     // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
     DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
     DataSizing::DataFractionUsedForSizing = 0.000114;
-    SizingString = "Rated Condenser Air Flow Rate [m3/s]";
     TempSize = this->original_input_specs.rated_condenser_air_flow_rate;
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-    this->ratedCondAirFlowRate = TempSize;
+
+    AutoCalculateSizer sizerCondAirFlow;
+    stringOverride = "Rated Condenser Air Flow Rate [m3/s]";
+    if (DataGlobals::isEpJSON) stringOverride = "rated_condenser_air_flow_rate";
+    sizerCondAirFlow.overrideSizingString(stringOverride);
+    sizerCondAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    this->ratedCondAirFlowRate = sizerCondAirFlow.size(state, TempSize, errorsFound);
 
 
     if (this->condenserType != AIRCOOLED) {
         // Auto size Nominal Evaporative Condenser Pump Power to Total Capacity * 0.004266 w/w (15 W/ton)
-        SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+        AutoCalculateSizer sizerCondEvapPumpPower;
         DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
         DataSizing::DataFractionUsedForSizing = 0.004266;
-        SizingString = "Nominal Evaporative Condenser Pump Power [W]";
+        stringOverride = "Nominal Evaporative Condenser Pump Power [W]";
+        sizerCondEvapPumpPower.overrideSizingString(stringOverride);
         TempSize = this->original_input_specs.nominal_evap_condenser_pump_power;
-        ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-        this->nominalEvaporativePumpPower = TempSize;
+        sizerCondEvapPumpPower.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+        this->nominalEvaporativePumpPower = sizerCondEvapPumpPower.size(state, TempSize, errorsFound);
     }
 
     for (auto &curSpeed : this->speeds) {
@@ -239,7 +250,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlusData &state
     }
     if (thisspeed.RatedAirMassFlowRate > 0.0) {
         // TODO: The original two-speed just grabbed the RatedAirMassFlowRate(mode1), not for a specific speed, so that's what I'll do too
-        thisspeed.AirFF = thisspeed.AirMassFlow / this->ratedEvapAirMassFlowRate;  //thisspeed.RatedAirMassFlowRate;
+        thisspeed.AirFF = thisspeed.AirMassFlow / this->ratedEvapAirMassFlowRate; // thisspeed.RatedAirMassFlowRate;
     } else {
         thisspeed.AirFF = 0.0;
     }
@@ -281,7 +292,8 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlusData &state
     }
 }
 
-Real64 CoilCoolingDXCurveFitOperatingMode::getCurrentEvapCondPumpPower(int speedNum) {
+Real64 CoilCoolingDXCurveFitOperatingMode::getCurrentEvapCondPumpPower(int speedNum)
+{
     // Currently speedNum is 1-based, while this->speeds are zero-based
     auto const &thisspeed(this->speeds[max(speedNum - 1, 0)]);
     auto const &powerFraction(thisspeed.evap_condenser_pump_power_fraction);

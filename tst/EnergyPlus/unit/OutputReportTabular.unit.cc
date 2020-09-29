@@ -51,6 +51,7 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
+#include <stdio.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include "Fixtures/SQLiteFixture.hh"
@@ -6469,9 +6470,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     Zone(1).ListMultiplier = 1;
     Zone(1).FloorArea = 12.;
 
-    WeatherManager::DesDayInput.allocate(1);
-    WeatherManager::DesDayInput(1).Month = 5;
-    WeatherManager::DesDayInput(1).DayOfMonth = 21;
+    state.dataWeatherManager->DesDayInput.allocate(1);
+    state.dataWeatherManager->DesDayInput(1).Month = 5;
+    state.dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
 
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 15;
@@ -6495,7 +6496,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     FinalZoneSizing.allocate(1);
     FinalZoneSizing(1).DesCoolLoad = 600.;
 
-    CollectPeakZoneConditions(compLoad, 1, timeOfMax, zoneIndex, isCooling);
+    CollectPeakZoneConditions(state, compLoad, 1, timeOfMax, zoneIndex, isCooling);
 
     EXPECT_EQ(compLoad.peakDateHrMin, "5/21 15:45:00");
     EXPECT_EQ(compLoad.outsideDryBulb, 38.);
@@ -6637,11 +6638,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetZoneComponentAreas_test)
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_CombineLoadCompResults_test)
 {
     CompLoadTablesType compLoadTotal;
+    //printf("3");
     compLoadTotal.cells.allocate(10, 30);
     compLoadTotal.cells = 0.;
     compLoadTotal.cellUsed.allocate(10, 30);
     compLoadTotal.cellUsed = false;
 
+    //printf("4");
     CompLoadTablesType compLoadPartial;
     compLoadPartial.cells.allocate(10, 30);
     compLoadPartial.cells = 0.;
@@ -6656,7 +6659,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CombineLoadCompResults_test)
     compLoadPartial.outsideWetBulb = 17.;
     compLoadPartial.diffDesignPeak = 11.;
 
+    //printf("5");
     CombineLoadCompResults(compLoadTotal, compLoadPartial, multiplier);
+    //printf("6");
 
     EXPECT_EQ(1.1 * 3., compLoadTotal.cells(1, 1));
     EXPECT_EQ(1.2 * 3., compLoadTotal.cells(4, 25));
@@ -6941,11 +6946,11 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     int numDesDays = 2;
     DataEnvironment::TotDesDays = numDesDays;
     DataEnvironment::TotRunDesPersDays = 0;
-    WeatherManager::DesDayInput.allocate(2);
-    WeatherManager::DesDayInput(1).Month = 7;
-    WeatherManager::DesDayInput(1).DayOfMonth = 21;
-    WeatherManager::DesDayInput(2).Month = 1;
-    WeatherManager::DesDayInput(2).DayOfMonth = 21;
+    state.dataWeatherManager->DesDayInput.allocate(2);
+    state.dataWeatherManager->DesDayInput(1).Month = 7;
+    state.dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
+    state.dataWeatherManager->DesDayInput(2).Month = 1;
+    state.dataWeatherManager->DesDayInput(2).DayOfMonth = 21;
 
 
     DataGlobals::NumOfTimeStepInHour = 4;
@@ -7431,7 +7436,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     OutputReportPredefined::SetPredefinedTables();
 
     // Call the routine that fills up the table we care about
-    HeatBalanceSurfaceManager::GatherForPredefinedReport(state.dataWindowManager);
+    HeatBalanceSurfaceManager::GatherForPredefinedReport(*state.dataWindowManager);
 
 
     // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
@@ -7553,7 +7558,7 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
     OutputReportPredefined::SetPredefinedTables();
 
     // Call the routine that fills up the table we care about
-    HeatBalanceSurfaceManager::GatherForPredefinedReport(state.dataWindowManager);
+    HeatBalanceSurfaceManager::GatherForPredefinedReport(*state.dataWindowManager);
 
 
     // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
@@ -7938,7 +7943,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     // AnotherEndUseSubCat
     EXPECT_NEAR(extLitUse * 3, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1), 1.);
 
-    OutputReportTabular::WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector, state.files);
+    OutputReportTabular::WriteBEPSTable(state.dataCostEstimateManager, *state.dataZoneTempPredictorCorrector, state.files);
     OutputReportTabular::WriteDemandEndUseSummary(state.dataCostEstimateManager);
 
     EnergyPlus::sqlite->sqliteCommit();

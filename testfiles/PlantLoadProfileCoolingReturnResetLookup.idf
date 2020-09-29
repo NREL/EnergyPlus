@@ -119,7 +119,9 @@
     NO,                      !- Do System Sizing Calculation
     NO,                      !- Do Plant Sizing Calculation
     YES,                     !- Run Simulation for Sizing Periods
-    NO;                      !- Run Simulation for Weather File Run Periods
+    NO,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   PlantLoop,
     Main Loop,               !- Name

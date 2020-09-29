@@ -136,10 +136,10 @@ namespace ZoneContaminantPredictorCorrector {
         // This module is revised from subroutine ManageZoneAirUpdates in
         // ZoneTempPredictorCorrector module.
 
-        if (state.dataZoneContaminantPredictorCorrector.GetZoneAirContamInputFlag) {
-            if (Contaminant.GenericContamSimulation) GetZoneContaminanInputs(state.dataZoneContaminantPredictorCorrector);
+        if (state.dataZoneContaminantPredictorCorrector->GetZoneAirContamInputFlag) {
+            if (Contaminant.GenericContamSimulation) GetZoneContaminanInputs(*state.dataZoneContaminantPredictorCorrector);
             GetZoneContaminanSetPoints();
-            state.dataZoneContaminantPredictorCorrector.GetZoneAirContamInputFlag = false;
+            state.dataZoneContaminantPredictorCorrector->GetZoneAirContamInputFlag = false;
         }
 
         if (!Contaminant.SimulateContaminants) return;
@@ -148,13 +148,13 @@ namespace ZoneContaminantPredictorCorrector {
             auto const SELECT_CASE_var(UpdateType);
 
             if (SELECT_CASE_var == iGetZoneSetPoints) {
-                InitZoneContSetPoints(state.dataZoneContaminantPredictorCorrector);
+                InitZoneContSetPoints(*state.dataZoneContaminantPredictorCorrector);
 
             } else if (SELECT_CASE_var == iPredictStep) {
                 PredictZoneContaminants(ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
             } else if (SELECT_CASE_var == iCorrectStep) {
-                CorrectZoneContaminants(state.dataZonePlenum, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                CorrectZoneContaminants(*state.dataZonePlenum, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
             } else if (SELECT_CASE_var == iRevertZoneTimestepHistories) {
                 RevertZoneTimestepHistories();
