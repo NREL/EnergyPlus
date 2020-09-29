@@ -53,14 +53,15 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -68,16 +69,15 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -111,7 +111,6 @@ namespace HVACSingleDuctInduc {
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
-    using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
@@ -172,7 +171,8 @@ namespace HVACSingleDuctInduc {
 
     // Functions
 
-    void SimIndUnit(EnergyPlusData &state, std::string const &CompName,   // name of the terminal unit
+    void SimIndUnit(EnergyPlusData &state,
+                    std::string const &CompName,   // name of the terminal unit
                     bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                     int const ZoneNum,             // index of zone served by the terminal unit
                     int const ZoneNodeNum,         // zone node number of zone served by the terminal unit
@@ -199,7 +199,7 @@ namespace HVACSingleDuctInduc {
 
         // First time SimIndUnit is called, get the input for all the passive terminal induction units
         if (GetIUInputFlag) {
-            GetIndUnits();
+            GetIndUnits(state);
             GetIUInputFlag = false;
         }
 
@@ -257,7 +257,7 @@ namespace HVACSingleDuctInduc {
         IndUnit(IUNum).ReportIndUnit(state);
     }
 
-    void GetIndUnits()
+    void GetIndUnits(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -380,7 +380,7 @@ namespace HVACSingleDuctInduc {
 
             IndUnit(IUNum).HCoil = Alphas(7); // name of heating coil object
             IsNotOK = false;
-            IndUnit(IUNum).HWControlNode = GetCoilWaterInletNode(IndUnit(IUNum).HCoilType, IndUnit(IUNum).HCoil, IsNotOK);
+            IndUnit(IUNum).HWControlNode = GetCoilWaterInletNode(state, IndUnit(IUNum).HCoilType, IndUnit(IUNum).HCoil, IsNotOK);
             if (IsNotOK) {
                 ShowContinueError("In " + CurrentModuleObject + " = " + IndUnit(IUNum).Name);
                 ShowContinueError("..Only Coil:Heating:Water is allowed.");
@@ -402,7 +402,7 @@ namespace HVACSingleDuctInduc {
 
             IndUnit(IUNum).CCoil = Alphas(9); // name of cooling coil object
             IsNotOK = false;
-            IndUnit(IUNum).CWControlNode = GetCoilWaterInletNode(IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, IsNotOK);
+            IndUnit(IUNum).CWControlNode = GetCoilWaterInletNode(state, IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, IsNotOK);
             if (IsNotOK) {
                 ShowContinueError("In " + CurrentModuleObject + " = " + IndUnit(IUNum).Name);
                 ShowContinueError("..Only Coil:Cooling:Water or Coil:Cooling:Water:DetailedGeometry is allowed.");
@@ -636,7 +636,7 @@ namespace HVACSingleDuctInduc {
 
         if (!SysSizingCalc && MySizeFlag(IUNum)) {
 
-            SizeIndUnit(IUNum);
+            SizeIndUnit(state, IUNum);
             MySizeFlag(IUNum) = false;
         }
 
@@ -747,7 +747,7 @@ namespace HVACSingleDuctInduc {
         }
     }
 
-    void SizeIndUnit(int const IUNum)
+    void SizeIndUnit(EnergyPlusData &state, int const IUNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -771,7 +771,6 @@ namespace HVACSingleDuctInduc {
         using FluidProperties::GetSpecificHeatGlycol;
         using General::RoundSigDigits;
         using PlantUtilities::MyPlantSizingIndex;
-        using ReportSizingManager::ReportSizingOutput;
         using WaterCoils::GetCoilWaterInletNode;
         using WaterCoils::GetCoilWaterOutletNode;
         using WaterCoils::SetCoilDesFlow;
@@ -820,10 +819,10 @@ namespace HVACSingleDuctInduc {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                 if (IndUnit(IUNum).MaxTotAirVolFlow > 0.0) {
-                    ReportSizingOutput(IndUnit(IUNum).UnitType,
-                                       IndUnit(IUNum).Name,
-                                       "User-Specified Maximum Total Air Flow Rate [m3/s]",
-                                       IndUnit(IUNum).MaxTotAirVolFlow);
+                    BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                                                 IndUnit(IUNum).Name,
+                                                 "User-Specified Maximum Total Air Flow Rate [m3/s]",
+                                                 IndUnit(IUNum).MaxTotAirVolFlow);
                 }
             } else {
                 CheckZoneSizing(IndUnit(IUNum).UnitType, IndUnit(IUNum).Name);
@@ -838,17 +837,17 @@ namespace HVACSingleDuctInduc {
                 }
                 if (IsAutoSize) {
                     IndUnit(IUNum).MaxTotAirVolFlow = MaxTotAirVolFlowDes;
-                    ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         IndUnit(IUNum).UnitType, IndUnit(IUNum).Name, "Design Size Maximum Total Air Flow Rate [m3/s]", MaxTotAirVolFlowDes);
                 } else {
                     if (IndUnit(IUNum).MaxTotAirVolFlow > 0.0 && MaxTotAirVolFlowDes > 0.0) {
                         MaxTotAirVolFlowUser = IndUnit(IUNum).MaxTotAirVolFlow;
-                        ReportSizingOutput(IndUnit(IUNum).UnitType,
-                                           IndUnit(IUNum).Name,
-                                           "Design Size Maximum Total Air Flow Rate [m3/s]",
-                                           MaxTotAirVolFlowDes,
-                                           "User-Specified Maximum Total Air Flow Rate [m3/s]",
-                                           MaxTotAirVolFlowUser);
+                        BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                                                     IndUnit(IUNum).Name,
+                                                     "Design Size Maximum Total Air Flow Rate [m3/s]",
+                                                     MaxTotAirVolFlowDes,
+                                                     "User-Specified Maximum Total Air Flow Rate [m3/s]",
+                                                     MaxTotAirVolFlowUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(MaxTotAirVolFlowDes - MaxTotAirVolFlowUser) / MaxTotAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage("SizeHVACSingleDuctInduction: Potential issue with equipment sizing for " + IndUnit(IUNum).UnitType +
@@ -873,18 +872,18 @@ namespace HVACSingleDuctInduc {
         if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                 if (IndUnit(IUNum).MaxVolHotWaterFlow > 0.0) {
-                    ReportSizingOutput(IndUnit(IUNum).UnitType,
-                                       IndUnit(IUNum).Name,
-                                       "User-Specified Maximum Hot Water Flow Rate [m3/s]",
-                                       IndUnit(IUNum).MaxVolHotWaterFlow);
+                    BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                                                 IndUnit(IUNum).Name,
+                                                 "User-Specified Maximum Hot Water Flow Rate [m3/s]",
+                                                 IndUnit(IUNum).MaxVolHotWaterFlow);
                 }
             } else {
                 CheckZoneSizing(IndUnit(IUNum).UnitType, IndUnit(IUNum).Name);
 
                 if (UtilityRoutines::SameString(IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
 
-                    CoilWaterInletNode = GetCoilWaterInletNode("Coil:Heating:Water", IndUnit(IUNum).HCoil, ErrorsFound);
-                    CoilWaterOutletNode = GetCoilWaterOutletNode("Coil:Heating:Water", IndUnit(IUNum).HCoil, ErrorsFound);
+                    CoilWaterInletNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", IndUnit(IUNum).HCoil, ErrorsFound);
+                    CoilWaterOutletNode = GetCoilWaterOutletNode(state, "Coil:Heating:Water", IndUnit(IUNum).HCoil, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum =
                             MyPlantSizingIndex("Coil:Heating:Water", IndUnit(IUNum).HCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
@@ -929,25 +928,25 @@ namespace HVACSingleDuctInduc {
                     }
                     if (IsAutoSize) {
                         IndUnit(IUNum).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
-                        ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             IndUnit(IUNum).UnitType, IndUnit(IUNum).Name, "Design Size Maximum Hot Water Flow Rate [m3/s]", MaxVolHotWaterFlowDes);
-                        ReportSizingOutput(IndUnit(IUNum).UnitType,
-                                           IndUnit(IUNum).Name,
-                                           "Design Size Inlet Air Temperature [C]",
-                                           TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU);
-                        ReportSizingOutput(IndUnit(IUNum).UnitType,
-                                           IndUnit(IUNum).Name,
-                                           "Design Size Inlet Air Humidity Ratio [kgWater/kgDryAir]",
-                                           TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
+                        BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                                                     IndUnit(IUNum).Name,
+                                                     "Design Size Inlet Air Temperature [C]",
+                                                     TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU);
+                        BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                                                     IndUnit(IUNum).Name,
+                                                     "Design Size Inlet Air Humidity Ratio [kgWater/kgDryAir]",
+                                                     TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
                     } else {
                         if (IndUnit(IUNum).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0) {
                             MaxVolHotWaterFlowUser = IndUnit(IUNum).MaxVolHotWaterFlow;
-                            ReportSizingOutput(IndUnit(IUNum).UnitType,
-                                               IndUnit(IUNum).Name,
-                                               "Design Size Maximum Hot Water Flow Rate [m3/s]",
-                                               MaxVolHotWaterFlowDes,
-                                               "User-Specified Maximum Hot Water Flow Rate [m3/s]",
-                                               MaxVolHotWaterFlowUser);
+                            BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                                                         IndUnit(IUNum).Name,
+                                                         "Design Size Maximum Hot Water Flow Rate [m3/s]",
+                                                         MaxVolHotWaterFlowDes,
+                                                         "User-Specified Maximum Hot Water Flow Rate [m3/s]",
+                                                         MaxVolHotWaterFlowUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeHVACSingleDuctInduction: Potential issue with equipment sizing for " + IndUnit(IUNum).UnitType +
@@ -975,10 +974,10 @@ namespace HVACSingleDuctInduc {
         if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                 if (IndUnit(IUNum).MaxVolColdWaterFlow > 0.0) {
-                    ReportSizingOutput(IndUnit(IUNum).UnitType,
-                                       IndUnit(IUNum).Name,
-                                       "User-Specified Maximum Cold Water Flow Rate [m3/s]",
-                                       IndUnit(IUNum).MaxVolColdWaterFlow);
+                    BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                                                 IndUnit(IUNum).Name,
+                                                 "User-Specified Maximum Cold Water Flow Rate [m3/s]",
+                                                 IndUnit(IUNum).MaxVolColdWaterFlow);
                 }
             } else {
                 CheckZoneSizing(IndUnit(IUNum).UnitType, IndUnit(IUNum).Name);
@@ -986,8 +985,8 @@ namespace HVACSingleDuctInduc {
                 if (UtilityRoutines::SameString(IndUnit(IUNum).CCoilType, "Coil:Cooling:Water") ||
                     UtilityRoutines::SameString(IndUnit(IUNum).CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
 
-                    CoilWaterInletNode = GetCoilWaterInletNode(IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, ErrorsFound);
-                    CoilWaterOutletNode = GetCoilWaterOutletNode(IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, ErrorsFound);
+                    CoilWaterInletNode = GetCoilWaterInletNode(state, IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, ErrorsFound);
+                    CoilWaterOutletNode = GetCoilWaterOutletNode(state, IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizCoolNum =
                             MyPlantSizingIndex(IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
@@ -1028,17 +1027,17 @@ namespace HVACSingleDuctInduc {
                     }
                     if (IsAutoSize) {
                         IndUnit(IUNum).MaxVolColdWaterFlow = MaxVolColdWaterFlowDes;
-                        ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             IndUnit(IUNum).UnitType, IndUnit(IUNum).Name, "Design Size Maximum Cold Water Flow Rate [m3/s]", MaxVolColdWaterFlowDes);
                     } else {
                         if (IndUnit(IUNum).MaxVolColdWaterFlow > 0.0 && MaxVolColdWaterFlowDes > 0.0) {
                             MaxVolColdWaterFlowUser = IndUnit(IUNum).MaxVolColdWaterFlow;
-                            ReportSizingOutput(IndUnit(IUNum).UnitType,
-                                               IndUnit(IUNum).Name,
-                                               "Design Size Maximum Cold Water Flow Rate [m3/s]",
-                                               MaxVolColdWaterFlowDes,
-                                               "User-Specified Maximum Cold Water Flow Rate [m3/s]",
-                                               MaxVolColdWaterFlowUser);
+                            BaseSizer::reportSizerOutput(IndUnit(IUNum).UnitType,
+                                                         IndUnit(IUNum).Name,
+                                                         "Design Size Maximum Cold Water Flow Rate [m3/s]",
+                                                         MaxVolColdWaterFlowDes,
+                                                         "User-Specified Maximum Cold Water Flow Rate [m3/s]",
+                                                         MaxVolColdWaterFlowUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolColdWaterFlowDes - MaxVolColdWaterFlowUser) / MaxVolColdWaterFlowUser) >
                                     AutoVsHardSizingThreshold) {
@@ -1073,15 +1072,16 @@ namespace HVACSingleDuctInduc {
             // save the induction ratio for use in subsequent sizing calcs
             TermUnitSizing(CurTermUnitSizingNum).InducRat = IndUnit(IUNum).InducRatio;
             if (UtilityRoutines::SameString(IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
-                SetCoilDesFlow(IndUnit(IUNum).HCoilType, IndUnit(IUNum).HCoil, TermUnitSizing(CurTermUnitSizingNum).AirVolFlow, ErrorsFound);
+                SetCoilDesFlow(state, IndUnit(IUNum).HCoilType, IndUnit(IUNum).HCoil, TermUnitSizing(CurTermUnitSizingNum).AirVolFlow, ErrorsFound);
             }
             if (UtilityRoutines::SameString(IndUnit(IUNum).CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
-                SetCoilDesFlow(IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, TermUnitSizing(CurTermUnitSizingNum).AirVolFlow, ErrorsFound);
+                SetCoilDesFlow(state, IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, TermUnitSizing(CurTermUnitSizingNum).AirVolFlow, ErrorsFound);
             }
         }
     }
 
-    void SimFourPipeIndUnit(EnergyPlusData &state, int const IUNum,              // number of the current unit being simulated
+    void SimFourPipeIndUnit(EnergyPlusData &state,
+                            int const IUNum,              // number of the current unit being simulated
                             int const ZoneNum,            // number of zone being served
                             int const ZoneNodeNum,        // zone node number
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
@@ -1114,8 +1114,8 @@ namespace HVACSingleDuctInduc {
         using DataPlant::PlantLoop;
         using General::RoundSigDigits;
         using General::SolveRoot;
-        using TempSolveRoot::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
+        using TempSolveRoot::SolveRoot;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1344,7 +1344,8 @@ namespace HVACSingleDuctInduc {
         // conditions have been set by CalcFourPipeIndUnit either explicitly or as a result of the simple component calls.
     }
 
-    void CalcFourPipeIndUnit(EnergyPlusData &state, int const IUNum,               // Unit index
+    void CalcFourPipeIndUnit(EnergyPlusData &state,
+                             int const IUNum,               // Unit index
                              bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                              int const ZoneNode,            // zone node number
                              Real64 const HWFlow,           // hot water flow (kg/s)
@@ -1395,7 +1396,6 @@ namespace HVACSingleDuctInduc {
         Real64 SecAirMassFlow; // secondary air mass flow rate [kg/s]
         Real64 TotAirMassFlow; // total air mass flow rate [kg/s]
         Real64 InducRat;       // induction ratio
-        Real64 CpAirZn;        // zone air specific heat [J/kg-C]
         Real64 mdotHW;         // local temporary hot water flow rate [kg/s]
         Real64 mdotCW;         // local temporary cold water flow rate [kg/s]
         int HWOutletNode;
@@ -1407,7 +1407,6 @@ namespace HVACSingleDuctInduc {
         OutletNode = IndUnit(IUNum).OutAirNode;
         PriAirMassFlow = Node(PriNode).MassFlowRateMaxAvail;
         InducRat = IndUnit(IUNum).InducRatio;
-        CpAirZn = PsyCpAirFnW(Node(ZoneNode).HumRat);
         SecAirMassFlow = InducRat * PriAirMassFlow;
         TotAirMassFlow = PriAirMassFlow + SecAirMassFlow;
         HotControlNode = IndUnit(IUNum).HWControlNode;
@@ -1448,10 +1447,12 @@ namespace HVACSingleDuctInduc {
         SimulateWaterCoilComponents(state, IndUnit(IUNum).HCoil, FirstHVACIteration, IndUnit(IUNum).HCoil_Num);
         SimulateWaterCoilComponents(state, IndUnit(IUNum).CCoil, FirstHVACIteration, IndUnit(IUNum).CCoil_Num);
         SimAirMixer(IndUnit(IUNum).MixerName, IndUnit(IUNum).Mixer_Num);
-        LoadMet = TotAirMassFlow * CpAirZn * (Node(OutletNode).Temp - Node(ZoneNode).Temp);
+        LoadMet = TotAirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(
+                                       Node(OutletNode).Temp, Node(OutletNode).HumRat, Node(ZoneNode).Temp, Node(ZoneNode).HumRat);
     }
 
-    Real64 FourPipeIUHeatingResidual(EnergyPlusData &state, Real64 const HWFlow,       // hot water flow rate in kg/s
+    Real64 FourPipeIUHeatingResidual(EnergyPlusData &state,
+                                     Real64 const HWFlow,       // hot water flow rate in kg/s
                                      Array1D<Real64> const &Par // Par(5) is the requested zone load
     )
     {
@@ -1509,7 +1510,8 @@ namespace HVACSingleDuctInduc {
         return Residuum;
     }
 
-    Real64 FourPipeIUCoolingResidual(EnergyPlusData &state, Real64 const CWFlow,       // cold water flow rate in kg/s
+    Real64 FourPipeIUCoolingResidual(EnergyPlusData &state,
+                                     Real64 const CWFlow,       // cold water flow rate in kg/s
                                      Array1D<Real64> const &Par // Par(5) is the requested zone load
     )
     {
@@ -1569,7 +1571,7 @@ namespace HVACSingleDuctInduc {
 
     // ========================= Utilities =======================
 
-    bool FourPipeInductionUnitHasMixer(std::string const &CompName) // component (mixer) name
+    bool FourPipeInductionUnitHasMixer(EnergyPlusData &state, std::string const &CompName) // component (mixer) name
     {
 
         // FUNCTION INFORMATION:
@@ -1589,7 +1591,7 @@ namespace HVACSingleDuctInduc {
         int ItemNum;
 
         if (GetIUInputFlag) {
-            GetIndUnits();
+            GetIndUnits(state);
             GetIUInputFlag = false;
         }
 

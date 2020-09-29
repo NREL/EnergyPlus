@@ -49,6 +49,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -70,7 +71,6 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
@@ -355,7 +355,7 @@ namespace Humidifiers {
             if (lAlphaBlanks(5)) {
                 Humidifier(HumNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                SetupTankDemandComponent(
+                SetupTankDemandComponent(state, 
                     Alphas(1), CurrentModuleObject, Alphas(5), ErrorsFound, Humidifier(HumNum).WaterTankID, Humidifier(HumNum).WaterTankDemandARRID);
                 Humidifier(HumNum).SuppliedByWaterSystem = true;
             }
@@ -404,12 +404,12 @@ namespace Humidifiers {
             Humidifier(HumNum).EfficiencyCurvePtr = GetCurveIndex(state, Alphas(3));
             if (Humidifier(HumNum).EfficiencyCurvePtr > 0) {
                 ErrorsFound |= CurveManager::CheckCurveDims(state,
-                    Humidifier(HumNum).EfficiencyCurvePtr,   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    Humidifier(HumNum).Name,        // Object Name
-                    cAlphaFields(3));               // Field Name
+                                                            Humidifier(HumNum).EfficiencyCurvePtr, // Curve index
+                                                            {1},                                   // Valid dimensions
+                                                            RoutineName,                           // Routine name
+                                                            CurrentModuleObject,                   // Object Type
+                                                            Humidifier(HumNum).Name,               // Object Name
+                                                            cAlphaFields(3));                      // Field Name
             } else if (!lAlphaBlanks(3)) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\",");
                 ShowContinueError("Invalid " + cAlphaFields(3) + '=' + Alphas(3));
@@ -421,9 +421,9 @@ namespace Humidifiers {
             if (lAlphaBlanks(6)) {
                 Humidifier(HumNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                SetupTankDemandComponent(
+                SetupTankDemandComponent(state, 
                     Alphas(1), CurrentModuleObject, Alphas(6), ErrorsFound, Humidifier(HumNum).WaterTankID, Humidifier(HumNum).WaterTankDemandARRID);
-                SetupTankSupplyComponent(
+                SetupTankSupplyComponent(state,
                     Alphas(1), CurrentModuleObject, Alphas(6), ErrorsFound, Humidifier(HumNum).WaterTankID, Humidifier(HumNum).TankSupplyID);
                 Humidifier(HumNum).SuppliedByWaterSystem = true;
             }
@@ -554,8 +554,12 @@ namespace Humidifiers {
                                     "System",
                                     "Average",
                                     Humidifier(HumNum).Name);
-                SetupOutputVariable(
-                    "Humidifier NaturalGas Rate", OutputProcessor::Unit::W, Humidifier(HumNum).GasUseRate, "System", "Average", Humidifier(HumNum).Name);
+                SetupOutputVariable("Humidifier NaturalGas Rate",
+                                    OutputProcessor::Unit::W,
+                                    Humidifier(HumNum).GasUseRate,
+                                    "System",
+                                    "Average",
+                                    Humidifier(HumNum).Name);
                 SetupOutputVariable("Humidifier NaturalGas Energy",
                                     OutputProcessor::Unit::J,
                                     Humidifier(HumNum).GasUseEnergy,
@@ -737,7 +741,6 @@ namespace Humidifiers {
         using General::RoundSigDigits;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::RhoH2O;
-        using ReportSizingManager::ReportSizingOutput;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -792,7 +795,7 @@ namespace Humidifiers {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Hardsize with no sizing run
                     HardSizeNoDesRun = true;
                     if (NomCapVol > 0.0) {
-                        ReportSizingOutput(HumidifierType(HumType_Code), Name, "User-Specified Nominal Capacity Volume [m3/s]", NomCapVol);
+                        BaseSizer::reportSizerOutput(HumidifierType(HumType_Code), Name, "User-Specified Nominal Capacity Volume [m3/s]", NomCapVol);
                     }
                 } else { // Sizing run done
 
@@ -807,7 +810,7 @@ namespace Humidifiers {
                 if (!IsAutoSize && !SysSizingRunDone) {
                     HardSizeNoDesRun = true;
                     if (NomCapVol > 0.0) {
-                        ReportSizingOutput(HumidifierType(HumType_Code), Name, "User-Specified Nominal Capacity Volume [m3/s]", NomCapVol);
+                        BaseSizer::reportSizerOutput(HumidifierType(HumType_Code), Name, "User-Specified Nominal Capacity Volume [m3/s]", NomCapVol);
                     }
                 } else {
                     CheckSysSizing("Humidifier:SizeHumidifier", Name);
@@ -865,16 +868,16 @@ namespace Humidifiers {
 
                 if (IsAutoSize) {
                     NomCapVol = NomCapVolDes;
-                    ReportSizingOutput(HumidifierType(HumType_Code), Name, "Design Size Nominal Capacity Volume [m3/s]", NomCapVolDes);
+                    BaseSizer::reportSizerOutput(HumidifierType(HumType_Code), Name, "Design Size Nominal Capacity Volume [m3/s]", NomCapVolDes);
                 } else {
                     if (NomCapVol > 0.0) {
                         NomCapVolUser = NomCapVol;
-                        ReportSizingOutput(HumidifierType(HumType_Code),
-                                           Name,
-                                           "Design Size Nominal Capacity Volume [m3/s]",
-                                           NomCapVolDes,
-                                           "User-Specified Nominal Capacity Volume [m3/s]",
-                                           NomCapVolUser);
+                        BaseSizer::reportSizerOutput(HumidifierType(HumType_Code),
+                                                     Name,
+                                                     "Design Size Nominal Capacity Volume [m3/s]",
+                                                     NomCapVolDes,
+                                                     "User-Specified Nominal Capacity Volume [m3/s]",
+                                                     NomCapVolUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(NomCapVolDes - NomCapVolUser) / NomCapVolUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage("SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType(HumType_Code) + " = \"" +
@@ -935,16 +938,16 @@ namespace Humidifiers {
             NomPowerDes = NominalPower;
             if (IsAutoSize) {
                 NomPower = NomPowerDes;
-                ReportSizingOutput(HumidifierType(HumType_Code), Name, "Design Size Rated Power [W]", NomPowerDes);
+                BaseSizer::reportSizerOutput(HumidifierType(HumType_Code), Name, "Design Size Rated Power [W]", NomPowerDes);
             } else {
                 if (NomPower >= 0.0 && NomCap > 0.0) {
                     NomPowerUser = NomPower;
-                    ReportSizingOutput(HumidifierType(HumType_Code),
-                                       Name,
-                                       "Design Size Rated Power [W]",
-                                       NomPowerDes,
-                                       "User-Specified Rated Power [W]",
-                                       NomPowerUser);
+                    BaseSizer::reportSizerOutput(HumidifierType(HumType_Code),
+                                                 Name,
+                                                 "Design Size Rated Power [W]",
+                                                 NomPowerDes,
+                                                 "User-Specified Rated Power [W]",
+                                                 NomPowerUser);
                     if (DisplayExtraWarnings) {
                         if ((std::abs(NomPowerDes - NomPowerUser) / NomPowerUser) > AutoVsHardSizingThreshold) {
                             ShowMessage("SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType(HumType_Code) + " =\"" + Name +
@@ -1459,7 +1462,7 @@ namespace Humidifiers {
         // Return value
         int NodeNum; // node number returned
 
-                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichHumidifier;
 
         // Obtains and Allocates heat exchanger related parameters from input file

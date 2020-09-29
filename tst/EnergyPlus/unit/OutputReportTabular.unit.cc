@@ -51,6 +51,7 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
+#include <stdio.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include "Fixtures/SQLiteFixture.hh"
@@ -64,6 +65,7 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -1499,7 +1501,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
     // expect energy to report according to multipliers
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).MechVentVolTotal / DataHeatBalance::ZonePreDefRep(1).MechVentVolTotal), 0.00001);
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).MechVentVolMin / DataHeatBalance::ZonePreDefRep(1).MechVentVolMin), 0.00001);
-    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnHvacCl / DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacCl), 0.00001);
+    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnZoneEqCl / DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl), 0.00001);
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnPeoplAdd / DataHeatBalance::ZonePreDefRep(1).SHGSAnPeoplAdd), 0.00001);
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnLiteAdd / DataHeatBalance::ZonePreDefRep(1).SHGSAnLiteAdd), 0.00001);
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnEquipAdd / DataHeatBalance::ZonePreDefRep(1).SHGSAnEquipAdd), 0.00001);
@@ -6468,9 +6470,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     Zone(1).ListMultiplier = 1;
     Zone(1).FloorArea = 12.;
 
-    WeatherManager::DesDayInput.allocate(1);
-    WeatherManager::DesDayInput(1).Month = 5;
-    WeatherManager::DesDayInput(1).DayOfMonth = 21;
+    state.dataWeatherManager->DesDayInput.allocate(1);
+    state.dataWeatherManager->DesDayInput(1).Month = 5;
+    state.dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
 
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 15;
@@ -6494,7 +6496,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     FinalZoneSizing.allocate(1);
     FinalZoneSizing(1).DesCoolLoad = 600.;
 
-    CollectPeakZoneConditions(compLoad, 1, timeOfMax, zoneIndex, isCooling);
+    CollectPeakZoneConditions(state, compLoad, 1, timeOfMax, zoneIndex, isCooling);
 
     EXPECT_EQ(compLoad.peakDateHrMin, "5/21 15:45:00");
     EXPECT_EQ(compLoad.outsideDryBulb, 38.);
@@ -6636,11 +6638,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetZoneComponentAreas_test)
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_CombineLoadCompResults_test)
 {
     CompLoadTablesType compLoadTotal;
+    //printf("3");
     compLoadTotal.cells.allocate(10, 30);
     compLoadTotal.cells = 0.;
     compLoadTotal.cellUsed.allocate(10, 30);
     compLoadTotal.cellUsed = false;
 
+    //printf("4");
     CompLoadTablesType compLoadPartial;
     compLoadPartial.cells.allocate(10, 30);
     compLoadPartial.cells = 0.;
@@ -6655,7 +6659,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CombineLoadCompResults_test)
     compLoadPartial.outsideWetBulb = 17.;
     compLoadPartial.diffDesignPeak = 11.;
 
+    //printf("5");
     CombineLoadCompResults(compLoadTotal, compLoadPartial, multiplier);
+    //printf("6");
 
     EXPECT_EQ(1.1 * 3., compLoadTotal.cells(1, 1));
     EXPECT_EQ(1.2 * 3., compLoadTotal.cells(4, 25));
@@ -6940,11 +6946,11 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     int numDesDays = 2;
     DataEnvironment::TotDesDays = numDesDays;
     DataEnvironment::TotRunDesPersDays = 0;
-    WeatherManager::DesDayInput.allocate(2);
-    WeatherManager::DesDayInput(1).Month = 7;
-    WeatherManager::DesDayInput(1).DayOfMonth = 21;
-    WeatherManager::DesDayInput(2).Month = 1;
-    WeatherManager::DesDayInput(2).DayOfMonth = 21;
+    state.dataWeatherManager->DesDayInput.allocate(2);
+    state.dataWeatherManager->DesDayInput(1).Month = 7;
+    state.dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
+    state.dataWeatherManager->DesDayInput(2).Month = 1;
+    state.dataWeatherManager->DesDayInput(2).DayOfMonth = 21;
 
 
     DataGlobals::NumOfTimeStepInHour = 4;
@@ -7430,7 +7436,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     OutputReportPredefined::SetPredefinedTables();
 
     // Call the routine that fills up the table we care about
-    HeatBalanceSurfaceManager::GatherForPredefinedReport(state.dataWindowManager);
+    HeatBalanceSurfaceManager::GatherForPredefinedReport(*state.dataWindowManager);
 
 
     // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
@@ -7552,7 +7558,7 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
     OutputReportPredefined::SetPredefinedTables();
 
     // Call the routine that fills up the table we care about
-    HeatBalanceSurfaceManager::GatherForPredefinedReport(state.dataWindowManager);
+    HeatBalanceSurfaceManager::GatherForPredefinedReport(*state.dataWindowManager);
 
 
     // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
@@ -7937,7 +7943,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     // AnotherEndUseSubCat
     EXPECT_NEAR(extLitUse * 3, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1), 1.);
 
-    OutputReportTabular::WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector, state.files);
+    OutputReportTabular::WriteBEPSTable(state.dataCostEstimateManager, *state.dataZoneTempPredictorCorrector, state.files);
     OutputReportTabular::WriteDemandEndUseSummary(state.dataCostEstimateManager);
 
     EnergyPlus::sqlite->sqliteCommit();
@@ -8292,4 +8298,44 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
 
     EXPECT_EQ(curSourceFactor, 1.2);
 
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
+{
+    EnergyPlus::OutputReportTabular::clear_state();
+    EnergyPlus::DataGlobals::DoWeathSim = true;
+    
+    EnergyPlus::OutputReportPredefined::pdrSensibleGain = 1;
+    EnergyPlus::OutputReportPredefined::reportName.allocate(1);
+    EnergyPlus::OutputReportPredefined::reportName(pdrSensibleGain).show = true; 
+
+    EnergyPlus::DataHVACGlobals::TimeStepSys = 10.0;
+    EnergyPlus::DataGlobals::TimeStepZone = 20.0;
+    EnergyPlus::DataDefineEquip::NumAirDistUnits = 1;
+
+    EnergyPlus::DataHeatBalance::ZonePreDefRep.allocate(1);
+    EnergyPlus::DataDefineEquip::AirDistUnit.allocate(1);
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).ZoneNum = 1;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).HeatGain = 1000.0;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).CoolGain = 2000.0;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).HeatRate = 3.0;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).CoolRate = 4.0;
+
+    EnergyPlus::DataGlobals::NumOfZones = 1;
+    EnergyPlus::DataHeatBalance::Zone.allocate(NumOfZones);
+    EnergyPlus::DataHeatBalance::Zone(1).Multiplier = 1;
+    EnergyPlus::DataHeatBalance::Zone(1).ListMultiplier = 1;
+
+    EnergyPlus::DataHeatBalance::ZnRpt.allocate(1);
+    EnergyPlus::DataHeatBalance::ZnAirRpt.allocate(1);
+
+    EnergyPlus::DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
+    EnergyPlus::DataHeatBalance::ZoneWinHeatLossRepEnergy.allocate(1);
+    
+    GatherHeatGainReport(OutputProcessor::TimeStepType::TimeStepSystem);
+
+    EXPECT_EQ(1.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*SecInHour, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqHt);
+    EXPECT_EQ(0.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*SecInHour, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl);
+    EXPECT_EQ(1000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUHt);
+    EXPECT_EQ(-2000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUCl);
 }

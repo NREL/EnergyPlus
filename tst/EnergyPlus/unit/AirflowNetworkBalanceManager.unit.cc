@@ -2243,7 +2243,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -2252,7 +2252,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
@@ -4425,7 +4425,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -4438,7 +4438,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
@@ -5694,7 +5694,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errors); // read material data
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(state.files, errors); // read construction data
@@ -5708,7 +5708,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, state.files, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput(state);
@@ -6398,7 +6398,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errors); // read material data
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(state.files, errors); // read construction data
@@ -6412,7 +6412,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, state.files, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput(state);
@@ -7021,7 +7021,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errors); // read material data
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(state.files, errors); // read construction data
@@ -7035,7 +7035,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, state.files, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput(state);
@@ -7710,7 +7710,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errors); // read material data
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(state.files, errors); // read construction data
@@ -7724,7 +7724,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, state.files, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput(state);
@@ -8344,7 +8344,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errors); // read material data
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(state.files, errors); // read construction data
@@ -8358,7 +8358,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, state.files, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput(state);
@@ -9077,7 +9077,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -9091,7 +9091,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, state.files, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput(state);
@@ -9552,7 +9552,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errors); // read material data
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(state.files, errors); // read construction data
@@ -9566,7 +9566,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, state.files, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput(state);
@@ -13102,7 +13102,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -13111,7 +13111,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
@@ -13641,7 +13641,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errors); // read material data
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(state.files, errors); // read construction data
@@ -13655,7 +13655,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, state.files, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput(state);
@@ -15575,7 +15575,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -15584,7 +15584,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
@@ -17154,7 +17154,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -17167,7 +17167,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
@@ -19932,7 +19932,7 @@ std::string const idf_objects = delimited_string({
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -19941,7 +19941,7 @@ std::string const idf_objects = delimited_string({
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
@@ -19996,7 +19996,7 @@ std::string const idf_objects = delimited_string({
     DataHeatBalFanSys::ZoneAirHumRat(5) = 0.001;
 
     DataZoneEquipment::GetZoneEquipmentData(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
     SimAirServingZones::GetAirPathData(state);
 
     // Read AirflowNetwork inputs
@@ -20013,4 +20013,133 @@ std::string const idf_objects = delimited_string({
     EXPECT_EQ(AirflowNetwork::DisSysCompCVFData(1).AirLoopNum,1);
 
 }
+
+TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
+{
+    Zone.allocate(1);
+    Zone(1).Name = "SALA DE AULA";
+
+    Surface.allocate(3);
+    Surface(1).Name = "WINDOW AULA 1";
+    Surface(1).Zone = 1;
+    Surface(1).ZoneName = "SALA DE AULA";
+    Surface(1).Azimuth = 0.0;
+    Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    Surface(1).HeatTransSurf = true;
+    Surface(1).IsAirBoundarySurf = false;
+    Surface(1).Tilt = 90.0;
+    Surface(1).Sides = 4;
+    Surface(2).Name = "AIR WALL AULA 2";
+    Surface(2).Zone = 1;
+    Surface(2).ZoneName = "SALA DE AULA";
+    Surface(2).Azimuth = 180.0;
+    Surface(2).BaseSurf = 2; // Make this a base surface
+    Surface(2).ExtBoundCond = 3; // Make this is an interzone surface
+    Surface(2).HeatTransSurf = false;
+    Surface(2).IsAirBoundarySurf = true;
+    Surface(2).Tilt = 90.0;
+    Surface(2).Sides = 4;
+    Surface(3).Name = "AIR WALL AULA 2b";
+    Surface(3).Zone = 1;
+    Surface(3).ZoneName = "SALA DE AULA";
+    Surface(3).Azimuth = 0.0;
+    Surface(3).BaseSurf = 3; // Make this a base surface
+    Surface(3).ExtBoundCond = 2; // Make this is an interzone surface
+    Surface(3).HeatTransSurf = false;
+    Surface(3).IsAirBoundarySurf = true;
+    Surface(3).Tilt = 90.0;
+    Surface(3).Sides = 4;
+
+    SurfaceGeometry::AllocateSurfaceWindows(2);
+    SurfWinOriginalClass(1) = 11;
+    SurfWinOriginalClass(2) = 11;
+    NumOfZones = 1;
+
+    std::string const idf_objects = delimited_string({
+        "Schedule:Constant,OnSch,,1.0;",
+        "Schedule:Constant,Aula people sched,,0.0;",
+        "Schedule:Constant,Sempre 21,,21.0;",
+        "AirflowNetwork:SimulationControl,",
+        "  NaturalVentilation, !- Name",
+        "  MultizoneWithoutDistribution, !- AirflowNetwork Control",
+        "  SurfaceAverageCalculation, !- Wind Pressure Coefficient Type",
+        "  , !- Height Selection for Local Wind Pressure Calculation",
+        "  LOWRISE, !- Building Type",
+        "  1000, !- Maximum Number of Iterations{ dimensionless }",
+        "  LinearInitializationMethod, !- Initialization Type",
+        "  0.0001, !- Relative Airflow Convergence Tolerance{ dimensionless }",
+        "  0.0001, !- Absolute Airflow Convergence Tolerance{ kg / s }",
+        "  -0.5, !- Convergence Acceleration Limit{ dimensionless }",
+        "  90, !- Azimuth Angle of Long Axis of Building{ deg }",
+        "  0.36;                    !- Ratio of Building Width Along Short Axis to Width Along Long Axis",
+        "AirflowNetwork:MultiZone:Zone,",
+        "  sala de aula, !- Zone Name",
+        "  Temperature, !- Ventilation Control Mode",
+        "  Sempre 21, !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "  1, !- Minimum Venting Open Factor{ dimensionless }",
+        "  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+        "  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+        "  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+        "  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+        "  Aula people sched, !- Venting Availability Schedule Name",
+        "  Standard;                !- Single Sided Wind Pressure Coefficient Algorithm",
+        "AirflowNetwork:MultiZone:Surface,",
+        "  window aula 1, !- Surface Name",
+        "  Simple Window, !- Leakage Component Name",
+        "  , !- External Node Name",
+        "  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+        "  Temperature, !- Ventilation Control Mode",
+        "  Sempre 21, !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "  , !- Minimum Venting Open Factor{ dimensionless }",
+        "  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+        "  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+        "  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+        "  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+        "  Aula people sched;       !- Venting Availability Schedule Name",
+        "AirflowNetwork:MultiZone:Surface,",
+        "  Air Wall aula 2, !- Surface Name",
+        "  Simple Window, !- Leakage Component Name",
+        "  , !- External Node Name",
+        "  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+        "  Temperature, !- Ventilation Control Mode",
+        "  Sempre 21, !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "  1, !- Minimum Venting Open Factor{ dimensionless }",
+        "  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+        "  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+        "  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+        "  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+        "  Aula people sched;       !- Venting Availability Schedule Name",
+        "AirflowNetwork:MultiZone:Component:SimpleOpening,",
+        "  Simple Window, !- Name",
+        "  0.0010, !- Air Mass Flow Coefficient When Opening is Closed{ kg / s - m }",
+        "  0.65, !- Air Mass Flow Exponent When Opening is Closed{ dimensionless }",
+        "  0.01, !- Minimum Density Difference for Two - Way Flow{ kg / m3 }",
+        "  0.78;                    !- Discharge Coefficient{ dimensionless }",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    GetAirflowNetworkInput(state);
+    // Expect warnings about the air boundary surface
+    EXPECT_TRUE(has_err_output(false));
+    std::string const expectedErrString = delimited_string({
+        "   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"AIR WALL AULA 2\" is an air boundary surface.",
+        "   **   ~~~   ** Ventilation Control Mode = TEMPERATURE is not valid. Resetting to Constant.",
+        "   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"AIR WALL AULA 2\" is an air boundary surface.",
+        "   **   ~~~   ** Venting Availability Schedule will be ignored, venting is always available."
+        });
+    EXPECT_TRUE(compare_err_stream(expectedErrString, true));
+
+    // MultizoneSurfaceData(1) is connected to a normal heat transfer surface - 
+    // venting schedule should be non-zero and venting method should be ZoneLevel
+    auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneSurfaceData(1).VentingSchName, Schedule({1, NumSchedules}));
+    EXPECT_GT(GetIndex, 0);
+    EXPECT_EQ(GetIndex, AirflowNetwork::MultizoneSurfaceData(1).VentingSchNum);
+    EXPECT_EQ(AirflowNetwork::MultizoneSurfaceData(1).VentSurfCtrNum, AirflowNetwork::VentControlType::Temp);
+
+    // MultizoneSurfaceData(2) is connected to an air boundary surface
+    // venting schedule should be zero and venting method should be Constant
+    EXPECT_EQ(0, AirflowNetwork::MultizoneSurfaceData(2).VentingSchNum);
+    EXPECT_EQ(AirflowNetwork::MultizoneSurfaceData(2).VentSurfCtrNum, AirflowNetwork::VentControlType::Const);
+}
 } // namespace EnergyPlus
+

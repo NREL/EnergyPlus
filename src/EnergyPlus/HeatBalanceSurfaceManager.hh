@@ -101,7 +101,7 @@ namespace HeatBalanceSurfaceManager {
 
     void InitThermalAndFluxHistories();
 
-    void InitSolarHeatGains(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager);
+    void InitSolarHeatGains(EnergyPlusData &state);
 
     void InitIntSolarDistribution();
 
@@ -159,14 +159,10 @@ namespace HeatBalanceSurfaceManager {
 
     Real64 GetQdotConvOutRepPerArea(int SurfNum);
 
-    void CalcHeatBalanceInsideSurf(EnergyPlusData& state,
+    void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
                                    Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
     void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
-                                    ConvectionCoefficientsData &dataConvectionCoefficients,
-                                    WindowComplexManagerData &dataWindowComplexManager,
-                                    WindowEquivalentLayerData &dataWindowEquivalentLayer,
-                                    WindowManagerData &dataWindowManager,
                                     IOFiles &ioFiles,
                                     const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
                                     const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
@@ -175,10 +171,6 @@ namespace HeatBalanceSurfaceManager {
                                     Optional_int_const ZoneToResimulate = _);
 
     void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
-                                           ConvectionCoefficientsData &dataConvectionCoefficients,
-                                           WindowComplexManagerData &dataWindowComplexManager,
-                                           WindowEquivalentLayerData &dataWindowEquivalentLayer,
-                                           WindowManagerData &dataWindowManager,
                                            IOFiles &ioFiles,
                                            const int FirstZone,             // First zone to simulate
                                            const int LastZone,              // Last zone to simulate

@@ -92,7 +92,7 @@ namespace SurfaceGeometry {
         RadiantEnclosures,
         SolarEnclosures
     };
-    
+
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
@@ -131,7 +131,7 @@ namespace SurfaceGeometry {
 
     void AllocateSurfaceWindows(int NumSurfaces);
 
-    void GetSurfaceData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, bool &ErrorsFound); // If errors found in input
+    void GetSurfaceData(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound); // If errors found in input
 
     void checkSubSurfAzTiltNorm(SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
@@ -153,7 +153,7 @@ namespace SurfaceGeometry {
                                   int const TotRectDetachedBldg   // Number of Building Detached Shading Surfaces to obtain
     );
 
-    void GetHTSurfaceData(IOFiles &ioFiles,
+    void GetHTSurfaceData(EnergyPlusData &state, IOFiles &ioFiles,
                           bool &ErrorsFound,                // Error flag indicator (true if errors found)
                           int &SurfNum,                     // Count of Current SurfaceNumber
                           int const TotHTSurfs,             // Number of Heat Transfer Base Surfaces to obtain
@@ -264,7 +264,7 @@ namespace SurfaceGeometry {
 
     void GetHTSurfExtVentedCavityData(bool &ErrorsFound); // Error flag indicator (true if errors found)
 
-    void GetSurfaceHeatTransferAlgorithmOverrides(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, bool &ErrorsFound);
+    void GetSurfaceHeatTransferAlgorithmOverrides(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound);
 
     class ExposedFoundationPerimeter
     {
@@ -301,6 +301,10 @@ namespace SurfaceGeometry {
     void InitialAssociateWindowShadingControlFenestration(bool &ErrorsFound, int &SurfNum);
 
     void FinalAssociateWindowShadingControlFenestration(bool &ErrorsFound);
+    
+    void CheckWindowShadingControlSimilarForWindow(bool& ErrorsFound);
+
+    bool isWindowShadingControlSimilar(int a, int b);
 
     void GetStormWindowData(bool &ErrorsFound); // If errors found in input
 
@@ -373,10 +377,17 @@ namespace SurfaceGeometry {
 
     void CreateShadedWindowConstruction(int const SurfNum, // Surface number
                                         int const WSCPtr,  // Pointer to WindowShadingControl for SurfNum
-                                        int const ShDevNum // Shading device material number for WSCptr
+                                        int const ShDevNum, // Shading device material number for WSCptr
+                                        int const shadeControlIndex // index to the Surface().windowShadingControlList, 
+                                              // Surface().shadedConstructionList, and Surface().shadedStormWinConstructionList
     );
 
     void CreateStormWindowConstructions();
+
+    int createAirMaterialFromDistance(Real64 distance, std::string namePrefix); //return new material number
+
+    // create a new construction with storm based on an old construction and storm and gap materials
+    int createConstructionWithStorm(int oldConstruction, std::string name, int stormMaterial, int gapMaterial); 
 
     void ModifyWindow(int const SurfNum,    // SurfNum has construction of glazing system from Window5 Data File;
                       bool &ErrorsFound,    // Set to true if errors found
@@ -412,7 +423,7 @@ namespace SurfaceGeometry {
                                 int const ConstrNumRev, // construction index for reversed construction
                                 int const TotalLayers   // total layers for construction definition
     );
-    
+
 } // namespace SurfaceGeometry
 
 } // namespace EnergyPlus

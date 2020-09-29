@@ -82,9 +82,9 @@ namespace WindowManager {
     //   Optical Calculation Routines
     //   Heat Balance Routines
 
-    void InitWindowOpticalCalculations(EnergyPlusData &state, WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
+    void InitWindowOpticalCalculations(EnergyPlusData &state, IOFiles &ioFiles);
 
-    void InitGlassOpticalCalculations(EnergyPlusData &state, WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
+    void InitGlassOpticalCalculations(EnergyPlusData &state, IOFiles &ioFiles);
 
     //*****************************************************************************************
 
@@ -133,13 +133,13 @@ namespace WindowManager {
     // Window Thermal Calculation Subroutines
     //***********************************************************************************
 
-    void CalcWindowHeatBalance(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
+    void CalcWindowHeatBalance(EnergyPlusData &state, int const SurfNum,          // Surface number
                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                Real64 &SurfInsideTemp,     // Inside window surface temperature
                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     );
 
-    void CalcWindowHeatBalanceInternalRoutines(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
+    void CalcWindowHeatBalanceInternalRoutines(EnergyPlusData &state, int const SurfNum,          // Surface number
                                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                                Real64 &SurfInsideTemp,     // Inside window surface temperature
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
@@ -339,7 +339,7 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void ReportGlass(EnergyPlusData &state, WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
+    void ReportGlass(EnergyPlusData &state, IOFiles &ioFiles);
 
     //*************************************************************************************
 

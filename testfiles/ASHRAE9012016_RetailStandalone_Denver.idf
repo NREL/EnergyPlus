@@ -120,7 +120,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    YES;                     !- Run Simulation for Weather File Run Periods
+    YES,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -7061,7 +7063,7 @@
     3,                       !- Digits After Decimal
     Electricity:HVAC,        !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating:NaturalGas,             !- Variable or Meter 2 Name
+    Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
@@ -7223,9 +7225,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Electricity:Building,    !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    NaturalGas:Building,            !- Variable or Meter 3 Name
+    NaturalGas:Building,     !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    NaturalGas:Building,            !- Variable or Meter 4 Name
+    NaturalGas:Building,     !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -7263,17 +7265,17 @@
   Output:Table:Monthly,
     Building Energy Performance - Natural Gas,  !- Name
     2,                       !- Digits After Decimal
-    InteriorEquipment:NaturalGas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:NaturalGas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:NaturalGas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,      !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Cooling:NaturalGas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,      !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    WaterSystems:NaturalGas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas, !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cogeneration:NaturalGas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas, !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -7366,23 +7368,23 @@
   Output:Table:Monthly,
     Peak Gas Demand,         !- Name
     3,                       !- Digits After Decimal
-    NaturalGas:Facility,            !- Variable or Meter 1 Name
+    NaturalGas:Facility,     !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    NaturalGas:Facility,            !- Variable or Meter 2 Name
+    NaturalGas:Facility,     !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    NaturalGas:HVAC,                !- Variable or Meter 3 Name
+    NaturalGas:HVAC,         !- Variable or Meter 3 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 3
-    InteriorEquipment:NaturalGas,   !- Variable or Meter 4 Name
+    InteriorEquipment:NaturalGas,  !- Variable or Meter 4 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 4
     MiscPlugGas:InteriorEquipment:NaturalGas,  !- Variable or Meter 5 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 5
-    NaturalGas:Plant,               !- Variable or Meter 6 Name
+    NaturalGas:Plant,        !- Variable or Meter 6 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 6
-    WaterSystems:NaturalGas,        !- Variable or Meter 7 Name
+    WaterSystems:NaturalGas, !- Variable or Meter 7 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 7
     Water Heater:WaterSystems:NaturalGas,  !- Variable or Meter 8 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 8
-    Heating:NaturalGas,             !- Variable or Meter 9 Name
+    Heating:NaturalGas,      !- Variable or Meter 9 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 9
 
 ! EMS code for Addendum CA
@@ -8480,7 +8482,7 @@
     Back_Space_Light_Actuator,  !- Name
     Back_Space_lights,       !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Back_Space_Light_EMS_Program,  !- Name
@@ -8517,7 +8519,7 @@
     Core_Retail_Light_Actuator,  !- Name
     Core_Retail_lights,      !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Core_Retail_Light_EMS_Program,  !- Name
@@ -8554,7 +8556,7 @@
     Point_Of_Sale_Light_Actuator,  !- Name
     Point_Of_Sale_lights,    !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Point_Of_Sale_Light_EMS_Program,  !- Name
@@ -8591,7 +8593,7 @@
     Front_Retail_Light_Actuator,  !- Name
     Front_Retail_lights,     !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Front_Retail_Light_EMS_Program,  !- Name
@@ -8628,7 +8630,7 @@
     Front_Entry_Light_Actuator,  !- Name
     Front_Entry_lights,      !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Front_Entry_Light_EMS_Program,  !- Name
@@ -8643,4 +8645,3 @@
     SET_Front_Entry_Light_EMS_Program_Prog_Manager,  !- Name
     BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
     SET_Front_Entry_Light_EMS_Program;  !- Program Name 1
-

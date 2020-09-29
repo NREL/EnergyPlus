@@ -83,8 +83,7 @@ SET( INCLUDED_TEX
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-pumps.tex
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-heating-and-cooling-coils.tex
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-fans.tex
-  ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-humidifiers.tex
-  ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-desiccant-dehumidifiers.tex
+  ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-humidifiers-and-dehumidifiers.tex
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-energy-management-system-ems.tex
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-python-plugins.tex
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-externalinterface.tex
