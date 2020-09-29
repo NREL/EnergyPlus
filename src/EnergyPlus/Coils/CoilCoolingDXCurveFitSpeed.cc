@@ -345,19 +345,19 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state, int const speedNum,
     bool PrintFlag = true;
     bool errorsFound = false;
     std::string CompType = this->object_name;
-    std::string CompName = this->parentName;
+    std::string CompName = this->name;
 
     CoolingAirFlowSizer sizingCoolingAirFlow;
     std::string stringOverride = "Rated Air Flow Rate [m3/s]";
     if (DataGlobals::isEpJSON) stringOverride = "rated_air_flow_rate [m3/s]";
     std::string preFixString;
-    if (maxSpeeds > 1) preFixString = "Speed " + std::to_string(speedNum + 1) + " ";
-    stringOverride = preFixString + stringOverride;
+    //if (maxSpeeds > 1) preFixString = "Speed " + std::to_string(speedNum + 1) + " ";
+    //stringOverride = preFixString + stringOverride;
     sizingCoolingAirFlow.overrideSizingString(stringOverride);
     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
     this->evap_air_flow_rate = sizingCoolingAirFlow.size(state, this->evap_air_flow_rate, errorsFound);
 
-    std::string SizingString = preFisString + "Gross Cooling Capacity [W]";
+    std::string SizingString = preFixString + "Gross Cooling Capacity [W]";
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
