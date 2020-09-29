@@ -15406,3 +15406,181 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
      EXPECT_NEAR(thisSys->m_SpeedRatio, 0.228062, 0.02);
      EXPECT_NEAR(sensOut, -11998.0, 210.0);
 }
+
+TEST_F(ZoneUnitarySysTest, UnitarySystemModel_CheckBadInputOutputNodes)
+{
+    std::string const idf_objects = R"IDF(
+  Zone,
+    Bath_ZN_1_FLR_1,         !- Name
+    0.0000,                  !- Direction of Relative North {deg}
+    0.0000,                  !- X Origin {m}
+    51.0000,                 !- Y Origin {m}
+    0.0000,                  !- Z Origin {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    ,                        !- Ceiling Height {m}
+    ,                        !- Volume {m3}
+    autocalculate,           !- Floor Area {m2}
+    ,                        !- Zone Inside Convection Algorithm
+    ,                        !- Zone Outside Convection Algorithm
+    Yes;                     !- Part of Total Floor Area
+
+  NodeList,
+    Bath_ZN_1_FLR_1 Inlet Nodes,  !- Name
+    Bath_ZN_1_FLR_1 ZN-PTAC Unitary Outlet Node;  !- Node 1 Name
+
+  NodeList,
+    Bath_ZN_1_FLR_1 Exhaust Nodes,  !- Name
+    Bath_ZN_1_FLR_1 ZN-PTAC Inlet Node;  !- Node 1 Name
+
+  ZoneHVAC:EquipmentConnections,
+    Bath_ZN_1_FLR_1,         !- Zone Name
+    Bath_ZN_1_FLR_1 Equipment,  !- Zone Conditioning Equipment List Name
+    Bath_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
+    Bath_ZN_1_FLR_1 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
+    Bath_ZN_1_FLR_1 Air Node,!- Zone Air Node Name
+    ;                        !- Zone Return Air Node or NodeList Name
+
+  Schedule:Compact,
+    Bath_ZN_1_FLR_1 ZN-PTAC Schedule,  !- Name
+    Binary Control,          !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1;          !- Field 3
+
+  Fan:OnOff,
+    Bath_ZN_1_FLR_1 ZN-PTAC Supply Fan,  !- Name
+    ,                        !- Availability Schedule Name
+    0.55,                    !- Fan Total Efficiency
+    124.5445,                !- Pressure Rise {Pa}
+    Autosize,                !- Maximum Flow Rate {m3/s}
+    0.85,                    !- Motor Efficiency
+    0.0,                     !- Motor In Airstream Fraction
+    Bath_ZN_1_FLR_1 ZN-PTAC Unitary Inlet Node,  !- Air Inlet Node Name
+    Bath_ZN_1_FLR_1 ZN-PTAC Supply Fan Outlet Node,  !- Air Outlet Node Name
+    ,                        !- Fan Power Ratio Function of Speed Ratio Curve Name
+    ,                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name
+    ZN-PTAC Fans;            !- End-Use Subcategory
+
+  Coil:Heating:Electric,
+    Bath_ZN_1_FLR_1 ZN-PTAC Heating Coil,  !- Name
+    ,                        !- Availability Schedule Name
+    0.98,                    !- Efficiency
+    Autosize,                !- Nominal Capacity {W}
+    Bath_ZN_1_FLR_1 ZN-PTAC Cooling Coil Outlet Node,  !- Air Inlet Node Name
+    Bath_ZN_1_FLR_1 ZN-PTAC Unitary Outlet Node;  !- Air Outlet Node Name
+
+  Coil:Cooling:DX:SingleSpeed,
+    Bath_ZN_1_FLR_1 ZN-PTAC Cooling Coil,  !- Name
+    ,                        !- Availability Schedule Name
+    Autosize,                !- Gross Rated Total Cooling Capacity {W}
+    Autosize,                !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    Bath_ZN_1_FLR_1 ZN-PTAC Supply Fan Outlet Node,  !- Air Inlet Node Name
+    Bath_ZN_1_FLR_1 ZN-PTAC Cooling Coil Outlet Node,  !- Air Outlet Node Name
+    Bath_ZN_1_FLR_1 ZN-PTAC Cool-Cap-fT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Bath_ZN_1_FLR_1 ZN-PTAC Cool-Cap-fFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Bath_ZN_1_FLR_1 ZN-PTAC Cool-EIR-fT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Bath_ZN_1_FLR_1 ZN-PTAC Cool-EIR-fFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Bath_ZN_1_FLR_1 ZN-PTAC Cool-PLF-fPLR,  !- Part Load Fraction Correlation Curve Name
+    -25.0,                   !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    1000,                    !- Nominal Time for Condensate Removal to Begin {s}
+    1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    3,                       !- Maximum Cycling Rate {cycles/hr}
+    45,                      !- Latent Capacity Time Constant {s}
+    ,                        !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0.0,                     !- Crankcase Heater Capacity {W}
+    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ;                        !- Condensate Collection Water Storage Tank Name
+
+
+  AirLoopHVAC:UnitarySystem,
+    Bath_ZN_1_FLR_1 ZN-PTAC Unitary,  !- Name
+    Load,                    !- Control Type
+    Bath_ZN_1_FLR_1,         !- Controlling Zone or Thermostat Location
+    None,                    !- Dehumidification Control Type
+    Bath_ZN_1_FLR_1 ZN-PTAC Schedule,  !- Availability Schedule Name
+    Bath_ZN_1_FLR_1 ZN-PTAC Unitary Inlet Node,  !- Air Inlet Node Name
+    Bath_ZN_1_FLR_1 ZN-PTAC Unitary Outlet Node,  !- Air Outlet Node Name
+    Fan:OnOff,               !- Supply Fan Object Type
+    Bath_ZN_1_FLR_1 ZN-PTAC Supply Fan,  !- Supply Fan Name
+    BlowThrough,             !- Fan Placement
+    Bath_ZN_1_FLR_1 ZN-PTAC Fan Mode Schedule,  !- Supply Air Fan Operating Mode Schedule Name
+    Coil:Heating:Electric,   !- Heating Coil Object Type
+    Bath_ZN_1_FLR_1 ZN-PTAC Heating Coil,  !- Heating Coil Name
+    ,                        !- DX Heating Coil Sizing Ratio
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    Bath_ZN_1_FLR_1 ZN-PTAC Cooling Coil,  !- Cooling Coil Name
+    No,                      !- Use DOAS DX Cooling Coil
+    ,                        !- Minimum Supply Air Temperature {C}
+    ,                        !- Latent Load Control
+    ,                        !- Supplemental Heating Coil Object Type
+    ,                        !- Supplemental Heating Coil Name
+    SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
+    Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+    SupplyAirFlowRate,       !- Heating Supply Air Flow Rate Method
+    Autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+    SupplyAirFlowRate,       !- No Load Supply Air Flow Rate Method
+    Autosize,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- No Load Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
+    ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
+    Autosize,                !- Maximum Supply Air Temperature {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
+    ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Heat Pump Time Constant {s}
+    ,                        !- Fraction of On-Cycle Power Use
+    ,                        !- Heat Pump Fan Delay Time {s}
+    ,                        !- Ancillary On-Cycle Electric Power {W}
+    ,                        !- Ancillary Off-Cycle Electric Power {W}
+    ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
+    ,                        !- Maximum Temperature for Heat Recovery {C}
+    ,                        !- Heat Recovery Water Inlet Node Name
+    ,                        !- Heat Recovery Water Outlet Node Name
+    ,                        !- Design Specification Multispeed Object Type
+    ;                        !- Design Specification Multispeed Object Name
+    )IDF";
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+
+    //HeatBalanceManager::GetZoneData(ErrorsFound);
+    //ASSERT_FALSE(ErrorsFound);
+    //DataZoneEquipment::GetZoneEquipmentData1(state);
+    //ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+
+    std::string compName = "UNITARY SYSTEM MODEL";
+    bool zoneEquipment = true;
+    UnitarySys mySys;
+    mySys.Name ="Bath_ZN_1_FLR_1 ZN-PTAC Unitary";
+    unitarySys.push_back(mySys);
+    DataZoneEquipment::ZoneEquipInputsFilled = true;                                 // indicate zone data is available
+    DataGlobals::NumOfZones =1;
+    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 1;
+    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    mySys.getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound);
+    ASSERT_EQ(ErrorsFound, true);
+    /*
+    ASSERT_THROW(
+        mySys.getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound),
+        "Input and exhaust names for unitary system do not match"
+    );
+     */
+}

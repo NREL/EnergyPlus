@@ -3360,7 +3360,6 @@ namespace UnitarySystems {
 
                 // check if the UnitarySystem is connected as zone equipment
                 if (thisSys.ATMixerExists && thisSys.ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
-
                     if (!AirLoopFound && !OASysFound) {
                         for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
                             for (int ZoneExhNum = 1; ZoneExhNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes;
@@ -3438,7 +3437,6 @@ namespace UnitarySystems {
                 }
 
                 if (thisSys.ATMixerExists && thisSys.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
-
                     if (!AirLoopFound && !OASysFound) {
                         for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
                             for (int ZoneExhNum = 1; ZoneExhNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes;
