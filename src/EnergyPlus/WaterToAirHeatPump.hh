@@ -58,8 +58,8 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace WaterToAirHeatPump {
 
@@ -267,20 +267,20 @@ namespace WaterToAirHeatPump {
 
         void clear_state() override
         {
-            NumWatertoAirHPs = 0;
-            CheckEquipName.clear();
-            RefrigIndex = 0;
-            WaterIndex = 0;
-            GetCoilsInputFlag = true;
-            MyOneTimeFlag = true;
-            firstTime = true;
-            WatertoAirHP.clear();
+            this->NumWatertoAirHPs = 0;
+            this->CheckEquipName.clear();
+            this->RefrigIndex = 0;
+            this->WaterIndex = 0;
+            this->GetCoilsInputFlag = true;
+            this->MyOneTimeFlag = true;
+            this->firstTime = true;
+            this->WatertoAirHP.clear();
         }
 
         // Default Constructor
         WaterToAirHeatPumpData()
             : CompressorType_Reciprocating(1), CompressorType_Rotary(2), CompressorType_Scroll(3),
-              NumWatertoAirHPs(0), RefrigIndex(0), WaterIndex(0), GetCoilsInputFlag(true), 
+              NumWatertoAirHPs(0), RefrigIndex(0), WaterIndex(0), GetCoilsInputFlag(true),
               MyOneTimeFlag(true), firstTime(true)
         {
         }

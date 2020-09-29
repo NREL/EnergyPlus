@@ -1781,7 +1781,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     Real64 AbsChillEvapLoad;
     bool AbsChillRunFlag = true;
     // check chiller inputs
-    auto &thisChiller = state.dataChillerAbsorbers.absorptionChillers(AbsChillNum);
+    auto &thisChiller = state.dataChillerAbsorber->absorptionChillers(AbsChillNum);
     EXPECT_EQ(thisChiller.NomCap, 100000.0);
     EXPECT_EQ(thisChiller.FlowMode, DataPlant::FlowMode::LEAVINGSETPOINTMODULATED);
     // define local var

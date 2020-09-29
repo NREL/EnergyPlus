@@ -5468,7 +5468,7 @@ namespace SingleDuct {
         UpdateATMixer(SysNum);
     }
 
-    void GetATMixers(EnergyPlusData &state, ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager)
+    void GetATMixers(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5522,7 +5522,7 @@ namespace SingleDuct {
         SysATMixer.allocate(NumATMixers);
 
         // Need air distribution units first
-        ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, dataZoneAirLoopEquipmentManager);
+        ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
 
         for (ATMixerNum = 1; ATMixerNum <= NumATMixers; ++ATMixerNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
@@ -6017,7 +6017,7 @@ namespace SingleDuct {
 
         if (GetATMixerFlag) {
             // CALL GetZoneAirLoopEquipment
-            GetATMixers(state, *state.dataZoneAirLoopEquipmentManager);
+            GetATMixers(state);
             GetATMixerFlag = false;
         }
 

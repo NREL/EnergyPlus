@@ -49,6 +49,7 @@
 #include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <string>
 

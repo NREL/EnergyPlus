@@ -837,7 +837,7 @@ namespace DemandManager {
                     DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
 
                     for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.exteriorEnergyUse.ExteriorLights);
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataExteriorEnergyUse->ExteriorLights);
 
                         if (LoadPtr > 0) {
                             DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
@@ -1806,14 +1806,14 @@ namespace DemandManager {
             auto const SELECT_CASE_var(DemandMgr(MgrNum).Type);
 
             if (SELECT_CASE_var == ManagerTypeExtLights) {
-                LowestPower = state.exteriorEnergyUse.ExteriorLights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
+                LowestPower = state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
                 if (Action == CheckCanReduce) {
-                    if (state.exteriorEnergyUse.ExteriorLights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
+                    if (state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
                 } else if (Action == SetLimit) {
-                    state.exteriorEnergyUse.ExteriorLights(LoadPtr).ManageDemand = true;
-                    state.exteriorEnergyUse.ExteriorLights(LoadPtr).DemandLimit = LowestPower;
+                    state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).ManageDemand = true;
+                    state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).DemandLimit = LowestPower;
                 } else if (Action == ClearLimit) {
-                    state.exteriorEnergyUse.ExteriorLights(LoadPtr).ManageDemand = false;
+                    state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).ManageDemand = false;
                 }
 
             } else if (SELECT_CASE_var == ManagerTypeLights) {

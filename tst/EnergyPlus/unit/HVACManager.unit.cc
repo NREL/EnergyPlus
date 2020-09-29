@@ -247,7 +247,7 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 1;
 
     Fans::Fan.allocate(1);
-    state.fans.NumFans = 1;
+    state.dataFans->NumFans = 1;
     Fans::Fan(1).FanType_Num = DataHVACGlobals::FanType_ZoneExhaust;
     Fans::Fan(1).OutletAirMassFlowRate = 1.0;
     Fans::Fan(1).OutletAirTemp = 22.0;

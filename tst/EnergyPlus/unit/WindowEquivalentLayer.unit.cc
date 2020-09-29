@@ -179,7 +179,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
 
     int VBMatNum(0);
@@ -195,7 +195,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
 
     int ConstrNum = 1;
     int EQLNum = 0;
-    InitEquivalentLayerWindowCalculations(*state.dataWindowEquivalentLayer);
+    InitEquivalentLayerWindowCalculations(state);
     EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
     EXPECT_EQ(CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL, state.dataWindowEquivalentLayer->lscVBNOBM);
 }
@@ -545,7 +545,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
         }
     }
     // get equivalent layer window optical properties
-    CalcEQLOpticalProperty(*state.dataWindowEquivalentLayer, SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam);
+    CalcEQLOpticalProperty(state, SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam);
     // check that the slat angle control type is set to MaximizeSolar
     EXPECT_EQ(dataMaterial.Material(VBMatNum).SlatAngleType, state.dataWindowEquivalentLayer->lscVBPROF);
     // check the slat angle
@@ -900,7 +900,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         }
     }
     // calc window optical property
-    CalcEQLOpticalProperty(*state.dataWindowEquivalentLayer, SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam);
+    CalcEQLOpticalProperty(state, SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam);
     // check VB slat angle for BlockBeamSolar slat angle control
     EXPECT_EQ(dataMaterial.Material(VBMatNum).SlatAngleType, state.dataWindowEquivalentLayer->lscVBNOBM);
     // check the VB slat angle
@@ -932,7 +932,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, DataHeatBalance::TotMaterials);
     EXPECT_EQ(dataMaterial.Material(1).Group, DataHeatBalance::WindowSimpleGlazing);
@@ -1256,14 +1256,14 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
     EXPECT_EQ(CFS(EQLNum).G(1).GTYPE, state.dataWindowEquivalentLayer->gtyOPENout);
     // zero solar absorbed on glazing layers or no solar input
     Source = 0.0;
-    ASHWAT_ThermalCalc(*state.dataWindowEquivalentLayer, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 308.610, 0.001);
     EXPECT_NEAR(T(2), 306.231, 0.001);
 
     // with solar absrobed on glazing layers
     Source(1) = 100.0; // outside glass layer
     Source(2) = 50.0;  // inside glass layer
-    ASHWAT_ThermalCalc(*state.dataWindowEquivalentLayer, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 313.886, 0.001);
     EXPECT_NEAR(T(2), 310.559, 0.001);
 }
@@ -1578,14 +1578,14 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
     EXPECT_EQ(CFS(EQLNum).G(1).GTYPE, state.dataWindowEquivalentLayer->gtyOPENin);
     // zero solar absorbed on glazing layers or no solar input
     Source = 0.0;
-    ASHWAT_ThermalCalc(*state.dataWindowEquivalentLayer, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 307.054, 0.001);
     EXPECT_NEAR(T(2), 304.197, 0.001);
 
     // with solar absrobed on glazing layers
     Source(1) = 100.0; // outside glass layer
     Source(2) = 50.0;  // inside glass layer
-    ASHWAT_ThermalCalc(*state.dataWindowEquivalentLayer, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 314.666, 0.001);
     EXPECT_NEAR(T(2), 311.282, 0.001);
 }
