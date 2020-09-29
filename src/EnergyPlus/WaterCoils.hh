@@ -224,6 +224,8 @@ namespace WaterCoils {
         Real64 DesTotWaterCoilLoad; // Total heat transfer rate at Design(Watt)
         Real64 DesSenWaterCoilLoad; // Sensible heat transfer rate at Design(Watt)
         Real64 DesRegenFanPower; 
+        Real64 DesPumpPower;
+        Real64 DesEffectNom; 
         // BEGIN calculated parameters for Design Detailed Simple inputs model
         Real64 DesAirMassFlowRate;   // Design Air MassFlow through the WaterCoil [kg/Sec]
         Real64 UACoilTotal;          // Overall external dry UA (W/C)
@@ -310,7 +312,9 @@ namespace WaterCoils {
               GeometryCoef2(0.0), DryFinEfficncyCoef(5, 0.0), SatEnthlCurveConstCoef(0.0), SatEnthlCurveSlope(0.0), EnthVsTempCurveAppxSlope(0.0),
               EnthVsTempCurveConst(0.0), MeanWaterTempSaved(0.0), InWaterTempSaved(0.0), OutWaterTempSaved(0.0), SurfAreaWetSaved(0.0),
               SurfAreaWetFraction(0.0), DesInletWaterTemp(0.0), DesInletSolnConcentration (0.0), DesAirVolFlowRate(0.0), DesInletAirTemp(0.0), DesInletAirHumRat(0.0), DesTotWaterCoilLoad(0.0), DesSenWaterCoilLoad(0.0),
-              DesRegenFanPower(0.0), DesAirMassFlowRate(0.0), UACoilTotal(0.0), UACoilInternal(0.0), UACoilExternal(0.0), UACoilInternalDes(0.0),
+              DesRegenFanPower(0.0), DesPumpPower(0.0), DesEffectNom(0.0), DesAirMassFlowRate(0.0), UACoilTotal(0.0), UACoilInternal(0.0),
+              UACoilExternal(0.0),
+              UACoilInternalDes(0.0),
               UACoilExternalDes(0.0), DesOutletAirTemp(0.0), DesOutletAirHumRat(0.0), DesOutletWaterTemp(0.0), OutdoorAirVolFlowRate(0.0), HeatExchType(0),
               CoolingCoilAnalysisMode(0), LiqDesiccantAirSource(0), LiqDesiccantOptMode(0), DesignSlnDeltaConcentration(0.0),
               UseDesignSlnDeltaConcentration(false), UACoilInternalPerUnitArea(0.0), UAWetExtPerUnitArea(0.0), UADryExtPerUnitArea(0.0),
@@ -506,6 +510,15 @@ namespace WaterCoils {
                               Real64 Tao,  // Air dry bulb temperature OUT to this function(C)
                               Real64 Wao   // Air Humidity Ratio OUT to this funcation (C)
     );
+    double CalculateDesHdAvVt_EffNtu(int const CoilNum, // Number of Coil
+                                        Real64 msi,                   // Solution mass flow rate IN to this function(kg/s)
+                                        Real64 Tsi,                   // Solution temperature IN to this function (C)
+                                        Real64 Xsi,                   // Solution concentration IN to this function (weight fraction)
+                                        Real64 ma,                    // Air mass flow rate IN to this function(kg/s)
+                                        Real64 DesEffectNom // Deisgn effectiveness at normal condition
+    );
+
+
 
     double TSHSX(double t, double x, double h);
     double WSSE(int MatlOfLiqDesiccant, double h, double x, double p);

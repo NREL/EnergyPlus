@@ -1065,9 +1065,11 @@ namespace WaterCoils {
             WaterCoil(CoilNum).DesRegenFanPower = NumArray(9); // regeneration fan power per mass flow rate at Design
             WaterCoil(CoilNum).OutdoorAirVolFlowRate = NumArray(10); // Leaving air humidity ratio  at Design
             if (WaterCoil(CoilNum).OutdoorAirVolFlowRate == AutoSize) WaterCoil(CoilNum).RequestingAutoSize = true;
+            WaterCoil(CoilNum).DesPumpPower = NumArray(11); //  pump power per mass flow rate at Design
+            WaterCoil(CoilNum).DesEffectNom = NumArray(12); //  pump power per mass flow rate at Design
 
-            if (!lNumericBlanks(11)) {
-                WaterCoil(CoilNum).DesignSlnDeltaConcentration = NumArray(11);
+            if (!lNumericBlanks(13)) {
+                WaterCoil(CoilNum).DesignSlnDeltaConcentration = NumArray(13);
                 WaterCoil(CoilNum).UseDesignSlnDeltaConcentration = true;
             } else {
                 WaterCoil(CoilNum).UseDesignSlnDeltaConcentration = false;
@@ -1110,9 +1112,26 @@ namespace WaterCoils {
                 }
             }
 
-            // A9; \field Name of Water Storage Tank for Condensate Collection
-            WaterCoil(CoilNum).CondensateCollectName = AlphArray(9);
-            if (lAlphaBlanks(9)) {
+            // A9; \field Name of solution material
+
+            {
+                auto const SELECT_CASE_var(AlphArray(9));
+                // The default is LiBr = 2.  and LiCl=1
+                if (SELECT_CASE_var == "LICL") {
+                    WaterCoil(CoilNum).MatlLiqDesiccant = 1;
+
+                } else if (SELECT_CASE_var == "LIBR") {
+                    WaterCoil(CoilNum).MatlLiqDesiccant = 2;
+
+                } else {
+                    WaterCoil(CoilNum).MatlLiqDesiccant = 1;
+                }
+            }
+
+
+            // A10; \field Name of Water Storage Tank for Condensate Collection
+            WaterCoil(CoilNum).CondensateCollectName = AlphArray(10);
+            if (lAlphaBlanks(10)) {
                 WaterCoil(CoilNum).CondensateCollectMode = CondensateDiscarded;
             } else {
                 WaterCoil(CoilNum).CondensateCollectMode = CondensateToTank;
@@ -1123,6 +1142,7 @@ namespace WaterCoils {
                                          WaterCoil(CoilNum).CondensateTankID,
                                          WaterCoil(CoilNum).CondensateTankSupplyARRID);
             }
+
 
             TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(3), AlphArray(4), "Water Nodes");
             TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
@@ -3424,23 +3444,12 @@ namespace WaterCoils {
         bool ErrorsFound = false;
         std::string CompName = WaterCoil(CoilNum).Name;
 
-        Real64 DesInletAirEnth;  // Entering air enthalpy at rating (J/kg)
-        Real64 DesOutletAirEnth; // Leaving air enthalpy at rating(J/kg)
-        // Variables for liquid desiccant dehumidification coil
-        Real64 CpAirDes; // specific heat of air at design conditions
-        Real64 DesSenCoilLoad;
-        Real64 DesLatCoilLoad;
         Real64 DesHdAvVt;
-        Real64 Qlat; // Coil latent load
         Real64 msi;  // Solution mass flow rate IN to this function(kg/s)
         Real64 Tsi;  // Solution temperature IN to this function (C)
         Real64 Xsi;  // Solution concentration IN to this function (weight fraction)
-        Real64 Tso;  // Solution temperature IN to this function (C)
         Real64 ma;   // Air mass flow rate IN to this function(kg/s)
-        Real64 Tai;  // Air dry bulb temperature IN to this function(C)
-        Real64 Wai;  // Air Humidity Ratio IN to this funcation (C)
-        Real64 Tao;  // Air dry bulb temperature OUT to this function(C)
-        Real64 Wao;  // Air Humidity Ratio OUT to this funcation (C)
+        Real64 DesEffectNom; // Deisgn effectiveness at normal condition
 
         int AirInletNode;
         int WaterInletNode;
@@ -3460,39 +3469,20 @@ namespace WaterCoils {
         if ((WaterCoil(CoilNum).DesAirVolFlowRate > 0.0) && (WaterCoil(CoilNum).MaxWaterMassFlowRate > 0.0)) {
 
             // Caculate the liquid desiccant coil HdAvVt at design conditions
-
-            // Enthalpy of Air at Inlet design conditions
-            DesInletAirEnth = PsyHFnTdbW(WaterCoil(CoilNum).DesInletAirTemp, WaterCoil(CoilNum).DesInletAirHumRat);
-
-            // Enthalpy of Air at outlet at design conditions
-            DesOutletAirEnth = PsyHFnTdbW(WaterCoil(CoilNum).DesOutletAirTemp, WaterCoil(CoilNum).DesOutletAirHumRat);
-
-            // Total Coil Load from Inlet and Outlet Air States (which include fan heat as appropriate).
-            WaterCoil(CoilNum).DesTotWaterCoilLoad = WaterCoil(CoilNum).DesAirMassFlowRate * (DesInletAirEnth - DesOutletAirEnth);
-
-            CpAirDes = PsyCpAirFnW(WaterCoil(CoilNum).DesInletAirHumRat);
-            DesSenCoilLoad =
-                WaterCoil(CoilNum).DesAirMassFlowRate * CpAirDes * (WaterCoil(CoilNum).DesInletAirTemp - WaterCoil(CoilNum).DesOutletAirTemp);
-            DesLatCoilLoad = WaterCoil(CoilNum).DesTotWaterCoilLoad - DesSenCoilLoad;
-
-            Qlat = DesLatCoilLoad;
             msi = WaterCoil(CoilNum).MaxWaterMassFlowRate;
             Tsi = WaterCoil(CoilNum).DesInletWaterTemp;
             Xsi = WaterCoil(CoilNum).DesInletSolnConcentration;
             ma = WaterCoil(CoilNum).DesAirMassFlowRate;
-            Tai = WaterCoil(CoilNum).DesInletAirTemp;
-            Wai = WaterCoil(CoilNum).DesInletAirHumRat;
-            Tao = WaterCoil(CoilNum).DesOutletAirTemp;
-            Wao = WaterCoil(CoilNum).DesOutletAirHumRat;
-            DesHdAvVt = CalculateDesHdAvVt(Qlat, // Coil latent load
-                                           msi,  // Solution mass flow rate IN to this function(kg/s)
-                                           Tsi,  // Solution temperature IN to this function (C)
-                                           Xsi,  // Solution concentration IN to this function (weight fraction)
-                                           ma,   // Air mass flow rate IN to this function(kg/s)
-                                           Tai,  // Air dry bulb temperature IN to this function(C)
-                                           Wai,  // Air Humidity Ratio IN to this funcation (C)
-                                           Tao,  // Air dry bulb temperature OUT to this function(C)
-                                           Wao); // Air Humidity Ratio OUT to this funcation (C)
+
+            DesEffectNom = WaterCoil(CoilNum).DesEffectNom;
+
+            DesHdAvVt = CalculateDesHdAvVt_EffNtu(CoilNum,
+                                                   msi,                      // Solution mass flow rate IN to this function(kg/s)
+                                                   Tsi,                        // Solution temperature IN to this function (C)
+                                                   Xsi,                        // Solution concentration IN to this function (weight fraction)
+                                                   ma,                         // Air mass flow rate IN to this function(kg/s)
+                                                   DesEffectNom);              // Deisgn effectiveness at normal condition
+            
 
             WaterCoil(CoilNum).HdAvVt = DesHdAvVt;
         }
@@ -4787,8 +4777,6 @@ namespace WaterCoils {
     } // end void CalcLiqDesiccantDehumCoil
 
 
-
-
     void LiqDesiccantCoil_Ntu(int const CoilNum,               // Number of Coil
                                    Real64 const SolnMassFlowRateIn, // Solution mass flow rate IN to this function(kg/s)
                                    Real64 const SolnTempIn,         // Solution temperature IN to this function (C)
@@ -5854,6 +5842,60 @@ namespace WaterCoils {
         DesHdAvVt = DesUACoilEnth; // / mcp_min;
         return (DesHdAvVt);
     };
+
+    double CalculateDesHdAvVt_EffNtu(int const CoilNum, // Number of Coil
+                              Real64 msi,  // Solution mass flow rate IN to this function(kg/s)
+                              Real64 Tsi,  // Solution temperature IN to this function (C)
+                              Real64 Xsi,  // Solution concentration IN to this function (weight fraction)
+                              Real64 ma,   // Air mass flow rate IN to this function(kg/s)
+                              Real64 DesEffectNom // Deisgn effectiveness at normal condition
+    )
+    {
+        int MatlOfLiqDesiccant = WaterCoil(CoilNum).MatlLiqDesiccant;
+  
+        // Output Varibles
+        Real64 mso, Xso, Tso;
+
+        Real64 DesHdAvVt;
+
+        // Local Variables
+        Real64 cps, wsatl, wsath, hsatl, hsath, csat;
+        Real64 Hsi, Hso, cps_h; 
+
+        Real64 m_star;
+        Real64 Ntu; 
+        Real64 Temp; 
+        Tsi = 10;
+        Tso = Tsi + 10; 
+        Xso = Xsi; 
+        Hsi = SolnHFnTX(MatlOfLiqDesiccant, Tsi, Xsi);
+        Hso = SolnHFnTX(MatlOfLiqDesiccant, Tso, Xso);
+        cps = SolnCpFnTX(MatlOfLiqDesiccant, Tsi, Xsi); // Cps = (Hso - Hsi )/(Tso - Tsi)
+        
+        wsatl = SolnWFnTX(MatlOfLiqDesiccant, Tsi, Xsi);
+        wsath = SolnWFnTX(MatlOfLiqDesiccant, Tso, Xso); 
+        hsatl = (1.006 * Tsi + wsatl * (1.84 * Tsi + 2501)) * 1000; // J/Kg
+        hsath = (1.006 * Tso + wsath * (1.84 * Tso + 2501)) * 1000; // J/Kg
+
+        csat = (hsatl - hsath) / (Tsi - Tso); 
+
+        m_star =  (ma * csat) / (msi * cps);
+        
+        if (m_star >= 1.0) {
+            ShowWarningError("Capacitance ratio is over 1.0, a max value of 0.99 is used");
+            m_star = 0.99;
+        }
+
+       
+
+        Temp = max(0.1, (1 - DesEffectNom) / (1 - DesEffectNom * m_star));
+        Ntu = min(0.1, -logf(Temp) / (1 - m_star));
+
+        DesHdAvVt = ma *Ntu; 
+        return (DesHdAvVt);
+    };
+
+
 
     double TSHSX(double t, double x, double h) // place holder
     {
