@@ -158,11 +158,12 @@ namespace BoilerSteam {
         int numBoilers = 0;
         bool getSteamBoilerInput = true;
         Array1D<BoilerSteam::BoilerSpecs> Boiler;
+
         void clear_state() override
         {
-            numBoilers = 0;
-            getSteamBoilerInput = true;
-            Boiler.deallocate();
+            this->numBoilers = 0;
+            this->getSteamBoilerInput = true;
+            this->Boiler.deallocate();
         }
     };
 

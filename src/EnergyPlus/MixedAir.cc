@@ -846,7 +846,7 @@ namespace MixedAir {
                 // Unglazed Transpired Solar Collector
             } else if (SELECT_CASE_var == Unglazed_SolarCollector) { // 'SolarCollector:UnglazedTranspired'
                 if (Sim) {
-                    SimTranspiredCollector(state, state.dataConvectionCoefficients, state.files, CompName, CompIndex);
+                    SimTranspiredCollector(state, state.files, CompName, CompIndex);
                 }
 
                 // Air-based Photovoltaic-thermal flat plate collector

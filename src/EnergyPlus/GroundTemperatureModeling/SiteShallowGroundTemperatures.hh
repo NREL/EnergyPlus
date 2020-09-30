@@ -62,8 +62,10 @@
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
-    struct EnergyPlusData;
+
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
 // Derived class for Site:GroundTemperature:Shallow
 class SiteShallowGroundTemps : public BaseGroundTempsModel

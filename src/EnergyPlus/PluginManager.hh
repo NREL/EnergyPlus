@@ -71,7 +71,8 @@
 
 namespace EnergyPlus {
 
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace PluginManagement {
 
@@ -168,7 +169,7 @@ namespace PluginManagement {
         PyObject *pAfterComponentInputReadIn = nullptr;
         PyObject *pUserDefinedComponentModel = nullptr;
         PyObject *pUnitarySystemSizing = nullptr;
-#endif        
+#endif
     };
 
     class PluginManager {

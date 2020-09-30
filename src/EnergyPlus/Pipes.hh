@@ -59,10 +59,9 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct PlantLocation;
-    struct PipesData;
+// Forward declarations
+struct EnergyPlusData;
+struct PlantLocation;
 
 namespace Pipes {
 
@@ -90,7 +89,7 @@ namespace Pipes {
         {
         }
 
-        static PlantComponent *factory(PipesData &pipes, int objectType, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
         void simulate(EnergyPlusData &EP_UNUSED(states), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
     };
 
@@ -100,7 +99,7 @@ namespace Pipes {
     // Functions
     void clear_state();
 
-    void GetPipeInput(PipesData &pipes);
+    void GetPipeInput(EnergyPlusData &state);
 
 } // namespace Pipes
 

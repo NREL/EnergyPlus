@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(state, state.files, foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(state.files, foundErrors); // read construction data
