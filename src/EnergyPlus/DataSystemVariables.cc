@@ -203,8 +203,7 @@ namespace DataSystemVariables {
                                 std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
                                 std::string &CheckedFileName,             // Blank if not found.
-                                std::vector<std::string> *pathsChecked,
-                                bool outputErrors
+                                const std::string contextString           //
     )
     {
 
@@ -262,7 +261,9 @@ namespace DataSystemVariables {
         InputFileName = originalInputFileName;
         makeNativePath(InputFileName);
 
-        std::array<std::string, 7> pathsToCheck = {
+        std::vector<std::string> pathsChecked;
+
+        const std::vector<std::string> pathsToCheck = {
             InputFileName,
             DataStringGlobals::inputDirPathName + InputFileName,
             envinputpath1 + InputFileName,
@@ -272,26 +273,26 @@ namespace DataSystemVariables {
             ProgramPath + InputFileName
         };
 
-        for(auto path : pathsToCheck) {
-            if (FileSystem::fileExists(path)) {
+        std::size_t numPathsToNotTest = (TestAllPaths) ? pathsToCheck.size()-2 : pathsToCheck.size();
+
+        for(std::size_t i = 0; i < numPathsToNotTest; i++) {
+            if (FileSystem::fileExists(pathsToCheck[i])) {
                 FileFound = true;
-                CheckedFileName = path;
+                CheckedFileName = pathsToCheck[i];
                 print(ioFiles.audit, "{}={}\n", "found (input file)", getAbsolutePath(CheckedFileName));
                 return;
             } else {
-                if (std::find(pathsChecked->begin(), pathsChecked->end(), getAbsolutePath(path)) == pathsChecked->end()){
-                    pathsChecked->push_back(getAbsolutePath(path));
+                if (std::find(pathsChecked.begin(), pathsChecked.end(), getAbsolutePath(pathsToCheck[i])) == pathsChecked.end()){
+                    pathsChecked.push_back(getAbsolutePath(pathsToCheck[i]));
                 }
-                print(ioFiles.audit, "{}={}\n", "not found", getAbsolutePath(path));
+                print(ioFiles.audit, "{}={}\n", "not found", getAbsolutePath(pathsToCheck[i]));
             }
-            if ( path ==(CurrentWorkingFolder + InputFileName) && !TestAllPaths ) return;
         }
-        if (outputErrors && FileFound==false) {
-            for(std::size_t i=0; i<pathsChecked->size(); i++){
-                ShowWarningMessage("Looking for File \"" + originalInputFileName + "\" : File not found in \"" + (*pathsChecked)[i] +"\"");
+        if (!FileFound) {
+            ShowSevereError(contextString+ "File \"" + originalInputFileName + "\" not found. Paths searched:");
+            for(auto path: pathsChecked){
+                ShowContinueError("   \"" + path +"\"");
             }
-            ShowSevereError("File \"" + originalInputFileName + "\" : File not found.");
-            ShowFatalError("File \"" + originalInputFileName + "\" : File not found.");
         }
     }
 

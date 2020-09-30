@@ -173,9 +173,8 @@ namespace DataSystemVariables {
     void CheckForActualFileName(IOFiles &ioFiles,
                                 std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
-                                std::string &CheckedFileName,             // Blank if not found.
-                                std::vector<std::string> *pathsChecked = nullptr,
-                                bool outputErrors = false
+                                std::string &foundFileName,             // Blank if not found.
+                                const std::string contextString = std::string()
     );
 
     // Needed for unit tests, should not be normally called.

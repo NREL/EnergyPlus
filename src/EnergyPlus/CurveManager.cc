@@ -1729,7 +1729,9 @@ namespace CurveManager {
                             std::size_t rowNum = indVarInstance.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
                             if (!state.dataCurveManager->btwxtManager.tableFiles.count(filePath)) {
-                                state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, TableFile{IOFiles::getSingleton(), filePath});
+                                TableFile tableFile;
+                                ErrorsFound |= tableFile.load(IOFiles::getSingleton(), filePath);
+                                state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, tableFile);
                             }
 
                             axis = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
@@ -1918,8 +1920,11 @@ namespace CurveManager {
                     std::size_t colNum = fields.at("external_file_column_number").get<std::size_t>() - 1;
                     std::size_t rowNum = fields.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
+
                     if (!state.dataCurveManager->btwxtManager.tableFiles.count(filePath)) {
-                        state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, TableFile{IOFiles::getSingleton(), filePath});
+                        TableFile tableFile;
+                        ErrorsFound |= tableFile.load(IOFiles::getSingleton(), filePath);
+                        state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, tableFile);
                     }
 
                     lookupValues = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
@@ -2018,18 +2023,16 @@ namespace CurveManager {
         tableFiles.clear();
     }
 
-    TableFile::TableFile(IOFiles &ioFiles, std::string path)
-    {
-        load(ioFiles, path);
-    }
-
-    void TableFile::load(IOFiles &ioFiles, std::string path)
+    bool TableFile::load(IOFiles &ioFiles, std::string path)
     {
         filePath = path;
         bool fileFound;
         std::string fullPath;
-        std::vector<std::string> pathsChecked;
-        DataSystemVariables::CheckForActualFileName(ioFiles, path, fileFound, fullPath, &pathsChecked, true);
+        std::string contextString = "CurveManager::TableFile::load: ";
+        DataSystemVariables::CheckForActualFileName(ioFiles, path, fileFound, fullPath, contextString);
+        if(!fileFound){
+            return true;
+        }
         std::ifstream file(fullPath);
         std::string line("");
         numRows = 0;
@@ -2062,6 +2065,7 @@ namespace CurveManager {
                 ++colNum;
             }
         }
+        return false;
     }
 
     std::vector<double>& TableFile::getArray(std::pair<std::size_t, std::size_t> colAndRow) {
