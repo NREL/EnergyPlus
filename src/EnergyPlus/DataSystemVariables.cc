@@ -374,7 +374,7 @@ namespace DataSystemVariables {
         firstTime = true;
     }
 
-    void processEnvironmentVariables(DataGlobal const &dataGlobals) {
+    void processEnvironmentVariables(EnergyPlusData &state) {
 
         static std::string cEnvValue;
 
@@ -390,7 +390,7 @@ namespace DataSystemVariables {
 
         get_environment_variable(FullAnnualSimulation, cEnvValue);
         FullAnnualRun = env_var_on(cEnvValue); // Yes or True
-        if (dataGlobals.AnnualSimulation) FullAnnualRun = true;
+        if (state.dataGlobal->AnnualSimulation) FullAnnualRun = true;
 
         get_environment_variable(cDisplayAllWarnings, cEnvValue);
         DataGlobals::DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True

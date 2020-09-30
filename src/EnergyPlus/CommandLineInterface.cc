@@ -67,7 +67,6 @@ namespace CommandLineInterface {
     using namespace DataGlobals;
     using namespace DataStringGlobals;
     using namespace FileSystem;
-    using namespace OutputProcessor;
     using namespace ez;
 
     int ProcessArgs(EnergyPlusData &state, int argc, const char *argv[])
@@ -187,7 +186,7 @@ namespace CommandLineInterface {
 
         DDOnlySimulation = opt.isSet("-D");
 
-        state.dataGlobals.AnnualSimulation = opt.isSet("-a");
+        state.dataGlobal->AnnualSimulation = opt.isSet("-a");
 
         outputEpJSONConversion = opt.isSet("-c");
 
@@ -496,7 +495,7 @@ namespace CommandLineInterface {
         }
 
         // Error for cases where both design-day and annual simulation switches are set
-        if (DDOnlySimulation && state.dataGlobals.AnnualSimulation) {
+        if (DDOnlySimulation && state.dataGlobal->AnnualSimulation) {
             DisplayString("ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.");
             DisplayString(errorFollowUp);
             exit(EXIT_FAILURE);

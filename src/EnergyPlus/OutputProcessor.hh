@@ -65,11 +65,10 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    class InputOutputFile;
-    class IOFiles;
-    struct EnergyPlusData;
-    struct DataGlobal;
+// Forward declarations
+class InputOutputFile;
+class IOFiles;
+struct EnergyPlusData;
 
 namespace OutputProcessor {
 

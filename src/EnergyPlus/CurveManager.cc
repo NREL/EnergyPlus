@@ -74,17 +74,6 @@
 
 namespace EnergyPlus {
 
-void CurveManagerData::clear_state()
-{
-    NumCurves = 0;
-    GetCurvesInputFlag = true;
-    UniqueCurveNames.clear();
-    PerfCurve.deallocate();
-    btwxtManager.clear();
-    CurveValueMyBeginTimeStepFlag = true;
-    FrictionFactorErrorHasOccurred = false;
-}
-
 namespace CurveManager {
     // Module containing the Curve Manager routines
 

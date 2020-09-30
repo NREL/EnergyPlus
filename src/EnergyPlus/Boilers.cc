@@ -99,12 +99,12 @@ namespace Boilers {
     PlantComponent *BoilerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for boilers if it hasn't been done already
-        if (state.dataBoilers.getBoilerInputFlag) {
+        if (state.dataBoilers->getBoilerInputFlag) {
             GetBoilerInput(state);
-            state.dataBoilers.getBoilerInputFlag = false;
+            state.dataBoilers->getBoilerInputFlag = false;
         }
         // Now look for this particular pipe in the list
-        for (auto &boiler : state.dataBoilers.Boiler) {
+        for (auto &boiler : state.dataBoilers->Boiler) {
             if (boiler.Name == objectName) {
                 return &boiler;
             }
@@ -167,21 +167,21 @@ namespace Boilers {
 
         // GET NUMBER OF ALL EQUIPMENT
         DataIPShortCuts::cCurrentModuleObject = "Boiler:HotWater";
-        state.dataBoilers.numBoilers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataBoilers->numBoilers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (state.dataBoilers.numBoilers <= 0) {
+        if (state.dataBoilers->numBoilers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " Equipment specified in input file");
             ErrorsFound = true;
         }
 
         // See if load distribution manager has already gotten the input
-        if (allocated(state.dataBoilers.Boiler)) return;
+        if (allocated(state.dataBoilers->Boiler)) return;
 
-        state.dataBoilers.Boiler.allocate(state.dataBoilers.numBoilers);
+        state.dataBoilers->Boiler.allocate(state.dataBoilers->numBoilers);
 
         // LOAD ARRAYS WITH CURVE FIT Boiler DATA
 
-        for (int BoilerNum = 1; BoilerNum <= state.dataBoilers.numBoilers; ++BoilerNum) {
+        for (int BoilerNum = 1; BoilerNum <= state.dataBoilers->numBoilers; ++BoilerNum) {
             int NumAlphas; // Number of elements in the alpha array
             int NumNums;   // Number of elements in the numeric array
             int IOStat;    // IO Status when calling get input subroutine
@@ -200,7 +200,7 @@ namespace Boilers {
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueBoilerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
-            auto &thisBoiler = state.dataBoilers.Boiler(BoilerNum);
+            auto &thisBoiler = state.dataBoilers->Boiler(BoilerNum);
             thisBoiler.Name = DataIPShortCuts::cAlphaArgs(1);
             thisBoiler.TypeNum = DataPlant::TypeOf_Boiler_Simple;
 

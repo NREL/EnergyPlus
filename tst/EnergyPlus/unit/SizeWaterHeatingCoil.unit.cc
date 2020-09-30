@@ -255,7 +255,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetWaterCoilInput(state);
     state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     state.dataWaterCoils->MySizeFlag(1) = true;
@@ -493,7 +493,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetWaterCoilInput(state);
     state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     state.dataWaterCoils->MySizeFlag(1) = true;
@@ -730,7 +730,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetWaterCoilInput(state);
     state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     state.dataWaterCoils->MySizeFlag(1) = true;
@@ -967,7 +967,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetWaterCoilInput(state);
     state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     state.dataWaterCoils->MySizeFlag(1) = true;
@@ -1378,7 +1378,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
     GetZoneEquipmentData1(state);
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetWaterCoilInput(state);
     state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     state.dataWaterCoils->MySizeFlag(1) = true;

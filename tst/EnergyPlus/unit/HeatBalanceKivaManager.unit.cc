@@ -201,7 +201,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     kv1.zoneControlNum = 1;
     kv1.zoneControlType = 1; // Temperature
 
-    kv1.setInitialBoundaryConditions(*state.dataZoneTempPredictorCorrector, kivaweather, 1, 1, 1);
+    kv1.setInitialBoundaryConditions(state, kivaweather, 1, 1, 1);
 
     Real64 expectedResult1 = kv1.instance.bcs->slabConvectiveTemp;
 
@@ -216,7 +216,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     kv2.zoneControlNum = 1;
     kv2.zoneControlType = 1; // Temperature
 
-    kv2.setInitialBoundaryConditions(*state.dataZoneTempPredictorCorrector, kivaweather, 1, 1, 1);
+    kv2.setInitialBoundaryConditions(state, kivaweather, 1, 1, 1);
 
     Real64 expectedResult2 = kv2.instance.bcs->slabConvectiveTemp;
 
@@ -234,7 +234,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     kv3.zoneControlNum = 1;
     kv3.zoneControlType = 1; // Temperature
 
-    kv3.setInitialBoundaryConditions(*state.dataZoneTempPredictorCorrector, kivaweather, 1, 1, 1);
+    kv3.setInitialBoundaryConditions(state, kivaweather, 1, 1, 1);
 
     Real64 expectedResult3 = kv3.instance.bcs->slabConvectiveTemp;
 
@@ -251,7 +251,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     kv4.zoneControlNum = 1;
     kv4.zoneControlType = 1; // Temperature
 
-    kv4.setInitialBoundaryConditions(*state.dataZoneTempPredictorCorrector, kivaweather, 1, 1, 1);
+    kv4.setInitialBoundaryConditions(state, kivaweather, 1, 1, 1);
 
     Real64 expectedResult4 = kv4.instance.bcs->slabConvectiveTemp;
 

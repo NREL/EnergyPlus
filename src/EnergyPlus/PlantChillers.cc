@@ -141,13 +141,13 @@ namespace PlantChillers {
         tempDesCondIn = this->TempDesCondIn;
     }
 
-    ElectricChillerSpecs *ElectricChillerSpecs::factory(PlantChillersData &chillers, std::string const &chillerName)
+    ElectricChillerSpecs *ElectricChillerSpecs::factory(EnergyPlusData &state, std::string const &chillerName)
     {
-        if (chillers.GetElectricInput) {
-            ElectricChillerSpecs::getInput(chillers);
-            chillers.GetElectricInput = false;
+        if (state.dataPlantChillers->GetElectricInput) {
+            ElectricChillerSpecs::getInput(state);
+            state.dataPlantChillers->GetElectricInput = false;
         }
-        for (auto &thisChiller : chillers.ElectricChiller) {
+        for (auto &thisChiller : state.dataPlantChillers->ElectricChiller) {
             if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
@@ -156,7 +156,7 @@ namespace PlantChillers {
         return nullptr;
     }
 
-    void ElectricChillerSpecs::getInput(PlantChillersData &chillers)
+    void ElectricChillerSpecs::getInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher / Brandon Anderson
@@ -175,21 +175,21 @@ namespace PlantChillers {
 
         // FLOW
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric";
-        chillers.NumElectricChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataPlantChillers->NumElectricChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (chillers.NumElectricChillers <= 0) {
+        if (state.dataPlantChillers->NumElectricChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " Equipment specified in input file");
             ErrorsFound = true;
         }
 
         // See if load distribution manager has already gotten the input
-        if (allocated(chillers.ElectricChiller)) return;
+        if (allocated(state.dataPlantChillers->ElectricChiller)) return;
 
         // ALLOCATE ARRAYS
-        chillers.ElectricChiller.allocate(chillers.NumElectricChillers);
+        state.dataPlantChillers->ElectricChiller.allocate(state.dataPlantChillers->NumElectricChillers);
 
         // LOAD ARRAYS WITH Electric CURVE FIT CHILLER DATA
-        for (int ChillerNum = 1; ChillerNum <= chillers.NumElectricChillers; ++ChillerNum) {
+        for (int ChillerNum = 1; ChillerNum <= state.dataPlantChillers->NumElectricChillers; ++ChillerNum) {
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           ChillerNum,
                                           DataIPShortCuts::cAlphaArgs,
@@ -207,7 +207,7 @@ namespace PlantChillers {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.ElectricChiller(ChillerNum);
+            auto &thisChiller = state.dataPlantChillers->ElectricChiller(ChillerNum);
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
             thisChiller.plantTypeOfNum = DataPlant::TypeOf_Chiller_Electric;
 
@@ -2013,11 +2013,11 @@ namespace PlantChillers {
 
     EngineDrivenChillerSpecs *EngineDrivenChillerSpecs::factory(EnergyPlusData &state, std::string const &chillerName)
     {
-        if (state.dataPlantChillers.GetEngineDrivenInput) {
-            EngineDrivenChillerSpecs::getInput(state, state.dataPlantChillers);
-            state.dataPlantChillers.GetEngineDrivenInput = false;
+        if (state.dataPlantChillers->GetEngineDrivenInput) {
+            EngineDrivenChillerSpecs::getInput(state);
+            state.dataPlantChillers->GetEngineDrivenInput = false;
         }
-        for (auto &thisChiller : state.dataPlantChillers.EngineDrivenChiller) {
+        for (auto &thisChiller : state.dataPlantChillers->EngineDrivenChiller) {
             if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
@@ -2059,7 +2059,7 @@ namespace PlantChillers {
         }
     }
 
-    void EngineDrivenChillerSpecs::getInput(EnergyPlusData &state, PlantChillersData &chillers)
+    void EngineDrivenChillerSpecs::getInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher / Brandon Anderson
@@ -2079,20 +2079,20 @@ namespace PlantChillers {
 
         // FLOW
         DataIPShortCuts::cCurrentModuleObject = "Chiller:EngineDriven";
-        chillers.NumEngineDrivenChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataPlantChillers->NumEngineDrivenChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (chillers.NumEngineDrivenChillers <= 0) {
+        if (state.dataPlantChillers->NumEngineDrivenChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
         // See if load distribution manager has already gotten the input
-        if (allocated(chillers.EngineDrivenChiller)) return;
+        if (allocated(state.dataPlantChillers->EngineDrivenChiller)) return;
 
         // ALLOCATE ARRAYS
-        chillers.EngineDrivenChiller.allocate(chillers.NumEngineDrivenChillers);
+        state.dataPlantChillers->EngineDrivenChiller.allocate(state.dataPlantChillers->NumEngineDrivenChillers);
 
         // LOAD ARRAYS WITH EngineDriven CURVE FIT CHILLER DATA
-        for (int ChillerNum = 1; ChillerNum <= chillers.NumEngineDrivenChillers; ++ChillerNum) {
+        for (int ChillerNum = 1; ChillerNum <= state.dataPlantChillers->NumEngineDrivenChillers; ++ChillerNum) {
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           ChillerNum,
                                           DataIPShortCuts::cAlphaArgs,
@@ -2110,7 +2110,7 @@ namespace PlantChillers {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.EngineDrivenChiller(ChillerNum);
+            auto &thisChiller = state.dataPlantChillers->EngineDrivenChiller(ChillerNum);
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
             thisChiller.plantTypeOfNum = DataPlant::TypeOf_Chiller_EngineDriven;
 
@@ -3933,13 +3933,13 @@ namespace PlantChillers {
         }
     }
 
-    GTChillerSpecs *GTChillerSpecs::factory(PlantChillersData &chillers, std::string const &chillerName)
+    GTChillerSpecs *GTChillerSpecs::factory(EnergyPlusData &state, std::string const &chillerName)
     {
-        if (chillers.GetGasTurbineInput) {
-            GTChillerSpecs::getInput(chillers);
-            chillers.GetGasTurbineInput = false;
+        if (state.dataPlantChillers->GetGasTurbineInput) {
+            GTChillerSpecs::getInput(state);
+            state.dataPlantChillers->GetGasTurbineInput = false;
         }
-        for (auto &thisChiller : chillers.GTChiller) {
+        for (auto &thisChiller : state.dataPlantChillers->GTChiller) {
             if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
@@ -3981,7 +3981,7 @@ namespace PlantChillers {
         }
     }
 
-    void GTChillerSpecs::getInput(PlantChillersData &chillers)
+    void GTChillerSpecs::getInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher / Brandon Anderson
@@ -4003,19 +4003,19 @@ namespace PlantChillers {
 
         // FLOW
         DataIPShortCuts::cCurrentModuleObject = "Chiller:CombustionTurbine";
-        chillers.NumGTChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataPlantChillers->NumGTChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (chillers.NumGTChillers <= 0) {
+        if (state.dataPlantChillers->NumGTChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
         // See if load distribution manager has already gotten the input
-        if (allocated(chillers.GTChiller)) return;
+        if (allocated(state.dataPlantChillers->GTChiller)) return;
 
         // ALLOCATE ARRAYS
-        chillers.GTChiller.allocate(chillers.NumGTChillers);
+        state.dataPlantChillers->GTChiller.allocate(state.dataPlantChillers->NumGTChillers);
 
-        for (int ChillerNum = 1; ChillerNum <= chillers.NumGTChillers; ++ChillerNum) {
+        for (int ChillerNum = 1; ChillerNum <= state.dataPlantChillers->NumGTChillers; ++ChillerNum) {
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           ChillerNum,
                                           DataIPShortCuts::cAlphaArgs,
@@ -4033,7 +4033,7 @@ namespace PlantChillers {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.GTChiller(ChillerNum);
+            auto &thisChiller = state.dataPlantChillers->GTChiller(ChillerNum);
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
             thisChiller.plantTypeOfNum = DataPlant::TypeOf_Chiller_CombTurbine;
 
@@ -5789,14 +5789,14 @@ namespace PlantChillers {
         }
     }
 
-    ConstCOPChillerSpecs *ConstCOPChillerSpecs::factory(PlantChillersData &chillers, std::string const &chillerName)
+    ConstCOPChillerSpecs *ConstCOPChillerSpecs::factory(EnergyPlusData &state, std::string const &chillerName)
     {
         // GET INPUT
-        if (chillers.GetConstCOPInput) {
-            ConstCOPChillerSpecs::getInput(chillers);
-            chillers.GetConstCOPInput = false;
+        if (state.dataPlantChillers->GetConstCOPInput) {
+            ConstCOPChillerSpecs::getInput(state);
+            state.dataPlantChillers->GetConstCOPInput = false;
         }
-        for (auto &thisChiller : chillers.ConstCOPChiller) {
+        for (auto &thisChiller : state.dataPlantChillers->ConstCOPChiller) {
             if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
@@ -5827,7 +5827,7 @@ namespace PlantChillers {
         }
     }
 
-    void ConstCOPChillerSpecs::getInput(PlantChillersData &chillers)
+    void ConstCOPChillerSpecs::getInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -5851,20 +5851,20 @@ namespace PlantChillers {
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
         DataIPShortCuts::cCurrentModuleObject = "Chiller:ConstantCOP";
-        chillers.NumConstCOPChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataPlantChillers->NumConstCOPChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (chillers.NumConstCOPChillers <= 0) {
+        if (state.dataPlantChillers->NumConstCOPChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
         // See if load distribution manager has already gotten the input
-        if (allocated(chillers.ConstCOPChiller)) return;
+        if (allocated(state.dataPlantChillers->ConstCOPChiller)) return;
 
-        chillers.ConstCOPChiller.allocate(chillers.NumConstCOPChillers);
+        state.dataPlantChillers->ConstCOPChiller.allocate(state.dataPlantChillers->NumConstCOPChillers);
 
         // LOAD ARRAYS WITH BLAST ConstCOP CHILLER DATA
-        for (int ChillerNum = 1; ChillerNum <= chillers.NumConstCOPChillers; ++ChillerNum) {
+        for (int ChillerNum = 1; ChillerNum <= state.dataPlantChillers->NumConstCOPChillers; ++ChillerNum) {
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           ChillerNum,
                                           DataIPShortCuts::cAlphaArgs,
@@ -5882,7 +5882,7 @@ namespace PlantChillers {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.ConstCOPChiller(ChillerNum);
+            auto &thisChiller = state.dataPlantChillers->ConstCOPChiller(ChillerNum);
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
             thisChiller.plantTypeOfNum = DataPlant::TypeOf_Chiller_ConstCOP;
             thisChiller.NomCap = DataIPShortCuts::rNumericArgs(1);

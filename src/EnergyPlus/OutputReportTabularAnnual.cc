@@ -622,18 +622,18 @@ namespace OutputReportTabularAnnual {
         return secondsInTimeStep;
     }
 
-    void WriteAnnualTables(CostEstimateManagerData &dataCostEstimateManager)
+    void WriteAnnualTables(EnergyPlusData &state)
     {
         // Jason Glazer, August 2015
         // This function is not part of the class but acts as an interface between procedural code and the class by
         // invoking the writeTable member function for each of the AnnualTable objects
         std::vector<AnnualTable>::iterator annualTableIt;
         for (annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt) {
-            annualTableIt->writeTable(dataCostEstimateManager, OutputReportTabular::unitsStyle);
+            annualTableIt->writeTable(state, OutputReportTabular::unitsStyle);
         }
     }
 
-    void AnnualTable::writeTable(CostEstimateManagerData &dataCostEstimateManager, int unitsStyle)
+    void AnnualTable::writeTable(EnergyPlusData &state, int unitsStyle)
     {
         Array1D_string columnHead;
         Array1D_int columnWidth;
@@ -923,7 +923,7 @@ namespace OutputReportTabularAnnual {
         } // fldStIt
         OutputReportTabular::WriteReportHeaders(m_name, "Entire Facility", OutputProcessor::StoreType::Averaged);
         OutputReportTabular::WriteSubtitle("Custom Annual Report");
-        OutputReportTabular::WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth, true); // transpose annual XML tables.
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose annual XML tables.
         if (sqlite) {
             sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, m_name, "Entire Facility", "Custom Annual Report");
         }
@@ -969,7 +969,7 @@ namespace OutputReportTabularAnnual {
                             OutputReportTabular::RealToStr(binBottom + float(iBin + 1) * intervalSize, fldStIt->m_showDigits);
                     }
                     OutputReportTabular::WriteSubtitle("Bin Sizes for: " + fldStIt->m_colHead);
-                    OutputReportTabular::WriteTable(dataCostEstimateManager, tableBodyRange, rowHeadRange, colHeadRange, colWidthRange, true); // transpose annual XML tables.
+                    OutputReportTabular::WriteTable(state, tableBodyRange, rowHeadRange, colHeadRange, colWidthRange, true); // transpose annual XML tables.
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(tableBodyRange, rowHeadRange, colHeadRange, m_name, "Entire Facility", "Bin Sizes");
                     }
