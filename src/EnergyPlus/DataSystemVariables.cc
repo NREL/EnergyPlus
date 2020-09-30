@@ -218,27 +218,12 @@ namespace DataSystemVariables {
         // be accurate. This searches a few folders (CurrentWorkingFolder, Program folder) to see
         // if the file can be found. (It may have been input with full path so that is checked first.)
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const blank;
         static ObjexxFCL::gio::Fmt fmtA("(A)");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string InputFileName; // save for changing out path characters
