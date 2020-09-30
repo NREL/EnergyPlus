@@ -116,12 +116,12 @@ namespace ChillerGasAbsorption {
     PlantComponent *GasAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
-        if (state.dataChillerGasAbsorption.getGasAbsorberInputs) {
+        if (state.dataChillerGasAbsorption->getGasAbsorberInputs) {
             GetGasAbsorberInput(state);
-            state.dataChillerGasAbsorption.getGasAbsorberInputs = false;
+            state.dataChillerGasAbsorption->getGasAbsorberInputs = false;
         }
         // Now look for this particular pipe in the list
-        for (auto &comp : state.dataChillerGasAbsorption.GasAbsorber) {
+        for (auto &comp : state.dataChillerGasAbsorption->GasAbsorber) {
             if (comp.Name == objectName) {
                 return &comp;
             }
@@ -265,10 +265,10 @@ namespace ChillerGasAbsorption {
             Get_ErrorsFound = true;
         }
 
-        if (allocated(state.dataChillerGasAbsorption.GasAbsorber)) return;
+        if (allocated(state.dataChillerGasAbsorption->GasAbsorber)) return;
 
         // ALLOCATE ARRAYS
-        state.dataChillerGasAbsorption.GasAbsorber.allocate(NumGasAbsorbers);
+        state.dataChillerGasAbsorption->GasAbsorber.allocate(NumGasAbsorbers);
 
         // LOAD ARRAYS
 
@@ -289,7 +289,7 @@ namespace ChillerGasAbsorption {
             // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
 
-            auto &thisChiller = state.dataChillerGasAbsorption.GasAbsorber(AbsorberNum);
+            auto &thisChiller = state.dataChillerGasAbsorption->GasAbsorber(AbsorberNum);
             thisChiller.Name = cAlphaArgs(1);
             ChillerName = cCurrentModuleObject + " Named " + thisChiller.Name;
 

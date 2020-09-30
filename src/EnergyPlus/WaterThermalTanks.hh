@@ -59,8 +59,10 @@
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
-    struct EnergyPlusData;
+
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
 namespace WaterThermalTanks {
 
@@ -919,35 +921,32 @@ namespace WaterThermalTanks {
 
         void clear_state() override
         {
-            numChilledWaterMixed = 0;
-            numChilledWaterStratified = 0;
-            numWaterHeaterMixed = 0;
-            numWaterHeaterStratified = 0;
-            numWaterThermalTank = 0;
-            numWaterHeaterDesuperheater = 0;
-            numHeatPumpWaterHeater = 0;
-            numWaterHeaterSizing = 0;
-
-            hpPartLoadRatio = 0.0;
-            mixerInletAirSchedule = 0.0;
-            mdotAir = 0.0;
-
-            WaterThermalTank.deallocate();
-            HPWaterHeater.deallocate();
-            WaterHeaterDesuperheater.deallocate();
-            UniqueWaterThermalTankNames.clear();
-
-            getWaterThermalTankInputFlag = true;
-            calcWaterThermalTankZoneGainsMyEnvrnFlag = true;
+            this->numChilledWaterMixed = 0;
+            this->numChilledWaterStratified = 0;
+            this->numWaterHeaterMixed = 0;
+            this->numWaterHeaterStratified = 0;
+            this->numWaterThermalTank = 0;
+            this->numWaterHeaterDesuperheater = 0;
+            this->numHeatPumpWaterHeater = 0;
+            this->numWaterHeaterSizing = 0;
+            this->hpPartLoadRatio = 0.0;
+            this->mixerInletAirSchedule = 0.0;
+            this->mdotAir = 0.0;
+            this->WaterThermalTank.deallocate();
+            this->HPWaterHeater.deallocate();
+            this->WaterHeaterDesuperheater.deallocate();
+            this->UniqueWaterThermalTankNames.clear();
+            this->getWaterThermalTankInputFlag = true;
+            this->calcWaterThermalTankZoneGainsMyEnvrnFlag = true;
         }
 
         // Default Constructor
         WaterThermalTanksData()
-            : heatMode(1), floatMode(0), ventMode(-1), coolMode(2), 
-              numChilledWaterMixed(0), numChilledWaterStratified(0), numWaterHeaterMixed(0), 
-              numWaterHeaterStratified(0), numWaterThermalTank(0), numWaterHeaterDesuperheater(0), 
-              numHeatPumpWaterHeater(0), numWaterHeaterSizing(0), hpPartLoadRatio(0.0), 
-              mixerInletAirSchedule(0.0), mdotAir(0.0), getWaterThermalTankInputFlag(true), 
+            : heatMode(1), floatMode(0), ventMode(-1), coolMode(2),
+              numChilledWaterMixed(0), numChilledWaterStratified(0), numWaterHeaterMixed(0),
+              numWaterHeaterStratified(0), numWaterThermalTank(0), numWaterHeaterDesuperheater(0),
+              numHeatPumpWaterHeater(0), numWaterHeaterSizing(0), hpPartLoadRatio(0.0),
+              mixerInletAirSchedule(0.0), mdotAir(0.0), getWaterThermalTankInputFlag(true),
               calcWaterThermalTankZoneGainsMyEnvrnFlag(true)
         {
         }

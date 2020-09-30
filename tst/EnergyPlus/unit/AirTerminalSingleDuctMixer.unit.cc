@@ -354,7 +354,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetPTUnit(state);
 
     ASSERT_EQ(1, NumATMixers);
@@ -604,7 +604,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
@@ -935,7 +935,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
@@ -1349,7 +1349,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
@@ -1762,7 +1762,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
@@ -2434,7 +2434,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
 
     GetVRFInput(state);
     GetVRFInputFlag = false;
@@ -3113,7 +3113,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
 
     GetVRFInput(state);
     GetVRFInputFlag = false;
@@ -4863,7 +4863,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
 
     GetVRFInput(state);
     GetVRFInputFlag = false;
@@ -6617,7 +6617,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
 
     GetVRFInput(state);
     GetVRFInputFlag = false;
@@ -6864,7 +6864,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetUnitVentilatorInput(state);
     GetUnitVentilatorInputFlag = false;
 
@@ -7101,7 +7101,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetUnitVentilatorInput(state);
     GetUnitVentilatorInputFlag = false;
 
@@ -7343,8 +7343,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputDOASpecs)
     SizingManager::GetZoneSizingInput();
     GetZoneEquipmentData1(state);
     ZoneEquipmentManager::SetUpZoneSizingArrays(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
-    GetATMixers(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
+    GetATMixers(state);
 
     ASSERT_EQ(2, NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", SysATMixer(1).Name);            // single duct air terminal mixer name
@@ -7625,8 +7625,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     BeginEnvrnFlag = true;
     DataGlobals::DoingSizing = true;
-    state.fans.LocalTurnFansOff = false;
-    state.fans.LocalTurnFansOn = true;
+    state.dataFans->LocalTurnFansOff = false;
+    state.dataFans->LocalTurnFansOn = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     DataGlobals::HourOfDay = 1;
@@ -8056,8 +8056,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     BeginEnvrnFlag = true;
     DataGlobals::DoingSizing = true;
-    state.fans.LocalTurnFansOff = false;
-    state.fans.LocalTurnFansOn = true;
+    state.dataFans->LocalTurnFansOff = false;
+    state.dataFans->LocalTurnFansOn = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     DataGlobals::HourOfDay = 1;

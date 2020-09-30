@@ -126,8 +126,8 @@ TEST_F(EnergyPlusFixture, ZonePlenum_InitAirZoneReturnPlenumTest)
 
     state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletNode = 4;
 
-    InitAirZoneReturnPlenum(*state.dataZonePlenum, ZonePlenumNum);
-    UpdateAirZoneReturnPlenum(*state.dataZonePlenum, ZonePlenumNum);
+    InitAirZoneReturnPlenum(state, ZonePlenumNum);
+    UpdateAirZoneReturnPlenum(state, ZonePlenumNum);
 
     EXPECT_EQ(Node(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum).CO2, Node(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletNode).CO2);
     EXPECT_EQ(Node(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum).CO2, Node(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletNode).CO2);

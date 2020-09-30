@@ -1630,7 +1630,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataGlobals::NumOfZones = 1;
     DataSurfaces::SurfWinShadingFlagEMSOn(2) = true;
     DataSurfaces::SurfWinShadingFlagEMSValue(2) = 1.0;
-    SolarShading::WindowShadingManager(*state.dataWindowEquivalentLayer);
+    SolarShading::WindowShadingManager(state);
     EXPECT_EQ(DataSurfaces::SurfWinShadingFlag(2), DataSurfaces::SurfWinShadingFlagEMSValue(2));
 
 }
