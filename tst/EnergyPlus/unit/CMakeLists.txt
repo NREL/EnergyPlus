@@ -72,6 +72,7 @@ set( test_src
   Datasets.unit.cc
   DataSizing.unit.cc
   DataSurfaces.unit.cc
+  DataSystemVariables.unit.cc
   DataZoneEquipment.unit.cc
   DaylightingManager.unit.cc
   DElightManager.unit.cc
