@@ -1078,6 +1078,15 @@ namespace UnitarySystems {
             DataLoopNode::Node(this->m_HeatRecoveryInletNodeNum).MassFlowRate = mdotHR;
         }
 
+        if (this->m_FanOpModeSchedPtr > 0) {
+            if (ScheduleManager::GetCurrentScheduleValue(this->m_FanOpModeSchedPtr) == 0.0) {
+                this->m_FanOpMode = DataHVACGlobals::CycFanCycCoil;
+            } else {
+                this->m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
+                DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
+            }
+        }
+
         // get operating capacity of water and steam coil
         if (FirstHVACIteration || this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
             if (FirstHVACIteration) {
@@ -7996,15 +8005,6 @@ namespace UnitarySystems {
                 }
                 this->m_DesiredOutletTemp = min(this->m_DesiredOutletTemp, MaxOutletTemp);
 
-                if (this->m_FanOpModeSchedPtr > 0) {
-                    if (ScheduleManager::GetCurrentScheduleValue(this->m_FanOpModeSchedPtr) == 0.0) {
-                        this->m_FanOpMode = DataHVACGlobals::CycFanCycCoil;
-                    } else {
-                        this->m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
-                        DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
-                    }
-                }
-
             } else {
                 // should never get here, only 3 control types
             }
@@ -9727,15 +9727,6 @@ namespace UnitarySystems {
                 if (std::abs(this->m_LatentLoadMet) > 0.0) {
                     if (std::abs(this->m_LatLoadLoss / this->m_LatentLoadMet) < 0.001) this->m_LatLoadLoss = 0.0;
                 }
-            }
-        }
-
-        if (this->m_FanOpModeSchedPtr > 0) {
-            if (ScheduleManager::GetCurrentScheduleValue(this->m_FanOpModeSchedPtr) == 0.0) {
-                this->m_FanOpMode = DataHVACGlobals::CycFanCycCoil;
-            } else {
-                this->m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
-                DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
             }
         }
 
