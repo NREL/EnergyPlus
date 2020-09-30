@@ -3520,36 +3520,35 @@ namespace VariableSpeedCoils {
                 } else if (UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).RecoveryUnitType, "Chiller:Electric:EIR")) {
                                                           
                     int IndexNum = UtilityRoutines::
-                        FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName, state.dataChillerElectricEIR.ElectricEIRChiller);
+                        FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName, state.dataChillerElectricEIR->ElectricEIRChiller);
                                         
                     if (IndexNum == 0){
                         ChillerElectricEIR::ElectricEIRChillerSpecs::factory(state, VarSpeedCoil(DXCoilNum).RecoveryUnitName);
                         IndexNum = UtilityRoutines::FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName,
-                                                                   state.dataChillerElectricEIR.ElectricEIRChiller);
+                                                                   state.dataChillerElectricEIR->ElectricEIRChiller);
                     }
 
                     if (IndexNum > 0) {
                         dScaleCapacity = VarSpeedCoil(DXCoilNum).RatedCapCoolTotal * VarSpeedCoil(DXCoilNum).RecoveryCapacityRatio;
-                        state.dataChillerElectricEIR.ElectricEIRChiller(IndexNum).RefCap = dScaleCapacity;
+                        state.dataChillerElectricEIR->ElectricEIRChiller(IndexNum).RefCap = dScaleCapacity;
                     }
 
                 } else if (UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).RecoveryUnitType, "Chiller:Electric")) {
 
                     int IndexNum =
-                        UtilityRoutines::FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName, state.dataPlantChillers.ElectricChiller);
+                        UtilityRoutines::FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName, state.dataPlantChillers->ElectricChiller);
 
-                    if (IndexNum == 0){
-                        PlantChillersData chiller;
-                        PlantChillers::ElectricChillerSpecs::factory(chiller, VarSpeedCoil(DXCoilNum).RecoveryUnitName);
+                    if (IndexNum == 0){                        
+                        PlantChillers::ElectricChillerSpecs::factory(state, VarSpeedCoil(DXCoilNum).RecoveryUnitName);
 
                         IndexNum = UtilityRoutines::
-                            FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName, state.dataPlantChillers.ElectricChiller);
+                            FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName, state.dataPlantChillers->ElectricChiller);
                     }
 
                     if (IndexNum > 0) {
                         dScaleCapacity = 
                             VarSpeedCoil(DXCoilNum).RatedCapCoolTotal * VarSpeedCoil(DXCoilNum).RecoveryCapacityRatio;
-                        state.dataPlantChillers.ElectricChiller(IndexNum).NomCap = dScaleCapacity;
+                        state.dataPlantChillers->ElectricChiller(IndexNum).NomCap = dScaleCapacity;
                     }
                 }
 

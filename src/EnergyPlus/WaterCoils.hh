@@ -59,9 +59,9 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    struct WaterCoilsData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace WaterCoils {
 
@@ -602,106 +602,108 @@ namespace WaterCoils {
 
 } // namespace WaterCoils
 
-struct WaterCoilsData : BaseGlobalStruct {
+    struct WaterCoilsData : BaseGlobalStruct {
 
-    int const MaxPolynomOrder;
-    int const MaxOrderedPairs;
+        int const MaxPolynomOrder;
+        int const MaxOrderedPairs;
 
-    Real64 const PolyConvgTol;
-    Real64 const MinWaterMassFlowFrac;
-    Real64 const MinAirMassFlow;
+        Real64 const PolyConvgTol;
+        Real64 const MinWaterMassFlowFrac;
+        Real64 const MinAirMassFlow;
 
-    int const CoilType_Cooling;
-    int const CoilType_Heating;
-    int const CoilType_Dehumidification;
+		int const CoilType_Cooling;
+		int const CoilType_Heating;
+		int const CoilType_Dehumidification;
 
-    int const CoilModel_Simple;
-    int const CoilModel_Cooling;
-    int const CoilModel_Detailed;
-    int const CoilModel_LiqDesiccantDehum;
+		int const CoilModel_Simple;
+		int const CoilModel_Cooling;
+		int const CoilModel_Detailed;
+		int const CoilModel_LiqDesiccantDehum;
 
-    // Parameters for Liquid desiccant operation mode
-    int const OutdoorAirSource;
-    int const ZoneAirSource;
-    int const RegenerationMode;
-    int const DehumidificationMode;
+		// Parameters for Liquid desiccant operation mode
+		int const OutdoorAirSource;
+		int const ZoneAirSource;
+		int const RegenerationMode;
+		int const DehumidificationMode;
 
-    // Parameters for Heat Exchanger Configuration
-    int const CounterFlow;
-    int const CrossFlow;
-    int const SimpleAnalysis;
-    int const DetailedAnalysis;
 
-    // Water Systems
-    int const CondensateDiscarded; // default mode where water is "lost"
-    int const CondensateToTank;    // collect coil condensate from air and store in water storage tank
+        // Parameters for Heat Exchanger Configuration
+        int const CounterFlow;
+        int const CrossFlow;
+        int const SimpleAnalysis;
+        int const DetailedAnalysis;
 
-                                         // Parameters for COIL:Water:SimpleHeating Coil Performance Input Method
-    int const UAandFlow; // for Coil Performance Input Method = UA and Design Water Flow Rate
-    int const NomCap;    // for Coil Performance Input Method = Nominal Capacity
+        // Water Systems
+        int const CondensateDiscarded; // default mode where water is "lost"
+        int const CondensateToTank;    // collect coil condensate from air and store in water storage tank
 
-                            // Parameters Subroutine CoolingCoil: design calc or simulation calc.
-    int const DesignCalc; // ignore on/off check in CoolingCoil
-    int const SimCalc;    // pay attention to on/off check in CoolingCoil
+                                             // Parameters for COIL:Water:SimpleHeating Coil Performance Input Method
+        int const UAandFlow; // for Coil Performance Input Method = UA and Design Water Flow Rate
+        int const NomCap;    // for Coil Performance Input Method = Nominal Capacity
 
-                             // DERIVED TYPE DEFINITIONS
+                                // Parameters Subroutine CoolingCoil: design calc or simulation calc.
+        int const DesignCalc; // ignore on/off check in CoolingCoil
+        int const SimCalc;    // pay attention to on/off check in CoolingCoil
 
-                             // MODULE VARIABLE DECLARATIONS:
-    int NumWaterCoils; // The Number of WaterCoils found in the Input
-    Array1D_bool MySizeFlag;
-    Array1D_bool MyUAAndFlowCalcFlag;
-    Array1D_bool MyCoilDesignFlag;
-    Array1D_bool CoilWarningOnceFlag;
-    Array1D_int WaterTempCoolCoilErrs;              // error counting for detailed coils
-    Array1D_int PartWetCoolCoilErrs;                // error counting for detailed coils
-    bool GetWaterCoilsInputFlag;              // Flag set to make sure you get input once
-    bool WaterCoilControllerCheckOneTimeFlag; // flg used to check water coil controller
-    Array1D_bool CheckEquipName;
+                                 // DERIVED TYPE DEFINITIONS
 
-    bool InitWaterCoilOneTimeFlag;
+                                 // MODULE VARIABLE DECLARATIONS:
+        int NumWaterCoils; // The Number of WaterCoils found in the Input
+        Array1D_bool MySizeFlag;
+        Array1D_bool MyUAAndFlowCalcFlag;
+        Array1D_bool MyCoilDesignFlag;
+        Array1D_bool CoilWarningOnceFlag;
+        Array1D_int WaterTempCoolCoilErrs;              // error counting for detailed coils
+        Array1D_int PartWetCoolCoilErrs;                // error counting for detailed coils
+        bool GetWaterCoilsInputFlag;              // Flag set to make sure you get input once
+        bool WaterCoilControllerCheckOneTimeFlag; // flg used to check water coil controller
+        Array1D_bool CheckEquipName;
 
-    // coil types in this module
-    int const WaterCoil_SimpleHeating;
-    int const WaterCoil_DetFlatFinCooling;
-    int const WaterCoil_Cooling;
-    int const WaterCoil_DehumLiqDesiccant; 
+        bool InitWaterCoilOneTimeFlag;
 
-    Array1D<WaterCoils::WaterCoilEquipConditions> WaterCoil;
-    Array1D<WaterCoils::WaterCoilNumericFieldData> WaterCoilNumericFields;
+		// coil types in this module
+		int const WaterCoil_SimpleHeating;
+		int const WaterCoil_DetFlatFinCooling;
+		int const WaterCoil_Cooling;
+		int const WaterCoil_DehumLiqDesiccant; 
 
-    void clear_state() override
-    {
-        NumWaterCoils = 0;
-        InitWaterCoilOneTimeFlag = true;
-        MySizeFlag.deallocate();
-        MyUAAndFlowCalcFlag.deallocate();
-        MyCoilDesignFlag.deallocate();
-        CoilWarningOnceFlag.deallocate();
-        WaterTempCoolCoilErrs.deallocate();
-        PartWetCoolCoilErrs.deallocate();
-        GetWaterCoilsInputFlag = true;
-        CheckEquipName.deallocate();
-        WaterCoil.deallocate();
-        WaterCoilNumericFields.deallocate();
-        WaterCoilControllerCheckOneTimeFlag = true;
-    }
 
-    // Default Constructor
-    WaterCoilsData()
-        : MaxPolynomOrder(4), MaxOrderedPairs(60), PolyConvgTol(1.E-05), MinWaterMassFlowFrac(0.000001), 
-          MinAirMassFlow(0.001), CoilType_Cooling(1),
-          CoilType_Heating(2), CoilType_Dehumidification(3), CoilModel_Simple(1), CoilModel_Cooling(2), CoilModel_Detailed(3),
-          CoilModel_LiqDesiccantDehum(4),
-          CounterFlow(1), CrossFlow(2), SimpleAnalysis(1), DetailedAnalysis(2), CondensateDiscarded(1001), 
-          CondensateToTank(1002), UAandFlow(1), NomCap(2), DesignCalc(1), SimCalc(2), NumWaterCoils(0), 
-          GetWaterCoilsInputFlag(true), WaterCoilControllerCheckOneTimeFlag(true),
-          InitWaterCoilOneTimeFlag(true), WaterCoil_SimpleHeating(DataPlant::TypeOf_CoilWaterSimpleHeating), WaterCoil_DetFlatFinCooling(DataPlant::TypeOf_CoilWaterDetailedFlatCooling), 
-          WaterCoil_Cooling(DataPlant::TypeOf_CoilWaterCooling),
-          WaterCoil_DehumLiqDesiccant(DataPlant::TypeOf_CoilLiqDesiccantDehum), OutdoorAirSource(1),
-          ZoneAirSource(2), RegenerationMode(1), DehumidificationMode(2)
-    {
-    }
-};
+        Array1D<WaterCoils::WaterCoilEquipConditions> WaterCoil;
+        Array1D<WaterCoils::WaterCoilNumericFieldData> WaterCoilNumericFields;
+
+        void clear_state() override
+        {
+            this->NumWaterCoils = 0;
+            this->InitWaterCoilOneTimeFlag = true;
+            this->MySizeFlag.deallocate();
+            this->MyUAAndFlowCalcFlag.deallocate();
+            this->MyCoilDesignFlag.deallocate();
+            this->CoilWarningOnceFlag.deallocate();
+            this->WaterTempCoolCoilErrs.deallocate();
+            this->PartWetCoolCoilErrs.deallocate();
+            this->GetWaterCoilsInputFlag = true;
+            this->CheckEquipName.deallocate();
+            this->WaterCoil.deallocate();
+            this->WaterCoilNumericFields.deallocate();
+            this->WaterCoilControllerCheckOneTimeFlag = true;
+        }
+
+        // Default Constructor
+        WaterCoilsData()
+            : MaxPolynomOrder(4), MaxOrderedPairs(60), PolyConvgTol(1.E-05), MinWaterMassFlowFrac(0.000001),
+              MinAirMassFlow(0.001), CoilType_Cooling(1), CoilType_Heating(2), CoilModel_Simple(1), CoilModel_Cooling(2), CoilModel_Detailed(3),
+              CounterFlow(1), CrossFlow(2), SimpleAnalysis(1), DetailedAnalysis(2), CondensateDiscarded(1001),
+              CondensateToTank(1002), UAandFlow(1), NomCap(2), DesignCalc(1), SimCalc(2), NumWaterCoils(0),
+              GetWaterCoilsInputFlag(true), WaterCoilControllerCheckOneTimeFlag(true),
+              InitWaterCoilOneTimeFlag(true), WaterCoil_SimpleHeating(DataPlant::TypeOf_CoilWaterSimpleHeating), 
+              WaterCoil_DetFlatFinCooling(DataPlant::TypeOf_CoilWaterDetailedFlatCooling), WaterCoil_Cooling(DataPlant::TypeOf_CoilWaterCooling),
+			  CoilType_Dehumidification(3), CoilModel_LiqDesiccantDehum(4),
+			  WaterCoil_DehumLiqDesiccant(DataPlant::TypeOf_CoilLiqDesiccantDehum), OutdoorAirSource(1),
+			  ZoneAirSource(2), RegenerationMode(1), DehumidificationMode(2)
+        {
+        }
+    };
+
 } // namespace EnergyPlus
 
 #endif
