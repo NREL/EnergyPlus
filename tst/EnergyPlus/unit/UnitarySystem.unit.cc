@@ -9945,7 +9945,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
     DataZoneEquipment::GetZoneEquipmentData(state); // read zone equipment configuration and list objects
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
     SingleDuct::GetSysInput(state);
 
     BranchInputManager::ManageBranchInput(state); // just gets input and returns.
@@ -11393,7 +11393,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerInlet)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -11542,7 +11542,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerSupply)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -11668,7 +11668,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
 
     // call the UnitarySystem factory
     std::string compName = "UNITARY SYSTEM MODEL";
@@ -11799,7 +11799,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipmentBlankCtrlZone)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
     UnitarySys thisSys;
 
     std::string compName = "UNITARY SYSTEM MODEL";
@@ -14069,7 +14069,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);

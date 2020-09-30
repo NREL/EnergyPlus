@@ -171,7 +171,7 @@ namespace HeatBalanceKivaManager {
 
         // Initialize with steady state before accelerated timestepping
         instance.ground->foundation.numericalScheme = Kiva::Foundation::NS_STEADY_STATE;
-        setInitialBoundaryConditions(*state.dataZoneTempPredictorCorrector, kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
+        setInitialBoundaryConditions(state, kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
         instance.calculate();
         accDate += acceleratedTimestep;
         while (accDate > 365 + state.dataWeatherManager->LeapYearAdd) {
@@ -181,7 +181,7 @@ namespace HeatBalanceKivaManager {
         // Accelerated timestepping
         instance.ground->foundation.numericalScheme = Kiva::Foundation::NS_IMPLICIT;
         for (int i = 0; i < numAccelaratedTimesteps; ++i) {
-            setInitialBoundaryConditions(*state.dataZoneTempPredictorCorrector, kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
+            setInitialBoundaryConditions(state, kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
             instance.calculate(acceleratedTimestep * 24 * 60 * 60);
             accDate += acceleratedTimestep;
             while (accDate > 365 + state.dataWeatherManager->LeapYearAdd) {
@@ -193,7 +193,7 @@ namespace HeatBalanceKivaManager {
         instance.foundation->numericalScheme = Kiva::Foundation::NS_ADI;
     }
 
-    void KivaInstanceMap::setInitialBoundaryConditions(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep)
+    void KivaInstanceMap::setInitialBoundaryConditions(EnergyPlusData &state, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep)
     {
 
         unsigned index, indexPrev;
@@ -259,7 +259,7 @@ namespace HeatBalanceKivaManager {
 
                     int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_SingleHeatSetPoint;
                     int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                    int spSchId = dataZoneTempPredictorCorrector.SetPointSingleHeating(schTypeId).TempSchedIndex;
+                    int spSchId = state.dataZoneTempPredictorCorrector->SetPointSingleHeating(schTypeId).TempSchedIndex;
                     Real64 setpoint = ScheduleManager::LookUpScheduleValue(spSchId, hour, timestep);
                     Tin = setpoint + DataGlobals::KelvinConv;
 
@@ -267,7 +267,7 @@ namespace HeatBalanceKivaManager {
 
                     int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_SingleCoolSetPoint;
                     int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                    int spSchId = dataZoneTempPredictorCorrector.SetPointSingleCooling(schTypeId).TempSchedIndex;
+                    int spSchId = state.dataZoneTempPredictorCorrector->SetPointSingleCooling(schTypeId).TempSchedIndex;
                     Real64 setpoint = ScheduleManager::LookUpScheduleValue(spSchId, hour, timestep);
                     Tin = setpoint + DataGlobals::KelvinConv;
 
@@ -275,7 +275,7 @@ namespace HeatBalanceKivaManager {
 
                     int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_SingleHeatCoolSetPoint;
                     int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                    int spSchId = dataZoneTempPredictorCorrector.SetPointSingleHeatCool(schTypeId).TempSchedIndex;
+                    int spSchId = state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(schTypeId).TempSchedIndex;
                     Real64 setpoint = ScheduleManager::LookUpScheduleValue(spSchId, hour, timestep);
                     Tin = setpoint + DataGlobals::KelvinConv;
 
@@ -283,8 +283,8 @@ namespace HeatBalanceKivaManager {
 
                     int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_DualSetPointWDeadBand;
                     int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                    int heatSpSchId = dataZoneTempPredictorCorrector.SetPointDualHeatCool(schTypeId).HeatTempSchedIndex;
-                    int coolSpSchId = dataZoneTempPredictorCorrector.SetPointDualHeatCool(schTypeId).CoolTempSchedIndex;
+                    int heatSpSchId = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(schTypeId).HeatTempSchedIndex;
+                    int coolSpSchId = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(schTypeId).CoolTempSchedIndex;
                     Real64 heatSetpoint = ScheduleManager::LookUpScheduleValue(heatSpSchId, hour, timestep);
                     Real64 coolSetpoint = ScheduleManager::LookUpScheduleValue(coolSpSchId, hour, timestep);
                     const Real64 heatBalanceTemp = 10.0; // (assumed) degC

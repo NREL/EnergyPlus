@@ -59,7 +59,7 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct CoolTowerData;
+struct EnergyPlusData;
 
 namespace CoolTower {
 
@@ -136,31 +136,31 @@ namespace CoolTower {
         }
     };
 
-    void ManageCoolTower(EnergyPlusData &state, CoolTowerData &dataCoolTower);
+    void ManageCoolTower(EnergyPlusData &state);
 
-    void GetCoolTower(EnergyPlusData &state, CoolTowerData &dataCoolTower);
+    void GetCoolTower(EnergyPlusData &state);
 
-    void CalcCoolTower(CoolTowerData &dataCoolTower);
+    void CalcCoolTower(EnergyPlusData &state);
 
-    void UpdateCoolTower(CoolTowerData &dataCoolTower);
+    void UpdateCoolTower(EnergyPlusData &state);
 
-    void ReportCoolTower(CoolTowerData &dataCoolTower);
+    void ReportCoolTower(EnergyPlusData &state);
 
 } // namespace CoolTower
 
-struct CoolTowerData : BaseGlobalStruct {
+    struct CoolTowerData : BaseGlobalStruct {
 
-    bool GetInputFlag = true;
-    int NumCoolTowers = 0;
-    Array1D<CoolTower::CoolTowerParams> CoolTowerSys;
+        bool GetInputFlag = true;
+        int NumCoolTowers = 0;
+        Array1D<CoolTower::CoolTowerParams> CoolTowerSys;
 
-    void clear_state() override
-    {
-        GetInputFlag = true;
-        NumCoolTowers = 0;
-        CoolTowerSys.deallocate();
-    }
-};
+        void clear_state() override
+        {
+            this->GetInputFlag = true;
+            this->NumCoolTowers = 0;
+            this->CoolTowerSys.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

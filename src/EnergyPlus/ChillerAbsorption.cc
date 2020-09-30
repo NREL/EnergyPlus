@@ -115,12 +115,12 @@ namespace ChillerAbsorption {
     PlantComponent *BLASTAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data
-        if (state.dataChillerAbsorbers.getInput) {
+        if (state.dataChillerAbsorber->getInput) {
             GetBLASTAbsorberInput(state);
-            state.dataChillerAbsorbers.getInput = false;
+            state.dataChillerAbsorber->getInput = false;
         }
         // Now look for this particular object
-        for (auto &thisAbs : state.dataChillerAbsorbers.absorptionChillers) {
+        for (auto &thisAbs : state.dataChillerAbsorber->absorptionChillers) {
             if (thisAbs.Name == objectName) {
                 return &thisAbs;
             }
@@ -237,20 +237,20 @@ namespace ChillerAbsorption {
 
         DataIPShortCuts::cCurrentModuleObject = moduleObjectType;
 
-        state.dataChillerAbsorbers.numAbsorbers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerAbsorber->numAbsorbers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (state.dataChillerAbsorbers.numAbsorbers <= 0) {
+        if (state.dataChillerAbsorber->numAbsorbers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             // See if load distribution manager has already gotten the input
             ErrorsFound = true;
         }
 
-        if (allocated(state.dataChillerAbsorbers.absorptionChillers)) return;
+        if (allocated(state.dataChillerAbsorber->absorptionChillers)) return;
 
-        state.dataChillerAbsorbers.absorptionChillers.allocate(state.dataChillerAbsorbers.numAbsorbers);
+        state.dataChillerAbsorber->absorptionChillers.allocate(state.dataChillerAbsorber->numAbsorbers);
 
         // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
-        for (AbsorberNum = 1; AbsorberNum <= state.dataChillerAbsorbers.numAbsorbers; ++AbsorberNum) {
+        for (AbsorberNum = 1; AbsorberNum <= state.dataChillerAbsorber->numAbsorbers; ++AbsorberNum) {
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           AbsorberNum,
                                           DataIPShortCuts::cAlphaArgs,
@@ -268,7 +268,7 @@ namespace ChillerAbsorption {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            auto &thisChiller = state.dataChillerAbsorbers.absorptionChillers(AbsorberNum);
+            auto &thisChiller = state.dataChillerAbsorber->absorptionChillers(AbsorberNum);
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
             thisChiller.NomCap = DataIPShortCuts::rNumericArgs(1);
             if (thisChiller.NomCap == DataSizing::AutoSize) {

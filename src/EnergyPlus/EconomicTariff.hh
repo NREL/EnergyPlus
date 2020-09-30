@@ -59,7 +59,7 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct CostEstimateManagerData;
+struct EnergyPlusData;
 
 namespace EconomicTariff {
 
@@ -557,7 +557,7 @@ namespace EconomicTariff {
 
     // Functions
 
-    void UpdateUtilityBills(CostEstimateManagerData &dataCostEstimateManager);
+    void UpdateUtilityBills(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -581,13 +581,13 @@ namespace EconomicTariff {
 
     void GetInputEconomicsComputation(bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsCurrencyType(CostEstimateManagerData &dataCostEstimateManager, bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsCurrencyType(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
     void parseComputeLine(std::string const &lineOfCompute, int const fromTariff);
 
     void GetLastWord(std::string const &lineOfText, std::string::size_type &endOfScan, std::string &aWord);
 
-    void initializeMonetaryUnit(CostEstimateManagerData &dataCostEstimateManager);
+    void initializeMonetaryUnit(EnergyPlusData &state);
 
     int LookUpSeason(std::string const &nameOfSeason, std::string const &nameOfReferingObj);
 
@@ -669,14 +669,14 @@ namespace EconomicTariff {
 
     void LEEDtariffReporting();
 
-    void WriteTabularTariffReports(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteTabularTariffReports(EnergyPlusData &state);
 
     void showWarningsBasedOnTotal();
 
     void getMaxAndSum(int const varPointer, Real64 &sumResult, Real64 &maxResult);
 
     void
-    ReportEconomicVariable(CostEstimateManagerData &dataCostEstimateManager, std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString);
+    ReportEconomicVariable(EnergyPlusData &state, std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString);
 
     void selectTariff();
 

@@ -58,8 +58,9 @@
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 // Derived class for Kusuda-Achenbach model
 class KusudaGroundTempsModel : public BaseGroundTempsModel

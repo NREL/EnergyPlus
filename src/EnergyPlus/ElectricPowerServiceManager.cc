@@ -2211,7 +2211,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
     }
     case GeneratorType::windTurbine: {
         WindTurbine::SimWindTurbine(state, DataGlobalConstants::iGeneratorWindTurbine, name, generatorIndex, runFlag, myElecLoadRequest);
-        WindTurbine::GetWTGeneratorResults(*state.dataWindTurbine,
+        WindTurbine::GetWTGeneratorResults(state,
             DataGlobalConstants::iGeneratorWindTurbine, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd);
         electricPowerOutput = electProdRate;
         thermalPowerOutput = thermProdRate;
