@@ -392,22 +392,23 @@ namespace CurveManager {
 } // namespace CurveManager
 
     struct CurveManagerData : BaseGlobalStruct {
-        int NumCurves;
-        bool GetCurvesInputFlag;
+        int NumCurves = 0;
+        bool GetCurvesInputFlag = true;
+        bool CurveValueMyBeginTimeStepFlag = false;
+        bool FrictionFactorErrorHasOccurred = false;
         Array1D<CurveManager::PerformanceCurveData> PerfCurve;
         CurveManager::BtwxtManager btwxtManager;
         std::unordered_map<std::string, std::string> UniqueCurveNames;
-        bool CurveValueMyBeginTimeStepFlag;
-        bool FrictionFactorErrorHasOccurred;
-
-        CurveManagerData()
-            : NumCurves(0), GetCurvesInputFlag(true), CurveValueMyBeginTimeStepFlag(false), FrictionFactorErrorHasOccurred(false)
-        {
-        }
 
         void clear_state() override
         {
-            *this = CurveManagerData();
+            this->NumCurves = 0;
+            this->GetCurvesInputFlag = true;
+            this->CurveValueMyBeginTimeStepFlag = false;
+            this->FrictionFactorErrorHasOccurred = false;
+            PerfCurve.deallocate();
+            btwxtManager.clear();
+            UniqueCurveNames.clear();
         }
     };
 
