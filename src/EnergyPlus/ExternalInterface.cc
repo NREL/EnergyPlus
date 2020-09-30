@@ -1156,7 +1156,9 @@ namespace ExternalInterface {
                                               cNumericFieldNames);
                 // Get the FMU name
                 FMU(Loop).Name = cAlphaArgs(1);
-                CheckForActualFileName(ioFiles, cAlphaArgs(1), fileExist, tempFullFileName);
+                std::string contextString = cCurrentModuleObject + ", " + cAlphaFieldNames(1) + ": ";
+
+                CheckForActualFileName(ioFiles, cAlphaArgs(1), fileExist, tempFullFileName, contextString);
                 if (fileExist) {
                     pos = index(FMU(Loop).Name, pathChar, true); // look backwards
                     if (pos != std::string::npos) {
@@ -1171,8 +1173,6 @@ namespace ExternalInterface {
                     }
                     fullFileName(Loop) = tempFullFileName;
                 } else {
-                    ShowSevereError("ExternalInterface/InitExternalInterfaceFMUImport:");
-                    ShowContinueError("file not located = \"" + cAlphaArgs(1) + "\".");
                     ErrorsFound = true;
                 }
                 // Get fmu time out

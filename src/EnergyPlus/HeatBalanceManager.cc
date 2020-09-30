@@ -6262,14 +6262,11 @@ namespace HeatBalanceManager {
         ConstructionFound = false;
         // ErrorsFound = .FALSE.
         EOFonFile = false;
+        std::string contextString = "HeatBalanceManager::SearchWindow5DataFile: ";
 
-        CheckForActualFileName(ioFiles, DesiredFileName, exists, ioFiles.TempFullFileName.fileName);
+        CheckForActualFileName(ioFiles, DesiredFileName, exists, ioFiles.TempFullFileName.fileName, contextString);
         // INQUIRE(FILE=TRIM(DesiredFileName), EXIST=exists)
         if (!exists) {
-            ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Could not locate Window5 Data File, expecting it as file name=" +
-                            DesiredFileName);
-            ShowContinueError("Certain run environments require a full path to be included with the file name in the input field.");
-            ShowContinueError("Try again with putting full path and file name in the field.");
             ShowFatalError("Program terminates due to these conditions.");
         }
 
