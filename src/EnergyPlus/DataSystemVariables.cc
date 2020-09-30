@@ -256,100 +256,34 @@ namespace DataSystemVariables {
             firstTime = false;
         }
 
-
         FileFound = false;
         CheckedFileName = blank;
         InputFileName = originalInputFileName;
         makeNativePath(InputFileName);
 
-        if (FileSystem::fileExists(InputFileName)) {
-            FileFound = true;
-            CheckedFileName = InputFileName;
-            print(ioFiles.audit, "{}={}\n", "found (user input)", getAbsolutePath(CheckedFileName));
-            return;
-        } else {
-            pathsChecked->push_back(getAbsolutePath(InputFileName));
-            print(ioFiles.audit, "{}={}\n", "not found (user input)", getAbsolutePath(InputFileName));
-        }
+        std::array<std::string, 7> pathsToCheck = {
+            InputFileName,
+            DataStringGlobals::inputDirPathName + InputFileName,
+            envinputpath1 + InputFileName,
+            envinputpath2 + InputFileName,
+            envprogrampath + InputFileName,
+            CurrentWorkingFolder + InputFileName,
+            ProgramPath + InputFileName
+        };
 
-        // Look relative to input file path
-        if (FileSystem::fileExists(DataStringGlobals::inputDirPathName + InputFileName)) {
-            FileFound = true;
-            CheckedFileName = DataStringGlobals::inputDirPathName + InputFileName;
-            print(ioFiles.audit, "{}={}\n", "found (input file)", getAbsolutePath(CheckedFileName));
-            return;
-        } else {
-            if (std::find(pathsChecked->begin(), pathsChecked->end(), getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName)) == pathsChecked->end()){
-                pathsChecked->push_back(getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName));
+        for(auto path : pathsToCheck) {
+            if (FileSystem::fileExists(path)) {
+                FileFound = true;
+                CheckedFileName = path;
+                print(ioFiles.audit, "{}={}\n", "found (input file)", getAbsolutePath(CheckedFileName));
+                return;
+            } else {
+                if (std::find(pathsChecked->begin(), pathsChecked->end(), getAbsolutePath(path)) == pathsChecked->end()){
+                    pathsChecked->push_back(getAbsolutePath(path));
+                }
+                print(ioFiles.audit, "{}={}\n", "not found", getAbsolutePath(path));
             }
-            print(ioFiles.audit, "{}={}\n", "not found (input file)", getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName));
-        }
-
-        // Look relative to input path
-        if (FileSystem::fileExists(envinputpath1 + InputFileName)) {
-            FileFound = true;
-            CheckedFileName = envinputpath1 + InputFileName;
-            print(ioFiles.audit, "{}={}\n", "found (epin)", getAbsolutePath(CheckedFileName));
-            return;
-        } else {
-            if (std::find(pathsChecked->begin(), pathsChecked->end(), getAbsolutePath(envinputpath1 + InputFileName)) == pathsChecked->end()){
-                pathsChecked->push_back(getAbsolutePath(envinputpath1 + InputFileName));
-            }
-            print(ioFiles.audit, "{}={}\n", "not found (epin)", getAbsolutePath(envinputpath1 + InputFileName));
-        }
-
-        // Look relative to input path
-        if (FileSystem::fileExists(envinputpath2 + InputFileName)) {
-            FileFound = true;
-            CheckedFileName = envinputpath2 + InputFileName;
-            print(ioFiles.audit, "{}={}\n", "found (input_path)", getAbsolutePath(CheckedFileName));
-            return;
-        } else {
-            if (std::find(pathsChecked->begin(), pathsChecked->end(), getAbsolutePath(envinputpath2 + InputFileName)) == pathsChecked->end()){
-                pathsChecked->push_back(getAbsolutePath(envinputpath2 + InputFileName));
-            }
-            print(ioFiles.audit, "{}={}\n", "not found (input_path)", getAbsolutePath(envinputpath2 + InputFileName));
-        }
-
-        // Look relative to program path
-        if (FileSystem::fileExists(envprogrampath + InputFileName)) {
-            FileFound = true;
-            CheckedFileName = envprogrampath + InputFileName;
-            print(ioFiles.audit, "{}={}\n", "found (program_path)", getAbsolutePath(CheckedFileName));
-            return;
-        } else {
-            if (std::find(pathsChecked->begin(), pathsChecked->end(), getAbsolutePath(envprogrampath + InputFileName)) == pathsChecked->end()){
-                pathsChecked->push_back(getAbsolutePath(envprogrampath + InputFileName));
-            }
-            print(ioFiles.audit, "{}={}\n", "not found (program_path)", getAbsolutePath(envprogrampath + InputFileName));
-        }
-
-        if (!TestAllPaths) return;
-
-        // Look relative to current working folder
-        if (FileSystem::fileExists(CurrentWorkingFolder + InputFileName)) {
-            FileFound = true;
-            CheckedFileName = CurrentWorkingFolder + InputFileName;
-            print(ioFiles.audit, "{}={}\n", "found (CWF)", getAbsolutePath(CheckedFileName));
-            return;
-        } else {
-            if (std::find(pathsChecked->begin(), pathsChecked->end(), getAbsolutePath(CurrentWorkingFolder + InputFileName)) == pathsChecked->end()){
-                pathsChecked->push_back(getAbsolutePath(CurrentWorkingFolder + InputFileName));
-            }
-            print(ioFiles.audit, "{}={}\n", "not found (CWF)", getAbsolutePath(CurrentWorkingFolder + InputFileName));
-        }
-
-        // Look relative to program path
-        if (FileSystem::fileExists(ProgramPath + InputFileName)) {
-            FileFound = true;
-            CheckedFileName = ProgramPath + InputFileName;
-            print(ioFiles.audit, "{}={}\n", "found (program path - ini)", getAbsolutePath(CheckedFileName));
-            return;
-        } else {
-            if (std::find(pathsChecked->begin(), pathsChecked->end(), getAbsolutePath(ProgramPath + InputFileName)) == pathsChecked->end()){
-                pathsChecked->push_back(getAbsolutePath(ProgramPath + InputFileName));
-            }
-            print(ioFiles.audit, "{}={}\n", "not found (program path - ini)", getAbsolutePath(ProgramPath + InputFileName));
+            if ( path ==(CurrentWorkingFolder + InputFileName) && !TestAllPaths ) return;
         }
     }
 

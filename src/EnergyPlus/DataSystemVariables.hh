@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
     // Forward declarations
