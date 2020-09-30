@@ -265,7 +265,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     }
 
     HeatBalanceSurfaceManager::InitSolarHeatGains(state);
-    SolarShading::CalcInteriorSolarDistribution(*state.dataWindowEquivalentLayer);
+    SolarShading::CalcInteriorSolarDistribution(state);
 
     // Calculate heat balance (iteratively solve for surface temperatures)
     Real64 outSurfTempPrev = outSurfTemp;
@@ -468,7 +468,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     HeatBalanceManager::SetPreConstructionInputParameters();
     HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     HeatBalanceManager::GetBuildingData(state, ErrorsFound);
 
@@ -2497,7 +2497,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     HeatBalanceManager::GetWindowGlassSpectralData(FoundError);
     EXPECT_FALSE(FoundError);
-    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, FoundError);
+    HeatBalanceManager::GetMaterialData(state, state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -2692,7 +2692,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     HeatBalanceManager::SetPreConstructionInputParameters();
     HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     HeatBalanceManager::GetBuildingData(state, ErrorsFound);
 
@@ -2861,7 +2861,7 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_found = false;
-    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, errors_found);
+    HeatBalanceManager::GetMaterialData(state, state.files, errors_found);
     EXPECT_FALSE(errors_found);
     EXPECT_EQ(DataHeatBalance::ComplexShade(1).Name, "SHADE_14_LAYER");
     EXPECT_EQ(DataHeatBalance::ComplexShade(1).LayerType, 1);

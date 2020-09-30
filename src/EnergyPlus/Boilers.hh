@@ -184,11 +184,12 @@ namespace Boilers {
         int numBoilers = 0;
         bool getBoilerInputFlag = true;
         Array1D<Boilers::BoilerSpecs> Boiler;
+
         void clear_state() override
         {
-            numBoilers = 0;
-            getBoilerInputFlag = true;
-            Boiler.deallocate();
+            this->numBoilers = 0;
+            this->getBoilerInputFlag = true;
+            this->Boiler.deallocate();
         }
     };
 

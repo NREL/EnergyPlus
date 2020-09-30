@@ -62,8 +62,8 @@
 
 namespace EnergyPlus {
 
-    struct DataGlobal;
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace GroundTemperatureManager {
 

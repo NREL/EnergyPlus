@@ -57,7 +57,8 @@
 
 namespace EnergyPlus {
 
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace WaterManager {
 
@@ -113,29 +114,29 @@ namespace WaterManager {
 
 } // namespace WaterManager
 
-struct WaterManagerData : BaseGlobalStruct {
+    struct WaterManagerData : BaseGlobalStruct {
 
-    bool MyOneTimeFlag;
-    bool GetInputFlag; // First time, input is "gotten"
-    bool MyEnvrnFlag;   // flag for init once at start of environment
-    bool MyWarmupFlag; // flag for init after warmup complete
-    bool MyTankDemandCheckFlag;
+        bool MyOneTimeFlag;
+        bool GetInputFlag; // First time, input is "gotten"
+        bool MyEnvrnFlag;   // flag for init once at start of environment
+        bool MyWarmupFlag; // flag for init after warmup complete
+        bool MyTankDemandCheckFlag;
 
-    void clear_state() override
-    {
-        MyOneTimeFlag = true;
-        GetInputFlag = true;
-        MyEnvrnFlag = true;
-        MyWarmupFlag = false;
-        MyTankDemandCheckFlag = true;
-    }
+        void clear_state() override
+        {
+            this->MyOneTimeFlag = true;
+            this->GetInputFlag = true;
+            this->MyEnvrnFlag = true;
+            this->MyWarmupFlag = false;
+            this->MyTankDemandCheckFlag = true;
+        }
 
-    // Default Constructor
-    WaterManagerData()
-        :     MyOneTimeFlag(true), GetInputFlag(true), MyEnvrnFlag(true), MyWarmupFlag(false), MyTankDemandCheckFlag(true)
-    {
-    }
-};
+        // Default Constructor
+        WaterManagerData()
+            :     MyOneTimeFlag(true), GetInputFlag(true), MyEnvrnFlag(true), MyWarmupFlag(false), MyTankDemandCheckFlag(true)
+        {
+        }
+    };
 
 } // namespace EnergyPlus
 

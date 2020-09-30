@@ -56,7 +56,9 @@
 #include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 // note there are routines that lie outside of the Module at the end of this file
 

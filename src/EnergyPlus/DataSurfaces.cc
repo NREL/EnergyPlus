@@ -946,7 +946,7 @@ namespace DataSurfaces {
         return temperature;
     }
 
-    Real64 SurfaceData::getOutsideIR(WindowManagerData &dataWindowManager, const int t_SurfNum) const
+    Real64 SurfaceData::getOutsideIR(EnergyPlusData &state, const int t_SurfNum) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -962,8 +962,8 @@ namespace DataSurfaces {
                     QSteamBaseboardSurf(ExtBoundCond) + QElecBaseboardSurf(ExtBoundCond);
         } else {
             Real64 tout = getOutsideAirTemperature(t_SurfNum) + KelvinConv;
-            value = dataWindowManager.sigma * pow_4(tout);
-            value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * dataWindowManager.sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
+            value = state.dataWindowManager->sigma * pow_4(tout);
+            value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
                     ViewFactorGroundIR * value;
         }
         return value;

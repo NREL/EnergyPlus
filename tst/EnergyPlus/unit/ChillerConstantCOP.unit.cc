@@ -108,9 +108,9 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
         loopsidebranch.Comp.allocate(1);
     }
 
-    ConstCOPChillerSpecs::getInput(state.dataPlantChillers);
+    ConstCOPChillerSpecs::getInput(state);
 
-    auto &thisChiller = state.dataPlantChillers.ConstCOPChiller(1);
+    auto &thisChiller = state.dataPlantChillers->ConstCOPChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";

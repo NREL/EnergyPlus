@@ -226,7 +226,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     EnergyPlus::DataHeatBalSurface::TempSurfIn(2) = 23.0;
     EnergyPlus::DataHeatBalSurface::TempSurfIn(3) = 23.0;
 
-    HcUCSDDV(state, state.dataConvectionCoefficients, 1, 0.5);
+    HcUCSDDV(state, 1, 0.5);
 
     EXPECT_NEAR(1.889346, DVHcIn(1), 0.0001);
     EXPECT_NEAR(1.650496, DVHcIn(2), 0.0001);

@@ -52,9 +52,9 @@
 
 namespace EnergyPlus {
 
-// Forward Declarations
-struct PlantLocation;
+// Forward declarations
 struct EnergyPlusData;
+struct PlantLocation;
 
 class PlantComponent
 {

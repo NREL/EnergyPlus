@@ -748,7 +748,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
         DataGlobals::DayOfSim = 0;
-        state.dataGlobals.DayOfSimChr = "0";
+        state.dataGlobal->DayOfSimChr = "0";
 
         while ((DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 

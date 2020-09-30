@@ -393,8 +393,8 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
         DataGlobals::DoingSizing = true;
 
-        state.fans.LocalTurnFansOff = false;
-        state.fans.LocalTurnFansOn = true;
+        state.dataFans->LocalTurnFansOff = false;
+        state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
@@ -707,8 +707,8 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
         DataGlobals::DoingSizing = true;
 
-        state.fans.LocalTurnFansOff = false;
-        state.fans.LocalTurnFansOn = true;
+        state.dataFans->LocalTurnFansOff = false;
+        state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
@@ -1042,8 +1042,8 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
         DataGlobals::DoingSizing = true;
 
-        state.fans.LocalTurnFansOff = false;
-        state.fans.LocalTurnFansOn = true;
+        state.dataFans->LocalTurnFansOff = false;
+        state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
@@ -1395,8 +1395,8 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
         DataGlobals::DoingSizing = true;
 
-        state.fans.LocalTurnFansOff = false;
-        state.fans.LocalTurnFansOn = true;
+        state.dataFans->LocalTurnFansOff = false;
+        state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
@@ -1740,8 +1740,8 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
         DataGlobals::DoingSizing = true;
 
-        state.fans.LocalTurnFansOff = false;
-        state.fans.LocalTurnFansOn = true;
+        state.dataFans->LocalTurnFansOff = false;
+        state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
@@ -2074,8 +2074,8 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
         DataGlobals::DoingSizing = true;
 
-        state.fans.LocalTurnFansOff = false;
-        state.fans.LocalTurnFansOn = true;
+        state.dataFans->LocalTurnFansOff = false;
+        state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
@@ -2784,8 +2784,8 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
         DataGlobals::DoingSizing = true;
 
-        state.fans.LocalTurnFansOff = false;
-        state.fans.LocalTurnFansOn = true;
+        state.dataFans->LocalTurnFansOff = false;
+        state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
@@ -3197,8 +3197,8 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
         DataGlobals::DoingSizing = true;
 
-        state.fans.LocalTurnFansOff = false;
-        state.fans.LocalTurnFansOn = true;
+        state.dataFans->LocalTurnFansOff = false;
+        state.dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
         DataEnvironment::DayOfMonth = 21;
@@ -3554,8 +3554,8 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         DataGlobals::DoingSizing = true;
-        state.fans.LocalTurnFansOff = false;
-        state.fans.LocalTurnFansOn = true;
+        state.dataFans->LocalTurnFansOff = false;
+        state.dataFans->LocalTurnFansOn = true;
         // heating mode tests
         CoolingLoad = false;
         HeatingLoad = true;
@@ -3618,7 +3618,7 @@ namespace EnergyPlus {
         QLatOut = 0.0;
         InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
         Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.LowSpeedRatio * thisFanCoil.MaxAirMassFlow) + 
+        expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.LowSpeedRatio * thisFanCoil.MaxAirMassFlow) +
             thisFanCoil.SpeedRatio * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow);
         // expect fan speed 2 and fan and fancoil cycling b/n speed 1 and 2
         EXPECT_EQ(thisFanCoil.SpeedFanSel, 2);
@@ -3636,7 +3636,7 @@ namespace EnergyPlus {
         QLatOut = 0.0;
         InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
         Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow) + 
+        expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow) +
             thisFanCoil.SpeedRatio * (1.0 * thisFanCoil.MaxAirMassFlow);
         // expect fan speed 3 and fan and fancoil cycling b/n speed 2 and 3
         EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
@@ -3921,8 +3921,8 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         DataGlobals::DoingSizing = true;
-        state.fans.LocalTurnFansOff = false;
-        state.fans.LocalTurnFansOn = true;
+        state.dataFans->LocalTurnFansOff = false;
+        state.dataFans->LocalTurnFansOn = true;
         // heating mode tests
         CoolingLoad = false;
         HeatingLoad = true;
@@ -3985,7 +3985,7 @@ namespace EnergyPlus {
         QLatOut = 0.0;
         InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
         Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.LowSpeedRatio * thisFanCoil.MaxAirMassFlow) + 
+        expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.LowSpeedRatio * thisFanCoil.MaxAirMassFlow) +
             thisFanCoil.SpeedRatio * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow);
         // expect fan speed 2 and fan and fancoil cycling b/n speed 1 and 2
         EXPECT_EQ(thisFanCoil.SpeedFanSel, 2);
@@ -4003,7 +4003,7 @@ namespace EnergyPlus {
         QLatOut = 0.0;
         InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
         Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
-        expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow) + 
+        expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow) +
             thisFanCoil.SpeedRatio * (1.0 * thisFanCoil.MaxAirMassFlow);
         // expect fan speed 3 and fan and fancoil cycling b/n speed 2 and 3
         EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
@@ -4288,8 +4288,8 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         DataGlobals::DoingSizing = true;
-        state.fans.LocalTurnFansOff = false;
-        state.fans.LocalTurnFansOn = true;
+        state.dataFans->LocalTurnFansOff = false;
+        state.dataFans->LocalTurnFansOn = true;
         // heating mode tests
         CoolingLoad = false;
         HeatingLoad = true;
@@ -4350,11 +4350,11 @@ namespace EnergyPlus {
         int SolFlag = 0;
         Array1D<Real64> Par(5);
         Real64 CyclingRatio = 1.0;
-        // test 1: fan runs continuously at low speed and 
+        // test 1: fan runs continuously at low speed and
         // only heating coil cycles On/Off to meet load
         QZnReq = 2000.0;
         Par(1) = double(FanCoilNum);
-        Par(2) = 0.0; 
+        Par(2) = 0.0;
         if (FirstHVACIteration) Par(2) = 1.0;
         Par(3) = ZoneNum;
         Par(4) = QZnReq;
@@ -4371,7 +4371,7 @@ namespace EnergyPlus {
         zSysEDemand.RemainingOutputRequired = 1000.0;
         QZnReq = 1000.0;
         Par(1) = double(FanCoilNum);
-        Par(2) = 0.0; 
+        Par(2) = 0.0;
         if (FirstHVACIteration) Par(2) = 1.0;
         Par(3) = ZoneNum;
         Par(4) = QZnReq;
@@ -4470,7 +4470,7 @@ namespace EnergyPlus {
             "  75,                        !- Design Pressure Rise {Pa}",
             "  0.5,                       !- Maximum Air Flow Rate {m3/s}",
             "  0.9,                       !- Motor Efficiency",
-            "  1,                         !- Motor In Air Stream Fraction",		
+            "  1,                         !- Motor In Air Stream Fraction",
             "  FanCoilOAMixerOutletNode,  !- Air Inlet Node Name",
             "  FanCoilFanOutletNode;      !- Air Outlet Node Name",
 
@@ -4600,8 +4600,8 @@ namespace EnergyPlus {
         state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
         state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
         DataGlobals::DoingSizing = true;
-        state.fans.LocalTurnFansOff = false;
-        state.fans.LocalTurnFansOn = true;
+        state.dataFans->LocalTurnFansOff = false;
+        state.dataFans->LocalTurnFansOn = true;
         // heating mode tests
         CoolingLoad = false;
         HeatingLoad = true;
