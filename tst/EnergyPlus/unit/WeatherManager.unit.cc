@@ -1172,7 +1172,7 @@ TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
     bool ErrorsFound(false);
     ErrorsFound = false;
 
-    WeatherManager::WeatherFileExists = true;
+    state.dataWeatherManager->WeatherFileExists = true;
     state.files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
 
     DataGlobals::BeginSimFlag = true;
@@ -1184,74 +1184,74 @@ TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
     EnergyPlus::DataGlobals::BeginSimFlag = true;
     WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
 
-    WeatherManager::Envrn = 1;
+    state.dataWeatherManager->Envrn = 1;
 
     DataGlobals::NumOfTimeStepInHour = 4;
-    Environment.allocate(1);
-    Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
-    Environment(1).StartMonth = 1;
-    Environment(1).StartDay = 1;
+    state.dataWeatherManager->Environment.allocate(1);
+    state.dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    state.dataWeatherManager->Environment(1).StartMonth = 1;
+    state.dataWeatherManager->Environment(1).StartDay = 1;
 
-    Environment(1).UseWeatherFileHorizontalIR = false;
+    state.dataWeatherManager->Environment(1).UseWeatherFileHorizontalIR = false;
 
-    AllocateWeatherData();
+    AllocateWeatherData(state);
     OpenWeatherFile(state, ErrorsFound);
-    ReadWeatherForDay(state.files, 1, 1, true);
+    ReadWeatherForDay(state, state.files, 1, 1, true);
 
     // Test the feature of interpolating some weather inputs to calc sky temp
     Real64 expected_DryBulbTemp = -12.2;
-    EXPECT_NEAR(TomorrowOutDryBulbTemp(4, 1), expected_DryBulbTemp, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutDryBulbTemp(4, 1), expected_DryBulbTemp, 1e-6);
 
-    EXPECT_NEAR(TomorrowOutDryBulbTemp(1, 1), expected_DryBulbTemp, 1e-6);
-    EXPECT_NEAR(TomorrowOutDryBulbTemp(2, 1), expected_DryBulbTemp, 1e-6);
-    EXPECT_NEAR(TomorrowOutDryBulbTemp(3, 1), expected_DryBulbTemp, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutDryBulbTemp(1, 1), expected_DryBulbTemp, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutDryBulbTemp(2, 1), expected_DryBulbTemp, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutDryBulbTemp(3, 1), expected_DryBulbTemp, 1e-6);
 
     Real64 expected_DewPointTemp = -16.1;
-    EXPECT_NEAR(TomorrowOutDewPointTemp(4, 1), expected_DewPointTemp, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutDewPointTemp(4, 1), expected_DewPointTemp, 1e-6);
 
-    EXPECT_NEAR(TomorrowOutDewPointTemp(1, 1), expected_DewPointTemp, 1e-6);
-    EXPECT_NEAR(TomorrowOutDewPointTemp(2, 1), expected_DewPointTemp, 1e-6);
-    EXPECT_NEAR(TomorrowOutDewPointTemp(3, 1), expected_DewPointTemp, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutDewPointTemp(1, 1), expected_DewPointTemp, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutDewPointTemp(2, 1), expected_DewPointTemp, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutDewPointTemp(3, 1), expected_DewPointTemp, 1e-6);
 
     Real64 expected_BaroPress = 99500;
-    EXPECT_NEAR(TomorrowOutBaroPress(4, 1), expected_BaroPress, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutBaroPress(4, 1), expected_BaroPress, 1e-6);
 
-    EXPECT_NEAR(TomorrowOutBaroPress(1, 1), expected_BaroPress, 1e-6);
-    EXPECT_NEAR(TomorrowOutBaroPress(2, 1), expected_BaroPress, 1e-6);
-    EXPECT_NEAR(TomorrowOutBaroPress(3, 1), expected_BaroPress, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutBaroPress(1, 1), expected_BaroPress, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutBaroPress(2, 1), expected_BaroPress, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutBaroPress(3, 1), expected_BaroPress, 1e-6);
 
     Real64 expected_RelHum = 73;
-    EXPECT_NEAR(TomorrowOutRelHum(4, 1), expected_RelHum, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutRelHum(4, 1), expected_RelHum, 1e-6);
 
-    EXPECT_NEAR(TomorrowOutRelHum(1, 1), expected_RelHum, 1e-6);
-    EXPECT_NEAR(TomorrowOutRelHum(2, 1), expected_RelHum, 1e-6);
-    EXPECT_NEAR(TomorrowOutRelHum(3, 1), expected_RelHum, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutRelHum(1, 1), expected_RelHum, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutRelHum(2, 1), expected_RelHum, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOutRelHum(3, 1), expected_RelHum, 1e-6);
 
     Real64 expected_WindSpeed = 2.6;
-    EXPECT_NEAR(TomorrowWindSpeed(4, 1), expected_WindSpeed, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowWindSpeed(4, 1), expected_WindSpeed, 1e-6);
 
-    EXPECT_NEAR(TomorrowWindSpeed(1, 1), expected_WindSpeed, 1e-6);
-    EXPECT_NEAR(TomorrowWindSpeed(2, 1), expected_WindSpeed, 1e-6);
-    EXPECT_NEAR(TomorrowWindSpeed(3, 1), expected_WindSpeed, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowWindSpeed(1, 1), expected_WindSpeed, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowWindSpeed(2, 1), expected_WindSpeed, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowWindSpeed(3, 1), expected_WindSpeed, 1e-6);
 
     Real64 expected_WindDir = 270;
-    EXPECT_NEAR(TomorrowWindDir(4, 1), expected_WindDir, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowWindDir(4, 1), expected_WindDir, 1e-6);
 
-    EXPECT_NEAR(TomorrowWindDir(1, 1), expected_WindDir, 1e-6);
-    EXPECT_NEAR(TomorrowWindDir(2, 1), expected_WindDir, 1e-6);
-    EXPECT_NEAR(TomorrowWindDir(3, 1), expected_WindDir, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowWindDir(1, 1), expected_WindDir, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowWindDir(2, 1), expected_WindDir, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowWindDir(3, 1), expected_WindDir, 1e-6);
 
     Real64 expected_TotalSkyCover = 9;
-    EXPECT_NEAR(TomorrowTotalSkyCover(4, 1), expected_TotalSkyCover, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowTotalSkyCover(4, 1), expected_TotalSkyCover, 1e-6);
 
-    EXPECT_NEAR(TomorrowTotalSkyCover(1, 1), expected_TotalSkyCover, 1e-6);
-    EXPECT_NEAR(TomorrowTotalSkyCover(2, 1), expected_TotalSkyCover, 1e-6);
-    EXPECT_NEAR(TomorrowTotalSkyCover(3, 1), expected_TotalSkyCover, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowTotalSkyCover(1, 1), expected_TotalSkyCover, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowTotalSkyCover(2, 1), expected_TotalSkyCover, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowTotalSkyCover(3, 1), expected_TotalSkyCover, 1e-6);
 
     Real64 expected_OpaqueSkyCover = 9;
-    EXPECT_NEAR(TomorrowOpaqueSkyCover(4, 1), expected_OpaqueSkyCover, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOpaqueSkyCover(4, 1), expected_OpaqueSkyCover, 1e-6);
 
-    EXPECT_NEAR(TomorrowOpaqueSkyCover(1, 1), expected_OpaqueSkyCover, 1e-6);
-    EXPECT_NEAR(TomorrowOpaqueSkyCover(2, 1), expected_OpaqueSkyCover, 1e-6);
-    EXPECT_NEAR(TomorrowOpaqueSkyCover(3, 1), expected_OpaqueSkyCover, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOpaqueSkyCover(1, 1), expected_OpaqueSkyCover, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOpaqueSkyCover(2, 1), expected_OpaqueSkyCover, 1e-6);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowOpaqueSkyCover(3, 1), expected_OpaqueSkyCover, 1e-6);
 }
