@@ -286,7 +286,7 @@ namespace DataSystemVariables {
             }
             if ( path ==(CurrentWorkingFolder + InputFileName) && !TestAllPaths ) return;
         }
-        if (outputErrors) {
+        if (outputErrors && FileFound==false) {
             for(std::size_t i=0; i<pathsChecked->size(); i++){
                 ShowWarningMessage("Looking for File \"" + filePath + "\" : File not found in \"" + pathsChecked[i] +"\"");
             }
