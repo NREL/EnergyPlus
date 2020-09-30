@@ -5296,7 +5296,7 @@ namespace VariableSpeedCoils {
                 const double dVolume = dRatedHeatCapa * VarSpeedCoil(DXCoilNum).PeakStoreHours * 3600.0 /
                                        VarSpeedCoil(DXCoilNum).StoreDiff / 4186.0 / 1000.0;
                 WaterThermalTanks::
-                    SetTankVolume(VarSpeedCoil(DXCoilNum).StorageType, VarSpeedCoil(DXCoilNum).StorageName, dVolume);
+                    SetTankVolume(state, VarSpeedCoil(DXCoilNum).StorageType, VarSpeedCoil(DXCoilNum).StorageName, dVolume);
 
                 BaseSizer::reportSizerOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
                                    VarSpeedCoil(DXCoilNum).Name,

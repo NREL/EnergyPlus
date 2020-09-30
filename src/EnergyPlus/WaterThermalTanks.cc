@@ -11772,12 +11772,12 @@ namespace WaterThermalTanks {
         }
     }
 
-    void SetTankVolume(std::string sType, std::string sName, const Real64 dVolume)
+    void SetTankVolume(EnergyPlusData &state, std::string sType, std::string sName, const Real64 dVolume)
     {
-        const int IndexNum = UtilityRoutines::FindItemInList(sName, WaterThermalTank);
+        const int IndexNum = UtilityRoutines::FindItemInList(sName, state.dataWaterThermalTanks->WaterThermalTank);
 
         if (IndexNum != 0) {
-            WaterThermalTank(IndexNum).Volume = dVolume;
+            state.dataWaterThermalTanks->WaterThermalTank(IndexNum).Volume = dVolume;
         }
     }
 
