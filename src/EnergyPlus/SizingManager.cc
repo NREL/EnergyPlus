@@ -288,7 +288,7 @@ namespace SizingManager {
 
             ShowMessage("Beginning Zone Sizing Calculations");
 
-            ResetEnvironmentCounter();
+            ResetEnvironmentCounter(state);
             KickOffSizing = true;
             SetupZoneSizing(state, ErrorsFound); // Should only be done ONCE
             KickOffSizing = false;
@@ -305,7 +305,7 @@ namespace SizingManager {
 
                 Available = true;
 
-                ResetEnvironmentCounter();
+                ResetEnvironmentCounter(state);
                 CurOverallSimDay = 0;
                 NumSizingPeriodsPerformed = 0;
                 while (Available) { // loop over environments
@@ -323,7 +323,7 @@ namespace SizingManager {
                     ++NumSizingPeriodsPerformed;
 
                     BeginEnvrnFlag = true;
-                    if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                    if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                         // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can
                         // more easily converge fewer warmup days are allowed
                         DisplayString("Suppressing Initialization of New Environment Parameters");
@@ -335,7 +335,7 @@ namespace SizingManager {
                     EndMonthFlag = false;
                     WarmupFlag = true;
                     DayOfSim = 0;
-                    state.dataGlobals.DayOfSimChr = "0";
+                    state.dataGlobal->DayOfSimChr = "0";
                     CurEnvirNumSimDay = 1;
                     ++CurOverallSimDay;
                     while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
@@ -345,7 +345,7 @@ namespace SizingManager {
                             ++CurEnvirNumSimDay;
                         }
 
-                        state.dataGlobals.DayOfSimChr = fmt::to_string(DayOfSim);
+                        state.dataGlobal->DayOfSimChr = fmt::to_string(DayOfSim);
                         BeginDayFlag = true;
                         EndDayFlag = false;
 
@@ -362,7 +362,7 @@ namespace SizingManager {
                                 }
                             }
                             UpdateZoneSizing(state, BeginDay);
-                            UpdateFacilitySizing(state.dataGlobals, BeginDay);
+                            UpdateFacilitySizing(state, BeginDay);
                         }
 
                         for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -422,7 +422,7 @@ namespace SizingManager {
 
                         if (EndDayFlag) {
                             UpdateZoneSizing(state, EndDay);
-                            UpdateFacilitySizing(state.dataGlobals, EndDay);
+                            UpdateFacilitySizing(state, EndDay);
                         }
 
                         if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
@@ -437,8 +437,8 @@ namespace SizingManager {
                 } // ... End environment loop
 
                 if (NumSizingPeriodsPerformed > 0) {
-                    UpdateZoneSizing(state, state.dataGlobals.EndZoneSizingCalc);
-                    UpdateFacilitySizing(state.dataGlobals, state.dataGlobals.EndZoneSizingCalc);
+                    UpdateZoneSizing(state, state.dataGlobal->EndZoneSizingCalc);
+                    UpdateFacilitySizing(state, state.dataGlobal->EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
                     ShowSevereError(RoutineName + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
@@ -493,7 +493,7 @@ namespace SizingManager {
             ManageAirLoops(state, true, SimAir, SimZoneEquip);
             SizingManager::UpdateTermUnitFinalZoneSizing(); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
             SimAirServingZones::SizeSysOutdoorAir(state);        // System OA can be sized now that TermUnitFinalZoneSizing is initialized
-            ResetEnvironmentCounter();
+            ResetEnvironmentCounter(state);
             CurEnvirNumSimDay = 0;
             CurOverallSimDay = 0;
             NumSizingPeriodsPerformed = 0;
@@ -512,7 +512,7 @@ namespace SizingManager {
                 ++NumSizingPeriodsPerformed;
 
                 BeginEnvrnFlag = true;
-                if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                     // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                     // easily converge fewer warmup days are allowed
                     DisplayString("Suppressing Initialization of New Environment Parameters");
@@ -523,7 +523,7 @@ namespace SizingManager {
                 EndEnvrnFlag = false;
                 WarmupFlag = false;
                 DayOfSim = 0;
-                state.dataGlobals.DayOfSimChr = "0";
+                state.dataGlobal->DayOfSimChr = "0";
                 CurEnvirNumSimDay = 1;
                 ++CurOverallSimDay;
 
@@ -533,7 +533,7 @@ namespace SizingManager {
                     if (!WarmupFlag && DayOfSim > 1) {
                         ++CurEnvirNumSimDay;
                     }
-                    state.dataGlobals.DayOfSimChr = fmt::to_string(DayOfSim);
+                    state.dataGlobal->DayOfSimChr = fmt::to_string(DayOfSim);
                     BeginDayFlag = true;
                     EndDayFlag = false;
 
@@ -1966,9 +1966,9 @@ namespace SizingManager {
         // now march through all zone timesteps for entire year to find the concurrent max
         int DaysInYear(366);  // assume leap year
         int dayOfWeekType(1); // assume year starts on Sunday
-        WeatherManager::CalcSpecialDayTypes();
+        WeatherManager::CalcSpecialDayTypes(state);
         for (int DayLoop = 1; DayLoop <= DaysInYear; ++DayLoop) { // loop over all days in year
-            DataEnvironment::HolidayIndex = WeatherManager::SpecialDayTypes(DayLoop);
+            DataEnvironment::HolidayIndex = state.dataWeatherManager->SpecialDayTypes(DayLoop);
             DataEnvironment::DayOfYear_Schedule = DayLoop;
             DataEnvironment::DayOfWeek = dayOfWeekType;
             ++dayOfWeekType;
@@ -4788,7 +4788,7 @@ namespace SizingManager {
     }
 
     // Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
-    void UpdateFacilitySizing(DataGlobal const &dataGlobals, int const CallIndicator)
+    void UpdateFacilitySizing(EnergyPlusData &state, int const CallIndicator)
     {
         int NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 
@@ -4900,7 +4900,7 @@ namespace SizingManager {
                 }
             }
 
-        } else if (CallIndicator == dataGlobals.EndZoneSizingCalc) {
+        } else if (CallIndicator == state.dataGlobal->EndZoneSizingCalc) {
             for (int DDNum = 1; DDNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DDNum) {
                 if (CalcFacilitySizing(DDNum).DesCoolLoad > CalcFinalFacilitySizing.DesCoolLoad) {
                     CalcFinalFacilitySizing.DesCoolLoad = CalcFacilitySizing(DDNum).DesCoolLoad;

@@ -120,12 +120,12 @@ namespace ChillerReformulatedEIR {
     PlantComponent *ReformulatedEIRChillerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
-        if (state.dataChillerReformulatedEIR.GetInputREIR) {
+        if (state.dataChillerReformulatedEIR->GetInputREIR) {
             GetElecReformEIRChillerInput(state);
-            state.dataChillerReformulatedEIR.GetInputREIR = false;
+            state.dataChillerReformulatedEIR->GetInputREIR = false;
         }
         // Now look for this particular object in the list
-        for (auto &obj : state.dataChillerReformulatedEIR.ElecReformEIRChiller) {
+        for (auto &obj : state.dataChillerReformulatedEIR->ElecReformEIRChiller) {
             if (obj.Name == objectName) {
                 return &obj;
             }
@@ -231,18 +231,18 @@ namespace ChillerReformulatedEIR {
         bool ErrorsFound(false); // True when input errors found
 
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric:ReformulatedEIR";
-        state.dataChillerReformulatedEIR.NumElecReformEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerReformulatedEIR->NumElecReformEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (state.dataChillerReformulatedEIR.NumElecReformEIRChillers <= 0) {
+        if (state.dataChillerReformulatedEIR->NumElecReformEIRChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
         // ALLOCATE ARRAYS
-        state.dataChillerReformulatedEIR.ElecReformEIRChiller.allocate(state.dataChillerReformulatedEIR.NumElecReformEIRChillers);
+        state.dataChillerReformulatedEIR->ElecReformEIRChiller.allocate(state.dataChillerReformulatedEIR->NumElecReformEIRChillers);
 
         // Load arrays with reformulated electric EIR chiller data
-        for (int EIRChillerNum = 1; EIRChillerNum <= state.dataChillerReformulatedEIR.NumElecReformEIRChillers; ++EIRChillerNum) {
+        for (int EIRChillerNum = 1; EIRChillerNum <= state.dataChillerReformulatedEIR->NumElecReformEIRChillers; ++EIRChillerNum) {
             int NumAlphas; // Number of elements in the alpha array
             int NumNums;   // Number of elements in the numeric array
             int IOStat;    // IO Status when calling get input subroutine
@@ -263,7 +263,7 @@ namespace ChillerReformulatedEIR {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            auto &thisChiller = state.dataChillerReformulatedEIR.ElecReformEIRChiller(EIRChillerNum);
+            auto &thisChiller = state.dataChillerReformulatedEIR->ElecReformEIRChiller(EIRChillerNum);
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
             // Performance curves
             thisChiller.ChillerCapFTIndex = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(2));

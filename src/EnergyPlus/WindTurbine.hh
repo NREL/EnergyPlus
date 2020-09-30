@@ -57,9 +57,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    struct WindTurbineData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace WindTurbine {
 
@@ -146,22 +146,24 @@ namespace WindTurbine {
                         Real64 const WTLoad               // Electrical load on WT (not used)
     );
 
-    void GetWTGeneratorResults(WindTurbineData &dataWindTurbine, int const GeneratorType,  // Type of Generator
+    void GetWTGeneratorResults(EnergyPlusData &state,
+                               int const GeneratorType,  // Type of Generator
                                int const GeneratorIndex, // Generator number
                                Real64 &GeneratorPower,   // Electrical power
                                Real64 &GeneratorEnergy,  // Electrical energy
                                Real64 &ThermalPower,
                                Real64 &ThermalEnergy);
 
-    void GetWindTurbineInput(WindTurbineData &dataWindTurbine);
+    void GetWindTurbineInput(EnergyPlusData &state);
 
     void InitWindTurbine(EnergyPlusData &state, int const WindTurbineNum);
 
-    void CalcWindTurbine(WindTurbineData &dataWindTurbine, int const WindTurbineNum, // System is on
+    void CalcWindTurbine(EnergyPlusData &state,
+                         int const WindTurbineNum, // System is on
                          bool const RunFlag        // System is on
     );
 
-    void ReportWindTurbine(WindTurbineData &dataWindTurbine, int const WindTurbineNum);
+    void ReportWindTurbine(EnergyPlusData &state, int const WindTurbineNum);
 
     //*****************************************************************************************
 
@@ -176,10 +178,10 @@ namespace WindTurbine {
 
         void clear_state() override
         {
-            NumWindTurbines = 0;
-            GetInputFlag = true;
-            MyOneTimeFlag = true;
-            WindTurbineSys.deallocate();
+            this->NumWindTurbines = 0;
+            this->GetInputFlag = true;
+            this->MyOneTimeFlag = true;
+            this->WindTurbineSys.deallocate();
         }
 
         // Default Constructor

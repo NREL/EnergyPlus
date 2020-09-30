@@ -1340,7 +1340,7 @@ namespace Furnaces {
 
                     // Get the Heating Coil water Inlet or control Node number
                     errFlag = false;
-                    Furnace(FurnaceNum).CoilControlNode = GetCoilWaterInletNode("Coil:Heating:Water", HeatingCoilName, errFlag);
+                    Furnace(FurnaceNum).CoilControlNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", HeatingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
                         ErrorsFound = true;
@@ -1348,7 +1348,7 @@ namespace Furnaces {
 
                     // Get the Heating Coil hot water max volume flow rate
                     errFlag = false;
-                    Furnace(FurnaceNum).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate("Coil:Heating:Water", HeatingCoilName, errFlag);
+                    Furnace(FurnaceNum).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", HeatingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
                         ErrorsFound = true;
@@ -1890,7 +1890,7 @@ namespace Furnaces {
 
                     // Get the Heating Coil water Inlet or control Node number
                     errFlag = false;
-                    Furnace(FurnaceNum).CoilControlNode = GetCoilWaterInletNode("Coil:Heating:Water", HeatingCoilName, errFlag);
+                    Furnace(FurnaceNum).CoilControlNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", HeatingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
                         ErrorsFound = true;
@@ -1898,7 +1898,7 @@ namespace Furnaces {
 
                     // Get the Heating Coil hot water max volume flow rate
                     errFlag = false;
-                    Furnace(FurnaceNum).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate("Coil:Heating:Water", HeatingCoilName, errFlag);
+                    Furnace(FurnaceNum).MaxHeatCoilFluidFlow = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", HeatingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
                         ErrorsFound = true;
@@ -2320,7 +2320,7 @@ namespace Furnaces {
 
                         // Get the Heating Coil water Inlet or control Node number
                         errFlag = false;
-                        Furnace(FurnaceNum).SuppCoilControlNode = GetCoilWaterInletNode("Coil:Heating:Water", ReheatingCoilName, errFlag);
+                        Furnace(FurnaceNum).SuppCoilControlNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", ReheatingCoilName, errFlag);
                         if (errFlag) {
                             ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
                             ErrorsFound = true;
@@ -2328,7 +2328,7 @@ namespace Furnaces {
 
                         // Get the ReHeat Coil hot water max volume flow rate
                         errFlag = false;
-                        Furnace(FurnaceNum).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate("Coil:Heating:Water", ReheatingCoilName, errFlag);
+                        Furnace(FurnaceNum).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", ReheatingCoilName, errFlag);
                         if (errFlag) {
                             ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
                             ErrorsFound = true;
@@ -3267,7 +3267,7 @@ namespace Furnaces {
 
                     // Get the Heating Coil water Inlet or control Node number
                     errFlag = false;
-                    Furnace(FurnaceNum).SuppCoilControlNode = GetCoilWaterInletNode("Coil:Heating:Water", SuppHeatCoilName, errFlag);
+                    Furnace(FurnaceNum).SuppCoilControlNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", SuppHeatCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
                         ErrorsFound = true;
@@ -3275,7 +3275,7 @@ namespace Furnaces {
 
                     // Get the ReHeat Coil hot water max volume flow rate
                     errFlag = false;
-                    Furnace(FurnaceNum).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate("Coil:Heating:Water", SuppHeatCoilName, errFlag);
+                    Furnace(FurnaceNum).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", SuppHeatCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
                         ErrorsFound = true;
@@ -3886,7 +3886,7 @@ namespace Furnaces {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else {
-                    Furnace(FurnaceNum).HeatingCoilIndex = GetWtoAHPCoilIndex(HeatingCoilType, HeatingCoilName, errFlag);
+                    Furnace(FurnaceNum).HeatingCoilIndex = GetWtoAHPCoilIndex(state, HeatingCoilType, HeatingCoilName, errFlag);
                     HeatingCoilInletNode = GetWtoAHPCoilInletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
                     HeatingCoilOutletNode = GetWtoAHPCoilOutletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
                 }
@@ -3899,7 +3899,7 @@ namespace Furnaces {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else {
-                    Furnace(FurnaceNum).HeatingCoilIndex = GetWtoAHPSimpleCoilIndex(HeatingCoilType, HeatingCoilName, errFlag);
+                    Furnace(FurnaceNum).HeatingCoilIndex = GetWtoAHPSimpleCoilIndex(state, HeatingCoilType, HeatingCoilName, errFlag);
                     HeatingCoilInletNode = GetWtoAHPSimpleCoilInletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
                     HeatingCoilOutletNode = GetWtoAHPSimpleCoilOutletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
                 }
@@ -3932,7 +3932,7 @@ namespace Furnaces {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else {
-                    Furnace(FurnaceNum).CoolingCoilIndex = GetWtoAHPCoilIndex(CoolingCoilType, CoolingCoilName, errFlag);
+                    Furnace(FurnaceNum).CoolingCoilIndex = GetWtoAHPCoilIndex(state, CoolingCoilType, CoolingCoilName, errFlag);
                     CoolingCoilInletNode = GetWtoAHPCoilInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     CoolingCoilOutletNode = GetWtoAHPCoilOutletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                 }
@@ -3945,7 +3945,7 @@ namespace Furnaces {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else {
-                    Furnace(FurnaceNum).CoolingCoilIndex = GetWtoAHPSimpleCoilIndex(CoolingCoilType, CoolingCoilName, errFlag);
+                    Furnace(FurnaceNum).CoolingCoilIndex = GetWtoAHPSimpleCoilIndex(state, CoolingCoilType, CoolingCoilName, errFlag);
                     CoolingCoilInletNode = GetWtoAHPSimpleCoilInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     CoolingCoilOutletNode = GetWtoAHPSimpleCoilOutletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                 }
@@ -3987,7 +3987,7 @@ namespace Furnaces {
             // end get water flow mode info
             if (Alphas(8) == "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" && Alphas(10) == "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT") {
                 Furnace(FurnaceNum).WatertoAirHPType = WatertoAir_Simple;
-                SetSimpleWSHPData(
+                SetSimpleWSHPData(state,
                     Furnace(FurnaceNum).CoolingCoilIndex, ErrorsFound, Furnace(FurnaceNum).WaterCyclingMode, _, Furnace(FurnaceNum).HeatingCoilIndex);
             } else if (Alphas(8) == "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" &&
                        Alphas(10) == "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION") {
@@ -4067,7 +4067,7 @@ namespace Furnaces {
 
                     // Get the Heating Coil water Inlet or control Node number
                     errFlag = false;
-                    Furnace(FurnaceNum).SuppCoilControlNode = GetCoilWaterInletNode("Coil:Heating:Water", SuppHeatCoilName, errFlag);
+                    Furnace(FurnaceNum).SuppCoilControlNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", SuppHeatCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
                         ErrorsFound = true;
@@ -4075,7 +4075,7 @@ namespace Furnaces {
 
                     // Get the ReHeat Coil hot water max volume flow rate
                     errFlag = false;
-                    Furnace(FurnaceNum).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate("Coil:Heating:Water", SuppHeatCoilName, errFlag);
+                    Furnace(FurnaceNum).MaxSuppCoilFluidFlow = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", SuppHeatCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
                         ErrorsFound = true;
@@ -4377,8 +4377,8 @@ namespace Furnaces {
                 // simple HP model air flow rate input will not be used.
             } else if (Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple) {
                 errFlag = false;
-                Furnace(FurnaceNum).MaxHeatAirVolFlow = GetWtoAHPSimpleCoilAirFlow(HeatingCoilType, HeatingCoilName, errFlag);
-                Furnace(FurnaceNum).MaxCoolAirVolFlow = GetWtoAHPSimpleCoilAirFlow(CoolingCoilType, CoolingCoilName, errFlag);
+                Furnace(FurnaceNum).MaxHeatAirVolFlow = GetWtoAHPSimpleCoilAirFlow(state, HeatingCoilType, HeatingCoilName, errFlag);
+                Furnace(FurnaceNum).MaxCoolAirVolFlow = GetWtoAHPSimpleCoilAirFlow(state, CoolingCoilType, CoolingCoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
@@ -4984,7 +4984,7 @@ namespace Furnaces {
                         ShowFatalError("InitFurnace: Program terminated for previous conditions.");
                     }
                     Furnace(FurnaceNum).MaxHeatCoilFluidFlow =
-                        GetCoilMaxWaterFlowRate("Coil:Heating:Water", Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
+                        GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
                     if (Furnace(FurnaceNum).MaxHeatCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(PlantLoop(Furnace(FurnaceNum).LoopNum).FluidName,
                                                DataGlobals::HWInitConvTemp,
@@ -5055,7 +5055,7 @@ namespace Furnaces {
                         ShowFatalError("InitFurnace: Program terminated for previous conditions.");
                     }
                     Furnace(FurnaceNum).MaxSuppCoilFluidFlow =
-                        GetCoilMaxWaterFlowRate("Coil:Heating:Water", Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
+                        GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
                     if (Furnace(FurnaceNum).MaxSuppCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidName,
                                                DataGlobals::HWInitConvTemp,
@@ -5127,9 +5127,8 @@ namespace Furnaces {
                 if (Furnace(FurnaceNum).MaxHeatCoilFluidFlow == AutoSize) {
                     // If water coil max water flow rate is autosized, simulate once in order to mine max flow rate
                     if (Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWater) {
-                        SimulateWaterCoilComponents(
-                            state, Furnace(FurnaceNum).HeatingCoilName, FirstHVACIteration, Furnace(FurnaceNum).HeatingCoilIndex);
-                        CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
+                        SimulateWaterCoilComponents(state, Furnace(FurnaceNum).HeatingCoilName, FirstHVACIteration, Furnace(FurnaceNum).HeatingCoilIndex);
+                        CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(PlantLoop(Furnace(FurnaceNum).LoopNum).FluidName,
                                                    DataGlobals::HWInitConvTemp,
@@ -5168,9 +5167,8 @@ namespace Furnaces {
                 if (Furnace(FurnaceNum).MaxSuppCoilFluidFlow == AutoSize) {
                     if (Furnace(FurnaceNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                         // If water coil max water flow rate is autosized, simulate once in order to mine max flow rate
-                        SimulateWaterCoilComponents(
-                            state, Furnace(FurnaceNum).SuppHeatCoilName, FirstHVACIteration, Furnace(FurnaceNum).SuppHeatCoilIndex);
-                        CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
+                        SimulateWaterCoilComponents(state, Furnace(FurnaceNum).SuppHeatCoilName, FirstHVACIteration, Furnace(FurnaceNum).SuppHeatCoilIndex);
+                        CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidName,
                                                    DataGlobals::HWInitConvTemp,
@@ -6485,7 +6483,7 @@ namespace Furnaces {
         Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
         //  OnOffAirFlowRatio = 1.0
 
-        // Calculate the Cp Air of zone 
+        // Calculate the Cp Air of zone
         Real64 cpair = PsyCpAirFnW(Node(ControlZoneNode).HumRat);
 
         if (FirstHVACIteration) {
@@ -6801,7 +6799,7 @@ namespace Furnaces {
         int ControlZoneNode = Furnace(FurnaceNum).NodeNumOfControlledZone;
         OpMode = Furnace(FurnaceNum).OpMode;
         HumControl = false;
-        // Calculate the Cp Air of zone 
+        // Calculate the Cp Air of zone
         Real64 cpair = PsyCpAirFnW(Node(ControlZoneNode).HumRat);
         NoHeatOutput = 0.0;
         SystemSensibleLoad = 0.0;

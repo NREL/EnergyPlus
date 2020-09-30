@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -1347,7 +1348,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromMains;
             } else {
                 DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                SetupTankDemandComponent(DXCoil(DXCoilNum).Name,
+                SetupTankDemandComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).EvapWaterSupplyName,
                                          ErrorsFound,
@@ -1361,7 +1362,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).CondensateCollectMode = CondensateDiscarded;
             } else {
                 DXCoil(DXCoilNum).CondensateCollectMode = CondensateToTank;
-                SetupTankSupplyComponent(DXCoil(DXCoilNum).Name,
+                SetupTankSupplyComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).CondensateCollectName,
                                          ErrorsFound,
@@ -1920,7 +1921,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromMains;
             } else {
                 DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                SetupTankDemandComponent(DXCoil(DXCoilNum).Name,
+                SetupTankDemandComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).EvapWaterSupplyName,
                                          ErrorsFound,
@@ -1934,7 +1935,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).CondensateCollectMode = CondensateDiscarded;
             } else {
                 DXCoil(DXCoilNum).CondensateCollectMode = CondensateToTank;
-                SetupTankSupplyComponent(DXCoil(DXCoilNum).Name,
+                SetupTankSupplyComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).CondensateCollectName,
                                          ErrorsFound,
@@ -2794,7 +2795,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromMains;
             } else {
                 DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                SetupTankDemandComponent(DXCoil(DXCoilNum).Name,
+                SetupTankDemandComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).EvapWaterSupplyName,
                                          ErrorsFound,
@@ -2808,7 +2809,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).CondensateCollectMode = CondensateDiscarded;
             } else {
                 DXCoil(DXCoilNum).CondensateCollectMode = CondensateToTank;
-                SetupTankSupplyComponent(DXCoil(DXCoilNum).Name,
+                SetupTankSupplyComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).CondensateCollectName,
                                          ErrorsFound,
@@ -3821,7 +3822,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromMains;
             } else {
                 DXCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                SetupTankDemandComponent(DXCoil(DXCoilNum).Name,
+                SetupTankDemandComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).EvapWaterSupplyName,
                                          ErrorsFound,
@@ -3835,7 +3836,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).CondensateCollectMode = CondensateDiscarded;
             } else {
                 DXCoil(DXCoilNum).CondensateCollectMode = CondensateToTank;
-                SetupTankSupplyComponent(DXCoil(DXCoilNum).Name,
+                SetupTankSupplyComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).CondensateCollectName,
                                          ErrorsFound,
@@ -4804,7 +4805,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).CondensateCollectMode = CondensateDiscarded;
             } else {
                 DXCoil(DXCoilNum).CondensateCollectMode = CondensateToTank;
-                SetupTankSupplyComponent(DXCoil(DXCoilNum).Name,
+                SetupTankSupplyComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).CondensateCollectName,
                                          ErrorsFound,
@@ -5017,7 +5018,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).CondensateCollectMode = CondensateDiscarded;
             } else {
                 DXCoil(DXCoilNum).CondensateCollectMode = CondensateToTank;
-                SetupTankSupplyComponent(DXCoil(DXCoilNum).Name,
+                SetupTankSupplyComponent(state, DXCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          DXCoil(DXCoilNum).CondensateCollectName,
                                          ErrorsFound,

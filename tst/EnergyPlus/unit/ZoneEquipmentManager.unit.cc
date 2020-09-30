@@ -956,14 +956,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
     auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
-    state.dataZoneEquipmentManager.PrioritySimOrder.allocate(3);
+    state.dataZoneEquipmentManager->PrioritySimOrder.allocate(3);
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration, true);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -976,7 +976,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
 
     // Sequential Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration, true);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -996,7 +996,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     energy.OutputRequiredToHeatingSP = -1000.0;
     energy.OutputRequiredToCoolingSP = -2000.0;
     firstHVACIteration = true;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration, true);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -1009,7 +1009,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
 
     // Sequential Test 4 - Cooling, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration, true);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -1137,8 +1137,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired / 3.0);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired / 3.0);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired / 3.0);
@@ -1155,8 +1155,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
 
     // UniformLoad Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired / 3.0);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired / 3.0);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired / 3.0);
@@ -1176,8 +1176,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     energy.OutputRequiredToHeatingSP = -1000.0;
     energy.OutputRequiredToCoolingSP = -2000.0;
     firstHVACIteration = true;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired / 2.0);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired / 2.0);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1194,8 +1194,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
 
     // UniformLoad Test 4 - Cooling, FirstHVACIteration = false, only 2 pieces of equipment are active for cooling
     firstHVACIteration = false;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired / 2.0);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired / 2.0);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1340,8 +1340,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
@@ -1353,7 +1353,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 2;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 3;
@@ -1376,8 +1376,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
 
     // UniformPLR Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.HeatingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), thisZEqList.HeatingCapacity(2) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(3), thisZEqList.HeatingCapacity(3) * plr);
@@ -1398,8 +1398,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     energy.OutputRequiredToHeatingSP = -1000.0;
     energy.OutputRequiredToCoolingSP = -2000.0;
     firstHVACIteration = true;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
@@ -1412,8 +1412,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
 
     // UniformPLR Test 4 - Cooling, FirstHVACIteration = false, only 2 pieces of equipment are active for cooling
     firstHVACIteration = false;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.CoolingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), thisZEqList.CoolingCapacity(2) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1558,8 +1558,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
@@ -1571,7 +1571,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 2;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 3;
@@ -1598,8 +1598,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     plr = energy.TotalOutputRequired / thisZEqList.HeatingCapacity(1);
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.HeatingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), 0.0);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1620,8 +1620,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     plr = energy.TotalOutputRequired / (thisZEqList.HeatingCapacity(1) + thisZEqList.HeatingCapacity(2));
     energy.OutputRequiredToHeatingSP = 2100.0;
     energy.OutputRequiredToCoolingSP = 2200.0;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.HeatingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), thisZEqList.HeatingCapacity(2) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1642,8 +1642,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     plr = energy.TotalOutputRequired / (thisZEqList.HeatingCapacity(1) + thisZEqList.HeatingCapacity(2) + thisZEqList.HeatingCapacity(3));
     energy.OutputRequiredToHeatingSP = 3600.0;
     energy.OutputRequiredToCoolingSP = 3800.0;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.HeatingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), thisZEqList.HeatingCapacity(2) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(3), thisZEqList.HeatingCapacity(3) * plr);
@@ -1664,8 +1664,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     energy.OutputRequiredToHeatingSP = -1000.0;
     energy.OutputRequiredToCoolingSP = -2000.0;
     firstHVACIteration = true;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
     EXPECT_EQ(energy.SequencedOutputRequired(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
@@ -1682,8 +1682,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     plr = energy.TotalOutputRequired / (thisZEqList.CoolingCapacity(1));
     energy.OutputRequiredToHeatingSP = -1000.0;
     energy.OutputRequiredToCoolingSP = -1200.0;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.CoolingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), 0.0);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1704,8 +1704,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     plr = energy.TotalOutputRequired / (thisZEqList.CoolingCapacity(1) + thisZEqList.CoolingCapacity(2));
     energy.OutputRequiredToHeatingSP = -1500.0;
     energy.OutputRequiredToCoolingSP = -1600.0;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.CoolingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), thisZEqList.CoolingCapacity(2) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1727,8 +1727,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     plr = energy.TotalOutputRequired / (thisZEqList.CoolingCapacity(1) + thisZEqList.CoolingCapacity(2));
     energy.OutputRequiredToHeatingSP = -2500.0;
     energy.OutputRequiredToCoolingSP = -2600.0;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     EXPECT_EQ(energy.SequencedOutputRequired(1), thisZEqList.CoolingCapacity(1) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(2), thisZEqList.CoolingCapacity(2) * plr);
     EXPECT_EQ(energy.SequencedOutputRequired(3), 0.0);
@@ -1865,14 +1865,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(NumEquip);
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
     auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
-    state.dataZoneEquipmentManager.PrioritySimOrder.allocate(NumEquip);
+    state.dataZoneEquipmentManager->PrioritySimOrder.allocate(NumEquip);
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration, true);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -1888,7 +1888,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 2;
@@ -1912,14 +1912,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Sequential Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
-    SetZoneEquipSimOrder(state.dataZoneEquipmentManager, ZoneNum, ZoneNum);
-    DistributeSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration);
+    SetZoneEquipSimOrder(state, ZoneNum, ZoneNum);
+    DistributeSystemOutputRequired(state, ZoneNum, firstHVACIteration);
     // Equipment 1 provides 100W of heating
     Real64 SysOutputProvided = 100.0;
     Real64 LatOutputProvided = 0.0;
     int EquipNum = 1;
-    UpdateSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, SysOutputProvided, LatOutputProvided, EquipNum);
+    UpdateSystemOutputRequired(state, ZoneNum, SysOutputProvided, LatOutputProvided, EquipNum);
 
     // Expect next sequenced load #2 to be Total minus SysOutputProvided here, others unchanged
     Real64 expectedHeatLoad = energy.OutputRequiredToHeatingSP - SysOutputProvided;
@@ -2091,7 +2091,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(NumEquip);
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
     auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
-    state.dataZoneEquipmentManager.PrioritySimOrder.allocate(NumEquip);
+    state.dataZoneEquipmentManager->PrioritySimOrder.allocate(NumEquip);
 
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("AIR TERMINAL 1 ADU COOLING FRACTION")).CurrentValue = 0.3;
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("AIR TERMINAL 1 ADU HEATING FRACTION")).CurrentValue = 0.4;
@@ -2103,7 +2103,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     energy.OutputRequiredToHeatingSP = 1000.0;
     energy.OutputRequiredToCoolingSP = 2000.0;
     bool firstHVACIteration = true;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration, true);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration, true);
     EXPECT_EQ(energy.SequencedOutputRequired(1), energy.TotalOutputRequired * 0.4);
     EXPECT_EQ(energy.SequencedOutputRequired(2), energy.TotalOutputRequired);
     EXPECT_EQ(energy.SequencedOutputRequired(3), energy.TotalOutputRequired);
@@ -2119,7 +2119,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 2;
@@ -2143,12 +2143,12 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Sequential Test 2 - Heating, FirstHVACIteration = false
     firstHVACIteration = false;
-    InitSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, firstHVACIteration, true);
+    InitSystemOutputRequired(state, ZoneNum, firstHVACIteration, true);
     // Equipment 1 provides 100W of heating
     Real64 SysOutputProvided = 100.0;
     Real64 LatOutputProvided = 0.0;
     int EquipNum = 1;
-    UpdateSystemOutputRequired(state.dataZoneEquipmentManager, ZoneNum, SysOutputProvided, LatOutputProvided, EquipNum);
+    UpdateSystemOutputRequired(state, ZoneNum, SysOutputProvided, LatOutputProvided, EquipNum);
 
     // Expect next sequenced load fractions to be applied here on the first and second equipments
     Real64 expectedHeatLoad = energy.UnadjRemainingOutputReqToHeatSP * 0.6;
@@ -2171,7 +2171,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
     DataEnvironment::TotRunDesPersDays = 3;
     int totDesDays = DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays;
     DataGlobals::NumOfZones = 5;
-    state.dataZoneEquipmentManager.NumOfTimeStepInDay = 4;
+    state.dataZoneEquipmentManager->NumOfTimeStepInDay = 4;
     DataSizing::ZoneSizing.allocate(totDesDays, DataGlobals::NumOfZones);
     DataSizing::CalcZoneSizing.allocate(totDesDays, DataGlobals::NumOfZones);
     DataSizing::FinalZoneSizing.allocate(DataGlobals::NumOfZones);
@@ -2316,36 +2316,36 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
             thisSizingType.DOASSupHumRat = 1.0;
             thisSizingType.DOASTotCoolLoad = 1.0;
 
-            thisSizingType.DOASHeatLoadSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.DOASCoolLoadSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.DOASHeatAddSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.DOASLatAddSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.DOASSupMassFlowSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.DOASSupTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.DOASSupHumRatSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.DOASTotCoolLoadSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.HeatFlowSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.HeatFlowSeqNoOA.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.CoolFlowSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.CoolFlowSeqNoOA.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.HeatLoadSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.CoolLoadSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.HeatZoneTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.HeatOutTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.HeatZoneRetTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.HeatTstatTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.DesHeatSetPtSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.CoolZoneTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.CoolOutTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.CoolZoneRetTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.CoolTstatTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.DesCoolSetPtSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.HeatZoneHumRatSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.CoolZoneHumRatSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.HeatOutHumRatSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType.CoolOutHumRatSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType.DOASHeatLoadSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.DOASCoolLoadSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.DOASHeatAddSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.DOASLatAddSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.DOASSupMassFlowSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.DOASSupTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.DOASSupHumRatSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.DOASTotCoolLoadSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.HeatFlowSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.HeatFlowSeqNoOA.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.CoolFlowSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.CoolFlowSeqNoOA.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.HeatLoadSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.CoolLoadSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.HeatZoneTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.HeatOutTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.HeatZoneRetTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.HeatTstatTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.DesHeatSetPtSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.CoolZoneTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.CoolOutTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.CoolZoneRetTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.CoolTstatTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.DesCoolSetPtSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.HeatZoneHumRatSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.CoolZoneHumRatSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.HeatOutHumRatSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType.CoolOutHumRatSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
 
-            for (int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager.NumOfTimeStepInDay; ++TimeStepIndex) {
+            for (int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
                 thisSizingType.DOASHeatLoadSeq(TimeStepIndex) = 1.0;
                 thisSizingType.DOASCoolLoadSeq(TimeStepIndex) = 1.0;
                 thisSizingType.DOASHeatAddSeq(TimeStepIndex) = 1.0;
@@ -2513,36 +2513,36 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
             thisSizingType2.DOASSupHumRat = 1.0;
             thisSizingType2.DOASTotCoolLoad = 1.0;
 
-            thisSizingType2.DOASHeatLoadSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.DOASCoolLoadSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.DOASHeatAddSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.DOASLatAddSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.DOASSupMassFlowSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.DOASSupTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.DOASSupHumRatSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.DOASTotCoolLoadSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.HeatFlowSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.HeatFlowSeqNoOA.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.CoolFlowSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.CoolFlowSeqNoOA.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.HeatLoadSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.CoolLoadSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.HeatZoneTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.HeatOutTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.HeatZoneRetTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.HeatTstatTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.DesHeatSetPtSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.CoolZoneTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.CoolOutTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.CoolZoneRetTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.CoolTstatTempSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.DesCoolSetPtSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.HeatZoneHumRatSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.CoolZoneHumRatSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.HeatOutHumRatSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
-            thisSizingType2.CoolOutHumRatSeq.allocate(state.dataZoneEquipmentManager.NumOfTimeStepInDay);
+            thisSizingType2.DOASHeatLoadSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.DOASCoolLoadSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.DOASHeatAddSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.DOASLatAddSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.DOASSupMassFlowSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.DOASSupTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.DOASSupHumRatSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.DOASTotCoolLoadSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.HeatFlowSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.HeatFlowSeqNoOA.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.CoolFlowSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.CoolFlowSeqNoOA.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.HeatLoadSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.CoolLoadSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.HeatZoneTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.HeatOutTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.HeatZoneRetTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.HeatTstatTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.DesHeatSetPtSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.CoolZoneTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.CoolOutTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.CoolZoneRetTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.CoolTstatTempSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.DesCoolSetPtSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.HeatZoneHumRatSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.CoolZoneHumRatSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.HeatOutHumRatSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            thisSizingType2.CoolOutHumRatSeq.allocate(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
 
-            for ( int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager.NumOfTimeStepInDay; ++TimeStepIndex ) {
+            for ( int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex ) {
                 thisSizingType2.DOASHeatLoadSeq(TimeStepIndex) = 1.0;
                 thisSizingType2.DOASCoolLoadSeq(TimeStepIndex) = 1.0;
                 thisSizingType2.DOASHeatAddSeq(TimeStepIndex) = 1.0;
@@ -2716,7 +2716,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
             EXPECT_EQ(thisSizingType.DOASSupHumRat, 0.0);
             EXPECT_EQ(thisSizingType.DOASTotCoolLoad, 0.0);
 
-            for ( int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager.NumOfTimeStepInDay; ++TimeStepIndex ) {
+            for ( int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex ) {
                 EXPECT_EQ(thisSizingType.DOASHeatLoadSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType.DOASCoolLoadSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType.DOASHeatAddSeq(TimeStepIndex), 0.0);
@@ -2884,7 +2884,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
             EXPECT_EQ(thisSizingType2.DOASSupHumRat, 0.0);
             EXPECT_EQ(thisSizingType2.DOASTotCoolLoad, 0.0);
 
-            for ( int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager.NumOfTimeStepInDay; ++TimeStepIndex ) {
+            for ( int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex ) {
                 EXPECT_EQ(thisSizingType2.DOASHeatLoadSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType2.DOASCoolLoadSeq(TimeStepIndex), 0.0);
                 EXPECT_EQ(thisSizingType2.DOASHeatAddSeq(TimeStepIndex), 0.0);

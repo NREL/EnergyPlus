@@ -1185,7 +1185,7 @@ namespace SimAirServingZones {
                             for (int OACompNum = 1; OACompNum <= state.dataAirLoop->OutsideAirSys(OANum).NumComponents; ++OACompNum) {
                                 CompType = state.dataAirLoop->OutsideAirSys(OANum).ComponentType(OACompNum);
                                 if (UtilityRoutines::SameString(CompType, "Coil:Heating:Water")) {
-                                    WaterCoilNodeNum = GetCoilWaterInletNode(CompType, state.dataAirLoop->OutsideAirSys(OANum).ComponentName(OACompNum), ErrorsFound);
+                                    WaterCoilNodeNum = GetCoilWaterInletNode(state, CompType, state.dataAirLoop->OutsideAirSys(OANum).ComponentName(OACompNum), ErrorsFound);
                                     if (WaterCoilNodeNum == ActuatorNodeNum) nonLockoutCoilFound = true;
                                     break;
                                 }
@@ -1205,7 +1205,7 @@ namespace SimAirServingZones {
                                     if (UtilityRoutines::SameString(CompType, "Coil:Cooling:Water:DetailedGeometry") ||
                                         UtilityRoutines::SameString(CompType, "Coil:Heating:Water") ||
                                         UtilityRoutines::SameString(CompType, "Coil:Cooling:Water")) {
-                                        WaterCoilNodeNum = GetCoilWaterInletNode(
+                                        WaterCoilNodeNum = GetCoilWaterInletNode(state,
                                             CompType, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, ErrorsFound);
                                         if (WaterCoilNodeNum == ActuatorNodeNum) {
                                             nonLockoutCoilFound = true;
@@ -1417,7 +1417,7 @@ namespace SimAirServingZones {
                 for (CompNum = 1; CompNum <= PrimaryAirSystem(AirSysNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                     CompType_Num = PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
                     if (CompType_Num == WaterCoil_DetailedCool || CompType_Num == WaterCoil_SimpleHeat || CompType_Num == WaterCoil_Cooling) {
-                        WaterCoilNodeNum = GetCoilWaterInletNode(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf,
+                        WaterCoilNodeNum = GetCoilWaterInletNode(state, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                  PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
                                                                  ErrorsFound);
                         CheckCoilWaterInletNode(state, WaterCoilNodeNum, NodeNotFound);
@@ -1439,8 +1439,7 @@ namespace SimAirServingZones {
             for (int OACompNum = 1; OACompNum <= NumInList; ++OACompNum) {
                 CompType_Num = GetOACompTypeNum(state, OASysNum, OACompNum);
                 if (CompType_Num == WaterCoil_DetailedCool || CompType_Num == WaterCoil_SimpleHeat || CompType_Num == WaterCoil_Cooling) {
-                    WaterCoilNodeNum =
-                        GetCoilWaterInletNode(GetOACompType(state, OASysNum, OACompNum), GetOACompName(state, OASysNum, OACompNum), ErrorsFound);
+                    WaterCoilNodeNum = GetCoilWaterInletNode(state, GetOACompType(state, OASysNum, OACompNum), GetOACompName(state, OASysNum, OACompNum), ErrorsFound);
                     CheckCoilWaterInletNode(state, WaterCoilNodeNum, NodeNotFound);
                     if (NodeNotFound) {
                         ErrorsFound = true;
@@ -1629,7 +1628,7 @@ namespace SimAirServingZones {
                         NumAllSupAirPathNodes += SplitterCond(SplitterNum).NumOutletNodes + 1;
                     } else if (UtilityRoutines::SameString(SupplyAirPath(SupAirPath).ComponentType(CompNum), "AirLoopHVAC:SupplyPlenum")) {
                         PlenumNum = UtilityRoutines::FindItemInList(SupplyAirPath(SupAirPath).ComponentName(CompNum),
-                                                                    state.dataZonePlenum.ZoneSupPlenCond,
+                                                                    state.dataZonePlenum->ZoneSupPlenCond,
                                                                     &ZoneSupplyPlenumConditions::ZonePlenumName);
                         if (PlenumNum == 0) {
                             ShowSevereError("AirLoopHVAC:SupplyPlenum not found=" + SupplyAirPath(SupAirPath).ComponentName(CompNum));
@@ -1637,7 +1636,7 @@ namespace SimAirServingZones {
                             ErrorsFound = true;
                         }
                         SupplyAirPath(SupAirPath).PlenumIndex(CompNum) = PlenumNum;
-                        NumAllSupAirPathNodes += state.dataZonePlenum.ZoneSupPlenCond(PlenumNum).NumOutletNodes + 1;
+                        NumAllSupAirPathNodes += state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).NumOutletNodes + 1;
                     }
                 }
                 SupNode.allocate(NumAllSupAirPathNodes);
@@ -1663,15 +1662,15 @@ namespace SimAirServingZones {
                         }
                     } else if (PlenumNum > 0) {
                         ++SupAirPathNodeNum;
-                        SupNode(SupAirPathNodeNum) = state.dataZonePlenum.ZoneSupPlenCond(PlenumNum).InletNode;
+                        SupNode(SupAirPathNodeNum) = state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).InletNode;
                         if (CompNum == 1) {
                             SupNodeType(SupAirPathNodeNum) = PathInlet;
                         } else {
                             SupNodeType(SupAirPathNodeNum) = CompInlet;
                         }
-                        for (PlenumOutNum = 1; PlenumOutNum <= state.dataZonePlenum.ZoneSupPlenCond(PlenumNum).NumOutletNodes; ++PlenumOutNum) {
+                        for (PlenumOutNum = 1; PlenumOutNum <= state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).NumOutletNodes; ++PlenumOutNum) {
                             ++SupAirPathNodeNum;
-                            SupNode(SupAirPathNodeNum) = state.dataZonePlenum.ZoneSupPlenCond(PlenumNum).OutletNode(PlenumOutNum);
+                            SupNode(SupAirPathNodeNum) = state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).OutletNode(PlenumOutNum);
                             SupNodeType(SupAirPathNodeNum) = 0;
                         }
                     }
@@ -2033,7 +2032,7 @@ namespace SimAirServingZones {
             }
 
             // now connect return nodes with airloops and corresponding inlet nodes
-            ConnectReturnNodes(state, state.dataZonePlenum);
+            ConnectReturnNodes(state);
 
             InitAirLoopsOneTimeFlag = false;
 
@@ -2386,7 +2385,7 @@ namespace SimAirServingZones {
         } // end loop over primary air systems
     }
 
-    void ConnectReturnNodes(EnergyPlusData &state, ZonePlenumData &dataZonePlenum)
+    void ConnectReturnNodes(EnergyPlusData &state)
     {
         // This initializes ZoneEquipConfig.ReturnNodeInletNum and ReturnNodeAirLoopNum
         // Search all return paths to match return nodes with the airloop they are connected to and find the corresponding zone inlet node (same zone,
@@ -2429,7 +2428,7 @@ namespace SimAirServingZones {
                                 }
                             }
                         } else if (compType == ZoneReturnPlenum_Type) {
-                            auto const &thisPlenum(dataZonePlenum.ZoneRetPlenCond(thisRetPath.ComponentIndex(compNum)));
+                            auto const &thisPlenum(state.dataZonePlenum->ZoneRetPlenCond(thisRetPath.ComponentIndex(compNum)));
                             for (int inNode = 1; inNode <= thisPlenum.NumInletNodes; ++inNode) {
                                 if (thisReturnNode == thisPlenum.InletNode(inNode)) {
                                     thisZoneEquip.ReturnNodeAirLoopNum(zoneOutNum) = airLoopNum; // set the return node airloop num
@@ -4233,7 +4232,7 @@ namespace SimAirServingZones {
                     CoilName = CompName;
                     CoilType = CompType;
                 }
-                SetCoilDesFlow(CoilType, CoilName, PrimaryAirSystem(AirLoopNum).DesignVolFlowRate, ErrorsFound);
+                SetCoilDesFlow(state, CoilType, CoilName, PrimaryAirSystem(AirLoopNum).DesignVolFlowRate, ErrorsFound);
             }
         } // End of component loop
         if (ErrorsFound) {

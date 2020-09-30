@@ -57,9 +57,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    struct WindowACData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace WindowAC {
 
@@ -176,7 +176,7 @@ namespace WindowAC {
                             Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     );
 
-    void ReportWindowAC(WindowACData &dataWindowAC, int const WindACNum); // number of the current AC unit being simulated
+    void ReportWindowAC(EnergyPlusData &state, int const WindACNum); // number of the current AC unit being simulated
 
     void CalcWindowACOutput(EnergyPlusData &state, int const WindACNum,           // Unit index in fan coil array
                             bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
@@ -231,21 +231,21 @@ namespace WindowAC {
 
         void clear_state() override
         {
-            NumWindAC = 0;
-            NumWindACCyc = 0;
-            GetWindowACInputFlag = true;
-            CoolingLoad = false;
-            MyOneTimeFlag = true;
-            ZoneEquipmentListChecked = false;
-            MySizeFlag.deallocate();
-            CheckEquipName.deallocate();
-            WindAC.deallocate();
-            WindACNumericFields.deallocate();
+            this->NumWindAC = 0;
+            this->NumWindACCyc = 0;
+            this->GetWindowACInputFlag = true;
+            this->CoolingLoad = false;
+            this->MyOneTimeFlag = true;
+            this->ZoneEquipmentListChecked = false;
+            this->MySizeFlag.deallocate();
+            this->CheckEquipName.deallocate();
+            this->WindAC.deallocate();
+            this->WindACNumericFields.deallocate();
         }
 
         // Default Constructor
         WindowACData()
-            : WindowAC_UnitType(1), cWindowAC_UnitType("ZoneHVAC:WindowAirConditioner"), 
+            : WindowAC_UnitType(1), cWindowAC_UnitType("ZoneHVAC:WindowAirConditioner"),
               cWindowAC_UnitTypes(1, cWindowAC_UnitType), On(1), Off(0), MyOneTimeFlag(true),
               ZoneEquipmentListChecked(false), NumWindAC(0), NumWindACCyc(0), GetWindowACInputFlag(true),
               CoolingLoad(false)

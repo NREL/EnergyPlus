@@ -355,7 +355,7 @@ namespace Humidifiers {
             if (lAlphaBlanks(5)) {
                 Humidifier(HumNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                SetupTankDemandComponent(
+                SetupTankDemandComponent(state, 
                     Alphas(1), CurrentModuleObject, Alphas(5), ErrorsFound, Humidifier(HumNum).WaterTankID, Humidifier(HumNum).WaterTankDemandARRID);
                 Humidifier(HumNum).SuppliedByWaterSystem = true;
             }
@@ -421,9 +421,9 @@ namespace Humidifiers {
             if (lAlphaBlanks(6)) {
                 Humidifier(HumNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                SetupTankDemandComponent(
+                SetupTankDemandComponent(state, 
                     Alphas(1), CurrentModuleObject, Alphas(6), ErrorsFound, Humidifier(HumNum).WaterTankID, Humidifier(HumNum).WaterTankDemandARRID);
-                SetupTankSupplyComponent(
+                SetupTankSupplyComponent(state,
                     Alphas(1), CurrentModuleObject, Alphas(6), ErrorsFound, Humidifier(HumNum).WaterTankID, Humidifier(HumNum).TankSupplyID);
                 Humidifier(HumNum).SuppliedByWaterSystem = true;
             }

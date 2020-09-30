@@ -58,9 +58,6 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct CostEstimateManagerData;
-
 namespace EconomicLifeCycleCost {
 
     // Using/Aliasing
@@ -286,7 +283,7 @@ namespace EconomicLifeCycleCost {
 
     void GetInputForLifeCycleCost();
 
-    void ComputeLifeCycleCostAndReport(CostEstimateManagerData &dataCostEstimateManager);
+    void ComputeLifeCycleCostAndReport(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -316,7 +313,7 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ExpressAsCashFlows(CostEstimateManagerData &dataCostEstimateManager);
+    void ExpressAsCashFlows(EnergyPlusData &state);
 
     void ComputeEscalatedEnergyCosts();
 
@@ -332,7 +329,7 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularLifeCycleCostReport(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteTabularLifeCycleCostReport(EnergyPlusData &state);
 
     void clear_state();
 
