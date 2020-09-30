@@ -288,10 +288,10 @@ namespace DataSystemVariables {
         }
         if (outputErrors && FileFound==false) {
             for(std::size_t i=0; i<pathsChecked->size(); i++){
-                ShowWarningMessage("Looking for File \"" + filePath + "\" : File not found in \"" + pathsChecked[i] +"\"");
+                ShowWarningMessage("Looking for File \"" + originalInputFileName + "\" : File not found in \"" + (*pathsChecked)[i] +"\"");
             }
-            ShowSevereError("File \"" + filePath + "\" : File not found.");
-            ShowFatalError("File \"" + filePath + "\" : File not found.");
+            ShowSevereError("File \"" + originalInputFileName + "\" : File not found.");
+            ShowFatalError("File \"" + originalInputFileName + "\" : File not found.");
         }
     }
 
