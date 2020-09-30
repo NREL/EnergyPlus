@@ -2029,14 +2029,7 @@ namespace CurveManager {
         bool fileFound;
         std::string fullPath;
         std::vector<std::string> pathsChecked;
-        DataSystemVariables::CheckForActualFileName(ioFiles, path, fileFound, fullPath, &pathsChecked);
-        if (!fileFound) {
-            for(std::size_t i=0; i<pathsChecked.size(); i++){
-                ShowWarningMessage("Looking for File \"" + filePath + "\" : File not found in \"" + pathsChecked[i] +"\"");
-            }
-            ShowSevereError("File \"" + filePath + "\" : File not found.");
-            ShowFatalError("File \"" + filePath + "\" : File not found.");
-        }
+        DataSystemVariables::CheckForActualFileName(ioFiles, path, fileFound, fullPath, &pathsChecked, true);
         std::ifstream file(fullPath);
         std::string line("");
         numRows = 0;

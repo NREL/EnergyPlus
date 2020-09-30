@@ -68,7 +68,6 @@ TEST_F(EnergyPlusFixture, File_Not_Found_ERR_Output)
     DataSystemVariables::CheckForActualFileName(ioFiles, filePath, fileFound, fullPath, &pathsChecked);
     ASSERT_EQ(pathsChecked.size(), 1);
     ASSERT_FALSE(fileFound);
-    // "/Users/tony-scimone/Projects/EnergyPlus/builds/debug/Products/NonExistentFile.txt"
     std::string expectedError = FileSystem::getAbsolutePath(DataStringGlobals::inputDirPathName + filePath);
     std::string pathCheckedError = pathsChecked[0];
     ASSERT_EQ(expectedError, pathCheckedError);

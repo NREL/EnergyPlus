@@ -203,7 +203,8 @@ namespace DataSystemVariables {
                                 std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
                                 std::string &CheckedFileName,             // Blank if not found.
-                                std::vector<std::string> *pathsChecked
+                                std::vector<std::string> *pathsChecked,
+                                bool outputErrors
     )
     {
 
@@ -284,6 +285,13 @@ namespace DataSystemVariables {
                 print(ioFiles.audit, "{}={}\n", "not found", getAbsolutePath(path));
             }
             if ( path ==(CurrentWorkingFolder + InputFileName) && !TestAllPaths ) return;
+        }
+        if (outputErrors) {
+            for(std::size_t i=0; i<pathsChecked->size(); i++){
+                ShowWarningMessage("Looking for File \"" + filePath + "\" : File not found in \"" + pathsChecked[i] +"\"");
+            }
+            ShowSevereError("File \"" + filePath + "\" : File not found.");
+            ShowFatalError("File \"" + filePath + "\" : File not found.");
         }
     }
 
