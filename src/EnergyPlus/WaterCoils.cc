@@ -269,7 +269,7 @@ namespace WaterCoils {
             CalcSimpleHeatingCoil(state, CoilNum, OpMode, PartLoadFrac, state.dataWaterCoils->SimCalc);
             if (present(QActual)) QActual = state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate;
         }
-        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_DehumLiqDesiccant) {
+        else if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_DehumLiqDesiccant) {
             CalcLiqDesiccantDehumCoil(state, CoilNum, FirstHVACIteration, state.dataWaterCoils->SimCalc, OpMode, PartLoadFrac);
             if (present(QActual)) QActual = state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate;
         }
