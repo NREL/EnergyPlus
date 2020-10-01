@@ -45,6 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+//C++ Headers
+#include <utility>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
 #include <ObjexxFCL/gio.hh>
@@ -246,37 +249,38 @@ namespace DataSystemVariables {
         InputFileName = originalInputFileName;
         makeNativePath(InputFileName);
 
-        std::vector<std::string> pathsChecked;
+        std::vector<std::pair<std::string, std::string>> pathsChecked;
 
-        const std::vector<std::string> pathsToCheck = {
-            InputFileName,
-            DataStringGlobals::inputDirPathName + InputFileName,
-            envinputpath1 + InputFileName,
-            envinputpath2 + InputFileName,
-            envprogrampath + InputFileName,
-            CurrentWorkingFolder + InputFileName,
-            ProgramPath + InputFileName
+        const std::vector<std::pair<std::string, std::string>> pathsToCheck = {
+            {InputFileName, "InputFileName"},
+            {DataStringGlobals::inputDirPathName + InputFileName, "inputDirPathName"},
+            {envinputpath1 + InputFileName, "envinputpath1"},
+            {envinputpath2 + InputFileName, "envinputpath2"},
+            {envprogrampath + InputFileName, "envprogrampath"},
+            {CurrentWorkingFolder + InputFileName, "CurrentWorkingFolder"},
+            {ProgramPath + InputFileName, "ProgramPath"}
         };
 
         std::size_t numPathsToNotTest = (TestAllPaths) ? pathsToCheck.size()-2 : pathsToCheck.size();
 
         for(std::size_t i = 0; i < numPathsToNotTest; i++) {
-            if (FileSystem::fileExists(pathsToCheck[i])) {
+            if (FileSystem::fileExists(pathsToCheck[i].first)) {
                 FileFound = true;
-                CheckedFileName = pathsToCheck[i];
-                print(ioFiles.audit, "{}={}\n", "found (input file)", getAbsolutePath(CheckedFileName));
+                CheckedFileName = pathsToCheck[i].first;
+                print(ioFiles.audit, "{}={}\n", "found (" + pathsToCheck[i].second +")", getAbsolutePath(CheckedFileName));
                 return;
             } else {
-                if (std::find(pathsChecked.begin(), pathsChecked.end(), getAbsolutePath(pathsToCheck[i])) == pathsChecked.end()){
-                    pathsChecked.push_back(getAbsolutePath(pathsToCheck[i]));
+                std::pair <std::string,std::string> currentPath(getAbsolutePath(pathsToCheck[i].first), pathsToCheck[i].second);
+                if (std::find(pathsChecked.begin(), pathsChecked.end(), currentPath) == pathsChecked.end()){
+                    pathsChecked.push_back(currentPath);
                 }
-                print(ioFiles.audit, "{}={}\n", "not found", getAbsolutePath(pathsToCheck[i]));
+                print(ioFiles.audit, "{}={}\n", "not found (" + pathsToCheck[i].second +")\"", getAbsolutePath(pathsToCheck[i].first));
             }
         }
         if (!FileFound) {
-            ShowSevereError(contextString+ "File \"" + originalInputFileName + "\" not found. Paths searched:");
+            ShowSevereError(contextString+ "\"" + originalInputFileName + "\" not found. Paths searched:");
             for(auto path: pathsChecked){
-                ShowContinueError("   \"" + path +"\"");
+                ShowContinueError("   (" + path.second +")\"" + path.first +"\"");
             }
         }
     }
