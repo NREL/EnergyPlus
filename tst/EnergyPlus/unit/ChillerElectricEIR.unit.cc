@@ -67,8 +67,8 @@ using namespace EnergyPlus::DataLoopNode;
 
 TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
 {
-    state.dataChillerElectricEIR.ElectricEIRChiller.allocate(1);
-    auto &thisEIR = state.dataChillerElectricEIR.ElectricEIRChiller(1);
+    state.dataChillerElectricEIR->ElectricEIRChiller.allocate(1);
+    auto &thisEIR = state.dataChillerElectricEIR->ElectricEIRChiller(1);
 
     thisEIR.EvapInletNodeNum = 1;
     thisEIR.EvapOutletNodeNum = 2;
@@ -92,8 +92,8 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
 TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
 {
     // unit test for autosizing heat recovery in Chiller:Electric:EIR
-    state.dataChillerElectricEIR.ElectricEIRChiller.allocate(1);
-    auto &thisEIR = state.dataChillerElectricEIR.ElectricEIRChiller(1);
+    state.dataChillerElectricEIR->ElectricEIRChiller.allocate(1);
+    auto &thisEIR = state.dataChillerElectricEIR->ElectricEIRChiller(1);
 
     thisEIR.SizFac = 1.0;
     thisEIR.DesignHeatRecVolFlowRateWasAutoSized = true;
@@ -206,7 +206,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     }
 
     GetElectricEIRChillerInput(state);
-    auto &thisEIR = state.dataChillerElectricEIR.ElectricEIRChiller(1);
+    auto &thisEIR = state.dataChillerElectricEIR->ElectricEIRChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";
@@ -313,7 +313,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     }
 
     GetElectricEIRChillerInput(state);
-    auto &thisEIRChiller = state.dataChillerElectricEIR.ElectricEIRChiller(1);
+    auto &thisEIRChiller = state.dataChillerElectricEIR->ElectricEIRChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";

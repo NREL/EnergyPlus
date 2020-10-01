@@ -56,12 +56,10 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward Declarations
-    struct EnergyPlusData;
-    struct WindowComplexManagerData;
-    struct WindowEquivalentLayerData;
-    struct WindowManagerData;
-    class IOFiles;
+
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
 namespace HeatBalanceManager {
 
@@ -163,7 +161,7 @@ namespace HeatBalanceManager {
 
     void GetSiteAtmosphereData(EnergyPlus::IOFiles &ioFiles, bool &ErrorsFound);
 
-    void GetMaterialData(EnergyPlusData &state, WindowEquivalentLayerData &dataWindowEquivalentLayer, IOFiles &ioFiles, bool &ErrorsFound); // set to true if errors found in input
+    void GetMaterialData(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound); // set to true if errors found in input
 
     void GetWindowGlassSpectralData(bool &ErrorsFound); // set to true if errors found in input
 

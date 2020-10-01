@@ -5023,7 +5023,7 @@ namespace SystemAvailabilityManager {
 
                     if (HybridVentSysAvailMgrData(SysAvailNum).ANControlTypeSchedPtr > 0 && HybridVentModeOA) {
                         ManageAirflowNetworkBalance(state, true);
-                        ACH = GetZoneInfilAirChangeRate(ZoneNum);
+                        ACH = GetZoneInfilAirChangeRate(state, ZoneNum);
                     }
                     if (ACH > OASetPoint) {
                         HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = HybridVentCtrl_Open;

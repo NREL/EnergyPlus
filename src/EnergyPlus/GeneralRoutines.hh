@@ -57,16 +57,12 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    class IOFiles;
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct ZonePlenumData;
-    class OutputFiles;
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
-    void GeneralRoutines_clear_state();
+void GeneralRoutines_clear_state();
 
 void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,               // the component Name
                        std::string const &CompType,               // Type of component
@@ -119,7 +115,6 @@ void ValidateComponent(std::string const &CompType,    // Component Type (e.g. C
 );
 
 void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
-                                  ConvectionCoefficientsData &dataConvectionCoefficients,
                                   IOFiles &ioFiles,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,        // Area available for venting the gap [m2]

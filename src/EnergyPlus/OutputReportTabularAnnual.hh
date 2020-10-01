@@ -67,9 +67,6 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct CostEstimateManagerData;
-
 namespace OutputReportTabularAnnual {
 
     // these functions are not in the class and act as an interface between procedural code and object oriented
@@ -82,7 +79,7 @@ namespace OutputReportTabularAnnual {
 
     void ResetAnnualGathering();
 
-    void WriteAnnualTables(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteAnnualTables(EnergyPlusData &state);
 
     void AddAnnualTableOfContents(std::ostream &);
 
@@ -121,7 +118,7 @@ namespace OutputReportTabularAnnual {
 
         void resetGathering();
 
-        void writeTable(CostEstimateManagerData &dataCostEstimateManager, int unitsStyle);
+        void writeTable(EnergyPlusData &state, int unitsStyle);
 
         void addTableOfContents(std::ostream &);
 

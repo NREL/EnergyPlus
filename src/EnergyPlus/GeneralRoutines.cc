@@ -989,7 +989,6 @@ void ValidateComponent(std::string const &CompType,    // Component Type (e.g. C
 }
 
 void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
-                                  ConvectionCoefficientsData &dataConvectionCoefficients,
                                   IOFiles &ioFiles,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,         // Area available for venting the gap [m2]
@@ -1152,7 +1151,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         // Initializations for this surface
         HMovInsul = 0.0;
         LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
-        InitExteriorConvectionCoeff(state, dataConvectionCoefficients, ioFiles,
+        InitExteriorConvectionCoeff(state, ioFiles,
             SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = Surface(SurfPtr).Construction;
         AbsThermSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;

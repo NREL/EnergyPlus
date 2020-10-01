@@ -224,11 +224,12 @@ namespace ChillerAbsorption {
         int numAbsorbers = 0;
         bool getInput = true;
         Array1D<ChillerAbsorption::BLASTAbsorberSpecs> absorptionChillers;
+
         void clear_state() override
         {
-            numAbsorbers = 0;
-            getInput = true;
-            absorptionChillers.deallocate();
+            this->numAbsorbers = 0;
+            this->getInput = true;
+            this->absorptionChillers.deallocate();
         }
     };
 

@@ -49,6 +49,7 @@
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <string>
 

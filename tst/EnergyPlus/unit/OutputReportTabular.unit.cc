@@ -3735,10 +3735,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     MixedAir::OAController.allocate(2);
     MixedAir::OAController(1).RelTotalLossRate = 1.0;
     MixedAir::OAController(2).RelTotalLossRate = 1.0;
-    state.dataCondenserLoopTowers.NumSimpleTowers = 1;
-    state.dataCondenserLoopTowers.towers.allocate(1);
-    state.dataCondenserLoopTowers.towers(1).Qactual = 1.0;
-    state.dataCondenserLoopTowers.towers(1).FanEnergy = 50.0;
+    state.dataCondenserLoopTowers->NumSimpleTowers = 1;
+    state.dataCondenserLoopTowers->towers.allocate(1);
+    state.dataCondenserLoopTowers->towers(1).Qactual = 1.0;
+    state.dataCondenserLoopTowers->towers(1).FanEnergy = 50.0;
 
     Real64 TimeStepSysSec = DataHVACGlobals::TimeStepSys * SecInHour;
     Real64 reliefEnergy = 2.0 * TimeStepSysSec;
@@ -6128,7 +6128,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     Zone(1).ExteriorTotalGroundSurfArea = 0;
     Zone(1).ExtWindowArea = Surface(3).GrossArea + Surface(4).GrossArea;
 
-    WriteVeriSumTable(state.dataCostEstimateManager, state.files);
+    WriteVeriSumTable(state, state.files);
 
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
@@ -6285,7 +6285,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     Zone(3).ExteriorTotalGroundSurfArea = 0;
     Zone(3).ExtWindowArea = 0.0;
 
-    WriteVeriSumTable(state.dataCostEstimateManager, state.files);
+    WriteVeriSumTable(state, state.files);
 
     /***********************************************************************************************************************************************
      *                                                              Check Yes/No flag                                                              *
@@ -6908,7 +6908,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
     SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = 0;    // set to zero to indicate no design day chosen
 
-    WriteLoadComponentSummaryTables(state, state.dataCostEstimateManager);
+    WriteLoadComponentSummaryTables(state);
 
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
@@ -7060,7 +7060,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
 
     AllocateLoadComponentArrays();
-    WriteLoadComponentSummaryTables(state, state.dataCostEstimateManager);
+    WriteLoadComponentSummaryTables(state);
 
     // TableName, ReportName, value
     std::vector<std::tuple<std::string, std::string, std::string>> results_strings({
@@ -7276,7 +7276,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     EXPECT_EQ("EquipmentSummary", OutputReportPredefined::reportName(5).name);
     OutputReportPredefined::reportName(5).show = true;
 
-    WritePredefinedTables(state.dataCostEstimateManager);
+    WritePredefinedTables(state);
     EnergyPlus::sqlite->sqliteCommit();
     EnergyPlus::sqlite->initializeIndexes();
 
@@ -7329,7 +7329,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
     EXPECT_EQ("CoilSizingDetails", OutputReportPredefined::reportName(7).name);
     OutputReportPredefined::reportName(7).show = true;
 
-    WritePredefinedTables(state.dataCostEstimateManager);
+    WritePredefinedTables(state);
     EnergyPlus::sqlite->sqliteCommit();
     EnergyPlus::sqlite->initializeIndexes();
 
@@ -7436,7 +7436,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     OutputReportPredefined::SetPredefinedTables();
 
     // Call the routine that fills up the table we care about
-    HeatBalanceSurfaceManager::GatherForPredefinedReport(*state.dataWindowManager);
+    HeatBalanceSurfaceManager::GatherForPredefinedReport(state);
 
 
     // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
@@ -7558,7 +7558,7 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
     OutputReportPredefined::SetPredefinedTables();
 
     // Call the routine that fills up the table we care about
-    HeatBalanceSurfaceManager::GatherForPredefinedReport(*state.dataWindowManager);
+    HeatBalanceSurfaceManager::GatherForPredefinedReport(state);
 
 
     // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
@@ -7766,7 +7766,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     OutputReportTabular::unitsStyle = OutputReportTabular::unitsStyleJtoKWH;
 
     // Now we're ready to call the actual function of interest
-    OutputReportTabular::WriteSourceEnergyEndUseSummary(state.dataCostEstimateManager);
+    OutputReportTabular::WriteSourceEnergyEndUseSummary(state);
 
 
     // Before we test the reporting itself, we check that DetermineBuildingFloorArea (called from WriteSourceEnergyEndUseSummary)
@@ -7943,8 +7943,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     // AnotherEndUseSubCat
     EXPECT_NEAR(extLitUse * 3, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1), 1.);
 
-    OutputReportTabular::WriteBEPSTable(state.dataCostEstimateManager, *state.dataZoneTempPredictorCorrector, state.files);
-    OutputReportTabular::WriteDemandEndUseSummary(state.dataCostEstimateManager);
+    OutputReportTabular::WriteBEPSTable(state, state.files);
+    OutputReportTabular::WriteDemandEndUseSummary(state);
 
     EnergyPlus::sqlite->sqliteCommit();
 

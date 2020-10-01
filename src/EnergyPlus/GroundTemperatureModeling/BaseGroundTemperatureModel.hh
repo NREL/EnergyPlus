@@ -56,7 +56,9 @@
 
 namespace EnergyPlus {
 
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
+
 // Base class
 class BaseGroundTempsModel
 {
