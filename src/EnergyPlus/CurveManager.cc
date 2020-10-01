@@ -1734,6 +1734,8 @@ namespace CurveManager {
                                 state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, tableFile);
                             }
 
+                            if (ErrorsFound) continue; // Unable to load file so continue on to see if there are other errors before fataling
+
                             axis = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
 
                             // remove NANs
@@ -1926,6 +1928,8 @@ namespace CurveManager {
                         ErrorsFound |= tableFile.load(IOFiles::getSingleton(), filePath);
                         state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, tableFile);
                     }
+
+                    if (ErrorsFound) continue; // Unable to load file so continue on to see if there are other errors before fataling
 
                     lookupValues = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
 

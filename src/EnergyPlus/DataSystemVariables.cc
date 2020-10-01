@@ -252,13 +252,14 @@ namespace DataSystemVariables {
         std::vector<std::pair<std::string, std::string>> pathsChecked;
 
         const std::vector<std::pair<std::string, std::string>> pathsToCheck = {
-            {InputFileName, "InputFileName"},
-            {DataStringGlobals::inputDirPathName + InputFileName, "inputDirPathName"},
-            {envinputpath1 + InputFileName, "envinputpath1"},
-            {envinputpath2 + InputFileName, "envinputpath2"},
-            {envprogrampath + InputFileName, "envprogrampath"},
-            {CurrentWorkingFolder + InputFileName, "CurrentWorkingFolder"},
-            {ProgramPath + InputFileName, "ProgramPath"}
+            {InputFileName, "Current Working Directory"},
+            {DataStringGlobals::inputDirPathName + InputFileName, "IDF Directory"},
+            {DataStringGlobals::exeDirectory + InputFileName, "EnergyPlus Executable Directory"},
+            {envinputpath1 + InputFileName, "\"epin\" Environment Variable"},
+            {envinputpath2 + InputFileName, "\"input_path\" Environment Variable"},
+            {envprogrampath + InputFileName, "\"program_path\" Environment Variable"},
+            {CurrentWorkingFolder + InputFileName, "INI File Directory"},
+            {ProgramPath + InputFileName, "\"program\", \"dir\" from INI File"}
         };
 
         std::size_t numPathsToNotTest = (TestAllPaths) ? pathsToCheck.size()-2 : pathsToCheck.size();
@@ -270,8 +271,14 @@ namespace DataSystemVariables {
                 print(ioFiles.audit, "{}={}\n", "found (" + pathsToCheck[i].second +")", getAbsolutePath(CheckedFileName));
                 return;
             } else {
-                std::pair <std::string,std::string> currentPath(getAbsolutePath(pathsToCheck[i].first), pathsToCheck[i].second);
-                if (std::find(pathsChecked.begin(), pathsChecked.end(), currentPath) == pathsChecked.end()){
+                std::pair <std::string,std::string> currentPath(getParentDirectoryPath(getAbsolutePath(pathsToCheck[i].first)), pathsToCheck[i].second);
+                bool found = false;
+                for(auto path: pathsChecked){
+                    if (path.first == currentPath.first){
+                        found = true;
+                    }
+                }
+                if (!found){
                     pathsChecked.push_back(currentPath);
                 }
                 print(ioFiles.audit, "{}={}\n", "not found (" + pathsToCheck[i].second +")\"", getAbsolutePath(pathsToCheck[i].first));
@@ -280,7 +287,7 @@ namespace DataSystemVariables {
         if (!FileFound) {
             ShowSevereError(contextString+ "\"" + originalInputFileName + "\" not found. Paths searched:");
             for(auto path: pathsChecked){
-                ShowContinueError("   (" + path.second +")\"" + path.first +"\"");
+                ShowContinueError("   " + path.second +": \"" + path.first +"\"");
             }
         }
     }
