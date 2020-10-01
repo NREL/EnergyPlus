@@ -639,8 +639,8 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
         "  ,                               !- Heat Pump Time Constant",
         "  ,                               !- Fraction of On-Cycle Power Use",
         "  ,                               !- Heat Pump Fan Delay Time",
-        "  ,                               !- Ancilliary On-Cycle Electric Power",
-        "  ,                               !- Ancilliary Off-Cycle Electric Power",
+        "  100,                            !- Ancilliary On-Cycle Electric Power",
+        "  50,                             !- Ancilliary Off-Cycle Electric Power",
         "  ,                               !- Design Heat Recovery Water Flow Rate",
         "  ,                               !- Maximum Temperature for Heat Recovery",
         "  ,                               !- Heat Recovery Water Inlet Node Name",
@@ -849,6 +849,14 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
                       sensOut,
                       latOut);
     EXPECT_EQ(compName, thisSys->Name);
+    EXPECT_NEAR(100.0, thisSys->m_AncillaryOnPower, 0.00000001);
+    EXPECT_NEAR(50.0, thisSys->m_AncillaryOffPower, 0.00000001);
+    EXPECT_NEAR(0.49388, thisSys->m_PartLoadFrac, 0.000001);
+    Real64 totalAncillaryPower =
+        thisSys->m_AncillaryOnPower * thisSys->m_PartLoadFrac + thisSys->m_AncillaryOffPower * (1.0 - thisSys->m_PartLoadFrac);
+    EXPECT_NEAR(totalAncillaryPower, thisSys->m_TotalAuxElecPower, 0.00000001);
+    // at PLR very near 0.5, m_TotalAuxElecPower should be very near 75 W.
+    EXPECT_NEAR(74.694, thisSys->m_TotalAuxElecPower, 0.0001);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
