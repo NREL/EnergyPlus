@@ -1257,6 +1257,7 @@ namespace HeatingCoils {
         static int ValidSourceTypeCounter(0);     // Counter used to determine if desuperheater source name is valid
         static bool HeatingCoilFatalError(false); // used for error checking
         static Array1D_bool MySPTestFlag;         // used for error checking
+        static Array1D_bool StptNodeErrorFlag;
         static Array1D_bool ShowSingleWarning;    // Used for single warning message for desuperheater coil
         static Array1D_bool MyEnvrnFlag;          // one time environment flag
 
@@ -1266,11 +1267,13 @@ namespace HeatingCoils {
             MySizeFlag.allocate(NumHeatingCoils);
             ShowSingleWarning.allocate(NumHeatingCoils);
             MySPTestFlag.allocate(NumHeatingCoils);
+            StptNodeErrorFlag.allocate(NumHeatingCoils);
             MyEnvrnFlag = true;
             MySizeFlag = true;
             ShowSingleWarning = true;
             MyOneTimeFlag = false;
             MySPTestFlag = true;
+            StptNodeErrorFlag = false;
         }
 
         if (!SysSizingCalc && MySizeFlag(CoilNum)) {
@@ -1360,8 +1363,14 @@ namespace HeatingCoils {
                 ShowContinueError(
                     "... if a temperature setpoint is placed at the outlet node of this heating coil, that temperature setpoint will not be used.");
                 ShowContinueError("... leaving the input field \"Temperature Setpoint Node Name\" blank will eliminate this warning.");
+                StptNodeErrorFlag(CoilNum) = true;
             }
             MySPTestFlag(CoilNum) = false;
+        }
+
+        // If the coil is temperature controlled, reset the desired outlet temperature so the temperature setpoint at the oulet node won't be used
+        if (StptNodeErrorFlag(CoilNum)) {
+            HeatingCoil(CoilNum).DesiredOutletTemp = 0.0;
         }
 
         // delay fatal error until all coils are called

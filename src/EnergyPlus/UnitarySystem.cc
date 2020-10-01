@@ -12851,11 +12851,6 @@ namespace UnitarySystems {
                     }
                 }
 
-                // If the coil is temperature controlled, reset the desired outlet temperature so the temperature setpoint at the oulet node won't be used
-                if (DataLoopNode::SensedLoadFlagValue < 0) {
-                    DataLoopNode::Node(OutletNode).Temp = 0;
-                }
-
                 //     IF outlet temp at no load is within ACC of set point, do not run the coil
                 if (std::abs(DataLoopNode::Node(OutletNode).Temp - DesOutTemp) < Acc ||
                     this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_UserDefined) {
