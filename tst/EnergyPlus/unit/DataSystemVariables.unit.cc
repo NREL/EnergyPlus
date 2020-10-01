@@ -61,7 +61,7 @@ TEST_F(EnergyPlusFixture, File_Not_Found_ERR_Output)
     IOFiles ioFiles = IOFiles();
     std::string filePath = "./NonExistentFile.txt";
     FileSystem::makeNativePath(filePath);
-    std::string expectedError = FileSystem::getAbsolutePath(filePath);
+    std::string expectedError = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(filePath));
     bool fileFound = false;
     std::string fullPath;
     DataSystemVariables::CheckForActualFileName(ioFiles, filePath, fileFound, fullPath);
