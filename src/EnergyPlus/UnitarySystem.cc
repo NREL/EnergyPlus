@@ -11066,7 +11066,9 @@ namespace UnitarySystems {
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
-                HeatCoilLoad = PartLoadRatio * m_DesignHeatingCapacity;
+                if ((HeatCoilLoad != DataLoopNode::SensedLoadFlagValue) || (PartLoadRatio > 0)) {
+                        HeatCoilLoad = PartLoadRatio * m_DesignHeatingCapacity;
+                }
                 HeatingCoils::SimulateHeatingCoilComponents(
                     state, CompName, FirstHVACIteration, HeatCoilLoad, this->m_HeatingCoilIndex, _, false, this->m_FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater) {

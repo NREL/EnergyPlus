@@ -1306,7 +1306,6 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).DesiredOutletTemp = Node(ControlNode).TempSetPoint - (Node(ControlNode).Temp - Node(AirOutletNode).Temp);
         }
 
-        bool StptNodeErrorFlag(false);
         if (QCoilRequired == SensedLoadFlagValue && MySPTestFlag(CoilNum) && HeatingCoil(CoilNum).HCoilType_Num != Coil_HeatingElectric_MultiStage &&
             HeatingCoil(CoilNum).HCoilType_Num != Coil_HeatingGas_MultiStage) {
 
@@ -1361,14 +1360,8 @@ namespace HeatingCoils {
                 ShowContinueError(
                     "... if a temperature setpoint is placed at the outlet node of this heating coil, that temperature setpoint will not be used.");
                 ShowContinueError("... leaving the input field \"Temperature Setpoint Node Name\" blank will eliminate this warning.");
-                StptNodeErrorFlag = true;
             }
             MySPTestFlag(CoilNum) = false;
-        }
-
-        // If the coil is temperature controlled, reset the desired outlet temperature so the temperature setpoint at the oulet node won't be used
-        if (StptNodeErrorFlag) {
-            HeatingCoil(CoilNum).DesiredOutletTemp = 0.0;
         }
 
         // delay fatal error until all coils are called
