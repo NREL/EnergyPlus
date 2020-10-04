@@ -2410,9 +2410,9 @@ namespace DataHeatBalance {
             if (Surface(loopSurfNum).Class != SurfaceClass_Window) continue;
             if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
             if (!Surface(loopSurfNum).HasShadeControl) continue;
-            if (DataSurfaces::SurfWinShadedConstruction(loopSurfNum) == 0) continue;
+            if (Surface(loopSurfNum).activeShadedConstruction == 0) continue;
 
-            ConstrNum = DataSurfaces::SurfWinShadedConstruction(loopSurfNum);
+            ConstrNum = Surface(loopSurfNum).activeShadedConstruction;
             if (dataConstruction.Construct(ConstrNum).TypeIsWindow) {
                 NumLayers = dataConstruction.Construct(ConstrNum).TotLayers;
                 for (Layer = 1; Layer <= NumLayers; ++Layer) {

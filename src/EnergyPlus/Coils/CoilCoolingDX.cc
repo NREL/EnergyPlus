@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -189,7 +190,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCo
                                                                         DataLoopNode::ObjectIsNotParent);
 
     if (!input_data.condensate_collection_water_storage_tank_name.empty()) {
-        WaterManager::SetupTankSupplyComponent(this->name,
+        WaterManager::SetupTankSupplyComponent(state, this->name,
                                                coilCoolingDXObjectName,
                                  input_data.condensate_collection_water_storage_tank_name,
                                  errorsFound,
@@ -198,7 +199,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCo
     }
 
     if (!input_data.evaporative_condenser_supply_water_storage_tank_name.empty()) {
-        WaterManager::SetupTankDemandComponent(this->name,
+        WaterManager::SetupTankDemandComponent(state, this->name,
                                                coilCoolingDXObjectName,
                                  input_data.evaporative_condenser_supply_water_storage_tank_name,
                                  errorsFound,
@@ -272,9 +273,9 @@ void CoilCoolingDX::oneTimeInit() {
                         this->name,
                         _,
                         "Electricity",
-                        "DHW",
+                        "Cooling",
                         _,
-                        "Plant");
+                        "System");
    // Ported from variable speed coil
     SetupOutputVariable("Cooling Coil Air Mass Flow Rate",
         OutputProcessor::Unit::kg_s,
@@ -535,13 +536,16 @@ void CoilCoolingDX::simulate(EnergyPlusData &state, int useAlternateMode, Real64
     this->outletAirDryBulbTemp = evapOutletNode.Temp;
     this->outletAirHumRat = evapOutletNode.HumRat;
 
-    this->totalCoolingEnergyRate = evapOutletNode.MassFlowRate * (evapInletNode.Enthalpy - evapOutletNode.Enthalpy);
+    CalcComponentSensibleLatentOutput(evapOutletNode.MassFlowRate,
+                                      evapInletNode.Temp,
+                                      evapInletNode.HumRat,
+                                      evapOutletNode.Temp,
+                                      evapOutletNode.HumRat,
+                                      this->sensCoolingEnergyRate,
+                                      this->latCoolingEnergyRate,
+                                      this->totalCoolingEnergyRate);
     this->totalCoolingEnergy = this->totalCoolingEnergyRate * reportingConstant;
-    Real64 minAirHumRat = min(evapInletNode.HumRat, evapOutletNode.HumRat);
-    this->sensCoolingEnergyRate = evapOutletNode.MassFlowRate * (Psychrometrics::PsyHFnTdbW(evapInletNode.Temp, minAirHumRat) -
-                                                                 Psychrometrics::PsyHFnTdbW(evapOutletNode.Temp, minAirHumRat));
     this->sensCoolingEnergy = this->sensCoolingEnergyRate * reportingConstant;
-    this->latCoolingEnergyRate = this->totalCoolingEnergyRate - this->sensCoolingEnergyRate;
     this->latCoolingEnergy = this->latCoolingEnergyRate * reportingConstant;
 
     this->evapCondPumpElecConsumption = this->evapCondPumpElecPower * reportingConstant;

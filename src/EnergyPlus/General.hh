@@ -63,9 +63,10 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    class IOFiles;
-    struct EnergyPlusData;
+
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
 // Forward declaration
 namespace OutputProcessor {
@@ -399,9 +400,30 @@ namespace General {
 
     std::vector<std::string> splitString(const std::string &string, char delimiter);
 
-    Real64 epexp(Real64 x);
+    inline Real64 epexp(const Real64 numerator, const Real64 denominator)
+    {
+        if (denominator == 0.0) {
+            return 0.0;
+        } else {
+            return std::exp(numerator/denominator);
+        }
+    }
 
-    Real64 epexp(Real64 x, Real64 defaultHigh);
+    /* Not currently used
+    inline Real64 epexpOverflow(const Real64 numerator, const Real64 denominator, const Real64 maxInput=700.0)
+    {
+        if (denominator == 0.0) {
+            return 0.0;
+        } else {
+            Real64 x = numerator/denominator;
+            if (x > maxInput) {
+                return std::exp(maxInput);
+            }
+            return std::exp(x);
+        }
+    }
+    */
+
 } // namespace General
 
 } // namespace EnergyPlus

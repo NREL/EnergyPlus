@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -78,7 +79,6 @@
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/StandardRatings.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
@@ -120,12 +120,12 @@ namespace ChillerReformulatedEIR {
     PlantComponent *ReformulatedEIRChillerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
-        if (state.dataChillerReformulatedEIR.GetInputREIR) {
+        if (state.dataChillerReformulatedEIR->GetInputREIR) {
             GetElecReformEIRChillerInput(state);
-            state.dataChillerReformulatedEIR.GetInputREIR = false;
+            state.dataChillerReformulatedEIR->GetInputREIR = false;
         }
         // Now look for this particular object in the list
-        for (auto &obj : state.dataChillerReformulatedEIR.ElecReformEIRChiller) {
+        for (auto &obj : state.dataChillerReformulatedEIR->ElecReformEIRChiller) {
             if (obj.Name == objectName) {
                 return &obj;
             }
@@ -231,18 +231,18 @@ namespace ChillerReformulatedEIR {
         bool ErrorsFound(false); // True when input errors found
 
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric:ReformulatedEIR";
-        state.dataChillerReformulatedEIR.NumElecReformEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerReformulatedEIR->NumElecReformEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (state.dataChillerReformulatedEIR.NumElecReformEIRChillers <= 0) {
+        if (state.dataChillerReformulatedEIR->NumElecReformEIRChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
         // ALLOCATE ARRAYS
-        state.dataChillerReformulatedEIR.ElecReformEIRChiller.allocate(state.dataChillerReformulatedEIR.NumElecReformEIRChillers);
+        state.dataChillerReformulatedEIR->ElecReformEIRChiller.allocate(state.dataChillerReformulatedEIR->NumElecReformEIRChillers);
 
         // Load arrays with reformulated electric EIR chiller data
-        for (int EIRChillerNum = 1; EIRChillerNum <= state.dataChillerReformulatedEIR.NumElecReformEIRChillers; ++EIRChillerNum) {
+        for (int EIRChillerNum = 1; EIRChillerNum <= state.dataChillerReformulatedEIR->NumElecReformEIRChillers; ++EIRChillerNum) {
             int NumAlphas; // Number of elements in the alpha array
             int NumNums;   // Number of elements in the numeric array
             int IOStat;    // IO Status when calling get input subroutine
@@ -263,7 +263,7 @@ namespace ChillerReformulatedEIR {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            auto &thisChiller = state.dataChillerReformulatedEIR.ElecReformEIRChiller(EIRChillerNum);
+            auto &thisChiller = state.dataChillerReformulatedEIR->ElecReformEIRChiller(EIRChillerNum);
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
             // Performance curves
             thisChiller.ChillerCapFTIndex = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(2));
@@ -1027,13 +1027,13 @@ namespace ChillerReformulatedEIR {
                 if (this->EvapVolFlowRateWasAutoSized) {
                     this->EvapVolFlowRate = tmpEvapVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("Chiller:Electric:ReformulatedEIR",
+                        BaseSizer::reportSizerOutput("Chiller:Electric:ReformulatedEIR",
                                                                 this->Name,
                                                                 "Design Size Reference Chilled Water Flow Rate [m3/s]",
                                                                 tmpEvapVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("Chiller:Electric:ReformulatedEIR",
+                        BaseSizer::reportSizerOutput("Chiller:Electric:ReformulatedEIR",
                                                                 this->Name,
                                                                 "Initial Design Size Reference Chilled Water Flow Rate [m3/s]",
                                                                 tmpEvapVolFlowRate);
@@ -1042,7 +1042,7 @@ namespace ChillerReformulatedEIR {
                     if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
                         Real64 EvapVolFlowRateUser = this->EvapVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("Chiller:Electric:ReformulatedEIR",
+                            BaseSizer::reportSizerOutput("Chiller:Electric:ReformulatedEIR",
                                                                     this->Name,
                                                                     "Design Size Reference Chilled Water Flow Rate [m3/s]",
                                                                     tmpEvapVolFlowRate,
@@ -1073,7 +1073,7 @@ namespace ChillerReformulatedEIR {
             }
             if (!this->EvapVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport &&
                 (this->EvapVolFlowRate > 0.0)) { // Hard-size with sizing data
-                ReportSizingManager::ReportSizingOutput(
+                BaseSizer::reportSizerOutput(
                     "Chiller:Electric:ReformulatedEIR", this->Name, "User-Specified Reference Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
             }
         }
@@ -1108,18 +1108,18 @@ namespace ChillerReformulatedEIR {
                 if (this->RefCapWasAutoSized) {
                     this->RefCap = tmpNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "Chiller:Electric:ReformulatedEIR", this->Name, "Design Size Reference Capacity [W]", tmpNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "Chiller:Electric:ReformulatedEIR", this->Name, "Initial Design Size Reference Capacity [W]", tmpNomCap);
                     }
                 } else {
                     if (this->RefCap > 0.0 && tmpNomCap > 0.0) {
                         Real64 RefCapUser = this->RefCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("Chiller:Electric:ReformulatedEIR",
+                            BaseSizer::reportSizerOutput("Chiller:Electric:ReformulatedEIR",
                                                                     this->Name,
                                                                     "Design Size Reference Capacity [W]",
                                                                     tmpNomCap,
@@ -1147,7 +1147,7 @@ namespace ChillerReformulatedEIR {
                 ErrorsFound = true;
             }
             if (!this->RefCapWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->RefCap > 0.0)) {
-                ReportSizingManager::ReportSizingOutput(
+                BaseSizer::reportSizerOutput(
                     "Chiller:Electric:ReformulatedEIR", this->Name, "User-Specified Reference Capacity [W]", this->RefCap);
             }
         }
@@ -1173,13 +1173,13 @@ namespace ChillerReformulatedEIR {
                 if (this->CondVolFlowRateWasAutoSized) {
                     this->CondVolFlowRate = tmpCondVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("Chiller:Electric:ReformulatedEIR",
+                        BaseSizer::reportSizerOutput("Chiller:Electric:ReformulatedEIR",
                                                                 this->Name,
                                                                 "Design Size Reference Condenser Water Flow Rate [m3/s]",
                                                                 tmpCondVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("Chiller:Electric:ReformulatedEIR",
+                        BaseSizer::reportSizerOutput("Chiller:Electric:ReformulatedEIR",
                                                                 this->Name,
                                                                 "Initial Design Size Reference Condenser Water Flow Rate [m3/s]",
                                                                 tmpCondVolFlowRate);
@@ -1188,7 +1188,7 @@ namespace ChillerReformulatedEIR {
                     if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
                         Real64 CondVolFlowRateUser = this->CondVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("Chiller:Electric:ReformulatedEIR",
+                            BaseSizer::reportSizerOutput("Chiller:Electric:ReformulatedEIR",
                                                                     this->Name,
                                                                     "Design Size Reference Condenser Water Flow Rate [m3/s]",
                                                                     tmpCondVolFlowRate,
@@ -1219,7 +1219,7 @@ namespace ChillerReformulatedEIR {
                 ErrorsFound = true;
             }
             if (!this->CondVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
-                ReportSizingManager::ReportSizingOutput("Chiller:Electric:ReformulatedEIR",
+                BaseSizer::reportSizerOutput("Chiller:Electric:ReformulatedEIR",
                                                         this->Name,
                                                         "User-Specified Reference Condenser Water Flow Rate [m3/s]",
                                                         this->CondVolFlowRate);
@@ -1236,13 +1236,13 @@ namespace ChillerReformulatedEIR {
                 if (this->DesignHeatRecVolFlowRateWasAutoSized) {
                     this->DesignHeatRecVolFlowRate = tmpHeatRecVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("Chiller:Electric:ReformulatedEIR",
+                        BaseSizer::reportSizerOutput("Chiller:Electric:ReformulatedEIR",
                                                                 this->Name,
                                                                 "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                                 tmpHeatRecVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("Chiller:Electric:ReformulatedEIR",
+                        BaseSizer::reportSizerOutput("Chiller:Electric:ReformulatedEIR",
                                                                 this->Name,
                                                                 "Initial Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                                 tmpHeatRecVolFlowRate);
@@ -1251,7 +1251,7 @@ namespace ChillerReformulatedEIR {
                     if (this->DesignHeatRecVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0) {
                         Real64 DesignHeatRecVolFlowRateUser = this->DesignHeatRecVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("Chiller:Electric:ReformulatedEIR",
+                            BaseSizer::reportSizerOutput("Chiller:Electric:ReformulatedEIR",
                                                                     this->Name,
                                                                     "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                                     tmpHeatRecVolFlowRate,

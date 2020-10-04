@@ -369,7 +369,7 @@ namespace HeatBalanceManager {
                   ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance(state, state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files); // Initialize all heat balance related parameters
+        InitHeatBalance(state, state.files); // Initialize all heat balance related parameters
         ManageEMS(state, DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
@@ -399,7 +399,7 @@ namespace HeatBalanceManager {
             CheckWarmupConvergence();
             if (!WarmupFlag) {
                 DayOfSim = 0; // Reset DayOfSim if Warmup converged
-                state.dataGlobals.DayOfSimChr = "0";
+                state.dataGlobal->DayOfSimChr = "0";
 
                 ManageEMS(state, emsCallFromBeginNewEvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const()); // calling point
             }
@@ -461,7 +461,7 @@ namespace HeatBalanceManager {
 
         GetWindowGlassSpectralData(ErrorsFound);
 
-        GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // Read materials from input file/transfer from legacy data structure
+        GetMaterialData(state, state.files, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
         GetFrameAndDividerData(ErrorsFound);
 
@@ -1219,7 +1219,7 @@ namespace HeatBalanceManager {
             AlphaName(3) = "NO";
         }
 
-        WindowManager::initWindowModel(state.dataWindowManager);
+        WindowManager::initWindowModel(state);
 
         static constexpr auto Format_728(
             "! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");
@@ -1465,7 +1465,7 @@ namespace HeatBalanceManager {
         print(ioFiles.eio, Format_720, SiteWindExp, SiteWindBLHeight, SiteTempGradient);
     }
 
-    void GetMaterialData(EnergyPlusData &state, WindowEquivalentLayerData &dataWindowEquivalentLayer, IOFiles &ioFiles, bool &ErrorsFound) // set to true if errors found in input
+    void GetMaterialData(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -3564,11 +3564,11 @@ namespace HeatBalanceManager {
             //  they are used with window shading controls that adjust slat angles like MaximizeSolar or BlockBeamSolar
             if (!lAlphaFieldBlanks(3)) {
                 if (UtilityRoutines::SameString(MaterialNames(3), "FixedSlatAngle")) {
-                    dataMaterial.Material(MaterNum).SlatAngleType = dataWindowEquivalentLayer.lscNONE;
+                    dataMaterial.Material(MaterNum).SlatAngleType = state.dataWindowEquivalentLayer->lscNONE;
                 } else if (UtilityRoutines::SameString(MaterialNames(3), "MaximizeSolar")) {
-                    dataMaterial.Material(MaterNum).SlatAngleType = dataWindowEquivalentLayer.lscVBPROF;
+                    dataMaterial.Material(MaterNum).SlatAngleType = state.dataWindowEquivalentLayer->lscVBPROF;
                 } else if (UtilityRoutines::SameString(MaterialNames(3), "BlockBeamSolar")) {
-                    dataMaterial.Material(MaterNum).SlatAngleType = dataWindowEquivalentLayer.lscVBNOBM;
+                    dataMaterial.Material(MaterNum).SlatAngleType = state.dataWindowEquivalentLayer->lscVBNOBM;
                 } else {
                     dataMaterial.Material(MaterNum).SlatAngleType = 0;
                 }
@@ -5155,7 +5155,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(EnergyPlusData &state, WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, IOFiles &ioFiles)
+    void InitHeatBalance(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5199,9 +5199,9 @@ namespace HeatBalanceManager {
             }
 
             DisplayString("Initializing Window Optical Properties");
-            InitEquivalentLayerWindowCalculations(dataWindowEquivalentLayer); // Initialize the EQL window optical properties
+            InitEquivalentLayerWindowCalculations(state); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
-            InitWindowOpticalCalculations(state, dataWindowComplexManager, dataWindowManager, ioFiles);
+            InitWindowOpticalCalculations(state, ioFiles);
             InitDaylightingDevices(ioFiles); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(ioFiles); // Initialize the shadowing calculations
@@ -5269,12 +5269,12 @@ namespace HeatBalanceManager {
                 }
             }
             if (!DetailedSolarTimestepIntegration) {
-                PerformSolarCalculations(dataWindowComplexManager, ioFiles);
+                PerformSolarCalculations(state, ioFiles);
             }
         }
 
         if (DetailedSolarTimestepIntegration) { // always redo solar calcs
-            PerformSolarCalculations(dataWindowComplexManager, ioFiles);
+            PerformSolarCalculations(state, ioFiles);
         }
 
         if (BeginDayFlag && !WarmupFlag && KindOfSim == ksRunPeriodWeather && ReportExtShadingSunlitFrac) {
@@ -5925,11 +5925,11 @@ namespace HeatBalanceManager {
             CalcMoreNodeInfo();
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
-                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
+                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
             }
 
             UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
-            UpdateUtilityBills(state.dataCostEstimateManager);
+            UpdateUtilityBills(state);
         } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
             if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                 PrintEnvrnStampWarmup = true;
@@ -5968,13 +5968,13 @@ namespace HeatBalanceManager {
             CalcMoreNodeInfo();
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
-                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
+                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
             }
 
         } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
-                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
+                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
             }
         }
         // There is no hourly reporting in the heat balance.

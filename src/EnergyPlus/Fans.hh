@@ -60,14 +60,13 @@
 
 namespace EnergyPlus {
 
-    struct EnergyPlusData;
-    struct FansData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace Fans {
 
     // Using/Aliasing
     using DataHVACGlobals::MinFrac;
-    using DataHVACGlobals::SystemAirflowSizing;
 
     struct FanEquipConditions
     {
@@ -275,17 +274,17 @@ namespace Fans {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void SimSimpleFan(EnergyPlusData &state, FansData &fans, int const FanNum);
+    void SimSimpleFan(EnergyPlusData &state, int const FanNum);
 
-    void SimVariableVolumeFan(EnergyPlusData &state, FansData &fans, int const FanNum, Optional<Real64 const> PressureRise = _);
+    void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> PressureRise = _);
 
-    void SimOnOffFan(EnergyPlusData &state, FansData &fans, int const FanNum, Optional<Real64 const> SpeedRatio = _);
+    void SimOnOffFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> SpeedRatio = _);
 
-    void SimZoneExhaustFan(FansData &fans, int const FanNum);
+    void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum);
 
     // cpw22Aug2010 Added Component Model fan algorithm
 
-    void SimComponentModelFan(EnergyPlusData &state, FansData &fans, int const FanNum);
+    void SimComponentModelFan(EnergyPlusData &state, int const FanNum);
 
     // End Algorithm Section of the Module
     // *****************************************************************************
@@ -384,6 +383,16 @@ namespace Fans {
     );
 
     void SetFanAirLoopNumber(int const FanIndex, int const AirLoopNum);
+
+    void FanInputsForDesHeatGain(EnergyPlusData &state,
+                                 int const &fanIndex,
+                                 Real64 &deltaP,
+                                 Real64 &motEff,
+                                 Real64 &totEff,
+                                 Real64 &motInAirFrac,
+                                 Real64 &fanShaftPow,
+                                 Real64 &motInPower,
+                                 bool &fanCompModel);
 
     // Clears the global data in Fans.
     // Needed for unit tests, should not be normally called.

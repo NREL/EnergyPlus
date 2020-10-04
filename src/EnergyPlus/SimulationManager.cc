@@ -285,7 +285,6 @@ namespace SimulationManager {
         using PlantPipingSystemsManager::SimulateGroundDomains;
         using Psychrometrics::InitializePsychRoutines;
         using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
-        using WeatherManager::CheckIfAnyUnderwaterBoundaries;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -387,7 +386,7 @@ namespace SimulationManager {
         }
         Available = true;
 
-        if (state.dataBranchInputManager.InvalidBranchDefinitions) {
+        if (state.dataBranchInputManager->InvalidBranchDefinitions) {
             ShowFatalError("Preceding error(s) in Branch Input cause termination.");
         }
 
@@ -400,7 +399,7 @@ namespace SimulationManager {
         DisplayString("Initializing Simulation");
         KickOffSimulation = true;
 
-        ResetEnvironmentCounter();
+        ResetEnvironmentCounter(state);
         SetupSimulation(state, ErrorsFound);
 
         CheckAndReadFaults(state);
@@ -488,7 +487,7 @@ namespace SimulationManager {
         ShowMessage("Beginning Simulation");
         DisplayString("Beginning Primary Simulation");
 
-        ResetEnvironmentCounter();
+        ResetEnvironmentCounter(state);
 
         EnvCount = 0;
         WarmupFlag = true;
@@ -519,7 +518,7 @@ namespace SimulationManager {
             DisplayString("Initializing New Environment Parameters");
 
             BeginEnvrnFlag = true;
-            if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+            if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                 // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                 // easily converge fewer warmup days are allowed
                 DisplayString("Design Day Fast Warmup Mode: Suppressing Initialization of New Environment Parameters");
@@ -531,7 +530,7 @@ namespace SimulationManager {
             EndMonthFlag = false;
             WarmupFlag = true;
             DayOfSim = 0;
-            state.dataGlobals.DayOfSimChr = "0";
+            state.dataGlobal->DayOfSimChr = "0";
             NumOfWarmupDays = 0;
             if (CurrentYearIsLeapYear) {
                 if (NumOfDayInEnvrn <= 366) {
@@ -554,12 +553,12 @@ namespace SimulationManager {
                 if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
 
                 ++DayOfSim;
-                state.dataGlobals.DayOfSimChr = fmt::to_string(DayOfSim);
+                state.dataGlobal->DayOfSimChr = fmt::to_string(DayOfSim);
                 if (!WarmupFlag) {
                     ++CurrentOverallSimDay;
                     DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
                 } else {
-                    state.dataGlobals.DayOfSimChr = "0";
+                    state.dataGlobal->DayOfSimChr = "0";
                 }
                 BeginDayFlag = true;
                 EndDayFlag = false;
@@ -587,7 +586,7 @@ namespace SimulationManager {
                 }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
                 if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
-                    DisplayString("Starting last  year of environment at:  " + state.dataGlobals.DayOfSimChr);
+                    DisplayString("Starting last  year of environment at:  " + state.dataGlobal->DayOfSimChr);
                     ResetTabularReports();
                 }
 
@@ -605,7 +604,7 @@ namespace SimulationManager {
                         }
 
                         if (AnyUnderwaterBoundaries) {
-                            WeatherManager::UpdateUnderwaterBoundaries();
+                            WeatherManager::UpdateUnderwaterBoundaries(state);
                         }
 
                         if (DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0 ||
@@ -635,12 +634,12 @@ namespace SimulationManager {
 
                         ManageWeather(state);
 
-                        ManageExteriorEnergyUse(state.exteriorEnergyUse);
+                        ManageExteriorEnergyUse(state);
 
                         ManageHeatBalance(state);
 
                         if (oneTimeUnderwaterBoundaryCheck) {
-                            AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
+                            AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries(state);
                             oneTimeUnderwaterBoundaryCheck = false;
                         }
 
@@ -693,13 +692,13 @@ namespace SimulationManager {
 
         ReportForTabularReports(); // For Energy Meters (could have other things that need to be pushed to after simulation)
 
-        OpenOutputTabularFile();
+        OpenOutputTabularFile(state.files);
 
         WriteTabularReports(state); //     Create the tabular reports at completion of each
 
-        WriteTabularTariffReports(state.dataCostEstimateManager);
+        WriteTabularTariffReports(state);
 
-        ComputeLifeCycleCostAndReport(state.dataCostEstimateManager); // must be after WriteTabularReports and WriteTabularTariffReports
+        ComputeLifeCycleCostAndReport(state); // must be after WriteTabularReports and WriteTabularTariffReports
 
         CloseOutputTabularFile();
 
@@ -1243,9 +1242,7 @@ namespace SimulationManager {
                 bool overrideMaxZoneTempDiff(false);
                 bool overrideSystemTimestep(false);
                 bool overrideMaxAllowedDelTemp(false);
-                // ZoneTempPredictorCorrector::OscillationVariablesNeeded = true;
-                // dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
-                state.dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
+                state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
                     overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
                     if (overrideModeValue == "NORMAL") {
@@ -2141,7 +2138,7 @@ namespace SimulationManager {
 
             ManageWeather(state);
 
-            ManageExteriorEnergyUse(state.exteriorEnergyUse);
+            ManageExteriorEnergyUse(state);
 
             ManageHeatBalance(state);
 
@@ -2156,7 +2153,7 @@ namespace SimulationManager {
 
             ManageWeather(state);
 
-            ManageExteriorEnergyUse(state.exteriorEnergyUse);
+            ManageExteriorEnergyUse(state);
 
             ManageHeatBalance(state);
 
@@ -2169,7 +2166,7 @@ namespace SimulationManager {
             if (DeveloperFlag) DisplayString("Initializing Simulation - hour 24 timestep 1:" + EnvironmentName);
             ManageWeather(state);
 
-            ManageExteriorEnergyUse(state.exteriorEnergyUse);
+            ManageExteriorEnergyUse(state);
 
             ManageHeatBalance(state);
 
@@ -3078,7 +3075,8 @@ namespace SimulationManager {
 
 // EXTERNAL SUBROUTINES:
 
-void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the exterior energy use simulation
+void Resimulate(EnergyPlusData &state,
+                bool &ResimExt, // Flag to resimulate the exterior energy use simulation
                 bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
                 bool &ResimHVAC // Flag to resimulate the HVAC simulation
 )
@@ -3162,7 +3160,7 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
 
     // FLOW:
     if (ResimExt) {
-        ManageExteriorEnergyUse(state.exteriorEnergyUse);
+        ManageExteriorEnergyUse(state);
 
         ++DemandManagerExtIterations;
     }
@@ -3170,7 +3168,7 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
     if (ResimHB) {
         // Surface simulation
         InitSurfaceHeatBalance(state);
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.files);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
         // Air simulation

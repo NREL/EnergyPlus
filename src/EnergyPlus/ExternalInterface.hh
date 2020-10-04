@@ -65,7 +65,8 @@ extern "C" {
 
 namespace EnergyPlus {
 
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace ExternalInterface {
 

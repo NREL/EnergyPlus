@@ -3125,7 +3125,7 @@ namespace OutputProcessor {
                                          TimeStepStampReportNbr,
                                          TimeStepStampReportChr,
                                          DayOfSim,
-                                         state.dataGlobals.DayOfSimChr,
+                                         state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3151,7 +3151,7 @@ namespace OutputProcessor {
                                          TimeStepStampReportNbr,
                                          TimeStepStampReportChr,
                                          DayOfSim,
-                                         state.dataGlobals.DayOfSimChr,
+                                         state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintESOTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3252,7 +3252,7 @@ namespace OutputProcessor {
                                          TimeStepStampReportNbr,
                                          TimeStepStampReportChr,
                                          DayOfSim,
-                                         state.dataGlobals.DayOfSimChr,
+                                         state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3338,9 +3338,6 @@ namespace OutputProcessor {
         if (!ResultsFramework::resultsFramework->DYMeters.rVariablesScanned()) {
             ResultsFramework::resultsFramework->initializeMeters(EnergyMeters, ReportingFrequency::Daily);
         }
-        if (ResultsFramework::resultsFramework->DYMeters.rDataFrameEnabled()) {
-            ResultsFramework::resultsFramework->DYMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
-        }
 
         PrintTimeStamp = true;
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
@@ -3355,7 +3352,7 @@ namespace OutputProcessor {
                                          DailyStampReportNbr,
                                          DailyStampReportChr,
                                          DayOfSim,
-                                         state.dataGlobals.DayOfSimChr,
+                                         state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3440,9 +3437,6 @@ namespace OutputProcessor {
         if (!ResultsFramework::resultsFramework->MNMeters.rVariablesScanned()) {
             ResultsFramework::resultsFramework->initializeMeters(EnergyMeters, ReportingFrequency::Monthly);
         }
-        if (ResultsFramework::resultsFramework->MNMeters.rDataFrameEnabled()) {
-            ResultsFramework::resultsFramework->MNMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
-        }
 
         PrintTimeStamp = true;
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
@@ -3453,7 +3447,7 @@ namespace OutputProcessor {
                                          MonthlyStampReportNbr,
                                          MonthlyStampReportChr,
                                          DayOfSim,
-                                         state.dataGlobals.DayOfSimChr,
+                                         state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month);
                 if (ResultsFramework::resultsFramework->MNMeters.rDataFrameEnabled()) {
@@ -3614,9 +3608,6 @@ namespace OutputProcessor {
         if (!ResultsFramework::resultsFramework->SMMeters.rVariablesScanned()) {
             ResultsFramework::resultsFramework->initializeMeters(EnergyMeters, ReportingFrequency::Simulation);
         }
-        if (ResultsFramework::resultsFramework->SMMeters.rDataFrameEnabled()) {
-            ResultsFramework::resultsFramework->SMMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
-        }
 
         PrintTimeStamp = true;
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
@@ -3632,7 +3623,7 @@ namespace OutputProcessor {
                                          RunPeriodStampReportNbr,
                                          RunPeriodStampReportChr,
                                          DayOfSim,
-                                         state.dataGlobals.DayOfSimChr,
+                                         state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL);
                 if (ResultsFramework::resultsFramework->SMMeters.rDataFrameEnabled()) {
                     ResultsFramework::resultsFramework->SMMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
@@ -6126,7 +6117,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                              TimeStepStampReportNbr,
                                              TimeStepStampReportChr,
                                              DayOfSim,
-                                             state.dataGlobals.DayOfSimChr,
+                                             state.dataGlobal->DayOfSimChr,
                                              true,
                                              Month,
                                              DayOfMonth,
@@ -6210,7 +6201,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                              TimeStepStampReportNbr,
                                              TimeStepStampReportChr,
                                              DayOfSim,
-                                             state.dataGlobals.DayOfSimChr,
+                                             state.dataGlobal->DayOfSimChr,
                                              true,
                                              Month,
                                              DayOfMonth,
@@ -6299,7 +6290,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                                      TimeStepStampReportNbr,
                                                      TimeStepStampReportChr,
                                                      DayOfSim,
-                                                     state.dataGlobals.DayOfSimChr,
+                                                     state.dataGlobal->DayOfSimChr,
                                                      true,
                                                      Month,
                                                      DayOfMonth,
@@ -6355,7 +6346,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                                      TimeStepStampReportNbr,
                                                      TimeStepStampReportChr,
                                                      DayOfSim,
-                                                     state.dataGlobals.DayOfSimChr,
+                                                     state.dataGlobal->DayOfSimChr,
                                                      true,
                                                      Month,
                                                      DayOfMonth,
@@ -6401,7 +6392,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      TimeStepStampReportNbr,
                                      TimeStepStampReportChr,
                                      DayOfSim,
-                                     state.dataGlobals.DayOfSimChr,
+                                     state.dataGlobal->DayOfSimChr,
                                      true,
                                      Month,
                                      DayOfMonth,
@@ -6502,7 +6493,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      DailyStampReportNbr,
                                      DailyStampReportChr,
                                      DayOfSim,
-                                     state.dataGlobals.DayOfSimChr,
+                                     state.dataGlobal->DayOfSimChr,
                                      true,
                                      Month,
                                      DayOfMonth,
@@ -6553,7 +6544,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      MonthlyStampReportNbr,
                                      MonthlyStampReportChr,
                                      DayOfSim,
-                                     state.dataGlobals.DayOfSimChr,
+                                     state.dataGlobal->DayOfSimChr,
                                      true,
                                      Month);
             TimePrint = false;
@@ -6598,7 +6589,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      RunPeriodStampReportNbr,
                                      RunPeriodStampReportChr,
                                      DayOfSim,
-                                     state.dataGlobals.DayOfSimChr,
+                                     state.dataGlobal->DayOfSimChr,
                                      true);
             TimePrint = false;
         }
@@ -8819,17 +8810,17 @@ void ProduceRDDMDD(EnergyPlusData &state)
     state.files.rdd.ensure_open("ProduceRDDMDD", state.files.outputControl.rdd);
     state.files.mdd.ensure_open("ProduceRDDMDD", state.files.outputControl.mdd);
     if (ProduceReportVDD == ReportVDD_Yes) {
-        print(state.files.rdd, "Program Version,{},{}{}", VerString, IDDVerString, DataStringGlobals::NL);
-        print(state.files.rdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", DataStringGlobals::NL);
+        print(state.files.rdd, "Program Version,{},{}{}", VerString, IDDVerString, '\n');
+        print(state.files.rdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", '\n');
 
-        print(state.files.mdd, "Program Version,{},{}{}", VerString, IDDVerString, DataStringGlobals::NL);
-        print(state.files.mdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", DataStringGlobals::NL);
+        print(state.files.mdd, "Program Version,{},{}{}", VerString, IDDVerString, '\n');
+        print(state.files.mdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", '\n');
     } else if (ProduceReportVDD == ReportVDD_IDF) {
-        print(state.files.rdd, "! Program Version,{},{}{}", VerString, IDDVerString, DataStringGlobals::NL);
-        print(state.files.rdd, "! Output:Variable Objects (applicable to this run){}", DataStringGlobals::NL);
+        print(state.files.rdd, "! Program Version,{},{}{}", VerString, IDDVerString, '\n');
+        print(state.files.rdd, "! Output:Variable Objects (applicable to this run){}", '\n');
 
-        print(state.files.mdd, "! Program Version,{},{}{}", VerString, IDDVerString, DataStringGlobals::NL);
-        print(state.files.mdd, "! Output:Meter Objects (applicable to this run){}", DataStringGlobals::NL);
+        print(state.files.mdd, "! Program Version,{},{}{}", VerString, IDDVerString, '\n');
+        print(state.files.mdd, "! Output:Meter Objects (applicable to this run){}", '\n');
     }
 
     Array1D_string VariableNames(NumVariablesForOutput);
@@ -8849,7 +8840,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
         if (ProduceReportVDD == ReportVDD_Yes) {
             ItemPtr = iVariableNames(Item);
             if (!DDVariableTypes(ItemPtr).ReportedOnDDFile) {
-                print(state.files.rdd, "{},{},{}{}{}", StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), VariableNames(Item), unitStringFromDDitem(ItemPtr), DataStringGlobals::NL);
+                print(state.files.rdd, "{},{},{}{}{}", StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), VariableNames(Item), unitStringFromDDitem(ItemPtr), '\n');
                 ResultsFramework::resultsFramework->RDD.push_back(StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType) + "," +
                                                                   standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType) + "," +
                                                                   VariableNames(Item) + unitStringFromDDitem(ItemPtr));
@@ -8860,7 +8851,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
                     } else {
                         ItemPtr = DDVariableTypes(ItemPtr).Next;
                     }
-                    print(state.files.rdd, "{},{},{}{}{}", StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), VariableNames(Item), unitStringFromDDitem(ItemPtr), DataStringGlobals::NL);
+                    print(state.files.rdd, "{},{},{}{}{}", StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), VariableNames(Item), unitStringFromDDitem(ItemPtr), '\n');
                     ResultsFramework::resultsFramework->RDD.push_back(StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType) + "," +
                                                                       standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType) + "," +
                                                                       VariableNames(Item) + unitStringFromDDitem(ItemPtr));
@@ -8870,7 +8861,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
         } else if (ProduceReportVDD == ReportVDD_IDF) {
             ItemPtr = iVariableNames(Item);
             if (!DDVariableTypes(ItemPtr).ReportedOnDDFile) {
-                print(state.files.rdd, "Output:Variable,*,{},hourly; !- {} {}{}{}", VariableNames(Item), StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), unitStringFromDDitem(ItemPtr), DataStringGlobals::NL);
+                print(state.files.rdd, "Output:Variable,*,{},hourly; !- {} {}{}{}", VariableNames(Item), StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), unitStringFromDDitem(ItemPtr), '\n');
                 ResultsFramework::resultsFramework->RDD.push_back(StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType) + "," +
                                                                   standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType) + "," +
                                                                   VariableNames(Item) + unitStringFromDDitem(ItemPtr));
@@ -8881,7 +8872,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
                     } else {
                         ItemPtr = DDVariableTypes(ItemPtr).Next;
                     }
-                    print(state.files.rdd, "Output:Variable,*,{},hourly; !- {} {}{}{}", VariableNames(Item), StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), unitStringFromDDitem(ItemPtr), DataStringGlobals::NL);
+                    print(state.files.rdd, "Output:Variable,*,{},hourly; !- {} {}{}{}", VariableNames(Item), StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), unitStringFromDDitem(ItemPtr), '\n');
                     ResultsFramework::resultsFramework->RDD.push_back(StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType) + "," +
                                                                       standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType) + "," +
                                                                       VariableNames(Item) + unitStringFromDDitem(ItemPtr));
@@ -8910,14 +8901,14 @@ void ProduceRDDMDD(EnergyPlusData &state)
     for (Item = 1; Item <= NumEnergyMeters; ++Item) {
         ItemPtr = iVariableNames(Item);
         if (ProduceReportVDD == ReportVDD_Yes) {
-            print(state.files.mdd, "Zone,Meter,{}{}{}", EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units), DataStringGlobals::NL);
+            print(state.files.mdd, "Zone,Meter,{}{}{}", EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units), '\n');
             ResultsFramework::resultsFramework->MDD.push_back("Zone,Meter," + EnergyMeters(ItemPtr).Name +
                                                               unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units));
         } else if (ProduceReportVDD == ReportVDD_IDF) {
-            print(state.files.mdd, "Output:Meter,{},hourly; !-{}{}", EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units), DataStringGlobals::NL);
+            print(state.files.mdd, "Output:Meter,{},hourly; !-{}{}", EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units), '\n');
             ResultsFramework::resultsFramework->MDD.push_back("Output:Meter," + EnergyMeters(ItemPtr).Name +
                                                               unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units));
-            print(state.files.mdd, "Output:Meter:Cumulative,{},hourly; !-{}{}", EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units), DataStringGlobals::NL);
+            print(state.files.mdd, "Output:Meter:Cumulative,{},hourly; !-{}{}", EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units), '\n');
             ResultsFramework::resultsFramework->MDD.push_back("Output:Meter:Cumulative," + EnergyMeters(ItemPtr).Name +
                                                               unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units));
         }

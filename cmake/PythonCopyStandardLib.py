@@ -3,13 +3,18 @@
 # an easy way is to find the __init__ file for a known standard lib package and go two parents up
 # should result in something like `/usr/lib/python3.7`
 
-# this script must be called with a target directory to copy this into
+# this script must be called with two args:
+# 1 - the path to the EnergyPlus executable in the install tree, which is be used to determine where to copy the library
+#     since this is in the install tree, you'll need to use a cmake generator expression
+# 2 - name of the folder to create to store the copied in python standard library, usually python_standard_library
 import ctypes
 from distutils.dir_util import copy_tree
 import os
 import platform
 import shutil
 import sys
+
+print("PYTHON: Copying standard library files")
 
 if len(sys.argv) == 3:
     exe_path = sys.argv[1]

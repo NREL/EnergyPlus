@@ -55,6 +55,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -99,7 +100,6 @@
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -613,8 +613,6 @@ namespace MixedAir {
         using SteamCoils::SimulateSteamCoilComponents;
         using TranspiredCollector::SimTranspiredCollector;
         using UserDefinedComponents::SimCoilUserDefined;
-        using WaterCoils::SimulateWaterCoilComponents;
-        using WaterCoils::WaterCoil;
         // Locals
         // SUBROUTINE ARGUMENTS:
 
@@ -667,35 +665,35 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == WaterCoil_Cooling) { // 'Coil:Cooling:Water'
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
+                    if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                     // iterate on OA sys controller and water coil at the same time
                     SolveWaterCoilController(state,
                                              FirstHVACIteration,
                                              AirLoopNum,
                                              CompName,
                                              CompIndex,
-                                             WaterCoil(CompIndex).ControllerName,
-                                             WaterCoil(CompIndex).ControllerIndex,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerName,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
                                              false);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
+                    if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                     // iterate on OA sys controller and water coil at the same time
                     SolveWaterCoilController(state,
                                              FirstHVACIteration,
                                              AirLoopNum,
                                              CompName,
                                              CompIndex,
-                                             WaterCoil(CompIndex).ControllerName,
-                                             WaterCoil(CompIndex).ControllerIndex,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerName,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
                                              false);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OAHeatingCoil = true;
             } else if (SELECT_CASE_var == SteamCoil_AirHeat) { // 'Coil:Heating:Steam'
@@ -706,18 +704,18 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == WaterCoil_DetailedCool) { // 'Coil:Cooling:Water:DetailedGeometry'
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
+                    if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                     // iterate on OA sys controller and water coil at the same time
                     SolveWaterCoilController(state,
                                              FirstHVACIteration,
                                              AirLoopNum,
                                              CompName,
                                              CompIndex,
-                                             WaterCoil(CompIndex).ControllerName,
-                                             WaterCoil(CompIndex).ControllerIndex,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerName,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
                                              false);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == Coil_ElectricHeat) { // 'Coil:Heating:Electric'
@@ -848,7 +846,7 @@ namespace MixedAir {
                 // Unglazed Transpired Solar Collector
             } else if (SELECT_CASE_var == Unglazed_SolarCollector) { // 'SolarCollector:UnglazedTranspired'
                 if (Sim) {
-                    SimTranspiredCollector(state, state.dataConvectionCoefficients, state.files, CompName, CompIndex);
+                    SimTranspiredCollector(state, state.files, CompName, CompIndex);
                 }
 
                 // Air-based Photovoltaic-thermal flat plate collector
@@ -2021,10 +2019,9 @@ namespace MixedAir {
             }
 
             // write to .eio file
-            static constexpr auto Format_700(
-                "!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
-                "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
-                "Name,DSZAD Name");
+            static constexpr auto Format_700("!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
+                                             "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
+                                             "Name,DSZAD Name");
             print(state.files.eio, "{}\n", Format_700);
             for (VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum) {
                 print(state.files.eio,
@@ -4914,7 +4911,6 @@ namespace MixedAir {
         using General::TrimSigDigits;
         using HVACHXAssistedCoolingCoil::GetHXCoilType;
         using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
-        using ReportSizingManager::ReportSizingOutput;
         using WaterCoils::SetCoilDesFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -4983,7 +4979,7 @@ namespace MixedAir {
                 this->MaxOA = 0.0;
             }
 
-            ReportSizingOutput(CurrentModuleObject, this->Name, "Maximum Outdoor Air Flow Rate [m3/s]", this->MaxOA);
+            BaseSizer::reportSizerOutput(CurrentModuleObject, this->Name, "Maximum Outdoor Air Flow Rate [m3/s]", this->MaxOA);
         }
 
         if (this->MinOA == AutoSize) {
@@ -4998,7 +4994,7 @@ namespace MixedAir {
                 }
             }
 
-            ReportSizingOutput(CurrentModuleObject, this->Name, "Minimum Outdoor Air Flow Rate [m3/s]", this->MinOA);
+            BaseSizer::reportSizerOutput(CurrentModuleObject, this->Name, "Minimum Outdoor Air Flow Rate [m3/s]", this->MinOA);
 
             if (this->HumidistatZoneNum > 0 && this->FixedMin) {
                 if (this->MaxOA > 0.0) {
@@ -5032,7 +5028,7 @@ namespace MixedAir {
                         CoilName = CompName;
                         CoilType = CompType;
                     }
-                    SetCoilDesFlow(CoilType, CoilName, this->MinOA, ErrorsFound);
+                    SetCoilDesFlow(state, CoilType, CoilName, this->MinOA, ErrorsFound);
                 }
             } // End of component loop
         }

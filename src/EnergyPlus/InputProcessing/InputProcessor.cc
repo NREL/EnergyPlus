@@ -283,7 +283,7 @@ void InputProcessor::processInput()
             std::string input_file;
             std::string line;
             while (std::getline(input_stream, line)) {
-                input_file.append(line + DataStringGlobals::NL);
+                input_file.append(line + '\n');
             }
             if (input_file.empty()) {
                 ShowFatalError("Failed to read input file: " + DataStringGlobals::inputFileName);
@@ -1638,7 +1638,6 @@ void InputProcessor::preScanReportingVariables()
     // Output:Variable
     // Meter:Custom
     // Meter:CustomDecrement
-    // Meter:CustomDifference
     // Output:Table:Monthly
     // Output:Table:TimeBins
     // Output:Table:SummaryReports
@@ -1649,7 +1648,6 @@ void InputProcessor::preScanReportingVariables()
     static std::string const OutputVariable("Output:Variable");
     static std::string const MeterCustom("Meter:Custom");
     static std::string const MeterCustomDecrement("Meter:CustomDecrement");
-    //      static std::string const MeterCustomDifference( "METER:CUSTOMDIFFERENCE" );
     static std::string const OutputTableMonthly("Output:Table:Monthly");
     static std::string const OutputTableAnnual("Output:Table:Annual");
     static std::string const OutputTableTimeBins("Output:Table:TimeBins");

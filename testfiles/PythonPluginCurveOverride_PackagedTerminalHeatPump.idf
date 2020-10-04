@@ -119,10 +119,10 @@
 ! Utility Tariffs:                None
 
   PythonPlugin:Instance,
-    EMSBasedCurveManager,  !- Name
+    EMSBasedCurveManager,    !- Name
     Yes,                     !- Run During Warmup Days
-    PythonPluginCurveOverride_PackagedTerminalHeatPump, !- Python Module Name
-    CurveOverwriteMGR;        !- Plugin Class Name
+    PythonPluginCurveOverride_PackagedTerminalHeatPump,  !- Python Module Name
+    CurveOverwriteMGR;       !- Plugin Class Name
 
 !  curve use for example
 !  Curve:Biquadratic,
@@ -172,7 +172,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -2024,9 +2026,16 @@
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
 
   Output:Variable,Zone1PTHPFanOutletNode,System Node Temperature,timestep;
+
   Output:Variable,Zone1PTHPFanOutletNode,System Node Humidity Ratio,timestep;
+
   Output:Variable,Zone1PTHPOAInNode,System Node Pressure,timestep;
+
   Output:Variable,Zone1PTHPOAInNode,System Node Temperature,timestep;
+
   Output:Variable,Zone1PTHPDXCoolCoil,Cooling Coil Total Cooling Rate,timestep;
+
   Output:Variable,Zone2PTHPDXCoolCoil,Cooling Coil Total Cooling Rate,timestep;
+
   Output:Variable,Zone3PTHPDXCoolCoil,Cooling Coil Total Cooling Rate,timestep;
+

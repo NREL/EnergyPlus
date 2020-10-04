@@ -314,7 +314,7 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values
-    ZoneEquipmentManager::AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
+    ZoneEquipmentManager::AutoCalcDOASControlStrategy(state, state.files);
     // check default low and high set point values
     ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
@@ -383,7 +383,7 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values
-    ZoneEquipmentManager::AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
+    ZoneEquipmentManager::AutoCalcDOASControlStrategy(state, state.files);
     // check default low and high set point values
     ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
@@ -481,5 +481,5 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     DaySim = 2;
     Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
     ASSERT_FALSE(Answer);
-    
+
 }

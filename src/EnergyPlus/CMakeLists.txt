@@ -4,7 +4,7 @@ if(WIN32)
 endif()
 
 set(PYTHON_API_VERSION_MAJOR 0)
-set(PYTHON_API_VERSION_MINOR 1)
+set(PYTHON_API_VERSION_MINOR 2)
 configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
 configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
@@ -25,6 +25,56 @@ SET( SRC
   AirLoopHVACDOAS.cc
   AirLoopHVACDOAS.hh
   AirTerminalUnit.hh
+  Autosizing/All_Simple_Sizing.cc
+  Autosizing/All_Simple_Sizing.hh
+  Autosizing/Base.cc
+  Autosizing/Base.hh
+  Autosizing/BaseSizerWithFanHeatInputs.cc
+  Autosizing/BaseSizerWithFanHeatInputs.hh
+  Autosizing/BaseSizerWithScalableInputs.cc
+  Autosizing/BaseSizerWithScalableInputs.hh
+  Autosizing/CoolingAirFlowSizing.cc
+  Autosizing/CoolingAirFlowSizing.hh
+  Autosizing/CoolingCapacitySizing.cc
+  Autosizing/CoolingCapacitySizing.hh
+  Autosizing/CoolingSHRSizing.cc
+  Autosizing/CoolingSHRSizing.hh
+  Autosizing/CoolingWaterDesAirInletHumRatSizing.cc
+  Autosizing/CoolingWaterDesAirInletHumRatSizing.hh
+  Autosizing/CoolingWaterDesAirInletTempSizing.cc
+  Autosizing/CoolingWaterDesAirInletTempSizing.hh
+  Autosizing/CoolingWaterDesAirOutletHumRatSizing.cc
+  Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh
+  Autosizing/CoolingWaterDesAirOutletTempSizing.cc
+  Autosizing/CoolingWaterDesAirOutletTempSizing.hh
+  Autosizing/CoolingWaterDesWaterInletTempSizing.cc
+  Autosizing/CoolingWaterDesWaterInletTempSizing.hh
+  Autosizing/CoolingWaterflowSizing.cc
+  Autosizing/CoolingWaterflowSizing.hh
+  Autosizing/CoolingWaterNumofTubesPerRowSizing.cc
+  Autosizing/CoolingWaterNumofTubesPerRowSizing.hh
+  Autosizing/HeatingAirFlowSizing.cc
+  Autosizing/HeatingAirFlowSizing.hh
+  Autosizing/HeatingAirflowUASizing.cc
+  Autosizing/HeatingAirflowUASizing.hh
+  Autosizing/HeatingCapacitySizing.cc
+  Autosizing/HeatingCapacitySizing.hh
+  Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.cc
+  Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.hh
+  Autosizing/HeatingWaterDesAirInletHumRatSizing.cc
+  Autosizing/HeatingWaterDesAirInletHumRatSizing.hh
+  Autosizing/HeatingWaterDesAirInletTempSizing.cc
+  Autosizing/HeatingWaterDesAirInletTempSizing.hh
+  Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.cc
+  Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.hh
+  Autosizing/HeatingWaterflowSizing.cc
+  Autosizing/HeatingWaterflowSizing.hh
+  Autosizing/SystemAirFlowSizing.cc
+  Autosizing/SystemAirFlowSizing.hh
+  Autosizing/WaterHeatingCapacitySizing.cc
+  Autosizing/WaterHeatingCapacitySizing.hh
+  Autosizing/WaterHeatingCoilUASizing.cc
+  Autosizing/WaterHeatingCoilUASizing.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
   BaseboardRadiator.cc
@@ -488,8 +538,6 @@ SET( SRC
   RefrigeratedCase.hh
   ReportCoilSelection.cc
   ReportCoilSelection.hh
-  ReportSizingManager.cc
-  ReportSizingManager.hh
   ResultsFramework.cc
   ResultsFramework.hh
   ReturnAirPathManager.cc
@@ -731,6 +779,9 @@ endif()
 if (WIN32)
   target_link_libraries( energypluslib Shlwapi )
 endif()
+if(LINK_WITH_PYTHON)
+  target_link_libraries( energypluslib ${PYTHON_LIBRARIES} )
+endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
 SET( API_HEADERS
@@ -738,6 +789,7 @@ SET( API_HEADERS
   api/runtime.h
   api/datatransfer.h
   api/state.h
+#  api/autosizing.h
   api/EnergyPlusPgm.hh
   api/EnergyPlusAPI.h
   api/TypeDefs.h
@@ -747,6 +799,7 @@ SET( API_CORE_SRC
   api/runtime.cc
   api/state.cc
   api/datatransfer.cc
+#  api/autosizing.cc
   api/EnergyPlusPgm.cc)
 
 option( BUILD_STATIC_ENERGYPLUS_API "Build a static library instead of a shared library for the EnergyPlus API" OFF )
@@ -776,21 +829,6 @@ install( TARGETS energyplusapi
   ARCHIVE DESTINATION ./
 )
 
-# we will build the intermediate wrapper DLL that hard links to Python DLL here
-if(LINK_WITH_PYTHON)
-  add_library( pythonwrapper SHARED
-          PythonLibWrapper.cc
-          PythonLibWrapper.hh
-          )
-  target_link_libraries( pythonwrapper ${PYTHON_LIBRARIES} )
-  add_dependencies( energyplusapi pythonwrapper)
-  install( TARGETS pythonwrapper
-          RUNTIME DESTINATION ./
-          LIBRARY DESTINATION ./
-          ARCHIVE DESTINATION ./
-          )
-endif()
-
 # now the actual E+ executable
 if (APPLE OR UNIX)
   add_executable( energyplus main.cc )
@@ -806,6 +844,9 @@ set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 add_custom_command(
         TARGET energyplusapi
         POST_BUILD
+        DEPENDS "${PROJECT_SOURCE_DIR}/src/EnergyPlus/api"
+        # TODO: temporary "hack" to depend on a specific file that doesn't exist to force this to run
+        DEPENDS __ALWAYSRUNME
         COMMAND ${CMAKE_COMMAND}
         -DREPO_ROOT=${PROJECT_SOURCE_DIR}
         -DEXECUTABLE_PATH=$<TARGET_FILE:energyplusapi>
@@ -816,9 +857,6 @@ add_custom_command(
         -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}"
         -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}"
         -P "${PROJECT_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake"
-        # TODO: temporary "hack" to depend on a specific file that doesn't exist to force this to run
-        # ideally the whole process would be revamped
-        DEPENDS __ALWAYSRUNME
 )
 
 install( TARGETS energyplus energyplusapi DESTINATION ./ )
@@ -853,6 +891,7 @@ if(LINK_WITH_PYTHON)
       "execute_process(
         COMMAND ${CMAKE_COMMAND}
         -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
+        -DEPLUS_DYNAMIC_LIB_NAME=libenergyplusapi.${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}.dylib
         -DEXECUTABLE_PATH=\${CMAKE_INSTALL_PREFIX}/energyplus${CMAKE_EXECUTABLE_SUFFIX}
         -P ${PROJECT_SOURCE_DIR}/cmake/PythonFixUpOnMac.cmake
       )"
@@ -918,6 +957,12 @@ if( BUILD_TESTING )
   target_link_libraries( TestAPI_DataTransfer_C energyplusapi )
   add_test(NAME "API.TestDataTransferC" COMMAND TestAPI_DataTransfer_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
 
+#  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/autosizing")
+#  file(MAKE_DIRECTORY ${TEST_DIR})
+#  add_executable( TestAPI_Autosizing_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestAutosizing.c )
+#  target_link_libraries( TestAPI_Autosizing_C energyplusapi )
+#  add_test(NAME "API.TestAutosizingC" COMMAND TestAPI_Autosizing_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
+
   # This is tricky, the test scripts should be copied into the Products/<config> directory, but add_test has to be
   # called so early, it's hard to figure that out ahead of time.  I dunno.  Just skipping these on MSVC builds for now.
   if(NOT MSVC)
@@ -941,6 +986,13 @@ if( BUILD_TESTING )
     add_test(NAME "API.TestDataTransferPython"
             COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
             WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+
+#    set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/autosizing_python")
+#    file(MAKE_DIRECTORY ${TEST_DIR})
+#    configure_file( "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestAutosizing.py" "${API_TEST_TARGET_DIR}/TestAutosizing.py" )
+#    add_test(NAME "API.TestAutosizingPython"
+#            COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestAutosizing.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
+#            WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
     set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/plugin_tester_tester")
     file(MAKE_DIRECTORY ${TEST_DIR})

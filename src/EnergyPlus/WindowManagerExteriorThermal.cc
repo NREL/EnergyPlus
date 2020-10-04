@@ -49,6 +49,7 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -75,7 +76,8 @@ using namespace General;
 namespace WindowManager {
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    void CalcWindowHeatBalanceExternalRoutines(WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
+    void CalcWindowHeatBalanceExternalRoutines(EnergyPlusData &state,
+                                               int const SurfNum,          // Surface number
                                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                                Real64 &SurfInsideTemp,     // Inside window surface temperature
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
@@ -100,7 +102,7 @@ namespace WindowManager {
 
         // Tarcog thermal system for solving heat transfer through the window
         auto aFactory = CWCEHeatTransferFactory(surface, SurfNum);
-        auto aSystem = aFactory.getTarcogSystem(dataWindowManager, HextConvCoeff);
+        auto aSystem = aFactory.getTarcogSystem(state, HextConvCoeff);
         aSystem->setTolerance(solutionTolerance);
 
         // get previous timestep temperatures solution for faster iterations
@@ -133,7 +135,7 @@ namespace WindowManager {
             Real64 aTemp = 0;
             for (auto aSide : EnumSide()) {
                 aTemp = aLayer->getTemperature(aSide);
-                dataWindowManager.thetas(i) = aTemp;
+                state.dataWindowManager->thetas(i) = aTemp;
                 if (i == 1) {
                     SurfOutsideTemp = aTemp - KelvinConv;
                 }
@@ -144,7 +146,7 @@ namespace WindowManager {
                 auto EffShBlEmiss = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), window.EffShBlindEmiss);
                 auto EffGlEmiss = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), window.EffGlassEmiss);
                 SurfWinEffInsSurfTemp(SurfNum) =
-                    (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (dataWindowManager.thetas(2 * totSolidLayers - 2) - dataWindowManager.TKelvin)) / (EffShBlEmiss + EffGlEmiss);
+                    (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (state.dataWindowManager->thetas(2 * totSolidLayers - 2) - state.dataWindowManager->TKelvin)) / (EffShBlEmiss + EffGlEmiss);
             }
         }
 
@@ -155,8 +157,8 @@ namespace WindowManager {
             // through shade (consider case when openings are zero) is different from heat flow obtained by these equations. Will keep
             // these calculations just to confirm that current exterior engine is giving close results to what is in here. (Simon)
             auto totLayers = aLayers.size();
-            dataWindowManager.nglface = 2 * totLayers - 2;
-            dataWindowManager.nglfacep = dataWindowManager.nglface + 2;
+            state.dataWindowManager->nglface = 2 * totLayers - 2;
+            state.dataWindowManager->nglfacep = state.dataWindowManager->nglface + 2;
             auto aShadeLayer = aLayers[totLayers - 1];
             auto aGlassLayer = aLayers[totLayers - 2];
             auto ShadeArea = Surface(SurfNum).Area + SurfWinDividerArea(SurfNum);
@@ -171,11 +173,11 @@ namespace WindowManager {
             auto RhoGlIR2 = 1.0 - glassEmiss;
             auto ShGlReflFacIR = 1.0 - RhoGlIR2 * RhoShIR1;
             auto rmir = surface.getInsideIR(SurfNum);
-            auto NetIRHeatGainShade = ShadeArea * EpsShIR2 * (dataWindowManager.sigma * pow(dataWindowManager.thetas(dataWindowManager.nglfacep), 4) - rmir) +
-                                      EpsShIR1 * (dataWindowManager.sigma * pow(dataWindowManager.thetas(dataWindowManager.nglfacep - 1), 4) - rmir) * RhoGlIR2 * TauShIR / ShGlReflFacIR;
-            auto NetIRHeatGainGlass = ShadeArea * (glassEmiss * TauShIR / ShGlReflFacIR) * (dataWindowManager.sigma * pow(dataWindowManager.thetas(dataWindowManager.nglface), 4) - rmir);
+            auto NetIRHeatGainShade = ShadeArea * EpsShIR2 * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep), 4) - rmir) +
+                                      EpsShIR1 * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep - 1), 4) - rmir) * RhoGlIR2 * TauShIR / ShGlReflFacIR;
+            auto NetIRHeatGainGlass = ShadeArea * (glassEmiss * TauShIR / ShGlReflFacIR) * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglface), 4) - rmir);
             auto tind = surface.getInsideAirTemperature(SurfNum) + KelvinConv;
-            auto ConvHeatGainFrZoneSideOfShade = ShadeArea * HConvIn(SurfNum) * (dataWindowManager.thetas(dataWindowManager.nglfacep) - tind);
+            auto ConvHeatGainFrZoneSideOfShade = ShadeArea * HConvIn(SurfNum) * (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep) - tind);
             SurfWinHeatGain(SurfNum) = SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
             SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
 
@@ -207,9 +209,9 @@ namespace WindowManager {
                 surface.Area * h_cin * (backSurface->getTemperature() - aSystem->getAirTemperature(Environment::Indoor));
 
             auto rmir = surface.getInsideIR(SurfNum);
-            auto NetIRHeatGainGlass = surface.Area * backSurface->getEmissivity() * (dataWindowManager.sigma * pow(backSurface->getTemperature(), 4) - rmir);
+            auto NetIRHeatGainGlass = surface.Area * backSurface->getEmissivity() * (state.dataWindowManager->sigma * pow(backSurface->getTemperature(), 4) - rmir);
 
-            SurfWinEffInsSurfTemp(SurfNum) = aLayers[totLayers - 1]->getTemperature(Side::Back) - dataWindowManager.TKelvin;
+            SurfWinEffInsSurfTemp(SurfNum) = aLayers[totLayers - 1]->getTemperature(Side::Back) - state.dataWindowManager->TKelvin;
             SurfaceWindow(SurfNum).EffGlassEmiss = aLayers[totLayers - 1]->getSurface(Side::Back)->getEmissivity();
 
             SurfWinHeatGain(SurfNum) = SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
@@ -225,12 +227,12 @@ namespace WindowManager {
         SurfWinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
 
         for (auto k = 1; k <= surface.getTotLayers(); ++k) {
-            SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = dataWindowManager.thetas(2 * k - 1);
-            SurfaceWindow(SurfNum).ThetaFace(2 * k) = dataWindowManager.thetas(2 * k);
+            SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas(2 * k - 1);
+            SurfaceWindow(SurfNum).ThetaFace(2 * k) = state.dataWindowManager->thetas(2 * k);
 
             // temperatures for reporting
-            SurfWinFenLaySurfTempFront(k, SurfNum) = dataWindowManager.thetas(2 * k - 1) - KelvinConv;
-            SurfWinFenLaySurfTempBack(k, SurfNum) = dataWindowManager.thetas(2 * k) - KelvinConv;
+            SurfWinFenLaySurfTempFront(k, SurfNum) = state.dataWindowManager->thetas(2 * k - 1) - KelvinConv;
+            SurfWinFenLaySurfTempBack(k, SurfNum) = state.dataWindowManager->thetas(2 * k) - KelvinConv;
         }
     }
 
@@ -249,8 +251,8 @@ namespace WindowManager {
 
         if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn ||
             ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn) {
-            m_ConstructionNumber = m_Surface.ShadedConstruction;
-            if (SurfWinStormWinFlag(t_SurfNum) > 0) m_ConstructionNumber = m_Surface.StormWinShadedConstruction;
+            m_ConstructionNumber = m_Surface.activeShadedConstruction;
+            if (SurfWinStormWinFlag(t_SurfNum) > 0) m_ConstructionNumber = m_Surface.activeStormWinShadedConstruction;
         }
 
         m_TotLay = getNumOfLayers();
@@ -269,10 +271,10 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CSingleSystem> CWCEHeatTransferFactory::getTarcogSystem(WindowManagerData &dataWindowManager, Real64 const t_HextConvCoeff)
+    std::shared_ptr<CSingleSystem> CWCEHeatTransferFactory::getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff)
     {
         auto Indoor = getIndoor();
-        auto Outdoor = getOutdoor(dataWindowManager, t_HextConvCoeff);
+        auto Outdoor = getOutdoor(state, t_HextConvCoeff);
         auto aIGU = getIGU();
 
         // pick-up all layers and put them in IGU (this includes gap layers as well)
@@ -305,8 +307,8 @@ namespace WindowManager {
         if (SurfWinShadingFlag(m_SurfNum) == IntShadeOn || SurfWinShadingFlag(m_SurfNum) == ExtShadeOn || SurfWinShadingFlag(m_SurfNum) == IntBlindOn ||
             SurfWinShadingFlag(m_SurfNum) == ExtBlindOn || SurfWinShadingFlag(m_SurfNum) == BGShadeOn || SurfWinShadingFlag(m_SurfNum) == BGBlindOn ||
             SurfWinShadingFlag(m_SurfNum) == ExtScreenOn) {
-            ConstrNum = m_Surface.ShadedConstruction;
-            if (SurfWinStormWinFlag(m_SurfNum) > 0) ConstrNum = m_Surface.StormWinShadedConstruction;
+            ConstrNum = m_Surface.activeShadedConstruction;
+            if (SurfWinStormWinFlag(m_SurfNum) > 0) ConstrNum = m_Surface.activeStormWinShadedConstruction;
         }
 
         auto &construction(dataConstruction.Construct(ConstrNum));
@@ -603,7 +605,7 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CEnvironment> CWCEHeatTransferFactory::getOutdoor(WindowManagerData &dataWindowManager, const Real64 t_Hext) const
+    std::shared_ptr<CEnvironment> CWCEHeatTransferFactory::getOutdoor(EnergyPlusData &state, const Real64 t_Hext) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -614,7 +616,7 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Creates outdoor environment object from surface properties in EnergyPlus
         double tout = m_Surface.getOutsideAirTemperature(m_SurfNum) + KelvinConv;
-        double IR = m_Surface.getOutsideIR(dataWindowManager, m_SurfNum);
+        double IR = m_Surface.getOutsideIR(state, m_SurfNum);
         // double dirSolRad = QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
         double swRadiation = m_Surface.getSWIncident(m_SurfNum);
         double tSky = SkyTempKelvin;

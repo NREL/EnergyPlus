@@ -59,10 +59,8 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -124,7 +122,6 @@ namespace WindowEquivalentLayer {
     //  Vol. 110, Pt. 1., pp. 455-462.
     // Using/Aliasing
     using namespace DataHeatBalance;
-    using namespace DataPrecisionGlobals;
     using namespace DataSurfaces;
     using DataEnvironment::DayOfMonth;
     using DataEnvironment::Month;
@@ -139,7 +136,7 @@ namespace WindowEquivalentLayer {
     using DataGlobals::WarmupFlag;
     using General::TrimSigDigits;
 
-    void InitEquivalentLayerWindowCalculations(WindowEquivalentLayerData &dataWindowEquivalentLayer)
+    void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -160,17 +157,17 @@ namespace WindowEquivalentLayer {
 
         if (TotWinEquivLayerConstructs < 1) return;
         if (!allocated(CFS)) CFS.allocate(TotWinEquivLayerConstructs);
-        if (!allocated(dataWindowEquivalentLayer.EQLDiffPropFlag)) dataWindowEquivalentLayer.EQLDiffPropFlag.allocate(TotWinEquivLayerConstructs);
-        if (!allocated(dataWindowEquivalentLayer.CFSDiffAbsTrans)) dataWindowEquivalentLayer.CFSDiffAbsTrans.allocate(2, CFSMAXNL + 1, TotWinEquivLayerConstructs);
+        if (!allocated(state.dataWindowEquivalentLayer->EQLDiffPropFlag)) state.dataWindowEquivalentLayer->EQLDiffPropFlag.allocate(TotWinEquivLayerConstructs);
+        if (!allocated(state.dataWindowEquivalentLayer->CFSDiffAbsTrans)) state.dataWindowEquivalentLayer->CFSDiffAbsTrans.allocate(2, CFSMAXNL + 1, TotWinEquivLayerConstructs);
 
-        dataWindowEquivalentLayer.EQLDiffPropFlag = true;
-        dataWindowEquivalentLayer.CFSDiffAbsTrans = 0.0;
+        state.dataWindowEquivalentLayer->EQLDiffPropFlag = true;
+        state.dataWindowEquivalentLayer->CFSDiffAbsTrans = 0.0;
 
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
             if (!dataConstruction.Construct(ConstrNum).TypeIsWindow) continue;
             if (!dataConstruction.Construct(ConstrNum).WindowTypeEQL) continue; // skip if not equivalent layer window
 
-            SetEquivalentLayerWindowProperties(dataWindowEquivalentLayer, ConstrNum);
+            SetEquivalentLayerWindowProperties(state, ConstrNum);
 
         } //  end do for TotConstructs
 
@@ -183,7 +180,7 @@ namespace WindowEquivalentLayer {
         } //  end do for SurfNum
     }
 
-    void SetEquivalentLayerWindowProperties(WindowEquivalentLayerData &dataWindowEquivalentLayer, int const ConstrNum)
+    void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -193,7 +190,7 @@ namespace WindowEquivalentLayer {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Polpulates the the equivalent layer window model optical and thermal
+        // Populates the the equivalent layer window model optical and thermal
         // properties, fills default values and shades geomterical calculations
 
         // METHODOLOGY EMPLOYED:
@@ -333,7 +330,7 @@ namespace WindowEquivalentLayer {
                 CFS(EQLNum).G(gLayer).FG.CVISC = dataMaterial.Material(MaterNum).GasVis(3, 1);
                 CFS(EQLNum).G(gLayer).FG.MHAT = dataMaterial.Material(MaterNum).GasWght(1);
                 // fills gas density and effective gap thickness
-                BuildGap(dataWindowEquivalentLayer, CFS(EQLNum).G(gLayer), CFS(EQLNum).G(gLayer).GTYPE, CFS(EQLNum).G(gLayer).TAS);
+                BuildGap(state, CFS(EQLNum).G(gLayer), CFS(EQLNum).G(gLayer).GTYPE, CFS(EQLNum).G(gLayer).TAS);
             } else {
                 CFS(EQLNum).L(sLayer).LTYPE = ltyNONE;
             }
@@ -345,35 +342,36 @@ namespace WindowEquivalentLayer {
 
             // checks optical properties and fill in default values for diffuse optical
             // properties by calculating from other optical inputs, also fills in geometrical inputs
-            CheckAndFixCFSLayer(dataWindowEquivalentLayer, CFS(EQLNum).L(sLayer));
+            CheckAndFixCFSLayer(state, CFS(EQLNum).L(sLayer));
 
         } // end do for Construct(ConstrNum)%TotLayers
 
         // Finalize CFS after get input.  Correct effective gap thickness for VB
-        FinalizeCFS(dataWindowEquivalentLayer, CFS(EQLNum));
+        FinalizeCFS(state, CFS(EQLNum));
 
         // get total solid layers (glazing layers + shade layers)
         dataConstruction.Construct(ConstrNum).TotSolidLayers = CFS(EQLNum).NL;
 
         // Calculate layers diffuse absorptance and system diffuse transmittance
-        CalcEQLWindowOpticalProperty(dataWindowEquivalentLayer, CFS(EQLNum), isDIFF, SysAbs1, 0.0, 0.0, 0.0);
+        CalcEQLWindowOpticalProperty(state, CFS(EQLNum), isDIFF, SysAbs1, 0.0, 0.0, 0.0);
         dataConstruction.Construct(ConstrNum).TransDiffFrontEQL = SysAbs1(1, CFS(EQLNum).NL + 1);
-        dataWindowEquivalentLayer.CFSDiffAbsTrans(_, _, EQLNum) = SysAbs1;
+        state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, _, EQLNum) = SysAbs1;
         dataConstruction.Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = SysAbs1(1, {1, CFSMAXNL});
         dataConstruction.Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = SysAbs1(2, {1, CFSMAXNL});
         // get construction front and back diffuse effective reflectance
         dataConstruction.Construct(ConstrNum).ReflectSolDiffFront = CFS(EQLNum).L(1).SWP_EL.RHOSFDD;
         dataConstruction.Construct(ConstrNum).ReflectSolDiffBack = CFS(EQLNum).L(CFS(EQLNum).NL).SWP_EL.RHOSBDD;
         // calculate U-Value, SHGC and Normal Transmittance of EQL Window
-        CalcEQLWindowStandardRatings(dataWindowEquivalentLayer, ConstrNum);
+        CalcEQLWindowStandardRatings(state, ConstrNum);
 
-        if (CFSHasControlledShade(dataWindowEquivalentLayer, CFS(EQLNum)) > 0) CFS(EQLNum).ISControlled = true; // is controlled
+        if (CFSHasControlledShade(state, CFS(EQLNum)) > 0) CFS(EQLNum).ISControlled = true; // is controlled
 
         // set internal face emissivity
         dataConstruction.Construct(ConstrNum).InsideAbsorpThermal = EffectiveEPSLB(CFS(EQLNum));
     }
 
-    void CalcEQLWindowUvalue(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSTY const &FS, // CFS to be calculated
+    void CalcEQLWindowUvalue(EnergyPlusData &state,
+                             CFSTY const &FS, // CFS to be calculated
                              Real64 &UNFRC    // NFRC U-factor, W/m2-K
     )
     {
@@ -448,7 +446,7 @@ namespace WindowEquivalentLayer {
             HXI = HCI + HRI;
             HXO = HCO + HRO;
             UOld = U;
-            if (!CFSUFactor(dataWindowEquivalentLayer, FS, TOUT, HCO, TIN, HCI, U)) break;
+            if (!CFSUFactor(state, FS, TOUT, HCO, TIN, HCI, U)) break;
             if (I > 1 && FEQX(U, UOld, 0.001)) {
                 CFSURated = true;
                 break;
@@ -462,7 +460,8 @@ namespace WindowEquivalentLayer {
         UNFRC = U;
     }
 
-    void CalcEQLWindowSHGCAndTransNormal(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSTY const &FS,    // fenestration system
+    void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
+                                         CFSTY const &FS,    // fenestration system
                                          Real64 &SHGCSummer, // solar heat gain coefficient
                                          Real64 &TransNormal // transmittance at normal incidence
     )
@@ -537,13 +536,14 @@ namespace WindowEquivalentLayer {
 
         //  Convert direct-normal solar properties for beam incidence to current incident angle
         for (I = 1; I <= NL; ++I) {
-            ASHWAT_OffNormalProperties(dataWindowEquivalentLayer, FS.L(I), IncA, VProfA, HProfA, SWP_ON(I));
+            ASHWAT_OffNormalProperties(state, FS.L(I), IncA, VProfA, HProfA, SWP_ON(I));
         }
         ASHWAT_Solar(FS.NL, SWP_ON, SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1(1, {1, FS.NL + 1}), Abs1(2, {1, FS.NL + 1}));
         TransNormal = Abs1(1, NL + 1);
 
         // Calculate SHGC using net radiation method (ASHWAT Model)
-        CFSSHGC = ASHWAT_ThermalRatings(dataWindowEquivalentLayer, FS,
+        CFSSHGC = ASHWAT_ThermalRatings(state,
+                                        FS,
                                         TIN,
                                         TOUT,
                                         HCIN,
@@ -574,7 +574,8 @@ namespace WindowEquivalentLayer {
         SHGCSummer = SHGC;
     }
 
-    void CalcEQLWindowOpticalProperty(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSTY &FS,              // fenestration system
+    void CalcEQLWindowOpticalProperty(EnergyPlusData &state,
+                                      CFSTY &FS,              // fenestration system
                                       int const DiffBeamFlag, // isDIFF: calc diffuse properties
                                       Array2A<Real64> Abs1,
                                       Real64 const IncA,   // angle of incidence, radians
@@ -625,8 +626,8 @@ namespace WindowEquivalentLayer {
         if (FS.ISControlled) { // at least 1 controlled layer found
             for (iL = 1; iL <= NL; ++iL) {
                 // If there is shade control (Venetian Blind Only).
-                if (IsControlledShade(dataWindowEquivalentLayer, FS.L(iL))) {
-                    DoShadeControlR = DoShadeControl(dataWindowEquivalentLayer, FS.L(iL), IncA, VProfA, HProfA);
+                if (IsControlledShade(state, FS.L(iL))) {
+                    DoShadeControlR = DoShadeControl(state, FS.L(iL), IncA, VProfA, HProfA);
                 }
             }
         }
@@ -634,7 +635,7 @@ namespace WindowEquivalentLayer {
         if (DiffBeamFlag != isDIFF) {
             //  Beam: Convert direct-normal solar properties to off-normal properties
             for (I = 1; I <= NL; ++I) {
-                ASHWAT_OffNormalProperties(dataWindowEquivalentLayer, FS.L(I), IncA, VProfA, HProfA, SWP_ON(I));
+                ASHWAT_OffNormalProperties(state, FS.L(I), IncA, VProfA, HProfA, SWP_ON(I));
             }
             ASHWAT_Solar(FS.NL, SWP_ON, SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1(1, {1, FS.NL + 1}), Abs1(2, {1, FS.NL + 1}));
         } else {
@@ -647,7 +648,8 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    void EQLWindowSurfaceHeatBalance(WindowEquivalentLayerData &dataWindowEquivalentLayer, int const SurfNum,       // Surface number
+    void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
+                                     int const SurfNum,       // Surface number
                                      Real64 const HcOut,      // outside convection coeficient at this timestep, W/m2K
                                      Real64 &SurfInsideTemp,  // Inside window surface temperature (innermost face) [C]
                                      Real64 &SurfOutsideTemp, // Outside surface temperature (C)
@@ -673,7 +675,6 @@ namespace WindowEquivalentLayer {
         using DataEnvironment::SkyTempKelvin;
         using DataGlobals::AnyLocalEnvironmentsInModel;
         using DataGlobals::StefanBoltzmann;
-        using DataHeatBalSurface::HcExtSurf;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::InterpSw;
@@ -886,7 +887,7 @@ namespace WindowEquivalentLayer {
         QAllSWwinAbs({1, NL + 1}) = SurfWinQRadSWwinAbs({1, NL + 1}, SurfNum);
         //  Solve energy balance(s) for temperature at each node/layer and
         //  heat flux, including components, between each pair of nodes/layers
-        ASHWAT_ThermalCalc(dataWindowEquivalentLayer, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, QAllSWwinAbs({1, NL + 1}), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+        ASHWAT_ThermalCalc(state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, QAllSWwinAbs({1, NL + 1}), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
 
         // effective surface temperature is set to surface temperature calculated
         // by the fenestration layers temperature solver
@@ -995,7 +996,8 @@ namespace WindowEquivalentLayer {
         return P01;
     }
 
-    Real64 HEMINT(WindowEquivalentLayerData &dataWindowEquivalentLayer, std::function<Real64(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const THETA, int const OPT, const Array1D<Real64> &)> F, // property integrand function
+    Real64 HEMINT(EnergyPlusData &state,
+                  std::function<Real64(EnergyPlusData &state, Real64 const THETA, int const OPT, const Array1D<Real64> &)> F, // property integrand function
                   int const F_Opt,                                                                   // options passed to F() (hipRHO, hipTAU)
                   const Array1D<Real64> &F_P                                                          // parameters passed to F()
     )
@@ -1011,7 +1013,7 @@ namespace WindowEquivalentLayer {
         //  Romberg Integration.
 
         // Argument array dimensioning
-        EP_SIZE_CHECK(F_P, dataWindowEquivalentLayer.hipDIM);
+        EP_SIZE_CHECK(F_P, state.dataWindowEquivalentLayer->hipDIM);
 
         static int const KMAX(8); // max steps
         static int const NPANMAX(std::pow(2, KMAX));
@@ -1044,7 +1046,7 @@ namespace WindowEquivalentLayer {
                     //   evaluate integrand function for new X values
                     //   2 * sin( x) * cos( x) covers hemisphere with single integral
                     X = X1 + I * DX;
-                    FX = 2.0 * std::sin(X) * std::cos(X) * F(dataWindowEquivalentLayer, X, F_Opt, F_P);
+                    FX = 2.0 * std::sin(X) * std::cos(X) * F(state, X, F_Opt, F_P);
                     if (K == 1) FX /= 2.0;
                     SUM += FX;
                 }
@@ -1073,7 +1075,8 @@ namespace WindowEquivalentLayer {
         return P01(T(K, K), RoutineName);
     }
 
-    void RB_DIFF(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const RHO_BT0, // normal incidence beam-total reflectance
+    void RB_DIFF(EnergyPlusData &state,
+                 Real64 const RHO_BT0, // normal incidence beam-total reflectance
                  Real64 const TAU_BT0, // normal incidence beam-total transmittance
                  Real64 const TAU_BB0, // normal incidence beam-beam transmittance
                  Real64 &RHO_DD,       // returned: diffuse-diffuse reflectance
@@ -1093,15 +1096,15 @@ namespace WindowEquivalentLayer {
 
         static std::string const RoutineName("RB_DIFF: ");
 
-        Array1D<Real64> P(dataWindowEquivalentLayer.hipDIM);
+        Array1D<Real64> P(state.dataWindowEquivalentLayer->hipDIM);
         Real64 SumRefAndTran; // sum of the reflectance and transmittance
 
         RHO_DD = RHO_BT0;
-        P(dataWindowEquivalentLayer.hipRHO_BT0) = RHO_BT0;
-        P(dataWindowEquivalentLayer.hipTAU_BT0) = TAU_BT0;
-        P(dataWindowEquivalentLayer.hipTAU_BB0) = TAU_BB0;
+        P(state.dataWindowEquivalentLayer->hipRHO_BT0) = RHO_BT0;
+        P(state.dataWindowEquivalentLayer->hipTAU_BT0) = TAU_BT0;
+        P(state.dataWindowEquivalentLayer->hipTAU_BB0) = TAU_BB0;
 
-        TAU_DD = HEMINT(dataWindowEquivalentLayer, RB_F, 0, P);
+        TAU_DD = HEMINT(state, RB_F, 0, P);
 
         if (RHO_DD + TAU_DD > 1.0) {
             SumRefAndTran = RHO_DD + TAU_DD;
@@ -1114,7 +1117,8 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    Real64 RB_F(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const THETA,       // incidence angle, radians
+    Real64 RB_F(EnergyPlusData &state,
+                Real64 const THETA,       // incidence angle, radians
                 int const EP_UNUSED(OPT), // options (unused)
                 const Array1D<Real64> &P   // parameters
     )
@@ -1128,14 +1132,14 @@ namespace WindowEquivalentLayer {
         //  Roller blind integrand
 
         // Argument array dimensioning
-        EP_SIZE_CHECK(P, dataWindowEquivalentLayer.hipDIM);
+        EP_SIZE_CHECK(P, state.dataWindowEquivalentLayer->hipDIM);
 
         Real64 RHO_BD;
         Real64 TAU_BB;
         Real64 TAU_BD;
         // Flow
 
-        RB_BEAM(THETA, P(dataWindowEquivalentLayer.hipRHO_BT0), P(dataWindowEquivalentLayer.hipTAU_BT0), P(dataWindowEquivalentLayer.hipTAU_BB0), RHO_BD, TAU_BB, TAU_BD);
+        RB_BEAM(THETA, P(state.dataWindowEquivalentLayer->hipRHO_BT0), P(state.dataWindowEquivalentLayer->hipTAU_BT0), P(state.dataWindowEquivalentLayer->hipTAU_BB0), RHO_BD, TAU_BB, TAU_BD);
 
         return TAU_BB + TAU_BD;
     }
@@ -1206,7 +1210,8 @@ namespace WindowEquivalentLayer {
         TAU_BD = P01(TAU_BT - TAU_BB, ContextName);
     }
 
-    void IS_DIFF(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const RHO_BT0, // normal incidence beam-total reflectance
+    void IS_DIFF(EnergyPlusData &state,
+                 Real64 const RHO_BT0, // normal incidence beam-total reflectance
                  Real64 const TAU_BT0, // normal incidence beam-total transmittance
                  Real64 const TAU_BB0, // normal incidence beam-beam transmittance
                  Real64 &RHO_DD,       // returned: diffuse-diffuse reflectance
@@ -1226,18 +1231,18 @@ namespace WindowEquivalentLayer {
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //   TAU_BT0 = TAU_BB0 + TAU_BD0
-        Array1D<Real64> P(dataWindowEquivalentLayer.hipDIM);
+        Array1D<Real64> P(state.dataWindowEquivalentLayer->hipDIM);
 
         static std::string const RoutineName("IS_DIFF: ");
 
         Real64 SumRefAndTran;
 
-        P(dataWindowEquivalentLayer.hipRHO_BT0) = RHO_BT0;
-        P(dataWindowEquivalentLayer.hipTAU_BT0) = TAU_BT0;
-        P(dataWindowEquivalentLayer.hipTAU_BB0) = TAU_BB0;
+        P(state.dataWindowEquivalentLayer->hipRHO_BT0) = RHO_BT0;
+        P(state.dataWindowEquivalentLayer->hipTAU_BT0) = TAU_BT0;
+        P(state.dataWindowEquivalentLayer->hipTAU_BB0) = TAU_BB0;
 
-        RHO_DD = HEMINT(dataWindowEquivalentLayer, IS_F, dataWindowEquivalentLayer.hipRHO, P);
-        TAU_DD = HEMINT(dataWindowEquivalentLayer, IS_F, dataWindowEquivalentLayer.hipTAU, P);
+        RHO_DD = HEMINT(state, IS_F, state.dataWindowEquivalentLayer->hipRHO, P);
+        TAU_DD = HEMINT(state, IS_F, state.dataWindowEquivalentLayer->hipTAU, P);
 
         if (RHO_DD + TAU_DD > 1.0) {
             SumRefAndTran = RHO_DD + TAU_DD;
@@ -1250,7 +1255,8 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    Real64 IS_F(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const THETA,     // incidence angle, radians
+    Real64 IS_F(EnergyPlusData &state,
+                Real64 const THETA,     // incidence angle, radians
                 int const OPT,          // options (1=reflectance, 2=transmittance)
                 const Array1D<Real64> &P // parameters
     )
@@ -1267,18 +1273,18 @@ namespace WindowEquivalentLayer {
         Real64 IS_F;
 
         // Argument array dimensioning
-        EP_SIZE_CHECK(P, dataWindowEquivalentLayer.hipDIM);
+        EP_SIZE_CHECK(P, state.dataWindowEquivalentLayer->hipDIM);
 
         Real64 RHO_BD;
         Real64 TAU_BB;
         Real64 TAU_BD;
         // Flow
 
-        IS_BEAM(THETA, P(dataWindowEquivalentLayer.hipRHO_BT0), P(dataWindowEquivalentLayer.hipTAU_BT0), P(dataWindowEquivalentLayer.hipTAU_BB0), RHO_BD, TAU_BB, TAU_BD);
+        IS_BEAM(THETA, P(state.dataWindowEquivalentLayer->hipRHO_BT0), P(state.dataWindowEquivalentLayer->hipTAU_BT0), P(state.dataWindowEquivalentLayer->hipTAU_BB0), RHO_BD, TAU_BB, TAU_BD);
 
-        if (OPT == dataWindowEquivalentLayer.hipRHO) {
+        if (OPT == state.dataWindowEquivalentLayer->hipRHO) {
             IS_F = RHO_BD;
-        } else if (OPT == dataWindowEquivalentLayer.hipTAU) {
+        } else if (OPT == state.dataWindowEquivalentLayer->hipTAU) {
             IS_F = TAU_BB + TAU_BD;
         } else {
             IS_F = -1.0;
@@ -1388,7 +1394,8 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    void FM_DIFF(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const RHO_BT0, // fabric beam-total reflectance at normal incidence
+    void FM_DIFF(EnergyPlusData &state,
+                 Real64 const RHO_BT0, // fabric beam-total reflectance at normal incidence
                  Real64 const TAU_BT0, // fabric beam-total transmittance at normal incidence
                  Real64 const TAU_BB0, // forward facing fabric beam-beam transmittance at normal incidence
                  Real64 &RHO_DD,       // returned: fabric diffuse-diffuse reflectance
@@ -1412,17 +1419,17 @@ namespace WindowEquivalentLayer {
         static std::string const RoutineName("FM_DIFF: ");
 
         Real64 TAU_BD0;
-        Array1D<Real64> P(dataWindowEquivalentLayer.hipDIM);
+        Array1D<Real64> P(state.dataWindowEquivalentLayer->hipDIM);
         Real64 SumRefAndTran;
 
         TAU_BD0 = TAU_BT0 - TAU_BB0;
 
-        P(dataWindowEquivalentLayer.hipRHO_BT0) = RHO_BT0;
-        P(dataWindowEquivalentLayer.hipTAU_BT0) = TAU_BT0;
-        P(dataWindowEquivalentLayer.hipTAU_BB0) = TAU_BB0;
+        P(state.dataWindowEquivalentLayer->hipRHO_BT0) = RHO_BT0;
+        P(state.dataWindowEquivalentLayer->hipTAU_BT0) = TAU_BT0;
+        P(state.dataWindowEquivalentLayer->hipTAU_BB0) = TAU_BB0;
 
-        RHO_DD = HEMINT(dataWindowEquivalentLayer, FM_F, dataWindowEquivalentLayer.hipRHO, P);
-        TAU_DD = HEMINT(dataWindowEquivalentLayer, FM_F, dataWindowEquivalentLayer.hipTAU, P);
+        RHO_DD = HEMINT(state, FM_F, state.dataWindowEquivalentLayer->hipRHO, P);
+        TAU_DD = HEMINT(state, FM_F, state.dataWindowEquivalentLayer->hipTAU, P);
 
         if (RHO_DD + TAU_DD > 1.0) {
             SumRefAndTran = RHO_DD + TAU_DD;
@@ -1435,7 +1442,8 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    Real64 FM_F(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const THETA,     // incidence angle, radians
+    Real64 FM_F(EnergyPlusData &state,
+                Real64 const THETA,     // incidence angle, radians
                 int const Opt,          // options (hipRHO, hipTAU)
                 const Array1D<Real64> &P // parameters
     )
@@ -1452,17 +1460,17 @@ namespace WindowEquivalentLayer {
         Real64 FM_F;
 
         // Argument array dimensioning
-        EP_SIZE_CHECK(P, dataWindowEquivalentLayer.hipDIM);
+        EP_SIZE_CHECK(P, state.dataWindowEquivalentLayer->hipDIM);
 
         Real64 RHO_BD;
         Real64 TAU_BB;
         Real64 TAU_BD;
 
-        FM_BEAM(THETA, P(dataWindowEquivalentLayer.hipRHO_BT0), P(dataWindowEquivalentLayer.hipTAU_BT0), P(dataWindowEquivalentLayer.hipTAU_BB0), RHO_BD, TAU_BB, TAU_BD);
+        FM_BEAM(THETA, P(state.dataWindowEquivalentLayer->hipRHO_BT0), P(state.dataWindowEquivalentLayer->hipTAU_BT0), P(state.dataWindowEquivalentLayer->hipTAU_BB0), RHO_BD, TAU_BB, TAU_BD);
 
-        if (Opt == dataWindowEquivalentLayer.hipRHO) {
+        if (Opt == state.dataWindowEquivalentLayer->hipRHO) {
             FM_F = RHO_BD;
-        } else if (Opt == dataWindowEquivalentLayer.hipTAU) {
+        } else if (Opt == state.dataWindowEquivalentLayer->hipTAU) {
             FM_F = TAU_BB + TAU_BD;
         } else {
             FM_F = -1.0;
@@ -1530,7 +1538,8 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    void PD_LW(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const S,               // pleat spacing (> 0)
+    void PD_LW(EnergyPlusData &state,
+               Real64 const S,               // pleat spacing (> 0)
                Real64 const W,               // pleat depth (>=0, same units as S)
                Real64 const OPENNESS_FABRIC, // fabric openness, 0-1 (=tausbb at normal incidence)
                Real64 const EPSLWF0_FABRIC,  // fabric LW front emittance at 0 openness
@@ -1573,12 +1582,13 @@ namespace WindowEquivalentLayer {
         RHOLWF_FABRIC = P01(1.0 - EPSLWF_FABRIC - TAULW_FABRIC, RhoLWF_Name);
         RHOLWB_FABRIC = P01(1.0 - EPSLWB_FABRIC - TAULW_FABRIC, RhoLWB_Name);
 
-        PD_DIFF(dataWindowEquivalentLayer, S, W, RHOLWF_FABRIC, RHOLWB_FABRIC, TAULW_FABRIC, RHOLWF_PD, TAULW_PD);
+        PD_DIFF(state, S, W, RHOLWF_FABRIC, RHOLWB_FABRIC, TAULW_FABRIC, RHOLWF_PD, TAULW_PD);
 
         EPSLWF_PD = P01(1.0 - TAULW_PD - RHOLWF_PD, EpsLWF_Name);
     }
 
-    void PD_DIFF(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const S,        // pleat spacing (> 0)
+    void PD_DIFF(EnergyPlusData &state,
+                 Real64 const S,        // pleat spacing (> 0)
                  Real64 const W,        // pleat depth (>=0, same units as S)
                  Real64 const RHOFF_DD, // fabric front diffuse-diffuse reflectance
                  Real64 const RHOBF_DD, // fabric back diffuse-diffuse reflectance
@@ -1641,7 +1651,7 @@ namespace WindowEquivalentLayer {
         Array2D<Real64> A(N + 2, N);
         Array1D<Real64> XSOL(N);
 
-        if (W / S < dataWindowEquivalentLayer.SMALL_ERROR) {
+        if (W / S < state.dataWindowEquivalentLayer->SMALL_ERROR) {
             // flat drape (no pleats)
             RHOFDD = RHOFF_DD;
             TAUFDD = TAUF_DD;
@@ -1740,7 +1750,8 @@ namespace WindowEquivalentLayer {
         RHOFDD = P01((RHOFF_DD + TAUF_DD * G1 + G5) / 2.0, RhoDD_Name);
     }
 
-    void PD_BEAM(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const S,         // pleat spacing (> 0)
+    void PD_BEAM(EnergyPlusData &state,
+                 Real64 const S,         // pleat spacing (> 0)
                  Real64 const W,         // pleat depth (>=0, same units as S)
                  Real64 const OHM_V_RAD, // vertical profile angle, radians +=above horiz
                  Real64 const OHM_H_RAD, // horizontal profile angle, radians=clockwise when viewed from above
@@ -1811,7 +1822,7 @@ namespace WindowEquivalentLayer {
         // off-normal fabric properties, front surface
         TAUFF_BT0 = TAUFF_BB0 + TAUFF_BD0;
         FM_BEAM(THETA_PARL, RHOFF_BT0, TAUFF_BT0, TAUFF_BB0, RHOFF_BT_PARL, TAUFF_BB_PARL, TAUFF_BD_PARL);
-        if (W / S < dataWindowEquivalentLayer.SMALL_ERROR) {
+        if (W / S < state.dataWindowEquivalentLayer->SMALL_ERROR) {
             // flat drape (no pleats) -- return fabric properties
             RHO_BD = RHOFF_BT_PARL;
             TAU_BD = TAUFF_BD_PARL;
@@ -1830,9 +1841,9 @@ namespace WindowEquivalentLayer {
         EF = W - DE;
 
         // select geometric case
-        if (DE < W - dataWindowEquivalentLayer.SMALL_ERROR) {
+        if (DE < W - state.dataWindowEquivalentLayer->SMALL_ERROR) {
             // illuminated length less than pleat depth
-            if (DE < EF - dataWindowEquivalentLayer.SMALL_ERROR) {
+            if (DE < EF - state.dataWindowEquivalentLayer->SMALL_ERROR) {
                 // illum < shade
                 PD_BEAM_CASE_I(S,
                                W,
@@ -1857,7 +1868,7 @@ namespace WindowEquivalentLayer {
                                RHO_BD,
                                TAU_BD,
                                TAU_BB);
-            } else if (DE <= EF + dataWindowEquivalentLayer.SMALL_ERROR) {
+            } else if (DE <= EF + state.dataWindowEquivalentLayer->SMALL_ERROR) {
                 // illum and shade equal
                 PD_BEAM_CASE_II(S,
                                 W,
@@ -1908,7 +1919,7 @@ namespace WindowEquivalentLayer {
                                  TAU_BD,
                                  TAU_BB);
             }
-        } else if (DE <= W + dataWindowEquivalentLayer.SMALL_ERROR) {
+        } else if (DE <= W + state.dataWindowEquivalentLayer->SMALL_ERROR) {
             // illum length same as pleat depth
             PD_BEAM_CASE_IV(S,
                             W,
@@ -3761,7 +3772,8 @@ namespace WindowEquivalentLayer {
         return VB_SLAT_RADIUS_RATIO;
     }
 
-    void VB_SOL46_CURVE(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const S,           // slat spacing (any length units; same units as W)
+    void VB_SOL46_CURVE(EnergyPlusData &state,
+                        Real64 const S,           // slat spacing (any length units; same units as W)
                         Real64 const W,           // slat tip-to-tip (chord) width (any length units; same units as S)
                         Real64 const SL_WR,       // slat curvature radius ratio (= W/R)
                         Real64 const PHIx,        // slat angle, radians (-PI/2 <= PHI <= PI/2)
@@ -3850,7 +3862,7 @@ namespace WindowEquivalentLayer {
                 YC = SL_RAD * std::cos(PHI + OMEGA); // Tangent to slat in irradiance direction
                 XC = std::sqrt(pow_2(SL_RAD) - pow_2(YC));
                 Slope = -XC / YC;
-                if (std::abs(Slope) < dataWindowEquivalentLayer.SMALL_ERROR) {
+                if (std::abs(Slope) < state.dataWindowEquivalentLayer->SMALL_ERROR) {
                     XD = 0.0;
                     YD = YA;
                     XE = 0.0;
@@ -3886,7 +3898,7 @@ namespace WindowEquivalentLayer {
                     DE = S * std::abs(std::cos(OMEGA) / std::sin(OMEGA + PHI));
                 }
                 //  CHECK TO SEE IF THERE IS DIRECT BEAM TRANSMISSION
-                if ((DE / W) > (1.0 - dataWindowEquivalentLayer.SMALL_ERROR)) { // YES
+                if ((DE / W) > (1.0 - state.dataWindowEquivalentLayer->SMALL_ERROR)) { // YES
                     TAU_BB = max(0.0, (DE - W) / DE);
                 } else { // NO
                     TAU_BB = 0.0;
@@ -3905,11 +3917,11 @@ namespace WindowEquivalentLayer {
                 } else {
                     DE = S * std::abs(std::cos(OMEGA) / std::sin(OMEGA + PHI));
                 }
-                if ((DE / W) > (1.0 - dataWindowEquivalentLayer.SMALL_ERROR)) { // YES
-                    VB_SOL4(dataWindowEquivalentLayer, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
+                if ((DE / W) > (1.0 - state.dataWindowEquivalentLayer->SMALL_ERROR)) { // YES
+                    VB_SOL4(state, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
 
                 } else { // NO
-                    VB_SOL6(dataWindowEquivalentLayer, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
+                    VB_SOL6(state, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
                 }
 
             } else { // NO, THERE IS NO DOUBLE BLOCKAGE
@@ -3923,7 +3935,7 @@ namespace WindowEquivalentLayer {
                     YC = SL_RAD * std::cos(PHI + OMEGA); // Tangent to slat in irradiance direction
                     XC = std::sqrt(pow_2(SL_RAD) - pow_2(YC));
                     Slope = -XC / YC;
-                    if (std::abs(Slope) < dataWindowEquivalentLayer.SMALL_ERROR) {
+                    if (std::abs(Slope) < state.dataWindowEquivalentLayer->SMALL_ERROR) {
                         XD = 0.0;
                         YD = YA;
                         XE = 0.0;
@@ -3950,18 +3962,18 @@ namespace WindowEquivalentLayer {
 
                     if ((PHI + OMEGA) >= 0.0) { // Slat is lit from above
                         DE = XC - XA;
-                        VB_SOL6(dataWindowEquivalentLayer, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
+                        VB_SOL6(state, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
                         Real64 const S_cos_OMEGA_inv(1.0 / (S * std::cos(OMEGA)));
                         RHO_BD *= T_CORR_D * S_cos_OMEGA_inv;
                         TAU_BD *= T_CORR_D * S_cos_OMEGA_inv;
                     } else { // Slat is lit from below
                         DE = XC - XA;
-                        VB_SOL6(dataWindowEquivalentLayer, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
+                        VB_SOL6(state, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
                         Real64 const S_cos_OMEGA_inv(1.0 / (S * std::cos(OMEGA)));
                         RHO_TEMP = RHO_BD * T_CORR_F * S_cos_OMEGA_inv;
                         TAU_TEMP = TAU_BD * T_CORR_F * S_cos_OMEGA_inv;
                         DE = std::abs(XB - XF);
-                        VB_SOL6(dataWindowEquivalentLayer, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
+                        VB_SOL6(state, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
                         RHO_BD = RHO_BD * (T_CORR_D - T_CORR_F) * S_cos_OMEGA_inv + RHO_TEMP;
                         TAU_BD = TAU_BD * (T_CORR_D - T_CORR_F) * S_cos_OMEGA_inv + TAU_TEMP;
                     }
@@ -3972,11 +3984,11 @@ namespace WindowEquivalentLayer {
                     } else {
                         DE = S * std::abs(std::cos(OMEGA) / std::sin(OMEGA + PHI));
                     }
-                    if (DE / W > 1.0 - dataWindowEquivalentLayer.SMALL_ERROR) { // YES
-                        VB_SOL4(dataWindowEquivalentLayer, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
+                    if (DE / W > 1.0 - state.dataWindowEquivalentLayer->SMALL_ERROR) { // YES
+                        VB_SOL4(state, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
 
                     } else { // NO
-                        VB_SOL6(dataWindowEquivalentLayer, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
+                        VB_SOL6(state, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
                     }
                 }
             }
@@ -3984,7 +3996,7 @@ namespace WindowEquivalentLayer {
         } else { // DO NOT CORRECT FOR SLAT CURVATURE
 
             //  CHECK TO SEE IF BEAM IS ALLIGNED WITH SLATS
-            if (std::abs(PHI + OMEGA) < dataWindowEquivalentLayer.SMALL_ERROR) { // YES!
+            if (std::abs(PHI + OMEGA) < state.dataWindowEquivalentLayer->SMALL_ERROR) { // YES!
                 RHO_BD = 0.0;
                 TAU_BB = 1.0;
                 TAU_BD = 0.0;
@@ -3995,19 +4007,20 @@ namespace WindowEquivalentLayer {
                 TAU_BD = 0.0;
                 DE = S * std::abs(std::cos(OMEGA) / std::sin(OMEGA + PHI));
                 //  CHECK TO SEE IF THERE IS DIRECT BEAM TRANSMISSION
-                if ((DE / W) > (1.0 - dataWindowEquivalentLayer.SMALL_ERROR)) { // YES
+                if ((DE / W) > (1.0 - state.dataWindowEquivalentLayer->SMALL_ERROR)) { // YES
                     TAU_BB = (DE - W) / DE;
                     if (TAU_BB < 0.0) TAU_BB = 0.0;
-                    VB_SOL4(dataWindowEquivalentLayer, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
+                    VB_SOL4(state, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
                 } else { // NO
                     TAU_BB = 0.0;
-                    VB_SOL6(dataWindowEquivalentLayer, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
+                    VB_SOL6(state, S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD);
                 } //  END CHECK FOR DIRECT BEAM TRANSMISSION
             }     // END CHECK TO SEE IF BEAM ALLIGNED WITH SLATS
         }
     }
 
-    void VB_SOL4(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const S,           // slat spacing (any length units; same units as W)
+    void VB_SOL4(EnergyPlusData &state,
+                 Real64 const S,           // slat spacing (any length units; same units as W)
                  Real64 const W,           // slat tip-to-tip width (any length units; same units as S)
                  Real64 const OMEGA,       // incident beam profile angle (radians)
                  Real64 const DE,          // distance from front tip of any slat to shadow (caused by the adjacent slat) on
@@ -4076,7 +4089,7 @@ namespace WindowEquivalentLayer {
             //      PRINT *, PHI, OMEGA, DE, 'BOTLIT'
         }
         //  CHECK TO SEE IF VENETIAN BLIND IS CLOSED
-        if (std::abs(PHI - PiOvr2) < dataWindowEquivalentLayer.SMALL_ERROR) { // VENETIAN BLIND IS CLOSED
+        if (std::abs(PHI - PiOvr2) < state.dataWindowEquivalentLayer->SMALL_ERROR) { // VENETIAN BLIND IS CLOSED
 
             // CHECK TO SEE IF THERE ARE GAPS IN BETWEEN SLATS WHEN THE BLIND IS CLOSED
             if (W < S) { // YES, THERE ARE GAPS IN BETWEEN SLATS
@@ -4109,7 +4122,8 @@ namespace WindowEquivalentLayer {
         } // END OF CHECK FOR CLOSED BLIND
     }
 
-    void VB_SOL6(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const S,           // slat spacing (any length units; same units as W)
+    void VB_SOL6(EnergyPlusData &state,
+                 Real64 const S,           // slat spacing (any length units; same units as W)
                  Real64 const W,           // slat tip-to-tip width (any length units; same units as S)
                  Real64 const OMEGA,       // incident beam profile angle (radians)
                  Real64 const DE,          // distance from front tip of any slat to shadow (caused by the adjacent slat) on
@@ -4195,7 +4209,7 @@ namespace WindowEquivalentLayer {
         }
 
         //  CHECK TO SEE IF VENETIAN BLIND IS CLOSED
-        if (std::abs(PHI - PiOvr2) < dataWindowEquivalentLayer.SMALL_ERROR) { // VENETIAN BLIND IS CLOSED
+        if (std::abs(PHI - PiOvr2) < state.dataWindowEquivalentLayer->SMALL_ERROR) { // VENETIAN BLIND IS CLOSED
 
             // CHECK TO SEE IF THERE ARE GAPS IN BETWEEN SLATS WHEN THE BLIND IS CLOSED
             if (W < S) { // YES, THERE ARE GAPS IN BETWEEN SLATS
@@ -4369,7 +4383,8 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    void ASHWAT_ThermalCalc(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSTY &FS,        // fenestration system
+    void ASHWAT_ThermalCalc(EnergyPlusData &state,
+                            CFSTY &FS,        // fenestration system
                             Real64 const TIN, // indoor / outdoor air temperature, K
                             Real64 const TOUT,
                             Real64 const HCIN, // indoor / outdoor convective heat transfer
@@ -4561,8 +4576,8 @@ namespace WindowEquivalentLayer {
 
         ALPHA = 1.0;
         if (NL >= 2) {
-            if (FS.G(NL - 1).GTYPE == dataWindowEquivalentLayer.gtyOPENin) ALPHA = 0.5;
-            if (FS.G(1).GTYPE == dataWindowEquivalentLayer.gtyOPENout) ALPHA = 0.10;
+            if (FS.G(NL - 1).GTYPE == state.dataWindowEquivalentLayer->gtyOPENin) ALPHA = 0.5;
+            if (FS.G(1).GTYPE == state.dataWindowEquivalentLayer->gtyOPENout) ALPHA = 0.10;
         }
 
         //   FIRST ESTIMATE OF GLAZING TEMPERATURES AND BLACK EMISSIVE POWERS
@@ -4616,25 +4631,25 @@ namespace WindowEquivalentLayer {
                 for (I = 1; I <= NL - 1; ++I) { // Scan gaps between layers
 
                     // DEAL WITH INDOOR OPEN CHANNEL FLOW HERE
-                    if ((I == NL - 1) && (FS.G(I).GTYPE == dataWindowEquivalentLayer.gtyOPENin)) {
+                    if ((I == NL - 1) && (FS.G(I).GTYPE == state.dataWindowEquivalentLayer->gtyOPENin)) {
 
                         // TOC_EFF = FS%G( I)%TAS_EFF / 1000.    ! effective thickness of OC gap, m
                         TOC_EFF = FS.G(I).TAS_EFF; // effective thickness of OC gap, m Modified by BAN May 9, 2013
                         HFS = 1.0;                 // nominal height of system (m)
 
                         // convection - glass to air
-                        GLtoAMB(dataWindowEquivalentLayer, TOC_EFF, HFS, T(NL - 1), TIN, HCIN, HC_GA, hin_scheme);
+                        GLtoAMB(state, TOC_EFF, HFS, T(NL - 1), TIN, HCIN, HC_GA, hin_scheme);
                         // CALL GLtoAMB( 1.0, HFS, T( NL-1), TIN, HCIN, HC_GA, hin_scheme)
                         //   ^ VERY WIDE GAP
 
                         // convection - shade (both sides) to air
                         ConvF = ConvectionFactor(FS.L(I + 1));
-                        HC_SA = ConvF * SLtoAMB(dataWindowEquivalentLayer, TOC_EFF, HFS, T(NL), TIN, HCIN, hin_scheme);
+                        HC_SA = ConvF * SLtoAMB(state, TOC_EFF, HFS, T(NL), TIN, HCIN, hin_scheme);
                         // HC_SA = ConvF * SLtoAMB( 1.0, HFS, T(NL), TIN, HCIN, hin_scheme)
                         //  ^ VERY WIDE GAP
 
                         // convection - glass to shade (one side)
-                        SLtoGL(dataWindowEquivalentLayer, TOC_EFF, T(NL), T(NL - 1), HC_GS, 1);
+                        SLtoGL(state, TOC_EFF, T(NL), T(NL - 1), HC_GS, 1);
                         // CALL  SLtoGL( 1.0, T(NL), T(NL-1), HC_GS, 2)   !  REMOVE LATER
                         //  ^ VERY WIDE GAP, should return near zero
                         //  Don't use hin_scheme as last parameter - set manually
@@ -4648,7 +4663,7 @@ namespace WindowEquivalentLayer {
                         QOCFRoom = -QOCF_B(NL - 1) - QOCF_F(NL);
                         // end of gap open to indoor side
 
-                    } else if ((I == 1) && (FS.G(I).GTYPE == dataWindowEquivalentLayer.gtyOPENout)) {
+                    } else if ((I == 1) && (FS.G(I).GTYPE == state.dataWindowEquivalentLayer->gtyOPENout)) {
                         // outdoor open channel
                         QOCF_B(1) = (TOUT - T(1)) * HCOCFout;
                         QOCF_F(2) = (TOUT - T(2)) * HCOCFout;
@@ -4809,16 +4824,15 @@ namespace WindowEquivalentLayer {
         QGAIN = SOURCE(NL + 1) + HC[NL] * (T(NL) - TIN) + JB[NL] - JF(NL + 1);
         // Modified by BAN May 3, 2013 to avoid zero layer index
         if (NL >= 2) {
-            if (FS.G(NL - 1).GTYPE == dataWindowEquivalentLayer.gtyOPENin) {
+            if (FS.G(NL - 1).GTYPE == state.dataWindowEquivalentLayer->gtyOPENin) {
                 QGAIN = SOURCE(NL + 1) + (HC_SA / 2.0) * (T(NL) - TIN) + JB[NL] - JF(NL + 1);
                 QGAIN += HC_GA * (T(NL - 1) - TIN) + (HC_SA / 2.0) * (T(NL) - TIN);
             }
         }
-
-        return;
     }
 
-    bool ASHWAT_ThermalRatings(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSTY const &FS,  // fenestration system
+    bool ASHWAT_ThermalRatings(EnergyPlusData &state,
+                               CFSTY const &FS,  // fenestration system
                                Real64 const TIN, // indoor / outdoor air temperature, K
                                Real64 const TOUT,
                                Real64 const HCIN, // indoor / outdoor convective heat transfer
@@ -5040,8 +5054,8 @@ namespace WindowEquivalentLayer {
 
         ALPHA = 1.0;
         if (NL >= 2) {
-            if (FS.G(NL - 1).GTYPE == dataWindowEquivalentLayer.gtyOPENin) ALPHA = 0.5;
-            if (FS.G(1).GTYPE == dataWindowEquivalentLayer.gtyOPENout) ALPHA = 0.10;
+            if (FS.G(NL - 1).GTYPE == state.dataWindowEquivalentLayer->gtyOPENin) ALPHA = 0.5;
+            if (FS.G(1).GTYPE == state.dataWindowEquivalentLayer->gtyOPENout) ALPHA = 0.10;
         }
 
         //   FIRST ESTIMATE OF GLAZING TEMPERATURES AND BLACK EMISSIVE POWERS
@@ -5093,25 +5107,25 @@ namespace WindowEquivalentLayer {
                 for (I = 1; I <= NL - 1; ++I) { // Scan gaps between layers
 
                     // DEAL WITH INDOOR OPEN CHANNEL FLOW HERE
-                    if ((I == NL - 1) && (FS.G(I).GTYPE == dataWindowEquivalentLayer.gtyOPENin)) {
+                    if ((I == NL - 1) && (FS.G(I).GTYPE == state.dataWindowEquivalentLayer->gtyOPENin)) {
 
                         // TOC_EFF = FS%G( I)%TAS_EFF / 1000.    ! effective thickness of OC gap, m
                         TOC_EFF = FS.G(I).TAS_EFF; // effective thickness of OC gap, m Modified by BAN May 9, 2013
                         HFS = 1.0;                 // nominal height of system (m)
 
                         // convection - glass to air
-                        GLtoAMB(dataWindowEquivalentLayer, TOC_EFF, HFS, T(NL - 1), TIN, HCIN, HC_GA, hin_scheme);
+                        GLtoAMB(state, TOC_EFF, HFS, T(NL - 1), TIN, HCIN, HC_GA, hin_scheme);
                         // CALL GLtoAMB( 1.0, HFS, T( NL-1), TIN, HCIN, HC_GA, hin_scheme)
                         //   ^ VERY WIDE GAP
 
                         // convection - shade (both sides) to air
                         ConvF = ConvectionFactor(FS.L(I + 1));
-                        HC_SA = ConvF * SLtoAMB(dataWindowEquivalentLayer, TOC_EFF, HFS, T(NL), TIN, HCIN, hin_scheme);
+                        HC_SA = ConvF * SLtoAMB(state, TOC_EFF, HFS, T(NL), TIN, HCIN, hin_scheme);
                         // HC_SA = ConvF * SLtoAMB( 1.0, HFS, T(NL), TIN, HCIN, hin_scheme)
                         //  ^ VERY WIDE GAP
 
                         // convection - glass to shade (one side)
-                        SLtoGL(dataWindowEquivalentLayer, TOC_EFF, T(NL), T(NL - 1), HC_GS, 1);
+                        SLtoGL(state, TOC_EFF, T(NL), T(NL - 1), HC_GS, 1);
                         // CALL  SLtoGL( 1.0, T(NL), T(NL-1), HC_GS, 2)   !  REMOVE LATER
                         //  ^ VERY WIDE GAP, should return near zero
                         //  Don't use hin_scheme as last parameter - set manually
@@ -5125,7 +5139,7 @@ namespace WindowEquivalentLayer {
                         QOCFRoom = -QOCF_B(NL - 1) - QOCF_F(NL);
                         // end of gap open to indoor side
 
-                    } else if ((I == 1) && (FS.G(I).GTYPE == dataWindowEquivalentLayer.gtyOPENout)) {
+                    } else if ((I == 1) && (FS.G(I).GTYPE == state.dataWindowEquivalentLayer->gtyOPENout)) {
                         // outdoor open channel
                         QOCF_B(1) = (TOUT - T(1)) * HCOCFout;
                         QOCF_F(2) = (TOUT - T(2)) * HCOCFout;
@@ -5286,7 +5300,7 @@ namespace WindowEquivalentLayer {
         QGAIN = SOURCE(NL + 1) + HC[NL] * (T(NL) - TIN) + JB[NL] - JF(NL + 1);
         // Modified by BAN May 3, 2013 to avoid zero layer index
         if (NL >= 2) {
-            if (FS.G(NL - 1).GTYPE == dataWindowEquivalentLayer.gtyOPENin) {
+            if (FS.G(NL - 1).GTYPE == state.dataWindowEquivalentLayer->gtyOPENin) {
                 QGAIN = SOURCE(NL + 1) + (HC_SA / 2.0) * (T(NL) - TIN) + JB[NL] - JF(NL + 1);
                 QGAIN += HC_GA * (T(NL - 1) - TIN) + (HC_SA / 2.0) * (T(NL) - TIN);
             }
@@ -5419,7 +5433,7 @@ namespace WindowEquivalentLayer {
                        //  It is not possible for both of the following cases to be
                        //  true for the same gap (i.e., for NL=2)
 
-            if (FS.G(NL - 1).GTYPE == dataWindowEquivalentLayer.gtyOPENin) {
+            if (FS.G(NL - 1).GTYPE == state.dataWindowEquivalentLayer->gtyOPENin) {
                 SaveHCNLm = HC[NL - 1];
                 SaveHCNL = HC[NL];
                 HC[NL - 1] = HC_GS;
@@ -5428,7 +5442,7 @@ namespace WindowEquivalentLayer {
             }
 
             HC[0] = HCOUT;
-            if (FS.G(1).GTYPE == dataWindowEquivalentLayer.gtyOPENout) {
+            if (FS.G(1).GTYPE == state.dataWindowEquivalentLayer->gtyOPENout) {
                 HC[0] = HCOUT + HCOCFout;
                 HJC(1) = HCOCFout;
             }
@@ -5745,7 +5759,7 @@ namespace WindowEquivalentLayer {
         //  for more general resistor network - otherwise mainline will
         //  receive faulty data
         if (NL >= 2) { // no OCF unless at least two layers exist
-            if (FS.G(NL - 1).GTYPE == dataWindowEquivalentLayer.gtyOPENin) {
+            if (FS.G(NL - 1).GTYPE == state.dataWindowEquivalentLayer->gtyOPENin) {
                 HC[NL - 1] = SaveHCNLm;
                 HC[NL] = SaveHCNL;
             }
@@ -6072,7 +6086,8 @@ namespace WindowEquivalentLayer {
         return HIC_ASHRAE;
     }
 
-    void SLtoGL(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const breal, // distance from shade to glass (m)
+    void SLtoGL(EnergyPlusData &state,
+                Real64 const breal, // distance from shade to glass (m)
                 Real64 const Ts,    // shade temperature (K)
                 Real64 const Tg,    // glass temperature (K)
                 Real64 &hsg,        // the heat transfer coefficient, shade-to-glass, {W/m2K}
@@ -6119,7 +6134,7 @@ namespace WindowEquivalentLayer {
             Tavg = (Ts + Tg) / 2.0; // T for properties calculations
 
             // properties of AIR
-            rho = dataWindowEquivalentLayer.PAtmSeaLevel / (287.097 * Tavg); // density (kg/m3) <- temperature in (K)
+            rho = state.dataWindowEquivalentLayer->PAtmSeaLevel / (287.097 * Tavg); // density (kg/m3) <- temperature in (K)
             beta = 1.0 / Tavg;                     // thermal expansion coef(/K)
             dvisc = (18.05 + ((Tavg - 290.0) / 10.0) * (18.53 - 18.05)) * 1.0e-6;
             //  dynamic viscosity (kg/m.sec) or (N.sec/m2)
@@ -6134,7 +6149,8 @@ namespace WindowEquivalentLayer {
         } //  end of scheme .eq. 2
     }
 
-    Real64 SLtoAMB(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const b,     // distance from shade to glass (m) where air flow takes place
+    Real64 SLtoAMB(EnergyPlusData &state,
+                   Real64 const b,     // distance from shade to glass (m) where air flow takes place
                    Real64 const L,     // window height, m (usually taken as 1 m)
                    Real64 const Ts,    // shade temperature, K
                    Real64 const Tamb,  // room air temperature, K
@@ -6179,7 +6195,7 @@ namespace WindowEquivalentLayer {
         if (scheme == 1) {
             // properties of AIR
             Tavg = (Ts + Tamb) / 2.0;
-            rho = dataWindowEquivalentLayer.PAtmSeaLevel / (287.097 * Tavg); // density (kg/m3) <- temperature in (K)
+            rho = state.dataWindowEquivalentLayer->PAtmSeaLevel / (287.097 * Tavg); // density (kg/m3) <- temperature in (K)
             beta = 1.0 / Tavg;                     // thermal expansion coef(/K)
             dvisc = (18.05 + ((Tavg - 290.0) / 10.0) * (18.53 - 18.05)) * 1.0e-6;
             //  dynamic viscosity (kg/m.sec) or (N.sec/m2)
@@ -6208,7 +6224,7 @@ namespace WindowEquivalentLayer {
         } else if (scheme == 2) {
             // properties of AIR
             Tavg = (Ts + Tamb) / 2.0;
-            rho = dataWindowEquivalentLayer.PAtmSeaLevel / (287.097 * Tavg); // density (kg/m3) <- temperature in (K)
+            rho = state.dataWindowEquivalentLayer->PAtmSeaLevel / (287.097 * Tavg); // density (kg/m3) <- temperature in (K)
             beta = 1.0 / Tavg;                     // thermal expansion coef(/K)
             dvisc = (18.05 + ((Tavg - 290.0) / 10.0) * (18.53 - 18.05)) * 1.0e-6;
             //  dynamic viscosity (kg/m.sec) or (N.sec/m2)
@@ -6247,7 +6263,8 @@ namespace WindowEquivalentLayer {
         return SLtoAMB;
     }
 
-    void GLtoAMB(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const b,     // distance from shade to glass {m}
+    void GLtoAMB(EnergyPlusData &state,
+                 Real64 const b,     // distance from shade to glass {m}
                  Real64 const L,     // window height {m}, usually taken as 1 meter
                  Real64 const Tg,    // glass temperature {K}
                  Real64 const Tamb,  // room air temperature, {K}
@@ -6285,7 +6302,7 @@ namespace WindowEquivalentLayer {
             Tavg = (Tg + Tamb) / 2.0; // T for properties calculations
 
             // properties of AIR
-            rho = dataWindowEquivalentLayer.PAtmSeaLevel / (287.097 * Tavg); // density (kg/m3) <- temperature in (K)
+            rho = state.dataWindowEquivalentLayer->PAtmSeaLevel / (287.097 * Tavg); // density (kg/m3) <- temperature in (K)
             beta = 1.0 / Tavg;                     // thermal expansion coef(/K)
             dvisc = (18.05 + ((Tavg - 290.0) / 10.0) * (18.53 - 18.05)) * 1.0e-6;
             //  dynamic viscosity (kg/m.sec) or (N.sec/m2)
@@ -6310,7 +6327,7 @@ namespace WindowEquivalentLayer {
             Tavg = (Tg + Tamb) / 2.0; // T for properties calculations
 
             // properties of AIR
-            rho = dataWindowEquivalentLayer.PAtmSeaLevel / (287.097 * Tavg); // density (kg/m3) <- temperature in (K)
+            rho = state.dataWindowEquivalentLayer->PAtmSeaLevel / (287.097 * Tavg); // density (kg/m3) <- temperature in (K)
             beta = 1.0 / Tavg;                     // thermal expansion coef(/K)
             dvisc = (18.05 + ((Tavg - 290.0) / 10.0) * (18.53 - 18.05)) * 1.0e-6;
             //  dynamic viscosity (kg/m.sec) or (N.sec/m2)
@@ -6373,7 +6390,8 @@ namespace WindowEquivalentLayer {
         return ConvectionFactor;
     }
 
-    bool CFSUFactor(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSTY const &FS,    // fenestration system
+    bool CFSUFactor(EnergyPlusData &state,
+                    CFSTY const &FS,    // fenestration system
                     Real64 const TOUT,  // outdoor temperature, C (air and MRT)
                     Real64 const HCOUT, // outdoor convective coefficient, W/m2-K
                     Real64 const TIN,   // indoor air temperature, C
@@ -6438,7 +6456,7 @@ namespace WindowEquivalentLayer {
         ISOL = 0.0; // no solar winter condition
         SOURCE = 0.0;
 
-        CFSUFactor = ASHWAT_ThermalRatings(dataWindowEquivalentLayer,
+        CFSUFactor = ASHWAT_ThermalRatings(state,
             FS, TIABS, TOABS, HCIN, HCOUT, TRMOUT, TRMIN, ISOL, SOURCE({1, NL + 1}), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H, U, SHGC, true);
 
         return CFSUFactor;
@@ -6470,7 +6488,7 @@ namespace WindowEquivalentLayer {
         //   Layer Array, ASHRAE Transactions, Vol. 112, Pt. 2. pp. 3-12.
         //   University of Waterloo, Mechanical Engineering
         //   Advanced Glazing System Laboratory
- 
+
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //   1=outside .. NL=inside
         //   generally black or minimally reflective
@@ -6747,7 +6765,8 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    void ASHWAT_OffNormalProperties(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSLAYER const &L,    // layer for which to derive off-normal properties
+    void ASHWAT_OffNormalProperties(EnergyPlusData &state,
+                                    CFSLAYER const &L,    // layer for which to derive off-normal properties
                                     Real64 const THETA,   // solar beam angle of incidence, from normal, radians
                                     Real64 const OMEGA_V, // solar beam vertical profile angle, +=above horizontal, radians
                                     Real64 const OMEGA_H, // solar beam horizontal profile angle, +=clockwise when viewed
@@ -6785,15 +6804,15 @@ namespace WindowEquivalentLayer {
             // HBX note: ltyGZS here iff modelOption F=x; spectral cases elsewhere
             Specular_SWP(LSWP_ON, THETA);
         } else if (L.LTYPE == ltyVBHOR) {
-            OKAY = VB_SWP(dataWindowEquivalentLayer, L, LSWP_ON, OMEGA_V);
+            OKAY = VB_SWP(state, L, LSWP_ON, OMEGA_V);
         } else if (L.LTYPE == ltyVBVER) {
-            OKAY = VB_SWP(dataWindowEquivalentLayer, L, LSWP_ON, OMEGA_H);
+            OKAY = VB_SWP(state, L, LSWP_ON, OMEGA_H);
         } else if (L.LTYPE == ltyDRAPE) {
-            OKAY = PD_SWP(dataWindowEquivalentLayer, L, LSWP_ON, OMEGA_V, OMEGA_H);
+            OKAY = PD_SWP(state, L, LSWP_ON, OMEGA_V, OMEGA_H);
         } else if (L.LTYPE == ltyROLLB) {
-            OKAY = RB_SWP(dataWindowEquivalentLayer, L, LSWP_ON, THETA);
+            OKAY = RB_SWP(state, L, LSWP_ON, THETA);
         } else if (L.LTYPE == ltyINSCRN) {
-            OKAY = IS_SWP(dataWindowEquivalentLayer, L, LSWP_ON, THETA);
+            OKAY = IS_SWP(state, L, LSWP_ON, THETA);
         } else if (L.LTYPE == ltyNONE || L.LTYPE == ltyROOM) {
             // none or room: do nothing
         } else {
@@ -6925,7 +6944,7 @@ namespace WindowEquivalentLayer {
         SWP.RHOSBBB = 1.0 - RAT_1MR * (1.0 - SWP.RHOSBBB);
     }
 
-    void Specular_RATDiff(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 &RAT_1MRDiff, Real64 &RAT_TAUDiff)
+    void Specular_RATDiff(EnergyPlusData &state, Real64 &RAT_1MRDiff, Real64 &RAT_TAUDiff)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         JOHN L. WRIGHT, University of Waterloo, Mechanical Engineering
@@ -6939,18 +6958,19 @@ namespace WindowEquivalentLayer {
 
         static Real64 X1MRDiff(-1.0);
         static Real64 XTAUDiff(-1.0);
-        Array1D<Real64> P(dataWindowEquivalentLayer.hipDIM);
+        Array1D<Real64> P(state.dataWindowEquivalentLayer->hipDIM);
 
         if (XTAUDiff < 0.0) {
             // calculate and save on first call
-            X1MRDiff = HEMINT(dataWindowEquivalentLayer, Specular_F, dataWindowEquivalentLayer.hipRHO, P);
-            XTAUDiff = HEMINT(dataWindowEquivalentLayer, Specular_F, dataWindowEquivalentLayer.hipTAU, P);
+            X1MRDiff = HEMINT(state, Specular_F, state.dataWindowEquivalentLayer->hipRHO, P);
+            XTAUDiff = HEMINT(state, Specular_F, state.dataWindowEquivalentLayer->hipTAU, P);
         }
         RAT_TAUDiff = XTAUDiff;
         RAT_1MRDiff = X1MRDiff;
     }
 
-    Real64 Specular_F(WindowEquivalentLayerData &dataWindowEquivalentLayer, Real64 const THETA,     // incidence angle, radians
+    Real64 Specular_F(EnergyPlusData &state,
+                      Real64 const THETA,     // incidence angle, radians
                       int const OPT,          // options (unused)
                       const Array1D<Real64> &EP_UNUSED(P) // parameters (none defined)
     )
@@ -6981,9 +7001,9 @@ namespace WindowEquivalentLayer {
         // Modified by BAN April 19, 2013
         Specular_OffNormal(THETA, RAT_1MR, RAT_TAU);
 
-        if (OPT == dataWindowEquivalentLayer.hipRHO) {
+        if (OPT == state.dataWindowEquivalentLayer->hipRHO) {
             Specular_F = RAT_1MR;
-        } else if (OPT == dataWindowEquivalentLayer.hipTAU) {
+        } else if (OPT == state.dataWindowEquivalentLayer->hipTAU) {
             Specular_F = RAT_TAU;
         } else {
             Specular_F = -1.0;
@@ -6991,7 +7011,7 @@ namespace WindowEquivalentLayer {
         return Specular_F;
     }
 
-    void Specular_EstimateDiffuseProps(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSSWP &SWP) // short wave properties
+    void Specular_EstimateDiffuseProps(EnergyPlusData &state, CFSSWP &SWP) // short wave properties
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         JOHN L. WRIGHT, University of Waterloo, Mechanical Engineering
@@ -7007,7 +7027,7 @@ namespace WindowEquivalentLayer {
         Real64 RAT_1MR;
 
         //#if 1
-        Specular_RATDiff(dataWindowEquivalentLayer, RAT_1MR, RAT_TAU);
+        Specular_RATDiff(state, RAT_1MR, RAT_TAU);
         //#else
         //    ! estimate diffuse properties as 60 deg angle of incidence
         //    CALL Specular_RAT60( RAT_TAU, RAT_1MR)
@@ -7050,7 +7070,8 @@ namespace WindowEquivalentLayer {
         return RB_LWP;
     }
 
-    bool RB_SWP(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSLAYER const &L,           // RB layer
+    bool RB_SWP(EnergyPlusData &state,
+                CFSLAYER const &L,           // RB layer
                 CFSSWP &LSWP,                // returned: equivalent layer properties set
                 Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
     )
@@ -7093,9 +7114,9 @@ namespace WindowEquivalentLayer {
 
         if (DODIFFUSE) {
             // front
-            RB_DIFF(dataWindowEquivalentLayer, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFDD, LSWP.TAUS_DD);
+            RB_DIFF(state, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFDD, LSWP.TAUS_DD);
             // back
-            RB_DIFF(dataWindowEquivalentLayer, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBDD, TAUX);
+            RB_DIFF(state, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBDD, TAUX);
         } else {
             RB_BEAM(THETA, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFBD, LSWP.TAUSFBB, LSWP.TAUSFBD);
 
@@ -7137,7 +7158,8 @@ namespace WindowEquivalentLayer {
         return IS_LWP;
     }
 
-    bool IS_SWP(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSLAYER const &L,           // PD layer
+    bool IS_SWP(EnergyPlusData &state,
+                CFSLAYER const &L,           // PD layer
                 CFSSWP &LSWP,                // returned: equivalent layer properties set
                 Optional<Real64 const> THETA // incident angle, 0 <= theta <= PI/2
     )
@@ -7181,9 +7203,9 @@ namespace WindowEquivalentLayer {
         if (DODIFFUSE) {
 
             // front
-            IS_DIFF(dataWindowEquivalentLayer, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFDD, LSWP.TAUS_DD);
+            IS_DIFF(state, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFDD, LSWP.TAUS_DD);
             // back
-            IS_DIFF(dataWindowEquivalentLayer, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBDD, TAUX);
+            IS_DIFF(state, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBDD, TAUX);
         } else {
             // front
             IS_BEAM(THETA, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFBD, LSWP.TAUSFBB, LSWP.TAUSFBD);
@@ -7195,7 +7217,7 @@ namespace WindowEquivalentLayer {
         return IS_SWP;
     }
 
-    void Fabric_EstimateDiffuseProps(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSSWP &SWP) // fabric short wave properties
+    void Fabric_EstimateDiffuseProps(EnergyPlusData &state, CFSSWP &SWP) // fabric short wave properties
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         JOHN L. WRIGHT, University of Waterloo, Mechanical Engineering
@@ -7218,11 +7240,12 @@ namespace WindowEquivalentLayer {
         RHOBF_BT0 = SWP.RHOSBBB + SWP.RHOSBBD; // back rho
         TAUFF_BT0 = SWP.TAUSFBB + SWP.TAUSFBD; // front tau
         TAUBF_BT0 = SWP.TAUSBBB + SWP.TAUSBBD; // back tau
-        FM_DIFF(dataWindowEquivalentLayer, RHOFF_BT0, TAUFF_BT0, SWP.TAUSFBB, SWP.RHOSFDD, SWP.TAUS_DD);
-        FM_DIFF(dataWindowEquivalentLayer, RHOBF_BT0, TAUBF_BT0, SWP.TAUSBBB, SWP.RHOSBDD, TAUX);
+        FM_DIFF(state, RHOFF_BT0, TAUFF_BT0, SWP.TAUSFBB, SWP.RHOSFDD, SWP.TAUS_DD);
+        FM_DIFF(state, RHOBF_BT0, TAUBF_BT0, SWP.TAUSBBB, SWP.RHOSBDD, TAUX);
     }
 
-    bool PD_LWP(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSLAYER const &L, // PD layer
+    bool PD_LWP(EnergyPlusData &state,
+                CFSLAYER const &L, // PD layer
                 CFSLWP &LLWP       // returned: equivalent layer long wave properties
     )
     {
@@ -7247,15 +7270,16 @@ namespace WindowEquivalentLayer {
 
         OPENNESS_FABRIC = L.SWP_MAT.TAUSFBB;
 
-        PD_LW(dataWindowEquivalentLayer, L.S, L.W, OPENNESS_FABRIC, L.LWP_MAT.EPSLF, L.LWP_MAT.EPSLB, L.LWP_MAT.TAUL, LLWP.EPSLF, LLWP.TAUL);
+        PD_LW(state, L.S, L.W, OPENNESS_FABRIC, L.LWP_MAT.EPSLF, L.LWP_MAT.EPSLB, L.LWP_MAT.TAUL, LLWP.EPSLF, LLWP.TAUL);
 
-        PD_LW(dataWindowEquivalentLayer, L.S, L.W, OPENNESS_FABRIC, L.LWP_MAT.EPSLB, L.LWP_MAT.EPSLF, L.LWP_MAT.TAUL, LLWP.EPSLB, TAULX);
+        PD_LW(state, L.S, L.W, OPENNESS_FABRIC, L.LWP_MAT.EPSLB, L.LWP_MAT.EPSLF, L.LWP_MAT.TAUL, LLWP.EPSLB, TAULX);
 
         PD_LWP = true;
         return PD_LWP;
     }
 
-    bool PD_SWP(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSLAYER const &L,                // PD layer
+    bool PD_SWP(EnergyPlusData &state,
+                CFSLAYER const &L,                // PD layer
                 CFSSWP &LSWP,                     // returned: equivalent layer properties set
                 Optional<Real64 const> OHM_V_RAD, // vertical VB profile angles, radians
                 Optional<Real64 const> OHM_H_RAD  // horizonatl VB profile angles, radians
@@ -7285,16 +7309,16 @@ namespace WindowEquivalentLayer {
         DODIFFUSE = !(present(OHM_V_RAD) && present(OHM_H_RAD));
 
         if (DODIFFUSE) {
-            PD_DIFF(dataWindowEquivalentLayer, L.S, L.W, L.SWP_MAT.RHOSFDD, L.SWP_MAT.RHOSBDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSFDD, LSWP.TAUS_DD);
+            PD_DIFF(state, L.S, L.W, L.SWP_MAT.RHOSFDD, L.SWP_MAT.RHOSBDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSFDD, LSWP.TAUS_DD);
 
-            PD_DIFF(dataWindowEquivalentLayer, L.S, L.W, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
+            PD_DIFF(state, L.S, L.W, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
         } else {
             // normal beam-total properties of fabric
             RHOFF_BT0 = L.SWP_MAT.RHOSFBB + L.SWP_MAT.RHOSFBD; // front rho
             RHOBF_BT0 = L.SWP_MAT.RHOSBBB + L.SWP_MAT.RHOSBBD; // back rho
 
             // drape front properties
-            PD_BEAM(dataWindowEquivalentLayer, L.S,
+            PD_BEAM(state, L.S,
                     L.W,
                     OHM_V_RAD,
                     OHM_H_RAD,
@@ -7313,7 +7337,7 @@ namespace WindowEquivalentLayer {
                     LSWP.TAUSFBD);
 
             // drape back properties: call with reversed fabric properies
-            PD_BEAM(dataWindowEquivalentLayer, L.S,
+            PD_BEAM(state, L.S,
                     L.W,
                     OHM_V_RAD,
                     OHM_H_RAD,
@@ -7378,7 +7402,8 @@ namespace WindowEquivalentLayer {
         return VB_LWP;
     }
 
-    bool VB_SWP(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSLAYER const &L,           // VB layer
+    bool VB_SWP(EnergyPlusData &state,
+                CFSLAYER const &L,           // VB layer
                 CFSSWP &LSWP,                // returned: equivalent off-normal properties
                 Optional<Real64 const> OMEGA // incident profile angle (radians)
     )
@@ -7418,7 +7443,7 @@ namespace WindowEquivalentLayer {
             VB_DIFF(L.S, L.W, -DegToRadians * L.PHI_DEG, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
         } else {
             // modify angle-dependent values for actual profile angle
-            VB_SOL46_CURVE(dataWindowEquivalentLayer, L.S,
+            VB_SOL46_CURVE(state, L.S,
                            L.W,
                            SL_WR,
                            DegToRadians * L.PHI_DEG,
@@ -7430,7 +7455,7 @@ namespace WindowEquivalentLayer {
                            LSWP.TAUSFBB,
                            LSWP.TAUSFBD);
 
-            VB_SOL46_CURVE(dataWindowEquivalentLayer, L.S,
+            VB_SOL46_CURVE(state, L.S,
                            L.W,
                            SL_WR,
                            -DegToRadians * L.PHI_DEG,
@@ -7446,7 +7471,8 @@ namespace WindowEquivalentLayer {
         return VB_SWP;
     }
 
-    bool VB_ShadeControl(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSLAYER &L,           // VB layer
+    bool VB_ShadeControl(EnergyPlusData &state,
+                         CFSLAYER &L,           // VB layer
                          Real64 const OMEGA_DEG // incident profile angle (degrees)
     )
     {
@@ -7471,14 +7497,14 @@ namespace WindowEquivalentLayer {
 
         SLATA = L.PHI_DEG;
 
-        if (L.CNTRL == dataWindowEquivalentLayer.lscVBPROF) {
+        if (L.CNTRL == state.dataWindowEquivalentLayer->lscVBPROF) {
             // slatA = profA (max gain)
             if (OMEGA_DEG < 0.0) {
                 SLATA = -30.0;
             } else {
                 SLATA = -OMEGA_DEG;
             }
-        } else if (L.CNTRL == dataWindowEquivalentLayer.lscVBNOBM) {
+        } else if (L.CNTRL == state.dataWindowEquivalentLayer->lscVBNOBM) {
             // slatA set to just exclude beam
             if (OMEGA_DEG < 0.0) {
                 SLATA = VB_CriticalSlatAngle(30.0); // assume 30 deg for diffuse
@@ -7517,7 +7543,8 @@ namespace WindowEquivalentLayer {
         return VB_CriticalSlatAngle;
     }
 
-    bool DoShadeControl(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSLAYER &L,          // layer (returned updated)
+    bool DoShadeControl(EnergyPlusData &state,
+                        CFSLAYER &L,          // layer (returned updated)
                         Real64 const THETA,   // solar beam angle of incidence, from normal, (radians)
                         Real64 const OMEGA_V, // solar beam vertical profile angle, +=above horizontal (radians)
                         Real64 const OMEGA_H  // solar beam horizontal profile angle, +=clockwise when viewed
@@ -7549,25 +7576,25 @@ namespace WindowEquivalentLayer {
         DoShadeControl = false; // default: no shade controls implemented
 
         // must be consistent with IsControlledShade()
-        if (IsVBLayer(L) && L.CNTRL != dataWindowEquivalentLayer.lscNONE) {
+        if (IsVBLayer(L) && L.CNTRL != state.dataWindowEquivalentLayer->lscNONE) {
             if (THETA < 0.0 || THETA >= PiOvr2) {
                 OMEGA_DEG = -1.0; // diffuse only
             } else if (L.LTYPE == ltyVBHOR) {
                 // horiz VB
-                OMEGA_DEG = dataWindowEquivalentLayer.RadiansToDeg * OMEGA_V;
+                OMEGA_DEG = state.dataWindowEquivalentLayer->RadiansToDeg * OMEGA_V;
             } else {
                 // vert VB
-                OMEGA_DEG = dataWindowEquivalentLayer.RadiansToDeg * OMEGA_H;
+                OMEGA_DEG = state.dataWindowEquivalentLayer->RadiansToDeg * OMEGA_H;
             }
-            if (VB_ShadeControl(dataWindowEquivalentLayer, L, OMEGA_DEG)) {
-                FinalizeCFSLAYER(dataWindowEquivalentLayer, L);
+            if (VB_ShadeControl(state, L, OMEGA_DEG)) {
+                FinalizeCFSLAYER(state, L);
                 DoShadeControl = true;
             }
         }
         return DoShadeControl;
     }
 
-    void FinalizeCFSLAYER(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSLAYER &L) // layer, input: LTYPE, LWP_MAT, SWP_MAT
+    void FinalizeCFSLAYER(EnergyPlusData &state, CFSLAYER &L) // layer, input: LTYPE, LWP_MAT, SWP_MAT
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         JOHN L. WRIGHT, University of Waterloo, Mechanical Engineering
@@ -7593,27 +7620,27 @@ namespace WindowEquivalentLayer {
 
         if (IsVBLayer(L)) {
             LOK = VB_LWP(L, L.LWP_EL);
-            DOK = VB_SWP(dataWindowEquivalentLayer, L, L.SWP_EL);      // SW diffuse
-            BOK = VB_SWP(dataWindowEquivalentLayer, L, L.SWP_EL, 0.0); // SW properties w/ profile ang = 0
+            DOK = VB_SWP(state, L, L.SWP_EL);      // SW diffuse
+            BOK = VB_SWP(state, L, L.SWP_EL, 0.0); // SW properties w/ profile ang = 0
         } else {
             L.PHI_DEG = 0.0; // phi, C, CNTRL are VB only
             L.C = 0.0;
-            L.CNTRL = dataWindowEquivalentLayer.lscNONE;
+            L.CNTRL = state.dataWindowEquivalentLayer->lscNONE;
             if (L.LTYPE == ltyDRAPE) {
-                LOK = PD_LWP(dataWindowEquivalentLayer, L, L.LWP_EL);
-                DOK = PD_SWP(dataWindowEquivalentLayer, L, L.SWP_EL);           // SW diffuse
-                BOK = PD_SWP(dataWindowEquivalentLayer, L, L.SWP_EL, 0.0, 0.0); // SW properties w/ profile angs = 0
+                LOK = PD_LWP(state, L, L.LWP_EL);
+                DOK = PD_SWP(state, L, L.SWP_EL);           // SW diffuse
+                BOK = PD_SWP(state, L, L.SWP_EL, 0.0, 0.0); // SW properties w/ profile angs = 0
             } else if (L.LTYPE == ltyINSCRN) {
                 LOK = IS_LWP(L, L.LWP_EL);      // LW
-                DOK = IS_SWP(dataWindowEquivalentLayer, L, L.SWP_EL);      // SW diffuse
-                BOK = IS_SWP(dataWindowEquivalentLayer, L, L.SWP_EL, 0.0); // SW beam w/ theta = 0
+                DOK = IS_SWP(state, L, L.SWP_EL);      // SW diffuse
+                BOK = IS_SWP(state, L, L.SWP_EL, 0.0); // SW beam w/ theta = 0
             } else {
                 L.S = 0.0; // geometry mbrs unused
                 L.W = 0.0;
                 if (L.LTYPE == ltyROLLB) {
                     LOK = RB_LWP(L, L.LWP_EL);      // LW
-                    DOK = RB_SWP(dataWindowEquivalentLayer, L, L.SWP_EL);      // SW diffuse
-                    BOK = RB_SWP(dataWindowEquivalentLayer, L, L.SWP_EL, 0.0); // SW beam w/ theta = 0
+                    DOK = RB_SWP(state, L, L.SWP_EL);      // SW diffuse
+                    BOK = RB_SWP(state, L, L.SWP_EL, 0.0); // SW beam w/ theta = 0
                                                     // ELSE IF (ISGZSLayer( L)) THEN
                     // spectral glazing. Set layer xxx_MAT from GZS file data
                     //    BOK = GZSLayerInit( L) .EQ. 0
@@ -7672,7 +7699,7 @@ namespace WindowEquivalentLayer {
         return IsGlazeLayerX;
     }
 
-    bool IsControlledShade(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSLAYER const &L)
+    bool IsControlledShade(EnergyPlusData &state, CFSLAYER const &L)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         JOHN L. WRIGHT, University of Waterloo, Mechanical Engineering
@@ -7687,7 +7714,7 @@ namespace WindowEquivalentLayer {
         // Return value
         bool IsControlledShade;
 
-        IsControlledShade = IsVBLayer(L) && L.CNTRL != dataWindowEquivalentLayer.lscNONE;
+        IsControlledShade = IsVBLayer(L) && L.CNTRL != state.dataWindowEquivalentLayer->lscNONE;
         return IsControlledShade;
     }
 
@@ -7710,7 +7737,8 @@ namespace WindowEquivalentLayer {
         return IsVBLayer;
     }
 
-    void BuildGap(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSGAP &G,                    // returned
+    void BuildGap(EnergyPlusData &state,
+                  CFSGAP &G,                    // returned
                   int const GType,              // gap type (gtyOPENin, gtyOPENout or gtySEALED)
                   Real64 &TAS,                  // gap thickness, m
                   Optional<Real64 const> xTMan, // re density calc -- temp (C) and pressure (Pa)
@@ -7752,7 +7780,7 @@ namespace WindowEquivalentLayer {
         G.GTYPE = GType;
         TMan = 21.0;
         if (present(xTMan)) TMan = xTMan;
-        PMan = dataWindowEquivalentLayer.PAtmSeaLevel;
+        PMan = state.dataWindowEquivalentLayer->PAtmSeaLevel;
         if (present(xPMan)) PMan = xPMan;
 
         G.RHOGAS = DensityCFSFillGas(G.FG, PMan, TMan + KelvinConv);
@@ -7835,7 +7863,7 @@ namespace WindowEquivalentLayer {
         return CFSNGlz;
     }
 
-    int CFSHasControlledShade(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSTY const &FS)
+    int CFSHasControlledShade(EnergyPlusData &state, CFSTY const &FS)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         ASHRAE 1311-RP
@@ -7853,7 +7881,7 @@ namespace WindowEquivalentLayer {
 
         CFSHasControlledShade = 0;
         for (iL = 1; iL <= FS.NL; ++iL) {
-            if (IsControlledShade(dataWindowEquivalentLayer, FS.L(iL))) {
+            if (IsControlledShade(state, FS.L(iL))) {
                 CFSHasControlledShade = iL;
                 break;
             }
@@ -7861,7 +7889,7 @@ namespace WindowEquivalentLayer {
         return CFSHasControlledShade;
     }
 
-    void CheckAndFixCFSLayer(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSLAYER &Layer)
+    void CheckAndFixCFSLayer(EnergyPlusData &state, CFSLAYER &Layer)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         ASHRAE 1311-RP
@@ -7871,11 +7899,11 @@ namespace WindowEquivalentLayer {
         // PURPOSE OF THIS SUBROUTINE:
         // Verify CFS layer validity, sets bad items to valid defaults if possible
 
-        FillDefaultsSWP(dataWindowEquivalentLayer, Layer, Layer.SWP_MAT);
-        FinalizeCFSLAYER(dataWindowEquivalentLayer, Layer);
+        FillDefaultsSWP(state, Layer, Layer.SWP_MAT);
+        FinalizeCFSLAYER(state, Layer);
     }
 
-    void FillDefaultsSWP(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSLAYER const &L, // CFSLayer (input properties must be set)
+    void FillDefaultsSWP(EnergyPlusData &state, CFSLAYER const &L, // CFSLayer (input properties must be set)
                          CFSSWP &SWP        // properties to fill
     )
     {
@@ -7900,19 +7928,19 @@ namespace WindowEquivalentLayer {
         if (L.LTYPE == ltyGLAZE) {
             // estimate diffuse properties if any < 0 or autocalculate
             if (min(SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD) < 0.0) {
-                Specular_EstimateDiffuseProps(dataWindowEquivalentLayer, SWP);
+                Specular_EstimateDiffuseProps(state, SWP);
             }
         } else if (L.LTYPE == ltyVBHOR || L.LTYPE == ltyVBVER) {
 
         } else if (L.LTYPE == ltyDRAPE) {
             // estimate diffuse properties if any < 0
             if (min(SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD) < 0.0) {
-                Fabric_EstimateDiffuseProps(dataWindowEquivalentLayer, SWP);
+                Fabric_EstimateDiffuseProps(state, SWP);
             }
         } else if (L.LTYPE == ltyROLLB) {
             // estimate diffuse properties if any < 0
             if (min(SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD) < 0.0) {
-                OK = RB_SWP(dataWindowEquivalentLayer, L, SWP); // TODO RB
+                OK = RB_SWP(state, L, SWP); // TODO RB
             }
         } else if (L.LTYPE == ltyINSCRN) {
             if (SWP.TAUSFBB < 0.0) {
@@ -7920,7 +7948,7 @@ namespace WindowEquivalentLayer {
                 if (SWP.TAUSBBB < 0.0) SWP.TAUSBBB = SWP.TAUSFBB;
             }
             if (min(SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD) < 0.0) {
-                OK = IS_SWP(dataWindowEquivalentLayer, L, SWP); // TODO IS
+                OK = IS_SWP(state, L, SWP); // TODO IS
             }
         } else if (L.LTYPE == ltyNONE || L.LTYPE == ltyROOM) {
             // none or room: do nothing
@@ -7930,7 +7958,7 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    void FinalizeCFS(WindowEquivalentLayerData &dataWindowEquivalentLayer, CFSTY &FS)
+    void FinalizeCFS(EnergyPlusData &state, CFSTY &FS)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         The University of WaterLoo
@@ -7969,12 +7997,12 @@ namespace WindowEquivalentLayer {
             }
             if (iL < FS.NL) {
                 gType = FS.G(iL).GTYPE;
-                if (gType == dataWindowEquivalentLayer.gtyOPENout && iL != 1) {
+                if (gType == state.dataWindowEquivalentLayer->gtyOPENout && iL != 1) {
                     ShowSevereError(CurrentModuleObject + "=\"" + FS.Name);
                     ShowContinueError("...invalid EquivalentLayer window gap type specified =" + FS.G(iL).Name + '.');
                     ShowContinueError("...VentedOutDoor gap is not outermost.");
                 }
-                if (gType == dataWindowEquivalentLayer.gtyOPENin && iL != FS.NL - 1) {
+                if (gType == state.dataWindowEquivalentLayer->gtyOPENin && iL != FS.NL - 1) {
                     ShowSevereError(CurrentModuleObject + "=\"" + FS.Name);
                     ShowContinueError("...invalid EquivalentLayer window gap type specified =" + FS.G(iL).Name + '.');
                     ShowContinueError("...VentedIndoor gap is not innermost.");
@@ -8102,7 +8130,8 @@ namespace WindowEquivalentLayer {
         return root_4(J / (StefanBoltzmann * max(Emiss, 0.001))) - KelvinConv;
     }
 
-    void CalcEQLOpticalProperty(WindowEquivalentLayerData &dataWindowEquivalentLayer, int const SurfNum,
+    void CalcEQLOpticalProperty(EnergyPlusData &state,
+                                int const SurfNum,
                                 int const BeamDIffFlag, // identifier index of diffuse and beam SW radiation
                                 Array2A<Real64> CFSAbs  // absorbed beam solar radiation by layers fraction
     )
@@ -8157,11 +8186,11 @@ namespace WindowEquivalentLayer {
             }
             // Incident angle
             IncAng = std::acos(CosIncAng(TimeStep, HourOfDay, SurfNum));
-            CalcEQLWindowOpticalProperty(dataWindowEquivalentLayer, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
+            CalcEQLWindowOpticalProperty(state, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
             CFSAbs(1, {1, CFSMAXNL + 1}) = Abs1(1, {1, CFSMAXNL + 1});
             CFSAbs(2, {1, CFSMAXNL + 1}) = Abs1(2, {1, CFSMAXNL + 1});
         } else {
-            if (dataWindowEquivalentLayer.EQLDiffPropFlag(EQLNum)) {
+            if (state.dataWindowEquivalentLayer->EQLDiffPropFlag(EQLNum)) {
                 for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                     if (IsVBLayer(CFS(EQLNum).L(Lay))) {
                         if (CFS(EQLNum).L(Lay).LTYPE == ltyVBHOR) {
@@ -8172,18 +8201,18 @@ namespace WindowEquivalentLayer {
                     }
                 }
                 IncAng = std::acos(CosIncAng(TimeStep, HourOfDay, SurfNum));
-                CalcEQLWindowOpticalProperty(dataWindowEquivalentLayer, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
+                CalcEQLWindowOpticalProperty(state, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
                 CFSAbs(_, {1, CFSMAXNL + 1}) = Abs1(_, {1, CFSMAXNL + 1});
-                dataWindowEquivalentLayer.CFSDiffAbsTrans(_, {1, CFSMAXNL + 1}, EQLNum) = Abs1(_, {1, CFSMAXNL + 1});
+                state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, {1, CFSMAXNL + 1}, EQLNum) = Abs1(_, {1, CFSMAXNL + 1});
                 dataConstruction.Construct(ConstrNum).TransDiff = Abs1(1, CFS(EQLNum).NL + 1);
                 dataConstruction.Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = Abs1(1, {1, CFSMAXNL});
                 dataConstruction.Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = Abs1(2, {1, CFSMAXNL});
                 dataConstruction.Construct(ConstrNum).ReflectSolDiffFront = CFS(EQLNum).L(1).SWP_EL.RHOSFDD;
                 dataConstruction.Construct(ConstrNum).ReflectSolDiffBack = CFS(EQLNum).L(CFS(EQLNum).NL).SWP_EL.RHOSBDD;
-                if (!CFS(EQLNum).ISControlled) dataWindowEquivalentLayer.EQLDiffPropFlag(EQLNum) = false;
+                if (!CFS(EQLNum).ISControlled) state.dataWindowEquivalentLayer->EQLDiffPropFlag(EQLNum) = false;
             } else {
-                CFSAbs(_, {1, CFSMAXNL + 1}) = dataWindowEquivalentLayer.CFSDiffAbsTrans(_, {1, CFSMAXNL + 1}, EQLNum);
-                dataConstruction.Construct(ConstrNum).TransDiff = dataWindowEquivalentLayer.CFSDiffAbsTrans(1, CFS(EQLNum).NL + 1, EQLNum);
+                CFSAbs(_, {1, CFSMAXNL + 1}) = state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, {1, CFSMAXNL + 1}, EQLNum);
+                dataConstruction.Construct(ConstrNum).TransDiff = state.dataWindowEquivalentLayer->CFSDiffAbsTrans(1, CFS(EQLNum).NL + 1, EQLNum);
                 dataConstruction.Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = CFSAbs(1, {1, CFSMAXNL});
                 dataConstruction.Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = CFSAbs(2, {1, CFSMAXNL});
             }
@@ -8193,7 +8222,7 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    void CalcEQLWindowStandardRatings(WindowEquivalentLayerData &dataWindowEquivalentLayer, int const ConstrNum) // construction index
+    void CalcEQLWindowStandardRatings(EnergyPlusData &state, int const ConstrNum) // construction index
     {
 
         // SUBROUTINE INFORMATION:
@@ -8221,11 +8250,11 @@ namespace WindowEquivalentLayer {
         EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
 
         // calculate fenestration air-to-air U-value
-        CalcEQLWindowUvalue(dataWindowEquivalentLayer, CFS(EQLNum), UValue);
+        CalcEQLWindowUvalue(state, CFS(EQLNum), UValue);
         NominalU(ConstrNum) = UValue;
 
         // calculate the SHGC and Normal Transmittance
-        CalcEQLWindowSHGCAndTransNormal(dataWindowEquivalentLayer, CFS(EQLNum), SHGCSummer, TransNormal);
+        CalcEQLWindowSHGCAndTransNormal(state, CFS(EQLNum), SHGCSummer, TransNormal);
         dataConstruction.Construct(ConstrNum).SummerSHGC = SHGCSummer;
         dataConstruction.Construct(ConstrNum).SolTransNorm = TransNormal;
     }

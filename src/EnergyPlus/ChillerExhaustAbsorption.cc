@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -77,7 +78,6 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -116,12 +116,12 @@ namespace ChillerExhaustAbsorption {
     PlantComponent *ExhaustAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
-        if (state.dataChillerExhaustAbsorption.Sim_GetInput) {
+        if (state.dataChillerExhaustAbsorption->Sim_GetInput) {
             GetExhaustAbsorberInput(state);
-            state.dataChillerExhaustAbsorption.Sim_GetInput = false;
+            state.dataChillerExhaustAbsorption->Sim_GetInput = false;
         }
         // Now look for this particular pipe in the list
-        for (auto &comp : state.dataChillerExhaustAbsorption.ExhaustAbsorber) {
+        for (auto &comp : state.dataChillerExhaustAbsorption->ExhaustAbsorber) {
             if (comp.Name == objectName) {
                 return &comp;
             }
@@ -267,10 +267,10 @@ namespace ChillerExhaustAbsorption {
             Get_ErrorsFound = true;
         }
 
-        if (allocated(state.dataChillerExhaustAbsorption.ExhaustAbsorber)) return;
+        if (allocated(state.dataChillerExhaustAbsorption->ExhaustAbsorber)) return;
 
         // ALLOCATE ARRAYS
-        state.dataChillerExhaustAbsorption.ExhaustAbsorber.allocate(NumExhaustAbsorbers);
+        state.dataChillerExhaustAbsorption->ExhaustAbsorber.allocate(NumExhaustAbsorbers);
 
         // LOAD ARRAYS
 
@@ -291,7 +291,7 @@ namespace ChillerExhaustAbsorption {
             // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
 
-            auto &thisChiller = state.dataChillerExhaustAbsorption.ExhaustAbsorber(AbsorberNum);
+            auto &thisChiller = state.dataChillerExhaustAbsorption->ExhaustAbsorber(AbsorberNum);
             thisChiller.Name = cAlphaArgs(1);
             ChillerName = cCurrentModuleObject + " Named " + thisChiller.Name;
 
@@ -951,18 +951,18 @@ namespace ChillerExhaustAbsorption {
                 if (this->NomCoolingCapWasAutoSized) {
                     this->NomCoolingCap = tmpNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "ChillerHeater:Absorption:DoubleEffect", this->Name, "Design Size Nominal Cooling Capacity [W]", tmpNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "ChillerHeater:Absorption:DoubleEffect", this->Name, "Initial Design Size Nominal Cooling Capacity [W]", tmpNomCap);
                     }
                 } else {
                     if (this->NomCoolingCap > 0.0 && tmpNomCap > 0.0) {
                         NomCapUser = this->NomCoolingCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DoubleEffect",
+                            BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DoubleEffect",
                                                                     this->Name,
                                                                     "Design Size Nominal Cooling Capacity [W]",
                                                                     tmpNomCap,
@@ -994,7 +994,7 @@ namespace ChillerExhaustAbsorption {
             } else {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     if (this->NomCoolingCap > 0.0) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "Chiller:Absorption:DoubleEffect", this->Name, "User-Specified Nominal Capacity [W]", this->NomCoolingCap);
                     }
                 }
@@ -1013,13 +1013,13 @@ namespace ChillerExhaustAbsorption {
                 if (this->EvapVolFlowRateWasAutoSized) {
                     this->EvapVolFlowRate = tmpEvapVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DoubleEffect",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DoubleEffect",
                                                                 this->Name,
                                                                 "Design Size Design Chilled Water Flow Rate [m3/s]",
                                                                 tmpEvapVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DoubleEffect",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DoubleEffect",
                                                                 this->Name,
                                                                 "Initial Design Size Design Chilled Water Flow Rate [m3/s]",
                                                                 tmpEvapVolFlowRate);
@@ -1028,7 +1028,7 @@ namespace ChillerExhaustAbsorption {
                     if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
                         EvapVolFlowRateUser = this->EvapVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DoubleEffect",
+                            BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DoubleEffect",
                                                                     this->Name,
                                                                     "Design Size Design Chilled Water Flow Rate [m3/s]",
                                                                     tmpEvapVolFlowRate,
@@ -1062,7 +1062,7 @@ namespace ChillerExhaustAbsorption {
             } else {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     if (this->EvapVolFlowRate > 0.0) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DoubleEffect",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DoubleEffect",
                                                                 this->Name,
                                                                 "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                                 this->EvapVolFlowRate);
@@ -1085,13 +1085,13 @@ namespace ChillerExhaustAbsorption {
                 if (this->HeatVolFlowRateWasAutoSized) {
                     this->HeatVolFlowRate = tmpHeatRecVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DoubleEffect",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DoubleEffect",
                                                                 this->Name,
                                                                 "Design Size Design Hot Water Flow Rate [m3/s]",
                                                                 tmpHeatRecVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DoubleEffect",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DoubleEffect",
                                                                 this->Name,
                                                                 "Initial Design Size Design Hot Water Flow Rate [m3/s]",
                                                                 tmpHeatRecVolFlowRate);
@@ -1100,7 +1100,7 @@ namespace ChillerExhaustAbsorption {
                     if (this->HeatVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0) {
                         HeatRecVolFlowRateUser = this->HeatVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DoubleEffect",
+                            BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DoubleEffect",
                                                                     this->Name,
                                                                     "Design Size Design Hot Water Flow Rate [m3/s]",
                                                                     tmpHeatRecVolFlowRate,
@@ -1134,7 +1134,7 @@ namespace ChillerExhaustAbsorption {
             } else {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     if (this->HeatVolFlowRate > 0.0) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DoubleEffect",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DoubleEffect",
                                                                 this->Name,
                                                                 "User-Specified Design Hot Water Flow Rate [m3/s]",
                                                                 this->HeatVolFlowRate);
@@ -1166,13 +1166,13 @@ namespace ChillerExhaustAbsorption {
                 if (this->CondVolFlowRateWasAutoSized) {
                     this->CondVolFlowRate = tmpCondVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DoubleEffect",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DoubleEffect",
                                                                 this->Name,
                                                                 "Design Size Design Condenser Water Flow Rate [m3/s]",
                                                                 tmpCondVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DoubleEffect",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DoubleEffect",
                                                                 this->Name,
                                                                 "Initial Design Size Design Condenser Water Flow Rate [m3/s]",
                                                                 tmpCondVolFlowRate);
@@ -1181,7 +1181,7 @@ namespace ChillerExhaustAbsorption {
                     if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
                         CondVolFlowRateUser = this->CondVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DoubleEffect",
+                            BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DoubleEffect",
                                                                     this->Name,
                                                                     "Design Size Design Condenser Water Flow Rate [m3/s]",
                                                                     tmpCondVolFlowRate,
@@ -1215,7 +1215,7 @@ namespace ChillerExhaustAbsorption {
             } else {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     if (this->CondVolFlowRate > 0.0) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DoubleEffect",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DoubleEffect",
                                                                 this->Name,
                                                                 "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                                 this->CondVolFlowRate);

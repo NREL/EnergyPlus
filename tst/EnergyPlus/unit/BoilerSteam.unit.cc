@@ -91,7 +91,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects, false));
     GetBoilerInput(state);
-    auto &thisBoiler = state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers);
+    auto &thisBoiler = state.dataBoilerSteam->Boiler(state.dataBoilerSteam->numBoilers);
     EXPECT_EQ(thisBoiler.Name, "STEAM BOILER PLANT BOILER");
     EXPECT_EQ(thisBoiler.FuelType, AssignResourceTypeNum("NATURALGAS"));
     EXPECT_EQ(thisBoiler.BoilerMaxOperPress, 160000);
@@ -159,7 +159,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     }
 
     GetBoilerInput(state);
-    auto &thisBoiler = state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers);
+    auto &thisBoiler = state.dataBoilerSteam->Boiler(state.dataBoilerSteam->numBoilers);
 
     DataPlant::PlantLoop(1).Name = "SteamLoop";
     DataPlant::PlantLoop(1).FluidName = "Steam";

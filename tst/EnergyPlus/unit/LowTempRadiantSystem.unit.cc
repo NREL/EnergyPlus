@@ -1118,7 +1118,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     ScheduleInputProcessed = true;
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetConstructData(state.files, ErrorsFound);
@@ -2420,10 +2420,10 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     auto &thisCFloSys (CFloRadSys(1));
 
     NumOfTimeStepInHour = 1;
-    WeatherManager::TodayOutDryBulbTemp.allocate(NumOfTimeStepInHour, DataGlobals::HoursInDay);
-    WeatherManager::TodayOutDryBulbTemp = 0.0;
+    state.dataWeatherManager->TodayOutDryBulbTemp.allocate(NumOfTimeStepInHour, DataGlobals::HoursInDay);
+    state.dataWeatherManager->TodayOutDryBulbTemp = 0.0;
     for (int hourNumber = 1; hourNumber <= DataGlobals::HoursInDay; ++hourNumber) {
-        WeatherManager::TodayOutDryBulbTemp(NumOfTimeStepInHour,hourNumber) = double(hourNumber);
+        state.dataWeatherManager->TodayOutDryBulbTemp(NumOfTimeStepInHour,hourNumber) = double(hourNumber);
     }
 
     // Test 1: First day of the simulation and it's in warmup-->everything set to the same temperature
@@ -2436,7 +2436,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = -9999.9;
     thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
     expectedResult = 12.5;
-    thisCFloSys.calculateRunningMeanAverageTemperature();
+    thisCFloSys.calculateRunningMeanAverageTemperature(state);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
@@ -2452,7 +2452,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = -9999.9;
     thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
     expectedResult = -9999.9;
-    thisCFloSys.calculateRunningMeanAverageTemperature();
+    thisCFloSys.calculateRunningMeanAverageTemperature(state);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
@@ -2468,7 +2468,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = 12.345;
     thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
     expectedResult = 12.345;
-    thisCFloSys.calculateRunningMeanAverageTemperature();
+    thisCFloSys.calculateRunningMeanAverageTemperature(state);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
@@ -2483,7 +2483,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature = 14.5;
     thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = 5.0;
     thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
-    thisCFloSys.calculateRunningMeanAverageTemperature();
+    thisCFloSys.calculateRunningMeanAverageTemperature(state);
     expectedResult = 12.5;  // Average of TodayOutDryBulbTemp(firstTimeStepIndex,hourNumber)
     EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
     expectedResult = 15.0;  // Should transfer what was todayAverageOutdoorDryBulbTemperature (see above)

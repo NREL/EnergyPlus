@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -77,7 +78,6 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -116,12 +116,12 @@ namespace ChillerGasAbsorption {
     PlantComponent *GasAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
-        if (state.dataChillerGasAbsorption.getGasAbsorberInputs) {
+        if (state.dataChillerGasAbsorption->getGasAbsorberInputs) {
             GetGasAbsorberInput(state);
-            state.dataChillerGasAbsorption.getGasAbsorberInputs = false;
+            state.dataChillerGasAbsorption->getGasAbsorberInputs = false;
         }
         // Now look for this particular pipe in the list
-        for (auto &comp : state.dataChillerGasAbsorption.GasAbsorber) {
+        for (auto &comp : state.dataChillerGasAbsorption->GasAbsorber) {
             if (comp.Name == objectName) {
                 return &comp;
             }
@@ -265,10 +265,10 @@ namespace ChillerGasAbsorption {
             Get_ErrorsFound = true;
         }
 
-        if (allocated(state.dataChillerGasAbsorption.GasAbsorber)) return;
+        if (allocated(state.dataChillerGasAbsorption->GasAbsorber)) return;
 
         // ALLOCATE ARRAYS
-        state.dataChillerGasAbsorption.GasAbsorber.allocate(NumGasAbsorbers);
+        state.dataChillerGasAbsorption->GasAbsorber.allocate(NumGasAbsorbers);
 
         // LOAD ARRAYS
 
@@ -289,7 +289,7 @@ namespace ChillerGasAbsorption {
             // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
 
-            auto &thisChiller = state.dataChillerGasAbsorption.GasAbsorber(AbsorberNum);
+            auto &thisChiller = state.dataChillerGasAbsorption->GasAbsorber(AbsorberNum);
             thisChiller.Name = cAlphaArgs(1);
             ChillerName = cCurrentModuleObject + " Named " + thisChiller.Name;
 
@@ -944,18 +944,18 @@ namespace ChillerGasAbsorption {
                 if (this->NomCoolingCapWasAutoSized) {
                     this->NomCoolingCap = tmpNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "ChillerHeater:Absorption:DirectFired", this->Name, "Design Size Nominal Cooling Capacity [W]", tmpNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "ChillerHeater:Absorption:DirectFired", this->Name, "Initial Design Size Nominal Cooling Capacity [W]", tmpNomCap);
                     }
                 } else {
                     if (this->NomCoolingCap > 0.0 && tmpNomCap > 0.0) {
                         NomCapUser = this->NomCoolingCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DirectFired",
+                            BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DirectFired",
                                                                     this->Name,
                                                                     "Design Size Nominal Cooling Capacity [W]",
                                                                     tmpNomCap,
@@ -987,7 +987,7 @@ namespace ChillerGasAbsorption {
             } else {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     if (this->NomCoolingCap > 0.0) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "ChillerHeater:Absorption:DirectFired", this->Name, "User-Specified Nominal Capacity [W]", this->NomCoolingCap);
                     }
                 }
@@ -1005,13 +1005,13 @@ namespace ChillerGasAbsorption {
                 if (this->EvapVolFlowRateWasAutoSized) {
                     this->EvapVolFlowRate = tmpEvapVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DirectFired",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DirectFired",
                                                                 this->Name,
                                                                 "Design Size Design Chilled Water Flow Rate [m3/s]",
                                                                 tmpEvapVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DirectFired",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DirectFired",
                                                                 this->Name,
                                                                 "Initial Design Size Design Chilled Water Flow Rate [m3/s]",
                                                                 tmpEvapVolFlowRate);
@@ -1020,7 +1020,7 @@ namespace ChillerGasAbsorption {
                     if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
                         EvapVolFlowRateUser = this->EvapVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DirectFired",
+                            BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DirectFired",
                                                                     this->Name,
                                                                     "Design Size Design Chilled Water Flow Rate [m3/s]",
                                                                     tmpEvapVolFlowRate,
@@ -1054,7 +1054,7 @@ namespace ChillerGasAbsorption {
             } else {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     if (this->EvapVolFlowRate > 0.0) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DirectFired",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DirectFired",
                                                                 this->Name,
                                                                 "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                                 this->EvapVolFlowRate);
@@ -1077,13 +1077,13 @@ namespace ChillerGasAbsorption {
                 if (this->HeatVolFlowRateWasAutoSized) {
                     this->HeatVolFlowRate = tmpHeatRecVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DirectFired",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DirectFired",
                                                                 this->Name,
                                                                 "Design Size Design Hot Water Flow Rate [m3/s]",
                                                                 tmpHeatRecVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DirectFired",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DirectFired",
                                                                 this->Name,
                                                                 "Initial Design Size Design Hot Water Flow Rate [m3/s]",
                                                                 tmpHeatRecVolFlowRate);
@@ -1092,7 +1092,7 @@ namespace ChillerGasAbsorption {
                     if (this->HeatVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0) {
                         HeatRecVolFlowRateUser = this->HeatVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DirectFired",
+                            BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DirectFired",
                                                                     this->Name,
                                                                     "Design Size Design Hot Water Flow Rate [m3/s]",
                                                                     tmpHeatRecVolFlowRate,
@@ -1126,7 +1126,7 @@ namespace ChillerGasAbsorption {
             } else {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     if (this->HeatVolFlowRate > 0.0) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DirectFired",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DirectFired",
                                                                 this->Name,
                                                                 "User-Specified Design Hot Water Flow Rate [m3/s]",
                                                                 this->HeatVolFlowRate);
@@ -1159,13 +1159,13 @@ namespace ChillerGasAbsorption {
                 if (this->CondVolFlowRateWasAutoSized) {
                     this->CondVolFlowRate = tmpCondVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DirectFired",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DirectFired",
                                                                 this->Name,
                                                                 "Design Size Design Condenser Water Flow Rate [m3/s]",
                                                                 tmpCondVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DirectFired",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DirectFired",
                                                                 this->Name,
                                                                 "Initial Design Size Design Condenser Water Flow Rate [m3/s]",
                                                                 tmpCondVolFlowRate);
@@ -1174,7 +1174,7 @@ namespace ChillerGasAbsorption {
                     if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
                         CondVolFlowRateUser = this->CondVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DirectFired",
+                            BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DirectFired",
                                                                     this->Name,
                                                                     "Design Size Design Condenser Water Flow Rate [m3/s]",
                                                                     tmpCondVolFlowRate,
@@ -1208,7 +1208,7 @@ namespace ChillerGasAbsorption {
             } else {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     if (this->CondVolFlowRate > 0.0) {
-                        ReportSizingManager::ReportSizingOutput("ChillerHeater:Absorption:DirectFired",
+                        BaseSizer::reportSizerOutput("ChillerHeater:Absorption:DirectFired",
                                                                 this->Name,
                                                                 "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                                 this->CondVolFlowRate);

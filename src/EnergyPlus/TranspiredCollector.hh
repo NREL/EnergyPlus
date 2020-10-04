@@ -60,7 +60,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct ConvectionCoefficientsData;
 
 namespace TranspiredCollector {
 
@@ -177,7 +176,6 @@ namespace TranspiredCollector {
     void clear_state();
 
     void SimTranspiredCollector(EnergyPlusData &state,
-                                ConvectionCoefficientsData &dataConvectionCoefficients,
                                 IOFiles &ioFiles,
                                 std::string const &CompName, // component name
                                 int &CompIndex               // component index (to reduce string compares during simulation)
@@ -187,9 +185,9 @@ namespace TranspiredCollector {
 
     void InitTranspiredCollector(int const UTSCNum); // compindex already checked in calling routine
 
-    void CalcActiveTranspiredCollector(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const UTSCNum);
+    void CalcActiveTranspiredCollector(EnergyPlusData &state, IOFiles &ioFiles, int const UTSCNum);
 
-    void CalcPassiveTranspiredCollector(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const UTSCNum);
+    void CalcPassiveTranspiredCollector(EnergyPlusData &state, IOFiles &ioFiles, int const UTSCNum);
 
     void UpdateTranspiredCollector(int const UTSCNum);
 
