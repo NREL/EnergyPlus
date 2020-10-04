@@ -2930,7 +2930,7 @@ namespace HeatBalanceSurfaceManager {
                                     SurfWinWindowModelType(SurfNum) != WindowEQLModel &&
                                     !state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
                                     int TotGlassLay = dataConstruction.Construct(ConstrNum).TotGlassLayers; // Number of glass layers
-                                    for (Lay = 1; Lay <= TotGlassLay; ++Lay) {
+                                    for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                         AbsDiffWin(Lay) = dataConstruction.Construct(ConstrNum).AbsDiff(Lay);
                                     }
 
@@ -3018,7 +3018,7 @@ namespace HeatBalanceSurfaceManager {
                                         // AWinSurf is from InteriorSolarDistribution
                                         if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn ||
                                             ShadeFlag == BGBlindOn) {
-                                            int ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+                                            int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                                             if (Blind(SurfWinBlindNumber(SurfNum)).SlatOrientation == Horizontal) {
                                                 // AbsDiffGlassLayGnd - System glass layer ground diffuse solar absorptance with blind on
                                                 // AbsDiffGlassLaySky - System glass layer sky diffuse solar absorptance with blind on
@@ -3124,14 +3124,13 @@ namespace HeatBalanceSurfaceManager {
                                     if (SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
                                         SurfNum2 = TDDPipe(SurfWinTDDPipeNum(SurfNum)).Dome;
                                     }
-                                    std::pair<Real64, Real64> incomingAngle = getSunWCEAngles(
-                                            dataWindowComplexManager, SurfNum2, BSDFHemisphere::Incoming);
+                                    std::pair<Real64, Real64> incomingAngle =
+                                            getSunWCEAngles(state, SurfNum2, BSDFHemisphere::Incoming);
                                     Real64 Theta = incomingAngle.first;
                                     Real64 Phi = incomingAngle.second;
 
                                     std::shared_ptr<CMultiLayerScattered> aLayer = CWindowConstructionsSimplified::instance().getEquivalentLayer(
                                         state, WavelengthRange::Solar, ConstrNum);
-
                                     size_t totLayers = aLayer->getNumOfLayers();
                                     for (size_t Lay = 1; Lay <= totLayers; ++Lay) {
 
@@ -3220,7 +3219,7 @@ namespace HeatBalanceSurfaceManager {
                                                 TransDiffGl = dataConstruction.Construct(ConstrNum).TransDiff;
                                                 if (ShadeFlag == SwitchableGlazing) { // Switchable glazing
                                                     Real64 SwitchFac = SurfWinSwitchingFactor(SurfNum);
-                                                    int ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+                                                    int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                                                     Real64 TransGlSh = POLYF(CosInc, dataConstruction.Construct(
                                                             ConstrNumSh).TransSolBeamCoef);
                                                     TransGl = InterpSw(SwitchFac, TransGl, TransGlSh);
@@ -3271,7 +3270,7 @@ namespace HeatBalanceSurfaceManager {
                                             Real64 ReflGl = dataMaterial.Material(MatNumGl).ReflectSolBeamFront;
                                             Real64 AbsGl = 1.0 - TransGl - ReflGl;
                                             Real64 SwitchFac = SurfWinSwitchingFactor(SurfNum);
-                                            int ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+                                            int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                                             if (ShadeFlag == SwitchableGlazing) { // Switchable glazing
                                                 Real64 MatNumGlSh = dataConstruction.Construct(
                                                         ConstrNumSh).LayerPoint(1);
@@ -3322,7 +3321,7 @@ namespace HeatBalanceSurfaceManager {
                                                         ConstrNum).TransDiff; // Diffuse solar transmittance
                                                 if (ShadeFlag == SwitchableGlazing) { // Switchable glazing
                                                     Real64 SwitchFac = SurfWinSwitchingFactor(SurfNum);
-                                                    int ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+                                                    int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                                                     Real64 TransGlSh = POLYF(CosInc, dataConstruction.Construct(
                                                             ConstrNumSh).TransSolBeamCoef);
                                                     // Outer glass solar trans, refl, absorptance if switched
@@ -3396,7 +3395,7 @@ namespace HeatBalanceSurfaceManager {
                                                             Blind(BlNum).SolFrontDiffDiffTrans));
 
                                         } else if (ShadeFlag == ExtShadeOn) { // Exterior shade
-                                            int ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+                                            int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                                             SurfWinDividerQRadOutAbs(SurfNum) =
                                                     DividerAbs * dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Trans *
                                                     (DivIncSolarOutBm +DivIncSolarOutDif);
