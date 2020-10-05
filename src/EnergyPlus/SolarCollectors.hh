@@ -229,9 +229,9 @@ namespace SolarCollectors {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
         void initialize(EnergyPlusData &state);
 
@@ -246,9 +246,9 @@ namespace SolarCollectors {
                                     Optional<Real64> RefSysDiffuse = _ // cover system solar reflectance from inner to outer cover
         );
 
-        void CalcSolarCollector();
+        void CalcSolarCollector(EnergyPlusData &state);
 
-        void CalcICSSolarCollector();
+        void CalcICSSolarCollector(EnergyPlusData &state);
 
         void CalcTransAbsorProduct(Real64 IncidAngle);
 
@@ -275,7 +275,8 @@ namespace SolarCollectors {
                                                  Real64 SinTilt    // sine of surface tilt angle relative to the horizontal
         );
 
-        static Real64 CalcConvCoeffAbsPlateAndWater(Real64 TAbsorber, // temperature of absorber plate [C]
+        static Real64 CalcConvCoeffAbsPlateAndWater(EnergyPlusData &state,
+                                                    Real64 TAbsorber, // temperature of absorber plate [C]
                                                     Real64 TWater,    // temperature of water [C]
                                                     Real64 Lc,        // characteristic length [m]
                                                     Real64 TiltR2V    // collector tilt angle relative to the vertical [degree]
@@ -283,7 +284,7 @@ namespace SolarCollectors {
 
         static void GetExtVentedCavityIndex(int SurfacePtr, int &VentCavIndex);
 
-        void update();
+        void update(EnergyPlusData &state);
 
         void report();
     };
@@ -294,7 +295,7 @@ namespace SolarCollectors {
 
     // Functions
     void clear_state();
-    void GetSolarCollectorInput();
+    void GetSolarCollectorInput(EnergyPlusData &state);
 
 } // namespace SolarCollectors
 

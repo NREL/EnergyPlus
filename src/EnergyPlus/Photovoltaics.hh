@@ -59,6 +59,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace Photovoltaics {
 
     // Data
@@ -72,7 +75,8 @@ namespace Photovoltaics {
 
     void clear_state();
 
-    void SimPVGenerator(int const GeneratorType,          // type of Generator !unused1208
+    void SimPVGenerator(EnergyPlusData &state,
+                        int const GeneratorType,          // type of Generator !unused1208
                         std::string const &GeneratorName, // user specified name of Generator
                         int &GeneratorIndex,
                         bool const RunFlag, // is PV ON or OFF as determined by schedules in ElecLoadCenter
@@ -88,7 +92,7 @@ namespace Photovoltaics {
 
     // *************
 
-    void GetPVInput();
+    void GetPVInput(EnergyPlusData &state);
 
     int GetPVZone(int const SurfNum);
 

@@ -88,7 +88,7 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
-    state.dataPlantChillers->GTChiller(1).size();
+    state.dataPlantChillers->GTChiller(1).size(state);
     // see if heat recovery flow rate is as expected
     EXPECT_NEAR(state.dataPlantChillers->GTChiller(1).DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
@@ -124,7 +124,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
-    state.dataPlantChillers->EngineDrivenChiller(1).size();
+    state.dataPlantChillers->EngineDrivenChiller(1).size(state);
     // see if heat recovery flow rate is as expected
     EXPECT_NEAR(state.dataPlantChillers->EngineDrivenChiller(1).DesignHeatRecVolFlowRate, 0.5, 0.00001);
 

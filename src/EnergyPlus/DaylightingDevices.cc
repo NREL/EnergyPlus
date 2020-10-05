@@ -55,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDaylightingDevices.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -68,11 +69,9 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Vectors.hh>
 
 namespace EnergyPlus {
 
@@ -210,7 +209,7 @@ namespace DaylightingDevices {
 
     // Functions
 
-    void InitDaylightingDevices(IOFiles &ioFiles)
+    void InitDaylightingDevices(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -273,7 +272,7 @@ namespace DaylightingDevices {
 
         // FLOW:
         // Initialize tubular daylighting devices (TDDs)
-        GetTDDInput();
+        GetTDDInput(state);
 
         if (NumOfTDDPipes > 0) {
             DisplayString("Initializing Tubular Daylighting Devices");
@@ -362,50 +361,50 @@ namespace DaylightingDevices {
                 TDDPipe(PipeNum).ExtLength = TDDPipe(PipeNum).TotLength - SumTZoneLengths;
 
                 // Setup report variables: CurrentModuleObject='DaylightingDevice:Tubular'
-                SetupOutputVariable("Tubular Daylighting Device Transmitted Solar Radiation Rate",
+                SetupOutputVariable(state, "Tubular Daylighting Device Transmitted Solar Radiation Rate",
                                     OutputProcessor::Unit::W,
                                     TDDPipe(PipeNum).TransmittedSolar,
                                     "Zone",
                                     "Average",
                                     TDDPipe(PipeNum).Name);
-                SetupOutputVariable("Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate",
+                SetupOutputVariable(state, "Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate",
                                     OutputProcessor::Unit::W,
                                     TDDPipe(PipeNum).PipeAbsorbedSolar,
                                     "Zone",
                                     "Average",
                                     TDDPipe(PipeNum).Name);
-                SetupOutputVariable("Tubular Daylighting Device Heat Gain Rate",
+                SetupOutputVariable(state, "Tubular Daylighting Device Heat Gain Rate",
                                     OutputProcessor::Unit::W,
                                     TDDPipe(PipeNum).HeatGain,
                                     "Zone",
                                     "Average",
                                     TDDPipe(PipeNum).Name);
-                SetupOutputVariable("Tubular Daylighting Device Heat Loss Rate",
+                SetupOutputVariable(state, "Tubular Daylighting Device Heat Loss Rate",
                                     OutputProcessor::Unit::W,
                                     TDDPipe(PipeNum).HeatLoss,
                                     "Zone",
                                     "Average",
                                     TDDPipe(PipeNum).Name);
 
-                SetupOutputVariable("Tubular Daylighting Device Beam Solar Transmittance",
+                SetupOutputVariable(state, "Tubular Daylighting Device Beam Solar Transmittance",
                                     OutputProcessor::Unit::None,
                                     TDDPipe(PipeNum).TransSolBeam,
                                     "Zone",
                                     "Average",
                                     TDDPipe(PipeNum).Name);
-                SetupOutputVariable("Tubular Daylighting Device Beam Visible Transmittance",
+                SetupOutputVariable(state, "Tubular Daylighting Device Beam Visible Transmittance",
                                     OutputProcessor::Unit::None,
                                     TDDPipe(PipeNum).TransVisBeam,
                                     "Zone",
                                     "Average",
                                     TDDPipe(PipeNum).Name);
-                SetupOutputVariable("Tubular Daylighting Device Diffuse Solar Transmittance",
+                SetupOutputVariable(state, "Tubular Daylighting Device Diffuse Solar Transmittance",
                                     OutputProcessor::Unit::None,
                                     TDDPipe(PipeNum).TransSolDiff,
                                     "Zone",
                                     "Average",
                                     TDDPipe(PipeNum).Name);
-                SetupOutputVariable("Tubular Daylighting Device Diffuse Visible Transmittance",
+                SetupOutputVariable(state, "Tubular Daylighting Device Diffuse Visible Transmittance",
                                     OutputProcessor::Unit::None,
                                     TDDPipe(PipeNum).TransVisDiff,
                                     "Zone",
@@ -418,7 +417,7 @@ namespace DaylightingDevices {
         }
 
         // Initialize daylighting shelves
-        GetShelfInput();
+        GetShelfInput(state);
 
         if (NumOfShelf > 0) DisplayString("Initializing Light Shelf Daylighting Devices");
 
@@ -447,18 +446,18 @@ namespace DaylightingDevices {
 
                 // Report calculated view factor so that user knows what to make the view factor to ground
                 if (!ShelfReported) {
-                    print(ioFiles.eio,
+                    print(state.files.eio,
                         "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground\n");
                     ShelfReported = true;
                 }
-                print(ioFiles.eio,
+                print(state.files.eio,
                       "{},{:.2R},{},{:.2R},{:.2R}\n",
                       Shelf(ShelfNum).Name,
                       Shelf(ShelfNum).ViewFactor,
                       Surface(WinSurf).Name,
                       Surface(WinSurf).ViewFactorSky,
                       Surface(WinSurf).ViewFactorGround);
-                //      CALL SetupOutputVariable('View Factor To Outside Shelf []', &
+                //      CALL SetupOutputVariable(state, 'View Factor To Outside Shelf []', &
                 //        Shelf(ShelfNum)%ViewFactor,'Zone','Average',Shelf(ShelfNum)%Name)
             }
         }
@@ -474,7 +473,7 @@ namespace DaylightingDevices {
         }
     }
 
-    void GetTDDInput()
+    void GetTDDInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -516,7 +515,8 @@ namespace DaylightingDevices {
             TDDPipe.allocate(NumOfTDDPipes);
 
             for (PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               PipeNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -745,7 +745,7 @@ namespace DaylightingDevices {
         }
     }
 
-    void GetShelfInput()
+    void GetShelfInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -780,7 +780,8 @@ namespace DaylightingDevices {
             Shelf.allocate(NumOfShelf);
 
             for (ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               ShelfNum,
                                               cAlphaArgs,
                                               NumAlphas,

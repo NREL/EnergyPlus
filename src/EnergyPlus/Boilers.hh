@@ -151,17 +151,17 @@ namespace Boilers {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &SizFac) override;
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        void SetupOutputVars();
+        void SetupOutputVars(EnergyPlusData &state);
 
         void InitBoiler(EnergyPlusData &state); // number of the current boiler being simulated
 
-        void SizeBoiler();
+        void SizeBoiler(EnergyPlusData &state);
 
         void CalcBoilerModel(EnergyPlusData &state,
                              Real64 MyLoad,    // W - hot water demand to be met by boiler

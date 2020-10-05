@@ -92,7 +92,6 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MatrixDataManager.hh>
@@ -345,7 +344,7 @@ namespace HeatBalanceManager {
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(state); // Obtains heat balance related parameters from input file
-            HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
+            HeatBalanceIntRadExchange::InitSolarViewFactors(state);
 
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
@@ -369,7 +368,7 @@ namespace HeatBalanceManager {
                   ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance(state, state.files); // Initialize all heat balance related parameters
+        InitHeatBalance(state); // Initialize all heat balance related parameters
         ManageEMS(state, DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
@@ -381,13 +380,13 @@ namespace HeatBalanceManager {
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance(state);
         ManageEMS(state, emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
-        RecKeepHeatBalance(state.files);                                             // Do any heat balance related record keeping
+        RecKeepHeatBalance(state);                                             // Do any heat balance related record keeping
 
         // This call has been moved to the FanSystemModule and does effect the output file
         //   You do get a shift in the Air Handling System Summary for the building electric loads
         // IF ((.NOT.WarmupFlag).AND.(DayOfSim.GT.0)) CALL RCKEEP  ! Do fan system accounting (to be moved later)
 
-        ReportHeatBalance(state, state.files); // Manage heat balance reporting until the new reporting is in place
+        ReportHeatBalance(state); // Manage heat balance reporting until the new reporting is in place
 
         ManageEMS(state, emsCallFromEndZoneTimestepAfterZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
@@ -406,7 +405,7 @@ namespace HeatBalanceManager {
         }
 
         if (!WarmupFlag && EndDayFlag && DayOfSim == 1 && !DoingSizing) {
-            ReportWarmupConvergence(state.files);
+            ReportWarmupConvergence(state);
         }
     }
 
@@ -457,20 +456,20 @@ namespace HeatBalanceManager {
 
         GetProjectControlData(state, ErrorsFound);
 
-        GetSiteAtmosphereData(state.files, ErrorsFound);
+        GetSiteAtmosphereData(state, ErrorsFound);
 
-        GetWindowGlassSpectralData(ErrorsFound);
+        GetWindowGlassSpectralData(state, ErrorsFound);
 
-        GetMaterialData(state, state.files, ErrorsFound); // Read materials from input file/transfer from legacy data structure
+        GetMaterialData(state, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
-        GetFrameAndDividerData(ErrorsFound);
+        GetFrameAndDividerData(state, ErrorsFound);
 
-        GetConstructData(state.files, ErrorsFound); // Read constructs from input file/transfer from legacy data structure
+        GetConstructData(state, ErrorsFound); // Read constructs from input file/transfer from legacy data structure
 
         GetBuildingData(state, ErrorsFound); // Read building data from input file
 
         // Added SV 6/26/2013 to load scheduled surface gains
-        GetScheduledSurfaceGains(ErrorsFound);
+        GetScheduledSurfaceGains(state, ErrorsFound);
 
         // Added TH 1/9/2009 to create thermochromic window constructions
         CreateTCConstructions(ErrorsFound);
@@ -483,7 +482,7 @@ namespace HeatBalanceManager {
             }
         }
 
-        CheckUsedConstructions(ErrorsFound);
+        CheckUsedConstructions(state, ErrorsFound);
 
         if (ErrorsFound) {
             ShowFatalError("Errors found in Building Input, Program Stopped");
@@ -494,7 +493,7 @@ namespace HeatBalanceManager {
         ManageInternalHeatGains(state, true);
     }
 
-    void CheckUsedConstructions(bool &ErrorsFound)
+    void CheckUsedConstructions(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -537,7 +536,7 @@ namespace HeatBalanceManager {
         for (ONum = 1; ONum <= NumConstrObjects; ++ONum) {
             NumObjects = inputProcessor->getNumObjectsFound(ConstrObjects(ONum));
             for (Loop = 1; Loop <= NumObjects; ++Loop) {
-                inputProcessor->getObjectItem(ConstrObjects(ONum), Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status);
+                inputProcessor->getObjectItem(state, ConstrObjects(ONum), Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status);
                 if (ONum == 5) {
                     CNum = UtilityRoutines::FindItemInList(cAlphaArgs(4), dataConstruction.Construct);
                 } else {
@@ -614,7 +613,7 @@ namespace HeatBalanceManager {
         return ValidSimulation;
     }
 
-    void SetPreConstructionInputParameters()
+    void SetPreConstructionInputParameters(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -645,7 +644,8 @@ namespace HeatBalanceManager {
         std::string constructName("Construction:WindowEquivalentLayer");
         int numConstructions(inputProcessor->getNumObjectsFound(constructName));
         for (int constructionNum = 1; constructionNum <= numConstructions; ++constructionNum) {
-            inputProcessor->getObjectItem(constructName,
+            inputProcessor->getObjectItem(state,
+                                          constructName,
                                           constructionNum,
                                           cAlphaArgs,
                                           NumAlpha,
@@ -723,7 +723,8 @@ namespace HeatBalanceManager {
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
         if (NumObjects > 0) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           AlphaName,
                                           NumAlpha,
@@ -875,7 +876,8 @@ namespace HeatBalanceManager {
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumObjects > 0) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           AlphaName,
                                           NumAlpha,
@@ -932,7 +934,8 @@ namespace HeatBalanceManager {
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumObjects > 0) {
-            inputProcessor->getObjectItem("SurfaceConvectionAlgorithm:Outside",
+            inputProcessor->getObjectItem(state,
+                                          "SurfaceConvectionAlgorithm:Outside",
                                           1,
                                           AlphaName,
                                           NumAlpha,
@@ -986,7 +989,8 @@ namespace HeatBalanceManager {
         CurrentModuleObject = "HeatBalanceAlgorithm";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumObjects > 0) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           AlphaName,
                                           NumAlpha,
@@ -1074,7 +1078,8 @@ namespace HeatBalanceManager {
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
         if (NumObjects > 0) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           AlphaName,
                                           NumAlpha,
@@ -1093,7 +1098,8 @@ namespace HeatBalanceManager {
         CurrentModuleObject = "ZoneAirHeatBalanceAlgorithm";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumObjects > 0) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           AlphaName,
                                           NumAlpha,
@@ -1146,7 +1152,8 @@ namespace HeatBalanceManager {
         CurrentModuleObject = "ZoneAirContaminantBalance";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumObjects > 0) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           AlphaName,
                                           NumAlpha,
@@ -1178,7 +1185,7 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 }
             } else if (NumAlpha > 1 && Contaminant.CO2Simulation) {
-                Contaminant.CO2OutdoorSchedPtr = GetScheduleIndex(AlphaName(2));
+                Contaminant.CO2OutdoorSchedPtr = GetScheduleIndex(state, AlphaName(2));
                 if (Contaminant.CO2OutdoorSchedPtr == 0) {
                     ShowSevereError(CurrentModuleObject + ", " + cAlphaFieldNames(2) + " not found: " + AlphaName(2));
                     ErrorsFound = true;
@@ -1204,7 +1211,7 @@ namespace HeatBalanceManager {
                         ErrorsFound = true;
                     }
                 } else if (NumAlpha > 3 && Contaminant.GenericContamSimulation) {
-                    Contaminant.GenericContamOutdoorSchedPtr = GetScheduleIndex(AlphaName(4));
+                    Contaminant.GenericContamOutdoorSchedPtr = GetScheduleIndex(state, AlphaName(4));
                     if (Contaminant.GenericContamOutdoorSchedPtr == 0) {
                         ShowSevereError(CurrentModuleObject + ", " + cAlphaFieldNames(4) + " not found: " + AlphaName(4));
                         ErrorsFound = true;
@@ -1247,7 +1254,8 @@ namespace HeatBalanceManager {
         ZoneAirMassFlow.EnforceZoneMassBalance = false;
 
         if (NumObjects > 0) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           AlphaName,
                                           NumAlpha,
@@ -1348,7 +1356,8 @@ namespace HeatBalanceManager {
         CurrentModuleObject = "HVACSystemRootFindingAlgorithm";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumObjects > 0) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           AlphaName,
                                           NumAlpha,
@@ -1398,7 +1407,7 @@ namespace HeatBalanceManager {
         print(state.files.eio, Format_735, HVACSystemRootFinding.Algorithm);
     }
 
-    void GetSiteAtmosphereData(IOFiles &ioFiles, bool &ErrorsFound)
+    void GetSiteAtmosphereData(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1429,7 +1438,8 @@ namespace HeatBalanceManager {
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
         if (NumObjects == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           AlphArray,
                                           NumAlphas,
@@ -1458,14 +1468,14 @@ namespace HeatBalanceManager {
         }
 
         // Write to the initialization output file
-        print(ioFiles.eio,
+        print(state.files.eio,
             "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {{}},Wind Speed Profile Boundary "
             "Layer Thickness {{m}},Air Temperature Gradient Coefficient {{K/m}}\n");
 
-        print(ioFiles.eio, Format_720, SiteWindExp, SiteWindBLHeight, SiteTempGradient);
+        print(state.files.eio, Format_720, SiteWindExp, SiteWindBLHeight, SiteTempGradient);
     }
 
-    void GetMaterialData(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound) // set to true if errors found in input
+    void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -1606,7 +1616,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= RegMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -1688,7 +1699,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= RegRMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -1759,7 +1771,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= AirMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -1793,7 +1806,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= IRTMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -1857,7 +1871,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= W5GlsMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -2230,7 +2245,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= W5GlsMatAlt; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -2313,7 +2329,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= W5GlsMatEQL; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -2398,7 +2415,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= W5GasMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -2509,7 +2527,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= W5GapMatEQL; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -2629,7 +2648,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= W5GasMatMixture; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
                                           MaterialNumAlpha,
@@ -2701,7 +2721,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotShades; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -2777,7 +2798,8 @@ namespace HeatBalanceManager {
             MaterialProps = 0;
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -2855,7 +2877,8 @@ namespace HeatBalanceManager {
             MaterialProps = 0;
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -2932,7 +2955,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotScreens; ++Loop) {
 
             // Call GetObjectItem routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -3102,7 +3126,8 @@ namespace HeatBalanceManager {
             MaterialProps = 0;
 
             // Call GetObjectItem routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -3233,7 +3258,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotBlinds; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -3491,7 +3517,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotBlindsEQL; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -3645,7 +3672,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= EcoRoofMat; ++Loop) {
             // Call Input Get Routine to retrieve material data from ecoroof
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -3732,7 +3760,8 @@ namespace HeatBalanceManager {
 
             for (Loop = 1; Loop <= TotTCGlazings; ++Loop) {
                 // Get each TCGlazings from the input processor
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               Loop,
                                               cAlphaArgs,
                                               MaterialNumAlpha,
@@ -3798,7 +3827,8 @@ namespace HeatBalanceManager {
         cCurrentModuleObject = "WindowMaterial:SimpleGlazingSystem";
         for (Loop = 1; Loop <= TotSimpleWindow; ++Loop) {
 
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
                                           MaterialNumAlpha,
@@ -3828,21 +3858,21 @@ namespace HeatBalanceManager {
 
         // Simon: Place to load materials for complex fenestrations
         if ((TotComplexShades > 0) || (TotComplexGaps > 0)) {
-            SetupComplexFenestrationMaterialInput(MaterNum, ErrorsFound);
+            SetupComplexFenestrationMaterialInput(state, MaterNum, ErrorsFound);
             if (ErrorsFound) {
                 ShowSevereError("Errors found in processing complex fenestration material input");
             }
         }
-        ScanForReports("Constructions", DoReport, "Materials");
+        ScanForReports(state, "Constructions", DoReport, "Materials");
 
         if (DoReport) {
 
-            print(ioFiles.eio,
+            print(state.files.eio,
                   "! <Material Details>,Material Name,ThermalResistance {{m2-K/w}},Roughness,Thickness {{m}},Conductivity "
                   "{{w/m-K}},Density {{kg/m3}},Specific Heat "
                   "{{J/kg-K}},Absorptance:Thermal,Absorptance:Solar,Absorptance:Visible\n");
 
-            print(ioFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
+            print(state.files.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
 
             // Formats
             static constexpr auto Format_701(" Material Details,{},{:.4R},{},{:.4R},{:.3R},{:.3R},{:.3R},{:.4R},{:.4R},{:.4R}\n");
@@ -3853,9 +3883,9 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(dataMaterial.Material(MaterNum).Group);
                     if (SELECT_CASE_var == Air) {
-                        print(ioFiles.eio, Format_702, dataMaterial.Material(MaterNum).Name, dataMaterial.Material(MaterNum).Resistance);
+                        print(state.files.eio, Format_702, dataMaterial.Material(MaterNum).Name, dataMaterial.Material(MaterNum).Resistance);
                     } else {
-                        print(ioFiles.eio,
+                        print(state.files.eio,
                               Format_701,
                               dataMaterial.Material(MaterNum).Name,
                               dataMaterial.Material(MaterNum).Resistance,
@@ -3901,11 +3931,11 @@ namespace HeatBalanceManager {
 
         // try assigning phase change material properties for each material, won't do anything for non pcm surfaces
         for (auto &m : dataMaterial.Material) {
-            m.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory(m.Name);
+            m.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory(state, m.Name);
         }
     }
 
-    void GetWindowGlassSpectralData(bool &ErrorsFound) // set to true if errors found in input
+    void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -3965,7 +3995,8 @@ namespace HeatBalanceManager {
             // Name is followed by up to 450 sets of normal-incidence measured values of
             // [wavelength (microns), transmittance, front reflectance, back reflectance] for
             // wavelengths covering the short-wave solar spectrum (from about 0.25 to 2.5 microns)
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           SpecDataNames,
                                           SpecDataNumAlpha,
@@ -4123,7 +4154,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void GetConstructData(IOFiles &ioFiles, bool &ErrorsFound) // If errors found in input
+    void GetConstructData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -4234,7 +4265,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotRegConstructs; ++Loop) { // Loop through all constructs in the input...
 
             // Get the object names for each construction from the input processor
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           ConstructAlphas,
                                           ConstructNumAlpha,
@@ -4319,7 +4351,7 @@ namespace HeatBalanceManager {
 
         // Added TH 7/2009 for underground walls and floors constructions
         if (TotFfactorConstructs + TotCfactorConstructs >= 1) {
-            CreateFCfactorConstructions(ConstrNum, ErrorsFound);
+            CreateFCfactorConstructions(state, ConstrNum, ErrorsFound);
             if (ErrorsFound) {
                 ShowSevereError("Errors found in creating the constructions defined with Ffactor or Cfactor method");
             }
@@ -4327,7 +4359,7 @@ namespace HeatBalanceManager {
         }
 
         if (totAirBoundaryConstructs >= 1) {
-            CreateAirBoundaryConstructions(ConstrNum, ErrorsFound);
+            CreateAirBoundaryConstructions(state, ConstrNum, ErrorsFound);
             if (ErrorsFound) {
                 ShowSevereError("Errors found in creating the constructions defined with Construction:AirBoundary.");
             }
@@ -4336,7 +4368,7 @@ namespace HeatBalanceManager {
 
         // Added BG 6/2010 for complex fenestration
         if (TotComplexFenStates > 0) {
-            SetupComplexFenestrationStateInput(ConstrNum, ErrorsFound);
+            SetupComplexFenestrationStateInput(state, ConstrNum, ErrorsFound);
             if (ErrorsFound) {
                 ShowSevereError("Errors found in processing complex fenestration input");
             }
@@ -4350,7 +4382,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotSourceConstructs; ++Loop) { // Loop through all constructs with sources in the input...
 
             // Get the object names for each construction from the input processor
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           ConstructAlphas,
                                           ConstructNumAlpha,
@@ -4450,7 +4483,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotWinEquivLayerConstructs; ++Loop) { // Loop through all constructs with Window EquivalentLayer ...
 
             // Get the object names for each construction from the input processor
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           ConstructAlphas,
                                           ConstructNumAlpha,
@@ -4525,7 +4559,8 @@ namespace HeatBalanceManager {
                                                                // from the Window5 data file and can be referenced only by windows
 
             // Get the object names for each construction from the input processor
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           ConstructAlphas,
                                           ConstructNumAlpha,
@@ -4565,7 +4600,7 @@ namespace HeatBalanceManager {
             }
             DisplayString("Searching Window5 data file for Construction=" + ConstructAlphas(0));
 
-            SearchWindow5DataFile(ioFiles, window5DataFileName, ConstructAlphas(0), ConstructionFound, EOFonW5File, ErrorsFound);
+            SearchWindow5DataFile(state, window5DataFileName, ConstructAlphas(0), ConstructionFound, EOFonW5File, ErrorsFound);
 
             if (EOFonW5File || !ConstructionFound) {
                 DisplayString("--Construction not found");
@@ -4634,12 +4669,12 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        GetZoneData(ErrorsFound); // Read Zone data from input file
+        GetZoneData(state,ErrorsFound); // Read Zone data from input file
 
         SetupZoneGeometry(state, ErrorsFound);
     }
 
-    void GetZoneData(bool &ErrorsFound) // If errors found in input
+    void GetZoneData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -4702,7 +4737,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= NumOfZones; ++Loop) {
 
             rNumericArgs = 0.0; // Zero out just in case
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -4727,7 +4763,8 @@ namespace HeatBalanceManager {
             if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
 
             ++ZoneLoop;
-            ProcessZoneData(cCurrentModuleObject,
+            ProcessZoneData(state,
+                            cCurrentModuleObject,
                             ZoneLoop,
                             cAlphaArgs,
                             NumAlphas,
@@ -4744,7 +4781,7 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= NumOfZones; ++Loop) {
             // Check to see if "nominally" controlled -- Zone Name appears in Zone Equip Configuration
             // relies on zone name being the "name" of the Zone Controlled Equip Configuration
-            if (inputProcessor->getObjectItemNum("ZoneHVAC:EquipmentConnections", "zone_name", Zone(Loop).Name) > 0) {
+            if (inputProcessor->getObjectItemNum(state, "ZoneHVAC:EquipmentConnections", "zone_name", Zone(Loop).Name) > 0) {
                 Zone(Loop).isNominalControlled = true;
             } else {
                 Zone(Loop).isNominalControlled = false;
@@ -4760,7 +4797,8 @@ namespace HeatBalanceManager {
             ZoneList.allocate(NumOfZoneLists);
 
             for (ListNum = 1; ListNum <= NumOfZoneLists; ++ListNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               ListNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -4821,7 +4859,8 @@ namespace HeatBalanceManager {
             ZoneGroup.allocate(NumOfZoneGroups);
 
             for (GroupNum = 1; GroupNum <= NumOfZoneGroups; ++GroupNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               GroupNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -4879,13 +4918,13 @@ namespace HeatBalanceManager {
             } // GroupNum
         }
 
-        GetZoneLocalEnvData(ErrorsFound);
+        GetZoneLocalEnvData(state, ErrorsFound);
 
         // allocate the array the holds the predefined report data
         ZonePreDefRep.allocate(NumOfZones);
     }
 
-    void GetZoneLocalEnvData(bool &ErrorsFound) // Error flag indicator (true if errors found)
+    void GetZoneLocalEnvData(EnergyPlusData &state, bool &ErrorsFound) // Error flag indicator (true if errors found)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         X LUO
@@ -4945,7 +4984,8 @@ namespace HeatBalanceManager {
             }
 
             for (Loop = 1; Loop <= TotZoneEnv; ++Loop) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               Loop,
                                               cAlphaArgs,
                                               NumAlpha,
@@ -4973,9 +5013,9 @@ namespace HeatBalanceManager {
                 }
 
                 // Assign outdoor air node number;
-                NodeNum = GetOnlySingleNode(
+                NodeNum = GetOnlySingleNode(state,
                     cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
-                if (NodeNum == 0 && CheckOutAirNodeNumber(NodeNum)) {
+                if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(3) + " has been found.");
                     ShowContinueError(cAlphaFieldNames(3) + " entered value = \"" + cAlphaArgs(3) +
@@ -4999,7 +5039,8 @@ namespace HeatBalanceManager {
         }
     }
 
-    void ProcessZoneData(std::string const &cCurrentModuleObject,
+    void ProcessZoneData(EnergyPlusData &state,
+                         std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
                          Array1D_string const &cAlphaArgs,
                          int &NumAlphas,
@@ -5139,13 +5180,13 @@ namespace HeatBalanceManager {
         }
 
         // Zone outdoor environmental variables, used for zone infiltration/ventilation
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Zone Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, Zone(ZoneLoop).OutDryBulbTemp, "Zone", "Average", Zone(ZoneLoop).Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Zone Outdoor Air Wetbulb Temperature", OutputProcessor::Unit::C, Zone(ZoneLoop).OutWetBulbTemp, "Zone", "Average", Zone(ZoneLoop).Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Zone Outdoor Air Wind Speed", OutputProcessor::Unit::m_s, Zone(ZoneLoop).WindSpeed, "Zone", "Average", Zone(ZoneLoop).Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Zone Outdoor Air Wind Direction", OutputProcessor::Unit::deg, Zone(ZoneLoop).WindDir, "Zone", "Average", Zone(ZoneLoop).Name);
     }
 
@@ -5155,7 +5196,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(EnergyPlusData &state, IOFiles &ioFiles)
+    void InitHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5195,16 +5236,16 @@ namespace HeatBalanceManager {
             AllocateHeatBalArrays(); // Allocate the Module Arrays
             if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
                 DisplayString("Initializing Response Factors");
-                InitConductionTransferFunctions(ioFiles); // Initialize the response factors
+                InitConductionTransferFunctions(state); // Initialize the response factors
             }
 
             DisplayString("Initializing Window Optical Properties");
             InitEquivalentLayerWindowCalculations(state); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
-            InitWindowOpticalCalculations(state, ioFiles);
-            InitDaylightingDevices(ioFiles); // Initialize any daylighting devices
+            InitWindowOpticalCalculations(state);
+            InitDaylightingDevices(state); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
-            InitSolarCalculations(ioFiles); // Initialize the shadowing calculations
+            InitSolarCalculations(state); // Initialize the shadowing calculations
         }
 
         if (BeginEnvrnFlag) {
@@ -5256,7 +5297,7 @@ namespace HeatBalanceManager {
         }
 
         if (BeginSimFlag && DoWeathSim && ReportExtShadingSunlitFrac) {
-            OpenShadingFile(ioFiles);
+            OpenShadingFile(state);
         }
 
         if (BeginDayFlag) {
@@ -5269,12 +5310,12 @@ namespace HeatBalanceManager {
                 }
             }
             if (!DetailedSolarTimestepIntegration) {
-                PerformSolarCalculations(state, ioFiles);
+                PerformSolarCalculations(state);
             }
         }
 
         if (DetailedSolarTimestepIntegration) { // always redo solar calcs
-            PerformSolarCalculations(state, ioFiles);
+            PerformSolarCalculations(state);
         }
 
         if (BeginDayFlag && !WarmupFlag && KindOfSim == ksRunPeriodWeather && ReportExtShadingSunlitFrac) {
@@ -5282,15 +5323,15 @@ namespace HeatBalanceManager {
                 for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
                     static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
                         if (TS == NumOfTimeStepInHour) {
-                            print(ioFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour, 0);
+                            print(state.files.shade, ShdFracFmt1, Month, DayOfMonth, iHour, 0);
                         } else {
-                            print(ioFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / NumOfTimeStepInHour) * TS);
+                            print(state.files.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / NumOfTimeStepInHour) * TS);
                         }
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         static constexpr auto ShdFracFmt2("{:10.8F},");
-                        print(ioFiles.shade, ShdFracFmt2, SunlitFrac(TS, iHour, SurfNum));
+                        print(state.files.shade, ShdFracFmt2, SunlitFrac(TS, iHour, SurfNum));
                     }
-                    print(ioFiles.shade, "\n");
+                    print(state.files.shade, "\n");
                 }
             }
         }
@@ -5307,7 +5348,7 @@ namespace HeatBalanceManager {
 
         // Set zone data to linked air node value if defined.
         if (AnyLocalEnvironmentsInModel) {
-            SetOutAirNodes();
+            SetOutAirNodes(state);
             for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).HasLinkedOutAirNode) {
                     if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
@@ -5514,7 +5555,7 @@ namespace HeatBalanceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void RecKeepHeatBalance(IOFiles &ioFiles)
+    void RecKeepHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5573,11 +5614,11 @@ namespace HeatBalanceManager {
                     // Write Warmup Convergence Information to the initialization output file
                     if (FirstWarmupWrite) {
                         static constexpr auto Format_732{"! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature Difference {{deltaC}},Warmup Load Difference {{W}}\n"};
-                        print(ioFiles.eio, Format_732);
+                        print(state.files.eio, Format_732);
                         FirstWarmupWrite = false;
                     }
                     static constexpr auto Format_731{" Warmup Convergence Information, {},{},{},{:.10R},{:.10R}\n"};
-                    print(ioFiles.eio, Format_731, Zone(ZoneNum).Name, TimeStep, HourOfDay, WarmupTempDiff(ZoneNum), WarmupLoadDiff(ZoneNum));
+                    print(state.files.eio, Format_731, Zone(ZoneNum).Name, TimeStep, HourOfDay, WarmupTempDiff(ZoneNum), WarmupLoadDiff(ZoneNum));
                 }
             }
         }
@@ -5764,7 +5805,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void ReportWarmupConvergence(IOFiles &ioFiles)
+    void ReportWarmupConvergence(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5817,7 +5858,7 @@ namespace HeatBalanceManager {
         if (!WarmupFlag) { // Report out average/std dev
             // Write Warmup Convervence Information to the initialization output file
             if (ReportWarmupConvergenceFirstWarmupWrite && NumOfZones > 0) {
-                print(ioFiles.eio, Format_730);
+                print(state.files.eio, Format_730);
                 ReportWarmupConvergenceFirstWarmupWrite = false;
             }
 
@@ -5850,7 +5891,7 @@ namespace HeatBalanceManager {
                 StdDevZoneLoad = std::sqrt(sum(LoadZoneRptStdDev({1, CountWarmupDayPoints})) / double(CountWarmupDayPoints));
 
                 static constexpr auto Format_731(" Warmup Convergence Information,{},{},{:.10R},{:.10R},{},{},{:.10R},{:.10R},{},{}\n");
-                print(ioFiles.eio,
+                print(state.files.eio,
                       Format_731,
                       Zone(ZoneNum).Name,
                       EnvHeader + ' ' + EnvironmentName,
@@ -5889,7 +5930,7 @@ namespace HeatBalanceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportHeatBalance(EnergyPlusData &state, IOFiles &ioFiles)
+    void ReportHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5919,10 +5960,10 @@ namespace HeatBalanceManager {
         using DataGlobals::KindOfSim;
         using DataGlobals::ksHVACSizeDesignDay;
 
-        ReportScheduleValues();
+        ReportScheduleValues(state);
 
         if (!WarmupFlag && DoOutputReporting) {
-            CalcMoreNodeInfo();
+            CalcMoreNodeInfo(state);
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
@@ -5939,13 +5980,13 @@ namespace HeatBalanceManager {
             if (PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && DoOutputReporting) {
                     static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
-                    print(ioFiles.eso, "{}\n", EndOfHeaderString);
-                    print(ioFiles.mtr, "{}\n", EndOfHeaderString);
+                    print(state.files.eso, "{}\n", EndOfHeaderString);
+                    print(state.files.mtr, "{}\n", EndOfHeaderString);
                     PrintEndDataDictionary = false;
                 }
                 if (DoOutputReporting) {
                     static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
-                    print(ioFiles.eso,
+                    print(state.files.eso,
                           EnvironmentStampFormatStr,
                           "1",
                           "Warmup {" + cWarmupDay + "} " + EnvironmentName,
@@ -5954,7 +5995,7 @@ namespace HeatBalanceManager {
                           TimeZoneNumber,
                           Elevation);
 
-                    print(ioFiles.mtr,
+                    print(state.files.mtr,
                           EnvironmentStampFormatStr,
                           "1",
                           "Warmup {" + cWarmupDay + "} " + EnvironmentName,
@@ -5965,7 +6006,7 @@ namespace HeatBalanceManager {
                     PrintEnvrnStampWarmup = false;
                 }
             }
-            CalcMoreNodeInfo();
+            CalcMoreNodeInfo(state);
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
@@ -5986,7 +6027,7 @@ namespace HeatBalanceManager {
 
     //        End of Reporting subroutines for the HB Module
 
-    void OpenShadingFile(IOFiles &ioFiles)
+    void OpenShadingFile(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6004,14 +6045,14 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;
 
-        ioFiles.shade.ensure_open("OpenOutputFiles", ioFiles.outputControl.extshd);
-        print(ioFiles.shade, "Surface Name,");
+        state.files.shade.ensure_open("OpenOutputFiles", state.files.outputControl.extshd);
+        print(state.files.shade, "Surface Name,");
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            print(ioFiles.shade, "{},", Surface(SurfNum).Name);
+            print(state.files.shade, "{},", Surface(SurfNum).Name);
         }
-        print(ioFiles.shade, "()\n");
+        print(state.files.shade, "()\n");
     }
-    void GetFrameAndDividerData(bool &ErrorsFound) // set to true if errors found in input
+    void GetFrameAndDividerData(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -6044,7 +6085,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotFrameDivider; ++Loop) {
 
             // Call Input Get routine to retrieve frame/divider data
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           FrameDividerNames,
                                           FrameDividerNumAlpha,
@@ -6128,7 +6170,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void SearchWindow5DataFile(IOFiles &ioFiles,
+    void SearchWindow5DataFile(EnergyPlusData &state,
                                std::string const &DesiredFileName,         // File name that contains the Window5 constructions.
                                std::string const &DesiredConstructionName, // Name that will be searched for in the Window5 data file
                                bool &ConstructionFound,                    // True if DesiredConstructionName is in the Window5 data file
@@ -6263,7 +6305,7 @@ namespace HeatBalanceManager {
         // ErrorsFound = .FALSE.
         EOFonFile = false;
 
-        CheckForActualFileName(ioFiles, DesiredFileName, exists, ioFiles.TempFullFileName.fileName);
+        CheckForActualFileName(state, DesiredFileName, exists, state.files.TempFullFileName.fileName);
         // INQUIRE(FILE=TRIM(DesiredFileName), EXIST=exists)
         if (!exists) {
             ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Could not locate Window5 Data File, expecting it as file name=" +
@@ -6273,7 +6315,7 @@ namespace HeatBalanceManager {
             ShowFatalError("Program terminates due to these conditions.");
         }
 
-        auto W5DataFile = ioFiles.TempFullFileName.open("SearchWindow5DataFile");
+        auto W5DataFile = state.files.TempFullFileName.open("SearchWindow5DataFile");
         auto NextLine = W5DataFile.readLine();
         endcol = len(NextLine.data);
         if (endcol > 0) {
@@ -7120,7 +7162,8 @@ namespace HeatBalanceManager {
         }
     }
 
-    void CreateFCfactorConstructions(int &ConstrNum,   // Counter for Constructions
+    void CreateFCfactorConstructions(EnergyPlusData &state,
+                                     int &ConstrNum,   // Counter for Constructions
                                      bool &ErrorsFound // If errors found in input
     )
     {
@@ -7210,7 +7253,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotFfactorConstructs; ++Loop) {
 
             // Get the object names for each construction from the input processor
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           ConstructAlphas,
                                           ConstructNumAlpha,
@@ -7296,7 +7340,8 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= TotCfactorConstructs; ++Loop) { // Loop through all constructs defined with Ffactor method
 
             // Get the object names for each construction from the input processor
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           ConstructAlphas,
                                           ConstructNumAlpha,
@@ -7373,7 +7418,8 @@ namespace HeatBalanceManager {
         }
     }
 
-    void CreateAirBoundaryConstructions(int &constrNum,   // Counter for Constructions
+    void CreateAirBoundaryConstructions(EnergyPlusData &state,
+                                        int &constrNum,   // Counter for Constructions
                                         bool &errorsFound // If errors found in input
     )
     {
@@ -7462,7 +7508,7 @@ namespace HeatBalanceManager {
                     }
                     if (fields.find("simple_mixing_schedule_name") != fields.end()) {
                         auto &schedName = fields.at("simple_mixing_schedule_name");
-                        thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(UtilityRoutines::MakeUPPERCase(schedName));
+                        thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(state, UtilityRoutines::MakeUPPERCase(schedName));
                         if (thisConstruct.AirBoundaryMixingSched == 0) {
                             ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + thisConstruct.Name + "\", invalid (not found) " +
                                             "Simple Mixing Schedule Name" + "=\"" + schedName.get<std::string>() + "\".");
@@ -7476,7 +7522,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void GetScheduledSurfaceGains(bool &ErrorsFound) // If errors found in input
+    void GetScheduledSurfaceGains(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -7538,7 +7584,8 @@ namespace HeatBalanceManager {
             }
 
             for (Loop = 1; Loop <= TotSurfIncSolSSG; ++Loop) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               Loop,
                                               cAlphaArgs,
                                               NumAlpha,
@@ -7582,7 +7629,7 @@ namespace HeatBalanceManager {
                 }
 
                 // Assign schedule number
-                ScheduleNum = GetScheduleIndex(cAlphaArgs(4));
+                ScheduleNum = GetScheduleIndex(state, cAlphaArgs(4));
                 if (ScheduleNum == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(4) + " has been found.");
@@ -7607,7 +7654,8 @@ namespace HeatBalanceManager {
             }
 
             for (Loop = 1; Loop <= TotFenLayAbsSSG; ++Loop) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               Loop,
                                               cAlphaArgs,
                                               NumAlpha,
@@ -7671,7 +7719,7 @@ namespace HeatBalanceManager {
                     FenLayAbsSSG(Loop).NumOfSched = NumOfScheduledLayers;
 
                     for (i = 1; i <= NumOfScheduledLayers; ++i) {
-                        ScheduleNum = GetScheduleIndex(cAlphaArgs(i + 3));
+                        ScheduleNum = GetScheduleIndex(state, cAlphaArgs(i + 3));
                         if (ScheduleNum == 0) {
                             ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                             cAlphaFieldNames(NumOfScheduledLayers + 3) + " has been found.");
@@ -8070,7 +8118,8 @@ namespace HeatBalanceManager {
         }
     }
 
-    void SetupComplexFenestrationMaterialInput(int &MaterNum, // num of material items thus far
+    void SetupComplexFenestrationMaterialInput(EnergyPlusData &state,
+                                               int &MaterNum, // num of material items thus far
                                                bool &ErrorsFound)
     {
 
@@ -8111,7 +8160,8 @@ namespace HeatBalanceManager {
         W7SupportPillars = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         SupportPillar.allocate(W7SupportPillars);
         for (Loop = 1; Loop <= W7SupportPillars; ++Loop) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -8153,7 +8203,8 @@ namespace HeatBalanceManager {
         W7DeflectionStates = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         DeflectionState.allocate(W7DeflectionStates);
         for (Loop = 1; Loop <= W7DeflectionStates; ++Loop) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -8187,7 +8238,8 @@ namespace HeatBalanceManager {
         W7MaterialGaps = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         // ALLOCATE(DeflectionState(W7DeflectionStates))
         for (Loop = 1; Loop <= W7MaterialGaps; ++Loop) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -8250,7 +8302,8 @@ namespace HeatBalanceManager {
         }
 
         for (Loop = 1; Loop <= TotComplexShades; ++Loop) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -8456,7 +8509,8 @@ namespace HeatBalanceManager {
         }
     }
 
-    void SetupComplexFenestrationStateInput(int &ConstrNum, // num of construction items thus far
+    void SetupComplexFenestrationStateInput(EnergyPlusData &state,
+                                            int &ConstrNum, // num of construction items thus far
                                             bool &ErrorsFound)
     {
 
@@ -8520,7 +8574,8 @@ namespace HeatBalanceManager {
         WindowThermalModel.allocate(TotThermalModels);
 
         for (Loop = 1; Loop <= TotThermalModels; ++Loop) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -8639,7 +8694,8 @@ namespace HeatBalanceManager {
 
         FirstBSDF = ConstrNum + 1; // Location of first BSDF construction input (They will be consecutive)
         for (Loop = 1; Loop <= TotComplexFenStates; ++Loop) {
-            inputProcessor->getObjectItem(locCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          locCurrentModuleObject,
                                           Loop,
                                           locAlphaArgs,
                                           NumAlphas,
@@ -8715,7 +8771,7 @@ namespace HeatBalanceManager {
             // ***************************************************************************************
             // Basis matrix
             // ***************************************************************************************
-            dataConstruction.Construct(ConstrNum).BSDFInput.BasisMatIndex = MatrixIndex(locAlphaArgs(5));
+            dataConstruction.Construct(ConstrNum).BSDFInput.BasisMatIndex = MatrixIndex(state, locAlphaArgs(5));
             Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.BasisMatIndex, NumRows, NumCols);
             dataConstruction.Construct(ConstrNum).BSDFInput.BasisMatNrows = NumRows;
             dataConstruction.Construct(ConstrNum).BSDFInput.BasisMatNcols = NumCols;
@@ -8757,7 +8813,7 @@ namespace HeatBalanceManager {
                 // *******************************************************************************
                 // Solar front transmittance
                 // *******************************************************************************
-                dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransIndex = MatrixIndex(locAlphaArgs(6));
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransIndex = MatrixIndex(state, locAlphaArgs(6));
                 Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransIndex, NumRows, NumCols);
                 dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransNrows = NumRows;
                 dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransNcols = NumCols;
@@ -8795,7 +8851,7 @@ namespace HeatBalanceManager {
                 // *******************************************************************************
                 // Solar back reflectance
                 // *******************************************************************************
-                dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflIndex = MatrixIndex(locAlphaArgs(7));
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflIndex = MatrixIndex(state, locAlphaArgs(7));
                 Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflIndex, NumRows, NumCols);
                 dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflNrows = NumRows;
                 dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflNcols = NumCols;
@@ -8828,7 +8884,7 @@ namespace HeatBalanceManager {
                 // *******************************************************************************
                 // Visible front transmittance
                 // *******************************************************************************
-                dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransIndex = MatrixIndex(locAlphaArgs(8));
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransIndex = MatrixIndex(state, locAlphaArgs(8));
                 Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransIndex, NumRows, NumCols);
                 dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransNrows = NumRows;
                 dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransNcols = NumCols;
@@ -8863,7 +8919,7 @@ namespace HeatBalanceManager {
                 // *******************************************************************************
                 // Visible back reflectance
                 // *******************************************************************************
-                dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflIndex = MatrixIndex(locAlphaArgs(9));
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflIndex = MatrixIndex(state, locAlphaArgs(9));
                 Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflIndex, NumRows, NumCols);
                 dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflNrows = NumRows;
                 dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflNcols = NumCols;
@@ -8908,7 +8964,7 @@ namespace HeatBalanceManager {
                         // *******************************************************************************
                         // Front absorptance matrix
                         // *******************************************************************************
-                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex = MatrixIndex(locAlphaArgs(AlphaIndex));
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex = MatrixIndex(state, locAlphaArgs(AlphaIndex));
                         Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
@@ -8947,7 +9003,7 @@ namespace HeatBalanceManager {
                         // *******************************************************************************
                         // Back absorptance matrix
                         // *******************************************************************************
-                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex = MatrixIndex(locAlphaArgs(AlphaIndex));
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex = MatrixIndex(state, locAlphaArgs(AlphaIndex));
                         Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
@@ -8990,7 +9046,7 @@ namespace HeatBalanceManager {
                 // *******************************************************************************
                 // Solar front transmittance
                 // *******************************************************************************
-                dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransIndex = MatrixIndex(locAlphaArgs(6));
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransIndex = MatrixIndex(state, locAlphaArgs(6));
                 Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransIndex, NumRows, NumCols);
                 dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransNrows = NBasis;
                 dataConstruction.Construct(ConstrNum).BSDFInput.SolFrtTransNcols = NBasis;
@@ -9028,7 +9084,7 @@ namespace HeatBalanceManager {
                 // *******************************************************************************
                 // Solar back reflectance
                 // *******************************************************************************
-                dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflIndex = MatrixIndex(locAlphaArgs(7));
+                dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflIndex = MatrixIndex(state, locAlphaArgs(7));
                 Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflIndex, NumRows, NumCols);
                 dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflNrows = NBasis;
                 dataConstruction.Construct(ConstrNum).BSDFInput.SolBkReflNcols = NBasis;
@@ -9065,7 +9121,7 @@ namespace HeatBalanceManager {
                 // *******************************************************************************
                 // Visible front transmittance
                 // *******************************************************************************
-                dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransIndex = MatrixIndex(locAlphaArgs(8));
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransIndex = MatrixIndex(state, locAlphaArgs(8));
                 Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransIndex, NumRows, NumCols);
                 dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransNrows = NBasis;
                 dataConstruction.Construct(ConstrNum).BSDFInput.VisFrtTransNcols = NBasis;
@@ -9104,7 +9160,7 @@ namespace HeatBalanceManager {
                 // *******************************************************************************
                 // Visible back reflectance
                 // *******************************************************************************
-                dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflIndex = MatrixIndex(locAlphaArgs(9));
+                dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflIndex = MatrixIndex(state, locAlphaArgs(9));
                 Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflIndex, NumRows, NumCols);
                 dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflNrows = NBasis;
                 dataConstruction.Construct(ConstrNum).BSDFInput.VisBkReflNcols = NBasis;
@@ -9162,7 +9218,7 @@ namespace HeatBalanceManager {
                         // Front absorptance matrix
                         // *******************************************************************************
                         ++AlphaIndex;
-                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex = MatrixIndex(locAlphaArgs(AlphaIndex));
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex = MatrixIndex(state, locAlphaArgs(AlphaIndex));
                         Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
@@ -9202,7 +9258,7 @@ namespace HeatBalanceManager {
                         // Back absorptance matrix
                         // *******************************************************************************
                         ++AlphaIndex;
-                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex = MatrixIndex(locAlphaArgs(AlphaIndex));
+                        dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex = MatrixIndex(state, locAlphaArgs(AlphaIndex));
                         Get2DMatrixDimensions(dataConstruction.Construct(ConstrNum).BSDFInput.Layer(currentOpticalLayer).BkAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
@@ -9256,7 +9312,7 @@ namespace HeatBalanceManager {
         if (ErrorsFound) ShowFatalError("Error in complex fenestration input.");
     }
 
-    void InitConductionTransferFunctions(IOFiles &ioFiles)
+    void InitConductionTransferFunctions(EnergyPlusData &state)
     {
         bool ErrorsFound(false); // Flag for input error condition
         bool DoCTFErrorReport(false);
@@ -9265,22 +9321,22 @@ namespace HeatBalanceManager {
         }
 
         bool InitCTFDoReport;
-        General::ScanForReports("Constructions", InitCTFDoReport, "Constructions");
+        General::ScanForReports(state, "Constructions", InitCTFDoReport, "Constructions");
         if (InitCTFDoReport || DoCTFErrorReport) {
-            print(ioFiles.eio,
+            print(state.files.eio,
                   "! <Construction CTF>,Construction Name,Index,#Layers,#CTFs,Time Step {{hours}},ThermalConductance "
                   "{{w/m2-K}},OuterThermalAbsorptance,InnerThermalAbsorptance,OuterSolarAbsorptance,InnerSolarAbsorptance,Roughness\n");
-            print(ioFiles.eio,
+            print(state.files.eio,
                   "! <Material CTF Summary>,Material Name,Thickness {{m}},Conductivity {{w/m-K}},Density {{kg/m3}},Specific Heat "
                   "{{J/kg-K}},ThermalResistance {{m2-K/w}}\n");
-            print(ioFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
-            print(ioFiles.eio, "! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)\n");
+            print(state.files.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
+            print(state.files.eio, "! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)\n");
 
             int cCounter = 0; // just used to keep construction index in output report
             for (auto & construction : dataConstruction.Construct) {
                 cCounter++;
                 if (!construction.IsUsedCTF) continue;
-                construction.reportTransferFunction(ioFiles, cCounter);
+                construction.reportTransferFunction(state, cCounter);
             }
         }
 

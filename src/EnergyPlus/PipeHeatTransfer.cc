@@ -210,9 +210,9 @@ namespace PipeHeatTransfer {
             {
                 auto const SELECT_CASE_var(this->EnvironmentPtr);
                 if (SELECT_CASE_var == GroundEnv) {
-                    this->CalcBuriedPipeSoil();
+                    this->CalcBuriedPipeSoil(state);
                 } else {
-                    this->CalcPipesHeatTransfer();
+                    this->CalcPipesHeatTransfer(state);
                 }
             }
             this->PushInnerTimeStepArrays();
@@ -308,7 +308,8 @@ namespace PipeHeatTransfer {
         for (PipeItem = 1; PipeItem <= NumOfPipeHTInt; ++PipeItem) {
             ++Item;
             // get the object name
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           PipeItem,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -336,7 +337,7 @@ namespace PipeHeatTransfer {
 
             // get inlet node data
             PipeHT(Item).InletNode = cAlphaArgs(3);
-            PipeHT(Item).InletNodeNum = GetOnlySingleNode(
+            PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             if (PipeHT(Item).InletNodeNum == 0) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
@@ -346,7 +347,7 @@ namespace PipeHeatTransfer {
 
             // get outlet node data
             PipeHT(Item).OutletNode = cAlphaArgs(4);
-            PipeHT(Item).OutletNodeNum = GetOnlySingleNode(
+            PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             if (PipeHT(Item).OutletNodeNum == 0) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
@@ -376,9 +377,9 @@ namespace PipeHeatTransfer {
                 } else if (SELECT_CASE_var == "SCHEDULE") {
                     PipeHT(Item).EnvironmentPtr = ScheduleEnv;
                     PipeHT(Item).EnvrSchedule = cAlphaArgs(7);
-                    PipeHT(Item).EnvrSchedPtr = GetScheduleIndex(PipeHT(Item).EnvrSchedule);
+                    PipeHT(Item).EnvrSchedPtr = GetScheduleIndex(state, PipeHT(Item).EnvrSchedule);
                     PipeHT(Item).EnvrVelSchedule = cAlphaArgs(8);
-                    PipeHT(Item).EnvrVelSchedPtr = GetScheduleIndex(PipeHT(Item).EnvrVelSchedule);
+                    PipeHT(Item).EnvrVelSchedPtr = GetScheduleIndex(state, PipeHT(Item).EnvrVelSchedule);
                     if (PipeHT(Item).EnvrSchedPtr == 0) {
                         ShowSevereError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -427,7 +428,8 @@ namespace PipeHeatTransfer {
         for (PipeItem = 1; PipeItem <= NumOfPipeHTExt; ++PipeItem) {
             ++Item;
             // get the object name
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           PipeItem,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -455,7 +457,7 @@ namespace PipeHeatTransfer {
 
             // get inlet node data
             PipeHT(Item).InletNode = cAlphaArgs(3);
-            PipeHT(Item).InletNodeNum = GetOnlySingleNode(
+            PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             if (PipeHT(Item).InletNodeNum == 0) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
@@ -465,7 +467,7 @@ namespace PipeHeatTransfer {
 
             // get outlet node data
             PipeHT(Item).OutletNode = cAlphaArgs(4);
-            PipeHT(Item).OutletNodeNum = GetOnlySingleNode(
+            PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             if (PipeHT(Item).OutletNodeNum == 0) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
@@ -480,7 +482,7 @@ namespace PipeHeatTransfer {
             PipeHT(Item).EnvironmentPtr = OutsideAirEnv;
 
             PipeHT(Item).EnvrAirNode = cAlphaArgs(5);
-            PipeHT(Item).EnvrAirNodeNum = GetOnlySingleNode(cAlphaArgs(5),
+            PipeHT(Item).EnvrAirNodeNum = GetOnlySingleNode(state, cAlphaArgs(5),
                                                             ErrorsFound,
                                                             cCurrentModuleObject,
                                                             cAlphaArgs(1),
@@ -489,7 +491,7 @@ namespace PipeHeatTransfer {
                                                             1,
                                                             ObjectIsNotParent);
             if (!lAlphaFieldBlanks(5)) {
-                if (!CheckOutAirNodeNumber(PipeHT(Item).EnvrAirNodeNum)) {
+                if (!CheckOutAirNodeNumber(state, PipeHT(Item).EnvrAirNodeNum)) {
                     ShowSevereError("Invalid " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));
                     ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                     ShowContinueError("Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
@@ -531,7 +533,8 @@ namespace PipeHeatTransfer {
 
             ++Item;
             // get the object name
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           PipeItem,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -559,7 +562,7 @@ namespace PipeHeatTransfer {
 
             // get inlet node data
             PipeHT(Item).InletNode = cAlphaArgs(3);
-            PipeHT(Item).InletNodeNum = GetOnlySingleNode(
+            PipeHT(Item).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             if (PipeHT(Item).InletNodeNum == 0) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
@@ -569,7 +572,7 @@ namespace PipeHeatTransfer {
 
             // get outlet node data
             PipeHT(Item).OutletNode = cAlphaArgs(4);
-            PipeHT(Item).OutletNodeNum = GetOnlySingleNode(
+            PipeHT(Item).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             if (PipeHT(Item).OutletNodeNum == 0) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
@@ -697,31 +700,31 @@ namespace PipeHeatTransfer {
         // Set up the output variables CurrentModuleObject='Pipe:Indoor/Outdoor/Underground'
         for (Item = 1; Item <= nsvNumOfPipeHT; ++Item) {
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Pipe Fluid Heat Transfer Rate", OutputProcessor::Unit::W, PipeHT(Item).FluidHeatLossRate, "Plant", "Average", PipeHT(Item).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Pipe Fluid Heat Transfer Energy", OutputProcessor::Unit::J, PipeHT(Item).FluidHeatLossEnergy, "Plant", "Sum", PipeHT(Item).Name);
 
             if (PipeHT(Item).EnvironmentPtr == ZoneEnv) {
-                SetupOutputVariable("Pipe Ambient Heat Transfer Rate",
+                SetupOutputVariable(state, "Pipe Ambient Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     PipeHT(Item).EnvironmentHeatLossRate,
                                     "Plant",
                                     "Average",
                                     PipeHT(Item).Name);
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "Pipe Ambient Heat Transfer Energy", OutputProcessor::Unit::J, PipeHT(Item).EnvHeatLossEnergy, "Plant", "Sum", PipeHT(Item).Name);
 
                 SetupZoneInternalGain(
                     PipeHT(Item).EnvrZonePtr, "Pipe:Indoor", PipeHT(Item).Name, IntGainTypeOf_PipeIndoor, &PipeHT(Item).ZoneHeatGainRate);
             }
 
-            SetupOutputVariable("Pipe Mass Flow Rate", OutputProcessor::Unit::kg_s, PipeHT(Item).MassFlowRate, "Plant", "Average", PipeHT(Item).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state, "Pipe Mass Flow Rate", OutputProcessor::Unit::kg_s, PipeHT(Item).MassFlowRate, "Plant", "Average", PipeHT(Item).Name);
+            SetupOutputVariable(state,
                 "Pipe Volume Flow Rate", OutputProcessor::Unit::m3_s, PipeHT(Item).VolumeFlowRate, "Plant", "Average", PipeHT(Item).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Pipe Inlet Temperature", OutputProcessor::Unit::C, PipeHT(Item).FluidInletTemp, "Plant", "Average", PipeHT(Item).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Pipe Outlet Temperature", OutputProcessor::Unit::C, PipeHT(Item).FluidOutletTemp, "Plant", "Average", PipeHT(Item).Name);
         }
     }
@@ -1046,8 +1049,8 @@ namespace PipeHeatTransfer {
         // Thus, this is called at the beginning of every time step once.
 
         this->FluidSpecHeat =
-            GetSpecificHeatGlycol(PlantLoop(this->LoopNum).FluidName, nsvInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
-        this->FluidDensity = GetDensityGlycol(PlantLoop(this->LoopNum).FluidName, nsvInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            GetSpecificHeatGlycol(state, PlantLoop(this->LoopNum).FluidName, nsvInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+        this->FluidDensity = GetDensityGlycol(state, PlantLoop(this->LoopNum).FluidName, nsvInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
         // At this point, for all Pipe:Interior objects we should zero out the energy and rate arrays
         this->FluidHeatLossRate = 0.0;
@@ -1067,7 +1070,7 @@ namespace PipeHeatTransfer {
 
     //==============================================================================
 
-    void PipeHTData::CalcPipesHeatTransfer(Optional_int_const LengthIndex)
+    void PipeHTData::CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const LengthIndex)
     {
 
         //       AUTHOR         Simon Rees
@@ -1147,7 +1150,7 @@ namespace PipeHeatTransfer {
             AirConvCoef = 1.0 / (1.0 / this->OutsidePipeHeatTransCoef() + this->InsulationResistance);
         }
 
-        FluidConvCoef = this->CalcPipeHeatTransCoef(nsvInletTemp, nsvMassFlowRate, this->PipeID);
+        FluidConvCoef = this->CalcPipeHeatTransCoef(state, nsvInletTemp, nsvMassFlowRate, this->PipeID);
 
         // heat transfer to air or ground
         {
@@ -1250,7 +1253,7 @@ namespace PipeHeatTransfer {
 
     //==============================================================================
 
-    void PipeHTData::CalcBuriedPipeSoil() // Current Simulation Pipe Number
+    void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation Pipe Number
     {
 
         //       AUTHOR         Edwin Lee
@@ -1412,7 +1415,7 @@ namespace PipeHeatTransfer {
                             if (DepthIndex == this->PipeNodeDepth) { // On the node containing the pipe
 
                                 //-Call to simulate a single pipe segment (by passing OPTIONAL LengthIndex argument)
-                                this->CalcPipesHeatTransfer(LengthIndex);
+                                this->CalcPipesHeatTransfer(state, LengthIndex);
 
                                 //-Update node for cartesian system
                                 this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) = this->PipeTemp(LengthIndex);
@@ -1623,7 +1626,8 @@ namespace PipeHeatTransfer {
 
     //==============================================================================
 
-    Real64 PipeHTData::CalcPipeHeatTransCoef(Real64 const Temperature,  // Temperature of water entering the surface, in C
+    Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
+                                             Real64 const Temperature,  // Temperature of water entering the surface, in C
                                              Real64 const MassFlowRate, // Mass flow rate, in kg/s
                                              Real64 const Diameter      // Pipe diameter, m
     )
@@ -1725,8 +1729,8 @@ namespace PipeHeatTransfer {
         }
 
         // look up conductivity and viscosity
-        Kactual = GetConductivityGlycol(PlantLoop(LoopNum).FluidName, this->FluidTemp(0), PlantLoop(LoopNum).FluidIndex, RoutineName); // W/m-K
-        MUactual = GetViscosityGlycol(PlantLoop(LoopNum).FluidName, this->FluidTemp(0), PlantLoop(LoopNum).FluidIndex, RoutineName) /
+        Kactual = GetConductivityGlycol(state, PlantLoop(LoopNum).FluidName, this->FluidTemp(0), PlantLoop(LoopNum).FluidIndex, RoutineName); // W/m-K
+        MUactual = GetViscosityGlycol(state, PlantLoop(LoopNum).FluidName, this->FluidTemp(0), PlantLoop(LoopNum).FluidIndex, RoutineName) /
                    1000.0; // Note fluid properties routine returns mPa-s, we need Pa-s
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter) - as RadiantSysLowTemp

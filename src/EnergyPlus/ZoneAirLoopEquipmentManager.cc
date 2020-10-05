@@ -221,7 +221,8 @@ namespace ZoneAirLoopEquipmentManager {
         if (NumAirDistUnits > 0) {
 
             for (AirDistUnitNum = 1; AirDistUnitNum <= NumAirDistUnits; ++AirDistUnitNum) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               AirDistUnitNum,
                                               AlphArray,
                                               NumAlphas,
@@ -236,7 +237,7 @@ namespace ZoneAirLoopEquipmentManager {
 
                 AirDistUnit(AirDistUnitNum).Name = AlphArray(1);
                 // Input Outlet Node Num
-                AirDistUnit(AirDistUnitNum).OutletNodeNum = GetOnlySingleNode(
+                AirDistUnit(AirDistUnitNum).OutletNodeNum = GetOnlySingleNode(state,
                     AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
                 AirDistUnit(AirDistUnitNum).InletNodeNum = 0;
                 AirDistUnit(AirDistUnitNum).NumComponents = 1;
@@ -244,7 +245,7 @@ namespace ZoneAirLoopEquipmentManager {
                 // Load the air Distribution Unit Equip and Name
                 AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum) = AlphArray(3);
                 AirDistUnit(AirDistUnitNum).EquipName(AirDistCompUnitNum) = AlphArray(4);
-                ValidateComponent(AlphArray(3), AlphArray(4), IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, AlphArray(3), AlphArray(4), IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("In " + CurrentModuleObject + " = " + AlphArray(1));
                     ErrorsFound = true;
@@ -424,7 +425,8 @@ namespace ZoneAirLoopEquipmentManager {
                                   AirDistUnit(AirDistUnitNum).EquipName(AirDistCompUnitNum),
                                   "UNDEFINED",
                                   AlphArray(2));
-                    GetDualDuctOutdoorAirRecircUse(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
+                    GetDualDuctOutdoorAirRecircUse(state,
+                                                   AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                    AirDistUnit(AirDistUnitNum).EquipName(AirDistCompUnitNum),
                                                    DualDuctRecircIsUsed);
                     if (DualDuctRecircIsUsed) {
@@ -446,25 +448,25 @@ namespace ZoneAirLoopEquipmentManager {
 
             } // End of Air Dist Do Loop
             for (AirDistUnitNum = 1; AirDistUnitNum <= NumAirDistUnits; ++AirDistUnitNum) {
-                SetupOutputVariable("Zone Air Terminal Sensible Heating Energy",
+                SetupOutputVariable(state, "Zone Air Terminal Sensible Heating Energy",
                                     OutputProcessor::Unit::J,
                                     AirDistUnit(AirDistUnitNum).HeatGain,
                                     "System",
                                     "Sum",
                                     AirDistUnit(AirDistUnitNum).Name);
-                SetupOutputVariable("Zone Air Terminal Sensible Cooling Energy",
+                SetupOutputVariable(state, "Zone Air Terminal Sensible Cooling Energy",
                                     OutputProcessor::Unit::J,
                                     AirDistUnit(AirDistUnitNum).CoolGain,
                                     "System",
                                     "Sum",
                                     AirDistUnit(AirDistUnitNum).Name);
-                SetupOutputVariable("Zone Air Terminal Sensible Heating Rate",
+                SetupOutputVariable(state, "Zone Air Terminal Sensible Heating Rate",
                                     OutputProcessor::Unit::W,
                                     AirDistUnit(AirDistUnitNum).HeatRate,
                                     "System",
                                     "Average",
                                     AirDistUnit(AirDistUnitNum).Name);
-                SetupOutputVariable("Zone Air Terminal Sensible Cooling Rate",
+                SetupOutputVariable(state, "Zone Air Terminal Sensible Cooling Rate",
                                     OutputProcessor::Unit::W,
                                     AirDistUnit(AirDistUnitNum).CoolRate,
                                     "System",

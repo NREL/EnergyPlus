@@ -239,7 +239,8 @@ namespace WindTurbine {
         // Flow
         for (WindTurbineNum = 1; WindTurbineNum <= state.dataWindTurbine->NumWindTurbines; ++WindTurbineNum) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           WindTurbineNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -258,7 +259,7 @@ namespace WindTurbine {
             if (lAlphaBlanks(2)) {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = ScheduleAlwaysOn;
             } else {
-                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr == 0) {
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(2) + "=\"" + cAlphaArgs(2) +
                                     "\" not found.");
@@ -536,13 +537,13 @@ namespace WindTurbine {
         if (ErrorsFound) ShowFatalError(CurrentModuleObject + " errors occurred in input.  Program terminates.");
 
         for (WindTurbineNum = 1; WindTurbineNum <= state.dataWindTurbine->NumWindTurbines; ++WindTurbineNum) {
-            SetupOutputVariable("Generator Produced AC Electricity Rate",
+            SetupOutputVariable(state, "Generator Produced AC Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Power,
                                 "System",
                                 "Average",
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-            SetupOutputVariable("Generator Produced AC Electricity Energy",
+            SetupOutputVariable(state, "Generator Produced AC Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Energy,
                                 "System",
@@ -553,19 +554,19 @@ namespace WindTurbine {
                                 "WINDTURBINE",
                                 _,
                                 "Plant");
-            SetupOutputVariable("Generator Turbine Local Wind Speed",
+            SetupOutputVariable(state, "Generator Turbine Local Wind Speed",
                                 OutputProcessor::Unit::m_s,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalWindSpeed,
                                 "System",
                                 "Average",
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-            SetupOutputVariable("Generator Turbine Local Air Density",
+            SetupOutputVariable(state, "Generator Turbine Local Air Density",
                                 OutputProcessor::Unit::kg_m3,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalAirDensity,
                                 "System",
                                 "Average",
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-            SetupOutputVariable("Generator Turbine Tip Speed Ratio",
+            SetupOutputVariable(state, "Generator Turbine Tip Speed Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).TipSpeedRatio,
                                 "System",
@@ -574,32 +575,32 @@ namespace WindTurbine {
             {
                 auto const SELECT_CASE_var(state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType);
                 if (SELECT_CASE_var == RotorType::HAWT) {
-                    SetupOutputVariable("Generator Turbine Power Coefficient",
+                    SetupOutputVariable(state, "Generator Turbine Power Coefficient",
                                         OutputProcessor::Unit::None,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeff,
                                         "System",
                                         "Average",
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
                 } else if (SELECT_CASE_var == RotorType::VAWT) {
-                    SetupOutputVariable("Generator Turbine Chordal Component Velocity",
+                    SetupOutputVariable(state, "Generator Turbine Chordal Component Velocity",
                                         OutputProcessor::Unit::m_s,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).ChordalVel,
                                         "System",
                                         "Average",
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-                    SetupOutputVariable("Generator Turbine Normal Component Velocity",
+                    SetupOutputVariable(state, "Generator Turbine Normal Component Velocity",
                                         OutputProcessor::Unit::m_s,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NormalVel,
                                         "System",
                                         "Average",
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-                    SetupOutputVariable("Generator Turbine Relative Flow Velocity",
+                    SetupOutputVariable(state, "Generator Turbine Relative Flow Velocity",
                                         OutputProcessor::Unit::m_s,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RelFlowVel,
                                         "System",
                                         "Average",
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
-                    SetupOutputVariable("Generator Turbine Attack Angle",
+                    SetupOutputVariable(state, "Generator Turbine Attack Angle",
                                         OutputProcessor::Unit::deg,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).AngOfAttack,
                                         "System",
