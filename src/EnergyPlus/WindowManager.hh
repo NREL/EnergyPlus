@@ -64,13 +64,10 @@
 #include <EnergyPlus/WindowManagerExteriorData.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
 
-    // Forward Declarations
-    struct EnergyPlusData;
-    struct WindowComplexManagerData;
-    struct WindowEquivalentLayerData;
-    struct WindowManagerData;
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
 namespace WindowManager {
 
@@ -82,26 +79,28 @@ namespace WindowManager {
     //   Optical Calculation Routines
     //   Heat Balance Routines
 
-    void InitWindowOpticalCalculations(EnergyPlusData &state, WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
+    void InitWindowOpticalCalculations(EnergyPlusData &state, IOFiles &ioFiles);
 
-    void InitGlassOpticalCalculations(EnergyPlusData &state, WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
+    void InitGlassOpticalCalculations(EnergyPlusData &state, IOFiles &ioFiles);
 
     //*****************************************************************************************
 
-    void W5InitGlassParameters(WindowManagerData &dataWindowManager);
+    void W5InitGlassParameters(EnergyPlusData &state);
 
     //****************************************************************************
     // WINDOW 5 Optical Calculation Subroutines
     //****************************************************************************
 
-    void SystemSpectralPropertiesAtPhi(WindowManagerData &dataWindowManager, int const iquasi,   // When there is no spectral data, this is the wavelength
+    void SystemSpectralPropertiesAtPhi(EnergyPlusData &state,
+                                       int const iquasi,   // When there is no spectral data, this is the wavelength
                                        int const ngllayer, // Number of glass layers in construction
                                        Real64 const wlbot, // Lowest and highest wavelength considered
                                        Real64 const wltop);
 
     //************************************************************************
 
-    void SystemPropertiesAtLambdaAndPhi(WindowManagerData &dataWindowManager, int const n, // Number of glass layers
+    void SystemPropertiesAtLambdaAndPhi(EnergyPlusData &state,
+                                        int const n, // Number of glass layers
                                         Real64 &tt,  // System transmittance
                                         Real64 &rft, // System front and back reflectance
                                         Real64 &rbt,
@@ -110,13 +109,13 @@ namespace WindowManager {
 
     //*************************************************************************
 
-    void SolarSprectrumAverage(WindowManagerData &dataWindowManager, Array1A<Real64> p, // Quantity to be weighted by solar spectrum
+    void SolarSprectrumAverage(EnergyPlusData &state, Array1A<Real64> p, // Quantity to be weighted by solar spectrum
                                Real64 &psol       // Quantity p weighted by solar spectrum
     );
 
     //********************************************************************
 
-    void VisibleSprectrumAverage(WindowManagerData &dataWindowManager, Array1A<Real64> p, // Quantity to be weighted by solar spectrum
+    void VisibleSprectrumAverage(EnergyPlusData &state, Array1A<Real64> p, // Quantity to be weighted by solar spectrum
                                  Real64 &pvis       // Quantity p weighted by solar spectrum and photopic
     );
 
@@ -133,13 +132,14 @@ namespace WindowManager {
     // Window Thermal Calculation Subroutines
     //***********************************************************************************
 
-    void CalcWindowHeatBalance(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
+    void CalcWindowHeatBalance(EnergyPlusData &state, int const SurfNum,          // Surface number
                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                Real64 &SurfInsideTemp,     // Inside window surface temperature
                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     );
 
-    void CalcWindowHeatBalanceInternalRoutines(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
+    void CalcWindowHeatBalanceInternalRoutines(EnergyPlusData &state,
+                                               int const SurfNum,          // Surface number
                                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
                                                Real64 &SurfInsideTemp,     // Inside window surface temperature
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
@@ -147,15 +147,16 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void WindowHeatBalanceEquations(WindowManagerData &dataWindowManager, int const SurfNum); // Surface number
+    void WindowHeatBalanceEquations(EnergyPlusData &state, int const SurfNum); // Surface number
 
     //****************************************************************************
 
-    void SolveForWindowTemperatures(WindowManagerData &dataWindowManager, int const SurfNum); // Surface number
+    void SolveForWindowTemperatures(EnergyPlusData &state, int const SurfNum); // Surface number
 
     //****************************************************************************
 
-    void ExtOrIntShadeNaturalFlow(WindowManagerData &dataWindowManager, int const SurfNum,  // Surface number
+    void ExtOrIntShadeNaturalFlow(EnergyPlusData &state,
+                                  int const SurfNum,  // Surface number
                                   int const iter,     // Iteration number for glass heat balance calculation
                                   Real64 &VGap,       // Air velocity in glass-shade/blind gap (m/s)
                                   Real64 &TGapNew,    // Current-iteration average air temp in glass-shade/blind gap (K)
@@ -166,7 +167,8 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void BetweenGlassShadeNaturalFlow(WindowManagerData &dataWindowManager, int const SurfNum,       // Surface number
+    void BetweenGlassShadeNaturalFlow(EnergyPlusData &state,
+                                      int const SurfNum,       // Surface number
                                       int const iter,          // Iteration number for glass heat balance calculation
                                       Real64 &VGap,            // Gas velocity in gaps (m/s)
                                       Array1A<Real64> TGapNew, // Current-iteration average gas temp in gaps (K)
@@ -175,7 +177,8 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void BetweenGlassForcedFlow(WindowManagerData &dataWindowManager, int const SurfNum,  // Surface number
+    void BetweenGlassForcedFlow(EnergyPlusData &state,
+                                int const SurfNum,  // Surface number
                                 int const iter,     // Iteration number for glass heat balance calculation
                                 Real64 &VGap,       // Air velocity in airflow gap (m/s)
                                 Real64 &TGapNew,    // Current-iteration average air temp in airflow gap (K)
@@ -186,7 +189,8 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void BetweenGlassShadeForcedFlow(WindowManagerData &dataWindowManager, int const SurfNum,       // Surface number
+    void BetweenGlassShadeForcedFlow(EnergyPlusData &state,
+                                     int const SurfNum,       // Surface number
                                      int const iter,          // Iteration number for glass heat balance calculation
                                      Real64 &VGap,            // Air velocity in each gap (m/s)
                                      Array1A<Real64> TGapNew, // Current-iteration average gas temp in gaps (K)
@@ -213,7 +217,8 @@ namespace WindowManager {
 
     //******************************************************************************
 
-    void WindowGasConductance(WindowManagerData &dataWindowManager, Real64 const tleft,  // Temperature of gap surface closest to outside (K)
+    void WindowGasConductance(EnergyPlusData &state,
+                              Real64 const tleft,  // Temperature of gap surface closest to outside (K)
                               Real64 const tright, // Temperature of gap surface closest to zone (K)
                               int const IGap,      // Gap number
                               Real64 &con,         // Gap gas conductance (W/m2-K)
@@ -223,7 +228,8 @@ namespace WindowManager {
 
     //******************************************************************************
 
-    void WindowGasPropertiesAtTemp(WindowManagerData &dataWindowManager, Real64 const tmean, // Temperature of gas in gap (K)
+    void WindowGasPropertiesAtTemp(EnergyPlusData &state,
+                                   Real64 const tmean, // Temperature of gas in gap (K)
                                    int const IGap,     // Gap number
                                    Real64 &dens,       // Gap gas density at tmean (kg/m3)
                                    Real64 &visc        // Gap gas dynamic viscosity at tmean (g/m-s)
@@ -231,13 +237,15 @@ namespace WindowManager {
 
     //********************************************************************************
 
-    void StartingWindowTemps(WindowManagerData &dataWindowManager, int const SurfNum,          // Surface number
+    void StartingWindowTemps(EnergyPlusData &state,
+                             int const SurfNum,          // Surface number
                              Array1A<Real64> AbsRadShade // Short-wave radiation absorbed by shade/blind faces
     );
 
     //****************************************************************************
 
-    void NusseltNumber(WindowManagerData &dataWindowManager, int const SurfNum, // Surface number
+    void NusseltNumber(EnergyPlusData &state,
+                       int const SurfNum, // Surface number
                        Real64 const tso,  // Temperature of gap surface closest to outside (K)
                        Real64 const tsi,  // Temperature of gap surface closest to zone (K)
                        int const IGap,    // Gap number
@@ -307,7 +315,8 @@ namespace WindowManager {
 
     //*************************************************************************************
 
-    void CalcWinFrameAndDividerTemps(WindowManagerData &dataWindowManager, int const SurfNum,     // Surface number
+    void CalcWinFrameAndDividerTemps(EnergyPlusData &state,
+                                     int const SurfNum,     // Surface number
                                      Real64 const tout,     // Outside air temperature (K)
                                      Real64 const tin,      // Inside air temperature (K)
                                      Real64 const HOutConv, // Outside convective air film conductance (W/m2-K)
@@ -318,7 +327,8 @@ namespace WindowManager {
 
     //************************************************************************************
 
-    void CalcNominalWindowCond(WindowManagerData &dataWindowManager, int const ConstrNum,        // Construction number
+    void CalcNominalWindowCond(EnergyPlusData &state,
+                               int const ConstrNum,        // Construction number
                                int const WinterSummerFlag, // 1=winter, 2=summer
                                Real64 &NominalConductance, // Nominal center-of-glass conductance, including air films
                                Real64 &SHGC,               // Nominal center-of-glass solar heat gain coefficient for
@@ -329,17 +339,18 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void WindowTempsForNominalCond(WindowManagerData &dataWindowManager, int const ConstrNum, // Construction number
+    void WindowTempsForNominalCond(EnergyPlusData &state,
+                                   int const ConstrNum, // Construction number
                                    Array1A<Real64> hgap // Gap gas conductive conductance (W/m2-K)
     );
 
     //****************************************************************************
 
-    void StartingWinTempsForNominalCond(WindowManagerData &dataWindowManager);
+    void StartingWinTempsForNominalCond(EnergyPlusData &state);
 
     //****************************************************************************
 
-    void ReportGlass(EnergyPlusData &state, WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
+    void ReportGlass(EnergyPlusData &state, IOFiles &ioFiles);
 
     //*************************************************************************************
 
@@ -396,11 +407,11 @@ namespace WindowManager {
 
     // added for custom solar or visible spectrum
 
-    void CheckAndReadCustomSprectrumData(WindowManagerData &dataWindowManager);
+    void CheckAndReadCustomSprectrumData(EnergyPlusData &state);
 
     //*****************************************************************************************
 
-    void initWindowModel(WindowManagerData &dataWindowManager);
+    void initWindowModel(EnergyPlusData &state);
 
     //*****************************************************************************************
 
@@ -547,7 +558,7 @@ namespace WindowManager {
         bool HasEQLWindows = false; // equivalent layer window defined
 
         void clear_state() override {
-            wle = Array1D<Real64>(nume, {0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800,
+            this->wle = Array1D<Real64>(nume, {0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800,
                 0.3900, 0.4000, 0.4100, 0.4200, 0.4300, 0.4400, 0.4500, 0.4600, 0.4700, 0.4800, 0.4900, 0.5000, 0.5100, 0.5200,
                 0.5300, 0.5400, 0.5500, 0.5700, 0.5900, 0.6100, 0.6300, 0.6500, 0.6700, 0.6900, 0.7100, 0.7180, 0.7244, 0.7400,
                 0.7525, 0.7575, 0.7625, 0.7675, 0.7800, 0.8000, 0.8160, 0.8237, 0.8315, 0.8400, 0.8600, 0.8800, 0.9050, 0.9150,
@@ -555,7 +566,7 @@ namespace WindowManager {
                 1.1800, 1.2000, 1.2350, 1.2900, 1.3200, 1.3500, 1.3950, 1.4425, 1.4625, 1.4770, 1.4970, 1.5200, 1.5390, 1.5580,
                 1.5780, 1.5920, 1.6100, 1.6300, 1.6460, 1.6780, 1.7400, 1.8000, 1.8600, 1.9200, 1.9600, 1.9850, 2.0050, 2.0350,
                 2.0650, 2.1000, 2.1480, 2.1980, 2.2700, 2.3600, 2.4500, 2.4940, 2.5370});
-            e = Array1D<Real64>(nume, {0.0,    9.5,    42.3,   107.8,  181.0,  246.0,  395.3,  390.1,  435.3,  438.9,  483.7,  520.3,  666.2,  712.5,
+            this->e = Array1D<Real64>(nume, {0.0,    9.5,    42.3,   107.8,  181.0,  246.0,  395.3,  390.1,  435.3,  438.9,  483.7,  520.3,  666.2,  712.5,
                 720.7,  1013.1, 1158.2, 1184.0, 1071.9, 1302.0, 1526.0, 1599.6, 1581.0, 1628.3, 1539.2, 1548.7, 1586.5, 1484.9,
                 1572.4, 1550.7, 1561.5, 1501.5, 1395.5, 1485.3, 1434.1, 1419.9, 1392.3, 1130.0, 1316.7, 1010.3, 1043.2, 1211.2,
                 1193.9, 1175.5, 643.1,  1030.7, 1131.1, 1081.6, 849.2,  785.0,  916.4,  959.9,  978.9,  933.2,  748.5,  667.5,
@@ -563,112 +574,112 @@ namespace WindowManager {
                 460.0,  423.6,  480.5,  413.1,  250.2,  32.5,   1.6,    55.7,   105.1,  105.5,  182.1,  262.2,  274.2,  275.0,
                 244.6,  247.4,  228.7,  244.5,  234.8,  220.5,  171.5,  30.7,   2.0,    1.2,    21.2,   91.1,   26.8,   99.5,
                 60.4,   89.1,   82.2,   71.5,   70.2,   62.0,   21.2,   18.5,   3.2});
-            wlt3 = Array1D<Real64>(numt3,
+            this->wlt3 = Array1D<Real64>(numt3,
                 {0.380, 0.385, 0.390, 0.395, 0.400, 0.405, 0.410, 0.415, 0.420, 0.425, 0.430, 0.435, 0.440, 0.445, 0.450, 0.455, 0.460,
                 0.465, 0.470, 0.475, 0.480, 0.485, 0.490, 0.495, 0.500, 0.505, 0.510, 0.515, 0.520, 0.525, 0.530, 0.535, 0.540, 0.545,
                 0.550, 0.555, 0.560, 0.565, 0.570, 0.575, 0.580, 0.585, 0.590, 0.595, 0.600, 0.605, 0.610, 0.615, 0.620, 0.625, 0.630,
                 0.635, 0.640, 0.645, 0.650, 0.655, 0.660, 0.665, 0.670, 0.675, 0.680, 0.685, 0.690, 0.695, 0.700, 0.705, 0.710, 0.715,
                 0.720, 0.725, 0.730, 0.735, 0.740, 0.745, 0.750, 0.755, 0.760, 0.765, 0.770, 0.775, 0.780});
-            y30 = Array1D<Real64>(numt3, {0.0000, 0.0001, 0.0001, 0.0002, 0.0004, 0.0006, 0.0012, 0.0022, 0.0040, 0.0073, 0.0116, 0.0168, 0.0230, 0.0298,
+            this->y30 = Array1D<Real64>(numt3, {0.0000, 0.0001, 0.0001, 0.0002, 0.0004, 0.0006, 0.0012, 0.0022, 0.0040, 0.0073, 0.0116, 0.0168, 0.0230, 0.0298,
                 0.0380, 0.0480, 0.0600, 0.0739, 0.0910, 0.1126, 0.1390, 0.1693, 0.2080, 0.2586, 0.3230, 0.4073, 0.5030, 0.6082,
                 0.7100, 0.7932, 0.8620, 0.9149, 0.9540, 0.9803, 0.9950, 1.0000, 0.9950, 0.9786, 0.9520, 0.9154, 0.8700, 0.8163,
                 0.7570, 0.6949, 0.6310, 0.5668, 0.5030, 0.4412, 0.3810, 0.3210, 0.2650, 0.2170, 0.1750, 0.1382, 0.1070, 0.0816,
                 0.0610, 0.0446, 0.0320, 0.0232, 0.0170, 0.0119, 0.0082, 0.0158, 0.0041, 0.0029, 0.0021, 0.0015, 0.0010, 0.0007,
                 0.0005, 0.0004, 0.0002, 0.0002, 0.0001, 0.0001, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000});
-            ngllayer = 0;
-            nglface = 0;
-            nglfacep = 0;
-            tout = 0.0;
-            tin = 0.0;
-            tilt = 0.0;
-            tiltr = 0.0;
-            hcin = 0.0;
-            hcout = 0.0;
-            Ebout = 0.0;
-            Outir = 0.0;
-            Rmir = 0.0;
-            Rtot = 0.0;
-            gcon = Array3D<Real64>(3, 5, 5, 0.0);
-            gvis = Array3D<Real64>(3, 5, 5, 0.0);
-            gcp = Array3D<Real64>(3, 5, 5, 0.0);
-            gwght = Array2D<Real64>(5, 5, 0.0);
-            gfract = Array2D<Real64>(5, 5, 0.0);
-            gnmix = Array1D_int(5, 0);
-            gap = Array1D<Real64>(5, 0.0);
-            thick = Array1D<Real64>(5, 0.0);
-            scon = Array1D<Real64>(5, 0.0);
-            tir = Array1D<Real64>(10, 0.0);
-            emis = Array1D<Real64>(10, 0.0);
-            rir = Array1D<Real64>(10, 0.0);
-            AbsRadGlassFace = Array1D<Real64>(10, 0.0);
-            thetas = Array1D<Real64>(10, 0.0);
-            thetasPrev = Array1D<Real64>(10, 0.0);
-            fvec = Array1D<Real64>(10, 0.0);
-            fjac = Array2D<Real64>(10, 10, 0.0);
-            dtheta = Array1D<Real64>(5, 0.0);
-            zir = Array2D<Real64>(10, 10, 0.0);
-            ziri = Array2D<Real64>(10, 10, 0.0);
-            ddeldt = Array2D<Real64>(10, 10, 0.0);
-            dtddel = Array2D<Real64>(10, 10, 0.0);
-            qf = Array1D<Real64>(10, 0.0);
-            hf = Array1D<Real64>(10, 0.0);
-            der = Array2D<Real64>(5, 10, 0.0);
-            dhf = Array2D<Real64>(5, 10, 0.0);
-            sour = Array1D<Real64>(10, 0.0);
-            delta = Array1D<Real64>(5, 0.0);
-            hcgap = Array1D<Real64>(5, 0.0);
-            hrgap = Array1D<Real64>(5, 0.0);
-            rgap = Array1D<Real64>(6, 0.0);
-            rs = Array1D<Real64>(6, 0.0);
-            arhs = Array1D<Real64>(6, 0.0);
-            A23P = 0.0;
-            A32P = 0.0;
-            A45P = 0.0;
-            A54P = 0.0;
-            A67P = 0.0;
-            A76P = 0.0;
-            A23 = 0.0;
-            A45 = 0.0;
-            A67 = 0.0;
-            wlt = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-            t = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-            rff = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-            rbb = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-            tPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-            rfPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-            rbPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-            tadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-            rfadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-            rbadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-            numpt = Array1D_int(5, 0);
-            stPhi = Array1D<Real64>(nume, 0.0);
-            srfPhi = Array1D<Real64>(nume, 0.0);
-            srbPhi = Array1D<Real64>(nume, 0.0);
-            saPhi = Array2D<Real64>(5, nume, 0.0);
-            top = Array2D<Real64>(5, 5, 0.0);
-            rfop = Array2D<Real64>(5, 5, 0.0);
-            rbop = Array2D<Real64>(5, 5, 0.0);
-            DepVarCurveFit = Array1D<Real64>(10, 0.0);
-            CoeffsCurveFit = Array1D<Real64>(6, 0.0);
-            tsolPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-            rfsolPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-            rbsolPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-            solabsPhi = Array2D<Real64>(5, MaxNumOfIncidentAngles, 0.0);
-            solabsBackPhi = Array2D<Real64>(5, MaxNumOfIncidentAngles, 0.0);
-            solabsShadePhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-            tvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-            rfvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-            rbvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-            CosPhiIndepVar = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
+            this->ngllayer = 0;
+            this->nglface = 0;
+            this->nglfacep = 0;
+            this->tout = 0.0;
+            this->tin = 0.0;
+            this->tilt = 0.0;
+            this->tiltr = 0.0;
+            this->hcin = 0.0;
+            this->hcout = 0.0;
+            this->Ebout = 0.0;
+            this->Outir = 0.0;
+            this->Rmir = 0.0;
+            this->Rtot = 0.0;
+            this->gcon = Array3D<Real64>(3, 5, 5, 0.0);
+            this->gvis = Array3D<Real64>(3, 5, 5, 0.0);
+            this->gcp = Array3D<Real64>(3, 5, 5, 0.0);
+            this->gwght = Array2D<Real64>(5, 5, 0.0);
+            this->gfract = Array2D<Real64>(5, 5, 0.0);
+            this->gnmix = Array1D_int(5, 0);
+            this->gap = Array1D<Real64>(5, 0.0);
+            this->thick = Array1D<Real64>(5, 0.0);
+            this->scon = Array1D<Real64>(5, 0.0);
+            this->tir = Array1D<Real64>(10, 0.0);
+            this->emis = Array1D<Real64>(10, 0.0);
+            this->rir = Array1D<Real64>(10, 0.0);
+            this->AbsRadGlassFace = Array1D<Real64>(10, 0.0);
+            this->thetas = Array1D<Real64>(10, 0.0);
+            this->thetasPrev = Array1D<Real64>(10, 0.0);
+            this->fvec = Array1D<Real64>(10, 0.0);
+            this->fjac = Array2D<Real64>(10, 10, 0.0);
+            this->dtheta = Array1D<Real64>(5, 0.0);
+            this->zir = Array2D<Real64>(10, 10, 0.0);
+            this->ziri = Array2D<Real64>(10, 10, 0.0);
+            this->ddeldt = Array2D<Real64>(10, 10, 0.0);
+            this->dtddel = Array2D<Real64>(10, 10, 0.0);
+            this->qf = Array1D<Real64>(10, 0.0);
+            this->hf = Array1D<Real64>(10, 0.0);
+            this->der = Array2D<Real64>(5, 10, 0.0);
+            this->dhf = Array2D<Real64>(5, 10, 0.0);
+            this->sour = Array1D<Real64>(10, 0.0);
+            this->delta = Array1D<Real64>(5, 0.0);
+            this->hcgap = Array1D<Real64>(5, 0.0);
+            this->hrgap = Array1D<Real64>(5, 0.0);
+            this->rgap = Array1D<Real64>(6, 0.0);
+            this->rs = Array1D<Real64>(6, 0.0);
+            this->arhs = Array1D<Real64>(6, 0.0);
+            this->A23P = 0.0;
+            this->A32P = 0.0;
+            this->A45P = 0.0;
+            this->A54P = 0.0;
+            this->A67P = 0.0;
+            this->A76P = 0.0;
+            this->A23 = 0.0;
+            this->A45 = 0.0;
+            this->A67 = 0.0;
+            this->wlt = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            this->t = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            this->rff = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            this->rbb = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            this->tPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            this->rfPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            this->rbPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            this->tadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            this->rfadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            this->rbadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
+            this->numpt = Array1D_int(5, 0);
+            this->stPhi = Array1D<Real64>(nume, 0.0);
+            this->srfPhi = Array1D<Real64>(nume, 0.0);
+            this->srbPhi = Array1D<Real64>(nume, 0.0);
+            this->saPhi = Array2D<Real64>(5, nume, 0.0);
+            this->top = Array2D<Real64>(5, 5, 0.0);
+            this->rfop = Array2D<Real64>(5, 5, 0.0);
+            this->rbop = Array2D<Real64>(5, 5, 0.0);
+            this->DepVarCurveFit = Array1D<Real64>(10, 0.0);
+            this->CoeffsCurveFit = Array1D<Real64>(6, 0.0);
+            this->tsolPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
+            this->rfsolPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
+            this->rbsolPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
+            this->solabsPhi = Array2D<Real64>(5, MaxNumOfIncidentAngles, 0.0);
+            this->solabsBackPhi = Array2D<Real64>(5, MaxNumOfIncidentAngles, 0.0);
+            this->solabsShadePhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
+            this->tvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
+            this->rfvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
+            this->rbvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
+            this->CosPhiIndepVar = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
             WindowManager::CWindowConstructionsSimplified::clearState();
-            RunMeOnceFlag = false;
-            lSimpleGlazingSystem = false; // true if using simple glazing system block model
-            BGFlag = false;               // True if between-glass shade or blind
-            locTCFlag = false; // True if this surface is a TC window
-            DoReport = false;
-            HasWindows = false;
-            HasComplexWindows = false;
-            HasEQLWindows = false; // equivalent layer window defined
+            this->RunMeOnceFlag = false;
+            this->lSimpleGlazingSystem = false; // true if using simple glazing system block model
+            this->BGFlag = false;               // True if between-glass shade or blind
+            this->locTCFlag = false; // True if this surface is a TC window
+            this->DoReport = false;
+            this->HasWindows = false;
+            this->HasComplexWindows = false;
+            this->HasEQLWindows = false; // equivalent layer window defined
         }
 
         // Default Constructor

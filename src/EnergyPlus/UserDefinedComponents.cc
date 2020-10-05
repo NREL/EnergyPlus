@@ -132,11 +132,11 @@ namespace UserDefinedComponents {
         UserAirTerminal.deallocate();
     }
 
-    PlantComponent *UserPlantComponentStruct::factory(std::string const &objectName)
+    PlantComponent *UserPlantComponentStruct::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data
         if (GetPlantCompInput) {
-            GetUserDefinedPlantComponents();
+            GetUserDefinedPlantComponents(state);
             GetPlantCompInput = false;
         }
         // Now look for this particular object
@@ -270,7 +270,7 @@ namespace UserDefinedComponents {
         int CompNum;
 
         if (GetPlantCompInput) {
-            GetUserDefinedPlantComponents();
+            GetUserDefinedPlantComponents(state);
             GetPlantCompInput = false;
         }
 
@@ -360,7 +360,7 @@ namespace UserDefinedComponents {
         int CompNum;
 
         if (GetInput) {
-            GetUserDefinedComponents();
+            GetUserDefinedComponents(state);
             GetInput = false;
         }
 
@@ -456,7 +456,7 @@ namespace UserDefinedComponents {
         int CompNum;
 
         if (GetInput) {
-            GetUserDefinedComponents();
+            GetUserDefinedComponents(state);
             GetInput = false;
         }
 
@@ -522,7 +522,7 @@ namespace UserDefinedComponents {
         UserAirTerminal(CompNum).report();
     }
 
-    void GetUserDefinedPlantComponents()
+    void GetUserDefinedPlantComponents(EnergyPlusData &state)
     {
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
@@ -808,7 +808,7 @@ namespace UserDefinedComponents {
                 }
 
                 if (!lAlphaFieldBlanks(29)) {
-                    WaterManager::SetupTankDemandComponent(cAlphaArgs(1),
+                    WaterManager::SetupTankDemandComponent(state, cAlphaArgs(1),
                                                            cCurrentModuleObject,
                                                            cAlphaArgs(29),
                                                            ErrorsFound,
@@ -825,7 +825,7 @@ namespace UserDefinedComponents {
                 }
 
                 if (!lAlphaFieldBlanks(30)) {
-                    WaterManager::SetupTankSupplyComponent(cAlphaArgs(1),
+                    WaterManager::SetupTankSupplyComponent(state, cAlphaArgs(1),
                                                            cCurrentModuleObject,
                                                            cAlphaArgs(30),
                                                            ErrorsFound,
@@ -1136,7 +1136,7 @@ namespace UserDefinedComponents {
                     }
 
                     if (!lAlphaFieldBlanks(11)) {
-                        WaterManager::SetupTankDemandComponent(cAlphaArgs(1),
+                        WaterManager::SetupTankDemandComponent(state, cAlphaArgs(1),
                                                                cCurrentModuleObject,
                                                                cAlphaArgs(11),
                                                                ErrorsFound,
@@ -1153,7 +1153,7 @@ namespace UserDefinedComponents {
                     }
 
                     if (!lAlphaFieldBlanks(12)) {
-                        WaterManager::SetupTankSupplyComponent(cAlphaArgs(1),
+                        WaterManager::SetupTankSupplyComponent(state, cAlphaArgs(1),
                                                                cCurrentModuleObject,
                                                                cAlphaArgs(12),
                                                                ErrorsFound,
@@ -1242,7 +1242,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void GetUserDefinedComponents()
+    void GetUserDefinedComponents(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1266,7 +1266,7 @@ namespace UserDefinedComponents {
         static bool lDummy; // Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
 
         if (GetPlantCompInput) {
-            GetUserDefinedPlantComponents();
+            GetUserDefinedPlantComponents(state);
             GetPlantCompInput = false;
         }
 
@@ -1547,7 +1547,7 @@ namespace UserDefinedComponents {
                 }
 
                 if (!lAlphaFieldBlanks(14)) {
-                    WaterManager::SetupTankDemandComponent(cAlphaArgs(1),
+                    WaterManager::SetupTankDemandComponent(state, cAlphaArgs(1),
                                                            cCurrentModuleObject,
                                                            cAlphaArgs(14),
                                                            ErrorsFound,
@@ -1564,7 +1564,7 @@ namespace UserDefinedComponents {
                 }
 
                 if (!lAlphaFieldBlanks(15)) {
-                    WaterManager::SetupTankSupplyComponent(cAlphaArgs(1),
+                    WaterManager::SetupTankSupplyComponent(state, cAlphaArgs(1),
                                                            cCurrentModuleObject,
                                                            cAlphaArgs(15),
                                                            ErrorsFound,
@@ -1974,7 +1974,7 @@ namespace UserDefinedComponents {
                 }
 
                 if (!lAlphaFieldBlanks(12)) {
-                    WaterManager::SetupTankDemandComponent(cAlphaArgs(1),
+                    WaterManager::SetupTankDemandComponent(state, cAlphaArgs(1),
                                                            cCurrentModuleObject,
                                                            cAlphaArgs(12),
                                                            ErrorsFound,
@@ -1991,7 +1991,7 @@ namespace UserDefinedComponents {
                 }
 
                 if (!lAlphaFieldBlanks(13)) {
-                    WaterManager::SetupTankSupplyComponent(cAlphaArgs(1),
+                    WaterManager::SetupTankSupplyComponent(state, cAlphaArgs(1),
                                                            cCurrentModuleObject,
                                                            cAlphaArgs(13),
                                                            ErrorsFound,
@@ -2611,7 +2611,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void GetUserDefinedCoilIndex(std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject)
+    void GetUserDefinedCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2626,7 +2626,7 @@ namespace UserDefinedComponents {
 
         // Obtains and allocates TESCoil related parameters from input file
         if (GetInput) { // First time subroutine has been called, get input data
-            GetUserDefinedComponents();
+            GetUserDefinedComponents(state);
             GetInput = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -2642,7 +2642,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void GetUserDefinedCoilAirInletNode(std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
+    void GetUserDefinedCoilAirInletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2659,7 +2659,7 @@ namespace UserDefinedComponents {
 
         // Obtains and allocates TESCoil related parameters from input file
         if (GetInput) { // First time subroutine has been called, get input data
-            GetUserDefinedComponents();
+            GetUserDefinedComponents(state);
             GetInput = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -2679,7 +2679,7 @@ namespace UserDefinedComponents {
     }
 
     void
-    GetUserDefinedCoilAirOutletNode(std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
+    GetUserDefinedCoilAirOutletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2696,7 +2696,7 @@ namespace UserDefinedComponents {
 
         // Obtains and allocates TESCoil related parameters from input file
         if (GetInput) { // First time subroutine has been called, get input data
-            GetUserDefinedComponents();
+            GetUserDefinedComponents(state);
             GetInput = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 

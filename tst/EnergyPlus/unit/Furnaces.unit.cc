@@ -266,30 +266,30 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     firstHVACIteration = false; // now the coils will be called
     Furnace(FurnaceNum).CoolingCoilIndex = 1;
     Furnace(FurnaceNum).HeatingCoilIndex = 2;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP.allocate(2);
-    WaterToAirHeatPumpSimple::NumWatertoAirHPs = 2;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).Name = "WATERCOOLINGCOIL";
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).WAHPPlantTypeOfNum = DataPlant::TypeOf_CoilWAHPCoolingEquationFit;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(2).Name = "WATERHEATINGCOIL";
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(2).WAHPPlantTypeOfNum = DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
-    WaterToAirHeatPumpSimple::SimpleHPTimeStepFlag.allocate(2);
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).AirInletNodeNum = 1;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).AirOutletNodeNum = 3;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).WaterInletNodeNum = 5;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).WaterOutletNodeNum = 6;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).LoopNum = 1;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).LoopSide = 1;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).BranchNum = 1;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).CompNum = 1;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP.allocate(2);
+    state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs = 2;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).Name = "WATERCOOLINGCOIL";
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WAHPPlantTypeOfNum = DataPlant::TypeOf_CoilWAHPCoolingEquationFit;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).Name = "WATERHEATINGCOIL";
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WAHPPlantTypeOfNum = DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
+    state.dataWaterToAirHeatPumpSimple->SimpleHPTimeStepFlag.allocate(2);
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).AirInletNodeNum = 1;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).AirOutletNodeNum = 3;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterInletNodeNum = 5;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterOutletNodeNum = 6;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopNum = 1;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopSide = 1;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).BranchNum = 1;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).CompNum = 1;
 
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(2).AirInletNodeNum = 3;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(2).AirOutletNodeNum = 2;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(2).WaterInletNodeNum = 7;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(2).WaterOutletNodeNum = 8;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(2).LoopNum = 2;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(2).LoopSide = 1;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(2).BranchNum = 1;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(2).CompNum = 1;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).AirInletNodeNum = 3;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).AirOutletNodeNum = 2;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterInletNodeNum = 7;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterOutletNodeNum = 8;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopNum = 2;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopSide = 1;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).BranchNum = 1;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).CompNum = 1;
 
     // set up plant loop
     DataPlant::TotNumLoops = 2;
@@ -320,8 +320,8 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
 
     DataHeatBalance::HeatReclaimSimple_WAHPCoil.allocate(2);
 
-    WaterToAirHeatPumpSimple::GetCoilsInputFlag = false; // turn off water source coil GetInput
-    CalcNewZoneHeatCoolFlowRates(state,
+    state.dataWaterToAirHeatPumpSimple->GetCoilsInputFlag = false; // turn off water source coil GetInput
+    CalcNewZoneHeatCoolFlowRates(state, 
         FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(Furnace(1).MdotFurnace, 0.2); // flow rate is at idle speed flow rate
     EXPECT_EQ(DataLoopNode::Node(1).MassFlowRate, 0.2); // furnace inlet node mass flow rate is at idle speed flow rate

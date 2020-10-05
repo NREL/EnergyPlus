@@ -59,14 +59,16 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
     namespace PlantPipingSystemsManager {
 
@@ -877,13 +879,13 @@ namespace EnergyPlus {
 
             void DoEndOfIterationOperations(bool &Finished);
 
-            void DoOneTimeInitializations(Circuit * thisCircuit);
+            void DoOneTimeInitializations(EnergyPlusData &state, Circuit * thisCircuit);
 
             void DoStartOfTimeStepInitializations();
 
             void DoStartOfTimeStepInitializations(Circuit * thisCircuit);
 
-            Real64 GetFarfieldTemp(CartesianCell const &cell);
+            Real64 GetFarfieldTemp(EnergyPlusData &state, CartesianCell const &cell);
 
             void PreparePipeCircuitSimulation(Circuit * thisCircuit);
 
@@ -894,24 +896,24 @@ namespace EnergyPlus {
 
             void SimulateRadialToCartesianInterface(CartesianCell &ThisCell);
 
-            void PerformTemperatureFieldUpdate();
+            void PerformTemperatureFieldUpdate(EnergyPlusData &state);
 
             Real64 EvaluateFieldCellTemperature(CartesianCell &ThisCell);
 
-            Real64 EvaluateGroundSurfaceTemperature(CartesianCell &cell);
+            Real64 EvaluateGroundSurfaceTemperature(EnergyPlusData &state, CartesianCell &cell);
 
             Real64 EvaluateBasementCellTemperature(CartesianCell &cell);
 
             Real64 EvaluateZoneInterfaceTemperature(CartesianCell &cell);
 
-            Real64 EvaluateFarfieldBoundaryTemperature(CartesianCell &cell);
+            Real64 EvaluateFarfieldBoundaryTemperature(EnergyPlusData &state, CartesianCell &cell);
 
-            void EvaluateFarfieldCharacteristics(CartesianCell &cell, Direction direction, Real64 &neighbortemp,
+            void EvaluateFarfieldCharacteristics(EnergyPlusData &state, CartesianCell &cell, Direction direction, Real64 &neighbortemp,
                                                  Real64 &resistance, Real64 &adiabaticMultiplier);
 
-            void PerformIterationLoop();
+            void PerformIterationLoop(EnergyPlusData &state);
 
-            void PerformIterationLoop(Circuit * thisCircuit);
+            void PerformIterationLoop(EnergyPlusData &state, Circuit * thisCircuit);
 
             void InitPipingSystems(EnergyPlusData &state, Circuit * thisCircuit);
 

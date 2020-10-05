@@ -244,8 +244,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     autosizing_clear_state();
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
-    dataAirflowNetworkBalanceManager.clear_state();
-    state.dataAirLoop->clear_state();
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
     DataBranchNodeConnections::clear_state();
@@ -416,12 +414,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     UtilityRoutines::clear_state();
     VariableSpeedCoils::clear_state();
     VentilatedSlab::clear_state();
-    WaterCoils::clear_state();
-    WaterManager::clear_state();
-    WaterThermalTanks::clear_state();
-    WaterToAirHeatPump::clear_state();
-    WaterToAirHeatPumpSimple::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
-    WeatherManager::clear_state();
     ResultsFramework::clear_state();
 }

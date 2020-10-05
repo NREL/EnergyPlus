@@ -262,11 +262,12 @@ namespace ChillerElectricEIR {
         int NumElectricEIRChillers = 0;
         bool getInputFlag = true;
         Array1D<ChillerElectricEIR::ElectricEIRChillerSpecs> ElectricEIRChiller;
+
         void clear_state() override
         {
-            NumElectricEIRChillers = 0;
-            getInputFlag = true;
-            ElectricEIRChiller.deallocate();
+            this->NumElectricEIRChillers = 0;
+            this->getInputFlag = true;
+            this->ElectricEIRChiller.deallocate();
         }
     };
 

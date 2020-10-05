@@ -55,10 +55,11 @@
 #include <EnergyPlus/api/EnergyPlusAPI.h>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    class IOFiles;
-    class InputFile;
+
+// Forward declarations
+class IOFiles;
+class InputFile;
+struct EnergyPlusData;
 
 namespace CommandLineInterface {
 

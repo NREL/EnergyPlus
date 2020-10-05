@@ -110,7 +110,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -804,7 +806,7 @@
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    5.12,                    !- Gross Rated Cooling COP
+    5.12,                    !- Gross Rated Cooling COP {W/W}
     -9.149069561,            !- Total Cooling Capacity Coefficient 1
     10.87814026,             !- Total Cooling Capacity Coefficient 2
     -1.718780157,            !- Total Cooling Capacity Coefficient 3
@@ -833,7 +835,7 @@
     Autosize,                !- Rated Air Flow Rate {m3/s}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Heating Capacity {W}
-    4.75,                    !- Gross Rated Heating COP
+    4.75,                    !- Gross Rated Heating COP {W/W}
     -1.361311959,            !- Heating Capacity Coefficient 1
     -2.471798046,            !- Heating Capacity Coefficient 2
     4.173164514,             !- Heating Capacity Coefficient 3

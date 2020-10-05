@@ -191,7 +191,7 @@ namespace PoweredInductionUnits {
                  bool const FirstHVACIteration // TRUE if first zone equip this HVAC step
     );
 
-    void SizePIU(int const PIUNum);
+    void SizePIU(EnergyPlusData &state, int const PIUNum);
 
     void CalcSeriesPIU(EnergyPlusData &state, int const PIUNum,             // number of the current PIU being simulated
                        int const ZoneNum,            // number of zone being served

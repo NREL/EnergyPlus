@@ -254,7 +254,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
     DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNum(1) = 1;
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).CompType_Num = 5; // WaterCoil_Cooling
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).CompType_Num = 5; // state.dataWaterCoils->WaterCoil_Cooling
     DataPlant::PlantLoop.allocate(1);
     DataPlant::TotNumLoops = 1;
     DataPlant::PlantLoop(1).LoopSide.allocate(2);
@@ -404,8 +404,8 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
 
     GetControllerInput(state);
 
-    ASSERT_EQ(WaterCoil(1).Name, "CHILLED WATER COIL");
-    ASSERT_EQ(WaterCoil(1).WaterCoilType_Num, WaterCoils::WaterCoil_Cooling);
+    ASSERT_EQ(state.dataWaterCoils->WaterCoil(1).Name, "CHILLED WATER COIL");
+    ASSERT_EQ(state.dataWaterCoils->WaterCoil(1).WaterCoilType_Num, state.dataWaterCoils->WaterCoil_Cooling);
 
     OutputReportPredefined::SetPredefinedTables();
     SimAirServingZones::GetAirLoopInputFlag = false;
@@ -426,7 +426,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
     DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNum.allocate(1);
     DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNum(1) = 1;
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = WaterCoil(1).Name;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = state.dataWaterCoils->WaterCoil(1).Name;
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::WaterCoil_Cooling;
 
     bool WaterCoilOnAirLoop = true;
@@ -450,7 +450,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
     EXPECT_TRUE(WaterCoilOnAirLoop);
 
     // now test a different water coil type
-    CoilTypeNum = WaterCoils::WaterCoil_DetFlatFinCooling;
+    CoilTypeNum = state.dataWaterCoils->WaterCoil_DetFlatFinCooling;
     WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
 }
@@ -497,8 +497,8 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
 
     GetControllerInput(state);
 
-    ASSERT_EQ(WaterCoil(1).Name, "OA PREHEAT HW COIL");
-    ASSERT_EQ(WaterCoil(1).WaterCoilType_Num, WaterCoils::WaterCoil_SimpleHeating);
+    ASSERT_EQ(state.dataWaterCoils->WaterCoil(1).Name, "OA PREHEAT HW COIL");
+    ASSERT_EQ(state.dataWaterCoils->WaterCoil(1).WaterCoilType_Num, state.dataWaterCoils->WaterCoil_SimpleHeating);
 
     OutputReportPredefined::SetPredefinedTables();
     SimAirServingZones::GetAirLoopInputFlag = false;
@@ -514,7 +514,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     state.dataAirLoop->OutsideAirSys(1).ComponentType(1) = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
     state.dataAirLoop->OutsideAirSys(1).ComponentType(2) = "OutdoorAir:Mixer";
     state.dataAirLoop->OutsideAirSys(1).ComponentName.allocate(2);
-    state.dataAirLoop->OutsideAirSys(1).ComponentName(1) = WaterCoil(1).Name;
+    state.dataAirLoop->OutsideAirSys(1).ComponentName(1) = state.dataWaterCoils->WaterCoil(1).Name;
     state.dataAirLoop->OutsideAirSys(1).ComponentName(2) = "OAMixer";
     state.dataAirLoop->OutsideAirSys(1).ComponentType_Num.allocate(2);
     state.dataAirLoop->OutsideAirSys(1).ComponentType_Num(1) = SimAirServingZones::WaterCoil_SimpleHeat;
@@ -536,7 +536,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
 
     bool WaterCoilOnAirLoop = true;
     std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
-    std::string CompName = WaterCoil(1).Name;
+    std::string CompName = state.dataWaterCoils->WaterCoil(1).Name;
     int CoilTypeNum = SimAirServingZones::WaterCoil_SimpleHeat;
 
     WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(state, CoilTypeNum, CompName);
@@ -629,8 +629,8 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
 
     GetControllerInput(state);
 
-    ASSERT_EQ(WaterCoil(1).Name, "DETAILED PRE COOLING COIL");
-    ASSERT_EQ(WaterCoil(1).WaterCoilType_Num, WaterCoils::WaterCoil_DetFlatFinCooling);
+    ASSERT_EQ(state.dataWaterCoils->WaterCoil(1).Name, "DETAILED PRE COOLING COIL");
+    ASSERT_EQ(state.dataWaterCoils->WaterCoil(1).WaterCoilType_Num, state.dataWaterCoils->WaterCoil_DetFlatFinCooling);
 
     OutputReportPredefined::SetPredefinedTables();
     SimAirServingZones::GetAirLoopInputFlag = false;
@@ -668,7 +668,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
 
     bool WaterCoilOnAirLoop = true;
     std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWaterDetailed);
-    std::string CompName = WaterCoil(1).Name;
+    std::string CompName = state.dataWaterCoils->WaterCoil(1).Name;
     int CoilTypeNum = SimAirServingZones::WaterCoil_DetailedCool;
 
     WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(state, CoilTypeNum, CompName);

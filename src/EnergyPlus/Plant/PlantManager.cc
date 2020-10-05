@@ -871,11 +871,11 @@ namespace EnergyPlus {
                             if (UtilityRoutines::SameString(this_comp_type, "Pipe:Adiabatic")) {
                                 this_comp.TypeOf_Num = TypeOf_Pipe;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = Pipes::LocalPipeData::factory(state.pipes, TypeOf_Pipe, CompNames(CompNum));
+                                this_comp.compPtr = Pipes::LocalPipeData::factory(state, TypeOf_Pipe, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Pipe:Adiabatic:Steam")) {
                                 this_comp.TypeOf_Num = TypeOf_PipeSteam;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = Pipes::LocalPipeData::factory(state.pipes, TypeOf_PipeSteam, CompNames(CompNum));
+                                this_comp.compPtr = Pipes::LocalPipeData::factory(state, TypeOf_PipeSteam, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Pipe:Outdoor")) {
                                 this_comp.TypeOf_Num = TypeOf_PipeExterior;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
@@ -974,7 +974,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "WaterUse:Connections")) {
                                 this_comp.TypeOf_Num = TypeOf_WaterUseConnection;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
-                                this_comp.compPtr = WaterUse::WaterConnectionsType::factory(state.dataWaterUse, CompNames(CompNum));
+                                this_comp.compPtr = WaterUse::WaterConnectionsType::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:Water")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilWaterCooling;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
@@ -1054,7 +1054,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = PlantChillers::ElectricChillerSpecs::factory(state.dataPlantChillers, CompNames(CompNum));
+                                this_comp.compPtr = PlantChillers::ElectricChillerSpecs::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:EngineDriven")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_EngineDriven;
                                 if (LoopSideNum == DemandSide) {
@@ -1070,7 +1070,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = PlantChillers::GTChillerSpecs::factory(state.dataPlantChillers, CompNames(CompNum));
+                                this_comp.compPtr = PlantChillers::GTChillerSpecs::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:ConstantCOP")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ConstCOP;
                                 if (LoopSideNum == DemandSide) {
@@ -1078,7 +1078,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = PlantChillers::ConstCOPChillerSpecs::factory(state.dataPlantChillers, CompNames(CompNum));
+                                this_comp.compPtr = PlantChillers::ConstCOPChillerSpecs::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Boiler:HotWater")) {
                                 this_comp.TypeOf_Num = TypeOf_Boiler_Simple;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
@@ -1275,11 +1275,11 @@ namespace EnergyPlus {
                                         TypeOf_FluidCooler_TwoSpd, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "EvaporativeFluidCooler:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_EvapFluidCooler_SingleSpd;
-                                this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(
+                                this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(state,
                                         TypeOf_EvapFluidCooler_SingleSpd, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "EvaporativeFluidCooler:TwoSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_EvapFluidCooler_TwoSpd;
-                                this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(
+                                this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(state,
                                         TypeOf_EvapFluidCooler_TwoSpd, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "SolarCollector:FlatPlate:PhotovoltaicThermal")) {
@@ -1369,7 +1369,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "PlantComponent:UserDefined")) {
                                 this_comp.TypeOf_Num = TypeOf_PlantComponentUserDefined;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
-                                this_comp.compPtr = UserDefinedComponents::UserPlantComponentStruct::factory(CompNames(CompNum));
+                                this_comp.compPtr = UserDefinedComponents::UserPlantComponentStruct::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:UserDefined")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilUserDefined;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;

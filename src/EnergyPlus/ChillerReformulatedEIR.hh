@@ -288,11 +288,12 @@ namespace ChillerReformulatedEIR {
         int NumElecReformEIRChillers = 0;
         bool GetInputREIR = true;
         Array1D<ChillerReformulatedEIR::ReformulatedEIRChillerSpecs> ElecReformEIRChiller;
+
         void clear_state() override
         {
-            NumElecReformEIRChillers = 0;
-            GetInputREIR = true;
-            ElecReformEIRChiller.deallocate();
+            this->NumElecReformEIRChillers = 0;
+            this->GetInputREIR = true;
+            this->ElecReformEIRChiller.deallocate();
         }
     };
 

@@ -200,7 +200,9 @@
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
@@ -4655,3 +4657,4 @@
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     ;                        !- Mechanical Ventilation Controller Name
+

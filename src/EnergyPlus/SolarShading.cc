@@ -2647,7 +2647,7 @@ namespace SolarShading {
         // SEE IF ANY VERTICES OF THE back surface ARE IN FRONT OF THE receiving surface
 
         for (N = 2; N < NVRS; N++) {
-            CVec += cross(Surface(NRS).Vertex(N) - Surface(NRS).Vertex(1), 
+            CVec += cross(Surface(NRS).Vertex(N) - Surface(NRS).Vertex(1),
                 Surface(NRS).Vertex((N + 1)) - Surface(NRS).Vertex(1));
         }
         CVec /= (NVRS>=3 ? NVRS : 3);
@@ -4892,7 +4892,8 @@ namespace SolarShading {
         }
     }
 
-    void CalcPerSolarBeam(WindowComplexManagerData &dataWindowComplexManager, Real64 const AvgEqOfTime,       // Average value of Equation of Time for period
+    void CalcPerSolarBeam(EnergyPlusData &state,
+                          Real64 const AvgEqOfTime,       // Average value of Equation of Time for period
                           Real64 const AvgSinSolarDeclin, // Average value of Sine of Solar Declination for period
                           Real64 const AvgCosSolarDeclin  // Average value of Cosine of Solar Declination for period
     )
@@ -4939,7 +4940,7 @@ namespace SolarShading {
         int iHour;   // Hour index number
         int TS;      // TimeStep Loop Countergit
 
-        if (InitComplexOnce) InitComplexWindows(dataWindowComplexManager);
+        if (InitComplexOnce) InitComplexWindows(state);
         InitComplexOnce = false;
 
         if (KickOffSizing || KickOffSimulation) return; // Skip solar calcs for these Initialization steps.
@@ -4989,7 +4990,7 @@ namespace SolarShading {
             FigureSunCosines(HourOfDay, TimeStep, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
         }
         // Initialize/update the Complex Fenestration geometry and optical properties
-        UpdateComplexWindows(dataWindowComplexManager);
+        UpdateComplexWindows(state);
         if (!DetailedSolarTimestepIntegration) {
             for (iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
                 for (TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
@@ -6450,7 +6451,7 @@ namespace SolarShading {
             }
         } // End of check that sunlit area > 0.
     }
-    void CalcInteriorSolarDistribution(WindowEquivalentLayerData &dataWindowEquivalentLayer)
+    void CalcInteriorSolarDistribution(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7279,15 +7280,15 @@ namespace SolarShading {
                         // call the ASHWAT fenestration model for optical properties
                         // determine the beam radiation absorptance and tranmittance of the
                         // the equivalent layer window model
-                        WindowEquivalentLayer::CalcEQLOpticalProperty(dataWindowEquivalentLayer, SurfNum, isBEAM, AbsSolBeamEQL);
+                        WindowEquivalentLayer::CalcEQLOpticalProperty(state, SurfNum, isBEAM, AbsSolBeamEQL);
 
                         // recalcuate the diffuse absorptance and transmittance of the
                         // the equivalent layer window model if there is shade control
                         EQLNum = dataConstruction.Construct(Surface(SurfNum).Construction).EQLConsPtr;
                         if (CFS(EQLNum).ISControlled) {
-                            WindowEquivalentLayer::CalcEQLOpticalProperty(dataWindowEquivalentLayer, SurfNum, isDIFF, AbsSolDiffEQL);
+                            WindowEquivalentLayer::CalcEQLOpticalProperty(state, SurfNum, isDIFF, AbsSolDiffEQL);
                         } else {
-                            AbsSolDiffEQL(_, {1, CFS(EQLNum).NL + 1}) = dataWindowEquivalentLayer.CFSDiffAbsTrans(_, {1, CFS(EQLNum).NL + 1}, EQLNum);
+                            AbsSolDiffEQL(_, {1, CFS(EQLNum).NL + 1}) = state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, {1, CFS(EQLNum).NL + 1}, EQLNum);
                         }
                         dataConstruction.Construct(ConstrNum).TransDiff = AbsSolDiffEQL(1, CFS(EQLNum).NL + 1);
 
@@ -8518,7 +8519,7 @@ namespace SolarShading {
                                     // or interior window (treates windows with/without shades as defined) for this timestep
 
                                     // call the ASHWAT fenestration model for beam radiation here
-                                    WindowEquivalentLayer::CalcEQLOpticalProperty(dataWindowEquivalentLayer, BackSurfNum, isBEAM, AbsSolBeamBackEQL);
+                                    WindowEquivalentLayer::CalcEQLOpticalProperty(state, BackSurfNum, isBEAM, AbsSolBeamBackEQL);
 
                                     EQLNum = dataConstruction.Construct(ConstrNumBack).EQLConsPtr;
                                     AbsBeamWinEQL({ 1, CFS(EQLNum).NL }) = AbsSolBeamBackEQL(1, { 1, CFS(EQLNum).NL });
@@ -8810,7 +8811,7 @@ namespace SolarShading {
         // RJH - Calculate initial distribution of diffuse solar transmitted by exterior windows into each zone
         //       to all interior surfaces in the zone
         //       Includes subsequent transmittance of diffuse solar to adjacent zones through interior windows
-        CalcWinTransDifSolInitialDistribution(dataWindowEquivalentLayer);
+        CalcWinTransDifSolInitialDistribution(state);
     }
     void CalcAborbedOnExteriorOpaqueSurfaces()
     {
@@ -8871,7 +8872,7 @@ namespace SolarShading {
         }
     }
 
-    void CalcInteriorSolarDistributionWCE(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager)
+    void CalcInteriorSolarDistributionWCE(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8891,12 +8892,12 @@ namespace SolarShading {
 
         CalcAborbedOnExteriorOpaqueSurfaces();
 
-        if (dataWindowManager.winOpticalModel->isSimplifiedModel()) {
-            CalcInteriorSolarDistributionWCESimple(dataWindowComplexManager, dataWindowManager);
+        if (state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
+            CalcInteriorSolarDistributionWCESimple(state);
         } // else for built in BSDF (possible future implementation)
     }
 
-    void CalcInteriorSolarDistributionWCESimple(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager)
+    void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8946,14 +8947,14 @@ namespace SolarShading {
                 }
                 auto &window = SurfaceWindow(SurfNum2);
                 Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum2);
-                std::pair<Real64, Real64> incomingAngle = getSunWCEAngles(dataWindowComplexManager, SurfNum2, BSDFHemisphere::Incoming);
+                std::pair<Real64, Real64> incomingAngle = getSunWCEAngles(state, SurfNum2, BSDFHemisphere::Incoming);
                 Real64 Theta = incomingAngle.first;
                 Real64 Phi = incomingAngle.second;
                 Real64 SunLitFract = SunlitFrac(TimeStep, HourOfDay, SurfNum2);
 
                 int ConstrNum = Surface(SurfNum2).Construction;
                 if (Surface(SurfNum2).activeShadedConstruction > 0) ConstrNum = Surface(SurfNum2).activeShadedConstruction;
-                auto aLayer = CWindowConstructionsSimplified::instance().getEquivalentLayer(dataWindowManager, WavelengthRange::Solar, ConstrNum);
+                auto aLayer = CWindowConstructionsSimplified::instance().getEquivalentLayer(state, WavelengthRange::Solar, ConstrNum);
 
                 ///////////////////////////////////////////////
                 // Solar absorbed in window layers
@@ -9169,7 +9170,7 @@ namespace SolarShading {
         return SurfaceScheduledSolarInc;
     }
 
-    void PerformSolarCalculations(WindowComplexManagerData &dataWindowComplexManager, IOFiles &ioFiles)
+    void PerformSolarCalculations(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9282,7 +9283,7 @@ namespace SolarShading {
                 }
             }
 
-            CalcPerSolarBeam(dataWindowComplexManager, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
+            CalcPerSolarBeam(state, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
             // Calculate factors for solar reflection
             if (CalcSolRefl) {
@@ -9815,7 +9816,7 @@ namespace SolarShading {
         SUNCOS(1) = CosSolarDeclin * std::sin(H);
     }
 
-    void WindowShadingManager(WindowEquivalentLayerData &dataWindowEquivalentLayer)
+    void WindowShadingManager(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9899,7 +9900,7 @@ namespace SolarShading {
                 if (SurfWinWindowModelType(ISurf) == WindowEQLModel) {
                     int EQLNum = dataConstruction.Construct(Surface(ISurf).Construction).EQLConsPtr;
                     if (CFS(EQLNum).VBLayerPtr > 0) {
-                        if (CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL == dataWindowEquivalentLayer.lscNONE) {
+                        if (CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL == state.dataWindowEquivalentLayer->lscNONE) {
                             SurfWinSlatAngThisTSDeg(ISurf) = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
                         } else {
                             SurfWinSlatAngThisTSDeg(ISurf) = 0.0;
@@ -9954,7 +9955,7 @@ namespace SolarShading {
                     SurfWinVisTransSelected(ISurf) = POLYF(1.0, dataConstruction.Construct(IConst).TransVisBeamCoef) *
                                                      SurfWinGlazedFrac(ISurf);
 
- 
+
                 // Window has shading control
                 // select the active window shading control and corresponding contructions
                 size_t indexWindowShadingControl = selectActiveWindowShadingControlIndex(ISurf);
@@ -11831,7 +11832,7 @@ namespace SolarShading {
         }
     }
 
-    void CalcWinTransDifSolInitialDistribution(WindowEquivalentLayerData &dataWindowEquivalentLayer)
+    void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -12276,7 +12277,7 @@ namespace SolarShading {
                             // SurfaceWindow(HeatTransSurfNum)%WindowModelType == WindowEQLModel
                             // ConstrNum=Surface(HeatTransSurfNum)%Construction
                             // call the ASHWAT fenestration model for diffuse radiation here
-                            WindowEquivalentLayer::CalcEQLOpticalProperty(dataWindowEquivalentLayer, HeatTransSurfNum, isDIFF, AbsSolDiffBackEQL);
+                            WindowEquivalentLayer::CalcEQLOpticalProperty(state, HeatTransSurfNum, isDIFF, AbsSolDiffBackEQL);
 
                             EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
                             for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
@@ -13020,7 +13021,7 @@ namespace SolarShading {
         LOCHCA = 1;
     }
 
-    void TimestepInitComplexFenestration(WindowComplexManagerData &dataWindowComplexManager)
+    void TimestepInitComplexFenestration(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -13043,7 +13044,7 @@ namespace SolarShading {
         for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
             if (SurfWinWindowModelType(iSurf) == WindowBSDFModel) {
                 // This will check complex fenestrations state and add new one if necessary (EMS case)
-                CheckCFSStates(dataWindowComplexManager, iSurf);
+                CheckCFSStates(state, iSurf);
 
                 NumOfStates = ComplexWind(iSurf).NumStates;
 
