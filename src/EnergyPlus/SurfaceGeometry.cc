@@ -184,6 +184,7 @@ namespace SurfaceGeometry {
     // Object Data
     Array1D<SurfaceData> SurfaceTmp; // Allocated/Deallocated during input processing
     Array1D<bool> SurfaceTmpClassInvalid; // Tmp class is invalid
+    Array1D<bool> SurfaceTmpClassMoved; // Tmp class is invalid
     HeatBalanceKivaManager::KivaManager kivaManager;
     ExposedFoundationPerimeter exposedFoundationPerimeter;
 
@@ -213,6 +214,7 @@ namespace SurfaceGeometry {
         Warning3Count = 0;
         SurfaceTmp.deallocate();
         SurfaceTmpClassInvalid.deallocate();
+        SurfaceTmpClassMoved.deallocate();
         GetSurfaceDataOneTimeFlag = false;
         UniqueSurfaceNames.clear();
         kivaManager = HeatBalanceKivaManager::KivaManager();
@@ -1195,7 +1197,8 @@ namespace SurfaceGeometry {
                       TotRectRoofs + TotRectCeilings + TotRectIZCeilings + TotRectGCFloors + TotRectIntFloors + TotRectIZFloors;
 
         SurfaceTmp.allocate(TotSurfaces); // Allocate the Surface derived type appropriately
-        SurfaceTmpClassInvalid.allocate(TotSurfaces);
+        SurfaceTmpClassInvalid.dimension(TotSurfaces, false);
+        SurfaceTmpClassMoved.dimension(TotSurfaces, false);
         UniqueSurfaceNames.reserve(TotSurfaces);
         // SurfaceTmp structure is allocated via derived type initialization.
 
@@ -1463,7 +1466,7 @@ namespace SurfaceGeometry {
 
             ++MovedSurfs;
             Surface(MovedSurfs) = SurfaceTmp(SurfNum);
-            SurfaceTmp(SurfNum).Class = SurfaceClass::Moved; //'Moved'
+            SurfaceTmpClassMoved(SurfNum) = true; //'Moved'
             // Store list of moved surface numbers in reporting order 
             DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
         }
@@ -1485,7 +1488,7 @@ namespace SurfaceGeometry {
 
                     ++MovedSurfs;
                     Surface(MovedSurfs) = SurfaceTmp(SurfNum);
-                    SurfaceTmp(SurfNum).Class = SurfaceClass::Moved; // 'Moved'
+                    SurfaceTmpClassMoved(SurfNum) = true; // 'Moved'
                     SurfaceTmp(SurfNum).BaseSurf = -1;              // Default has base surface = base surface
                     BaseSurfNum = MovedSurfs;
                     Surface(MovedSurfs).BaseSurf = BaseSurfNum;
@@ -1514,7 +1517,7 @@ namespace SurfaceGeometry {
                 ++MovedSurfs;
                 Surface(MovedSurfs) = SurfaceTmp(SurfNum);
                 Surface(MovedSurfs).BaseSurf = MovedSurfs;
-                SurfaceTmp(SurfNum).Class = SurfaceClass::Moved; // 'Moved'
+                SurfaceTmpClassMoved(SurfNum) = true; // 'Moved'
                 // Store list of moved surface numbers in reporting order
                 DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
             }
@@ -1523,7 +1526,7 @@ namespace SurfaceGeometry {
             // includes SurfaceClass::TDD_Dome which transmits light but is not a window for heat balance purposes
             for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
-                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass::Moved) continue;
+                if (SurfaceTmpClassMoved(SubSurfNum)) continue;
                 if (SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
                 if (SurfaceTmp(SubSurfNum).Class == SurfaceClass::Window) continue;
                 if (SurfaceTmp(SubSurfNum).Class == SurfaceClass::GlassDoor) continue;
@@ -1532,7 +1535,7 @@ namespace SurfaceGeometry {
 
                 ++MovedSurfs;
                 Surface(MovedSurfs) = SurfaceTmp(SubSurfNum);
-                SurfaceTmp(SubSurfNum).Class = SurfaceClass::Moved; // 'Moved'
+                SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
                 // Reset BaseSurf to it's positive value (set to negative earlier)
                 Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
                 SurfaceTmp(SubSurfNum).BaseSurf = -1;
@@ -1543,7 +1546,7 @@ namespace SurfaceGeometry {
             // Last but not least, the window subsurfaces (includes SurfaceClass::TDD_Diffuser)
             for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
-                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass::Moved) continue;
+                if (SurfaceTmpClassMoved(SubSurfNum)) continue;
                 if (SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
                 if ((SurfaceTmp(SubSurfNum).Class != SurfaceClass::Window) && (SurfaceTmp(SubSurfNum).Class != SurfaceClass::GlassDoor) &&
                     (SurfaceTmp(SubSurfNum).Class != SurfaceClass::TDD_Diffuser))
@@ -1551,7 +1554,7 @@ namespace SurfaceGeometry {
 
                 ++MovedSurfs;
                 Surface(MovedSurfs) = SurfaceTmp(SubSurfNum);
-                SurfaceTmp(SubSurfNum).Class = SurfaceClass::Moved; // 'Moved'
+                SurfaceTmpClassMoved(SubSurfNum) = true;// 'Moved'
                 // Reset BaseSurf to it's positive value (set to negative earlier)
                 Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
                 SurfaceTmp(SubSurfNum).BaseSurf = -1;
@@ -1564,7 +1567,7 @@ namespace SurfaceGeometry {
             ShowSevereError(format("{}Reordered # of Surfaces ({}) not = Total # of Surfaces ({})", RoutineName, MovedSurfs, TotSurfaces));
             SurfError = true;
             for (int Loop = 1; Loop <= TotSurfaces; ++Loop) {
-                if (SurfaceTmp(Loop).Class != SurfaceClass::Moved) {
+                if (SurfaceTmpClassMoved(Loop)) {
                     if (SurfaceTmpClassInvalid(Loop)) {
                         ShowSevereError(RoutineName + "Error in Surface= \"" + SurfaceTmp(Loop).Name + "\" Class=" +
                                         cSurfaceClass(SurfaceTmp(Loop).Class) + " indicated Zone=\"" + SurfaceTmp(Loop).ZoneName + "\"");
