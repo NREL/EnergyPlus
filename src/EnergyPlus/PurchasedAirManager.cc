@@ -1057,17 +1057,32 @@ namespace PurchasedAirManager {
                                 "Average",
                                 PurchAir(PurchAirNum).Name);
 
-            // Air temperature
+            // Supply Air temperature
             SetupOutputVariable("Zone Ideal Loads Supply Air Temperature",
                                 OutputProcessor::Unit::C,
                                 PurchAir(PurchAirNum).SupplyTemp,
                                 "System",
                                 "Average",
                                 PurchAir(PurchAirNum).Name);
-            // Humidity Ratio
+            // Supply Air Humidity Ratio
             SetupOutputVariable("Zone Ideal Loads Supply Air Humidity Ratio",
                                 OutputProcessor::Unit::kgWater_kgDryAir,
                                 PurchAir(PurchAirNum).SupplyHumRat,
+                                "System",
+                                "Average",
+                                PurchAir(PurchAirNum).Name);
+
+            // Mixed Air temperature
+            SetupOutputVariable("Zone Ideal Loads Mixed Air Temperature",
+                                OutputProcessor::Unit::C,
+                                PurchAir(PurchAirNum).MixedAirTemp,
+                                "System",
+                                "Average",
+                                PurchAir(PurchAirNum).Name);
+            // Mixed Air Humidity Ratio
+            SetupOutputVariable("Zone Ideal Loads Mixed Air Humidity Ratio",
+                                OutputProcessor::Unit::kgWater_kgDryAir,
+                                PurchAir(PurchAirNum).MixedAirHumRat,
                                 "System",
                                 "Average",
                                 PurchAir(PurchAirNum).Name);
@@ -2313,7 +2328,7 @@ namespace PurchasedAirManager {
                     {
                         auto const SELECT_CASE_var(PurchAir(PurchAirNum).DehumidCtrlType);
                         if (SELECT_CASE_var == None) {
-                            PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
+                            PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat; // Unnecessary line?
                         } else if (SELECT_CASE_var == ConstantSensibleHeatRatio) {
                             // SHR = CoolSensOutput/CoolTotOutput
                             // CoolTotOutput = CoolSensOutput/SHR
@@ -2672,8 +2687,6 @@ namespace PurchasedAirManager {
             }
 
             if (SupplyMassFlowRate > 0.0) {
-                PurchAir(PurchAirNum).FinalMixedAirTemp = PurchAir(PurchAirNum).MixedAirTemp;
-                PurchAir(PurchAirNum).FinalMixedAirHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
                 // compute coil loads
                 if ((PurchAir(PurchAirNum).SupplyHumRat == PurchAir(PurchAirNum).MixedAirHumRat) &&
                     (PurchAir(PurchAirNum).SupplyTemp == PurchAir(PurchAirNum).MixedAirTemp)) {
@@ -2775,8 +2788,8 @@ namespace PurchasedAirManager {
                 PurchAir(PurchAirNum).LatCoilLoad = 0.0;
                 PurchAir(PurchAirNum).OASenOutput = 0.0;
                 PurchAir(PurchAirNum).OALatOutput = 0.0;
-                PurchAir(PurchAirNum).FinalMixedAirTemp = Node(RecircNodeNum).Temp;
-                PurchAir(PurchAirNum).FinalMixedAirHumRat = Node(RecircNodeNum).HumRat;
+                PurchAir(PurchAirNum).MixedAirTemp = Node(RecircNodeNum).Temp;
+                PurchAir(PurchAirNum).MixedAirHumRat = Node(RecircNodeNum).HumRat;
                 if (Contaminant.CO2Simulation) {
                     Node(InNodeNum).CO2 = Node(ZoneNodeNum).CO2;
                 }
@@ -2819,8 +2832,8 @@ namespace PurchasedAirManager {
             PurchAir(PurchAirNum).LatCoilLoad = 0.0;
             PurchAir(PurchAirNum).OASenOutput = 0.0;
             PurchAir(PurchAirNum).OALatOutput = 0.0;
-            PurchAir(PurchAirNum).FinalMixedAirTemp = Node(RecircNodeNum).Temp;
-            PurchAir(PurchAirNum).FinalMixedAirHumRat = Node(RecircNodeNum).HumRat;
+            PurchAir(PurchAirNum).MixedAirTemp = Node(RecircNodeNum).Temp;
+            PurchAir(PurchAirNum).MixedAirHumRat = Node(RecircNodeNum).HumRat;
         }
 
         PurchAir(PurchAirNum).OutdoorAirMassFlowRate = OAMassFlowRate;
@@ -3388,7 +3401,7 @@ namespace PurchasedAirManager {
             GetPurchAirInputFlag = false;
         }
 
-        MixedAirTemp = PurchAir(PurchAirNum).FinalMixedAirTemp;
+        MixedAirTemp = PurchAir(PurchAirNum).MixedAirTemp;
 
         return MixedAirTemp;
     }
@@ -3437,7 +3450,7 @@ namespace PurchasedAirManager {
             GetPurchAirInputFlag = false;
         }
 
-        MixedAirHumRat = PurchAir(PurchAirNum).FinalMixedAirHumRat;
+        MixedAirHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
 
         return MixedAirHumRat;
     }

@@ -175,8 +175,6 @@ namespace PurchasedAirManager {
         Real64 SupplyAirMassFlowRate;       // Supply air mass flow rate [kg/s]
         Real64 SupplyAirVolFlowRateStdRho;  // supply air volume flow using standard density [m3/s]
         // Intermediate results
-        Real64 FinalMixedAirTemp;     // Dry-bulb temperature of the mixed air, saved for system ventilation load reporting [C]
-        Real64 FinalMixedAirHumRat;   // Humidity ratio of the mixed air, saved for system ventilation load reporting [kgWater/kgDryAir]
         Real64 HtRecSenOutput;        // Sensible heating/cooling rate from heat recovery (<0 means cooling) [W]
         Real64 HtRecLatOutput;        // Latent heating/cooling rate from heat recovery (<0 means cooling or dehumidfying) [W]
         Real64 OASenOutput;           // Outdoor air sensible output relative to zone conditions [W], <0 means OA is cooler than zone air
@@ -247,7 +245,6 @@ namespace PurchasedAirManager {
         Real64 TimeHtRecActive;    // Time heat reocovery is active [hrs]
         int ZonePtr;               // pointer to a zone served by an Ideal load air system
         int HVACSizingIndex;       // index of a HVAC Sizing object for an Ideal load air system
-
         Real64 SupplyTemp;         // Supply inlet to zone dry bulb temperature [C]
         Real64 SupplyHumRat;       // Supply inlet to zone humidity ratio [kgWater/kgDryAir]
         Real64 MixedAirTemp;       // Mixed air dry bulb temperature [C]
@@ -264,8 +261,7 @@ namespace PurchasedAirManager {
               EMSValueMassFlowRate(0.0), EMSOverrideOAMdotOn(false), EMSValueOAMassFlowRate(0.0),
               EMSOverrideSupplyTempOn(false), EMSValueSupplyTemp(0.0), EMSOverrideSupplyHumRatOn(false),
               EMSValueSupplyHumRat(0.0), MinOAMassFlowRate(0.0),
-              OutdoorAirMassFlowRate(0.0), OutdoorAirVolFlowRateStdRho(0.0), SupplyAirMassFlowRate(0.0), SupplyAirVolFlowRateStdRho(0.0),
-              FinalMixedAirTemp(0.0), FinalMixedAirHumRat(0.0), HtRecSenOutput(0.0), HtRecLatOutput(0.0), OASenOutput(0.0), OALatOutput(0.0),
+              OutdoorAirMassFlowRate(0.0), OutdoorAirVolFlowRateStdRho(0.0), SupplyAirMassFlowRate(0.0), SupplyAirVolFlowRateStdRho(0.0), HtRecSenOutput(0.0), HtRecLatOutput(0.0), OASenOutput(0.0), OALatOutput(0.0),
               SenOutputToZone(0.0), LatOutputToZone(0.0), SenCoilLoad(0.0), LatCoilLoad(0.0), OAFlowMaxCoolOutputError(0),
               OAFlowMaxHeatOutputError(0), SaturationOutputError(0), OAFlowMaxCoolOutputIndex(0), OAFlowMaxHeatOutputIndex(0),
               SaturationOutputIndex(0), AvailStatus(0), CoolErrIndex(0), HeatErrIndex(0), SenHeatEnergy(0.0), LatHeatEnergy(0.0), TotHeatEnergy(0.0),
