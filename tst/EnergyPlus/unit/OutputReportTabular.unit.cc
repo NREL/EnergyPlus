@@ -8332,7 +8332,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     EnergyPlus::DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
     EnergyPlus::DataHeatBalance::ZoneWinHeatLossRepEnergy.allocate(1);
 
-    GatherHeatGainReport(OutputProcessor::TimeStepType::TimeStepSystem);
+    GatherHeatGainReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
     EXPECT_EQ(1.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*SecInHour, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqHt);
     EXPECT_EQ(0.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*SecInHour, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl);
