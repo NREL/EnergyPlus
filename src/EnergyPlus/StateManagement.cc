@@ -224,7 +224,6 @@
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
-#include <EnergyPlus/VariableSpeedCoils.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -404,7 +403,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     UnitVentilator::clear_state();
     UserDefinedComponents::clear_state();
     UtilityRoutines::clear_state();
-    VariableSpeedCoils::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();
 }

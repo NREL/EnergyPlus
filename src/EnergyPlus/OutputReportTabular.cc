@@ -4903,8 +4903,6 @@ namespace OutputReportTabular {
         using PackagedThermalStorageCoil::TESCoil;
         using RefrigeratedCase::Condenser;
         using RefrigeratedCase::RefrigRack;
-        using VariableSpeedCoils::NumVarSpeedCoils;
-        using VariableSpeedCoils::VarSpeedCoil;
 
         static int iOACtrl(0);
         static int iCoil(0);
@@ -4997,18 +4995,18 @@ namespace OutputReportTabular {
             }
         }
         // VAV coils - air to air
-        for (iCoil = 1; iCoil <= NumVarSpeedCoils; ++iCoil) {
-            if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                if (VarSpeedCoil(iCoil).CondenserType == AirCooled) {
-                    SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
-                                                  VarSpeedCoil(iCoil).DefrostConsumption + VarSpeedCoil(iCoil).EnergyLoadTotal;
-                } else if (VarSpeedCoil(iCoil).CondenserType == EvapCooled) {
-                    SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).EvapCondPumpElecConsumption + VarSpeedCoil(iCoil).BasinHeaterConsumption +
-                                                  VarSpeedCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
+        for (iCoil = 1; iCoil <= state.dataVariableSpeedCoils->NumVarSpeedCoils; ++iCoil) {
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                if (state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).CondenserType == AirCooled) {
+                    SysTotalHVACRejectHeatLoss += state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).Energy + state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
+                                                  state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).DefrostConsumption + state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).EnergyLoadTotal;
+                } else if (state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).CondenserType == EvapCooled) {
+                    SysTotalHVACRejectHeatLoss += state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).EvapCondPumpElecConsumption + state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).BasinHeaterConsumption +
+                                                  state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
                 }
-            } else if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
-                SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
-                                              VarSpeedCoil(iCoil).DefrostConsumption - VarSpeedCoil(iCoil).EnergyLoadTotal;
+            } else if (state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+                SysTotalHVACRejectHeatLoss += state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).Energy + state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
+                                              state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).DefrostConsumption - state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).EnergyLoadTotal;
             }
         }
 

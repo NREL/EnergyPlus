@@ -53,6 +53,8 @@
 #include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -62,101 +64,9 @@ struct EnergyPlusData;
 
 namespace VariableSpeedCoils {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    extern Real64 const RatedInletAirTemp;       // 26.6667C or 80F
-    extern Real64 const RatedInletWetBulbTemp;   // 19.44 or 67F, cooling mode
-    extern Real64 const RatedInletAirHumRat;     // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-    extern Real64 const RatedInletWaterTemp;     // 85 F cooling mode
-    extern Real64 const RatedAmbAirTemp;         // 95 F cooling mode
-    extern Real64 const RatedInletAirTempHeat;   // 21.11C or 70F, heating mode
-    extern Real64 const RatedInletWaterTempHeat; // 21.11C or 70F, heating mode
-    extern Real64 const RatedAmbAirTempHeat;     // 8.33 or 47F, heating mode
-    extern Real64 const RatedAmbAirWBHeat;       // 8.33 or 43F, heating mode, rated wet bulb temperature
-
-    // Airflow per total capacity range
-    extern Real64 const MaxRatedVolFlowPerRatedTotCap; // m3/s per watt = 450 cfm/ton
-    extern Real64 const MinRatedVolFlowPerRatedTotCap; // m3/s per watt = 300 cfm/ton
-    extern Real64 const MaxHeatVolFlowPerRatedTotCap;  // m3/s per watt = 600 cfm/ton
-    extern Real64 const MaxCoolVolFlowPerRatedTotCap;  // m3/s per watt = 500 cfm/ton
-    extern Real64 const MinOperVolFlowPerRatedTotCap;  // m3/s per watt = 200 cfm/ton
-
-    // Water Systems
-    extern int const CondensateDiscarded; // default mode where water is "lost"
-    extern int const CondensateToTank;    // collect coil condensate from air and store in water storage tank
-
-    extern int const WaterSupplyFromMains;
-    extern int const WaterSupplyFromTank;
-
-    // Curve Types
-    extern int const Linear;
-    extern int const BiLinear;
-    extern int const Quadratic;
-    extern int const BiQuadratic;
-    extern int const Cubic;
-
-    // Defrost strategy (heat pump only)
-    extern int const ReverseCycle; // uses reverse cycle defrost strategy
-    extern int const Resistive;    // uses electric resistance heater for defrost
-    // Defrost control  (heat pump only)
-    extern int const Timed;    // defrost cycle is timed
-    extern int const OnDemand; // defrost cycle occurs only when required
-
-    extern int const MaxSpedLevels; // Maximum number of speed that supports
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    // Identifier is VarSpeedCoil
-    extern int NumVarSpeedCoils; // The Number of variable speed Water to Air Heat Pumps and variable dx coils found in the Input
-
-    extern bool GetCoilsInputFlag; // Flag set to make sure you get input once
-    // LOGICAL, ALLOCATABLE, DIMENSION(:) :: MySizeFlag
-
-    extern Real64 SourceSideMassFlowRate; // Source Side Mass flow rate [Kg/s]
-    extern Real64 SourceSideInletTemp;    // Source Side Inlet Temperature [C]
-    extern Real64 SourceSideInletEnth;    // Source Side Inlet Enthalpy [J/kg]
-    extern Real64 LoadSideMassFlowRate;   // Load Side Mass flow rate [Kg/s]
-    extern Real64 LoadSideInletDBTemp;    // Load Side Inlet Dry Bulb Temp [C]
-    extern Real64 LoadSideInletWBTemp;    // Load Side Inlet Wet Bulb Temp [C]
-    extern Real64 LoadSideInletHumRat;    // Load Side Outlet Humidity ratio
-    extern Real64 LoadSideInletEnth;      // Load Side Inlet Enthalpy [J/kg]
-    extern Real64 LoadSideOutletDBTemp;   // Load Side Outlet Dry Bulb Temp [C]
-    extern Real64 LoadSideOutletHumRat;   // Load Side Outlet Humidity ratio
-    extern Real64 LoadSideOutletEnth;     // Load Side Outlet Enthalpy [J/kg]
-    extern Real64 QSensible;              // Load side sensible heat transfer rate [W]
-    extern Real64 QLoadTotal;             // Load side total heat transfer rate [W]
-    extern Real64 QLatRated;              // Latent Capacity [W] rated at entering air conditions [Tdb=26.7C Twb=19.4C]
-    extern Real64 QLatActual;             // Actual Latent Capacity [W]
-    extern Real64 QSource;                // Source side heat transfer rate [W]
-    extern Real64 Winput;                 // Power Consumption [W]
-    extern Real64 PLRCorrLoadSideMdot;    // Load Side Mdot corrected for Part Load Ratio of the unit
-
-    extern Real64 VSHPWHHeatingCapacity; // Used by Heat Pump:Water Heater object as total water heating capacity [W]
-    extern Real64 VSHPWHHeatingCOP;      // Used by Heat Pump:Water Heater object as water heating COP [W/W]
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Update routines to check convergence and update nodes
-
-    // Update routine
-
-    // Utility routines
-    // SHR, bypass factor routines
-
-    // Types
-
     struct VariableSpeedCoilData // variable speed coil
     {
+        int MaxSpedLevels = 10;
         // Members
         std::string Name;              // Name of the  Coil
         std::string VarSpeedCoilType;  // type of coil
@@ -366,14 +276,64 @@ namespace VariableSpeedCoils {
         Real64 capModFacTotal;     // coil  TotCapTempModFac * TotCapAirFFModFac * TotCapWaterFFModFac, for result for simulation peak reporting
 
         // Default Constructor
-        VariableSpeedCoilData();
+        VariableSpeedCoilData::VariableSpeedCoilData()
+            : NumOfSpeeds(2), NormSpedLevel(MaxSpedLevels), RatedWaterVolFlowRate(DataSizing::AutoSize), RatedWaterMassFlowRate(DataSizing::AutoSize),
+            RatedAirVolFlowRate(DataSizing::AutoSize), RatedCapHeat(DataSizing::AutoSize), RatedCapCoolTotal(DataSizing::AutoSize), MaxONOFFCyclesperHour(0.0), Twet_Rated(0.0),
+            Gamma_Rated(0.0), HOTGASREHEATFLG(0), HPTimeConstant(0.0), PLFFPLR(0), VSCoilTypeOfNum(0), SimFlag(false), DesignWaterMassFlowRate(0.0),
+            DesignWaterVolFlowRate(0.0), DesignAirMassFlowRate(0.0), DesignAirVolFlowRate(0.0), AirVolFlowRate(0.0), AirMassFlowRate(0.0),
+            InletAirPressure(0.0), InletAirDBTemp(0.0), InletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirDBTemp(0.0), OutletAirHumRat(0.0),
+            OutletAirEnthalpy(0.0), WaterVolFlowRate(0.0), WaterMassFlowRate(0.0), InletWaterTemp(0.0), InletWaterEnthalpy(0.0), OutletWaterTemp(0.0),
+            OutletWaterEnthalpy(0.0), Power(0.0), QLoadTotal(0.0), QSensible(0.0), QLatent(0.0), QSource(0.0), QWasteHeat(0.0), Energy(0.0),
+            EnergyLoadTotal(0.0), EnergySensible(0.0), EnergyLatent(0.0), EnergySource(0.0), COP(0.0), RunFrac(0.0), PartLoadRatio(0.0),
+            RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolSens(0.0), RatedPowerCool(0.0), RatedCOPCool(0.0), AirInletNodeNum(0),
+            AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0),
+            FindCompanionUpStreamCoil(true), IsDXCoilInZone(false), CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), FanDelayTime(0.0),
+            // This one calls into a std::vector, so it's 0-indexed, so we initialize it to -1
+            MSHPDesignSpecIndex(-1), MSErrIndex(MaxSpedLevels, 0), MSRatedPercentTotCap(MaxSpedLevels, 0.0), MSRatedTotCap(MaxSpedLevels, 0.0),
+            MSRatedSHR(MaxSpedLevels, 0.0), MSRatedCOP(MaxSpedLevels, 0.0), MSRatedAirVolFlowPerRatedTotCap(MaxSpedLevels, 0.0),
+            MSRatedAirVolFlowRate(MaxSpedLevels, 0.0), MSRatedAirMassFlowRate(MaxSpedLevels, 0.0),
+            MSRatedWaterVolFlowPerRatedTotCap(MaxSpedLevels, 0.0), MSRatedWaterVolFlowRate(MaxSpedLevels, 0.0),
+            MSRatedWaterMassFlowRate(MaxSpedLevels, 0.0), MSRatedCBF(MaxSpedLevels, 0.0), MSEffectiveAo(MaxSpedLevels, 0.0),
+            MSCCapFTemp(MaxSpedLevels, 0), MSCCapAirFFlow(MaxSpedLevels, 0), MSCCapWaterFFlow(MaxSpedLevels, 0), MSEIRFTemp(MaxSpedLevels, 0),
+            MSEIRAirFFlow(MaxSpedLevels, 0), MSEIRWaterFFlow(MaxSpedLevels, 0), MSWasteHeat(MaxSpedLevels, 0), MSWasteHeatFrac(MaxSpedLevels, 0.0),
+            MSWHPumpPower(MaxSpedLevels, 0.0), MSWHPumpPowerPerRatedTotCap(MaxSpedLevels, 0.0), SpeedNumReport(0.0), SpeedRatioReport(0.0),
+            DefrostStrategy(0), DefrostControl(0), EIRFPLR(0), DefrostEIRFT(0), MinOATCompressor(0.0), OATempCompressorOn(0.0), MaxOATDefrost(0.0),
+            DefrostTime(0.0), DefrostCapacity(0.0), HPCompressorRuntime(0.0), HPCompressorRuntimeLast(0.0), TimeLeftToDefrost(0.0), DefrostPower(0.0),
+            DefrostConsumption(0.0), ReportCoolingCoilCrankcasePower(true), CrankcaseHeaterCapacity(0.0), CrankcaseHeaterPower(0.0),
+            MaxOATCrankcaseHeater(0.0), CrankcaseHeaterConsumption(0.0), CondenserInletNodeNum(0), CondenserType(DataHVACGlobals::AirCooled), ReportEvapCondVars(false),
+            EvapCondPumpElecNomPower(0.0), EvapCondPumpElecPower(0.0), EvapWaterConsumpRate(0.0), EvapCondPumpElecConsumption(0.0),
+            EvapWaterConsump(0.0), BasinHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), BasinHeaterPower(0.0),
+            BasinHeaterSchedulePtr(0), EvapCondAirFlow(MaxSpedLevels, 0.0), EvapCondEffect(MaxSpedLevels, 0.0),
+            MSRatedEvapCondVolFlowPerRatedTotCap(MaxSpedLevels, 0.0), EvapWaterSupplyMode(101), EvapWaterSupTankID(0),
+            EvapWaterTankDemandARRID(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0),
+            CondensateVdot(0.0), CondensateVol(0.0), CondInletTemp(0.0), SupplyFanIndex(0), SupplyFan_TypeNum(0), SourceAirMassFlowRate(0.0),
+            InletSourceAirTemp(0.0), InletSourceAirEnthalpy(0.0),
+            // begin varibles for HPWH
+            RatedCapWH(0.0),                  // Rated water heating Capacity [W]
+            InletAirTemperatureType(0),       // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
+            WHRatedInletDBTemp(0.0),          // Rated inlet air dry-bulb temperature [C]
+            WHRatedInletWBTemp(0.0),          // Rated inlet air wet-bulb temperature [C]
+            WHRatedInletWaterTemp(0.0),       // Rated condenser water inlet temperature [C]
+            HPWHCondPumpElecNomPower(0.0),    // Nominal power input to the condenser water circulation pump [W]
+            HPWHCondPumpFracToWater(1.0),     // Nominal power fraction to water for the condenser water circulation pump
+            RatedHPWHCondWaterFlow(0.0),      // Rated water flow rate through the condenser of the HPWH DX coil [m3/s]
+            ElecWaterHeatingPower(0.0),       // Total electric power consumed by compressor and condenser pump [W]
+            ElecWaterHeatingConsumption(0.0), // Total electric consumption by compressor and condenser pump [J]
+            FanPowerIncludedInCOP(false),     // Indicates that fan heat is included in heating capacity and COP
+            CondPumpHeatInCapacity(false),    // Indicates that condenser pump heat is included in heating capacity
+            CondPumpPowerInCOP(false),        // Indicates that condenser pump power is included in heating COP
+            AirVolFlowAutoSized(false),       // Used to report autosizing info for the HPWH DX coil
+            WaterVolFlowAutoSized(false),     // Used to report autosizing info for the HPWH DX coil
+            TotalHeatingEnergy(0.0),          // total water heating energy
+            TotalHeatingEnergyRate(0.0),      // total WH energy rate
+            bIsDesuperheater(false),          // whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
+                                              // end variables for HPWH
+            reportCoilFinalSizes(true), // coil report
+            capModFacTotal(0.0)         // coil report
+
+        {
+        }
     };
-
-    // Object Data
-    extern Array1D<VariableSpeedCoilData> VarSpeedCoil;
-
-    // Functions
-    void clear_state();
 
     void SimVariableSpeedCoils(EnergyPlusData &state, std::string const &CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
@@ -503,9 +463,9 @@ namespace VariableSpeedCoils {
                              Optional_int MSHPDesignSpecIndex = _      // index to UnitarySystemPerformance:Multispeed object
     );
 
-    void UpdateVarSpeedCoil(int const DXCoilNum);
+    void UpdateVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum);
 
-    Real64 CalcEffectiveSHR(int const DXCoilNum,     // Index number for cooling coil
+    Real64 CalcEffectiveSHR(EnergyPlusData &state, int const DXCoilNum,     // Index number for cooling coil
                             Real64 const SHRss,      // Steady-state sensible heat ratio
                             int const CyclingScheme, // Fan/compressor cycling scheme indicator
                             Real64 const RTF,        // Compressor run-time fraction
@@ -552,16 +512,115 @@ namespace VariableSpeedCoils {
                           int const CyclingScheme     // Continuous fan OR cycling compressor
     );
 
-    Real64 getVarSpeedPartLoadRatio(int const DXCoilNum); // the number of the DX coil to mined for current PLR
+    Real64 getVarSpeedPartLoadRatio(EnergyPlusData &state, int const DXCoilNum); // the number of the DX coil to mined for current PLR
 
-    void setVarSpeedHPWHFanTypeNum(int const dXCoilNum, int const fanTypeNum);
+    void setVarSpeedHPWHFanTypeNum(EnergyPlusData &state, int const dXCoilNum, int const fanTypeNum);
 
-    void setVarSpeedHPWHFanIndex(int const dXCoilNum, int const fanIndex);
+    void setVarSpeedHPWHFanIndex(EnergyPlusData &state, int const dXCoilNum, int const fanIndex);
 
-    void setVarSpeedFanInfo(int const dXCoilNum, std::string const fanName, int const fanIndex, int const fanTypeNum);
+    void setVarSpeedFanInfo(EnergyPlusData &state, int const dXCoilNum, std::string const fanName, int const fanIndex, int const fanTypeNum);
 
 } // namespace VariableSpeedCoils
 
+struct VariableSpeedCoilsData : BaseGlobalStruct {
+
+    Real64 const RatedInletAirTemp = 26.6667;       // 26.6667C or 80F
+    Real64 const RatedInletWetBulbTemp = 19.4444;   // 19.44 or 67F, cooling mode
+    Real64 const RatedInletAirHumRat = 0.0111847;   // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    Real64 const RatedInletWaterTemp = 29.4444;     // 85 F cooling mode
+    Real64 const RatedAmbAirTemp = 35.0;            // 95 F cooling mode
+    Real64 const RatedInletAirTempHeat = 21.1111;   // 21.11C or 70F, heating mode
+    Real64 const RatedInletWaterTempHeat = 21.1111; // 21.11C or 70F, heating mode
+    Real64 const RatedAmbAirTempHeat = 8.3333;      // 8.33 or 47F, heating mode
+    Real64 const RatedAmbAirWBHeat = 6.1111;        // 8.33 or 43F, heating mode, rated wet bulb temperature
+                                                       // Water Systems
+    int const CondensateDiscarded = 1001; // default mode where water is "lost"
+    int const CondensateToTank = 1002;    // collect coil condensate from air and store in water storage tank
+
+    int const WaterSupplyFromMains = 101;
+    int const WaterSupplyFromTank = 102;
+
+    // Curve Types
+    int const Linear = 1;
+    int const BiLinear = 2;
+    int const Quadratic = 3;
+    int const BiQuadratic = 4;
+    int const Cubic = 5;
+
+    // Defrost strategy (heat pump only)
+    int const ReverseCycle = 1; // uses reverse cycle defrost strategy
+    int const Resistive = 2;    // uses electric resistance heater for defrost
+                               // Defrost control  (heat pump only)
+    int const Timed = 1;    // defrost cycle is timed
+    int const OnDemand = 2; // defrost cycle occurs only when required
+
+    int const MaxSpedLevels = 10; // Maximum number of speed that supports  
+
+    int NumVarSpeedCoils = 0; // The Number of Water to Air Heat Pumps found in the Input
+
+    bool MyOneTimeFlag = true;     // one time allocation flag
+    bool GetCoilsInputFlag = true; // Flag set to make sure you get input once
+                                  // LOGICAL, ALLOCATABLE, DIMENSION(:) :: MySizeFlag
+
+    Real64 SourceSideMassFlowRate = 0.0; // Source Side Mass flow rate [Kg/s]
+    Real64 SourceSideInletTemp = 0.0;    // Source Side Inlet Temperature [C]
+    Real64 SourceSideInletEnth = 0.0;    // Source Side Inlet Enthalpy [J/kg]
+    Real64 LoadSideMassFlowRate = 0.0;   // Load Side Mass flow rate [Kg/s]
+    Real64 LoadSideInletDBTemp = 0.0;    // Load Side Inlet Dry Bulb Temp [C]
+    Real64 LoadSideInletWBTemp = 0.0;    // Load Side Inlet Wet Bulb Temp [C]
+    Real64 LoadSideInletHumRat = 0.0;    // Load Side Outlet Humidity ratio
+    Real64 LoadSideInletEnth = 0.0;      // Load Side Inlet Enthalpy [J/kg]
+    Real64 LoadSideOutletDBTemp = 0.0;   // Load Side Outlet Dry Bulb Temp [C]
+    Real64 LoadSideOutletHumRat = 0.0;   // Load Side Outlet Humidity ratio
+    Real64 LoadSideOutletEnth = 0.0;     // Load Side Outlet Enthalpy [J/kg]
+    Real64 QSensible = 0.0;              // Load side sensible heat transfer rate [W]
+    Real64 QLoadTotal = 0.0;             // Load side total heat transfer rate [W]
+    Real64 QLatRated = 0.0;              // Latent Capacity [W] rated at entering air conditions [Tdb=26.7C Twb=19.4C]
+    Real64 QLatActual = 0.0;             // Actual Latent Capacity [W]
+    Real64 QSource = 0.0;                // Source side heat transfer rate [W]
+    Real64 Winput = 0.0;                 // Power Consumption [W]
+    Real64 PLRCorrLoadSideMdot = 0.0;    // Load Side Mdot corrected for Part Load Ratio of the unit
+
+    Real64 VSHPWHHeatingCapacity = 0.0; // Used by Heat Pump:Water Heater object as total water heating capacity [W]
+    Real64 VSHPWHHeatingCOP = 0.0;      // Used by Heat Pump:Water Heater object as water heating COP [W/W]
+    
+    Array1D<VariableSpeedCoils::VariableSpeedCoilData> VarSpeedCoil;
+    bool firstTime = true;
+
+    void clear_state() override
+    {
+        NumVarSpeedCoils = 0;
+        MyOneTimeFlag = true;
+        GetCoilsInputFlag = true;
+        SourceSideMassFlowRate = 0.0;
+        SourceSideInletTemp = 0.0;
+        SourceSideInletEnth = 0.0;
+        LoadSideMassFlowRate = 0.0;
+        LoadSideInletDBTemp = 0.0;
+        LoadSideInletWBTemp = 0.0;
+        LoadSideInletHumRat = 0.0;
+        LoadSideInletEnth = 0.0;
+        LoadSideOutletDBTemp = 0.0;
+        LoadSideOutletHumRat = 0.0;
+        LoadSideOutletEnth = 0.0;
+        QSensible = 0.0;
+        QLoadTotal = 0.0;
+        QLatRated = 0.0;
+        QLatActual = 0.0;
+        QSource = 0.0;
+        Winput = 0.0;
+        PLRCorrLoadSideMdot = 0.0;
+        VSHPWHHeatingCapacity = 0.0;
+        VSHPWHHeatingCOP = 0.0;
+        VarSpeedCoil.deallocate();
+        firstTime = true;
+    }
+
+    // Default Constructor
+    VariableSpeedCoilsData()
+    {
+    }
+};
 } // namespace EnergyPlus
 
 #endif

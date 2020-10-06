@@ -86,6 +86,7 @@
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterManager.hh>
