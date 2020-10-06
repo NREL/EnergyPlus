@@ -66,7 +66,7 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitSpeedInputSpecification& input_data)
+void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, const CoilCoolingDXCurveFitSpeedInputSpecification& input_data)
 {
     bool errorsFound(false);
     static const std::string routineName("CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec: ");
@@ -196,7 +196,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlusData &state,
     }
 }
 
-bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlusData &state,
+bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlus::EnergyPlusData &state,
                                               const std::string& curveName,
                                               int &curveIndex,
                                               std::vector<int> validDims,
@@ -234,7 +234,7 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlusData &state,
     }
 }
 
-CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlusData &state, const std::string& name_to_find)
+CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusData &state, const std::string& name_to_find)
     :
       // model inputs
       indexCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexSHRFT(0), indexSHRFFF(0),
@@ -326,7 +326,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlusData &state, co
     }
 }
 
-void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state)
+void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
 {
 
     std::string RoutineName = "sizeSpeed";
@@ -394,7 +394,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state)
     this->RatedEIR = 1.0 / this->original_input_specs.gross_rated_cooling_COP;
 }
 
-void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlusData &state,
+void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &state,
     const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &_PLR, int &fanOpMode, const Real64 condInletTemp)
 {
 

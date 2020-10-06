@@ -61,7 +61,7 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
+void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
 {
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
@@ -104,7 +104,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlusData
     }
 }
 
-CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlusData &state, const std::string& name_to_find)
+CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlus::EnergyPlusData &state, const std::string& name_to_find)
 {
     int numModes = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitOperatingMode::object_name);
     if (numModes <= 0) {
@@ -152,7 +152,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlu
     }
 }
 
-void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
+void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
 {
 
     std::string RoutineName = "sizeOperatingMode";
@@ -216,7 +216,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     }
 }
 
-void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlusData &state,
+void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlusData &state,
                                                            const DataLoopNode::NodeData &inletNode,
                                                            DataLoopNode::NodeData &outletNode,
                                                            Real64 &PLR,

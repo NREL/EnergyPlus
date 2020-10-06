@@ -64,7 +64,7 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
+void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
 {
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
@@ -122,7 +122,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlusData &
     }
 }
 
-CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlusData &state, const std::string &name_to_find)
+CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::EnergyPlusData &state, const std::string &name_to_find)
 {
     int numPerformances = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitPerformance::object_name);
     if (numPerformances <= 0) {
@@ -170,7 +170,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlusDat
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const DataLoopNode::NodeData &inletNode,
+void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &state, const DataLoopNode::NodeData &inletNode,
                                                 DataLoopNode::NodeData &outletNode,
                                                 int useAlternateMode,
                                                 Real64 &PLR,
@@ -290,7 +290,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const Dat
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::size(EnergyPlusData &state)
+void CoilCoolingDXCurveFitPerformance::size(EnergyPlus::EnergyPlusData &state)
 {
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
         this->normalMode.size(state);
@@ -305,7 +305,7 @@ void CoilCoolingDXCurveFitPerformance::size(EnergyPlusData &state)
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlusData &state,
+void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlus::EnergyPlusData &state,
                                                  CoilCoolingDXCurveFitOperatingMode &currentMode,
                                                  const DataLoopNode::NodeData &inletNode,
                                                  DataLoopNode::NodeData &outletNode,
@@ -354,7 +354,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlusData &state,
 
 }
 
-void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state, int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex) {
+void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlusData &state, int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex) {
 
     using TempSolveRoot::SolveRoot;
     // If fan index hasn't been set, we can't do anything
@@ -785,7 +785,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
 }
 
 Real64
-CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlusData &state,Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlus::EnergyPlusData &state,Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                    std::vector<Real64> const &Par)
 {
     // FUNCTION INFORMATION:

@@ -80,7 +80,7 @@ namespace EnergyPlus {
     std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
 }
 
-int CoilCoolingDX::factory(EnergyPlusData &state, std::string const & coilName) {
+int CoilCoolingDX::factory(EnergyPlus::EnergyPlusData &state, std::string const & coilName) {
     if (coilCoolingDXGetInputFlag) {
         CoilCoolingDX::getInput(state);
         coilCoolingDXGetInputFlag = false;
@@ -101,7 +101,7 @@ void CoilCoolingDX::clear_state() {
     coilCoolingDXGetInputFlag = true;
 }
 
-void CoilCoolingDX::getInput(EnergyPlusData &state) {
+void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state) {
     int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(coilCoolingDXObjectName);
     if (numCoolingCoilDXs <= 0) {
         ShowFatalError(R"(No "Coil:Cooling:DX" objects in input file)");
@@ -128,7 +128,7 @@ void CoilCoolingDX::getInput(EnergyPlusData &state) {
     }
 }
 
-void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXInputSpecification& input_data)
+void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, const CoilCoolingDXInputSpecification& input_data)
 {
     static const std::string routineName("CoilCoolingDX::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
@@ -223,7 +223,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCo
     }
 }
 
-void CoilCoolingDX::oneTimeInit(EnergyPlusData &state) {
+void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state) {
 
     // setup output variables, needs to be done after object is instantiated and emplaced
     SetupOutputVariable(state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, this->totalCoolingEnergyRate, "System", "Average", this->name);
@@ -449,11 +449,11 @@ void CoilCoolingDX::getDataAfterSizing(Real64 &_normalModeRatedEvapAirFlowRate,
     _normalModeRatedCapacity = this->performance.normalMode.ratedGrossTotalCap;
 }
 
-void CoilCoolingDX::size(EnergyPlusData &state) {
+void CoilCoolingDX::size(EnergyPlus::EnergyPlusData &state) {
     this->performance.size(state);
 }
 
-void CoilCoolingDX::simulate(EnergyPlusData &state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR)
+void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR)
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit(state);
