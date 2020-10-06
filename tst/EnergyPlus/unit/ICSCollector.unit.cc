@@ -52,7 +52,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -129,12 +128,12 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     QRadSWOutIncident.allocate(1);
     QRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
-    state.dataConvectionCoefficients.GetUserSuppliedConvectionCoeffs = false;
+    state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
 
     // SurfPtr( 1 ); // Array of indexes pointing to Surface structure in DataSurfaces
     Real64 const VentArea(0.1);  // Area available for venting the gap [m2]
-    Real64 const Cv(0.1);        // Oriface coefficient for volume-based discharge, wind-driven [--]
-    Real64 const Cd(0.5);        // oriface coefficient for discharge,  bouyancy-driven [--]
+    Real64 const Cv(0.1);        // Orifice coefficient for volume-based discharge, wind-driven [--]
+    Real64 const Cd(0.5);        // Orifice coefficient for discharge,  buoyancy-driven [--]
     Real64 const HdeltaNPL(3.0); // Height difference from neutral pressure level [m]
     Real64 const SolAbs(0.75);   // solar absorptivity of baffle [--]
     Real64 const AbsExt(0.8);    // thermal absorptance/emittance of baffle material [--]
@@ -150,10 +149,10 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Real64 IscRpt;               //
     Real64 MdotVentRpt;          // gap air mass flow rate [kg/s]
     Real64 VdotWindRpt;          // gap wind driven air volume flow rate [m3/s]
-    Real64 VdotBouyRpt;          // gap bouyancy driven volume flow rate [m3/s]
+    Real64 VdotBouyRpt;          // gap buoyancy driven volume flow rate [m3/s]
 
     // call to test fix to resolve crash
-    CalcPassiveExteriorBaffleGap(state, state.dataConvectionCoefficients, state.files, ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs,
+    CalcPassiveExteriorBaffleGap(state, state.files, ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs,
                                  AbsExt, Tilt, AspRat, GapThick, Roughness, QdotSource, TsBaffle, TaGap, HcGapRpt, HrGapRpt, IscRpt,
                                  MdotVentRpt, VdotWindRpt, VdotBouyRpt);
 

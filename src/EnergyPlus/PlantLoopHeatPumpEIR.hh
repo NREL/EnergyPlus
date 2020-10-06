@@ -59,8 +59,9 @@
 #include <EnergyPlus/WaterToWaterHeatPumps.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace EIRPlantLoopHeatPumps {
 

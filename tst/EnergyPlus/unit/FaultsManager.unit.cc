@@ -99,9 +99,9 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     state.dataCurveManager->NumCurves = 1;
     state.dataCurveManager->PerfCurve.allocate(state.dataCurveManager->NumCurves);
 
-    state.fans.NumFans = 2;
-    Fan.allocate(state.fans.NumFans);
-    FaultsFouledAirFilters.allocate(state.fans.NumFans);
+    state.dataFans->NumFans = 2;
+    Fan.allocate(state.dataFans->NumFans);
+    FaultsFouledAirFilters.allocate(state.dataFans->NumFans);
 
     // Inputs: fan curve
     CurveNum = 1;
@@ -354,8 +354,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     state.dataCurveManager->NumCurves = 1;
     state.dataCurveManager->PerfCurve.allocate(state.dataCurveManager->NumCurves);
 
-    state.fans.NumFans = 1;
-    Fan.allocate(state.fans.NumFans);
+    state.dataFans->NumFans = 1;
+    Fan.allocate(state.dataFans->NumFans);
 
     // Inputs: fan curve
     CurveNum = 1;

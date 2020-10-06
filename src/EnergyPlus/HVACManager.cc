@@ -504,7 +504,7 @@ namespace HVACManager {
                 }
             }
 
-            DetectOscillatingZoneTemp(*state.dataZoneTempPredictorCorrector);
+            DetectOscillatingZoneTemp(state);
             UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
             UpdateIceFractions();          // Update fraction of ice stored in TES
             ManageWater(state);
@@ -543,7 +543,7 @@ namespace HVACManager {
                 }
                 if (ZoneSizingCalc) {
                     UpdateZoneSizing(state, DuringDay);
-                    UpdateFacilitySizing(state.dataGlobals, DuringDay);
+                    UpdateFacilitySizing(state, DuringDay);
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation();
             } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
@@ -2459,7 +2459,7 @@ namespace HVACManager {
         // Ensure no airflownetwork and simple calculations
         if (AirflowNetwork::SimulateAirflowNetwork == 0) return;
 
-        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) ReportAirflowNetwork();
+        if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) ReportAirflowNetwork(state);
 
         // Reports zone exhaust loss by exhaust fans
         for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
@@ -2476,7 +2476,7 @@ namespace HVACManager {
             ZnAirRpt(ZoneLoop).ExhTotalLoss = 0;
             ZnAirRpt(ZoneLoop).ExhSensiLoss = 0;
 
-            for (FanNum = 1; FanNum <= state.fans.NumFans; ++FanNum) {
+            for (FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
                 //  Add reportable vars
                 if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
                     for (int ExhNum = 1; ExhNum <= ZoneEquipConfig(ZoneLoop).NumExhaustNodes; ExhNum++) {

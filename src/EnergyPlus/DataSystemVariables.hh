@@ -55,9 +55,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    struct DataGlobal;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DataSystemVariables {
 
@@ -178,7 +178,7 @@ namespace DataSystemVariables {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void processEnvironmentVariables(DataGlobal const &dataGlobals);
+    void processEnvironmentVariables(EnergyPlusData &state);
 
 } // namespace DataSystemVariables
 

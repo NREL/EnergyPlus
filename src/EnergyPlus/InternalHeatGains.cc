@@ -187,7 +187,7 @@ namespace InternalHeatGains {
         if (ZoneSizingCalc) GatherComponentLoadsIntGain();
     }
 
-    void GetInternalHeatGainsInput(EnergyPlus::EnergyPlusData &state)
+    void GetInternalHeatGainsInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5522,7 +5522,7 @@ namespace InternalHeatGains {
 
         CalcWaterThermalTankZoneGains(state);
         PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
-        CalcWaterUseZoneGains(*state.dataWaterUse);
+        CalcWaterUseZoneGains(state);
         FigureFuelCellZoneGains();
         FigureMicroCHPZoneGains();
         initializeElectricPowerServiceZoneGains();

@@ -152,7 +152,6 @@ namespace TranspiredCollector {
     }
 
     void SimTranspiredCollector(EnergyPlusData &state,
-                                ConvectionCoefficientsData &dataConvectionCoefficients,
                                 IOFiles &ioFiles,
                                 std::string const &CompName, // component name
                                 int &CompIndex               // component index (to reduce string compares during simulation)
@@ -233,9 +232,9 @@ namespace TranspiredCollector {
         }
 
         if (UTSC(UTSCNum).IsOn) {
-            CalcActiveTranspiredCollector(state, dataConvectionCoefficients, ioFiles, UTSCNum);
+            CalcActiveTranspiredCollector(state, ioFiles, UTSCNum);
         } else {
-            CalcPassiveTranspiredCollector(state, dataConvectionCoefficients, ioFiles, UTSCNum);
+            CalcPassiveTranspiredCollector(state, ioFiles, UTSCNum);
         }
 
         UpdateTranspiredCollector(UTSCNum);
@@ -874,7 +873,7 @@ namespace TranspiredCollector {
         UTSC(UTSCNum).UTSCCollEff = 0.0;
     }
 
-    void CalcActiveTranspiredCollector(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const UTSCNum)
+    void CalcActiveTranspiredCollector(EnergyPlusData &state, IOFiles &ioFiles, int const UTSCNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1079,7 +1078,7 @@ namespace TranspiredCollector {
             HMovInsul = 0.0;
             HExt = 0.0;
             LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
-            InitExteriorConvectionCoeff(state, dataConvectionCoefficients, ioFiles,
+            InitExteriorConvectionCoeff(state, ioFiles,
                 SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = Surface(SurfPtr).Construction;
             AbsThermSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
@@ -1220,7 +1219,7 @@ namespace TranspiredCollector {
         }
     }
 
-    void CalcPassiveTranspiredCollector(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const UTSCNum)
+    void CalcPassiveTranspiredCollector(EnergyPlusData &state, IOFiles &ioFiles, int const UTSCNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1295,7 +1294,6 @@ namespace TranspiredCollector {
         // all the work is done in this routine located in GeneralRoutines.cc
 
         CalcPassiveExteriorBaffleGap(state,
-                                     dataConvectionCoefficients,
                                      ioFiles,
                                      UTSC(UTSCNum).SurfPtrs,
                                      holeArea,

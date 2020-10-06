@@ -56,12 +56,12 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct PlantChillersData;
 
 namespace PlantChillers {
 
@@ -232,11 +232,11 @@ namespace PlantChillers {
         {
         }
 
-        static void getInput(PlantChillersData &chillers);
+        static void getInput(EnergyPlusData &state);
 
         void setupOutputVariables();
 
-        static ElectricChillerSpecs *factory(PlantChillersData &chillers, std::string const &chillerName);
+        static ElectricChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -331,7 +331,7 @@ namespace PlantChillers {
 
         static EngineDrivenChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
 
-        static void getInput(EnergyPlusData &state, PlantChillersData &chillers);
+        static void getInput(EnergyPlusData &state);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -422,9 +422,9 @@ namespace PlantChillers {
         {
         }
 
-        static GTChillerSpecs *factory(PlantChillersData &chillers, std::string const &chillerName);
+        static GTChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
 
-        static void getInput(PlantChillersData &chillers);
+        static void getInput(EnergyPlusData &state);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -454,9 +454,9 @@ namespace PlantChillers {
         {
         }
 
-        static ConstCOPChillerSpecs *factory(PlantChillersData &chillers, std::string const &chillerName);
+        static ConstCOPChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
 
-        static void getInput(PlantChillersData &chillers);
+        static void getInput(EnergyPlusData &state);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 

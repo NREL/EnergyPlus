@@ -57,8 +57,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace SingleDuct {
 
@@ -371,7 +372,7 @@ namespace SingleDuct {
 
     void SimATMixer(EnergyPlusData &state, std::string const &SysName, bool const FirstHVACIteration, int &SysIndex);
 
-    void GetATMixers(EnergyPlusData &state, ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager);
+    void GetATMixers(EnergyPlusData &state);
 
     void CalcATMixer(int const SysNum);
 
