@@ -11381,7 +11381,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerInlet)
     EXPECT_TRUE(mySys.ATMixerExists);
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, mySys.ATMixerType);
     // EXPECT_FALSE(mySys.m_AirLoopEquipment);
-    EXPECT_EQ(0, mySys.ControlZoneNum); // control zone name/index not required for setpoint control
+    //EXPECT_EQ(0, mySys.ControlZoneNum); // control zone name/index not required for setpoint control
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerSupply)
@@ -11529,7 +11529,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerSupply)
     EXPECT_TRUE(mySys.ATMixerExists);
     EXPECT_EQ(DataHVACGlobals::ATMixer_SupplySide, mySys.ATMixerType);
     // EXPECT_FALSE(mySys.m_AirLoopEquipment);
-    EXPECT_EQ(0, mySys.ControlZoneNum); // control zone name/index not required for setpoint control
+    //EXPECT_EQ(0, mySys.ControlZoneNum); // control zone name/index not required for setpoint control
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)

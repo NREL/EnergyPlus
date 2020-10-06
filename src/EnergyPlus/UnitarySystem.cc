@@ -3283,232 +3283,60 @@ namespace UnitarySystems {
                 // if part of ZoneHVAC:OutdoorAirUnit bypass most checks for connection to air loop or OASystem
                 if (ZoneOAUnitNum > 0) OASysFound = true;
 
-                // check if the UnitarySystem is connected as zone equipment
-                if (!thisSys.ATMixerExists && !AirLoopFound && !OASysFound) {
-                    for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
-                        for (int ZoneExhNum = 1; ZoneExhNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNum) {
-                            if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != thisSys.AirInNode) continue;
-                            ZoneEquipmentFound = true;
-                            //               Find the controlled zone number for the specified thermostat location
-                            thisSys.NodeNumOfControlledZone = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-                            TotalFloorAreaOnAirLoop =
-                                DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
-                            thisSys.m_AirLoopEquipment = false;
-                            thisSys.m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum);
-                            if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex > 0) {
-                                for (int EquipNum = 1; EquipNum <= DataZoneEquipment::ZoneEquipList(
-                                                                       DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
-                                                                       .NumOfEquipTypes;
-                                     ++EquipNum) {
-                                    if ((DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
-                                             .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
-                                        DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
-                                                .EquipName(EquipNum) != thisObjectName)
-                                        continue;
-                                    // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
-                                    // leave this here in case it could be used in the future. It would need to be changed to use equipIndex instead.
-                                    // (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
-                                    thisSys.m_ZoneSequenceCoolingNum =
-                                        DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
-                                            .CoolingPriority(EquipNum);
-                                    thisSys.m_ZoneSequenceHeatingNum =
-                                        DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
-                                            .HeatingPriority(EquipNum);
-                                    break;
-                                }
-                            }
-                            thisSys.ControlZoneNum = ControlledZoneNum;
-                            break;
-                        }
+                if (!AirLoopFound && !OASysFound) {
+                    int ControlledZoneNum = 0;
+                    int ZoneExhNum = 0;
+
+                    if (!thisSys.ATMixerExists) {
+                        ZoneEquipmentFound = searchExhaustNodes(thisSys.AirInNode, ControlledZoneNum, ZoneExhNum);
                         if (ZoneEquipmentFound) {
-                            for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
-                                 ++ZoneInletNum) {
-                                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.AirOutNode) continue;
-                                ZoneInletNodeFound = true;
-                                break;
-                            }
-                        } else{
-                            // Inlet Node does not match any Exhaust Nodes
-                            ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                            ShowContinueError("Incorrect or misspelled Air Inlet Node Name = " + loc_AirInNodeName);
-                            ShowContinueError("Node name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections "
-                                              "object inputs.");
-                            errorsFound = true;
+                            // The Node was found among the exhaust nodes, now check that a matching inlet node exists
+                            thisSys.m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum);
+                            thisSys.ControlZoneNum = ControlledZoneNum;
+                            setSystemParams(thisSys, TotalFloorAreaOnAirLoop, thisObjectName);
+                            ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(thisSys.AirOutNode, thisSys.ControlZoneNum);
+                        }
+
+                    } else if (thisSys.ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
+                        ZoneEquipmentFound = searchExhaustNodes(thisSys.m_ATMixerSecNode, ControlledZoneNum, ZoneExhNum);
+                        if (ZoneEquipmentFound) {
+                            thisSys.m_ZoneInletNode = thisSys.AirOutNode;
+                            thisSys.ControlZoneNum = ControlledZoneNum;
+                            setSystemParams(thisSys, TotalFloorAreaOnAirLoop, thisObjectName);
+                            // The Node was found among the exhaust nodes, now check that a matching inlet node exists
+                            ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(thisSys.AirOutNode, thisSys.ControlZoneNum);
+                        }
+
+                    } else if (thisSys.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
+                        ZoneEquipmentFound = searchExhaustNodes(thisSys.AirInNode, ControlledZoneNum, ZoneExhNum);
+                        if (ZoneEquipmentFound) {
+                            thisSys.m_ZoneInletNode = thisSys.ATMixerOutNode;
+                            thisSys.ControlZoneNum = ControlledZoneNum;
+                            setSystemParams(thisSys, TotalFloorAreaOnAirLoop, thisObjectName);
+                            // The Node was found among the exhaust nodes, now check that a matching inlet node exists
+                            ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(thisSys.ATMixerOutNode, thisSys.ControlZoneNum);
                         }
                     }
-                    if (!ZoneInletNodeFound) {
-                        for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
-                            for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
-                                 ++ZoneInletNum) {
-                                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.AirOutNode) continue;
-                                ZoneInletNodeFound = true;
-                                ZoneEquipmentFound = true;
-                                break;
-                            }
-                        }
-                        if (!ZoneInletNodeFound && ZoneEquipmentFound) {
+
+                    if (!ZoneEquipmentFound) {
+                        // Exhaust Node was not found
+                        ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                        ShowContinueError("Incorrect or misspelled Air Inlet Node Name or Exhaust Node Name. = " + loc_AirInNodeName);
+                        ShowContinueError("Air Inlet Node " + loc_AirInNodeName +
+                                          " name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections "
+                                          "object inputs.");
+                        errorsFound = true;
+                    } else if (!ZoneInletNodeFound) {
+                        bool ZoneInletNodeExists = false;
+                        int InletControlledZoneNum = 0;
+                        int ZoneInletNum = 0;
+                        ZoneInletNodeExists = searchZoneInletNodes(thisSys.AirOutNode, InletControlledZoneNum, ZoneInletNum);
+                        if (!ZoneInletNodeExists) {
                             ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
                             ShowContinueError("Incorrect or misspelled Air Outlet Node Name = " + loc_AirOutNodeName);
-                            // ShowContinueError("Incorrect or misspelled " + cAlphaFields(iAirOutletNodeNameAlphaNum) + " = " +
-                            //                  Alphas(iAirOutletNodeNameAlphaNum));
                             ShowContinueError("Node name does not match any controlled zone inlet node name. Check ZoneHVAC:EquipmentConnections "
                                               "object inputs.");
                             errorsFound = true;
-                        }
-                    }
-                }
-
-                // check if the UnitarySystem is connected as zone equipment
-                if (thisSys.ATMixerExists && thisSys.ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
-                    if (!AirLoopFound && !OASysFound) {
-                        for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
-                            for (int ZoneExhNum = 1; ZoneExhNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes;
-                                 ++ZoneExhNum) {
-                                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != thisSys.m_ATMixerSecNode)
-                                    continue;
-                                ZoneEquipmentFound = true;
-                                //               Find the controlled zone number for the specified thermostat location
-                                thisSys.NodeNumOfControlledZone = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-                                TotalFloorAreaOnAirLoop =
-                                    DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
-                                thisSys.m_AirLoopEquipment = false;
-                                thisSys.m_ZoneInletNode = thisSys.AirOutNode;
-                                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex > 0) {
-                                    for (int EquipNum = 1; EquipNum <= DataZoneEquipment::ZoneEquipList(
-                                                                           DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
-                                                                           .NumOfEquipTypes;
-                                         ++EquipNum) {
-                                        if ((DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
-                                                 .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
-                                            DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
-                                                    .EquipName(EquipNum) != thisObjectName)
-                                            continue;
-                                        // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
-                                        // leave this here in case it could be used in the future. It would need to be changed to use equipIndex
-                                        // instead. (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
-                                        thisSys.m_ZoneSequenceCoolingNum =
-                                            DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
-                                                .CoolingPriority(EquipNum);
-                                        thisSys.m_ZoneSequenceHeatingNum =
-                                            DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
-                                                .HeatingPriority(EquipNum);
-                                    }
-                                }
-                                break;
-                            }
-                            if (ZoneEquipmentFound) {
-                                ZoneInletNodeFound = false;
-                                for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
-                                     ++ZoneInletNum) {
-                                    if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.AirOutNode) continue;
-                                    ZoneInletNodeFound = true;
-                                    break;
-                                }
-                            } else{
-                                // Inlet Node does not match any Exhaust Nodes
-                                ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                                ShowContinueError("Incorrect or misspelled Air Inlet Node Name = " + loc_AirInNodeName);
-                                ShowContinueError("Node name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections "
-                                                  "object inputs.");
-                                errorsFound = true;
-                            }
-                        }
-                        if (!ZoneInletNodeFound) {
-                            for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
-                                for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
-                                     ++ZoneInletNum) {
-                                    if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.AirOutNode) continue;
-                                    ZoneInletNodeFound = true;
-                                    ZoneEquipmentFound = true;
-                                    break;
-                                }
-                            }
-                            if (!ZoneInletNodeFound && ZoneEquipmentFound) {
-                                ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                                ShowContinueError("Incorrect or misspelled Air Outlet Node Name = " + loc_AirOutNodeName);
-                                // ShowContinueError("Incorrect or misspelled " + cAlphaFields(iAirOutletNodeNameAlphaNum) + " = " +
-                                //                  Alphas(iAirOutletNodeNameAlphaNum));
-                                ShowContinueError("Node name does not match any controlled zone inlet node name. Check ZoneHVAC:EquipmentConnections "
-                                                  "object inputs.");
-                                errorsFound = true;
-                            }
-                        }
-                    }
-                }
-
-                if (thisSys.ATMixerExists && thisSys.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
-                    if (!AirLoopFound && !OASysFound) {
-                        for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
-                            for (int ZoneExhNum = 1; ZoneExhNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes;
-                                 ++ZoneExhNum) {
-                                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != thisSys.AirInNode) continue;
-                                ZoneEquipmentFound = true;
-                                //               Find the controlled zone number for the specified thermostat location
-                                thisSys.NodeNumOfControlledZone = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-                                TotalFloorAreaOnAirLoop =
-                                    DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
-                                thisSys.m_AirLoopEquipment = false;
-                                thisSys.m_ZoneInletNode = thisSys.ATMixerOutNode;
-                                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex > 0) {
-                                    for (int EquipNum = 1; EquipNum <= DataZoneEquipment::ZoneEquipList(
-                                                                           DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
-                                                                           .NumOfEquipTypes;
-                                         ++EquipNum) {
-                                        if ((DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
-                                                 .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
-                                            DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
-                                                    .EquipName(EquipNum) != thisObjectName)
-                                            continue;
-                                        // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
-                                        // leave this here in case it could be used in the future. It would need to be changed to use equipIndex
-                                        // instead. (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
-                                        thisSys.m_ZoneSequenceCoolingNum =
-                                            DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
-                                                .CoolingPriority(EquipNum);
-                                        thisSys.m_ZoneSequenceHeatingNum =
-                                            DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
-                                                .HeatingPriority(EquipNum);
-                                    }
-                                }
-                                break;
-                            }
-                            if (ZoneEquipmentFound) {
-                                for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
-                                     ++ZoneInletNum) {
-                                    if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.ATMixerOutNode)
-                                        continue;
-                                    ZoneInletNodeFound = true;
-                                    break;
-                                }
-                            } else{
-                                // Inlet Node does not match any Exhaust Nodes
-                                ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                                ShowContinueError("Incorrect or misspelled Air Inlet Node Name = " + loc_AirInNodeName);
-                                ShowContinueError("Node name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections "
-                                                  "object inputs.");
-                                errorsFound = true;
-                            }
-                        }
-                        if (!ZoneInletNodeFound) {
-                            for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
-                                for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
-                                     ++ZoneInletNum) {
-                                    if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.ATMixerOutNode)
-                                        continue;
-                                    ZoneInletNodeFound = true;
-                                    ZoneEquipmentFound = true;
-                                    break;
-                                }
-                            }
-                            if (!ZoneInletNodeFound && ZoneEquipmentFound) {
-                                ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                                ShowContinueError("Incorrect or misspelled Air Outlet Node Name = " + loc_AirOutNodeName);
-                                // ShowContinueError("Incorrect or misspelled " + cAlphaFields(iAirOutletNodeNameAlphaNum) + " = " +
-                                //                  Alphas(iAirOutletNodeNameAlphaNum));
-                                ShowContinueError("Node name does not match any air terminal mixer secondary air inlet node. Check "
-                                                  "AirTerminal:SingleDuct:Mixer object inputs.");
-                                errorsFound = true;
-                            }
                         }
                     }
                 }
@@ -7489,7 +7317,6 @@ namespace UnitarySystems {
                                                     _,
                                                     this->m_FanOpMode,
                                                     this->m_SuppHeatPartLoadFrac);
-
         }
     }
 
@@ -16235,6 +16062,70 @@ namespace UnitarySystems {
         }
         if (airNode == 0) errFlag = true;
         return airNode;
+    }
+
+    bool searchZoneInletNodes(int nodeToFind, int &ZoneEquipConfigIndex, int &InletNodeIndex)
+    {
+        for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
+            for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++ZoneInletNum) {
+                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) == nodeToFind) {
+                    ZoneEquipConfigIndex = ControlledZoneNum;
+                    InletNodeIndex = ZoneInletNum;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    bool searchZoneInletNodesByEquipmentIndex(int nodeToFind, int zoneEquipmentIndex)
+    {
+        for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(zoneEquipmentIndex).NumInletNodes; ++ZoneInletNum) {
+            if (DataZoneEquipment::ZoneEquipConfig(zoneEquipmentIndex).InletNode(ZoneInletNum) == nodeToFind) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool searchExhaustNodes(const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex)
+    {
+        for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
+            for (int ZoneExhNum = 1; ZoneExhNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNum) {
+                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) == nodeToFind) {
+                    ZoneEquipConfigIndex = ControlledZoneNum;
+                    ExhaustNodeIndex = ZoneExhNum;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    void setSystemParams(UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName)
+    {
+        thisSys.NodeNumOfControlledZone = DataZoneEquipment::ZoneEquipConfig(thisSys.ControlZoneNum).ZoneNode;
+        TotalFloorAreaOnAirLoop = DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(thisSys.ControlZoneNum).ActualZoneNum).FloorArea;
+        thisSys.m_AirLoopEquipment = false;
+        if (DataZoneEquipment::ZoneEquipConfig(thisSys.ControlZoneNum).EquipListIndex > 0) {
+            for (int EquipNum = 1;
+                 EquipNum <=
+                 DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(thisSys.ControlZoneNum).EquipListIndex).NumOfEquipTypes;
+                 ++EquipNum) {
+                if ((DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(thisSys.ControlZoneNum).EquipListIndex)
+                         .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
+                    DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(thisSys.ControlZoneNum).EquipListIndex).EquipName(EquipNum) !=
+                        thisObjectName)
+                    continue;
+                thisSys.m_ZoneSequenceCoolingNum =
+                    DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(thisSys.ControlZoneNum).EquipListIndex)
+                        .CoolingPriority(EquipNum);
+                thisSys.m_ZoneSequenceHeatingNum =
+                    DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(thisSys.ControlZoneNum).EquipListIndex)
+                        .HeatingPriority(EquipNum);
+                break;
+            }
+        }
     }
 
 } // namespace UnitarySystems

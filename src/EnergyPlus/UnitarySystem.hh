@@ -782,6 +782,11 @@ namespace UnitarySystems {
     int getDesignSpecMSHPIndex(std::string const &objectName);
     int getUnitarySystemIndex(std::string const &objectName);
 
+    bool searchZoneInletNodes(int nodeToFind, int &ZoneEquipConfigIndex, int &InletNodeIndex);
+    bool searchZoneInletNodesByEquipmentIndex(int nodeToFind, int zoneEquipmentIndex);
+    bool searchExhaustNodes(const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
+    void setSystemParams(UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
+
 } // namespace UnitarySystems
 } // namespace EnergyPlus
 #endif // ENERGYPLUS_UNITARYSYSTEM_HH
