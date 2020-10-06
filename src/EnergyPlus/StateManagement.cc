@@ -247,7 +247,7 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
     DataBranchNodeConnections::clear_state();
-    dataConstruction.clear_state();
+    state.dataConstruction->clear_state();
     DataContaminantBalance::clear_state();
     DataConvergParams::clear_state();
     DataDefineEquip::clear_state();

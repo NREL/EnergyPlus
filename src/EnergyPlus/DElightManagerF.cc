@@ -334,7 +334,7 @@ namespace DElightManagerF {
                             // Is this Surface exposed to the exterior?
                             if (surf.ExtSolar) {
                                 // Get the index for the outside (i.e., 1st) Material Layer for this Construction
-                                iMatlLayer = dataConstruction.Construct(iconstruct).LayerPoint(1);
+                                iMatlLayer = state.dataConstruction->Construct(iconstruct).LayerPoint(1);
                                 // Get the outside visible reflectance of this material layer
                                 // (since Construct(iconstruct)%ReflectVisDiffFront always appears to == 0.0)
                                 rExtVisRefl = 1.0 - dataMaterial.Material(iMatlLayer).AbsorpVisible;
@@ -349,7 +349,7 @@ namespace DElightManagerF {
                                   cNameWOBlanks,
                                   surf.Azimuth,
                                   surf.Tilt,
-                                  dataConstruction.Construct(iconstruct).ReflectVisDiffBack,
+                                  state.dataConstruction->Construct(iconstruct).ReflectVisDiffBack,
                                   rExtVisRefl,
                                   surf.Sides);
 
@@ -650,14 +650,14 @@ namespace DElightManagerF {
             print(delightInFile,
                   Format_921,
                   iWndoConstIndexes(iconst) + 10000,
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransDiffVis,
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).ReflectVisDiffBack,
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(1),
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(2),
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(3),
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(4),
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(5),
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(6));
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).TransDiffVis,
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).ReflectVisDiffBack,
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(1),
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(2),
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(3),
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(4),
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(5),
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(6));
 
         } // Glass Type loop
 

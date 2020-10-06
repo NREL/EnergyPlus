@@ -164,16 +164,16 @@ namespace WindowEquivalentLayer {
         state.dataWindowEquivalentLayer->CFSDiffAbsTrans = 0.0;
 
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
-            if (!dataConstruction.Construct(ConstrNum).TypeIsWindow) continue;
-            if (!dataConstruction.Construct(ConstrNum).WindowTypeEQL) continue; // skip if not equivalent layer window
+            if (!state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
+            if (!state.dataConstruction->Construct(ConstrNum).WindowTypeEQL) continue; // skip if not equivalent layer window
 
             SetEquivalentLayerWindowProperties(state, ConstrNum);
 
         } //  end do for TotConstructs
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
-            if (!dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;
+            if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
+            if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;
 
             SurfWinWindowModelType(SurfNum) = WindowEQLModel;
 
@@ -206,24 +206,24 @@ namespace WindowEquivalentLayer {
         Array2D<Real64> SysAbs1(2, CFSMAXNL + 1); // layers absorptance and system transmittance
         // Flow
 
-        if (!allocated(CFSLayers)) CFSLayers.allocate(dataConstruction.Construct(ConstrNum).TotLayers);
+        if (!allocated(CFSLayers)) CFSLayers.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
 
         sLayer = 0;
         gLayer = 0;
-        EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
+        EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
 
-        CFS(EQLNum).Name = dataConstruction.Construct(ConstrNum).Name;
+        CFS(EQLNum).Name = state.dataConstruction->Construct(ConstrNum).Name;
 
-        for (Layer = 1; Layer <= dataConstruction.Construct(ConstrNum).TotLayers; ++Layer) {
+        for (Layer = 1; Layer <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Layer) {
 
-            MaterNum = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
+            MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
 
-            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != GlassEquivalentLayer &&
-                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != ShadeEquivalentLayer &&
-                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != DrapeEquivalentLayer &&
-                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != ScreenEquivalentLayer &&
-                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != BlindEquivalentLayer &&
-                dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Group != GapEquivalentLayer)
+            if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != GlassEquivalentLayer &&
+                dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != ShadeEquivalentLayer &&
+                dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != DrapeEquivalentLayer &&
+                dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != ScreenEquivalentLayer &&
+                dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != BlindEquivalentLayer &&
+                dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != GapEquivalentLayer)
                 continue;
 
             if (dataMaterial.Material(MaterNum).Group == GapEquivalentLayer) {
@@ -350,24 +350,24 @@ namespace WindowEquivalentLayer {
         FinalizeCFS(state, CFS(EQLNum));
 
         // get total solid layers (glazing layers + shade layers)
-        dataConstruction.Construct(ConstrNum).TotSolidLayers = CFS(EQLNum).NL;
+        state.dataConstruction->Construct(ConstrNum).TotSolidLayers = CFS(EQLNum).NL;
 
         // Calculate layers diffuse absorptance and system diffuse transmittance
         CalcEQLWindowOpticalProperty(state, CFS(EQLNum), isDIFF, SysAbs1, 0.0, 0.0, 0.0);
-        dataConstruction.Construct(ConstrNum).TransDiffFrontEQL = SysAbs1(1, CFS(EQLNum).NL + 1);
+        state.dataConstruction->Construct(ConstrNum).TransDiffFrontEQL = SysAbs1(1, CFS(EQLNum).NL + 1);
         state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, _, EQLNum) = SysAbs1;
-        dataConstruction.Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = SysAbs1(1, {1, CFSMAXNL});
-        dataConstruction.Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = SysAbs1(2, {1, CFSMAXNL});
+        state.dataConstruction->Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = SysAbs1(1, {1, CFSMAXNL});
+        state.dataConstruction->Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = SysAbs1(2, {1, CFSMAXNL});
         // get construction front and back diffuse effective reflectance
-        dataConstruction.Construct(ConstrNum).ReflectSolDiffFront = CFS(EQLNum).L(1).SWP_EL.RHOSFDD;
-        dataConstruction.Construct(ConstrNum).ReflectSolDiffBack = CFS(EQLNum).L(CFS(EQLNum).NL).SWP_EL.RHOSBDD;
+        state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront = CFS(EQLNum).L(1).SWP_EL.RHOSFDD;
+        state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack = CFS(EQLNum).L(CFS(EQLNum).NL).SWP_EL.RHOSBDD;
         // calculate U-Value, SHGC and Normal Transmittance of EQL Window
         CalcEQLWindowStandardRatings(state, ConstrNum);
 
         if (CFSHasControlledShade(state, CFS(EQLNum)) > 0) CFS(EQLNum).ISControlled = true; // is controlled
 
         // set internal face emissivity
-        dataConstruction.Construct(ConstrNum).InsideAbsorpThermal = EffectiveEPSLB(CFS(EQLNum));
+        state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal = EffectiveEPSLB(CFS(EQLNum));
     }
 
     void CalcEQLWindowUvalue(EnergyPlusData &state,
@@ -740,7 +740,7 @@ namespace WindowEquivalentLayer {
         QXConv = 0.0;
         ConvHeatFlowNatural = 0.0;
 
-        EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
+        EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
         HcIn = HConvIn(SurfNum); // windows inside surface convective film conductance
 
         if (CalcCondition == noCondition) {
@@ -8171,7 +8171,7 @@ namespace WindowEquivalentLayer {
         ProfAngHor = 0.0;
         ProfAngVer = 0.0;
         ConstrNum = Surface(SurfNum).Construction;
-        EQLNum = dataConstruction.Construct(Surface(SurfNum).Construction).EQLConsPtr;
+        EQLNum = state.dataConstruction->Construct(Surface(SurfNum).Construction).EQLConsPtr;
         if (BeamDIffFlag != isDIFF) {
             if (CosIncAng(TimeStep, HourOfDay, SurfNum) <= 0.0) return;
 
@@ -8204,17 +8204,17 @@ namespace WindowEquivalentLayer {
                 CalcEQLWindowOpticalProperty(state, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
                 CFSAbs(_, {1, CFSMAXNL + 1}) = Abs1(_, {1, CFSMAXNL + 1});
                 state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, {1, CFSMAXNL + 1}, EQLNum) = Abs1(_, {1, CFSMAXNL + 1});
-                dataConstruction.Construct(ConstrNum).TransDiff = Abs1(1, CFS(EQLNum).NL + 1);
-                dataConstruction.Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = Abs1(1, {1, CFSMAXNL});
-                dataConstruction.Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = Abs1(2, {1, CFSMAXNL});
-                dataConstruction.Construct(ConstrNum).ReflectSolDiffFront = CFS(EQLNum).L(1).SWP_EL.RHOSFDD;
-                dataConstruction.Construct(ConstrNum).ReflectSolDiffBack = CFS(EQLNum).L(CFS(EQLNum).NL).SWP_EL.RHOSBDD;
+                state.dataConstruction->Construct(ConstrNum).TransDiff = Abs1(1, CFS(EQLNum).NL + 1);
+                state.dataConstruction->Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = Abs1(1, {1, CFSMAXNL});
+                state.dataConstruction->Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = Abs1(2, {1, CFSMAXNL});
+                state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront = CFS(EQLNum).L(1).SWP_EL.RHOSFDD;
+                state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack = CFS(EQLNum).L(CFS(EQLNum).NL).SWP_EL.RHOSBDD;
                 if (!CFS(EQLNum).ISControlled) state.dataWindowEquivalentLayer->EQLDiffPropFlag(EQLNum) = false;
             } else {
                 CFSAbs(_, {1, CFSMAXNL + 1}) = state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, {1, CFSMAXNL + 1}, EQLNum);
-                dataConstruction.Construct(ConstrNum).TransDiff = state.dataWindowEquivalentLayer->CFSDiffAbsTrans(1, CFS(EQLNum).NL + 1, EQLNum);
-                dataConstruction.Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = CFSAbs(1, {1, CFSMAXNL});
-                dataConstruction.Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = CFSAbs(2, {1, CFSMAXNL});
+                state.dataConstruction->Construct(ConstrNum).TransDiff = state.dataWindowEquivalentLayer->CFSDiffAbsTrans(1, CFS(EQLNum).NL + 1, EQLNum);
+                state.dataConstruction->Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = CFSAbs(1, {1, CFSMAXNL});
+                state.dataConstruction->Construct(ConstrNum).AbsDiffBackEQL({1, CFSMAXNL}) = CFSAbs(2, {1, CFSMAXNL});
             }
         }
         if (CFS(EQLNum).VBLayerPtr > 0) {
@@ -8247,7 +8247,7 @@ namespace WindowEquivalentLayer {
         SHGCSummer = 0.0;
         TransNormal = 0.0;
 
-        EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
+        EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
 
         // calculate fenestration air-to-air U-value
         CalcEQLWindowUvalue(state, CFS(EQLNum), UValue);
@@ -8255,11 +8255,11 @@ namespace WindowEquivalentLayer {
 
         // calculate the SHGC and Normal Transmittance
         CalcEQLWindowSHGCAndTransNormal(state, CFS(EQLNum), SHGCSummer, TransNormal);
-        dataConstruction.Construct(ConstrNum).SummerSHGC = SHGCSummer;
-        dataConstruction.Construct(ConstrNum).SolTransNorm = TransNormal;
+        state.dataConstruction->Construct(ConstrNum).SummerSHGC = SHGCSummer;
+        state.dataConstruction->Construct(ConstrNum).SolTransNorm = TransNormal;
     }
 
-    Real64 EQLWindowInsideEffectiveEmiss(int const ConstrNum)
+    Real64 EQLWindowInsideEffectiveEmiss(EnergyPlusData &state, int const ConstrNum)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket A Nigusse
@@ -8271,10 +8271,10 @@ namespace WindowEquivalentLayer {
         // Given the consruction number, returns the equivalent layer inside
         // face effective longwave emmisivity.
 
-        return EffectiveEPSLB(CFS(dataConstruction.Construct(ConstrNum).EQLConsPtr));
+        return EffectiveEPSLB(CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr));
     }
 
-    Real64 EQLWindowOutsideEffectiveEmiss(int const ConstrNum)
+    Real64 EQLWindowOutsideEffectiveEmiss(EnergyPlusData &state, int const ConstrNum)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket A Nigusse
@@ -8291,7 +8291,7 @@ namespace WindowEquivalentLayer {
 
         int EQLNum; // EQL Window object number
 
-        EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
+        EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
         OutSideLWEmiss = EffectiveEPSLF(CFS(EQLNum));
 
         return OutSideLWEmiss;

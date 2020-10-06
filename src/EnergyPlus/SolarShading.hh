@@ -235,7 +235,7 @@ namespace SolarShading {
                                 bool const ignorey,
                                 bool const ignorez);
 
-    void ComputeIntSolarAbsorpFactors();
+    void ComputeIntSolarAbsorpFactors(EnergyPlusData &state);
 
     void CLIP(int const NVT, Array1D<Real64> &XVT, Array1D<Real64> &YVT, Array1D<Real64> &ZVT);
 
@@ -310,7 +310,7 @@ namespace SolarShading {
 
     void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const iTimeStep);
 
-    void DetermineShadowingCombinations();
+    void DetermineShadowingCombinations(EnergyPlusData &state);
 
     void SHADOW(EnergyPlusData &state,
                 int const iHour, // Hour index
@@ -341,7 +341,7 @@ namespace SolarShading {
 
     void CalcInteriorSolarDistribution(EnergyPlusData &state);
 
-    void CalcAborbedOnExteriorOpaqueSurfaces();
+    void CalcAbsorbedOnExteriorOpaqueSurfaces(EnergyPlusData &state);
 
     void CalcInteriorSolarDistributionWCE(EnergyPlusData &state);
 
@@ -362,7 +362,8 @@ namespace SolarShading {
                 int const Hour,
                 int const TS);
 
-    void SHDSBS(int const iHour, // Hour Index
+    void SHDSBS(EnergyPlusData &state,
+                int const iHour, // Hour Index
                 int const CurSurf,
                 int const NBKS, // Number of back surfaces
                 int const NSBS, // Number of subsurfaces
@@ -396,23 +397,25 @@ namespace SolarShading {
                                 int const HourNum   // Hour number
     );
 
-    void CalcBeamSolarOnWinRevealSurface();
+    void CalcBeamSolarOnWinRevealSurface(EnergyPlusData &state);
 
     void ReportSurfaceShading();
 
     void ReportSurfaceErrors();
 
-    void ComputeWinShadeAbsorpFactors();
+    void ComputeWinShadeAbsorpFactors(EnergyPlusData &state);
 
     void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state);
 
     void CalcInteriorWinTransDifSolInitialDistribution(
+        EnergyPlusData &state,
         int const IntWinEnclosureNum,     // Interior Window Enclosure index number
         int const IntWinSurfNum,          // Interior Window Surface number
         Real64 const IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent enclosure [W]
     );
 
-    void CalcComplexWindowOverlap(BSDFGeomDescr &Geom,               // State Geometry
+    void CalcComplexWindowOverlap(EnergyPlusData &state,
+                                  BSDFGeomDescr &Geom,               // State Geometry
                                   BSDFWindowGeomDescr const &Window, // Window Geometry
                                   int const ISurf                    // Surface number of the complex fenestration
     );

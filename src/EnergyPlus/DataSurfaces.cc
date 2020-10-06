@@ -1011,7 +1011,7 @@ namespace DataSurfaces {
         return QRadSWOutIncidentSkyDiffuse(t_SurfNum) + QRadSWOutIncidentGndDiffuse(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
-    int SurfaceData::getTotLayers() const
+    int SurfaceData::getTotLayers(EnergyPlusData &state) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -1022,7 +1022,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Returns total number of layer for current surface
 
-        auto &construction(dataConstruction.Construct(Construction));
+        auto &construction(state.dataConstruction->Construct(Construction));
         return construction.TotLayers;
     }
 

@@ -196,7 +196,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
     int ConstrNum = 1;
     int EQLNum = 0;
     InitEquivalentLayerWindowCalculations(state);
-    EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
+    EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
     EXPECT_EQ(CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL, state.dataWindowEquivalentLayer->lscVBNOBM);
 }
 
@@ -940,8 +940,8 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
     GetConstructData(state, ErrorsFound);
     EXPECT_EQ(1, DataHeatBalance::TotConstructs);
     EXPECT_EQ(1, DataWindowEquivalentLayer::TotWinEquivLayerConstructs);
-    EXPECT_TRUE(dataConstruction.Construct(1).TypeIsWindow);
-    EXPECT_TRUE(dataConstruction.Construct(1).WindowTypeEQL);
+    EXPECT_TRUE(state.dataConstruction->Construct(1).TypeIsWindow);
+    EXPECT_TRUE(state.dataConstruction->Construct(1).WindowTypeEQL);
     EXPECT_TRUE(ErrorsFound); // error found due to invalid layer
 }
 
@@ -1959,14 +1959,14 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
     }
     // get equivalent layer window contruction index
     for (int ConstrPtr = 1; ConstrPtr <= DataHeatBalance::TotConstructs; ++ConstrPtr) {
-        if (dataConstruction.Construct(ConstrPtr).WindowTypeEQL) {
+        if (state.dataConstruction->Construct(ConstrPtr).WindowTypeEQL) {
             ConstrNum = ConstrPtr;
         }
     }
     // check VB slat angle control for FixedSlatAngle
     EXPECT_EQ(dataMaterial.Material(VBMatNum).SlatAngleType, state.dataWindowEquivalentLayer->lscNONE);
 
-    EQLNum = dataConstruction.Construct(ConstrNum).EQLConsPtr;
+    EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
     // check number of solid layers
     EXPECT_EQ(CFS(EQLNum).NL, 3);
     // check optical and thermal property of the VB layer (Inside Layer)
@@ -1975,7 +1975,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
     EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.EPSLF, 0.90);
     EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.EPSLB, 0.90);
     // check inside face effective emissivity
-    EXPECT_NEAR(dataConstruction.Construct(ConstrNum).InsideAbsorpThermal, 0.91024, 0.00001);
+    EXPECT_NEAR(state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal, 0.91024, 0.00001);
     // for fixed slate angle the emissivity remains the same
-    EXPECT_NEAR(EQLWindowInsideEffectiveEmiss(ConstrNum), 0.91024, 0.00001);
+    EXPECT_NEAR(EQLWindowInsideEffectiveEmiss(state, ConstrNum), 0.91024, 0.00001);
 }

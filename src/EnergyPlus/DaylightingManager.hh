@@ -126,7 +126,7 @@ namespace DaylightingManager {
     // Functions
     void clear_state();
 
-    void DayltgAveInteriorReflectance(int &ZoneNum); // Zone number
+    void DayltgAveInteriorReflectance(EnergyPlusData &state, int &ZoneNum); // Zone number
 
     void CalcDayltgCoefficients(EnergyPlusData &state);
 
@@ -136,7 +136,8 @@ namespace DaylightingManager {
 
     void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum);
 
-    void FigureDayltgCoeffsAtPointsSetupForWindow(int const ZoneNum,
+    void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
+                                                  int const ZoneNum,
                                                   int const iRefPoint,
                                                   int const loopwin,
                                                   int const CalledFrom,          // indicate  which type of routine called this routine
@@ -390,7 +391,7 @@ namespace DaylightingManager {
                                     bool &hit                  // True iff ray hits an obstruction
     );
 
-    void DayltgInteriorIllum(int &ZoneNum); // Zone number
+    void DayltgInteriorIllum(EnergyPlusData &state, int &ZoneNum); // Zone number
 
     void DayltgInteriorTDDIllum();
 
@@ -417,7 +418,8 @@ namespace DaylightingManager {
                                        int const CalledFrom,
                                        Optional_int_const MapNum = _);
 
-    void DayltgInterReflectedIllumComplexFenestration(int const IWin,      // Window index
+    void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
+                                                      int const IWin,      // Window index
                                                       int const WinEl,     // Current window element counter
                                                       int const IHR,       // Hour of day
                                                       int const ZoneNum,   // Zone number
@@ -425,7 +427,8 @@ namespace DaylightingManager {
                                                       int const CalledFrom,
                                                       Optional_int_const MapNum = _);
 
-    void DayltgDirectIllumComplexFenestration(int const IWin,      // Window index
+    void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
+                                              int const IWin,      // Window index
                                               int const WinEl,     // Current window element counter
                                               int const IHR,       // Hour of day
                                               int const ZoneNum,   // Zone number
@@ -460,14 +463,15 @@ namespace DaylightingManager {
                                   Vector3<Real64> &NearestHitPt  // Ray's hit point on nearest obstruction (m)
     );
 
-    void DayltgSurfaceLumFromSun(int const IHR,                    // Hour number
+    void DayltgSurfaceLumFromSun(EnergyPlusData &state,
+                                 int const IHR,                    // Hour number
                                  Vector3<Real64> const &Ray,       // Ray from window to reflecting surface (m)
                                  int const ReflSurfNum,            // Number of surface for which luminance is being calculated
                                  Vector3<Real64> const &ReflHitPt, // Point on ReflSurfNum for luminance calculation (m)
                                  Real64 &LumAtReflHitPtFrSun       // Luminance at ReflHitPt from beam solar reflection for unit
     );
 
-    void DayltgInteriorMapIllum(int &ZoneNum); // Zone number
+    void DayltgInteriorMapIllum(EnergyPlusData &state, int &ZoneNum); // Zone number
 
     void ReportIllumMap(EnergyPlusData &state, int const MapNum);
 
@@ -481,7 +485,7 @@ namespace DaylightingManager {
 
     void MapShadeDeploymentOrderToLoopNumber(int &ZoneNum);
 
-    void DayltgInterReflIllFrIntWins(int &ZoneNum); // Zone number
+    void DayltgInterReflIllFrIntWins(EnergyPlusData &state, int &ZoneNum); // Zone number
 
     void CalcMinIntWinSolidAngs();
 

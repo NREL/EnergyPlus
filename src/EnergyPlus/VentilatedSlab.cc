@@ -514,11 +514,11 @@ namespace VentilatedSlab {
                     //        ErrorsFound=.TRUE.
                     //      END IF
                     if (Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction == 0) continue; // invalid construction, detected earlier
-                    if (!dataConstruction.Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
+                    if (!state.dataConstruction->Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
                         ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid surface=\"" +
                                         Surface(VentSlab(Item).SurfacePtr(SurfNum)).Name + "\".");
                         ShowContinueError("Surface Construction does not have a source/sink, Construction name= \"" +
-                                          dataConstruction.Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).Name + "\".");
+                                          state.dataConstruction->Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).Name + "\".");
                         ErrorsFound = true;
                     }
                 }
@@ -534,11 +534,11 @@ namespace VentilatedSlab {
                         ErrorsFound = true;
                     }
                     if (Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction == 0) continue; // invalid construction, detected earlier
-                    if (!dataConstruction.Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
+                    if (!state.dataConstruction->Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
                         ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid surface=\"" +
                                         Surface(VentSlab(Item).SurfacePtr(SurfNum)).Name + "\".");
                         ShowContinueError("Surface Construction does not have a source/sink, Construction name= \"" +
-                                          dataConstruction.Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).Name + "\".");
+                                          state.dataConstruction->Construct(Surface(VentSlab(Item).SurfacePtr(SurfNum)).Construction).Name + "\".");
                         ErrorsFound = true;
                     }
                 }
@@ -3710,9 +3710,9 @@ namespace VentilatedSlab {
                     Cf = RadSysToHBQsrcCoef(SurfNum);
 
                     Cg = CTFTsrcConstPart(SurfNum);
-                    Ch = double(dataConstruction.Construct(ConstrNum).CTFTSourceQ(0));
-                    Ci = double(dataConstruction.Construct(ConstrNum).CTFTSourceIn(0));
-                    Cj = double(dataConstruction.Construct(ConstrNum).CTFTSourceOut(0));
+                    Ch = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceQ(0));
+                    Ci = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceIn(0));
+                    Cj = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0));
 
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
@@ -3966,9 +3966,9 @@ namespace VentilatedSlab {
                     Cf = RadSysToHBQsrcCoef(SurfNum);
 
                     Cg = CTFTsrcConstPart(SurfNum);
-                    Ch = double(dataConstruction.Construct(ConstrNum).CTFTSourceQ(0));
-                    Ci = double(dataConstruction.Construct(ConstrNum).CTFTSourceIn(0));
-                    Cj = double(dataConstruction.Construct(ConstrNum).CTFTSourceOut(0));
+                    Ch = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceQ(0));
+                    Ci = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceIn(0));
+                    Cj = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0));
 
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));

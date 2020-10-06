@@ -654,7 +654,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays(state);
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::DetermineShadowingCombinations(state);
     DataEnvironment::DayOfYear_Schedule = 168;
     DataEnvironment::DayOfWeek = 6;
     DataGlobals::TimeStep = 4;
@@ -1050,7 +1050,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays(state);
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::DetermineShadowingCombinations(state);
     DataEnvironment::DayOfYear_Schedule = 168;
     DataEnvironment::DayOfWeek = 6;
     DataGlobals::TimeStep = 4;
@@ -1835,7 +1835,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays(state);
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::DetermineShadowingCombinations(state);
     DataEnvironment::DayOfYear_Schedule = 168;
     DataEnvironment::DayOfWeek = 6;
     DataGlobals::TimeStep = 4;
@@ -2246,7 +2246,7 @@ WindowMaterial:SimpleGlazingSystem,
     EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays(state);
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::DetermineShadowingCombinations(state);
 
     std::string error_string = delimited_string({"** Severe  ** Problem in interior solar distribution calculation (CHKBKS)"});
 
@@ -2559,7 +2559,7 @@ EXPECT_FALSE(FoundError);
 
 if (SolarShading::penumbra) {
     SolarShading::AllocateModuleArrays(state);
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::DetermineShadowingCombinations(state);
 
     std::string error_string = delimited_string({"** Severe  ** Problem in interior solar distribution calculation (CHKBKS)"});
 

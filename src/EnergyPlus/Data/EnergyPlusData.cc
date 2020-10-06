@@ -72,6 +72,7 @@ namespace EnergyPlus {
         this->dataChillerIndirectAbsorption = std::unique_ptr<ChillerIndirectAbsoprtionData>(new ChillerIndirectAbsoprtionData);
         this->dataChillerReformulatedEIR = std::unique_ptr<ChillerReformulatedEIRData>(new ChillerReformulatedEIRData);
         this->dataCondenserLoopTowers = std::unique_ptr<CondenserLoopTowersData>(new CondenserLoopTowersData);
+        this->dataConstruction = std::unique_ptr<ConstructionData>(new ConstructionData);
         this->dataConvectionCoefficient = std::unique_ptr<ConvectionCoefficientsData>(new ConvectionCoefficientsData);
         this->dataCoolTower = std::unique_ptr<CoolTowerData>(new CoolTowerData);
         this->dataCostEstimateManager = std::unique_ptr<CostEstimateManagerData>(new CostEstimateManagerData);
@@ -120,6 +121,7 @@ namespace EnergyPlus {
         this->dataChillerIndirectAbsorption->clear_state();
         this->dataChillerReformulatedEIR->clear_state();
         this->dataCondenserLoopTowers->clear_state();
+        this->dataConstruction->clear_state();
         this->dataConvectionCoefficient->clear_state();
         this->dataCoolTower->clear_state();
         this->dataCostEstimateManager->clear_state();

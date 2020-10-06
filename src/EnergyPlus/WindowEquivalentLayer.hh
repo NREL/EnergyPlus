@@ -749,9 +749,9 @@ namespace WindowEquivalentLayer {
 
     void CalcEQLWindowStandardRatings(EnergyPlusData &state, int const ConstrNum); // construction index
 
-    Real64 EQLWindowInsideEffectiveEmiss(int const ConstrNum);
+    Real64 EQLWindowInsideEffectiveEmiss(EnergyPlusData &state, int const ConstrNum);
 
-    Real64 EQLWindowOutsideEffectiveEmiss(int const ConstrNum);
+    Real64 EQLWindowOutsideEffectiveEmiss(EnergyPlusData &state, int const ConstrNum);
 
     Real64 HCInWindowStandardRatings(Real64 const Height,  // Window height, 1.0 m
                                      Real64 const TSurfIn, // Inside surface temperature

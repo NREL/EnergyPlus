@@ -69,6 +69,7 @@
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CostEstimateManager.hh>

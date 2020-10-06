@@ -57,11 +57,9 @@
 
 namespace EnergyPlus {
 
-ConstructionData dataConstruction;
-
 namespace Construction {
 
-    void ConstructionProps::calculateTransferFunction(bool & ErrorsFound, bool & DoCTFErrorReport) {
+    void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool & ErrorsFound, bool & DoCTFErrorReport) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -410,7 +408,7 @@ namespace Construction {
             // previously this loop would go from 1..currentConstructionIndex-1
             // instead of that, we'll loop through the list and stop when we get to the current construction
             // should be the same behavior, we're just checking it by address
-            for (auto & otherConstruction : dataConstruction.Construct) {
+            for (auto & otherConstruction : state.dataConstruction->Construct) {
                 if (&otherConstruction == this) break;
 
                 // If a source or sink is present in this construction, do not allow any

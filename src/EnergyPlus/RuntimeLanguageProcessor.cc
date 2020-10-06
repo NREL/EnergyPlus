@@ -2980,7 +2980,7 @@ namespace RuntimeLanguageProcessor {
                         continue;
                     }
 
-                    ConstructNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), dataConstruction.Construct);
+                    ConstructNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataConstruction->Construct);
 
                     if (ConstructNum == 0) {
                         if (lAlphaFieldBlanks(2)) {

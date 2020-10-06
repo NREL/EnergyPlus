@@ -713,7 +713,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     MRT(1) = 26.0;
     ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
-    CalcThermalComfortFanger();
+    CalcThermalComfortFanger(state);
 
     EXPECT_NEAR(ThermalComfortData(1).FangerPMV, -1.262, 0.005);
     EXPECT_NEAR(ThermalComfortData(1).FangerPPD, 38.3, 0.1);
@@ -722,7 +722,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     MRT(1) = 27.0;
     ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
-    CalcThermalComfortFanger();
+    CalcThermalComfortFanger(state);
 
     EXPECT_NEAR(ThermalComfortData(1).FangerPMV, -0.860, 0.005);
     EXPECT_NEAR(ThermalComfortData(1).FangerPPD, 20.6, 0.1);
@@ -731,7 +731,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     MRT(1) = 28.0;
     ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
-    CalcThermalComfortFanger();
+    CalcThermalComfortFanger(state);
 
     EXPECT_NEAR(ThermalComfortData(1).FangerPMV, -0.460, 0.005);
     EXPECT_NEAR(ThermalComfortData(1).FangerPPD, 9.4, 0.1);
@@ -740,7 +740,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     MRT(1) = 26.0;
     ZoneAirHumRatAvgComf(1) = 0.00629; // 0.002 to 0.006
 
-    CalcThermalComfortFanger();
+    CalcThermalComfortFanger(state);
 
     EXPECT_NEAR(ThermalComfortData(1).FangerPMV, -1.201, 0.005);
     EXPECT_NEAR(ThermalComfortData(1).FangerPPD, 35.3, 0.1);
@@ -761,7 +761,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     NumOfZones = 1;
     TH.allocate(2, 2, TotSurfaces);
     Surface.allocate(TotSurfaces);
-    dataConstruction.Construct.allocate(TotSurfaces);
+    state.dataConstruction->Construct.allocate(TotSurfaces);
     Zone.allocate(1);
 
     Surface(1).Area = 20.0;
@@ -773,9 +773,9 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     Surface(1).Construction = 1;
     Surface(2).Construction = 2;
     Surface(3).Construction = 3;
-    dataConstruction.Construct(1).InsideAbsorpThermal = 1.0;
-    dataConstruction.Construct(2).InsideAbsorpThermal = 0.9;
-    dataConstruction.Construct(3).InsideAbsorpThermal = 0.8;
+    state.dataConstruction->Construct(1).InsideAbsorpThermal = 1.0;
+    state.dataConstruction->Construct(2).InsideAbsorpThermal = 0.9;
+    state.dataConstruction->Construct(3).InsideAbsorpThermal = 0.8;
     Surface(1).Zone = 1;
     Surface(2).Zone = 1;
     Surface(3).Zone = 1;
@@ -787,17 +787,17 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
 
     SurfNum = 1;
     ThermalComfort::clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(ZoneNum, SurfNum);
+    RadTemp = CalcSurfaceWeightedMRT(state, ZoneNum, SurfNum);
     EXPECT_NEAR(RadTemp, 16.6, 0.1);
 
     SurfNum = 2;
     ThermalComfort::clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(ZoneNum, SurfNum);
+    RadTemp = CalcSurfaceWeightedMRT(state, ZoneNum, SurfNum);
     EXPECT_NEAR(RadTemp, 16.1, 0.1);
 
     SurfNum = 3;
     ThermalComfort::clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(ZoneNum, SurfNum);
+    RadTemp = CalcSurfaceWeightedMRT(state, ZoneNum, SurfNum);
     EXPECT_NEAR(RadTemp, 14.0, 0.1);
 }
 
@@ -822,9 +822,9 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT)
     TotSurfaces = AngleFactorList(1).TotAngleFacSurfaces;
     TH.allocate(2, 2, TotSurfaces);
     Surface.deallocate();
-    dataConstruction.Construct.deallocate();
+    state.dataConstruction->Construct.deallocate();
     Surface.allocate(TotSurfaces);
-    dataConstruction.Construct.allocate(TotSurfaces);
+    state.dataConstruction->Construct.allocate(TotSurfaces);
 
     TH(2, 1, 1) = 20.0;
     TH(2, 1, 2) = 15.0;
@@ -832,11 +832,11 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT)
     Surface(1).Construction = 1;
     Surface(2).Construction = 2;
     Surface(3).Construction = 3;
-    dataConstruction.Construct(1).InsideAbsorpThermal = 1.0;
-    dataConstruction.Construct(2).InsideAbsorpThermal = 0.9;
-    dataConstruction.Construct(3).InsideAbsorpThermal = 0.8;
+    state.dataConstruction->Construct(1).InsideAbsorpThermal = 1.0;
+    state.dataConstruction->Construct(2).InsideAbsorpThermal = 0.9;
+    state.dataConstruction->Construct(3).InsideAbsorpThermal = 0.8;
 
-    RadTemp = CalcAngleFactorMRT(1);
+    RadTemp = CalcAngleFactorMRT(state, 1);
     EXPECT_NEAR(RadTemp, 16.9, 0.1);
 }
 
@@ -992,7 +992,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     QSteamBaseboardToPerson(1) = 0.0;
     QElecBaseboardToPerson(1) = 0.0;
 
-    CalcThermalComfortPierce();
+    CalcThermalComfortPierce(state);
 
     EXPECT_NEAR(ThermalComfortData(1).PiercePMVSET, -3.350, 0.005);
     EXPECT_NEAR(ThermalComfortData(1).PierceSET, 23.62, 0.01);
