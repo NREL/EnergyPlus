@@ -302,7 +302,7 @@ namespace HeatingCoils {
                                          StageNum,
                                          OpMode); // Autodesk:OPTIONAL SpeedRatio, PartLoadRatio, StageNum used without PRESENT check
         } else if (HeatingCoil(CoilNum).HCoilType_Num == Coil_HeatingDesuperheater) {
-            CalcDesuperheaterHeatingCoil(CoilNum, QCoilRequired, QCoilActual2);
+            CalcDesuperheaterHeatingCoil(state, CoilNum, QCoilRequired, QCoilActual2);
         } else {
             QCoilActual2 = 0.0;
         }
@@ -1448,7 +1448,7 @@ namespace HeatingCoils {
                     break;
                 }
             } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
-                for (DXCoilNum = 1; DXCoilNum <= VariableSpeedCoils::NumVarSpeedCoils; ++DXCoilNum) {
+                for (DXCoilNum = 1; DXCoilNum <= state.dataVariableSpeedCoils->NumVarSpeedCoils; ++DXCoilNum) {
                     if (!UtilityRoutines::SameString(DataHeatBalance::HeatReclaimVS_DXCoil(DXCoilNum).Name,
                                                      HeatingCoil(CoilNum).ReclaimHeatingCoilName))
                         continue;
@@ -2574,7 +2574,7 @@ namespace HeatingCoils {
         Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
     }
 
-    void CalcDesuperheaterHeatingCoil(int const CoilNum,     // index to desuperheater heating coil
+    void CalcDesuperheaterHeatingCoil(EnergyPlusData &state, int const CoilNum,     // index to desuperheater heating coil
                                       Real64 const QCoilReq, // load requested by the simulation for load based control [W]
                                       Real64 &QCoilActual    // coil load actually delivered
     )
@@ -2680,7 +2680,7 @@ namespace HeatingCoils {
                     HeatReclaimDXCoil(SourceID).AvailCapacity * Effic - HeatReclaimDXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
             } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
                 // condenser heat rejection
-                HeatingCoil(CoilNum).RTF = VariableSpeedCoils::VarSpeedCoil(SourceID).RunFrac;
+                HeatingCoil(CoilNum).RTF = state.dataVariableSpeedCoils->VarSpeedCoil(SourceID).RunFrac;
                 HeatingCoil(CoilNum).NominalCapacity = DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity * Effic -
                                                        DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
             }

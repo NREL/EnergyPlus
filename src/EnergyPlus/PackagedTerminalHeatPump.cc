@@ -149,7 +149,6 @@ namespace PackagedTerminalHeatPump {
     using DataGlobals::SysSizingCalc;
     using namespace DataHVACGlobals;
     using DXCoils::DXCoilPartLoadRatio;
-    using VariableSpeedCoils::MaxSpedLevels;
 
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
@@ -3792,7 +3791,6 @@ namespace PackagedTerminalHeatPump {
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
         using VariableSpeedCoils::SimVariableSpeedCoils;
-        using VariableSpeedCoils::VarSpeedCoil;
         using WaterCoils::GetCoilMaxWaterFlowRate;
         using WaterCoils::SimulateWaterCoilComponents;
 
@@ -4061,12 +4059,12 @@ namespace PackagedTerminalHeatPump {
                                       0.0,
                                       0.0,
                                       0.0); // conduct the sizing operation in the VS WSHP
-                PTUnit(PTUnitNum).NumOfSpeedCooling = VarSpeedCoil(PTUnit(PTUnitNum).DXCoolCoilIndexNum).NumOfSpeeds;
+                PTUnit(PTUnitNum).NumOfSpeedCooling = state.dataVariableSpeedCoils->VarSpeedCoil(PTUnit(PTUnitNum).DXCoolCoilIndexNum).NumOfSpeeds;
 
                 for (Iter = 1; Iter <= PTUnit(PTUnitNum).NumOfSpeedCooling; ++Iter) {
                     PTUnit(PTUnitNum).MSCoolingSpeedRatio(Iter) =
-                        VarSpeedCoil(PTUnit(PTUnitNum).DXCoolCoilIndexNum).MSRatedAirVolFlowRate(Iter) /
-                        VarSpeedCoil(PTUnit(PTUnitNum).DXCoolCoilIndexNum).MSRatedAirVolFlowRate(PTUnit(PTUnitNum).NumOfSpeedCooling);
+                        state.dataVariableSpeedCoils->VarSpeedCoil(PTUnit(PTUnitNum).DXCoolCoilIndexNum).MSRatedAirVolFlowRate(Iter) /
+                        state.dataVariableSpeedCoils->VarSpeedCoil(PTUnit(PTUnitNum).DXCoolCoilIndexNum).MSRatedAirVolFlowRate(PTUnit(PTUnitNum).NumOfSpeedCooling);
                     PTUnit(PTUnitNum).CoolVolumeFlowRate(Iter) = PTUnit(PTUnitNum).MaxCoolAirVolFlow * PTUnit(PTUnitNum).MSCoolingSpeedRatio(Iter);
                     PTUnit(PTUnitNum).CoolMassFlowRate(Iter) = PTUnit(PTUnitNum).MaxCoolAirMassFlow * PTUnit(PTUnitNum).MSCoolingSpeedRatio(Iter);
                 }
@@ -4089,12 +4087,12 @@ namespace PackagedTerminalHeatPump {
                                           0.0,
                                           0.0); // conduct the sizing operation in the VS WSHP
 
-                    PTUnit(PTUnitNum).NumOfSpeedHeating = VarSpeedCoil(PTUnit(PTUnitNum).DXHeatCoilIndexNum).NumOfSpeeds;
+                    PTUnit(PTUnitNum).NumOfSpeedHeating = state.dataVariableSpeedCoils->VarSpeedCoil(PTUnit(PTUnitNum).DXHeatCoilIndexNum).NumOfSpeeds;
 
                     for (Iter = 1; Iter <= PTUnit(PTUnitNum).NumOfSpeedHeating; ++Iter) {
                         PTUnit(PTUnitNum).MSHeatingSpeedRatio(Iter) =
-                            VarSpeedCoil(PTUnit(PTUnitNum).DXHeatCoilIndexNum).MSRatedAirVolFlowRate(Iter) /
-                            VarSpeedCoil(PTUnit(PTUnitNum).DXHeatCoilIndexNum).MSRatedAirVolFlowRate(PTUnit(PTUnitNum).NumOfSpeedHeating);
+                            state.dataVariableSpeedCoils->VarSpeedCoil(PTUnit(PTUnitNum).DXHeatCoilIndexNum).MSRatedAirVolFlowRate(Iter) /
+                            state.dataVariableSpeedCoils->VarSpeedCoil(PTUnit(PTUnitNum).DXHeatCoilIndexNum).MSRatedAirVolFlowRate(PTUnit(PTUnitNum).NumOfSpeedHeating);
                         PTUnit(PTUnitNum).HeatVolumeFlowRate(Iter) =
                             PTUnit(PTUnitNum).MaxHeatAirVolFlow * PTUnit(PTUnitNum).MSHeatingSpeedRatio(Iter);
                         PTUnit(PTUnitNum).HeatMassFlowRate(Iter) = PTUnit(PTUnitNum).MaxHeatAirMassFlow * PTUnit(PTUnitNum).MSHeatingSpeedRatio(Iter);
@@ -8115,7 +8113,6 @@ namespace PackagedTerminalHeatPump {
         using SteamCoils::SimulateSteamCoilComponents;
         using TempSolveRoot::SolveRoot;
         using VariableSpeedCoils::SimVariableSpeedCoils;
-        using VariableSpeedCoils::VarSpeedCoil;
         using WaterCoils::SimulateWaterCoilComponents;
         using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 

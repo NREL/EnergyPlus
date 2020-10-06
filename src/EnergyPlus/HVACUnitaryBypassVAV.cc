@@ -2502,7 +2502,7 @@ namespace HVACUnitaryBypassVAV {
                             //           OutletTempDXCoil is the full capacity outlet temperature at PartLoadFrac = 1 from the CALL above. If this
                             //           temp is greater than the desired outlet temp, then run the compressor at PartLoadFrac = 1, otherwise find the
                             //           operating PLR.
-                            Real64 OutletTempDXCoil = VariableSpeedCoils::VarSpeedCoil(CBVAV(CBVAVNum).CoolCoilCompIndex).OutletAirDBTemp;
+                            Real64 OutletTempDXCoil = state.dataVariableSpeedCoils->VarSpeedCoil(CBVAV(CBVAVNum).CoolCoilCompIndex).OutletAirDBTemp;
                             if (OutletTempDXCoil > DesOutTemp) {
                                 PartLoadFrac = 1.0;
                                 SpeedNum = maxNumSpeeds;
@@ -2684,7 +2684,7 @@ namespace HVACUnitaryBypassVAV {
                         } else if (PartLoadFrac < 0.0) {
                             PartLoadFrac = 0.0;
                         }
-                        SaveCompressorPLR = VariableSpeedCoils::getVarSpeedPartLoadRatio(CBVAV(CBVAVNum).CoolCoilCompIndex);
+                        SaveCompressorPLR = VariableSpeedCoils::getVarSpeedPartLoadRatio(state, CBVAV(CBVAVNum).CoolCoilCompIndex);
                         // variable-speed air-to-air cooling coil, end -------------------------
 
                     } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
@@ -2990,7 +2990,7 @@ namespace HVACUnitaryBypassVAV {
                                                               SpeedRatio,
                                                               QZnReq,
                                                               QLatReq);
-                    SaveCompressorPLR = VariableSpeedCoils::getVarSpeedPartLoadRatio(CBVAV(CBVAVNum).CoolCoilCompIndex);
+                    SaveCompressorPLR = VariableSpeedCoils::getVarSpeedPartLoadRatio(state, CBVAV(CBVAVNum).CoolCoilCompIndex);
                 }
             }
 
@@ -3217,7 +3217,7 @@ namespace HVACUnitaryBypassVAV {
                 } else { //  Else find how the coil is modulating (speed level and speed ratio or part load between off and speed 1) to meet the load
                     //           OutletTempDXCoil is the full capacity outlet temperature at PartLoadFrac = 1 from the CALL above. If this temp is
                     //           greater than the desired outlet temp, then run the compressor at PartLoadFrac = 1, otherwise find the operating PLR.
-                    Real64 OutletTempDXCoil = VariableSpeedCoils::VarSpeedCoil(CBVAV(CBVAVNum).DXHeatCoilIndexNum).OutletAirDBTemp;
+                    Real64 OutletTempDXCoil = state.dataVariableSpeedCoils->VarSpeedCoil(CBVAV(CBVAVNum).DXHeatCoilIndexNum).OutletAirDBTemp;
                     if (OutletTempDXCoil < DesOutTemp) {
                         PartLoadFrac = 1.0;
                         SpeedNum = maxNumSpeeds;
@@ -3420,7 +3420,7 @@ namespace HVACUnitaryBypassVAV {
                 } else if (PartLoadFrac < 0.0) {
                     PartLoadFrac = 0.0;
                 }
-                SaveCompressorPLR = VariableSpeedCoils::getVarSpeedPartLoadRatio(CBVAV(CBVAVNum).DXHeatCoilIndexNum);
+                SaveCompressorPLR = VariableSpeedCoils::getVarSpeedPartLoadRatio(state, CBVAV(CBVAVNum).DXHeatCoilIndexNum);
             } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam)) { // not a DX heating coil
