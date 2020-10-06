@@ -2090,8 +2090,6 @@ namespace PurchasedAirManager {
         Real64 SupplyHumRatOrig; // Supply inlet to zone humidity ratio before saturation check [kgWater/kgDryAir]
         Real64 SupplyHumRatSat;  // Supply inlet to zone humidity ratio saturation at SupplyTemp [kgWater/kgDryAir]
         Real64 SupplyEnthalpy;   // Supply inlet to zone enthalpy [J/kg]
-        
-        
         Real64 MixedAirEnthalpy; // Mixed air enthalpy [J/kg]
         Real64 CpAir;            // Specific heat [J/kg-C] reused in multiple places
         //         REAL(r64) :: SpecHumOut   ! Specific humidity ratio of outlet air (kg moisture / kg moist air)
@@ -2840,7 +2838,6 @@ namespace PurchasedAirManager {
         PurchAir(PurchAirNum).OutdoorAirVolFlowRateStdRho = OAMassFlowRate / StdRhoAir;
         PurchAir(PurchAirNum).SupplyAirMassFlowRate = SupplyMassFlowRate;
         PurchAir(PurchAirNum).SupplyAirVolFlowRateStdRho = SupplyMassFlowRate / StdRhoAir;
-        
         if (PurchAir(PurchAirNum).PlenumExhaustAirNodeNum > 0) {
             Node(PurchAir(PurchAirNum).PlenumExhaustAirNodeNum).MassFlowRate = SupplyMassFlowRate;
         }
