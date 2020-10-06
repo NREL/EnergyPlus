@@ -276,7 +276,7 @@ namespace VariableSpeedCoils {
         Real64 capModFacTotal;     // coil  TotCapTempModFac * TotCapAirFFModFac * TotCapWaterFFModFac, for result for simulation peak reporting
 
         // Default Constructor
-        VariableSpeedCoilData::VariableSpeedCoilData()
+        VariableSpeedCoilData()
             : NumOfSpeeds(2), NormSpedLevel(MaxSpedLevels), RatedWaterVolFlowRate(DataSizing::AutoSize), RatedWaterMassFlowRate(DataSizing::AutoSize),
             RatedAirVolFlowRate(DataSizing::AutoSize), RatedCapHeat(DataSizing::AutoSize), RatedCapCoolTotal(DataSizing::AutoSize), MaxONOFFCyclesperHour(0.0), Twet_Rated(0.0),
             Gamma_Rated(0.0), HOTGASREHEATFLG(0), HPTimeConstant(0.0), PLFFPLR(0), VSCoilTypeOfNum(0), SimFlag(false), DesignWaterMassFlowRate(0.0),
