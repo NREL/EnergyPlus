@@ -131,7 +131,6 @@ namespace Furnaces {
 
     struct FurnaceEquipConditions
     { 
-        int MaxSpedLevels = 10;
         // Members
         std::string Name;                   // Name of the Furnace
         int FurnaceType_Num;                // Numeric Equivalent for Furnace Type
@@ -289,7 +288,7 @@ namespace Furnaces {
         bool FirstPass;             // used to determine when first call is made
 
         // Default Constructor
-        FurnaceEquipConditions()
+        FurnaceEquipConditions(EnergyPlusData &state)
             : FurnaceType_Num(0), FurnaceIndex(0), SchedPtr(0), FanSchedPtr(0), FanAvailSchedPtr(0), ControlZoneNum(0), ZoneSequenceCoolingNum(0),
               ZoneSequenceHeatingNum(0), CoolingCoilType_Num(0), CoolingCoilIndex(0), ActualDXCoilIndexForHXAssisted(0), CoolingCoilUpstream(true),
               HeatingCoilType_Num(0), HeatingCoilIndex(0), ReheatingCoilType_Num(0), ReheatingCoilIndex(0), CoilControlNode(0), HWCoilAirInletNode(0),
@@ -315,9 +314,9 @@ namespace Furnaces {
               LoopNumSupp(0), LoopSideSupp(0), BranchNumSupp(0), CompNumSupp(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0),
               EMSOverrideSensZoneLoadRequest(false), EMSSensibleZoneLoadValue(0.0), EMSOverrideMoistZoneLoadRequest(false),
               EMSMoistureZoneLoadValue(0.0), HeatCoolMode(0), NumOfSpeedCooling(0), NumOfSpeedHeating(0), IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0),
-              IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true), HeatVolumeFlowRate(MaxSpedLevels, 0.0),
-              HeatMassFlowRate(MaxSpedLevels, 0.0), CoolVolumeFlowRate(MaxSpedLevels, 0.0), CoolMassFlowRate(MaxSpedLevels, 0.0),
-              MSHeatingSpeedRatio(MaxSpedLevels, 0.0), MSCoolingSpeedRatio(MaxSpedLevels, 0.0), bIsIHP(false), CompSpeedNum(0), CompSpeedRatio(0.0),
+              IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true), HeatVolumeFlowRate(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0),
+              HeatMassFlowRate(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), CoolVolumeFlowRate(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), CoolMassFlowRate(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0),
+              MSHeatingSpeedRatio(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), MSCoolingSpeedRatio(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), bIsIHP(false), CompSpeedNum(0), CompSpeedRatio(0.0),
               ErrIndexCyc(0), ErrIndexVar(0), WaterCyclingMode(0), iterationCounter(0), iterationMode(0), FirstPass(true)
         {
         }

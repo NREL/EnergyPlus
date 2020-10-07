@@ -116,7 +116,6 @@ namespace PackagedTerminalHeatPump {
 
     struct PTUnitData
     {
-        int MaxSpedLevels = 10;
         // Members
         // input data
         int UnitType_Num;                // paramter equivalent to type of unit
@@ -300,7 +299,7 @@ namespace PackagedTerminalHeatPump {
         // end of the additional variables for variable speed water source heat pump
 
         // Default Constructor
-        PTUnitData()
+        PTUnitData(EnergyPlusData &state)
             : UnitType_Num(0), ZoneEquipType(0), useVSCoilModel(false), SchedPtr(0), MaxCoolAirVolFlow(0.0), MaxHeatAirVolFlow(0.0),
               MaxNoCoolHeatAirVolFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0), NoCoolHeatOutAirVolFlow(0.0), CoolOutAirMassFlow(0.0),
               HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), OutsideAirNode(0), AirReliefNode(0), OAMixIndex(0), FanType_Num(0), FanIndex(0),
@@ -319,8 +318,8 @@ namespace PackagedTerminalHeatPump {
               SuppCoilCompNum(0), MaxSuppCoilFluidFlow(0.0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), ActualFanVolFlowRate(0.0),
               HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0), NoHeatCoolSpeedRatio(1.0), AvailStatus(0), HeatCoolMode(0), NumOfSpeedCooling(0),
               NumOfSpeedHeating(0), IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true),
-              HeatVolumeFlowRate(MaxSpedLevels, 0.0), HeatMassFlowRate(MaxSpedLevels, 0.0), CoolVolumeFlowRate(MaxSpedLevels, 0.0),
-              CoolMassFlowRate(MaxSpedLevels, 0.0), MSHeatingSpeedRatio(MaxSpedLevels, 0.0), MSCoolingSpeedRatio(MaxSpedLevels, 0.0), CompSpeedNum(0),
+              HeatVolumeFlowRate(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), HeatMassFlowRate(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), CoolVolumeFlowRate(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0),
+              CoolMassFlowRate(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), MSHeatingSpeedRatio(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), MSCoolingSpeedRatio(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), CompSpeedNum(0),
               CompSpeedRatio(0.0), ErrIndexCyc(0), ErrIndexVar(0), ZonePtr(0), HVACSizingIndex(0), FirstPass(true), HeatCoilWaterFlowRate(0.0),
               ControlZoneMassFlowFrac(1.0),
               // variables used in SZVAV model:
