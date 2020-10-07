@@ -119,6 +119,7 @@
     SHDWHWHCoil1,            !- SHDWH Water Heating Coil Name
 	,						 ! - Enhanced dehumidification coil name
 	,						 ! - Grid Response Cooling coil name
+	,						 ! - Grid Response Heating coil name
     23.0,                    !- Indoor Temperature Limit for SCWH Mode {C}
     28.0,                    !- Ambient Temperature Limit for SCWH Mode {C}
     20.0,                    !- Indoor Temperature above Which WH has Higher Priority {C}

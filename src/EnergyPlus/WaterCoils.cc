@@ -1014,11 +1014,11 @@ namespace WaterCoils {
 
             {
                 auto const SELECT_CASE_var(AlphArray(9));
-                // The default is LiBr = 2.  and LiCl=1
+                // The default is LiBr = 2.  and CaCl2=1
                 if (SELECT_CASE_var == "LICL") {
                     state.dataWaterCoils->WaterCoil(CoilNum).MatlLiqDesiccant = 1;
 
-                } else if (SELECT_CASE_var == "LIBR") {
+                } else if (SELECT_CASE_var == "CACL2") {
                     state.dataWaterCoils->WaterCoil(CoilNum).MatlLiqDesiccant = 2;
 
                 } else {
@@ -5770,10 +5770,10 @@ namespace WaterCoils {
         // outputs
         // w  - kg/kg
 
-        return (WFnTX_LiCl(t, x));
+        return (WFnTX(MatlOfLiqDesiccant,t, x));
     };
 
-    double WFnTX_LiCl(double t, double xi) // wftx9 (double t, double xi)
+    double WFnTX(int MatlOfLiqDesiccant, double t, double xi) // wftx9 (double t, double xi)
     {
         // C*********************************************************************
         // C****** SUBROUTINE CALCULATES HUMIDITY RATIO OF MOIST AIR IN *********
@@ -5806,9 +5806,30 @@ namespace WaterCoils {
         PsatFnT(psat, t);
         tk = t + 273.15; // (t - 32) / 1.8 + 273.15;
         psatKpa = psat; // * 6.895;
-        A = 2 - pow((1 + pow((x / 0.28), 4.3)), 0.6);
-        B = pow(1 + pow((x / 0.21), 5.1), 0.49) - 1;
-        a25 = 1 - pow((1 + pow((x / 0.362), -4.75)), -0.4) - 0.03 * exp(-pow((x - 0.1), 2) / 0.005);
+
+        switch (MatlOfLiqDesiccant) {
+        
+        case 1:
+            A = 2 - pow((1 + pow((x / 0.28), 4.3)), 0.6);
+            B = pow(1 + pow((x / 0.21), 5.1), 0.49) - 1;
+            a25 = 1 - pow((1 + pow((x / 0.362), -4.75)), -0.4) - 0.03 * exp(-pow((x - 0.1), 2) / 0.005);
+            break;
+        case 2:
+            A = 2 - pow((1 + pow((x / 0.31), 3.698)), 0.6);
+            B = pow(1 + pow((x / 0.231), 4.584), 0.49) - 1;
+            a25 = 1 - pow((1 + pow((x / 0.478), -5.2)), -0.4) - 0.018 * exp(-pow((x - 0.1), 2) / 0.005);
+            break;
+        deafult: 
+            A = 2 - pow((1 + pow((x / 0.28), 4.3)), 0.6);
+            B = pow(1 + pow((x / 0.21), 5.1), 0.49) - 1;
+            a25 = 1 - pow((1 + pow((x / 0.362), -4.75)), -0.4) - 0.03 * exp(-pow((x - 0.1), 2) / 0.005);
+            break;
+
+        }
+
+       // A = 2 - pow((1 + pow((x / 0.28), 4.3)), 0.6);
+       // B = pow(1 + pow((x / 0.21), 5.1), 0.49) - 1;
+       // a25 = 1 - pow((1 + pow((x / 0.362), -4.75)), -0.4) - 0.03 * exp(-pow((x - 0.1), 2) / 0.005);
         C = tk / 647.1;
         pv1 = psatKpa * a25 * (A + B * C);
 
@@ -5857,10 +5878,10 @@ namespace WaterCoils {
         // outputs
         // Cp  - kJ/kg-k
 
-        return (CpFnTX_LiCl(tsi, xsi));
+        return (CpFnTX(MatlOfLiqDesiccant,tsi, xsi));
     };
 
-    double CpFnTX_LiCl(double tsi, double xsi) // cpftx9(double tsi, double xsi)
+    double CpFnTX(int MatlOfLiqDesiccant, double tsi, double xsi) // cpftx9(double tsi, double xsi)
     {
         // inputs
         // tsi  - dry bulb temperature, C
@@ -5875,6 +5896,16 @@ namespace WaterCoils {
         double B0 = 1.43980, B1 = -1.24317, B2 = -0.12070, B3 = 0.12825, B4 = 0.62934, B5 = 58.5225, B6 = -105.6343, B7 = 47.7948;
         double theta = T / 228 - 1;
         double A0 = 88.7891, A1 = -120.1959, A2 = -16.9264, A3 = 52.4654, A4 = 0.10826, A5 = 0.46988;
+        switch (MatlOfLiqDesiccant) {
+        case 1:
+            B0 = 1.43980, B1 = -1.24317, B2 = -0.12070, B3 = 0.12825, B4 = 0.62934, B5 = 58.5225, B6 = -105.6343, B7 = 47.7948;
+        case 2:
+            B0 = 1.63799, B1 = -1.69002, B2 = 1.05124, B3 = 0.0, B4 = 0.62934, B5 = 58.5225, B6 = -105.6343, B7 = 47.7948;
+            break;
+        default:
+            break;
+        }
+
         double cp_H2O = A0 + A1 * pow(theta, 0.02) + A2 * pow(theta, 0.04) + A3 * pow(theta, 0.06) + A4 * pow(theta, 1.8) + A5 * pow(theta, 8);
         double f1;
         if (xi < 0.31)
@@ -5897,9 +5928,9 @@ namespace WaterCoils {
 
         // outputs
         // h  - J/kg
-        return (HFnTX_LiCl(tsi, xsi));
+        return (HFnTX(MatlOfLiqDesiccant, tsi, xsi));
     };
-    Real64 HFnTX_LiCl(Real64 t, Real64 x) // hftx9(Real64 t, Real64 x)
+    Real64 HFnTX(int MatlOfLiqDesiccant, Real64 t, Real64 x) // hftx9(Real64 t, Real64 x)
     {
         // C*********************************************************************
         // C******  SUBROUTINE  CALCULATES  ENTHALPY  IN  BTU/LB  OF   **********
@@ -5933,7 +5964,30 @@ namespace WaterCoils {
         double B = 4.5751 - 0.146924 * xs + (6.307226E-03) * pow(xs, 2) - (1.38054E-04) * pow(xs, 3) + (1.06690E-06) * pow(xs, 4);
         double C = (-8.09689E-04) + (2.18145E-04) * xs - (1.36194E-05) * pow(xs, 2) + (3.20998E-07) * pow(xs, 3) - (2.64266E-09) * pow(xs, 4);
         double h = A + B * ts + C * pow(ts, 2);
-        double hs = 1000 * h; // / 2.326;
+        double hs; // / 2.326;
+        double a0 = 214.301719, b0 = 4.264902584, c0 = -0.000843215;
+        double a1 = -0.042846967, a2 = 0.001455972, a3 = -2.04778E-05, a4 = 9.7043E-08;
+        double b1 = -0.076268866, b2 = 0.000738026, b3 = 3.32436E-06, b4 = -7.25474E-10;
+        double c1 = 0.000192645, c2 = -4.68708E-06, c3 = 5.81802E-09, c4 = -2.88E-11;
+
+        double Term1 = a1 * xs + a2 * pow(xs, 2) + a3 * pow(xs, 3) + a4 * pow(xs,4); 
+        double Term2 = b1 * xs * ts + b2 * pow(xs, 2) * ts + b3 * pow(xs, 3) * ts + b4 * pow(xs, 4) * ts; 
+        double Term3 = c1 * xs * pow(ts, 2) + c2 * pow(xs, 2) * pow(ts, 2) + c3 * pow(xs, 3) * pow(ts, 2) + c4 * pow(xs, 4) * pow(ts, 2); 
+        double Term0 = a0 + b0 * ts + c0 * pow(ts, 2);
+        double htemp = Term0 + Term1 + Term2 + Term3;
+
+        switch (MatlOfLiqDesiccant) {
+        case 1:
+            h = A + B * ts + C * pow(ts, 2);
+            break;
+        case 2:
+            h = Term0 + Term1 + Term2 + Term3;
+            break;
+        default:
+            break;
+        }
+        
+        hs = 1000 * h;
 
         return (hs);
     };

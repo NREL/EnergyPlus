@@ -434,15 +434,15 @@ namespace WaterCoils {
     double WSSE(int MatlOfLiqDesiccant, double h, double x, double p);
 
     double SolnWFnTX(int MatlOfLiqDesiccant, double t, double x);
-    double WFnTX_LiCl(double t, double xi);
+    double WFnTX(int MatlOfLiqDesiccant, double t, double xi);
 
     void PsatFnT(double &p, double const &t);
 
     double SolnCpFnTX(int MatlOfLiqDesiccant, double tsi, double xsi);
-    double CpFnTX_LiCl(double tsi, double xsi);
+    double CpFnTX(int MatlOfLiqDesiccant, double tsi, double xsi);
 
     Real64 SolnHFnTX(int MatlOfLiqDesiccant, double tsi, double xsi);
-    Real64 HFnTX_LiCl(Real64 t, Real64 x);
+    Real64 HFnTX(int MatlOfLiqDesiccant, Real64 t, Real64 x);
 
     double LDSatEnthalpy(int MatlOfLiqDesiccant, double t, double x, double dPatm);
 
