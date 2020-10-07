@@ -52,7 +52,6 @@
 #include <ObjexxFCL/numeric.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/IOFiles.hh>
 
@@ -73,40 +72,6 @@ namespace DataGlobals {
     // This data-only module is a repository for all variables which are considered
     // to be "global" in nature in EnergyPlus.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-//    bool runReadVars(false);
-//    bool DDOnlySimulation(false);
-//    bool outputEpJSONConversion(false);
-//    bool outputEpJSONConversionOnly(false);
-//    bool isEpJSON(false);
-//    bool isCBOR(false);
-//    bool isMsgPack(false);
-//    bool isUBJSON(false);
-//    bool isBSON(false);
-//    bool preserveIDFOrder(true);
-//    bool stopSimulation(false);
-    std::function<void (void *)> externalHVACManager;
-    bool externalHVACManagerInitialized(false);
-
-    // MODULE PARAMETER DEFINITIONS:
-    int const BeginDay(1);
-    int const DuringDay(2);
-    int const EndDay(3);
-    int const EndSysSizingCalc(5);
-
     // Parameters for KindOfSim
     int const ksDesignDay(1);
     int const ksRunPeriodDesign(2);
@@ -115,7 +80,6 @@ namespace DataGlobals {
     int const ksHVACSizeRunPeriodDesign(5); // a weather period design day run during HVAC Sizing Simulation
     int const ksReadAllWeatherData(6);      // a weather period for reading all weather data prior to the simulation
 
-    Real64 const MaxEXPArg(709.78);       // maximum exponent in EXP() function
     Real64 const Pi(3.14159265358979324); // Pi 3.1415926535897932384626435
     Real64 const PiOvr2(Pi / 2.0);        // Pi/2
     Real64 const TwoPi(2.0 * Pi);         // 2*Pi 6.2831853071795864769252868
@@ -262,8 +226,6 @@ namespace DataGlobals {
     // Needed for unit tests, should not be normally called.
     void clear_state(IOFiles &ioFiles)
     {
-        externalHVACManager = nullptr;
-        externalHVACManagerInitialized = false;
         BeginDayFlag = false;
         BeginEnvrnFlag = false;
         BeginHourFlag = false;

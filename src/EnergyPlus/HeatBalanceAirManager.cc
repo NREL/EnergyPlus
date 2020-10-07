@@ -4226,11 +4226,11 @@ namespace HeatBalanceAirManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        if(DataGlobals::externalHVACManager) {
-          if (!DataGlobals::externalHVACManagerInitialized) {
+        if(state.dataGlobal->externalHVACManager) {
+          if (!state.dataGlobal->externalHVACManagerInitialized) {
               initializeForExternalHVACManager(state);
           }
-          DataGlobals::externalHVACManager(&state);
+          state.dataGlobal->externalHVACManager(&state);
         } else {
           ManageHVAC(state);
         }

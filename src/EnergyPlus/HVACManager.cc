@@ -135,7 +135,6 @@ namespace HVACManager {
     using DataGlobals::DayOfSim;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::DoOutputReporting;
-    using DataGlobals::DuringDay;
     using DataGlobals::emsCallFromAfterHVACManagers;
     using DataGlobals::emsCallFromBeforeHVACManagers;
     using DataGlobals::emsCallFromBeginTimestepBeforePredictor;
@@ -542,8 +541,8 @@ namespace HVACManager {
                     UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 }
                 if (ZoneSizingCalc) {
-                    UpdateZoneSizing(state, DuringDay);
-                    UpdateFacilitySizing(state, DuringDay);
+                    UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::DuringDay);
+                    UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::DuringDay);
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation();
             } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {

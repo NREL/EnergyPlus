@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -1402,7 +1403,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void UpdateZoneSizing(EnergyPlusData &state, int const CallIndicator)
+    void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1424,10 +1425,7 @@ namespace ZoneEquipmentManager {
         using DataEnvironment::StdBaroPress;
         using DataEnvironment::StdRhoAir;
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::BeginDay;
-        using DataGlobals::DuringDay;
         using DataGlobals::emsCallFromZoneSizing;
-        using DataGlobals::EndDay;
         using DataGlobals::HourOfDay;
         using DataGlobals::isPulseZoneSizing;
         using DataGlobals::MinutesPerTimeStep;
@@ -1473,7 +1471,7 @@ namespace ZoneEquipmentManager {
         {
             auto const SELECT_CASE_var(CallIndicator);
 
-            if (SELECT_CASE_var == BeginDay) {
+            if (SELECT_CASE_var == DataGlobalConstants::CallIndicator::BeginDay) {
 
                 for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
 
@@ -1487,7 +1485,7 @@ namespace ZoneEquipmentManager {
                     CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolDDNum = CurOverallSimDay;
                 }
 
-            } else if (SELECT_CASE_var == DuringDay) {
+            } else if (SELECT_CASE_var == DataGlobalConstants::CallIndicator::DuringDay) {
 
                 TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
 
@@ -1552,7 +1550,7 @@ namespace ZoneEquipmentManager {
                         CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DOASTotCoolLoad * FracTimeStepZone;
                 }
 
-            } else if (SELECT_CASE_var == EndDay) {
+            } else if (SELECT_CASE_var == DataGlobalConstants::CallIndicator::EndDay) {
                 // average some of the zone sequences to reduce peakiness
                 for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
                     if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
@@ -1784,7 +1782,7 @@ namespace ZoneEquipmentManager {
                     }
                 }
 
-            } else if (SELECT_CASE_var == state.dataGlobal->EndZoneSizingCalc) {
+            } else if (SELECT_CASE_var == DataGlobalConstants::CallIndicator::EndZoneSizingCalc) {
 
                 // candidate EMS calling point to customize CalcFinalZoneSizing
                 bool anyEMSRan;

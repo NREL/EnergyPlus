@@ -3157,7 +3157,7 @@ namespace SystemAvailabilityManager {
                         if (WarmupFlag) {
                             AdaTempGradHeat = OptStartMgr.InitTGradHeat;
                             AdaTempGradCool = OptStartMgr.InitTGradCool;
-                        } else if (DayOfSim == BeginDay && BeginDayFlag) {
+                        } else if (DayOfSim == DataGlobalConstants::CallIndicator::BeginDay && BeginDayFlag) {
                             OptStart_AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
                             AdaTempGradHeat = OptStartMgr.InitTGradHeat;
                             OptStart_AdaTempGradTrdCool = OptStartMgr.InitTGradCool;
@@ -3429,7 +3429,7 @@ namespace SystemAvailabilityManager {
                         if (WarmupFlag) {
                             AdaTempGradHeat = OptStartMgr.InitTGradHeat;
                             AdaTempGradCool = OptStartMgr.InitTGradCool;
-                        } else if (DayOfSim == BeginDay && BeginDayFlag) {
+                        } else if (DayOfSim == DataGlobalConstants::CallIndicator::BeginDay && BeginDayFlag) {
                             OptStart_AdaTempGradTrdHeat = OptStartMgr.InitTGradHeat;
                             AdaTempGradHeat = OptStartMgr.InitTGradHeat;
                             OptStart_AdaTempGradTrdCool = OptStartMgr.InitTGradCool;

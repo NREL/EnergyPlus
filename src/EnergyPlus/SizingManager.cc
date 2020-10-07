@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -359,8 +360,8 @@ namespace SizingManager {
                                     DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                                 }
                             }
-                            UpdateZoneSizing(state, BeginDay);
-                            UpdateFacilitySizing(state, BeginDay);
+                            UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::BeginDay);
+                            UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::BeginDay);
                         }
 
                         for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -419,8 +420,8 @@ namespace SizingManager {
                         } // ... End hour loop.
 
                         if (EndDayFlag) {
-                            UpdateZoneSizing(state, EndDay);
-                            UpdateFacilitySizing(state, EndDay);
+                            UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndDay);
+                            UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndDay);
                         }
 
                         if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
@@ -435,8 +436,8 @@ namespace SizingManager {
                 } // ... End environment loop
 
                 if (NumSizingPeriodsPerformed > 0) {
-                    UpdateZoneSizing(state, state.dataGlobal->EndZoneSizingCalc);
-                    UpdateFacilitySizing(state, state.dataGlobal->EndZoneSizingCalc);
+                    UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
+                    UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
                     ShowSevereError(RoutineName + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
@@ -542,7 +543,7 @@ namespace SizingManager {
                             DisplayString("Calculating System sizing");
                             DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                         }
-                        UpdateSysSizing(state, BeginDay);
+                        UpdateSysSizing(state, DataGlobalConstants::CallIndicator::BeginDay);
                     }
 
                     for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -571,7 +572,7 @@ namespace SizingManager {
 
                             ManageWeather(state);
 
-                            UpdateSysSizing(state, DuringDay);
+                            UpdateSysSizing(state, DataGlobalConstants::CallIndicator::DuringDay);
 
                             BeginHourFlag = false;
                             BeginDayFlag = false;
@@ -583,7 +584,7 @@ namespace SizingManager {
 
                     } // ... End hour loop.
 
-                    if (EndDayFlag) UpdateSysSizing(state, EndDay);
+                    if (EndDayFlag) UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndDay);
 
                     if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
                         ++CurOverallSimDay;
@@ -594,7 +595,7 @@ namespace SizingManager {
             } // ... End environment loop
 
             if (NumSizingPeriodsPerformed > 0) {
-                UpdateSysSizing(state, EndSysSizingCalc);
+                UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndSysSizingCalc);
                 SysSizingRunDone = true;
             } else {
                 ShowSevereError(RoutineName + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
@@ -4799,7 +4800,7 @@ namespace SizingManager {
     }
 
     // Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
-    void UpdateFacilitySizing(EnergyPlusData &state, int const CallIndicator)
+    void UpdateFacilitySizing(EnergyPlusData &EP_UNUSED(state), DataGlobalConstants::CallIndicator const CallIndicator)
     {
         int NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 
@@ -4853,10 +4854,10 @@ namespace SizingManager {
             CalcFinalFacilitySizing.HeatZoneTempSeq = 0.;
             CalcFinalFacilitySizing.HeatLoadSeq = 0.;
         }
-        if (CallIndicator == BeginDay) {
+        if (CallIndicator == DataGlobalConstants::CallIndicator::BeginDay) {
             CalcFacilitySizing(CurOverallSimDay).HeatDDNum = CurOverallSimDay;
             CalcFacilitySizing(CurOverallSimDay).CoolDDNum = CurOverallSimDay;
-        } else if (CallIndicator == DuringDay) {
+        } else if (CallIndicator == DataGlobalConstants::CallIndicator::DuringDay) {
             int TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
             // save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
             Real64 sumCoolLoad = 0.;
@@ -4899,7 +4900,7 @@ namespace SizingManager {
                 CalcFacilitySizing(CurOverallSimDay).HeatOutHumRatSeq(TimeStepInDay) = wghtdHeatHumRat / sumHeatLoad;
             }
 
-        } else if (CallIndicator == EndDay) {
+        } else if (CallIndicator == DataGlobalConstants::CallIndicator::EndDay) {
             for (int TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex) {
                 if (CalcFacilitySizing(CurOverallSimDay).CoolLoadSeq(TimeStepIndex) > CalcFacilitySizing(CurOverallSimDay).DesCoolLoad) {
                     CalcFacilitySizing(CurOverallSimDay).DesCoolLoad = CalcFacilitySizing(CurOverallSimDay).CoolLoadSeq(TimeStepIndex);
@@ -4911,7 +4912,7 @@ namespace SizingManager {
                 }
             }
 
-        } else if (CallIndicator == state.dataGlobal->EndZoneSizingCalc) {
+        } else if (CallIndicator == DataGlobalConstants::CallIndicator::EndZoneSizingCalc) {
             for (int DDNum = 1; DDNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DDNum) {
                 if (CalcFacilitySizing(DDNum).DesCoolLoad > CalcFinalFacilitySizing.DesCoolLoad) {
                     CalcFinalFacilitySizing.DesCoolLoad = CalcFacilitySizing(DDNum).DesCoolLoad;

@@ -1198,7 +1198,7 @@ namespace MicroCHPElectricGenerator {
         Real64 a = (MdotCpcw * TcwIn / MCcw) + (UAHX * Teng / MCcw);
         Real64 b = ((-1.0 * MdotCpcw / MCcw) + (-1.0 * UAHX / MCcw));
 
-        if (b * time < (-1.0 * DataGlobals::MaxEXPArg)) {
+        if (b * time < (-1.0 * DataGlobalConstants::MaxEXPArg())) {
             return -a / b;
         } else {
             return (TcwoutLast + a / b) * std::exp(b * time) - a / b;

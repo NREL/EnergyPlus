@@ -239,19 +239,18 @@ namespace DataGlobalConstants {
     extern int const iEvapCoolerInDirectRDDSpecial;
     extern int const iEvapCoolerDirectResearchSpecial;
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
+    enum class CallIndicator {
+        BeginDay = 1,
+        DuringDay = 2,
+        EndDay = 3,
+        EndZoneSizingCalc = 4,
+        EndSysSizingCalc = 5
+    };
 
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataGlobalConstants
-
-    // Functions
+    Real64 constexpr MaxEXPArg () { return 709.78; }                        // maximum exponent in EXP() function
 
     int AssignResourceTypeNum(std::string const &ResourceTypeChar);
-
-    std::string GetResourceTypeChar(int const ResourceTypeNum);
+    std::string GetResourceTypeChar(int ResourceTypeNum);
 
 } // namespace DataGlobalConstants
 

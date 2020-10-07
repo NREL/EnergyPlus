@@ -177,7 +177,7 @@ namespace SizingManager {
 
     std::string TimeIndexToHrMinString(int timeIndex);
 
-    void UpdateFacilitySizing(EnergyPlusData &state, int const CallIndicator);
+    void UpdateFacilitySizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator);
 
     void UpdateTermUnitFinalZoneSizing();
 

@@ -69,26 +69,6 @@ namespace DataGlobals {
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
-//    extern bool runReadVars;
-//    extern bool DDOnlySimulation;
-//    extern bool outputEpJSONConversion;
-//    extern bool outputEpJSONConversionOnly;
-//    extern bool isEpJSON;
-//    extern bool isCBOR;
-//    extern bool isMsgPack;
-//    extern bool isUBJSON;
-//    extern bool isBSON;
-//    extern bool preserveIDFOrder;
-//    extern bool stopSimulation;
-    extern std::function<void (void *)> externalHVACManager;
-    extern bool externalHVACManagerInitialized;
-
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const BeginDay;
-    extern int const DuringDay;
-    extern int const EndDay;
-    extern int const EndSysSizingCalc;
-
     // Parameters for KindOfSim
     extern int const ksDesignDay;
     extern int const ksRunPeriodDesign;
@@ -97,7 +77,6 @@ namespace DataGlobals {
     extern int const ksHVACSizeRunPeriodDesign; // a weather period design day run during HVAC Sizing Simulation
     extern int const ksReadAllWeatherData;      // a weather period for reading all weather data prior to the simulation
 
-    extern Real64 const MaxEXPArg; // maximum exponent in EXP() function
     extern Real64 const Pi;        // Pi 3.1415926535897932384626435
     extern Real64 const PiOvr2;    // Pi/2
     extern Real64 const TwoPi;     // 2*Pi 6.2831853071795864769252868
@@ -148,15 +127,6 @@ namespace DataGlobals {
     extern int const emsCallFromBeginZoneTimestepBeforeSetCurrentWeather; // Identity where EMS called from
 
     extern int const ScheduleAlwaysOn; // Value when passed to schedule routines gives back 1.0 (on)
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // see DataOmterfaces fpr global interface statements
-
-    // MODULE VARIABLE DECLARATIONS:
-
 
     extern bool BeginDayFlag;           // True at the start of each day, False after first time step in day
     extern bool BeginEnvrnFlag;         // True at the start of each environment, False after first time step in environ
@@ -263,7 +233,8 @@ namespace DataGlobals {
         bool preserveIDFOrder = true;
         bool stopSimulation= false;
 
-        static constexpr int EndZoneSizingCalc = 4;
+        std::function<void (void *)> externalHVACManager;
+        bool externalHVACManagerInitialized = false;
 
         void clear_state() override {
             this->AnnualSimulation = false;
@@ -279,6 +250,8 @@ namespace DataGlobals {
             this->isBSON = false;
             this->preserveIDFOrder = true;
             this->stopSimulation= false;
+            this->externalHVACManager = nullptr;
+            this->externalHVACManagerInitialized = false;
         }
     };
 
