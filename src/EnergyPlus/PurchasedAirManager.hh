@@ -272,8 +272,8 @@ namespace PurchasedAirManager {
               SenHeatRate(0.0), LatHeatRate(0.0), TotHeatRate(0.0), SenCoolRate(0.0), LatCoolRate(0.0), TotCoolRate(0.0), ZoneSenHeatRate(0.0),
               ZoneLatHeatRate(0.0), ZoneTotHeatRate(0.0), ZoneSenCoolRate(0.0), ZoneLatCoolRate(0.0), ZoneTotCoolRate(0.0), OASenHeatRate(0.0),
               OALatHeatRate(0.0), OATotHeatRate(0.0), OASenCoolRate(0.0), OALatCoolRate(0.0), OATotCoolRate(0.0), HtRecSenHeatRate(0.0),
-              HtRecLatHeatRate(0.0), HtRecTotHeatRate(0.0), HtRecSenCoolRate(0.0), HtRecLatCoolRate(0.0), HtRecTotCoolRate(0.0), TimeEconoActive(0.0),
-              TimeHtRecActive(0.0), SupplyTemp(0.0), SupplyHumRat(0.0), MixedAirTemp(0.0), MixedAirHumRat(0.0), ZonePtr(0), HVACSizingIndex(0)
+              HtRecLatHeatRate(0.0), HtRecTotHeatRate(0.0), HtRecSenCoolRate(0.0), HtRecLatCoolRate(0.0), HtRecTotCoolRate(0.0), TimeEconoActive(0.0), 
+              TimeHtRecActive(0.0), ZonePtr(0), HVACSizingIndex(0), SupplyTemp(0.0), SupplyHumRat(0.0), MixedAirTemp(0.0), MixedAirHumRat(0.0)
         {
         }
     };
