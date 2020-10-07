@@ -41,11 +41,11 @@ The optional name of the return plenum outlet node (or induced air outlet node) 
 
 \paragraph{Field: Maximum Heating Supply Air Temperature}\label{field-maximum-heating-supply-air-temperature-000}
 
-The maximum air temperature (degrees\si{\degreeCelsius}) of the air used for heating the zone. The default is 50\si{\degreeCelsius} (122F).
+The maximum air temperature (\si{\degreeCelsius}) of the air used for heating the zone. The default is 50\si{\degreeCelsius} (122F).
 
 \paragraph{Field: Minimum Cooling Supply Air Temperature}\label{field-minimum-cooling-supply-air-temperature-000}
 
-The minimum air temperature (degrees\si{\degreeCelsius}) of the air used for cooling the zone. The default is 13\si{\degreeCelsius} (55.4F).
+The minimum air temperature (\si{\degreeCelsius}) of the air used for cooling the zone. The default is 13\si{\degreeCelsius} (55.4F).
 
 \paragraph{Field: Maximum Heating Supply Air Humidity Ratio}\label{field-maximum-heating-supply-air-humidity-ratio-000}
 
@@ -2634,7 +2634,7 @@ This numeric field defines the maximum supply air temperature in degrees Celsius
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-supplemental-heater-operation-000}
 
-This numeric field defines the maximum outdoor dry-bulb temperature in degrees Celsius for PTHP supplemental heater operation. The supplemental heater will not operate when the outdoor dry-bulb temperature is above this value. The maximum value must be less than or equal to 21°\si{\degreeCelsius}. If this field is left blank, the default value is 21°\si{\degreeCelsius}.
+This numeric field defines the maximum outdoor dry-bulb temperature in degrees Celsius for PTHP supplemental heater operation. The supplemental heater will not operate when the outdoor dry-bulb temperature is above this value. The maximum value must be less than or equal to 21\si{\degreeCelsius}. If this field is left blank, the default value is 21\si{\degreeCelsius}.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-4-000}
 
@@ -3119,7 +3119,7 @@ This numeric field defines the maximum allowed supply air temperature exiting th
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-supplemental-heater-operation-1-000}
 
-This numeric field defines the outdoor air dry-bulb temperature in degrees Celsius above which the heat pump supplemental heating coil is disabled. The temperature for this input field must be less than or equal to 21°\si{\degreeCelsius}. If this input field is left blank, the default value is 21°\si{\degreeCelsius}.
+This numeric field defines the outdoor air dry-bulb temperature in degrees Celsius above which the heat pump supplemental heating coil is disabled. The temperature for this input field must be less than or equal to 21\si{\degreeCelsius}. If this input field is left blank, the default value is 21\si{\degreeCelsius}.
 
 \paragraph{Field: Outdoor Dry-Bulb Temperature Sensor Node Name}\label{field-outdoor-dry-bulb-temperature-sensor-node-name-000}
 
@@ -3402,7 +3402,7 @@ This object can be used for modeling conventional mechanical dehumidifiers. Thes
 \caption{Schematic of a mechanical dehumidifier \protect \label{fig:schematic-of-a-mechanical-dehumidifier}}
 \end{figure}
 
-The model has inputs for water removal, energy factor and air flow rate at rated conditions (26.7°\si{\degreeCelsius}, 60\% RH). Curve objects must be specified to describe performance at off-rated conditions. A part-load cycling curve input must also be specified to account for inefficiencies due to cycling. Other inputs including minimum and maximum operating temperatures for dehumidifier operation, off-cycle parasitic load, and an input to direct the removed water to a storage tank.
+The model has inputs for water removal, energy factor and air flow rate at rated conditions (26.7\si{\degreeCelsius}, 60\% RH). Curve objects must be specified to describe performance at off-rated conditions. A part-load cycling curve input must also be specified to account for inefficiencies due to cycling. Other inputs including minimum and maximum operating temperatures for dehumidifier operation, off-cycle parasitic load, and an input to direct the removed water to a storage tank.
 
 The model assumes that this equipment dehumidifies and heats the air. If used in tandem with another system that cools and dehumidifies the zone air, then the zone dehumidifier should be specified as the lowest cooling priority in the \hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList} object for best control of zone temperature and humidity levels (e.g., if there are 3 pieces of equipment in \hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList}, then the zone dehumidifier should have Cooling Priority = 3). With this zone equipment prioritization, the other cooling and dehumidification system would operate first to meet the temperature setpoint (and possibly meet the high humidity setpoint as well). If additional dehumidification is needed, then the zone dehumidifier would operate. The sensible heat generated by the dehumidifier is carried over to the zone air heat balance for the next HVAC time step.
 
@@ -3426,23 +3426,23 @@ This alpha field defines the name of the HVAC system node to which the dehumidif
 
 \paragraph{Field: Rated Water Removal}\label{field-rated-water-removal}
 
-This numeric input is the full load water removal rate, in liters per day, at rated conditions (air entering the dehumidifier at 26.7°\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' below). This is a required input field and the entered value must be greater than zero.
+This numeric input is the full load water removal rate, in liters per day, at rated conditions (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' below). This is a required input field and the entered value must be greater than zero.
 
 \paragraph{Field: Rated Energy Factor}\label{field-rated-energy-factor}
 
-This numeric input is the energy factor (liters of water removed per kWh of electricity consumed) at rated conditions (air entering the dehumidifier at 26.7°\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' below). This is a required input field and the entered value must be greater than zero.
+This numeric input is the energy factor (liters of water removed per kWh of electricity consumed) at rated conditions (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' below). This is a required input field and the entered value must be greater than zero.
 
 \paragraph{Field: Rated Air Flow Rate}\label{field-rated-air-flow-rate-001}
 
-This numeric input is the volumetric air flow rate through the dehumidifier, in m\(^{3}\) per second, at rated conditions (air entering the dehumidifier at 26.7°\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity). This is a required input field and the entered value must be greater than zero.
+This numeric input is the volumetric air flow rate through the dehumidifier, in m\(^{3}\) per second, at rated conditions (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity). This is a required input field and the entered value must be greater than zero.
 
 \paragraph{Field: Water Removal Curve Name}\label{field-water-removal-curve-name}
 
-This alpha field defines the name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of water removal as a function of the dry-bulb temperature (°\si{\degreeCelsius}) and relative humidity (\%) of the air entering the dehumidifier. The output of this curve is multiplied by the Rated Water Removal to give the water removal of the dehumidifier at specific operating conditions (i.e., at temperatures and relative humidity levels different from the rating point conditions). The curve should be normalized to have the value of 1.0 at the rating point (air entering the dehumidifier at 26.7°C {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' above).
+This alpha field defines the name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of water removal as a function of the dry-bulb temperature (\si{\degreeCelsius}) and relative humidity (\%) of the air entering the dehumidifier. The output of this curve is multiplied by the Rated Water Removal to give the water removal of the dehumidifier at specific operating conditions (i.e., at temperatures and relative humidity levels different from the rating point conditions). The curve should be normalized to have the value of 1.0 at the rating point (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' above).
 
 \paragraph{Field: Energy Factor Curve Name}\label{field-energy-factor-curve-name}
 
-This alpha field defines the name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy factor as a function of the dry-bulb temperature (°\si{\degreeCelsius}) and relative humidity (\%) of the air entering the dehumidifier. The output of this curve is multiplied by the Rated Energy Factor to give the energy factor of the dehumidifier at specific operating conditions (i.e., at temperatures and relative humidity levels different from the rating point conditions). The curve should be normalized to have the value of 1.0 at the rating point (air entering the dehumidifier at 26.7°\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' above).
+This alpha field defines the name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy factor as a function of the dry-bulb temperature (\si{\degreeCelsius}) and relative humidity (\%) of the air entering the dehumidifier. The output of this curve is multiplied by the Rated Energy Factor to give the energy factor of the dehumidifier at specific operating conditions (i.e., at temperatures and relative humidity levels different from the rating point conditions). The curve should be normalized to have the value of 1.0 at the rating point (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' above).
 
 \paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-000}
 
@@ -3464,11 +3464,11 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
 
 \paragraph{Field: Minimum Dry-Bulb Temperature for Dehumidifier Operation}\label{field-minimum-dry-bulb-temperature-for-dehumidifier-operation}
 
-This numeric field defines the minimum inlet air dry-bulb temperature for dehumidifier operation. The dehumidifier will not operate if the inlet air temperature is below this value. This input value must be less than the Maximum Dry-Bulb Temperature for Dehumidifier Operation, and the default value is 10°\si{\degreeCelsius}.
+This numeric field defines the minimum inlet air dry-bulb temperature for dehumidifier operation. The dehumidifier will not operate if the inlet air temperature is below this value. This input value must be less than the Maximum Dry-Bulb Temperature for Dehumidifier Operation, and the default value is 10\si{\degreeCelsius}.
 
 \paragraph{Field: Maximum Dry-Bulb Temperature for Dehumidifier Operation}\label{field-maximum-dry-bulb-temperature-for-dehumidifier-operation}
 
-This numeric field defines the maximum inlet air dry-bulb temperature for dehumidifier operation. The dehumidifier will not operate if the inlet air temperature is above this value. This input value must be greater than the Minimum Dry-Bulb Temperature for Dehumidifier Operation, and the default value is 35°\si{\degreeCelsius}.
+This numeric field defines the maximum inlet air dry-bulb temperature for dehumidifier operation. The dehumidifier will not operate if the inlet air temperature is above this value. This input value must be greater than the Minimum Dry-Bulb Temperature for Dehumidifier Operation, and the default value is 35\si{\degreeCelsius}.
 
 \paragraph{Field: Off-Cycle Parasitic Electric Load}\label{field-off-cycle-parasitic-electric-load-001}
 
@@ -4058,7 +4058,7 @@ This numeric field defines the maximum supply air temperature in degrees Celsius
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-supplemental-heater-operation-2-000}
 
-This numeric field defines the maximum outdoor dry-bulb temperature in degrees Celsius for this VRF terminal unit supplemental heating coil operation. The supplemental heater will not operate when the outdoor dry-bulb temperature is above this value. The maximum value must be less than or equal to 21°\si{\degreeCelsius}. If this field is left blank, the default value of 21°\si{\degreeCelsius} will be used.
+This numeric field defines the maximum outdoor dry-bulb temperature in degrees Celsius for this VRF terminal unit supplemental heating coil operation. The supplemental heater will not operate when the outdoor dry-bulb temperature is above this value. The maximum value must be less than or equal to 21\si{\degreeCelsius}. If this field is left blank, the default value of 21\si{\degreeCelsius} will be used.
 
 \paragraph{Field: Controlling Zone or Thermostat Location}\label{controlling-zone-or-thermostat-location-2-110}
 
@@ -4585,7 +4585,7 @@ This output reports the predicted latent heat transfer rate required to meet the
 This output reports the predicted moisture transfer rate required to meet the current zone humidistat setpoint. A positive value indicates a humidification load, a negative value indicates a dehumidification load. For a dual setpoint humidistat, the value is zero when the controlled zone’s relative humidity is between the defined humidifying and dehumidifying setpoints. See \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} for further information. This value is used as a soft inequality constraint in the constrained optimization problem that determines system settings in each time step. The output is the average over the reporting period.
 
 \paragraph{Zone Hybrid Unitary HVAC Supply Air Temperature [\si{\degreeCelsius}]}
-This output reports the supply air temperature. For each timestep the value is calculated as a supply air mass weighted average of the supply air temperature for each of the settings selected for the time step. For example, if the system operates for half of the timestep with supply air mass flow rate of 1 kg/s and supply air temperature of 16 °\si{\degreeCelsius}, and for half of the timestep at 2 kg/s and 10 °\si{\degreeCelsius}, the supply air temperature calculated for the time step would be 12 °\si{\degreeCelsius}. The output is the average over the reporting period.
+This output reports the supply air temperature. For each timestep the value is calculated as a supply air mass weighted average of the supply air temperature for each of the settings selected for the time step. For example, if the system operates for half of the timestep with supply air mass flow rate of 1 kg/s and supply air temperature of 16\si{\degreeCelsius}, and for half of the timestep at 2 kg/s and 10\si{\degreeCelsius}, the supply air temperature calculated for the time step would be 12 \si{\degreeCelsius}. The output is the average over the reporting period.
 
 \paragraph{Zone Hybrid Unitary HVAC Return Air Temperature [\si{\degreeCelsius}]}
 This output reports the return air temperature. The return air temperature is inherited from the associated zone outlet node in each timestep. The output is the average over the reporting period.
@@ -4594,7 +4594,7 @@ This output reports the return air temperature. The return air temperature is in
 This output reports the outdoor air temperature.  The outdoor air temperature is inherited from the associated outdoor air node in each timestep.  The output is the average over the reporting period.
 
 \paragraph{Zone Hybrid Unitary HVAC Supply Air Humidity Ratio [kgWater/kgDryAir]}
-This output reports the supply air humidity ratio. For each timestep the value is calculated as a supply air mass weighted average of the supply air humidity ratio for each of the settings selected for the time step. For example, if the system operates for half of the timestep with supply air mass flow rate of 1 kg/s and supply air humidity ratio of 0.016 kg/kg, and for half of the timestep at 2 kg/s and 0.010 kg/kg, the supply air humidity ratio calculated for the time step would be 0.012 °\si{\degreeCelsius}. The output is the average over the reporting period.
+This output reports the supply air humidity ratio. For each timestep the value is calculated as a supply air mass weighted average of the supply air humidity ratio for each of the settings selected for the time step. For example, if the system operates for half of the timestep with supply air mass flow rate of 1 kg/s and supply air humidity ratio of 0.016 kg/kg, and for half of the timestep at 2 kg/s and 0.010 kg/kg, the supply air humidity ratio calculated for the time step would be 0.012 \si{\degreeCelsius}. The output is the average over the reporting period.
 
 \paragraph{Zone Hybrid Unitary HVAC Return Air Humidity Ratio [kgWater/kgDryAir]}
 This output reports the return air humidity ratio. The return air humidity ratio is inherited from the associated zone outlet node in each timestep.  The output is the average over the reporting period.
