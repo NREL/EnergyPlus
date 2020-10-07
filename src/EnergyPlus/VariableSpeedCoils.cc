@@ -110,10 +110,9 @@ namespace VariableSpeedCoils {
     using General::RoundSigDigits;
 
     static std::string const BlankString;
-    
-    // Default Constructor
-    VariableSpeedCoilData::VariableSpeedCoilData(EnergyPlusData &state)
-        : NumOfSpeeds(2), NormSpedLevel(state.dataVariableSpeedCoils->MaxSpedLevels), RatedWaterVolFlowRate(DataSizing::AutoSize), RatedWaterMassFlowRate(DataSizing::AutoSize),
+
+    VariableSpeedCoilData::VariableSpeedCoilData()
+        : NumOfSpeeds(2), NormSpedLevel(MaxSpedLevels), RatedWaterVolFlowRate(DataSizing::AutoSize), RatedWaterMassFlowRate(DataSizing::AutoSize),
         RatedAirVolFlowRate(DataSizing::AutoSize), RatedCapHeat(DataSizing::AutoSize), RatedCapCoolTotal(DataSizing::AutoSize), MaxONOFFCyclesperHour(0.0), Twet_Rated(0.0),
         Gamma_Rated(0.0), HOTGASREHEATFLG(0), HPTimeConstant(0.0), PLFFPLR(0), VSCoilTypeOfNum(0), SimFlag(false), DesignWaterMassFlowRate(0.0),
         DesignWaterVolFlowRate(0.0), DesignAirMassFlowRate(0.0), DesignAirVolFlowRate(0.0), AirVolFlowRate(0.0), AirMassFlowRate(0.0),
@@ -125,22 +124,22 @@ namespace VariableSpeedCoils {
         AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0),
         FindCompanionUpStreamCoil(true), IsDXCoilInZone(false), CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), FanDelayTime(0.0),
         // This one calls into a std::vector, so it's 0-indexed, so we initialize it to -1
-        MSHPDesignSpecIndex(-1), MSErrIndex(state.dataVariableSpeedCoils->MaxSpedLevels, 0), MSRatedPercentTotCap(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), MSRatedTotCap(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0),
-        MSRatedSHR(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), MSRatedCOP(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), MSRatedAirVolFlowPerRatedTotCap(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0),
-        MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), MSRatedAirMassFlowRate(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0),
-        MSRatedWaterVolFlowPerRatedTotCap(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), MSRatedWaterVolFlowRate(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0),
-        MSRatedWaterMassFlowRate(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), MSRatedCBF(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), MSEffectiveAo(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0),
-        MSCCapFTemp(state.dataVariableSpeedCoils->MaxSpedLevels, 0), MSCCapAirFFlow(state.dataVariableSpeedCoils->MaxSpedLevels, 0), MSCCapWaterFFlow(state.dataVariableSpeedCoils->MaxSpedLevels, 0), MSEIRFTemp(state.dataVariableSpeedCoils->MaxSpedLevels, 0),
-        MSEIRAirFFlow(state.dataVariableSpeedCoils->MaxSpedLevels, 0), MSEIRWaterFFlow(state.dataVariableSpeedCoils->MaxSpedLevels, 0), MSWasteHeat(state.dataVariableSpeedCoils->MaxSpedLevels, 0), MSWasteHeatFrac(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0),
-        MSWHPumpPower(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), MSWHPumpPowerPerRatedTotCap(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), SpeedNumReport(0.0), SpeedRatioReport(0.0),
+        MSHPDesignSpecIndex(-1), MSErrIndex(MaxSpedLevels, 0), MSRatedPercentTotCap(MaxSpedLevels, 0.0), MSRatedTotCap(MaxSpedLevels, 0.0),
+        MSRatedSHR(MaxSpedLevels, 0.0), MSRatedCOP(MaxSpedLevels, 0.0), MSRatedAirVolFlowPerRatedTotCap(MaxSpedLevels, 0.0),
+        MSRatedAirVolFlowRate(MaxSpedLevels, 0.0), MSRatedAirMassFlowRate(MaxSpedLevels, 0.0),
+        MSRatedWaterVolFlowPerRatedTotCap(MaxSpedLevels, 0.0), MSRatedWaterVolFlowRate(MaxSpedLevels, 0.0),
+        MSRatedWaterMassFlowRate(MaxSpedLevels, 0.0), MSRatedCBF(MaxSpedLevels, 0.0), MSEffectiveAo(MaxSpedLevels, 0.0),
+        MSCCapFTemp(MaxSpedLevels, 0), MSCCapAirFFlow(MaxSpedLevels, 0), MSCCapWaterFFlow(MaxSpedLevels, 0), MSEIRFTemp(MaxSpedLevels, 0),
+        MSEIRAirFFlow(MaxSpedLevels, 0), MSEIRWaterFFlow(MaxSpedLevels, 0), MSWasteHeat(MaxSpedLevels, 0), MSWasteHeatFrac(MaxSpedLevels, 0.0),
+        MSWHPumpPower(MaxSpedLevels, 0.0), MSWHPumpPowerPerRatedTotCap(MaxSpedLevels, 0.0), SpeedNumReport(0.0), SpeedRatioReport(0.0),
         DefrostStrategy(0), DefrostControl(0), EIRFPLR(0), DefrostEIRFT(0), MinOATCompressor(0.0), OATempCompressorOn(0.0), MaxOATDefrost(0.0),
         DefrostTime(0.0), DefrostCapacity(0.0), HPCompressorRuntime(0.0), HPCompressorRuntimeLast(0.0), TimeLeftToDefrost(0.0), DefrostPower(0.0),
         DefrostConsumption(0.0), ReportCoolingCoilCrankcasePower(true), CrankcaseHeaterCapacity(0.0), CrankcaseHeaterPower(0.0),
         MaxOATCrankcaseHeater(0.0), CrankcaseHeaterConsumption(0.0), CondenserInletNodeNum(0), CondenserType(DataHVACGlobals::AirCooled), ReportEvapCondVars(false),
         EvapCondPumpElecNomPower(0.0), EvapCondPumpElecPower(0.0), EvapWaterConsumpRate(0.0), EvapCondPumpElecConsumption(0.0),
         EvapWaterConsump(0.0), BasinHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), BasinHeaterPower(0.0),
-        BasinHeaterSchedulePtr(0), EvapCondAirFlow(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), EvapCondEffect(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0),
-        MSRatedEvapCondVolFlowPerRatedTotCap(state.dataVariableSpeedCoils->MaxSpedLevels, 0.0), EvapWaterSupplyMode(101), EvapWaterSupTankID(0),
+        BasinHeaterSchedulePtr(0), EvapCondAirFlow(MaxSpedLevels, 0.0), EvapCondEffect(MaxSpedLevels, 0.0),
+        MSRatedEvapCondVolFlowPerRatedTotCap(MaxSpedLevels, 0.0), EvapWaterSupplyMode(101), EvapWaterSupTankID(0),
         EvapWaterTankDemandARRID(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0),
         CondensateVdot(0.0), CondensateVol(0.0), CondInletTemp(0.0), SupplyFanIndex(0), SupplyFan_TypeNum(0), SourceAirMassFlowRate(0.0),
         InletSourceAirTemp(0.0), InletSourceAirEnthalpy(0.0),

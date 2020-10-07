@@ -66,7 +66,7 @@ namespace VariableSpeedCoils {
 
     struct VariableSpeedCoilData // variable speed coil
     {
-        //int MaxSpedLevels = 10;
+        int MaxSpedLevels = 10; // Maximum number of speed that supports
         // Members
         std::string Name;              // Name of the  Coil
         std::string VarSpeedCoilType;  // type of coil
@@ -276,7 +276,7 @@ namespace VariableSpeedCoils {
         Real64 capModFacTotal;     // coil  TotCapTempModFac * TotCapAirFFModFac * TotCapWaterFFModFac, for result for simulation peak reporting
 
         //default constructor
-        VariableSpeedCoilData(EnergyPlusData &state);
+        VariableSpeedCoilData();
     };
 
     void SimVariableSpeedCoils(EnergyPlusData &state, std::string const &CompName,   // Coil Name
