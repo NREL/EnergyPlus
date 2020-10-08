@@ -179,7 +179,7 @@ namespace InternalHeatGains {
 
         InitInternalHeatGains(state);
 
-        ReportInternalHeatGains();
+        ReportInternalHeatGains(state);
 
         CheckReturnAirHeatGain();
 
@@ -6033,7 +6033,7 @@ namespace InternalHeatGains {
 
     } // End CalcZoneITEq
 
-    void ReportInternalHeatGains()
+    void ReportInternalHeatGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6086,7 +6086,7 @@ namespace InternalHeatGains {
             Lights(Loop).RetAirGainEnergy = Lights(Loop).RetAirGainRate * TimeStepZoneSec;
             Lights(Loop).TotGainEnergy = Lights(Loop).TotGainRate * TimeStepZoneSec;
             if (!WarmupFlag) {
-                if (DoOutputReporting && WriteTabularFiles && (KindOfSim == ksRunPeriodWeather)) { // for weather simulations only
+                if (DoOutputReporting && WriteTabularFiles && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // for weather simulations only
                     // for tabular report, accumulate the total electricity used for each Light object
                     Lights(Loop).SumConsumption += Lights(Loop).Consumption;
                     // for tabular report, accumulate the time when each Light has consumption (using a very small threshold instead of zero)

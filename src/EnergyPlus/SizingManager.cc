@@ -315,14 +315,14 @@ namespace SizingManager {
                     if (ErrorsFound) break;
 
                     // check that environment is one of the design days
-                    if (KindOfSim == ksRunPeriodWeather) {
+                    if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         continue;
                     }
 
                     ++NumSizingPeriodsPerformed;
 
                     BeginEnvrnFlag = true;
-                    if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
+                    if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                         // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can
                         // more easily converge fewer warmup days are allowed
                         DisplayString("Suppressing Initialization of New Environment Parameters");
@@ -392,7 +392,7 @@ namespace SizingManager {
 
                                 // set flag for pulse used in load component reporting
                                 doLoadComponentPulseNow =
-                                    CalcdoLoadComponentPulseNow(isPulseZoneSizing, WarmupFlag, HourOfDay, TimeStep, KindOfSim, DayOfSim);
+                                    CalcdoLoadComponentPulseNow(isPulseZoneSizing, WarmupFlag, HourOfDay, TimeStep, state.dataGlobal->KindOfSim, DayOfSim);
 
                                 ManageWeather(state);
 
@@ -501,7 +501,7 @@ namespace SizingManager {
                 GetNextEnvironment(state, Available, ErrorsFound); // get an environment
 
                 // check that environment is one of the design days
-                if (KindOfSim == ksRunPeriodWeather) {
+                if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                     continue;
                 }
 
@@ -511,7 +511,7 @@ namespace SizingManager {
                 ++NumSizingPeriodsPerformed;
 
                 BeginEnvrnFlag = true;
-                if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
+                if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                     // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                     // easily converge fewer warmup days are allowed
                     DisplayString("Suppressing Initialization of New Environment Parameters");
@@ -850,7 +850,12 @@ namespace SizingManager {
     }
 
     bool CalcdoLoadComponentPulseNow(
-        bool const isPulseZoneSizing, bool const WarmupFlag, int const HourOfDay, int const TimeStep, int const KindOfSim, int const DayOfSim)
+        bool const isPulseZoneSizing,
+        bool const WarmupFlag,
+        int const HourOfDay,
+        int const TimeStep,
+        DataGlobalConstants::KindOfSim const KindOfSim,
+        int const DayOfSim)
     {
         // This routine decides whether or not to do a Load Component Pulse.  True when yes it should, false when in shouldn't
         // This check looks to do the pulse at the first time step of the 10th hour of the day while not in warmup mode.
@@ -861,7 +866,7 @@ namespace SizingManager {
         int const TimeStepToPulse(1);
 
         if ((isPulseZoneSizing) && (!WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) &&
-            ((KindOfSim == ksRunPeriodDesign) || (DayOfSim == 1))) {
+            ((KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodDesign) || (DayOfSim == 1))) {
             return true;
         } else {
             return false;
@@ -3930,7 +3935,7 @@ namespace SizingManager {
             if (ErrorsFound) break;
 
             // check that environment is one of the design days
-            if (KindOfSim == ksRunPeriodWeather) {
+            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                 continue;
             }
 

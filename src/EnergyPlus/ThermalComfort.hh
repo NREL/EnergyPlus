@@ -318,7 +318,7 @@ namespace ThermalComfort {
 
     Real64 CalcRadTemp(EnergyPlusData &state, int const PeopleListNum); // Type of MRT calculation (zone averaged or surface weighted)
 
-    void CalcThermalComfortSimpleASH55();
+    void CalcThermalComfortSimpleASH55(EnergyPlusData &state);
 
     void ResetThermalComfortSimpleASH55();
 

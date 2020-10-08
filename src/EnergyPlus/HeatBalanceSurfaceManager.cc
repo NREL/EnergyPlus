@@ -310,15 +310,15 @@ namespace HeatBalanceSurfaceManager {
         CalcThermalResilience(state);
 
         if (OutputReportTabular::displayThermalResilienceSummary) {
-            ReportThermalResilience();
+            ReportThermalResilience(state);
         }
 
         if (OutputReportTabular::displayCO2ResilienceSummary) {
-            ReportCO2Resilience();
+            ReportCO2Resilience(state);
         }
 
         if (OutputReportTabular::displayVisualResilienceSummary) {
-            ReportVisualResilience();
+            ReportVisualResilience(state);
         }
 
         ManageSurfaceHeatBalancefirstTime = false;
@@ -5157,7 +5157,7 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void ReportThermalResilience() {
+    void ReportThermalResilience(EnergyPlusData &state) {
 
         int HINoBins = 5; // Heat Index range - number of bins
         int HumidexNoBins = 5; // Humidex range - number of bins
@@ -5188,7 +5188,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         // Count hours only during weather simulation periods
-        if (ksRunPeriodWeather == KindOfSim && !WarmupFlag) {
+        if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !WarmupFlag) {
             // Trace current time step Zone Pierce SET; NaN if no occupant or SET not calculated
             // Record last time step SET to trace SET unmet duration;
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
@@ -5299,7 +5299,7 @@ namespace HeatBalanceSurfaceManager {
         } // loop over zones
     }
 
-    void ReportCO2Resilience() {
+    void ReportCO2Resilience(EnergyPlusData &state) {
         int NoBins = 3;
         if (reportCO2ResilienceFirstTime) {
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
@@ -5318,7 +5318,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        if (ksRunPeriodWeather == KindOfSim && !WarmupFlag) {
+        if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !WarmupFlag) {
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 int ZoneNum = People(iPeople).ZonePtr;
                 ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(People(iPeople).NumberOfPeoplePtr);
@@ -5341,7 +5341,7 @@ namespace HeatBalanceSurfaceManager {
         } // loop over zones
     }
 
-    void ReportVisualResilience() {
+    void ReportVisualResilience(EnergyPlusData &state) {
         int NoBins = 4;
         if (reportVisualResilienceFirstTime) {
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
@@ -5367,7 +5367,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        if (ksRunPeriodWeather == KindOfSim && !WarmupFlag) {
+        if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !WarmupFlag) {
             for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
                 int ZoneNum = People(iPeople).ZonePtr;
                 ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(People(iPeople).NumberOfPeoplePtr);

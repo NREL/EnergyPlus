@@ -328,8 +328,6 @@ namespace EconomicTariff {
         //    routines for economics.
 
         using DataGlobals::DoOutputReporting;
-        using DataGlobals::KindOfSim;
-        using DataGlobals::ksRunPeriodWeather;
         using OutputReportTabular::AddTOCEntry;
         using OutputReportTabular::displayEconomicResultSummary;
 
@@ -353,7 +351,7 @@ namespace EconomicTariff {
             Update_GetInput = false;
             if (ErrorsFound) ShowFatalError("UpdateUtilityBills: Preceding errors cause termination.");
         }
-        if (DoOutputReporting && (KindOfSim == ksRunPeriodWeather)) {
+        if (DoOutputReporting && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
             GatherForEconomics();
         }
     }

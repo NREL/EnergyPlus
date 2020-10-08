@@ -197,7 +197,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     // Save current environment so we can revert back when done
     int Envrn_reset = state.dataWeatherManager->Envrn;
-    int KindOfSim_reset = KindOfSim;
+    DataGlobalConstants::KindOfSim KindOfSim_reset = state.dataGlobal->KindOfSim;
     int TimeStep_reset = TimeStep;
     int HourOfDay_reset = HourOfDay;
     bool BeginEnvrnFlag_reset = BeginEnvrnFlag;
@@ -224,7 +224,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     ++state.dataWeatherManager->TotRunPers;
     state.dataWeatherManager->Environment.redimension(state.dataWeatherManager->NumOfEnvrn);
     state.dataWeatherManager->RunPeriodInput.redimension(state.dataWeatherManager->TotRunPers);
-    state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = ksReadAllWeatherData;
+    state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = DataGlobalConstants::KindOfSim::ReadAllWeatherData;
     state.dataWeatherManager->RPReadAllWeatherData = true;
     WeathSimReq = true;
     // RunPeriod is initialized to be one year of simulation
@@ -241,7 +241,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
         ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
     }
 
-    if (KindOfSim != ksReadAllWeatherData) {
+    if (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::ReadAllWeatherData) {
         // This shouldn't happen
         ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data, bad KindOfSim.");
     }
@@ -349,7 +349,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     // Reset Envrionment when done reading data
     --state.dataWeatherManager->NumOfEnvrn; // May need better way of eliminating the extra envrionment that was added to read the data
     --state.dataWeatherManager->TotRunPers;
-    KindOfSim = KindOfSim_reset;
+    state.dataGlobal->KindOfSim = KindOfSim_reset;
     state.dataWeatherManager->RPReadAllWeatherData = false;
     state.dataWeatherManager->Environment.redimension(state.dataWeatherManager->NumOfEnvrn);
     state.dataWeatherManager->RunPeriodInput.redimension(state.dataWeatherManager->TotRunPers);

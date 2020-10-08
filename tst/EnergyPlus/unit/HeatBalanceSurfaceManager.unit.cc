@@ -2617,7 +2617,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 {
 
     int NumOfZones = 1;
-    DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather;
+    state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
     OutputReportTabular::displayThermalResilienceSummary = true;
     DataEnvironment::Month = 7;
     DataEnvironment::DayOfMonth = 1;
@@ -2661,7 +2661,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataHeatBalFanSys::ZTAV(1) = 25;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.00988; // RH = 50%
     CalcThermalResilience(state);
-    ReportThermalResilience();
+    ReportThermalResilience(state);
     EXPECT_NEAR(25, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(28, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
@@ -2670,7 +2670,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataHeatBalFanSys::ZTAV(1) = 27;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.02035; // RH = 90%
     CalcThermalResilience(state);
-    ReportThermalResilience();
+    ReportThermalResilience(state);
     EXPECT_NEAR(31, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(39, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
@@ -2679,7 +2679,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataHeatBalFanSys::ZTAV(1) = 27;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.0022; // RH = 10%
     CalcThermalResilience(state);
-    ReportThermalResilience();
+    ReportThermalResilience(state);
     EXPECT_NEAR(26, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(23, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
@@ -2688,7 +2688,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataHeatBalFanSys::ZTAV(1) = 30;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.01604; // RH = 60%
     CalcThermalResilience(state);
-    ReportThermalResilience();
+    ReportThermalResilience(state);
     EXPECT_NEAR(33, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(38, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
@@ -2712,7 +2712,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     for (int hour = 5; hour <= 7; hour++) {
         DataGlobals::HourOfDay = hour;
 //        CalcThermalResilience(state);
-        ReportThermalResilience();
+        ReportThermalResilience(state);
     }
     // Test SET-hours calculation - Heating unmet
     EXPECT_EQ(3, DataHeatBalFanSys::ZoneLowSETHours(1)[0]); // SET Hours = (12.2 - 11.2) * 3 Hours
@@ -2721,7 +2721,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 32;
     for (int hour = 8; hour <= 10; hour++) {
         DataGlobals::HourOfDay = hour;
-        ReportThermalResilience();
+        ReportThermalResilience(state);
     }
     // Test SET-hours calculation - Cooling unmet
     EXPECT_EQ(6, DataHeatBalFanSys::ZoneHighSETHours(1)[0]); // SET Hours = (32 - 30) * 3 Hours
@@ -2730,17 +2730,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 25;
     for (int hour = 11; hour <= 12; hour++) {
         DataGlobals::HourOfDay = hour;
-        ReportThermalResilience();
+        ReportThermalResilience(state);
     }
     EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 11.2;
     for (int hour = 13; hour <= 18; hour++) {
         DataGlobals::HourOfDay = hour;
-        ReportThermalResilience();
+        ReportThermalResilience(state);
     }
     ScheduleManager::Schedule(1).CurrentValue = 0;
     for (int hour = 18; hour <= 20; hour++) {
         DataGlobals::HourOfDay = hour;
-        ReportThermalResilience();
+        ReportThermalResilience(state);
     }
 
     // Test SET longest duration calculation
@@ -2758,7 +2758,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     ScheduleManager::Schedule(1).CurrentValue = 1;
     OutputReportTabular::displayCO2ResilienceSummary = true;
     DataContaminantBalance::ZoneAirCO2Avg(1) = 1100;
-    ReportCO2Resilience();
+    ReportCO2Resilience(state);
     EXPECT_EQ(1, DataHeatBalFanSys::ZoneCO2LevelHourBins(1)[1]);
     EXPECT_EQ(2, DataHeatBalFanSys::ZoneCO2LevelOccuHourBins(1)[1]);
 
@@ -2773,7 +2773,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataDaylighting::ZoneDaylight(1).IllumSetPoint(1) = 400;
     OutputReportTabular::displayVisualResilienceSummary = true;
 
-    ReportVisualResilience();
+    ReportVisualResilience(state);
     EXPECT_EQ(1, DataHeatBalFanSys::ZoneLightingLevelHourBins(1)[2]);
     EXPECT_EQ(2, DataHeatBalFanSys::ZoneLightingLevelOccuHourBins(1)[2]);
 

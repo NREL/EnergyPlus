@@ -397,7 +397,7 @@ namespace ThermalComfort {
             CalcThermalComfortFanger(state);
             CalcThermalComfortPierce(state);
             CalcThermalComfortKSU(state);
-            CalcThermalComfortSimpleASH55();
+            CalcThermalComfortSimpleASH55(state);
             CalcIfSetPointMet(state);
             if (ASH55Flag) CalcThermalComfortAdaptiveASH55(state, false);
             if (CEN15251Flag) CalcThermalComfortAdaptiveCEN15251(state, false);
@@ -2186,7 +2186,7 @@ namespace ThermalComfort {
         return CalcRadTemp;
     }
 
-    void CalcThermalComfortSimpleASH55()
+    void CalcThermalComfortSimpleASH55(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -2360,12 +2360,12 @@ namespace ThermalComfort {
             TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
             // report how the aggregation is conducted
             {
-                auto const SELECT_CASE_var(KindOfSim);
-                if (SELECT_CASE_var == ksDesignDay) {
+                auto const SELECT_CASE_var(state.dataGlobal->KindOfSim);
+                if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::DesignDay) {
                     addFootNoteSubTable(pdstSimpleComfort, "Aggregated over the Design Days");
-                } else if (SELECT_CASE_var == ksRunPeriodDesign) {
+                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
                     addFootNoteSubTable(pdstSimpleComfort, "Aggregated over the RunPeriods for Design");
-                } else if (SELECT_CASE_var == ksRunPeriodWeather) {
+                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                     addFootNoteSubTable(pdstSimpleComfort, "Aggregated over the RunPeriods for Weather");
                 }
             }
@@ -2545,12 +2545,12 @@ namespace ThermalComfort {
             TotalAnyZoneNotMetOccupied = 0.0;
             // report how the aggregation is conducted
             {
-                auto const SELECT_CASE_var(KindOfSim);
-                if (SELECT_CASE_var == ksDesignDay) {
+                auto const SELECT_CASE_var(state.dataGlobal->KindOfSim);
+                if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::DesignDay) {
                     addFootNoteSubTable(pdstUnmetLoads, "Aggregated over the Design Days");
-                } else if (SELECT_CASE_var == ksRunPeriodDesign) {
+                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
                     addFootNoteSubTable(pdstUnmetLoads, "Aggregated over the RunPeriods for Design");
-                } else if (SELECT_CASE_var == ksRunPeriodWeather) {
+                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                     addFootNoteSubTable(pdstUnmetLoads, "Aggregated over the RunPeriods for Weather");
                 }
             }

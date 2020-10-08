@@ -757,8 +757,6 @@ namespace DaylightingManager {
             }
         }
 
-        // TH 7/2010 report all daylight factors for the two reference points of daylight zones ...
-
         // Skip if no daylight windows
         if (TotWindowsWithDayl == 0) return;
 
@@ -772,12 +770,12 @@ namespace DaylightingManager {
 
         if (DFSReportSizingDays) {
             if (DoWeathSim && DoDesDaySim) {
-                if (KindOfSim == ksRunPeriodWeather) return;
+                if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) return;
             }
         }
 
         if (DFSReportAllShadowCalculationDays) {
-            if (KindOfSim != ksRunPeriodWeather) return;
+            if (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather) return;
         }
 
         // open a new file eplusout.dfs for saving the daylight factors

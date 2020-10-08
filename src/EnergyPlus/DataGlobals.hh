@@ -56,6 +56,7 @@
 // EnergyPlus Headers
 #include "IOFiles.hh"
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -68,14 +69,6 @@ namespace DataGlobals {
     // Data
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
-
-    // Parameters for KindOfSim
-    extern int const ksDesignDay;
-    extern int const ksRunPeriodDesign;
-    extern int const ksRunPeriodWeather;
-    extern int const ksHVACSizeDesignDay;       // a regular design day run during HVAC Sizing Simulation
-    extern int const ksHVACSizeRunPeriodDesign; // a weather period design day run during HVAC Sizing Simulation
-    extern int const ksReadAllWeatherData;      // a weather period for reading all weather data prior to the simulation
 
     extern Real64 const Pi;        // Pi 3.1415926535897932384626435
     extern Real64 const PiOvr2;    // Pi/2
@@ -166,7 +159,6 @@ namespace DataGlobals {
     extern bool DoHVACSizingSimulation;              // User input in SimulationControl object
     extern int HVACSizingSimMaxIterations;           // User input in SimulationControl object
     extern bool WeathSimReq;                         // Input has a RunPeriod request
-    extern int KindOfSim;                            // See parameters. (ksDesignDay, ksRunPeriodDesign, ksRunPeriodWeather)
     extern bool DoOutputReporting;                   // TRUE if variables to be written out
     extern bool DoingSizing;                         // TRUE when "sizing" is being performed (some error messages won't be displayed)
     extern bool DoingHVACSizingSimulations;          // true when HVAC Sizing Simulations are being performed.
@@ -232,9 +224,9 @@ namespace DataGlobals {
         bool isBSON= false;
         bool preserveIDFOrder = true;
         bool stopSimulation= false;
-
         std::function<void (void *)> externalHVACManager;
         bool externalHVACManagerInitialized = false;
+        DataGlobalConstants::KindOfSim KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
 
         void clear_state() override {
             this->AnnualSimulation = false;
@@ -252,6 +244,7 @@ namespace DataGlobals {
             this->stopSimulation= false;
             this->externalHVACManager = nullptr;
             this->externalHVACManagerInitialized = false;
+            KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
         }
     };
 

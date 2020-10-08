@@ -72,14 +72,6 @@ namespace DataGlobals {
     // This data-only module is a repository for all variables which are considered
     // to be "global" in nature in EnergyPlus.
 
-    // Parameters for KindOfSim
-    int const ksDesignDay(1);
-    int const ksRunPeriodDesign(2);
-    int const ksRunPeriodWeather(3);
-    int const ksHVACSizeDesignDay(4);       // a regular design day run during HVAC Sizing Simulation
-    int const ksHVACSizeRunPeriodDesign(5); // a weather period design day run during HVAC Sizing Simulation
-    int const ksReadAllWeatherData(6);      // a weather period for reading all weather data prior to the simulation
-
     Real64 const Pi(3.14159265358979324); // Pi 3.1415926535897932384626435
     Real64 const PiOvr2(Pi / 2.0);        // Pi/2
     Real64 const TwoPi(2.0 * Pi);         // 2*Pi 6.2831853071795864769252868
@@ -176,7 +168,6 @@ namespace DataGlobals {
     bool DoHVACSizingSimulation(false);              // User input in SimulationControl object
     int HVACSizingSimMaxIterations(0);               // User input in SimulationControl object
     bool WeathSimReq(false);                         // Input has a RunPeriod request
-    int KindOfSim(0);                                // See parameters. (ksDesignDay, ksRunPeriodDesign, ksRunPeriodWeather)
     bool DoOutputReporting(false);                   // TRUE if variables to be written out
     bool DoingSizing(false);                         // TRUE when "sizing" is being performed (some error messages won't be displayed)
     bool DoingHVACSizingSimulations(false);          // true when HVAC Sizing Simulations are being performed.
@@ -268,7 +259,6 @@ namespace DataGlobals {
         DoHVACSizingSimulation = false;
         HVACSizingSimMaxIterations = 0;
         WeathSimReq = false;
-        KindOfSim = 0;
         DoOutputReporting = false;
         DoingSizing = false;
         DoingHVACSizingSimulations = false;

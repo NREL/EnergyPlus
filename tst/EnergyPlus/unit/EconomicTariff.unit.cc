@@ -617,7 +617,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(EconomicTariff::seasonSummer, EconomicTariff::chargeSimple(2).season);
     EXPECT_EQ(0.04, EconomicTariff::chargeSimple(2).costPerVal);
 
-    DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather; // fake a weather run
+    state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run
 
     // Unitialized: default initialized to 0
     EXPECT_EQ(0, EconomicTariff::tariff(1).seasonForMonth(5));

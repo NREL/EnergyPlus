@@ -240,11 +240,22 @@ namespace DataGlobalConstants {
     extern int const iEvapCoolerDirectResearchSpecial;
 
     enum class CallIndicator {
-        BeginDay = 1,
-        DuringDay = 2,
-        EndDay = 3,
-        EndZoneSizingCalc = 4,
-        EndSysSizingCalc = 5
+        BeginDay,
+        DuringDay,
+        EndDay,
+        EndZoneSizingCalc,
+        EndSysSizingCalc
+    };
+
+    // Parameters for KindOfSim
+    enum class KindOfSim {
+        Unassigned = 0,
+        DesignDay = 1,
+        RunPeriodDesign = 2,
+        RunPeriodWeather = 3,
+        HVACSizeDesignDay = 4,                  // a regular design day run during HVAC Sizing Simulation
+        HVACSizeRunPeriodDesign = 5,            // a weather period design day run during HVAC Sizing Simulation
+        ReadAllWeatherData = 6                  // a weather period for reading all weather data prior to the simulation
     };
 
     Real64 constexpr MaxEXPArg () { return 709.78; }                        // maximum exponent in EXP() function

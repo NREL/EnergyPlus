@@ -101,7 +101,7 @@ namespace SizingManager {
                                      bool const WarmupFlag,
                                      int const HourOfDay,
                                      int const TimeStep,
-                                     int const KindOfSim,
+                                     DataGlobalConstants::KindOfSim const KindOfSim,
                                      int const DayOfSim
                                      );
 
