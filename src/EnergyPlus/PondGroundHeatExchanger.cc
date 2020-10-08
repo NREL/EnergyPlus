@@ -439,7 +439,7 @@ namespace PondGroundHeatExchanger {
                                                                DataPrecisionGlobals::constant_zero,
                                                                DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                RoutineName);
-            this->DesignMassFlowRate = DataGlobals::Pi / 4.0 * pow_2(this->TubeInDiameter) * DesignVelocity * rho * this->NumCircuits;
+            this->DesignMassFlowRate = DataGlobalConstants::Pi() / 4.0 * pow_2(this->TubeInDiameter) * DesignVelocity * rho * this->NumCircuits;
             this->DesignCapacity = this->DesignMassFlowRate * Cp * 10.0; // assume 10C delta T?
             PlantUtilities::InitComponentNodes(0.0,
                                                this->DesignMassFlowRate,
@@ -760,7 +760,7 @@ namespace PondGroundHeatExchanger {
             state, DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-        Real64 ReynoldsNum = 4.0 * massFlowRate / (DataGlobals::Pi * Viscosity * this->TubeInDiameter * this->NumCircuits);
+        Real64 ReynoldsNum = 4.0 * massFlowRate / (DataGlobalConstants::Pi() * Viscosity * this->TubeInDiameter * this->NumCircuits);
 
         Real64 PrantlNum = Viscosity * SpecificHeat / Conductivity;
 
@@ -819,7 +819,7 @@ namespace PondGroundHeatExchanger {
         if (massFlowRate == 0.0) {
             CalcEffectiveness = 1.0;
         } else {
-            NTU = DataGlobals::Pi * TubeInDiameter * this->CircuitLength * this->NumCircuits / (TotalResistance * massFlowRate * SpecificHeat);
+            NTU = DataGlobalConstants::Pi() * TubeInDiameter * this->CircuitLength * this->NumCircuits / (TotalResistance * massFlowRate * SpecificHeat);
             // Calculate effectiveness - formula for static fluid
             CalcEffectiveness = (1.0 - std::exp(-NTU));
         }

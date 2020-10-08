@@ -163,7 +163,7 @@ namespace MoistureBalanceEMPDManager {
         Real64 const EMPDdiffusivity = diffusivity_air / mat.EMPDmu;
 
         // Calculate penetration depth
-        Real64 const PenetrationDepth = std::sqrt(EMPDdiffusivity * PV_sat * period / (mat.Density * slope_MC * DataGlobals::Pi));
+        Real64 const PenetrationDepth = std::sqrt(EMPDdiffusivity * PV_sat * period / (mat.Density * slope_MC * DataGlobalConstants::Pi()));
 
         return PenetrationDepth;
     }

@@ -67,7 +67,6 @@ namespace DataContaminantBalance {
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::AutoCalculate;
-    using DataGlobals::DegToRadians;
     using DataSurfaces::MaxSlatAngs;
 
     // Data

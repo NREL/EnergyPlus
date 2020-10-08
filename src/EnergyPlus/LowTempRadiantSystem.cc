@@ -5346,7 +5346,6 @@ namespace LowTempRadiantSystem {
         // Code based loosely on code from IBLAST program (research version)
 
         // Using/Aliasing
-        using DataGlobals::Pi;
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -5437,12 +5436,12 @@ namespace LowTempRadiantSystem {
             // Calculate the NTU parameter
             // NTU = UA/[(Mdot*Cp)min]
             // where: U = h (convection coefficient) and h = (k)(Nu)/D
-            //        A = Pi*D*TubeLength
-            NTU = U * Pi * this->TubeDiameterOuter * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
+            //        A = DataGlobalConstants::Pi()*D*TubeLength
+            NTU = U * DataGlobalConstants::Pi() * this->TubeDiameterOuter * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
         } else {    // (this->FluidToSlabHeatTransfer == FluidToSlabHeatTransferTypes::ConvectionOnly)
 
             // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-            ReD = 4.0 * WaterMassFlow * FlowFraction / (Pi * MUactual * this->TubeDiameterInner * NumCircs);
+            ReD = 4.0 * WaterMassFlow * FlowFraction / (DataGlobalConstants::Pi() * MUactual * this->TubeDiameterInner * NumCircs);
 
             // Calculate the Nusselt number based on what flow regime one is in
             if (ReD >= MaxLaminarRe) { // Turbulent flow --> use Colburn equation
@@ -5458,7 +5457,7 @@ namespace LowTempRadiantSystem {
             // NTU = UA/[(Mdot*Cp)min]
             // where: U = h (convection coefficient) and h = (k)(Nu)/D
             //        A = Pi*D*TubeLength
-            NTU = Pi * Kactual * NuD * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
+            NTU = DataGlobalConstants::Pi() * Kactual * NuD * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
         }
 
         // Calculate Epsilon*MassFlowRate*Cp
@@ -5491,10 +5490,10 @@ namespace LowTempRadiantSystem {
         // Fluid resistance to heat transfer, assumes turbulent flow (Equation B5, p. 38 of ISO Standard 11855-2)
         Real64 distanceBetweenPipes = 2.0 * state.dataConstruction->Construct(constructionNumber).ThicknessPerpend;
         Real64 ratioDiameterToMassFlowLength = this->TubeDiameterInner / WaterMassFlow / this->TubeLength;
-        Real64 rFluid = 0.125 / DataGlobals::Pi * std::pow(distanceBetweenPipes, 0.13) * std::pow(ratioDiameterToMassFlowLength,0.87);
+        Real64 rFluid = 0.125 / DataGlobalConstants::Pi() * std::pow(distanceBetweenPipes, 0.13) * std::pow(ratioDiameterToMassFlowLength,0.87);
 
         // Resistance to heat transfer (conduction through the piping material, Equation B6, p. 38 of ISO Standard 11855-2)
-        Real64 rTube = 0.5 * distanceBetweenPipes * std::log(this->TubeDiameterOuter/this->TubeDiameterInner) / DataGlobals::Pi / this->TubeConductivity;
+        Real64 rTube = 0.5 * distanceBetweenPipes * std::log(this->TubeDiameterOuter/this->TubeDiameterInner) / DataGlobalConstants::Pi() / this->TubeConductivity;
 
         calculateUFromISOStandard = 1.0 / (rFluid + rTube);
 

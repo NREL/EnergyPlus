@@ -485,7 +485,6 @@ namespace SurfaceGroundHeatExchanger {
 
         // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
-        using DataGlobals::Pi;
         using namespace DataEnvironment;
         using DataHeatBalance::TotConstructs;
         using DataLoopNode::Node;
@@ -522,7 +521,7 @@ namespace SurfaceGroundHeatExchanger {
                 ShowFatalError("InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s).");
             }
             rho = GetDensityGlycol(state, PlantLoop(this->LoopNum).FluidName, constant_zero, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
-            this->DesignMassFlowRate = Pi / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho * this->TubeCircuits;
+            this->DesignMassFlowRate = DataGlobalConstants::Pi() / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho * this->TubeCircuits;
             InitComponentNodes(0.0,
                                this->DesignMassFlowRate,
                                this->InletNodeNum,
@@ -1124,7 +1123,6 @@ namespace SurfaceGroundHeatExchanger {
         // Code based loosely on code from IBLAST program (research version)
 
         // Using/Aliasing
-        using DataGlobals::Pi;
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
         using General::RoundSigDigits;
@@ -1213,7 +1211,7 @@ namespace SurfaceGroundHeatExchanger {
         CpWater = GetSpecificHeatGlycol(state, PlantLoop(this->LoopNum).FluidName, Temperature, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-        ReD = 4.0 * WaterMassFlow / (Pi * MUactual * this->TubeDiameter * this->TubeCircuits);
+        ReD = 4.0 * WaterMassFlow / (DataGlobalConstants::Pi() * MUactual * this->TubeDiameter * this->TubeCircuits);
 
         // Calculate the Nusselt number based on what flow regime one is in
         if (ReD >= MaxLaminarRe) { // Turbulent flow --> use Colburn equation
@@ -1229,7 +1227,7 @@ namespace SurfaceGroundHeatExchanger {
 
         PipeLength = this->SurfaceLength * this->SurfaceWidth / this->TubeSpacing;
 
-        NTU = Pi * Kactual * NuD * PipeLength / (WaterMassFlow * CpWater);
+        NTU = DataGlobalConstants::Pi() * Kactual * NuD * PipeLength / (WaterMassFlow * CpWater);
         // Calculate Epsilon*MassFlowRate*Cp
         if (-NTU >= EXP_LowerLimit) {
             CalcHXEffectTerm = (1.0 - std::exp(-NTU)) * WaterMassFlow * CpWater;

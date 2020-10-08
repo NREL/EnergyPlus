@@ -112,7 +112,6 @@ namespace TranspiredCollector {
     //   See EngineeringReference for details
 
     // Using/Aliasing
-    using DataGlobals::DegToRadians;
     using DataGlobals::KelvinConv;
     using DataGlobals::SecInHour;
     using DataHeatBalance::QRadSWOutIncident;
@@ -258,7 +257,6 @@ namespace TranspiredCollector {
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
-        using DataGlobals::Pi;
         using DataGlobals::ScheduleAlwaysOn;
         using DataHeatBalance::MediumRough;
         using DataHeatBalance::MediumSmooth;
@@ -652,10 +650,10 @@ namespace TranspiredCollector {
                 if (SELECT_CASE_var == Layout_Triangle) {                                                   // 'TRIANGLE'
                     UTSC(Item).Porosity = 0.907 * pow_2(UTSC(Item).HoleDia / UTSC(Item).Pitch);             // Kutscher equation, Triangle layout
                 } else if (SELECT_CASE_var == Layout_Square) {                                              // 'SQUARE'
-                    UTSC(Item).Porosity = (Pi / 4.0) * pow_2(UTSC(Item).HoleDia) / pow_2(UTSC(Item).Pitch); // Waterloo equation, square layout
+                    UTSC(Item).Porosity = (DataGlobalConstants::Pi() / 4.0) * pow_2(UTSC(Item).HoleDia) / pow_2(UTSC(Item).Pitch); // Waterloo equation, square layout
                 }
             }
-            TiltRads = std::abs(AvgTilt) * DegToRadians;
+            TiltRads = std::abs(AvgTilt) * DataGlobalConstants::DegToRadians();
             tempHdeltaNPL = std::sin(TiltRads) * UTSC(Item).Height / 4.0;
             UTSC(Item).HdeltaNPL = max(tempHdeltaNPL, UTSC(Item).PlenGapThick);
 

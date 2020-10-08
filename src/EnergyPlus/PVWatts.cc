@@ -465,8 +465,6 @@ namespace PVWatts {
     PVWattsGenerator::powerout(Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st)
     {
 
-        using DataGlobals::DegToRadians;
-        using DataGlobals::RadToDeg;
         using General::RoundSigDigits;
 
         const Real64 &gcr = m_groundCoverageRatio;
@@ -485,8 +483,8 @@ namespace PVWatts {
                     Real64 Fgnddiff = 1.0;
 
                     // worst-case mask angle using calculated surface tilt
-                    Real64 phi0 = RadToDeg * std::atan2(std::sin(irr_st.stilt * DegToRadians),
-                                                        1.0 / m_groundCoverageRatio - std::cos(irr_st.stilt * DegToRadians));
+                    Real64 phi0 = DataGlobalConstants::RadToDeg() * std::atan2(std::sin(irr_st.stilt * DataGlobalConstants::DegToRadians()),
+                                                        1.0 / m_groundCoverageRatio - std::cos(irr_st.stilt * DataGlobalConstants::DegToRadians()));
 
                     // calculate sky and gnd diffuse derate factors
                     // based on view factor reductions from self-shading

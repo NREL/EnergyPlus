@@ -286,9 +286,9 @@ namespace WeatherManager {
         if (DataEnvironment::varyingOrientationSchedIndex > 0) {
             DataHeatBalance::BuildingAzimuth = mod(ScheduleManager::GetCurrentScheduleValue(DataEnvironment::varyingOrientationSchedIndex), 360.0);
             SurfaceGeometry::CosBldgRelNorth =
-                std::cos(-(DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG) * DataGlobals::DegToRadians);
+                std::cos(-(DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians());
             SurfaceGeometry::SinBldgRelNorth =
-                std::sin(-(DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG) * DataGlobals::DegToRadians);
+                std::sin(-(DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians());
             for (size_t SurfNum = 1; SurfNum < DataSurfaces::Surface.size(); ++SurfNum) {
                 for (int n = 1; n <= DataSurfaces::Surface(SurfNum).Sides; ++n) {
                     Real64 Xb = DataSurfaces::Surface(SurfNum).Vertex(n).x;
@@ -312,8 +312,8 @@ namespace WeatherManager {
                                                  DataSurfaces::Surface(SurfNum).GrossArea,
                                                  DataSurfaces::Surface(SurfNum).NewellSurfaceNormalVector);
                 DataSurfaces::Surface(SurfNum).Azimuth = SurfWorldAz;
-                DataSurfaces::Surface(SurfNum).SinAzim = std::sin(SurfWorldAz * DataGlobals::DegToRadians);
-                DataSurfaces::Surface(SurfNum).CosAzim = std::cos(SurfWorldAz * DataGlobals::DegToRadians);
+                DataSurfaces::Surface(SurfNum).SinAzim = std::sin(SurfWorldAz * DataGlobalConstants::DegToRadians());
+                DataSurfaces::Surface(SurfNum).CosAzim = std::cos(SurfWorldAz * DataGlobalConstants::DegToRadians());
                 DataSurfaces::Surface(SurfNum).OutNormVec = DataSurfaces::Surface(SurfNum).NewellSurfaceNormalVector;
             }
         }
@@ -3517,7 +3517,7 @@ namespace WeatherManager {
             print(state.files.eio, "{:.4R},", C);
             print(state.files.eio, "{:.1R},", AVSC);
             print(state.files.eio, "{:.2R},", state.dataWeatherManager->DesignDay(EnvrnNum).EquationOfTime * 60.0);
-            print(state.files.eio, "{:.1R},", std::asin(state.dataWeatherManager->DesignDay(EnvrnNum).SinSolarDeclinAngle) / DataGlobals::DegToRadians);
+            print(state.files.eio, "{:.1R},", std::asin(state.dataWeatherManager->DesignDay(EnvrnNum).SinSolarDeclinAngle) / DataGlobalConstants::DegToRadians());
 
             if (state.dataWeatherManager->DesDayInput(EnvrnNum).SolarModel == DesignDaySolarModel::ASHRAE_ClearSky) {
                 StringOut = "ASHRAEClearSky";
@@ -3874,7 +3874,7 @@ namespace WeatherManager {
             AirMass = 1.0;
         } else {
             // note: COS( Zen) = SIN( Alt)
-            SunAltD = std::asin(CosZen) / DataGlobals::DegToRadians; // altitude, degrees
+            SunAltD = std::asin(CosZen) / DataGlobalConstants::DegToRadians(); // altitude, degrees
             AirMass = 1.0 / (CosZen + 0.50572 * std::pow(6.07995 + SunAltD, -1.6364));
         }
         return AirMass;
@@ -4053,7 +4053,7 @@ namespace WeatherManager {
         // coefficients a, b, and c.
         // See SUN3 in SolarShading. See SUN2 in BLAST.  See SUN3 in Tarp.
 
-        Real64 const DayCorrection(DataGlobals::Pi * 2.0 / 366.0);
+        Real64 const DayCorrection(DataGlobalConstants::Pi() * 2.0 / 366.0);
 
         // Fitted coefficients of Fourier series | Sine of declination coefficients
         static Array1D<Real64> const SineSolDeclCoef(
@@ -4104,7 +4104,7 @@ namespace WeatherManager {
 
         if (DataEnvironment::Latitude < 0.0) {
             // If in southern hemisphere, compute B and C with a six month time shift.
-            X -= DataGlobals::Pi;
+            X -= DataGlobalConstants::Pi();
             SinX = std::sin(X);
             CosX = std::cos(X);
         }
@@ -4146,7 +4146,7 @@ namespace WeatherManager {
 
         // COMPUTE THE HOUR ANGLE
         Real64 H =
-            (15.0 * (12.0 - (TimeValue + EqOfTime)) + (DataEnvironment::TimeZoneMeridian - DataEnvironment::Longitude)) * DataGlobals::DegToRadians;
+            (15.0 * (12.0 - (TimeValue + EqOfTime)) + (DataEnvironment::TimeZoneMeridian - DataEnvironment::Longitude)) * DataGlobalConstants::DegToRadians();
         Real64 COSH = std::cos(H);
         // COMPUTE THE COSINE OF THE SOLAR ZENITH ANGLE.
         // This is also the Sine of the Solar Altitude Angle
@@ -4188,7 +4188,7 @@ namespace WeatherManager {
              state.dataWeatherManager->HrAngle = (15.0 * (12.0 - ((DataGlobals::CurrentTime + DataEnvironment::TS1TimeOffset) + state.dataWeatherManager->TodayVariables.EquationOfTime)) +
                        (DataEnvironment::TimeZoneMeridian - DataEnvironment::Longitude));
         }
-        Real64 H =  state.dataWeatherManager->HrAngle * DataGlobals::DegToRadians;
+        Real64 H =  state.dataWeatherManager->HrAngle * DataGlobalConstants::DegToRadians();
 
         // Compute the Cosine of the Solar Zenith (Altitude) Angle.
         Real64 CosZenith = DataEnvironment::SinLatitude * state.dataWeatherManager->TodayVariables.SinSolarDeclinAngle +
@@ -4205,8 +4205,8 @@ namespace WeatherManager {
         CosAzimuth = min(1.0, CosAzimuth);
         Real64 SolarAzimuth = std::acos(CosAzimuth);
 
-         state.dataWeatherManager->SolarAltitudeAngle = SolarAltitude / DataGlobals::DegToRadians;
-        state.dataWeatherManager->SolarAzimuthAngle = SolarAzimuth / DataGlobals::DegToRadians;
+         state.dataWeatherManager->SolarAltitudeAngle = SolarAltitude / DataGlobalConstants::DegToRadians();
+        state.dataWeatherManager->SolarAzimuthAngle = SolarAzimuth / DataGlobalConstants::DegToRadians();
         if ( state.dataWeatherManager->HrAngle < 0.0) {
             state.dataWeatherManager->SolarAzimuthAngle = 360.0 - state.dataWeatherManager->SolarAzimuthAngle;
         }
@@ -4470,8 +4470,8 @@ namespace WeatherManager {
         } else {
             DataEnvironment::TimeZoneMeridian = DataEnvironment::TimeZoneNumber * 15.0 - 360.0;
         }
-        DataEnvironment::SinLatitude = std::sin(DataGlobals::DegToRadians * DataEnvironment::Latitude);
-        DataEnvironment::CosLatitude = std::cos(DataGlobals::DegToRadians * DataEnvironment::Latitude);
+        DataEnvironment::SinLatitude = std::sin(DataGlobalConstants::DegToRadians() * DataEnvironment::Latitude);
+        DataEnvironment::CosLatitude = std::cos(DataGlobalConstants::DegToRadians() * DataEnvironment::Latitude);
 
         if (DataEnvironment::Latitude == 0.0 && DataEnvironment::Longitude == 0.0 && DataEnvironment::TimeZoneNumber == 0.0) {
             ShowWarningError("Did you realize that you have Latitude=0.0, Longitude=0.0 and TimeZone=0.0?  Your building site is in the middle of "
@@ -7037,7 +7037,7 @@ namespace WeatherManager {
         // calculated water main temp (F)
         Real64 CurrentWaterMainsTemp =
             Tavg + Offset +
-            Ratio * (Tdiff / 2.0) * latitude_sign * std::sin((0.986 * (DataEnvironment::DayOfYear - 15.0 - Lag) - 90) * DataGlobals::DegToRadians);
+            Ratio * (Tdiff / 2.0) * latitude_sign * std::sin((0.986 * (DataEnvironment::DayOfYear - 15.0 - Lag) - 90) * DataGlobalConstants::DegToRadians());
 
         if (CurrentWaterMainsTemp < 32.0) CurrentWaterMainsTemp = 32.0;
 
@@ -7201,7 +7201,7 @@ namespace WeatherManager {
                                                       130471.0}); // Monthly exterrestrial direct normal illuminance (lum/m2)
 
         Real64 const SunZenith = std::acos(DataEnvironment::SOLCOS(3)); // Solar zenith angle (radians)
-        Real64 const SunAltitude = DataGlobals::PiOvr2 - SunZenith;     // Solar altitude angle (radians)
+        Real64 const SunAltitude = DataGlobalConstants::PiOvr2() - SunZenith;     // Solar altitude angle (radians)
         Real64 const SinSunAltitude = std::sin(SunAltitude);
         // Clearness of sky. SkyClearness close to 1.0 corresponds to an overcast sky.
         // SkyClearness > 6 is a clear sky.
@@ -7212,7 +7212,7 @@ namespace WeatherManager {
             ((DataEnvironment::DifSolarRad + DataEnvironment::BeamSolarRad) / (DataEnvironment::DifSolarRad + 0.0001) + Zeta) / (1.0 + Zeta);
         // Relative optical air mass
         Real64 const AirMass = (1.0 - 0.1 * DataEnvironment::Elevation / 1000.0) /
-                               (SinSunAltitude + 0.15 / std::pow(SunAltitude / DataGlobals::DegToRadians + 3.885, 1.253));
+                               (SinSunAltitude + 0.15 / std::pow(SunAltitude / DataGlobalConstants::DegToRadians() + 3.885, 1.253));
         // In the following, 93.73 is the extraterrestrial luminous efficacy
         DataEnvironment::SkyBrightness = (DataEnvironment::DifSolarRad * 93.73) * AirMass / ExtraDirNormIll(DataEnvironment::Month);
         int ISkyClearness; // Sky clearness bin

@@ -103,7 +103,6 @@ namespace PlantPressureSystem {
 
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
-    using DataGlobals::Pi;
     using namespace DataBranchAirLoopPlant;
 
     // Data

@@ -1127,7 +1127,7 @@ namespace UFADManager {
         HeightComfort = ZoneUCSDUI(UINum).ComfortHeight;
         TempDiffCritRep = ZoneUCSDUI(UINum).TempTrigger;
         DiffArea = ZoneUCSDUI(UINum).DiffArea;
-        ThrowAngle = DegToRadians * ZoneUCSDUI(UINum).DiffAngle;
+        ThrowAngle = DataGlobalConstants::DegToRadians() * ZoneUCSDUI(UINum).DiffAngle;
         SourceHeight = 0.0;
         NumDiffusers = ZoneUCSDUI(UINum).DiffusersPerZone;
         PowerPerPlume = ZoneUCSDUI(UINum).PowerPerPlume;
@@ -1605,7 +1605,7 @@ namespace UFADManager {
         HeightComfort = ZoneUCSDUE(UINum).ComfortHeight;
         TempDiffCritRep = ZoneUCSDUE(UINum).TempTrigger;
         DiffArea = ZoneUCSDUE(UINum).DiffArea;
-        ThrowAngle = DegToRadians * ZoneUCSDUE(UINum).DiffAngle;
+        ThrowAngle = DataGlobalConstants::DegToRadians() * ZoneUCSDUE(UINum).DiffAngle;
         SourceHeight = ZoneUCSDUE(UINum).HeatSrcHeight;
         NumDiffusers = ZoneUCSDUE(UINum).DiffusersPerZone;
         PowerPerPlume = ZoneUCSDUE(UINum).PowerPerPlume;

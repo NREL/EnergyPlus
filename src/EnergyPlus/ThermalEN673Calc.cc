@@ -260,7 +260,6 @@ namespace ThermalEN673Calc {
                        std::string &ErrorMessage)
     {
         // Using
-        using DataGlobals::GravityConstant;
         using DataGlobals::StefanBoltzmann;
 
         // Argument array dimensioning
@@ -410,7 +409,7 @@ namespace ThermalEN673Calc {
                              standard,
                              nperr,
                              ErrorMessage);
-                    Gr(i) = (GravityConstant * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
+                    Gr(i) = (DataGlobalConstants::GravityConstant() * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
                     Ra(i) = Gr(i) * pr;
                     Nu(i) = A * std::pow(Ra(i), n);
                     if (Nu(i) < 1.0) {
@@ -478,7 +477,7 @@ namespace ThermalEN673Calc {
                                      standard,
                                      nperr,
                                      ErrorMessage);
-                            Gr(i) = (GravityConstant * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
+                            Gr(i) = (DataGlobalConstants::GravityConstant() * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
                             Ra(i) = Gr(i) * pr;
                             Nu(i) = A * std::pow(Ra(i), n);
                             if (Nu(i) < 1.0) {

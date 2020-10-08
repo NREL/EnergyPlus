@@ -363,9 +363,9 @@ namespace HeatBalanceKivaManager {
 
         bcs->outdoorTemp = DataEnvironment::OutDryBulbTemp + DataGlobals::KelvinConv;
         bcs->localWindSpeed = DataEnvironment::WindSpeedAt(instance.ground->foundation.grade.roughness);
-        bcs->windDirection = DataEnvironment::WindDir * DataGlobals::DegToRadians;
+        bcs->windDirection = DataEnvironment::WindDir * DataGlobalConstants::DegToRadians();
         bcs->solarAzimuth = std::atan2(DataEnvironment::SOLCOS(1), DataEnvironment::SOLCOS(2));
-        bcs->solarAltitude = DataGlobals::PiOvr2 - std::acos(DataEnvironment::SOLCOS(3));
+        bcs->solarAltitude = DataGlobalConstants::PiOvr2() - std::acos(DataEnvironment::SOLCOS(3));
         bcs->directNormalFlux = DataEnvironment::BeamSolarRad;
         bcs->diffuseHorizontalFlux = DataEnvironment::DifSolarRad;
         bcs->skyEmissivity = pow4(DataEnvironment::SkyTempKelvin) / pow4(bcs->outdoorTemp);

@@ -13523,7 +13523,7 @@ namespace RefrigeratedCase {
         // corresponds to walk in temp and 90% assumed RH(kg water/kg dry air)
         Real64 HumRatioAirWalkIn = Psychrometrics::PsyWFnTdbH(TWalkIn, EnthalpyAirWalkIn);
         Real64 DensityAirWalkIn = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, TWalkIn, HumRatioAirWalkIn);
-        Real64 Conv = DataEnvironment::Latitude * 2.0 * DataGlobals::Pi / 360.0; // Convert DataEnvironment::Latitude to radians
+        Real64 Conv = DataEnvironment::Latitude * 2.0 * DataGlobalConstants::Pi() / 360.0; // Convert DataEnvironment::Latitude to radians
         Real64 Gravity = 9.780373 * (1.0 + 0.0052891 * pow_2(std::sin(Conv)) - 0.0000059 * pow_2(std::sin(2.0 * Conv)));
 
         // CALCULATE ALL LOADS INFLUENCED BY ZONE TEMPERATURE AND RH

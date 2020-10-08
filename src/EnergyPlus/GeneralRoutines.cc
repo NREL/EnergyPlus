@@ -1294,8 +1294,6 @@ void PassiveGapNusseltNumber(Real64 const AspRat, // Aspect Ratio of Gap height 
     // Window5 source code; ISO 15099
 
     // Using/Aliasing
-    using DataGlobals::DegToRadians;
-
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1324,7 +1322,7 @@ void PassiveGapNusseltNumber(Real64 const AspRat, // Aspect Ratio of Gap height 
     Real64 ang;
     Real64 tiltr;
 
-    tiltr = Tilt * DegToRadians;
+    tiltr = Tilt * DataGlobalConstants::DegToRadians();
     Ra = Gr * Pr;
 
     if (Ra > 2.0e6) {

@@ -126,10 +126,8 @@ namespace WindowEquivalentLayer {
     using DataEnvironment::DayOfMonth;
     using DataEnvironment::Month;
     using DataGlobals::CurrentTime;
-    using DataGlobals::GravityConstant;
     using DataGlobals::HourOfDay;
     using DataGlobals::KelvinConv;
-    using DataGlobals::PiOvr2;
     using DataGlobals::StefanBoltzmann;
     using DataGlobals::TimeStep;
     using DataGlobals::UniversalGasConst;
@@ -1035,7 +1033,7 @@ namespace WindowEquivalentLayer {
         int iPX;
 
         X1 = 0.0; // integration limits
-        X2 = PiOvr2;
+        X2 = DataGlobalConstants::PiOvr2();
         nPan = 1;
         SUM = 0.0;
         for (K = 1; K <= KMAX; ++K) {
@@ -1163,8 +1161,6 @@ namespace WindowEquivalentLayer {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the roller blind off-normal properties using semi-empirical relations
 
-        using DataGlobals::DegToRadians;
-
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //   TAU_BT0 = TAU_BB0 + TAU_BD0
         //   (openness)
@@ -1178,7 +1174,7 @@ namespace WindowEquivalentLayer {
         Real64 TAUBB_EXPO;   // exponent in the beam-beam transmittance model
         Real64 TAU_BT;       // beam-total transmittance
 
-        THETA = min(89.99 * DegToRadians, xTHETA);
+        THETA = min(89.99 * DataGlobalConstants::DegToRadians(), xTHETA);
 
         if (TAU_BB0 > 0.9999) {
             TAU_BB = 1.0;
@@ -1193,13 +1189,13 @@ namespace WindowEquivalentLayer {
             }
             TAU_BT = TAU_BT0 * std::pow(std::cos(THETA), TAUBT_EXPO); // always 0 - 1
 
-            Real64 const cos_TAU_BB0(std::cos(TAU_BB0 * PiOvr2));
-            THETA_CUTOFF = DegToRadians * (90.0 - 25.0 * cos_TAU_BB0);
+            Real64 const cos_TAU_BB0(std::cos(TAU_BB0 * DataGlobalConstants::PiOvr2()));
+            THETA_CUTOFF = DataGlobalConstants::DegToRadians() * (90.0 - 25.0 * cos_TAU_BB0);
             if (THETA >= THETA_CUTOFF) {
                 TAU_BB = 0.0;
             } else {
                 TAUBB_EXPO = 0.6 * std::pow(cos_TAU_BB0, 0.3);
-                TAU_BB = TAU_BB0 * std::pow(std::cos(PiOvr2 * THETA / THETA_CUTOFF), TAUBB_EXPO);
+                TAU_BB = TAU_BB0 * std::pow(std::cos(DataGlobalConstants::PiOvr2() * THETA / THETA_CUTOFF), TAUBB_EXPO);
                 // BB correlation can produce results slightly larger than BT
                 // Enforce consistency
                 TAU_BB = min(TAU_BT, TAU_BB);
@@ -1312,8 +1308,6 @@ namespace WindowEquivalentLayer {
         // Calculates insect screen off-normal solar optical properties
         // using semi-empirical relations.
 
-        using DataGlobals::DegToRadians;
-
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //   TAU_BTO = TAU_BB0 + TAU_BD0
 
@@ -1328,7 +1322,7 @@ namespace WindowEquivalentLayer {
         Real64 RHO_BT90;     // beam-total reflectance at 90 deg incidence
         Real64 TAU_BT;       // beam-total transmittance
 
-        Real64 const THETA(min(89.99 * DegToRadians, xTHETA)); // working incident angle, radians
+        Real64 const THETA(min(89.99 * DataGlobalConstants::DegToRadians(), xTHETA)); // working incident angle, radians
         Real64 const COSTHETA(std::cos(THETA));
 
         RHO_W = RHO_BT0 / max(0.00001, 1.0 - TAU_BB0);
@@ -1348,7 +1342,7 @@ namespace WindowEquivalentLayer {
                 TAU_BB = 0.0;
             } else {
                 B = -0.45 * std::log(max(TAU_BB0, 0.01)) + 0.1;
-                TAU_BB = P01(TAU_BB0 * std::pow(std::cos(PiOvr2 * THETA / THETA_CUTOFF), B), TauBB_Name);
+                TAU_BB = P01(TAU_BB0 * std::pow(std::cos(DataGlobalConstants::PiOvr2() * THETA / THETA_CUTOFF), B), TauBB_Name);
             }
 
             B = -0.65 * std::log(max(TAU_BT0, 0.01)) + 0.1;
@@ -1500,8 +1494,6 @@ namespace WindowEquivalentLayer {
         // on the forward facingsurface using optical properties at normal incidence and
         // semi-empirical relations.
 
-        using DataGlobals::DegToRadians;
-
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //   TAU_BTO = TAU_BB0 + TAU_BD0
         //   = openness
@@ -1513,7 +1505,7 @@ namespace WindowEquivalentLayer {
         Real64 RHO_BT90; // beam-total reflectance at 90 deg incidence
         Real64 TAU_BT;   // beam-total transmittance
 
-        THETA = std::abs(max(-89.99 * DegToRadians, min(89.99 * DegToRadians, xTHETA)));
+        THETA = std::abs(max(-89.99 * DataGlobalConstants::DegToRadians(), min(89.99 * DataGlobalConstants::DegToRadians(), xTHETA)));
         // limit -89.99 - +89.99
         // by symmetry, optical properties same at +/- theta
         Real64 const COSTHETA(std::cos(THETA));
@@ -1782,8 +1774,6 @@ namespace WindowEquivalentLayer {
         // METHODOLOGY EMPLOYED:
         // Pleated drape flat-fabric model with rectangular enclosure
 
-        using DataGlobals::DegToRadians;
-
         Real64 DE; // length of directly illuminated surface on side of pleat that
         //   is open on front (same units as S and W)
         Real64 EF;      // length of pleat side shaded surface (W-DE) (same units as S and W)
@@ -1807,8 +1797,8 @@ namespace WindowEquivalentLayer {
         Real64 TAUBF_BB_PERP;
         Real64 TAUBF_BD_PERP;
 
-        OMEGA_V = std::abs(max(-89.5 * DegToRadians, min(89.5 * DegToRadians, OHM_V_RAD)));
-        OMEGA_H = std::abs(max(-89.5 * DegToRadians, min(89.5 * DegToRadians, OHM_H_RAD)));
+        OMEGA_V = std::abs(max(-89.5 * DataGlobalConstants::DegToRadians(), min(89.5 * DataGlobalConstants::DegToRadians(), OHM_V_RAD)));
+        OMEGA_H = std::abs(max(-89.5 * DataGlobalConstants::DegToRadians(), min(89.5 * DataGlobalConstants::DegToRadians(), OHM_H_RAD)));
         // limit profile angles -89.5 - +89.5
         // by symmetry, properties same for +/- profile angle
 
@@ -3800,8 +3790,6 @@ namespace WindowEquivalentLayer {
         // reflectance call this routine a second time with the same input data - except
         // negative the slat angle, PHI_DEG.
 
-        using DataGlobals::DegToRadians;
-
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //    must be > 0
         //   must be > 0
@@ -3843,9 +3831,9 @@ namespace WindowEquivalentLayer {
         CORR = 1;
 
         // limit slat angle to +/- 90 deg
-        PHI = max(-DegToRadians * 90.0, min(DegToRadians * 90.0, PHIx));
+        PHI = max(-DataGlobalConstants::DegToRadians() * 90.0, min(DataGlobalConstants::DegToRadians() * 90.0, PHIx));
         // limit profile angle to +/- 89.5 deg
-        OMEGA = max(-DegToRadians * 89.5, min(DegToRadians * 89.5, OMEGAx));
+        OMEGA = max(-DataGlobalConstants::DegToRadians() * 89.5, min(DataGlobalConstants::DegToRadians() * 89.5, OMEGAx));
 
         SL_RAD = W / max(SL_WR, 0.0000001);
         SL_THETA = 2.0 * std::asin(0.5 * SL_WR);
@@ -4089,7 +4077,7 @@ namespace WindowEquivalentLayer {
             //      PRINT *, PHI, OMEGA, DE, 'BOTLIT'
         }
         //  CHECK TO SEE IF VENETIAN BLIND IS CLOSED
-        if (std::abs(PHI - PiOvr2) < state.dataWindowEquivalentLayer->SMALL_ERROR) { // VENETIAN BLIND IS CLOSED
+        if (std::abs(PHI - DataGlobalConstants::PiOvr2()) < state.dataWindowEquivalentLayer->SMALL_ERROR) { // VENETIAN BLIND IS CLOSED
 
             // CHECK TO SEE IF THERE ARE GAPS IN BETWEEN SLATS WHEN THE BLIND IS CLOSED
             if (W < S) { // YES, THERE ARE GAPS IN BETWEEN SLATS
@@ -4209,7 +4197,7 @@ namespace WindowEquivalentLayer {
         }
 
         //  CHECK TO SEE IF VENETIAN BLIND IS CLOSED
-        if (std::abs(PHI - PiOvr2) < state.dataWindowEquivalentLayer->SMALL_ERROR) { // VENETIAN BLIND IS CLOSED
+        if (std::abs(PHI - DataGlobalConstants::PiOvr2()) < state.dataWindowEquivalentLayer->SMALL_ERROR) { // VENETIAN BLIND IS CLOSED
 
             // CHECK TO SEE IF THERE ARE GAPS IN BETWEEN SLATS WHEN THE BLIND IS CLOSED
             if (W < S) { // YES, THERE ARE GAPS IN BETWEEN SLATS
@@ -5958,7 +5946,7 @@ namespace WindowEquivalentLayer {
         CP = ACP + BCP * TM + BCP * TM * TM;
         VISC = AVISC + BVISC * TM + BVISC * TM * TM;
 
-        FRA = (GravityConstant * RHOGAS * RHOGAS * DT * T * T * T * CP) / (VISC * K * TM * Z * Z);
+        FRA = (DataGlobalConstants::GravityConstant() * RHOGAS * RHOGAS * DT * T * T * T * CP) / (VISC * K * TM * Z * Z);
 
         return FRA;
     }
@@ -6838,8 +6826,6 @@ namespace WindowEquivalentLayer {
         //  Uses a reference glass property.
         // returns TRUE if RAT_TAU < 1 or RAT_1MR < 1 (and thus Specular_Adjust s/b called)
         //    else FALSE
-        using DataGlobals::DegToRadians;
-
         // Return value
         bool Specular_OffNormal;
 
@@ -6868,11 +6854,11 @@ namespace WindowEquivalentLayer {
 
         Specular_OffNormal = true;
         THETA1 = std::abs(THETA);
-        if (THETA1 > PiOvr2 - DegToRadians) {
+        if (THETA1 > DataGlobalConstants::PiOvr2() - DataGlobalConstants::DegToRadians()) {
             // theta > 89 deg
             RAT_TAU = 0.0;
             RAT_1MR = 0.0;
-        } else if (THETA1 >= DegToRadians) {
+        } else if (THETA1 >= DataGlobalConstants::DegToRadians()) {
             // theta >= 1 deg
             N2 = 1.526;
             KL = 55.0 * 0.006;
@@ -7373,8 +7359,6 @@ namespace WindowEquivalentLayer {
         // Return venetian blind longwave properties from slat properties and geometry.
         // If not VB layer returns False.
 
-        using DataGlobals::DegToRadians;
-
         // Return value
         bool VB_LWP;
 
@@ -7392,10 +7376,10 @@ namespace WindowEquivalentLayer {
         RHOUFS_SLAT = 1.0 - L.LWP_MAT.EPSLF - L.LWP_MAT.TAUL; // upward surface
 
         // TODO: are there cases where 2 calls not needed (RHODFS_SLAT == RHOUFS_SLAT??)
-        VB_DIFF(L.S, L.W, DegToRadians * L.PHI_DEG, RHODFS_SLAT, RHOUFS_SLAT, L.LWP_MAT.TAUL, RHOLF, LLWP.TAUL);
+        VB_DIFF(L.S, L.W, DataGlobalConstants::DegToRadians() * L.PHI_DEG, RHODFS_SLAT, RHOUFS_SLAT, L.LWP_MAT.TAUL, RHOLF, LLWP.TAUL);
         LLWP.EPSLF = 1.0 - RHOLF - LLWP.TAUL;
 
-        VB_DIFF(L.S, L.W, -DegToRadians * L.PHI_DEG, RHODFS_SLAT, RHOUFS_SLAT, L.LWP_MAT.TAUL, RHOLB, TAULX);
+        VB_DIFF(L.S, L.W, -DataGlobalConstants::DegToRadians() * L.PHI_DEG, RHODFS_SLAT, RHOUFS_SLAT, L.LWP_MAT.TAUL, RHOLB, TAULX);
         LLWP.EPSLB = 1.0 - RHOLB - LLWP.TAUL;
 
         VB_LWP = true;
@@ -7417,8 +7401,6 @@ namespace WindowEquivalentLayer {
         // PURPOSE OF THIS FUNCTION:
         // Returns venetian blind off-normal short wave properties. If not VB layer
         // returns False.
-        using DataGlobals::DegToRadians;
-
         // Return value
         bool VB_SWP;
 
@@ -7438,15 +7420,15 @@ namespace WindowEquivalentLayer {
 
         if (DODIFFUSE) {
 
-            VB_DIFF(L.S, L.W, DegToRadians * L.PHI_DEG, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSFDD, LSWP.TAUS_DD);
+            VB_DIFF(L.S, L.W, DataGlobalConstants::DegToRadians() * L.PHI_DEG, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSFDD, LSWP.TAUS_DD);
 
-            VB_DIFF(L.S, L.W, -DegToRadians * L.PHI_DEG, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
+            VB_DIFF(L.S, L.W, -DataGlobalConstants::DegToRadians() * L.PHI_DEG, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
         } else {
             // modify angle-dependent values for actual profile angle
             VB_SOL46_CURVE(state, L.S,
                            L.W,
                            SL_WR,
-                           DegToRadians * L.PHI_DEG,
+                           DataGlobalConstants::DegToRadians() * L.PHI_DEG,
                            OMEGA,
                            L.SWP_MAT.RHOSBDD,
                            L.SWP_MAT.RHOSFDD,
@@ -7458,7 +7440,7 @@ namespace WindowEquivalentLayer {
             VB_SOL46_CURVE(state, L.S,
                            L.W,
                            SL_WR,
-                           -DegToRadians * L.PHI_DEG,
+                           -DataGlobalConstants::DegToRadians() * L.PHI_DEG,
                            OMEGA,
                            L.SWP_MAT.RHOSBDD,
                            L.SWP_MAT.RHOSFDD,
@@ -7577,7 +7559,7 @@ namespace WindowEquivalentLayer {
 
         // must be consistent with IsControlledShade()
         if (IsVBLayer(L) && L.CNTRL != state.dataWindowEquivalentLayer->lscNONE) {
-            if (THETA < 0.0 || THETA >= PiOvr2) {
+            if (THETA < 0.0 || THETA >= DataGlobalConstants::PiOvr2()) {
                 OMEGA_DEG = -1.0; // diffuse only
             } else if (L.LTYPE == ltyVBHOR) {
                 // horiz VB
@@ -8315,7 +8297,6 @@ namespace WindowEquivalentLayer {
         // Uses ISO Standard 15099 method to calculate the inside surface
         // convection coefficient for fenestration ratings.
 
-        using DataGlobals::DegToRadians;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // Return value
@@ -8335,7 +8316,7 @@ namespace WindowEquivalentLayer {
         Real64 Nuint;           // Nusselt number for interior surface convection
 
         TiltDeg = 90.0;
-        sineTilt = std::sin(TiltDeg * DegToRadians); // degrees as arg
+        sineTilt = std::sin(TiltDeg * DataGlobalConstants::DegToRadians()); // degrees as arg
 
         // Begin calculating for ISO 15099 method.
         // mean film temperature
@@ -8349,7 +8330,7 @@ namespace WindowEquivalentLayer {
         Cp = 1002.737 + 1.2324E-2 * TmeanFilmKelvin;   // Table B.3 in ISO 15099
 
         RaH =
-            (pow_2(rho) * pow_3(Height) * GravityConstant * Cp * std::abs(TSurfIn - TAirIn)) / (TmeanFilmKelvin * mu * lambda); // eq 132 in ISO 15099
+            (pow_2(rho) * pow_3(Height) * DataGlobalConstants::GravityConstant() * Cp * std::abs(TSurfIn - TAirIn)) / (TmeanFilmKelvin * mu * lambda); // eq 132 in ISO 15099
 
         // eq. 135 in ISO 15099 (only need this one because tilt is 90 deg)
         Nuint = 0.56 * root_4(RaH * sineTilt);

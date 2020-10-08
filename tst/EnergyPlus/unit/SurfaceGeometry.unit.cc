@@ -482,8 +482,8 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     CosZoneRelNorth.allocate(1);
     SinZoneRelNorth.allocate(1);
 
-    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
+    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
@@ -934,8 +934,8 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
     EXPECT_FALSE(ErrorsFound);
     CosZoneRelNorth.allocate(1);
     SinZoneRelNorth.allocate(1);
-    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
+    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
     GetSurfaceData(state, ErrorsFound); // setup zone geometry and get zone data
@@ -2837,8 +2837,8 @@ TEST_F(EnergyPlusFixture, MakeRectangularVertices)
 
     CosZoneRelNorth.allocate(zoneNum);
     SinZoneRelNorth.allocate(zoneNum);
-    CosZoneRelNorth(zoneNum) = std::cos(-Zone(zoneNum).RelNorth * DataGlobals::DegToRadians);
-    SinZoneRelNorth(zoneNum) = std::sin(-Zone(zoneNum).RelNorth * DataGlobals::DegToRadians);
+    CosZoneRelNorth(zoneNum) = std::cos(-Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians());
+    SinZoneRelNorth(zoneNum) = std::sin(-Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians());
 
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
@@ -3890,8 +3890,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     CosZoneRelNorth.allocate(2);
     SinZoneRelNorth.allocate(2);
 
-    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
+    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     CosZoneRelNorth(2) = CosZoneRelNorth(1);
     SinZoneRelNorth(2) = SinZoneRelNorth(1);
     CosBldgRelNorth = 1.0;

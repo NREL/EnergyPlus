@@ -111,7 +111,6 @@ namespace HVACCooledBeam {
     using DataEnvironment::StdRhoAir;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::NumOfZones;
-    using DataGlobals::Pi;
     using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
@@ -855,7 +854,7 @@ namespace HVACCooledBeam {
                         DesLoadPerBeam = DesCoilLoad / NumBeams;
                         DesAirFlowPerBeam = CoolBeam(CBNum).MaxAirVolFlow / NumBeams;
                         WaterVolFlowPerBeam = CoolBeam(CBNum).MaxCoolWaterVolFlow / NumBeams;
-                        WaterVel = WaterVolFlowPerBeam / (Pi * pow_2(CoolBeam(CBNum).InDiam) / 4.0);
+                        WaterVel = WaterVolFlowPerBeam / (DataGlobalConstants::Pi() * pow_2(CoolBeam(CBNum).InDiam) / 4.0);
                         if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtCoolPeak > 0.0) {
                             DT = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtCoolPeak -
                                  0.5 * (CoolBeam(CBNum).DesInletWaterTemp + CoolBeam(CBNum).DesOutletWaterTemp);
@@ -1165,7 +1164,7 @@ namespace HVACCooledBeam {
             IndFlow =
                 CoolBeam(CBNum).K1 * std::pow(DT, CoolBeam(CBNum).n) + CoolBeam(CBNum).Kin * CoolBeam(CBNum).BeamFlow / CoolBeam(CBNum).BeamLength;
             CoilFlow = (IndFlow / CoolBeam(CBNum).a0) * StdRhoAir;
-            WaterVel = CWFlowPerBeam / (rho * Pi * pow_2(CoolBeam(CBNum).InDiam) / 4.0);
+            WaterVel = CWFlowPerBeam / (rho * DataGlobalConstants::Pi() * pow_2(CoolBeam(CBNum).InDiam) / 4.0);
             if (WaterVel > MinWaterVel) {
                 K = CoolBeam(CBNum).a * std::pow(DT, CoolBeam(CBNum).n1) * std::pow(CoilFlow, CoolBeam(CBNum).n2) *
                     std::pow(WaterVel, CoolBeam(CBNum).n3);

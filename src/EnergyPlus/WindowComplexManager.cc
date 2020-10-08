@@ -98,11 +98,9 @@ namespace WindowComplexManager {
     using namespace DataComplexFenestration;
     using namespace DataVectorTypes;
     using namespace DataBSDFWindow;
-    using DataGlobals::DegToRadians;
     using DataGlobals::KelvinConv;
     using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::NumOfZones;
-    using DataGlobals::Pi;
     using DataGlobals::rTinyValue;
     using DataGlobals::TimeStepZoneSec;
     using namespace DataSurfaces; // , ONLY: TotSurfaces,TotWindows,Surface,SurfaceWindow   !update this later
@@ -1036,11 +1034,11 @@ namespace WindowComplexManager {
                 // No basis symmetry
                 Basis.BasisSymmetryType = BasisSymmetry_None;
                 Thetas(1) = 0.0;                // By convention, the first basis point is at the center (theta=0,phi=0)
-                Thetas(NThetas + 1) = 0.5 * Pi; // and there is an N+1st point (not a basis element) at Pi/2
+                Thetas(NThetas + 1) = 0.5 * DataGlobalConstants::Pi(); // and there is an N+1st point (not a basis element) at Pi/2
                 NPhis(1) = 1;
                 NumElem = 1;
                 for (I = 2; I <= NThetas; ++I) {
-                    Thetas(I) = state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(1, I) * DegToRadians;
+                    Thetas(I) = state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(1, I) * DataGlobalConstants::DegToRadians();
                     NPhis(I) = std::floor(state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(2, I) + 0.001);
                     if (NPhis(I) <= 0) ShowFatalError("WindowComplexManager: incorrect input, no. phis must be positive.");
                     NumElem += NPhis(I);
@@ -1072,22 +1070,22 @@ namespace WindowComplexManager {
                         UpperTheta = Theta + HalfDTheta;
                     } else if (I == NThetas) {
                         LastTheta = Thetas(I - 1);
-                        NextTheta = 0.5 * Pi;
+                        NextTheta = 0.5 * DataGlobalConstants::Pi();
                         LowerTheta = UpperTheta; // It is assumed that Thetas(N) is the mean between the previous
                         // UpperTheta and pi/2.
-                        UpperTheta = 0.5 * Pi;
+                        UpperTheta = 0.5 * DataGlobalConstants::Pi();
                     }
-                    DPhi = 2.0 * Pi / NPhis(I);
+                    DPhi = 2.0 * DataGlobalConstants::Pi() / NPhis(I);
                     if (I == 1) {
-                        Lamda = Pi * pow_2(std::sin(UpperTheta));
-                        SolAng = 2.0 * Pi * (1.0 - std::cos(UpperTheta));
+                        Lamda = DataGlobalConstants::Pi() * pow_2(std::sin(UpperTheta));
+                        SolAng = 2.0 * DataGlobalConstants::Pi() * (1.0 - std::cos(UpperTheta));
                     } else {
                         Lamda = 0.5 * DPhi * (pow_2(std::sin(UpperTheta)) - pow_2(std::sin(LowerTheta))); // For W6 basis, lamda is funct of Theta and
                         // NPhis, not individual Phi
                         SolAng = DPhi * (std::cos(LowerTheta) - std::cos(UpperTheta));
                     }
                     DTheta = UpperTheta - LowerTheta;
-                    Basis.Phis(I, NPhis(I) + 1) = 2.0 * Pi; // Non-basis-element Phi point for table searching in Phi
+                    Basis.Phis(I, NPhis(I) + 1) = 2.0 * DataGlobalConstants::Pi(); // Non-basis-element Phi point for table searching in Phi
                     for (J = 1; J <= NPhis(I); ++J) {
                         ++ElemNo;
                         Basis.BasisIndex(J, I) = ElemNo;
@@ -1110,11 +1108,11 @@ namespace WindowComplexManager {
                 //  Axisymmetric basis symmetry (Note this only useful specular systems, where it allows shorter data input)
                 Basis.BasisSymmetryType = BasisSymmetry_Axisymmetric;
                 Thetas(1) = 0.0;                // By convention, the first basis point is at the center (theta=0,phi=0)
-                Thetas(NThetas + 1) = 0.5 * Pi; // and there is an N+1st point (not a basis element) at Pi/2
+                Thetas(NThetas + 1) = 0.5 * DataGlobalConstants::Pi(); // and there is an N+1st point (not a basis element) at Pi/2
                 NPhis = 1;                      // As insurance, define one phi for each theta
                 NumElem = 1;
                 for (I = 2; I <= NThetas; ++I) {
-                    Thetas(I) = state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(1, I) * DegToRadians;
+                    Thetas(I) = state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(1, I) * DataGlobalConstants::DegToRadians();
                     ++NumElem;
                 }
                 Basis.Phis.allocate(1, NThetas);
@@ -1127,7 +1125,7 @@ namespace WindowComplexManager {
                 Basis.Thetas = Thetas;
                 Basis.NPhis = NPhis;
                 ElemNo = 0;
-                DPhi = 2.0 * Pi;
+                DPhi = 2.0 * DataGlobalConstants::Pi();
                 for (I = 1; I <= NThetas; ++I) {
                     Theta = Thetas(I);
                     if (I == 1) { // First theta value must always be zero
@@ -1144,14 +1142,14 @@ namespace WindowComplexManager {
                         UpperTheta = Theta + HalfDTheta;
                     } else if (I == NThetas) {
                         LastTheta = Thetas(I - 1);
-                        NextTheta = 0.5 * Pi;
+                        NextTheta = 0.5 * DataGlobalConstants::Pi();
                         LowerTheta = UpperTheta; // It is assumed that Thetas(N) is the mean between the previous
                         // UpperTheta and pi/2.
-                        UpperTheta = 0.5 * Pi;
+                        UpperTheta = 0.5 * DataGlobalConstants::Pi();
                     }
                     if (I == 1) {
-                        Lamda = Pi * pow_2(std::sin(UpperTheta));
-                        SolAng = 2.0 * Pi * (1.0 - std::cos(UpperTheta));
+                        Lamda = DataGlobalConstants::Pi() * pow_2(std::sin(UpperTheta));
+                        SolAng = 2.0 * DataGlobalConstants::Pi() * (1.0 - std::cos(UpperTheta));
                     } else {
                         Lamda = 0.5 * DPhi * (pow_2(std::sin(UpperTheta)) - pow_2(std::sin(LowerTheta))); // For W6 basis, lamda is funct of Theta and
                         // NPhis, not individual Phi
@@ -1208,12 +1206,12 @@ namespace WindowComplexManager {
                 // first element, theta=0, is special case
                 BasisElem.Theta = Theta;
                 BasisElem.Phi = 0.0;
-                BasisElem.dPhi = 2.0 * Pi;
+                BasisElem.dPhi = 2.0 * DataGlobalConstants::Pi();
                 BasisElem.UpprTheta = UpperTheta;
                 BasisElem.dTheta = BasisElem.UpprTheta - Theta;
                 BasisElem.LwrTheta = Theta;
                 BasisElem.LwrPhi = 0.0;
-                BasisElem.UpprPhi = 2.0 * Pi;
+                BasisElem.UpprPhi = 2.0 * DataGlobalConstants::Pi();
             } else {
                 BasisElem.Theta = Theta;
                 BasisElem.Phi = Phi;
@@ -1321,8 +1319,8 @@ namespace WindowComplexManager {
         //  Define the central ray directions (in world coordinate system)
 
         SurfaceWindow(ISurf).ComplexFen.State(IState).NLayers = state.dataConstruction->Construct(IConst).BSDFInput.NumLayers;
-        Azimuth = DegToRadians * Surface(ISurf).Azimuth;
-        Tilt = DegToRadians * Surface(ISurf).Tilt;
+        Azimuth = DataGlobalConstants::DegToRadians() * Surface(ISurf).Azimuth;
+        Tilt = DataGlobalConstants::DegToRadians() * Surface(ISurf).Tilt;
 
         // For incoming grid
 
@@ -2094,16 +2092,16 @@ namespace WindowComplexManager {
                 DayPos.Azimuth = std::atan(UnitVect.y / UnitVect.x);
             } else {
                 if (UnitVect.y >= 0.0) {
-                    DayPos.Azimuth = Pi + std::atan(UnitVect.y / UnitVect.x);
+                    DayPos.Azimuth = DataGlobalConstants::Pi() + std::atan(UnitVect.y / UnitVect.x);
                 } else {
-                    DayPos.Azimuth = -Pi + std::atan(UnitVect.y / UnitVect.x);
+                    DayPos.Azimuth = -DataGlobalConstants::Pi() + std::atan(UnitVect.y / UnitVect.x);
                 }
             }
         } else {
             if (UnitVect.y >= 0.0) {
-                DayPos.Azimuth = PiOvr2;
+                DayPos.Azimuth = DataGlobalConstants::PiOvr2();
             } else {
-                DayPos.Azimuth = -PiOvr2;
+                DayPos.Azimuth = -DataGlobalConstants::PiOvr2();
             }
         }
 
@@ -2239,12 +2237,12 @@ namespace WindowComplexManager {
         }
 
         // get window tilt and azimuth
-        Gamma = DegToRadians * Surface(ISurf).Tilt;
-        Alpha = DegToRadians * Surface(ISurf).Azimuth;
+        Gamma = DataGlobalConstants::DegToRadians() * Surface(ISurf).Tilt;
+        Alpha = DataGlobalConstants::DegToRadians() * Surface(ISurf).Azimuth;
         // get the corresponding local Theta, Phi for ray
         W6CoordsFromWorldVect(state, RayToFind, RadType, Gamma, Alpha, Theta, Phi);
 
-        if (Theta >= 0.5 * Pi) { // Ray was in not in correct hemisphere
+        if (Theta >= 0.5 * DataGlobalConstants::Pi()) { // Ray was in not in correct hemisphere
             RayIndex = 0;
             return RayIndex;
         }
@@ -2373,7 +2371,7 @@ namespace WindowComplexManager {
                 RdotX = dot(W6x, RayVect);
                 Psi = std::atan2(-RdotY / Sint, -RdotX / Sint);
                 if (Psi < 0.0) {
-                    Phi = 2.0 * Pi + Psi;
+                    Phi = 2.0 * DataGlobalConstants::Pi() + Psi;
                 } else {
                     Phi = Psi;
                 }
@@ -2385,7 +2383,7 @@ namespace WindowComplexManager {
                 RdotX = dot(W6x, RayVect);
                 Psi = std::atan2(RdotY / Sint, RdotX / Sint);
                 if (Psi < 0.0) {
-                    Phi = 2.0 * Pi + Psi;
+                    Phi = 2.0 * DataGlobalConstants::Pi() + Psi;
                 } else {
                     Phi = Psi;
                 }
@@ -2398,7 +2396,7 @@ namespace WindowComplexManager {
                 RdotX = dot(W6x, RayVect);
                 Psi = std::atan2(RdotY / Sint, RdotX / Sint);
                 if (Psi < 0.0) {
-                    Phi = 2.0 * Pi + Psi;
+                    Phi = 2.0 * DataGlobalConstants::Pi() + Psi;
                 } else {
                     Phi = Psi;
                 }
@@ -2410,7 +2408,7 @@ namespace WindowComplexManager {
                 RdotX = dot(W6x, RayVect);
                 Psi = std::atan2(-RdotY / Sint, -RdotX / Sint);
                 if (Psi < 0.0) {
-                    Phi = 2 * Pi + Psi;
+                    Phi = 2 * DataGlobalConstants::Pi() + Psi;
                 } else {
                     Phi = Psi;
                 }
@@ -2423,7 +2421,7 @@ namespace WindowComplexManager {
                 RdotX = dot(W6x, RayVect);
                 Psi = std::atan2(RdotY / Sint, RdotX / Sint);
                 if (Psi < 0.0) {
-                    Phi = 2.0 * Pi + Psi;
+                    Phi = 2.0 * DataGlobalConstants::Pi() + Psi;
                 } else {
                     Phi = Psi;
                 }
@@ -2435,7 +2433,7 @@ namespace WindowComplexManager {
                 RdotX = dot(W6x, RayVect);
                 Psi = std::atan2(RdotY / Sint, RdotX / Sint);
                 if (Psi < 0.0) {
-                    Phi = 2.0 * Pi + Psi;
+                    Phi = 2.0 * DataGlobalConstants::Pi() + Psi;
                 } else {
                     Phi = Psi;
                 }
@@ -2444,7 +2442,7 @@ namespace WindowComplexManager {
             }
         }
         if (std::abs(Cost) < rTinyValue) Cost = 0.0;
-        if (Cost < 0.0) Theta = Pi - Theta; // This signals ray out of hemisphere
+        if (Cost < 0.0) Theta = DataGlobalConstants::Pi() - Theta; // This signals ray out of hemisphere
     }
 
     void CalcComplexWindowThermal(EnergyPlusData &state,

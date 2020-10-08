@@ -1040,9 +1040,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-        using DataGlobals::PiOvr2;
-
         // Return value
         Real64 InterpBlind;
 
@@ -1053,7 +1050,7 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaAngRad(Pi / 36.0); // Profile angle increment (rad)
+        Real64 const DeltaAngRad(DataGlobalConstants::Pi() / 36.0); // Profile angle increment (rad)
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1065,11 +1062,11 @@ namespace General {
         Real64 InterpFac; // Interpolation factor
         int IAlpha;       // Profile angle index
 
-        if (ProfAng > PiOvr2 || ProfAng < -PiOvr2) {
+        if (ProfAng > DataGlobalConstants::PiOvr2() || ProfAng < -DataGlobalConstants::PiOvr2()) {
             InterpBlind = 0.0;
         } else {
-            IAlpha = 1 + int((ProfAng + PiOvr2) / DeltaAngRad);
-            InterpFac = (ProfAng - (-PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
+            IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2()) / DeltaAngRad);
+            InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2() + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
             InterpBlind = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
         }
         return InterpBlind;
@@ -1095,9 +1092,6 @@ namespace General {
         // REFERENCES:na
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-        using DataGlobals::PiOvr2;
-
         // Return value
         Real64 InterpProfAng;
 
@@ -1105,18 +1099,18 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaAngRad(Pi / 36.0); // Profile angle increment (rad)
+        Real64 const DeltaAngRad(DataGlobalConstants::Pi() / 36.0); // Profile angle increment (rad)
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 InterpFac; // Interpolation factor
         int IAlpha;       // Profile angle index
 
         // DeltaAng = Pi/36
-        if (ProfAng > PiOvr2 || ProfAng < -PiOvr2) {
+        if (ProfAng > DataGlobalConstants::PiOvr2() || ProfAng < -DataGlobalConstants::PiOvr2()) {
             InterpProfAng = 0.0;
         } else {
-            IAlpha = 1 + int((ProfAng + PiOvr2) / DeltaAngRad);
-            InterpFac = (ProfAng - (-PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
+            IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2()) / DeltaAngRad);
+            InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2() + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
             InterpProfAng = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
         }
         return InterpProfAng;
@@ -1147,9 +1141,7 @@ namespace General {
     //
     //		// USE STATEMENTS:
     //		// Using/Aliasing
-    //		using DataGlobals::Pi;
-    //		using DataGlobals::PiOvr2;
-    //		using DataSurfaces::MaxSlatAngs;
+    //		//		//		using DataSurfaces::MaxSlatAngs;
     //
     //		// Return value
     //		Real64 InterpSlatAng;
@@ -1210,7 +1202,6 @@ namespace General {
         // REFERENCES:na
 
         // Using/Aliasing
-        using DataGlobals::Pi;
         using DataSurfaces::MaxSlatAngs;
 
         // Return value
@@ -1220,19 +1211,19 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static Real64 const DeltaAng(Pi / (double(MaxSlatAngs) - 1.0));
-        static Real64 const DeltaAng_inv((double(MaxSlatAngs) - 1.0) / Pi);
+        static Real64 const DeltaAng(DataGlobalConstants::Pi() / (double(MaxSlatAngs) - 1.0));
+        static Real64 const DeltaAng_inv((double(MaxSlatAngs) - 1.0) / DataGlobalConstants::Pi());
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 InterpFac; // Interpolation factor
         int IBeta;        // Slat angle index
         Real64 SlatAng1;
 
-        if (SlatAng > Pi || SlatAng < 0.0) {
+        if (SlatAng > DataGlobalConstants::Pi() || SlatAng < 0.0) {
             //  InterpSlatAng = 0.0
             //  RETURN
             // END IF
-            SlatAng1 = min(max(SlatAng, 0.0), Pi);
+            SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi());
         } else {
             SlatAng1 = SlatAng;
         }
@@ -1271,8 +1262,6 @@ namespace General {
         // REFERENCES:na
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-        using DataGlobals::PiOvr2;
         using DataSurfaces::MaxSlatAngs;
 
         // Return value
@@ -1285,8 +1274,8 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaProfAng(Pi / 36.0);
-        Real64 const DeltaSlatAng(Pi / (double(MaxSlatAngs) - 1.0));
+        Real64 const DeltaProfAng(DataGlobalConstants::Pi() / 36.0);
+        Real64 const DeltaSlatAng(DataGlobalConstants::Pi() / (double(MaxSlatAngs) - 1.0));
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 ProfAngRatio; // Profile angle interpolation factor
@@ -1302,21 +1291,21 @@ namespace General {
         Real64 SlatAng1;
         Real64 ProfAng1;
 
-        if (SlatAng > Pi || SlatAng < 0.0 || ProfAng > PiOvr2 || ProfAng < -PiOvr2) {
+        if (SlatAng > DataGlobalConstants::Pi() || SlatAng < 0.0 || ProfAng > DataGlobalConstants::PiOvr2() || ProfAng < -DataGlobalConstants::PiOvr2()) {
             //  InterpProfSlatAng = 0.0
             //  RETURN
-            SlatAng1 = min(max(SlatAng, 0.0), Pi);
+            SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi());
 
             // This is not correct, fixed 2/17/2010
             // ProfAng1 = MIN(MAX(SlatAng,-PiOvr2),PiOvr2)
-            ProfAng1 = min(max(ProfAng, -PiOvr2), PiOvr2);
+            ProfAng1 = min(max(ProfAng, -DataGlobalConstants::PiOvr2()), DataGlobalConstants::PiOvr2());
         } else {
             SlatAng1 = SlatAng;
             ProfAng1 = ProfAng;
         }
 
-        IAlpha = int((ProfAng1 + PiOvr2) / DeltaProfAng) + 1;
-        ProfAngRatio = (ProfAng1 + PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng;
+        IAlpha = int((ProfAng1 + DataGlobalConstants::PiOvr2()) / DeltaProfAng) + 1;
+        ProfAngRatio = (ProfAng1 + DataGlobalConstants::PiOvr2() - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng;
 
         if (VarSlats) { // Variable-angle slats: interpolate in profile angle and slat angle
             IBeta = int(SlatAng1 / DeltaSlatAng) + 1;
@@ -1360,9 +1349,6 @@ namespace General {
         // REFERENCES:na
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-        using DataGlobals::PiOvr2;
-
         // Return value
         Real64 BlindBeamBeamTrans;
 
@@ -1394,7 +1380,7 @@ namespace General {
             fEdge = 0.0;
             fEdge1 = 0.0;
             if (std::abs(std::sin(gamma)) > 0.01) {
-                if ((SlatAng > 0.0 && SlatAng <= PiOvr2 && ProfAng <= SlatAng) || (SlatAng > PiOvr2 && SlatAng <= Pi && ProfAng > -(Pi - SlatAng)))
+                if ((SlatAng > 0.0 && SlatAng <= DataGlobalConstants::PiOvr2() && ProfAng <= SlatAng) || (SlatAng > DataGlobalConstants::PiOvr2() && SlatAng <= DataGlobalConstants::Pi() && ProfAng > -(DataGlobalConstants::Pi() - SlatAng)))
                     fEdge1 =
                         SlatThickness * std::abs(std::sin(gamma)) / ((SlatSeparation + SlatThickness / std::abs(std::sin(SlatAng))) * CosProfAng);
                 fEdge = min(1.0, std::abs(fEdge1));

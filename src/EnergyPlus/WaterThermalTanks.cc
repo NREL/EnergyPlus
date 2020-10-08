@@ -2721,7 +2721,7 @@ namespace WaterThermalTanks {
             // adjust tank height used in these calculations for testing heater height
             Real64 tankHeightForTesting;
             if (Tank.Shape == TankShapeEnum::HorizCylinder) {
-                tankHeightForTesting = 2.0 * sqrt((Tank.Volume / Tank.Height) / DataGlobals::Pi);
+                tankHeightForTesting = 2.0 * sqrt((Tank.Volume / Tank.Height) / DataGlobalConstants::Pi());
             } else {
                 tankHeightForTesting = Tank.Height;
             }
@@ -4257,7 +4257,7 @@ namespace WaterThermalTanks {
                                 // For horizontal cylinders, the tank "height" is actually the length.
                                 // We need to calculate the height.
                                 Real64 EndArea = Tank.Volume / Tank.Height;
-                                Real64 Radius = std::sqrt(EndArea / DataGlobals::Pi);
+                                Real64 Radius = std::sqrt(EndArea / DataGlobalConstants::Pi());
                                 TankHeight = 2.0 * Radius; // actual vertical height
                             }
 
@@ -5147,8 +5147,8 @@ namespace WaterThermalTanks {
 
             Real64 Perimeter_loc;
             if (this->Shape == TankShapeEnum::VertCylinder) {
-                Real64 Radius = std::sqrt(EndArea / DataGlobals::Pi);
-                Perimeter_loc = 2.0 * DataGlobals::Pi * Radius;
+                Real64 Radius = std::sqrt(EndArea / DataGlobalConstants::Pi());
+                Perimeter_loc = 2.0 * DataGlobalConstants::Pi() * Radius;
             } else { // TankShapeOther
                 Perimeter_loc = this->Perimeter;
             }
@@ -5179,7 +5179,7 @@ namespace WaterThermalTanks {
         } else {                              // Tank%Shape == TankShapeHorizCylinder
             Real64 TankLength = this->Height; // Height is the length in the axial direction
             Real64 EndArea = this->Volume / TankLength;
-            Real64 Radius = std::sqrt(EndArea / DataGlobals::Pi);
+            Real64 Radius = std::sqrt(EndArea / DataGlobalConstants::Pi());
             TankHeight = 2.0 * Radius; // Actual vertical height
             Real64 NodeEndArea = EndArea / NumNodes;
 
@@ -10582,7 +10582,7 @@ namespace WaterThermalTanks {
         if ((this->VolumeWasAutoSized) && (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) &&
             DataPlant::PlantFirstSizesOkayToFinalize) { // might set height
             if ((this->HeightWasAutoSized) && (!this->VolumeWasAutoSized)) {
-                this->Height = std::pow((4.0 * this->Volume * pow_2(this->Sizing.HeightAspectRatio)) / DataGlobals::Pi, 0.3333333333333333);
+                this->Height = std::pow((4.0 * this->Volume * pow_2(this->Sizing.HeightAspectRatio)) / DataGlobalConstants::Pi(), 0.3333333333333333);
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Height [m]", this->Height);
                 }
@@ -10709,7 +10709,7 @@ namespace WaterThermalTanks {
         if ((this->VolumeWasAutoSized) && (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) &&
             DataPlant::PlantFirstSizesOkayToFinalize) { // might set height
             if ((this->HeightWasAutoSized) && (!this->VolumeWasAutoSized)) {
-                this->Height = std::pow((4.0 * this->Volume * pow_2(this->Sizing.HeightAspectRatio)) / DataGlobals::Pi, 0.3333333333333333);
+                this->Height = std::pow((4.0 * this->Volume * pow_2(this->Sizing.HeightAspectRatio)) / DataGlobalConstants::Pi(), 0.3333333333333333);
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Height [m]", this->Height);
                 }

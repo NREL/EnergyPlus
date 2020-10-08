@@ -2688,9 +2688,6 @@ namespace ThermalISO15099Calc {
         // If there is forced air in the room than use SPC142 corelation 5.49 to calculate the room side film coefficient.
 
         // Using
-        using DataGlobals::GravityConstant;
-        using DataGlobals::Pi;
-
         // Argument array dimensioning
         iprop.dim(maxgas, maxlay1);
         frct.dim(maxgas, maxlay1);
@@ -2729,7 +2726,7 @@ namespace ThermalISO15099Calc {
                 }
             }
         } else {                             // main IF - else
-            tiltr = tilt * 2.0 * Pi / 360.0; // convert tilt in degrees to radians
+            tiltr = tilt * 2.0 * DataGlobalConstants::Pi() / 360.0; // convert tilt in degrees to radians
             tmean = tair + 0.25 * (t - tair);
             delt = std::abs(tair - t);
 
@@ -2758,7 +2755,7 @@ namespace ThermalISO15099Calc {
 
             //   Calculate grashoff number:
             //   The grashoff number is the Rayleigh Number (equation 5.29) in SPC142 divided by the Prandtl Number (prand):
-            gr = GravityConstant * pow_3(height) * delt * pow_2(dens) / (tmean * pow_2(visc));
+            gr = DataGlobalConstants::GravityConstant() * pow_3(height) * delt * pow_2(dens) / (tmean * pow_2(visc));
 
             RaL = gr * pr;
             //   write(*,*)' RaCrit,RaL,gr,pr '
@@ -2841,8 +2838,6 @@ namespace ThermalISO15099Calc {
         //   delt  temperature difference
 
         // Using
-        using DataGlobals::GravityConstant;
-
         // Argument array dimensioning
         EP_SIZE_CHECK(theta, maxlay2);
         EP_SIZE_CHECK(Tgap, maxlay1);
@@ -2900,7 +2895,7 @@ namespace ThermalISO15099Calc {
 
                 // Calculate grashoff number:
                 // The grashoff number is the Rayleigh Number (equation 5.29) in SPC142 divided by the Prandtl Number (prand):
-                ra = GravityConstant * pow_3(gap(i)) * delt * cp * pow_2(dens) / (tmean * visc * con);
+                ra = DataGlobalConstants::GravityConstant() * pow_3(gap(i)) * delt * cp * pow_2(dens) / (tmean * visc * con);
                 Rayleigh(i) = ra;
                 // write(*,*) 'height,gap(i),asp',height,gap(i),asp
                 // asp = 1
@@ -2940,8 +2935,6 @@ namespace ThermalISO15099Calc {
         //***********************************************************************
 
         // Using
-        using DataGlobals::Pi;
-
         // Argument array dimensioning
         EP_SIZE_CHECK(SupportPillar, maxlay);
         EP_SIZE_CHECK(scon, maxlay);
@@ -2972,7 +2965,7 @@ namespace ThermalISO15099Calc {
                 // Average glass conductivity is taken as average from both glass surrounding gap
                 aveGlassConductivity = (scon(i) + scon(i + 1)) / 2;
 
-                cpa = 2.0 * aveGlassConductivity * PillarRadius(i) / (pow_2(PillarSpacing(i)) * (1.0 + 2.0 * gap(i) / (Pi * PillarRadius(i))));
+                cpa = 2.0 * aveGlassConductivity * PillarRadius(i) / (pow_2(PillarSpacing(i)) * (1.0 + 2.0 * gap(i) / (DataGlobalConstants::Pi() * PillarRadius(i))));
 
                 // It is important to add on prevoius values caluculated for gas
                 hcgas(i + 1) += cpa;
@@ -2994,8 +2987,6 @@ namespace ThermalISO15099Calc {
         //   nperr
 
         // Using
-        using DataGlobals::Pi;
-
         // Locals
         Real64 subNu1;
         Real64 subNu2;
@@ -3015,7 +3006,7 @@ namespace ThermalISO15099Calc {
         Nu90 = 0.0;
         Nu60 = 0.0;
         G = 0.0;
-        tiltr = tilt * 2.0 * Pi / 360.0;      // convert tilt in degrees to radians
+        tiltr = tilt * 2.0 * DataGlobalConstants::Pi() / 360.0;      // convert tilt in degrees to radians
         if ((tilt >= 0.0) && (tilt < 60.0)) { // ISO/DIS 15099 - chapter 5.3.3.1
             subNu1 = 1.0 - 1708.0 / (ra * std::cos(tiltr));
             subNu1 = pos(subNu1);
@@ -3175,8 +3166,6 @@ namespace ThermalISO15099Calc {
         //********************************************************************
 
         // Using
-        using DataGlobals::GravityConstant;
-
         // Argument array dimensioning
         EP_SIZE_CHECK(ibc, 2);
         EP_SIZE_CHECK(theta, maxlay2);
@@ -3309,7 +3298,7 @@ namespace ThermalISO15099Calc {
                 tmean, ipropg, frctg, presure(i + 1), nmix(i + 1), wght, gcon, gvis, gcp, con, visc, dens, cp, pr, ISO15099, nperr, ErrorMessage);
             gap_NOSD = gap(SDLayerIndex - 1) + gap(SDLayerIndex) + thick(SDLayerIndex);
             // determine the Rayleigh number:
-            rayl = GravityConstant * pow_3(gap_NOSD) * delt * cp * pow_2(dens) / (tmean * visc * con);
+            rayl = DataGlobalConstants::GravityConstant() * pow_3(gap_NOSD) * delt * cp * pow_2(dens) / (tmean * visc * con);
             asp = height / gap_NOSD;
             // determine the Nusselt number:
             nusselt(tilt, rayl, asp, gnu, nperr, ErrorMessage);

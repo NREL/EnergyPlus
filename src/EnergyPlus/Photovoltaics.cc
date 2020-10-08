@@ -970,7 +970,6 @@ namespace Photovoltaics {
         // Using/Aliasing
         using DataEnvironment::Elevation;
         using DataEnvironment::SOLCOS;
-        using DataGlobals::DegToRadians;
         using DataHeatBalance::CosIncidenceAngle;
         using DataHeatBalance::QRadSWOutIncident;
         using DataHeatBalance::QRadSWOutIncidentBeam;
@@ -1000,8 +999,8 @@ namespace Photovoltaics {
         //   get input from elsewhere in Energyplus for the current point in the simulation
         PVarray(PVnum).SNLPVinto.IcBeam = QRadSWOutIncidentBeam(ThisSurf);                                  //(W/m2)from DataHeatBalance
         PVarray(PVnum).SNLPVinto.IcDiffuse = QRadSWOutIncident(ThisSurf) - QRadSWOutIncidentBeam(ThisSurf); //(W/ m2)(was kJ/hr m2)
-        PVarray(PVnum).SNLPVinto.IncidenceAngle = std::acos(CosIncidenceAngle(ThisSurf)) / DegToRadians;    // (deg) from dataHeatBalance
-        PVarray(PVnum).SNLPVinto.ZenithAngle = std::acos(SOLCOS(3)) / DegToRadians;                         //(degrees),
+        PVarray(PVnum).SNLPVinto.IncidenceAngle = std::acos(CosIncidenceAngle(ThisSurf)) / DataGlobalConstants::DegToRadians();    // (deg) from dataHeatBalance
+        PVarray(PVnum).SNLPVinto.ZenithAngle = std::acos(SOLCOS(3)) / DataGlobalConstants::DegToRadians();                         //(degrees),
         PVarray(PVnum).SNLPVinto.Tamb = Surface(ThisSurf).OutDryBulbTemp;                                   //(deg. C)
         PVarray(PVnum).SNLPVinto.WindSpeed = Surface(ThisSurf).WindSpeed;                                   // (m/s)
         PVarray(PVnum).SNLPVinto.Altitude = Elevation;                                                      // from DataEnvironment via USE
@@ -2164,8 +2163,6 @@ namespace Photovoltaics {
         // na
 
         // Using/Aliasing
-        using DataGlobals::DegToRadians;
-
         // Return value
         Real64 AbsoluteAirMass;
 
@@ -2185,7 +2182,7 @@ namespace Photovoltaics {
         // na
 
         if (SolZen < 89.9) {
-            Real64 const AM(1.0 / (std::cos(SolZen * DegToRadians) + 0.5057 * std::pow(96.08 - SolZen, -1.634)));
+            Real64 const AM(1.0 / (std::cos(SolZen * DataGlobalConstants::DegToRadians()) + 0.5057 * std::pow(96.08 - SolZen, -1.634)));
             AbsoluteAirMass = std::exp(-0.0001184 * Altitude) * AM;
         } else {
             Real64 const AM(36.32); // evaluated above at SolZen = 89.9 issue #5528

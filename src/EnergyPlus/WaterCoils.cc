@@ -1164,7 +1164,7 @@ namespace WaterCoils {
             // effective fin diameter for detailed flat fin coil
             if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == state.dataWaterCoils->CoilModel_Detailed) { // 'DETAILED FLAT FIN'
                 state.dataWaterCoils->WaterCoil(CoilNum).EffectiveFinDiam = std::sqrt(4.0 * state.dataWaterCoils->WaterCoil(CoilNum).FinDiam * state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth /
-                                                                (Pi * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubeRows * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubesPerRow));
+                                                                (DataGlobalConstants::Pi() * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubeRows * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubesPerRow));
 
                 //   calculate fixed geometric parameters of the coil:
                 //   Total Area
@@ -1183,7 +1183,7 @@ namespace WaterCoils {
                     state.dataWaterCoils->WaterCoil(CoilNum).TubeDepthSpacing *= (pow_2(TubeToFinDiamRatio) + 0.1);
                     state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth = state.dataWaterCoils->WaterCoil(CoilNum).TubeDepthSpacing * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubeRows;
                     state.dataWaterCoils->WaterCoil(CoilNum).EffectiveFinDiam = std::sqrt(4.0 * state.dataWaterCoils->WaterCoil(CoilNum).FinDiam * state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth /
-                                                                    (Pi * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubeRows * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubesPerRow));
+                                                                    (DataGlobalConstants::Pi() * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubeRows * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubesPerRow));
                     state.dataWaterCoils->WaterCoil(CoilNum).CoilEffectiveInsideDiam =
                         4.0 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth / state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea;
                     TubeToFinDiamRatio = state.dataWaterCoils->WaterCoil(CoilNum).TubeOutsideDiam / state.dataWaterCoils->WaterCoil(CoilNum).EffectiveFinDiam;
@@ -3131,7 +3131,7 @@ namespace WaterCoils {
                                    RoutineName);
             //      water flow velocity - assuming number of water circuits = NumOfTubesPerRow
             TubeWaterVel = WaterMassFlowRate * 4.0 /
-                           (state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubesPerRow * rho * Pi * state.dataWaterCoils->WaterCoil(CoilNum).TubeInsideDiam * state.dataWaterCoils->WaterCoil(CoilNum).TubeInsideDiam);
+                           (state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubesPerRow * rho * DataGlobalConstants::Pi() * state.dataWaterCoils->WaterCoil(CoilNum).TubeInsideDiam * state.dataWaterCoils->WaterCoil(CoilNum).TubeInsideDiam);
             //      air mass flow rate per unit area
             ScaledAirMassFlowRate = (1.0 + InletAirHumRat) * AirMassFlow / state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea;
             //      air flow Reynold's Number
@@ -4979,7 +4979,7 @@ namespace WaterCoils {
             IBessFunc = 1.0;
             for (LoopCount = 1; LoopCount <= 30; ++LoopCount) { // Start of 1st LoopCount Loop
                 if (std::abs(TERM) <= std::abs(ErrorTol * IBessFunc)) {
-                    IBessFunc *= std::exp(BessFuncArg) / std::sqrt(2.0 * Pi * BessFuncArg);
+                    IBessFunc *= std::exp(BessFuncArg) / std::sqrt(2.0 * DataGlobalConstants::Pi() * BessFuncArg);
                     return;
                 }
                 TERM *= 0.125 / BessFuncArg * (pow_2(2 * LoopCount - 1) - 4 * BessFuncOrd * BessFuncOrd) / double(LoopCount);

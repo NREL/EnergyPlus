@@ -72,12 +72,6 @@ namespace DataGlobals {
     // This data-only module is a repository for all variables which are considered
     // to be "global" in nature in EnergyPlus.
 
-    Real64 const Pi(3.14159265358979324); // Pi 3.1415926535897932384626435
-    Real64 const PiOvr2(Pi / 2.0);        // Pi/2
-    Real64 const TwoPi(2.0 * Pi);         // 2*Pi 6.2831853071795864769252868
-    Real64 const GravityConstant(9.807);
-    Real64 const DegToRadians(Pi / 180.0);           // Conversion for Degrees to Radians
-    Real64 const RadToDeg(180.0 / Pi);               // Conversion for Radians to Degrees
     Real64 const SecInHour(3600.0);                  // Conversion for hours to seconds
     Real64 const HoursInDay(24.0);                   // Number of Hours in Day
     Real64 const SecsInDay(SecInHour *HoursInDay);   // Number of seconds in Day

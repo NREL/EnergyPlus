@@ -870,14 +870,14 @@ namespace SolarCollectors {
 
             this->Tilt = DataSurfaces::Surface(SurfNum).Tilt;
             this->TiltR2V = std::abs(90.0 - Tilt);
-            this->CosTilt = std::cos(Tilt * DataGlobals::DegToRadians);
-            this->SinTilt = std::sin(1.8 * Tilt * DataGlobals::DegToRadians);
+            this->CosTilt = std::cos(Tilt * DataGlobalConstants::DegToRadians());
+            this->SinTilt = std::sin(1.8 * Tilt * DataGlobalConstants::DegToRadians());
 
             // Diffuse reflectance of the cover for solar radiation diffusely reflected back from the absober
             // plate to the cover.  The diffuse solar radiation reflected back from the absober plate to the
             // cover is represented by the 60 degree equivalent incident angle.  This diffuse reflectance is
             // used to calculate the transmittance - absorptance product (Duffie and Beckman, 1991)
-            Real64 Theta = 60.0 * DataGlobals::DegToRadians;
+            Real64 Theta = 60.0 * DataGlobalConstants::DegToRadians();
             Real64 TransSys = 0.0;
             Real64 RefSys = 0.0;
             Real64 AbsCover1 = 0.0;
@@ -894,7 +894,7 @@ namespace SolarCollectors {
 
             // transmittance-absorptance product for sky diffuse radiation.  Uses equivalent incident angle
             // of sky radiation (radians), and is calculated according to Brandemuehl and Beckman (1980):
-            Theta = (59.68 - 0.1388 * Tilt + 0.001497 * pow_2(Tilt)) * DataGlobals::DegToRadians;
+            Theta = (59.68 - 0.1388 * Tilt + 0.001497 * pow_2(Tilt)) * DataGlobalConstants::DegToRadians();
             this->CalcTransRefAbsOfCover(Theta, TransSys, RefSys, AbsCover1, AbsCover2);
             this->TauAlphaSkyDiffuse = TransSys * SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate /
                                        (1.0 - (1.0 - SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate) * this->RefDiffInnerCover);
@@ -903,7 +903,7 @@ namespace SolarCollectors {
 
             // transmittance-absorptance product for ground diffuse radiation.  Uses equivalent incident angle
             // of ground radiation (radians), and is calculated according to Brandemuehl and Beckman (1980):
-            Theta = (90.0 - 0.5788 * Tilt + 0.002693 * pow_2(Tilt)) * DataGlobals::DegToRadians;
+            Theta = (90.0 - 0.5788 * Tilt + 0.002693 * pow_2(Tilt)) * DataGlobalConstants::DegToRadians();
             this->CalcTransRefAbsOfCover(Theta, TransSys, RefSys, AbsCover1, AbsCover2);
             this->TauAlphaGndDiffuse = TransSys * SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate /
                                        (1.0 - (1.0 - SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate) * this->RefDiffInnerCover);
@@ -992,10 +992,10 @@ namespace SolarCollectors {
             Real64 tilt = DataSurfaces::Surface(SurfNum).Tilt;
 
             // Equivalent incident angle of sky radiation (radians)
-            Real64 ThetaSky = (59.68 - 0.1388 * tilt + 0.001497 * pow_2(tilt)) * DataGlobals::DegToRadians;
+            Real64 ThetaSky = (59.68 - 0.1388 * tilt + 0.001497 * pow_2(tilt)) * DataGlobalConstants::DegToRadians();
 
             // Equivalent incident angle of ground radiation (radians)
-            Real64 ThetaGnd = (90.0 - 0.5788 * tilt + 0.002693 * pow_2(tilt)) * DataGlobals::DegToRadians;
+            Real64 ThetaGnd = (90.0 - 0.5788 * tilt + 0.002693 * pow_2(tilt)) * DataGlobalConstants::DegToRadians();
 
             incidentAngleModifier = (DataHeatBalance::QRadSWOutIncidentBeam(SurfNum) * SolarCollectors::Parameters(ParamNum).IAM(ThetaBeam) +
                                      DataHeatBalance::QRadSWOutIncidentSkyDiffuse(SurfNum) * SolarCollectors::Parameters(ParamNum).IAM(ThetaSky) +
@@ -1209,7 +1209,7 @@ namespace SolarCollectors {
         Real64 IAM;
 
         // cut off IAM for angles greater than 60 degrees. (CR 7534)
-        Real64 CutoffAngle = 60.0 * DataGlobals::DegToRadians;
+        Real64 CutoffAngle = 60.0 * DataGlobalConstants::DegToRadians();
         if (std::abs(IncidentAngle) > CutoffAngle) { // cut off, model curves not robust beyond cutoff
             // curves from FSEC/SRCC testing are only certified to 60 degrees, larger angles can cause numerical problems in curves
             IAM = 0.0;
@@ -1943,7 +1943,7 @@ namespace SolarCollectors {
 
         // Grashof number
         Real64 GrNum = gravity * VolExpWater * DensOfWater * DensOfWater * PrOfWater * DeltaT * pow_3(Lc) / pow_2(VisOfWater);
-        Real64 CosTilt = std::cos(TiltR2V * DataGlobals::DegToRadians);
+        Real64 CosTilt = std::cos(TiltR2V * DataGlobalConstants::DegToRadians());
 
         Real64 RaNum; // Raleigh number
         Real64 NuL;   // Nusselt number

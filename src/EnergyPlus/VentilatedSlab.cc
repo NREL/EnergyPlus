@@ -4335,8 +4335,6 @@ namespace VentilatedSlab {
         // Code based loosely on code from IBLAST program (research version)
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-
         // Return value
         Real64 CalcVentSlabHXEffectTerm;
 
@@ -4405,7 +4403,7 @@ namespace VentilatedSlab {
         SysAirMassFlow = AirMassFlow / CoreNumbers;
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-        ReD = 4.0 * SysAirMassFlow * FlowFraction / (Pi * MUactual * CoreDiameter);
+        ReD = 4.0 * SysAirMassFlow * FlowFraction / (DataGlobalConstants::Pi() * MUactual * CoreDiameter);
 
         // Calculate the Nusselt number based on what flow regime one is in
         if (ReD >= MaxLaminarRe) { // Turbulent flow --> use Colburn equation
@@ -4421,7 +4419,7 @@ namespace VentilatedSlab {
         // NTU = UA/[(Mdot*Cp)min]
         // where: U = h (convection coefficient) and h = (k)(Nu)/D
         //        A = Pi*D*TubeLength
-        NTU = Pi * Kactual * NuD * CoreLength / (SysAirMassFlow * CpAppAir); // FlowFraction cancels out here
+        NTU = DataGlobalConstants::Pi() * Kactual * NuD * CoreLength / (SysAirMassFlow * CpAppAir); // FlowFraction cancels out here
 
         // Calculate Epsilon*MassFlowRate*Cp
         if (NTU > MaxExpPower) {

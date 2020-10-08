@@ -141,10 +141,8 @@ namespace AirflowNetworkBalanceManager {
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::CurrentTime;
     using DataGlobals::DayOfSim;
-    using DataGlobals::DegToRadians;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::NumOfZones;
-    using DataGlobals::Pi;
     using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SecInHour;
     using DataGlobals::TimeStepZone;
@@ -6339,7 +6337,7 @@ namespace AirflowNetworkBalanceManager {
                     // Wind-pressure coefficients for vertical facades, low-rise building
 
                     if (UtilityRoutines::SameString(AirflowNetworkBalanceManager::AirflowNetworkSimu.BldgType, "LowRise") && FacadeNum <= 4) {
-                        IncRad = IncAng * AirflowNetworkBalanceManager::DegToRadians;
+                        IncRad = IncAng * DataGlobalConstants::DegToRadians();
                         Real64 const cos_IncRad_over_2(std::cos(IncRad / 2.0));
                         vals[windDirNum - 1] = 0.6 * std::log(1.248 - 0.703 * std::sin(IncRad / 2.0) - 1.175 * pow_2(std::sin(IncRad)) +
                                                               0.131 * pow_3(std::sin(2.0 * IncRad * SideRatioFac)) + 0.769 * cos_IncRad_over_2 +
@@ -6417,7 +6415,7 @@ namespace AirflowNetworkBalanceManager {
                     DelAng = mod(IncAng, 10.0);
                     WtAng = 1.0 - DelAng / 10.0;
                     // Wind-pressure coefficients for vertical facades, low-rise building
-                    IncRad = IncAng * AirflowNetworkBalanceManager::DegToRadians;
+                    IncRad = IncAng * DataGlobalConstants::DegToRadians();
                     valsByFacade[FacadeNum - 1][windDirNum - 1] =
                         0.6 * std::log(1.248 - 0.703 * std::sin(IncRad / 2.0) - 1.175 * pow_2(std::sin(IncRad)) +
                                        0.131 * pow_3(std::sin(2.0 * IncRad * SideRatioFac)) + 0.769 * std::cos(IncRad / 2.0) +
@@ -6558,7 +6556,7 @@ namespace AirflowNetworkBalanceManager {
             Real64 Tair_IP = Tair * 1.8 + 32.0;     // Convert C to F
             Real64 mdot_IP = mdot * 2.20462 * 3600; // Convert kg/s to lb/hr
             Real64 Dh_IP = Dh * 3.28084;            // Convert m to ft
-            Real64 Ai_IP = pow_2(Dh_IP) * Pi / 4;
+            Real64 Ai_IP = pow_2(Dh_IP) * DataGlobalConstants::Pi() / 4;
 
             Real64 CorrelationCoeff = 0.00368 + 1.5e-6 * (Tair_IP - 80);
             Real64 MassFlux = mdot_IP / Ai_IP; // lb/hr-ft2
@@ -6601,7 +6599,6 @@ namespace AirflowNetworkBalanceManager {
         // ASTM C1340
 
         using DataEnvironment::WindSpeed;
-        using DataGlobals::GravityConstant;
         using DataGlobals::KelvinConv;
 
         Real64 k = airThermConductivity(Ts);
@@ -6614,7 +6611,7 @@ namespace AirflowNetworkBalanceManager {
             Real64 Pr = airPrandtl((Ts + Tamb) / 2, Wamb, Pamb);
             Real64 KinVisc = airKinematicVisc((Ts + Tamb) / 2, Wamb, Pamb);
             Real64 Beta = 2.0 / ((Tamb + KelvinConv) + (Ts + KelvinConv));
-            Real64 Gr = GravityConstant * Beta * std::abs(Ts - Tamb) * pow_3(Dh) / pow_2(KinVisc);
+            Real64 Gr = DataGlobalConstants::GravityConstant() * Beta * std::abs(Ts - Tamb) * pow_3(Dh) / pow_2(KinVisc);
             Real64 Ra = Gr * Pr;
             Real64 Nu_free(0);
 
@@ -6779,7 +6776,7 @@ namespace AirflowNetworkBalanceManager {
                 Real64 Tin = AirflowNetworkNodeSimu(LF).TZ;
                 Real64 TDuctSurf = (Tamb + Tin) / 2.0;
                 Real64 TDuctSurf_K = TDuctSurf + KelvinConv;
-                Real64 DuctSurfArea = DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).hydraulicDiameter * Pi;
+                Real64 DuctSurfArea = DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).hydraulicDiameter * DataGlobalConstants::Pi();
 
                 // If user defined view factors not present, calculate air-to-air heat transfer
                 if (AirflowNetworkLinkageData(i).LinkageViewFactorObjectNum == 0) {
@@ -6946,11 +6943,11 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     DirSign = -1.0;
                 }
-                Ei = General::epexp(-0.001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Pi,
+                Ei = General::epexp(-0.001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * DataGlobalConstants::Pi(),
                               (DirSign * AirflowNetworkLinkSimu(i).FLOW * CpAir));
                 Tamb = AirflowNetworkNodeSimu(LT).TZ;
                 if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
-                    Ei = General::epexp(-0.001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Pi,
+                    Ei = General::epexp(-0.001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * DataGlobalConstants::Pi(),
                                             (AirflowNetworkLinkSimu(i).FLOW2 * CpAir));
                     state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
                     state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * Ei;
@@ -7208,7 +7205,7 @@ namespace AirflowNetworkBalanceManager {
                     DirSign = -1.0;
                 }
                 Ei = General::epexp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L *
-                                        DisSysCompDuctData(TypeNum).hydraulicDiameter * Pi, (DirSign * AirflowNetworkLinkSimu(i).FLOW));
+                                        DisSysCompDuctData(TypeNum).hydraulicDiameter * DataGlobalConstants::Pi(), (DirSign * AirflowNetworkLinkSimu(i).FLOW));
                 if (AirflowNetworkLinkageData(i).ZoneNum < 0) {
                     Wamb = OutHumRat;
                 } else if (AirflowNetworkLinkageData(i).ZoneNum == 0) {
@@ -7218,7 +7215,7 @@ namespace AirflowNetworkBalanceManager {
                 }
                 if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
                     Ei = General::epexp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L *
-                                            DisSysCompDuctData(TypeNum).hydraulicDiameter * Pi, (AirflowNetworkLinkSimu(i).FLOW2));
+                                            DisSysCompDuctData(TypeNum).hydraulicDiameter * DataGlobalConstants::Pi(), (AirflowNetworkLinkSimu(i).FLOW2));
                     state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                     state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Ei;
                     state.dataAirflowNetworkBalanceManager->MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Wamb * (1.0 - Ei);
@@ -7239,12 +7236,12 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     DirSign = -1.0;
                 }
-                Ei = General::epexp(-0.0001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Pi,
+                Ei = General::epexp(-0.0001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * DataGlobalConstants::Pi(),
                                         (DirSign * AirflowNetworkLinkSimu(i).FLOW));
                 Wamb = AirflowNetworkNodeSimu(LT).WZ;
                 if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
 
-                    Ei = General::epexp(-0.0001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Pi,
+                    Ei = General::epexp(-0.0001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * DataGlobalConstants::Pi(),
                                             (AirflowNetworkLinkSimu(i).FLOW2));
                     state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                     state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Ei;
@@ -10838,9 +10835,9 @@ namespace AirflowNetworkBalanceManager {
                     if (std::abs(state.dataAirflowNetworkBalanceManager->IncAng) > 180.0) state.dataAirflowNetworkBalanceManager->IncAng -= 360.0;
                     if (UtilityRoutines::SameString(AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation")) {
                         if (std::abs(state.dataAirflowNetworkBalanceManager->IncAng) <= 67.5) {
-                            PiFormula(windDirNum) = 0.44 * sign(std::sin(2.67 * std::abs(state.dataAirflowNetworkBalanceManager->IncAng) * Pi / 180.0), state.dataAirflowNetworkBalanceManager->IncAng);
+                            PiFormula(windDirNum) = 0.44 * sign(std::sin(2.67 * std::abs(state.dataAirflowNetworkBalanceManager->IncAng) * DataGlobalConstants::Pi() / 180.0), state.dataAirflowNetworkBalanceManager->IncAng);
                         } else if (std::abs(state.dataAirflowNetworkBalanceManager->IncAng) <= 180.0) {
-                            PiFormula(windDirNum) = -0.69 * sign(std::sin((288 - 1.6 * std::abs(state.dataAirflowNetworkBalanceManager->IncAng)) * Pi / 180.0), state.dataAirflowNetworkBalanceManager->IncAng);
+                            PiFormula(windDirNum) = -0.69 * sign(std::sin((288 - 1.6 * std::abs(state.dataAirflowNetworkBalanceManager->IncAng)) * DataGlobalConstants::Pi() / 180.0), state.dataAirflowNetworkBalanceManager->IncAng);
                         }
                         SigmaFormula(windDirNum) = 0.423 - 0.00163 * std::abs(state.dataAirflowNetworkBalanceManager->IncAng);
                         DeltaCp(ZnNum).WindDir(windDirNum) =

@@ -296,7 +296,7 @@ namespace TARCOGGasses90 {
             return;
         }
 
-        B = alpha * (gama + 1) / (gama - 1) * std::sqrt(UniversalGasConst / (8 * Pi * mwght * tmean));
+        B = alpha * (gama + 1) / (gama - 1) * std::sqrt(UniversalGasConst / (8 * DataGlobalConstants::Pi() * mwght * tmean));
 
         cond = B * pressure;
     }

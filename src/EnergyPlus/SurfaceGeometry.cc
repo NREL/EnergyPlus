@@ -420,12 +420,12 @@ namespace SurfaceGeometry {
         // as setting up DaylightingCoords
 
         // these include building north axis and Building Rotation for Appendix G
-        CosBldgRelNorth = std::cos(-(BuildingAzimuth + BuildingRotationAppendixG) * DegToRadians);
-        SinBldgRelNorth = std::sin(-(BuildingAzimuth + BuildingRotationAppendixG) * DegToRadians);
+        CosBldgRelNorth = std::cos(-(BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians());
+        SinBldgRelNorth = std::sin(-(BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians());
 
         // these are only for Building Rotation for Appendix G when using world coordinate system
-        CosBldgRotAppGonly = std::cos(-BuildingRotationAppendixG * DegToRadians);
-        SinBldgRotAppGonly = std::sin(-BuildingRotationAppendixG * DegToRadians);
+        CosBldgRotAppGonly = std::cos(-BuildingRotationAppendixG * DataGlobalConstants::DegToRadians());
+        SinBldgRotAppGonly = std::sin(-BuildingRotationAppendixG * DataGlobalConstants::DegToRadians());
 
         CosZoneRelNorth.allocate(NumOfZones);
         SinZoneRelNorth.allocate(NumOfZones);
@@ -435,8 +435,8 @@ namespace SurfaceGeometry {
 
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
 
-            CosZoneRelNorth(ZoneNum) = std::cos(-Zone(ZoneNum).RelNorth * DegToRadians);
-            SinZoneRelNorth(ZoneNum) = std::sin(-Zone(ZoneNum).RelNorth * DegToRadians);
+            CosZoneRelNorth(ZoneNum) = std::cos(-Zone(ZoneNum).RelNorth * DataGlobalConstants::DegToRadians());
+            SinZoneRelNorth(ZoneNum) = std::sin(-Zone(ZoneNum).RelNorth * DataGlobalConstants::DegToRadians());
         }
         GetSurfaceData(state, ErrorsFound);
 
@@ -1314,10 +1314,10 @@ namespace SurfaceGeometry {
                 SurfaceTmp(CurNewSurf).Tilt = SurfTilt;
 
                 // Sine and cosine of azimuth and tilt
-                SurfaceTmp(CurNewSurf).SinAzim = std::sin(SurfWorldAz * DegToRadians);
-                SurfaceTmp(CurNewSurf).CosAzim = std::cos(SurfWorldAz * DegToRadians);
-                SurfaceTmp(CurNewSurf).SinTilt = std::sin(SurfTilt * DegToRadians);
-                SurfaceTmp(CurNewSurf).CosTilt = std::cos(SurfTilt * DegToRadians);
+                SurfaceTmp(CurNewSurf).SinAzim = std::sin(SurfWorldAz * DataGlobalConstants::DegToRadians());
+                SurfaceTmp(CurNewSurf).CosAzim = std::cos(SurfWorldAz * DataGlobalConstants::DegToRadians());
+                SurfaceTmp(CurNewSurf).SinTilt = std::sin(SurfTilt * DataGlobalConstants::DegToRadians());
+                SurfaceTmp(CurNewSurf).CosTilt = std::cos(SurfTilt * DataGlobalConstants::DegToRadians());
                 // Outward normal unit vector (pointing away from room)
                 SurfaceTmp(CurNewSurf).OutNormVec = SurfaceTmp(CurNewSurf).NewellSurfaceNormalVector;
                 for (n = 1; n <= 3; ++n) {
@@ -3875,10 +3875,10 @@ namespace SurfaceGeometry {
 
         SurfAzimuth = SurfaceTmp(SurfNum).Azimuth;
         SurfTilt = SurfaceTmp(SurfNum).Tilt;
-        CosSurfAzimuth = std::cos(SurfAzimuth * DegToRadians);
-        SinSurfAzimuth = std::sin(SurfAzimuth * DegToRadians);
-        CosSurfTilt = std::cos(SurfTilt * DegToRadians);
-        SinSurfTilt = std::sin(SurfTilt * DegToRadians);
+        CosSurfAzimuth = std::cos(SurfAzimuth * DataGlobalConstants::DegToRadians());
+        SinSurfAzimuth = std::sin(SurfAzimuth * DataGlobalConstants::DegToRadians());
+        CosSurfTilt = std::cos(SurfTilt * DataGlobalConstants::DegToRadians());
+        SinSurfTilt = std::sin(SurfTilt * DataGlobalConstants::DegToRadians());
         if (!SurfWorldCoordSystem) {
             if (SurfaceTmp(SurfNum).Zone > 0) {
                 Xb = XCoord * CosZoneRelNorth(SurfaceTmp(SurfNum).Zone) - YCoord * SinZoneRelNorth(SurfaceTmp(SurfNum).Zone) +
@@ -5152,10 +5152,10 @@ namespace SurfaceGeometry {
 
         SurfAzimuth = SurfaceTmp(SurfNum).Azimuth;
         SurfTilt = SurfaceTmp(SurfNum).Tilt;
-        CosSurfAzimuth = std::cos(SurfAzimuth * DegToRadians);
-        SinSurfAzimuth = std::sin(SurfAzimuth * DegToRadians);
-        CosSurfTilt = std::cos(SurfTilt * DegToRadians);
-        SinSurfTilt = std::sin(SurfTilt * DegToRadians);
+        CosSurfAzimuth = std::cos(SurfAzimuth * DataGlobalConstants::DegToRadians());
+        SinSurfAzimuth = std::sin(SurfAzimuth * DataGlobalConstants::DegToRadians());
+        CosSurfTilt = std::cos(SurfTilt * DataGlobalConstants::DegToRadians());
+        SinSurfTilt = std::sin(SurfTilt * DataGlobalConstants::DegToRadians());
         BaseCosSurfAzimuth = SurfaceTmp(BaseSurfNum).CosAzim;
         BaseSinSurfAzimuth = SurfaceTmp(BaseSurfNum).SinAzim;
         BaseCosSurfTilt = SurfaceTmp(BaseSurfNum).CosTilt;
@@ -5698,10 +5698,10 @@ namespace SurfaceGeometry {
                         YLLC = -Xp * SurfaceTmp(BaseSurfNum).SinAzim * SurfaceTmp(BaseSurfNum).CosTilt -
                                Yp * SurfaceTmp(BaseSurfNum).CosAzim * SurfaceTmp(BaseSurfNum).CosTilt + Zp * SurfaceTmp(BaseSurfNum).SinTilt;
 
-                        SurfaceTmp(SurfNum).CosAzim = std::cos(SurfaceTmp(SurfNum).Azimuth * DegToRadians);
-                        SurfaceTmp(SurfNum).SinAzim = std::sin(SurfaceTmp(SurfNum).Azimuth * DegToRadians);
-                        SurfaceTmp(SurfNum).CosTilt = std::cos(SurfaceTmp(SurfNum).Tilt * DegToRadians);
-                        SurfaceTmp(SurfNum).SinTilt = std::sin(SurfaceTmp(SurfNum).Tilt * DegToRadians);
+                        SurfaceTmp(SurfNum).CosAzim = std::cos(SurfaceTmp(SurfNum).Azimuth * DataGlobalConstants::DegToRadians());
+                        SurfaceTmp(SurfNum).SinAzim = std::sin(SurfaceTmp(SurfNum).Azimuth * DataGlobalConstants::DegToRadians());
+                        SurfaceTmp(SurfNum).CosTilt = std::cos(SurfaceTmp(SurfNum).Tilt * DataGlobalConstants::DegToRadians());
+                        SurfaceTmp(SurfNum).SinTilt = std::sin(SurfaceTmp(SurfNum).Tilt * DataGlobalConstants::DegToRadians());
 
                         SurfaceTmp(SurfNum).Sides = 4;
                         SurfaceTmp(SurfNum).Vertex.allocate(SurfaceTmp(SurfNum).Sides);
@@ -5785,10 +5785,10 @@ namespace SurfaceGeometry {
                         TiltAngle = SurfaceTmp(Found).Tilt;
                         SurfaceTmp(SurfNum).Tilt = TiltAngle;
                         SurfaceTmp(SurfNum).Azimuth = SurfaceTmp(Found).Azimuth - (180.0 - rNumericArgs(9));
-                        SurfaceTmp(SurfNum).CosAzim = std::cos(SurfaceTmp(SurfNum).Azimuth * DegToRadians);
-                        SurfaceTmp(SurfNum).SinAzim = std::sin(SurfaceTmp(SurfNum).Azimuth * DegToRadians);
-                        SurfaceTmp(SurfNum).CosTilt = std::cos(SurfaceTmp(SurfNum).Tilt * DegToRadians);
-                        SurfaceTmp(SurfNum).SinTilt = std::sin(SurfaceTmp(SurfNum).Tilt * DegToRadians);
+                        SurfaceTmp(SurfNum).CosAzim = std::cos(SurfaceTmp(SurfNum).Azimuth * DataGlobalConstants::DegToRadians());
+                        SurfaceTmp(SurfNum).SinAzim = std::sin(SurfaceTmp(SurfNum).Azimuth * DataGlobalConstants::DegToRadians());
+                        SurfaceTmp(SurfNum).CosTilt = std::cos(SurfaceTmp(SurfNum).Tilt * DataGlobalConstants::DegToRadians());
+                        SurfaceTmp(SurfNum).SinTilt = std::sin(SurfaceTmp(SurfNum).Tilt * DataGlobalConstants::DegToRadians());
 
                         SurfaceTmp(SurfNum).Sides = 4;
                         SurfaceTmp(SurfNum).Vertex.allocate(SurfaceTmp(SurfNum).Sides);
@@ -7791,10 +7791,10 @@ namespace SurfaceGeometry {
             SurfaceTmp(SurfNum).Tilt = SurfTilt;
 
             // Sine and cosine of azimuth and tilt
-            SurfaceTmp(SurfNum).SinAzim = std::sin(SurfWorldAz * DegToRadians);
-            SurfaceTmp(SurfNum).CosAzim = std::cos(SurfWorldAz * DegToRadians);
-            SurfaceTmp(SurfNum).SinTilt = std::sin(SurfTilt * DegToRadians);
-            SurfaceTmp(SurfNum).CosTilt = std::cos(SurfTilt * DegToRadians);
+            SurfaceTmp(SurfNum).SinAzim = std::sin(SurfWorldAz * DataGlobalConstants::DegToRadians());
+            SurfaceTmp(SurfNum).CosAzim = std::cos(SurfWorldAz * DataGlobalConstants::DegToRadians());
+            SurfaceTmp(SurfNum).SinTilt = std::sin(SurfTilt * DataGlobalConstants::DegToRadians());
+            SurfaceTmp(SurfNum).CosTilt = std::cos(SurfTilt * DataGlobalConstants::DegToRadians());
             if (SurfaceTmp(SurfNum).ViewFactorGround == AutoCalculate) {
                 SurfaceTmp(SurfNum).ViewFactorGround = 0.5 * (1.0 - SurfaceTmp(SurfNum).CosTilt);
             }
@@ -8040,10 +8040,10 @@ namespace SurfaceGeometry {
             SurfaceTmp(SurfNum).Tilt = SurfTilt;
 
             // Sine and cosine of azimuth and tilt
-            SurfaceTmp(SurfNum).SinAzim = std::sin(SurfWorldAz * DegToRadians);
-            SurfaceTmp(SurfNum).CosAzim = std::cos(SurfWorldAz * DegToRadians);
-            SurfaceTmp(SurfNum).SinTilt = std::sin(SurfTilt * DegToRadians);
-            SurfaceTmp(SurfNum).CosTilt = std::cos(SurfTilt * DegToRadians);
+            SurfaceTmp(SurfNum).SinAzim = std::sin(SurfWorldAz * DataGlobalConstants::DegToRadians());
+            SurfaceTmp(SurfNum).CosAzim = std::cos(SurfWorldAz * DataGlobalConstants::DegToRadians());
+            SurfaceTmp(SurfNum).SinTilt = std::sin(SurfTilt * DataGlobalConstants::DegToRadians());
+            SurfaceTmp(SurfNum).CosTilt = std::cos(SurfTilt * DataGlobalConstants::DegToRadians());
             // Outward normal unit vector (pointing away from room)
             SurfaceTmp(SurfNum).OutNormVec = SurfaceTmp(SurfNum).NewellSurfaceNormalVector;
             for (n = 1; n <= 3; ++n) {
@@ -11092,10 +11092,10 @@ namespace SurfaceGeometry {
             // Retrieve base surface info
             Real64 const baseSurfWorldAz = Surface(ThisBaseSurface).Azimuth;
             Real64 const baseSurfTilt = Surface(ThisBaseSurface).Tilt;
-            Real64 const BaseCosAzimuth = std::cos(baseSurfWorldAz * DegToRadians);
-            Real64 const BaseSinAzimuth = std::sin(baseSurfWorldAz * DegToRadians);
-            Real64 const BaseCosTilt = std::cos(baseSurfTilt * DegToRadians);
-            Real64 const BaseSinTilt = std::sin(baseSurfTilt * DegToRadians);
+            Real64 const BaseCosAzimuth = std::cos(baseSurfWorldAz * DataGlobalConstants::DegToRadians());
+            Real64 const BaseSinAzimuth = std::sin(baseSurfWorldAz * DataGlobalConstants::DegToRadians());
+            Real64 const BaseCosTilt = std::cos(baseSurfTilt * DataGlobalConstants::DegToRadians());
+            Real64 const BaseSinTilt = std::sin(baseSurfTilt * DataGlobalConstants::DegToRadians());
             Real64 const BaseXLLC = Surface(ThisBaseSurface).Vertex(2).x;
             Real64 const BaseYLLC = Surface(ThisBaseSurface).Vertex(2).y;
             Real64 const BaseZLLC = Surface(ThisBaseSurface).Vertex(2).z;
@@ -13429,7 +13429,7 @@ namespace SurfaceGeometry {
         Real64 Diagonal1;                                      // Length of diagonal of 4-sided figure from vertex 1 to vertex 3 (m)
         Real64 Diagonal2;                                      // Length of diagonal of 4-sided figure from vertex 2 to vertex 4 (m)
         Real64 DotProd;                                        // Dot product of two adjacent sides - to test for right angle
-        Real64 const cos89deg = std::cos(89.0 * DegToRadians); // tolerance for right angle
+        Real64 const cos89deg = std::cos(89.0 * DataGlobalConstants::DegToRadians()); // tolerance for right angle
         Vector Vect32;                                         // normalized vector from vertex 3 to vertex 2
         Vector Vect21;                                         // normalized vector from vertex 2 to vertex 1
 
@@ -13500,10 +13500,10 @@ namespace SurfaceGeometry {
 
         SurfWorldAz = Surface(SurfNum).Azimuth;
         SurfTilt = Surface(SurfNum).Tilt;
-        BaseCosAzimuth = std::cos(SurfWorldAz * DegToRadians);
-        BaseSinAzimuth = std::sin(SurfWorldAz * DegToRadians);
-        BaseCosTilt = std::cos(SurfTilt * DegToRadians);
-        BaseSinTilt = std::sin(SurfTilt * DegToRadians);
+        BaseCosAzimuth = std::cos(SurfWorldAz * DataGlobalConstants::DegToRadians());
+        BaseSinAzimuth = std::sin(SurfWorldAz * DataGlobalConstants::DegToRadians());
+        BaseCosTilt = std::cos(SurfTilt * DataGlobalConstants::DegToRadians());
+        BaseSinTilt = std::sin(SurfTilt * DataGlobalConstants::DegToRadians());
         NumSurfSides = Surface(SurfNum).Sides;
 
         // Calculate WidthMax and HeightMax

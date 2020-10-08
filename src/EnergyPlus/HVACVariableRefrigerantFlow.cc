@@ -14091,7 +14091,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Use a physics based piping loss model.
 
-        using DataGlobals::Pi;
         using DXCoils::DXCoil;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSupHeatDensityRefrig;
@@ -14167,10 +14166,10 @@ namespace HVACVariableRefrigerantFlow {
             if (Pipe_viscosity_ref <= 0) Pipe_viscosity_ref = 16.26; // default superheated vapor viscosity data (MuPa*s) at T=353.15 K, P=2MPa
 
             Pipe_v_ref =
-                Pipe_m_ref / (Pi * pow_2(this->RefPipDiaSuc) * 0.25) /
+                Pipe_m_ref / (DataGlobalConstants::Pi() * pow_2(this->RefPipDiaSuc) * 0.25) /
                 GetSupHeatDensityRefrig(
                     state, this->RefrigerantName, this->EvaporatingTemp + Pipe_SH_merged, max(min(Pevap, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
-            Pipe_Num_Re = Pipe_m_ref / (Pi * pow_2(this->RefPipDiaSuc) * 0.25) * this->RefPipDiaSuc / Pipe_viscosity_ref * 1000000;
+            Pipe_Num_Re = Pipe_m_ref / (DataGlobalConstants::Pi() * pow_2(this->RefPipDiaSuc) * 0.25) * this->RefPipDiaSuc / Pipe_viscosity_ref * 1000000;
             Pipe_Num_Pr = Pipe_viscosity_ref * Pipe_cp_ref * 0.001 / Pipe_conductivity_ref;
             Pipe_Num_Nu = 0.023 * std::pow(Pipe_Num_Re, 0.8) * std::pow(Pipe_Num_Pr, 0.3);
             Pipe_Num_St = Pipe_Num_Nu / Pipe_Num_Re / Pipe_Num_Pr;
@@ -14202,7 +14201,7 @@ namespace HVACVariableRefrigerantFlow {
             }
 
             Pipe_Q = max(0.0,
-                         (Pi * this->RefPipLen) * (OutdoorDryBulb / 2 + Pipe_T_room / 2 - this->EvaporatingTemp - Pipe_SH_merged) /
+                         (DataGlobalConstants::Pi() * this->RefPipLen) * (OutdoorDryBulb / 2 + Pipe_T_room / 2 - this->EvaporatingTemp - Pipe_SH_merged) /
                              (1 / Pipe_Coe_k1 + 1 / Pipe_Coe_k2 + 1 / Pipe_Coe_k3));
 
             Pipe_h_comp_in = Pipe_h_IU_out + Pipe_Q / Pipe_m_ref;
@@ -14239,7 +14238,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Use a physics based piping loss model.
 
-        using DataGlobals::Pi;
         using DXCoils::DXCoil;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatTemperatureRefrig;
@@ -14330,9 +14328,9 @@ namespace HVACVariableRefrigerantFlow {
             if (Pipe_viscosity_ref <= 0) Pipe_viscosity_ref = 16.26; // default superheated vapor viscosity data (MuPa*s) at T=353.15 K, P=2MPa
 
             Pipe_v_ref =
-                Pipe_m_ref / (Pi * pow_2(this->RefPipDiaDis) * 0.25) /
+                Pipe_m_ref / (DataGlobalConstants::Pi() * pow_2(this->RefPipDiaDis) * 0.25) /
                 GetSupHeatDensityRefrig(state, this->RefrigerantName, Pipe_T_IU_in, max(min(Pcond, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
-            Pipe_Num_Re = Pipe_m_ref / (Pi * pow_2(this->RefPipDiaDis) * 0.25) * this->RefPipDiaDis / Pipe_viscosity_ref * 1000000;
+            Pipe_Num_Re = Pipe_m_ref / (DataGlobalConstants::Pi() * pow_2(this->RefPipDiaDis) * 0.25) * this->RefPipDiaDis / Pipe_viscosity_ref * 1000000;
             Pipe_Num_Pr = Pipe_viscosity_ref * Pipe_cp_ref * 0.001 / Pipe_conductivity_ref;
             Pipe_Num_Nu = 0.023 * std::pow(Pipe_Num_Re, 0.8) * std::pow(Pipe_Num_Pr, 0.4);
             Pipe_Num_St = Pipe_Num_Nu / Pipe_Num_Re / Pipe_Num_Pr;
@@ -14342,7 +14340,7 @@ namespace HVACVariableRefrigerantFlow {
             Pipe_Coe_k3 = RefPipInsH * (this->RefPipDiaDis + 2 * this->RefPipInsThi);
 
             Pipe_Q = max(0.0,
-                         (Pi * this->RefPipLen) * (Pipe_T_IU_in - OutdoorDryBulb / 2 - Pipe_T_room / 2) /
+                         (DataGlobalConstants::Pi() * this->RefPipLen) * (Pipe_T_IU_in - OutdoorDryBulb / 2 - Pipe_T_room / 2) /
                              (1 / Pipe_Coe_k1 + 1 / Pipe_Coe_k2 + 1 / Pipe_Coe_k3)); // [W]
             Pipe_DeltP = max(0.0,
                              8 * Pipe_Num_St * std::pow(Pipe_Num_Pr, 0.6667) * this->RefPipEquLen / this->RefPipDiaDis *

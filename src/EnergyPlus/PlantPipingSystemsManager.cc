@@ -2618,7 +2618,7 @@ namespace EnergyPlus {
             }
 
             //'also assign the interface cell surrounding the radial system
-            this->InterfaceVolume = (1.0 - (DataGlobals::Pi / 4.0)) * pow_2(GridCellWidth) * CellDepth;
+            this->InterfaceVolume = (1.0 - (DataGlobalConstants::Pi() / 4.0)) * pow_2(GridCellWidth) * CellDepth;
         }
 
         void Domain::developMesh() {
@@ -4451,7 +4451,7 @@ namespace EnergyPlus {
             }
 
             // Latitude, converted to radians...positive for northern hemisphere, [radians]
-            Latitude_Radians = DataGlobals::Pi / 180.0 * Latitude_Degrees;
+            Latitude_Radians = DataGlobalConstants::Pi() / 180.0 * Latitude_Degrees;
 
             // The day of year at this point in the simulation
             DayOfYear = int(this->Cur.CurSimTimeSeconds / DataGlobals::SecsInDay);
@@ -4466,11 +4466,11 @@ namespace EnergyPlus {
             CurAirTempK = this->Cur.CurAirTemp + 273.15;
 
             // Calculate some angles
-            dr = 1.0 + 0.033 * std::cos(2.0 * DataGlobals::Pi * DayOfYear / 365.0);
-            Declination = 0.409 * std::sin(2.0 * DataGlobals::Pi / 365.0 * DayOfYear - 1.39);
-            b_SC = 2.0 * DataGlobals::Pi * (DayOfYear - 81.0) / 364.0;
+            dr = 1.0 + 0.033 * std::cos(2.0 * DataGlobalConstants::Pi() * DayOfYear / 365.0);
+            Declination = 0.409 * std::sin(2.0 * DataGlobalConstants::Pi() / 365.0 * DayOfYear - 1.39);
+            b_SC = 2.0 * DataGlobalConstants::Pi() * (DayOfYear - 81.0) / 364.0;
             Sc = 0.1645 * std::sin(2.0 * b_SC) - 0.1255 * std::cos(b_SC) - 0.025 * std::sin(b_SC);
-            Hour_Angle = DataGlobals::Pi / 12.0 *
+            Hour_Angle = DataGlobalConstants::Pi() / 12.0 *
                          (((HourOfDay - 0.5) + 0.06667 * (StMeridian_Degrees - Longitude_Degrees) + Sc) - 12.0);
 
             // Calculate sunset something, and constrain to a minimum of 0.000001
@@ -4478,12 +4478,12 @@ namespace EnergyPlus {
             X_sunset = max(X_sunset, 0.000001);
 
             // Find sunset angle
-            Sunset_Angle = DataGlobals::Pi / 2.0 -
+            Sunset_Angle = DataGlobalConstants::Pi() / 2.0 -
                            std::atan(-std::tan(Latitude_Radians) * std::tan(Declination) / std::sqrt(X_sunset));
 
             // Find solar angles
-            Solar_Angle_1 = Hour_Angle - DataGlobals::Pi / 24.0;
-            Solar_Angle_2 = Hour_Angle + DataGlobals::Pi / 24.0;
+            Solar_Angle_1 = Hour_Angle - DataGlobalConstants::Pi() / 24.0;
+            Solar_Angle_2 = Hour_Angle + DataGlobalConstants::Pi() / 24.0;
 
             // Constrain solar angles
             if (Solar_Angle_1 < -Sunset_Angle) Solar_Angle_1 = -Sunset_Angle;
@@ -4496,7 +4496,7 @@ namespace EnergyPlus {
             IncidentSolar_MJhrmin = this->Cur.CurIncidentSolar * Convert_Wm2_To_MJhrmin;
 
             // Calculate another Q term...
-            QRAD_A = 12.0 * 60.0 / DataGlobals::Pi * MeanSolarConstant * dr *
+            QRAD_A = 12.0 * 60.0 / DataGlobalConstants::Pi() * MeanSolarConstant * dr *
                      ((Solar_Angle_2 - Solar_Angle_1) * std::sin(Latitude_Radians) * std::sin(Declination) +
                       std::cos(Latitude_Radians) * std::cos(Declination) *
                       (std::sin(Solar_Angle_2) - std::sin(Solar_Angle_1)));
@@ -5019,7 +5019,7 @@ namespace EnergyPlus {
             Real64 const Prandtl = thisCircuit->CurFluidPropertySet.Prandtl;
 
             // Flow calculations
-            Real64 const Area_c = (DataGlobals::Pi / 4.0) * pow_2(thisCircuit->PipeSize.InnerDia);
+            Real64 const Area_c = (DataGlobalConstants::Pi() / 4.0) * pow_2(thisCircuit->PipeSize.InnerDia);
             Real64 const Velocity = thisCircuit->CurCircuitFlowRate / (Density * Area_c);
 
             // Determine convection coefficient based on flow conditions
@@ -5227,7 +5227,7 @@ namespace EnergyPlus {
             Real64 OutermostRadialCellRadialCentroid = outerRadialCell.RadialCentroid;
             Real64 OutermostRadialCellTemperature = outerRadialCell.Temperature;
             Real64 Resistance = std::log(OutermostRadialCellOuterRadius / OutermostRadialCellRadialCentroid) /
-                                (2.0 * DataGlobals::Pi * cell.depth() * cell.Properties.Conductivity);
+                                (2.0 * DataGlobalConstants::Pi() * cell.depth() * cell.Properties.Conductivity);
             Numerator += (cell.Beta / Resistance) * OutermostRadialCellTemperature;
             Denominator += (cell.Beta / Resistance);
 
@@ -5299,15 +5299,15 @@ namespace EnergyPlus {
 
             //'add effects from interface cell
             Real64 Resistance = std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) /
-                                (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity);
+                                (2 * DataGlobalConstants::Pi() * cell.depth() * ThisRadialCellConductivity);
             Numerator += (Beta / Resistance) * cell.Temperature;
             Denominator += (Beta / Resistance);
 
             //'add effects from inner radial cell
             Resistance = (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) /
-                          (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity)) +
+                          (2 * DataGlobalConstants::Pi() * cell.depth() * ThisRadialCellConductivity)) +
                          (std::log(NextOuterRadialCellOuterRadius / NextOuterRadialCellRadialCentroid) /
-                          (2 * DataGlobals::Pi * cell.depth() * NextOuterRadialCellConductivity));
+                          (2 * DataGlobalConstants::Pi() * cell.depth() * NextOuterRadialCellConductivity));
             Numerator += (Beta / Resistance) * NextOuterRadialCellTemperature;
             Denominator += (Beta / Resistance);
 
@@ -5355,18 +5355,18 @@ namespace EnergyPlus {
                 //'add effects from outer cell
                 Real64 Resistance =
                         (std::log(OuterRadialCellRadialCentroid / OuterRadialCellInnerRadius) /
-                         (2 * DataGlobals::Pi * cell.depth() * OuterRadialCellConductivity)) +
+                         (2 * DataGlobalConstants::Pi() * cell.depth() * OuterRadialCellConductivity)) +
                         (std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) /
-                         (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity));
+                         (2 * DataGlobalConstants::Pi() * cell.depth() * ThisRadialCellConductivity));
                 Numerator += (thisSoilCell.Beta / Resistance) * OuterRadialCellTemperature;
                 Denominator += (thisSoilCell.Beta / Resistance);
 
                 //'add effects from inner cell
                 Resistance =
                         (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) /
-                         (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity)) +
+                         (2 * DataGlobalConstants::Pi() * cell.depth() * ThisRadialCellConductivity)) +
                         (std::log(InnerRadialCellOuterRadius / InnerRadialCellRadialCentroid) /
-                         (2 * DataGlobals::Pi * cell.depth() * InnerRadialCellConductivity));
+                         (2 * DataGlobalConstants::Pi() * cell.depth() * InnerRadialCellConductivity));
                 Numerator += (thisSoilCell.Beta / Resistance) * InnerRadialCellTemperature;
                 Denominator += (thisSoilCell.Beta / Resistance);
 
@@ -5425,17 +5425,17 @@ namespace EnergyPlus {
 
             //'add effects from outer radial cell
             Resistance = (std::log(OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius) /
-                          (2 * DataGlobals::Pi * cell.depth() * OuterNeighborRadialCellConductivity)) +
+                          (2 * DataGlobalConstants::Pi() * cell.depth() * OuterNeighborRadialCellConductivity)) +
                          (std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) /
-                          (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity));
+                          (2 * DataGlobalConstants::Pi() * cell.depth() * ThisRadialCellConductivity));
             Numerator += (soilZero.Beta / Resistance) * OuterNeighborRadialCellTemperature;
             Denominator += (soilZero.Beta / Resistance);
 
             //'add effects from pipe cell
             Resistance = (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) /
-                          (2 * DataGlobals::Pi * cell.depth() * ThisRadialCellConductivity)) +
+                          (2 * DataGlobalConstants::Pi() * cell.depth() * ThisRadialCellConductivity)) +
                          (std::log(InnerNeighborRadialCellOuterRadius / InnerNeighborRadialCellRadialCentroid) /
-                          (2 * DataGlobals::Pi * cell.depth() * InnerNeighborRadialCellConductivity));
+                          (2 * DataGlobalConstants::Pi() * cell.depth() * InnerNeighborRadialCellConductivity));
             Numerator += (soilZero.Beta / Resistance) * InnerNeighborRadialCellTemperature;
             Denominator += (soilZero.Beta / Resistance);
 
@@ -5466,17 +5466,17 @@ namespace EnergyPlus {
 
             //'add effects from outer radial cell
             Real64 Resistance = (std::log(NextInnerRadialCell.RadialCentroid / NextInnerRadialCell.InnerRadius) /
-                                 (2 * DataGlobals::Pi * cell.depth() * NextInnerRadialCell.Properties.Conductivity)) +
+                                 (2 * DataGlobalConstants::Pi() * cell.depth() * NextInnerRadialCell.Properties.Conductivity)) +
                                 (std::log(ThisInsulationCell.OuterRadius / ThisInsulationCell.RadialCentroid) /
-                                 (2 * DataGlobals::Pi * cell.depth() * ThisInsulationCell.Properties.Conductivity));
+                                 (2 * DataGlobalConstants::Pi() * cell.depth() * ThisInsulationCell.Properties.Conductivity));
             Numerator += (ThisInsulationCell.Beta / Resistance) * NextInnerRadialCell.Temperature;
             Denominator += (ThisInsulationCell.Beta / Resistance);
 
             //'add effects from pipe cell
             Resistance = (std::log(ThisInsulationCell.RadialCentroid / ThisInsulationCell.InnerRadius) /
-                          (2 * DataGlobals::Pi * cell.depth() * ThisInsulationCell.Properties.Conductivity)) +
+                          (2 * DataGlobalConstants::Pi() * cell.depth() * ThisInsulationCell.Properties.Conductivity)) +
                          (std::log(PipeCell.OuterRadius / PipeCell.RadialCentroid) /
-                          (2 * DataGlobals::Pi * cell.depth() * PipeCell.Properties.Conductivity));
+                          (2 * DataGlobalConstants::Pi() * cell.depth() * PipeCell.Properties.Conductivity));
             Numerator += (ThisInsulationCell.Beta / Resistance) * PipeCell.Temperature;
             Denominator += (ThisInsulationCell.Beta / Resistance);
 
@@ -5529,18 +5529,18 @@ namespace EnergyPlus {
 
             //'add effects from outer radial cell
             Real64 Resistance = (std::log(OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius) /
-                                 (2 * DataGlobals::Pi * cell.depth() * OuterNeighborRadialCellConductivity)) +
+                                 (2 * DataGlobalConstants::Pi() * cell.depth() * OuterNeighborRadialCellConductivity)) +
                                 (std::log(ThisPipeCellOuterRadius / ThisPipeCellRadialCentroid) /
-                                 (2 * DataGlobals::Pi * cell.depth() * ThisPipeCellConductivity));
+                                 (2 * DataGlobalConstants::Pi() * cell.depth() * ThisPipeCellConductivity));
             Numerator += (cell.PipeCellData.Pipe.Beta / Resistance) * OuterNeighborRadialCellTemperature;
             Denominator += (cell.PipeCellData.Pipe.Beta / Resistance);
 
             //'add effects from water cell
             Real64 PipeConductionResistance =
                     std::log(ThisPipeCellRadialCentroid / ThisPipeCellInnerRadius) /
-                    (2 * DataGlobals::Pi * cell.depth() * ThisPipeCellConductivity);
+                    (2 * DataGlobalConstants::Pi() * cell.depth() * ThisPipeCellConductivity);
             Real64 ConvectiveResistance =
-                    1.0 / (thisCircuit->CurCircuitConvectionCoefficient * 2 * DataGlobals::Pi * ThisPipeCellInnerRadius * cell.depth());
+                    1.0 / (thisCircuit->CurCircuitConvectionCoefficient * 2 * DataGlobalConstants::Pi() * ThisPipeCellInnerRadius * cell.depth());
             Resistance = PipeConductionResistance + ConvectiveResistance;
             Numerator += (cell.PipeCellData.Pipe.Beta / Resistance) * FluidCellTemperature;
             Denominator += (cell.PipeCellData.Pipe.Beta / Resistance);
@@ -5577,9 +5577,9 @@ namespace EnergyPlus {
 
             //'add effects from outer pipe cell
             Real64 PipeConductionResistance = std::log(PipeCellRadialCentroid / PipeCellInnerRadius) /
-                                              (2 * DataGlobals::Pi * cell.depth() * PipeCellConductivity);
+                                              (2 * DataGlobalConstants::Pi() * cell.depth() * PipeCellConductivity);
             Real64 ConvectiveResistance =
-                    1.0 / (thisCircuit->CurCircuitConvectionCoefficient * 2 * DataGlobals::Pi * PipeCellInnerRadius * cell.depth());
+                    1.0 / (thisCircuit->CurCircuitConvectionCoefficient * 2 * DataGlobalConstants::Pi() * PipeCellInnerRadius * cell.depth());
             Real64 TotalPipeResistance = PipeConductionResistance + ConvectiveResistance;
             Numerator += (cell.PipeCellData.Fluid.Beta / TotalPipeResistance) * PipeCellTemperature;
             Denominator += (cell.PipeCellData.Fluid.Beta / TotalPipeResistance);

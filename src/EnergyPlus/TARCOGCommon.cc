@@ -102,7 +102,6 @@ namespace TARCOGCommon {
         // Height - glazing system height
 
         // Using/Aliasing
-        using DataGlobals::PiOvr2;
         using namespace TARCOGParams;
         // use TARCOGGassesParams
 
@@ -115,10 +114,10 @@ namespace TARCOGCommon {
 
         LDSumMax = 0.0;
         for (i = 1; i <= mmax; i += 2) {
-            Real64 const sin_i(std::sin(i * PiOvr2));
+            Real64 const sin_i(std::sin(i * DataGlobalConstants::PiOvr2()));
             Real64 const pow_i_W(pow_2(i / Width));
             for (j = 1; j <= nmax; j += 2) {
-                LDSumMax += (sin_i * std::sin(j * PiOvr2)) / (i * j * pow_2(pow_i_W + pow_2(j / Height)));
+                LDSumMax += (sin_i * std::sin(j * DataGlobalConstants::PiOvr2())) / (i * j * pow_2(pow_i_W + pow_2(j / Height)));
             } // do j = 1, nmax, 2
         }     // do i = 1, mmax, 2
 
@@ -132,7 +131,6 @@ namespace TARCOGCommon {
         // Height - glazing system height
 
         // Using/Aliasing
-        using DataGlobals::Pi;
         using namespace TARCOGParams;
         // use TARCOGGassesParams
 
@@ -140,7 +138,7 @@ namespace TARCOGCommon {
         Real64 LDSumMean;
 
         // Locals
-        static Real64 const Pi_squared(Pi * Pi);
+        static Real64 const Pi_squared(DataGlobalConstants::Pi() * DataGlobalConstants::Pi());
         int i;
         int j;
 

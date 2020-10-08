@@ -3446,7 +3446,7 @@ namespace HeatBalanceManager {
 
             // Minimum and maximum slat angles allowed by slat geometry
             if (Blind(Loop).SlatWidth > Blind(Loop).SlatSeparation) {
-                MinSlatAngGeom = std::asin(Blind(Loop).SlatThickness / (Blind(Loop).SlatThickness + Blind(Loop).SlatSeparation)) / DegToRadians;
+                MinSlatAngGeom = std::asin(Blind(Loop).SlatThickness / (Blind(Loop).SlatThickness + Blind(Loop).SlatSeparation)) / DataGlobalConstants::DegToRadians();
             } else {
                 MinSlatAngGeom = 0.0;
             }
@@ -6754,13 +6754,13 @@ namespace HeatBalanceManager {
 
             // Pre-calculate constants
             for (IPhi = 1; IPhi <= 10; ++IPhi) {
-                CosPhiIndepVar(IPhi) = std::cos((IPhi - 1) * 10.0 * DegToRadians);
+                CosPhiIndepVar(IPhi) = std::cos((IPhi - 1) * 10.0 * DataGlobalConstants::DegToRadians());
             }
 
             // Pre-calculate constants
             for (IPhi = 1; IPhi <= 10; ++IPhi) {
                 Phi = double(IPhi - 1) * 10.0;
-                CosPhi(IPhi) = std::cos(Phi * DegToRadians);
+                CosPhi(IPhi) = std::cos(Phi * DataGlobalConstants::DegToRadians());
                 if (std::abs(CosPhi(IPhi)) < 0.0001) CosPhi(IPhi) = 0.0;
             }
 

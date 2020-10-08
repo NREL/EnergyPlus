@@ -3060,7 +3060,7 @@ namespace ConvectionCoefficients {
         Real64 sintilt;
 
         tilt = Surface(SurfNum).Tilt;
-        tiltr = tilt * DegToRadians;
+        tiltr = tilt * DataGlobalConstants::DegToRadians();
         costilt = Surface(SurfNum).CosTilt;
         sintilt = Surface(SurfNum).SinTilt;
         ra = gr * pr;
@@ -6185,12 +6185,12 @@ namespace ConvectionCoefficients {
             } else if (SELECT_CASE_var == RefWindParallComp) {
                 // WindSpeed , WindDir, surface Azimuth
                 Theta = WindDir - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
-                ThetaRad = Theta * DegToRadians;
+                ThetaRad = Theta * DataGlobalConstants::DegToRadians();
                 windVel = std::cos(ThetaRad) * WindSpeed;
             } else if (SELECT_CASE_var == RefWindParallCompAtZ) {
                 // Surface WindSpeed , Surface WindDir, surface Azimuth
                 Theta = Surface(SurfNum).WindDir - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
-                ThetaRad = Theta * DegToRadians;
+                ThetaRad = Theta * DataGlobalConstants::DegToRadians();
                 windVel = std::cos(ThetaRad) * Surface(SurfNum).WindSpeed;
             }
         }

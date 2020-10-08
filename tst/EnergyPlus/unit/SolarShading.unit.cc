@@ -640,8 +640,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -1040,8 +1040,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -1453,8 +1453,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -1821,8 +1821,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -2228,8 +2228,8 @@ WindowMaterial:SimpleGlazingSystem,
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -2540,8 +2540,8 @@ EXPECT_FALSE(FoundError);
 SurfaceGeometry::CosZoneRelNorth.allocate(1);
 SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
 SurfaceGeometry::CosBldgRelNorth = 1.0;
 SurfaceGeometry::SinBldgRelNorth = 0.0;
 

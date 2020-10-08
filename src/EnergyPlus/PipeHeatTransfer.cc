@@ -256,7 +256,6 @@ namespace PipeHeatTransfer {
         // needed to define and simulate the surface.
 
         // Using/Aliasing
-        using DataGlobals::Pi;
         using DataGlobals::SecInHour;
         using DataHeatBalance::IntGainTypeOf_PipeIndoor;
         using DataHeatBalance::Zone;
@@ -681,15 +680,15 @@ namespace PipeHeatTransfer {
             PipeHT(Item).PreviousPipeTemp = 0.0;
 
             // work out heat transfer areas (area per section)
-            PipeHT(Item).InsideArea = Pi * PipeHT(Item).PipeID * PipeHT(Item).Length / NumSections;
-            PipeHT(Item).OutsideArea = Pi * (PipeHT(Item).PipeOD + 2 * PipeHT(Item).InsulationThickness) * PipeHT(Item).Length / NumSections;
+            PipeHT(Item).InsideArea = DataGlobalConstants::Pi() * PipeHT(Item).PipeID * PipeHT(Item).Length / NumSections;
+            PipeHT(Item).OutsideArea = DataGlobalConstants::Pi() * (PipeHT(Item).PipeOD + 2 * PipeHT(Item).InsulationThickness) * PipeHT(Item).Length / NumSections;
 
             // cross sectional area
-            PipeHT(Item).SectionArea = Pi * 0.25 * pow_2(PipeHT(Item).PipeID);
+            PipeHT(Item).SectionArea = DataGlobalConstants::Pi() * 0.25 * pow_2(PipeHT(Item).PipeID);
 
             // pipe & insulation mass
             PipeHT(Item).PipeHeatCapacity = PipeHT(Item).PipeCp * PipeHT(Item).PipeDensity *
-                                            (Pi * 0.25 * pow_2(PipeHT(Item).PipeOD) - PipeHT(Item).SectionArea); // the metal component
+                                            (DataGlobalConstants::Pi() * 0.25 * pow_2(PipeHT(Item).PipeOD) - PipeHT(Item).SectionArea); // the metal component
         }
 
         // final error check
@@ -852,7 +851,6 @@ namespace PipeHeatTransfer {
         using DataGlobals::BeginSimFlag;
         using DataGlobals::DayOfSim;
         using DataGlobals::HourOfDay;
-        using DataGlobals::Pi;
         using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
@@ -1283,7 +1281,6 @@ namespace PipeHeatTransfer {
         using DataEnvironment::WindSpeed;
         using DataGlobals::HourOfDay;
         using DataGlobals::KelvinConv;
-        using DataGlobals::Pi;
         using DataGlobals::rTinyValue;
         using DataGlobals::TimeStep;
         using DataLoopNode::Node;
@@ -1655,7 +1652,6 @@ namespace PipeHeatTransfer {
         // Code based loosely on code from IBLAST program (research version)
 
         // Using/Aliasing
-        using DataGlobals::Pi;
         using DataPlant::PlantLoop;
         using FluidProperties::GetConductivityGlycol;
         using FluidProperties::GetViscosityGlycol;
@@ -1735,7 +1731,7 @@ namespace PipeHeatTransfer {
                    1000.0; // Note fluid properties routine returns mPa-s, we need Pa-s
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter) - as RadiantSysLowTemp
-        ReD = 4.0 * MassFlowRate / (Pi * MUactual * Diameter);
+        ReD = 4.0 * MassFlowRate / (DataGlobalConstants::Pi() * MUactual * Diameter);
 
         if (ReD == 0.0) { // No flow
 

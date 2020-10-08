@@ -186,7 +186,6 @@ Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData& state)
     // Kusuda and Achenbach correlation is used
 
     // Using/Aliasing
-    using DataGlobals::Pi;
     using DataGlobals::SecsInDay;
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
@@ -197,8 +196,8 @@ Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData& state)
 
     secsInYear = SecsInDay * state.dataWeatherManager->NumDaysInYear;
 
-    term1 = -depth * std::sqrt(Pi / (secsInYear * groundThermalDiffisivity));
-    term2 = (2 * Pi / secsInYear) * (simTimeInSeconds - phaseShiftInSecs - (depth / 2) * std::sqrt(secsInYear / (Pi * groundThermalDiffisivity)));
+    term1 = -depth * std::sqrt(DataGlobalConstants::Pi() / (secsInYear * groundThermalDiffisivity));
+    term2 = (2 * DataGlobalConstants::Pi() / secsInYear) * (simTimeInSeconds - phaseShiftInSecs - (depth / 2) * std::sqrt(secsInYear / (DataGlobalConstants::Pi() * groundThermalDiffisivity)));
 
     retVal = aveGroundTemp - aveGroundTempAmplitude * std::exp(term1) * std::cos(term2);
 

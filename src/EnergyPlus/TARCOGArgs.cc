@@ -83,7 +83,6 @@ namespace TARCOGArgs {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using DataGlobals::Pi;
     using DataGlobals::StefanBoltzmann;
     using namespace TARCOGCommon;
     using namespace TARCOGGassesParams;
@@ -664,14 +663,14 @@ namespace TARCOGArgs {
                 if (ThermalMod == THERM_MOD_SCW) {
                     // bi...the idea here is to have glass-to-glass width the same as before scaling
                     // bi...TODO: check for outdoor and indoor blinds! SCW model is only applicable to in-between SDs!!!
-                    thick(i) = SlatWidth(i) * std::cos(SlatAngle(i) * Pi / 180.0);
+                    thick(i) = SlatWidth(i) * std::cos(SlatAngle(i) * DataGlobalConstants::Pi() / 180.0);
                     if (i > 1) gap(i - 1) += (1.0 - SDScalar) / 2.0 * thick(i); // Autodesk:BoundsViolation gap(i-1) @ i=1: Added if condition
                     gap(i) += (1.0 - SDScalar) / 2.0 * thick(i);
                     thick(i) *= SDScalar;
                     if (thick(i) < SlatThick(i)) thick(i) = SlatThick(i);
                 } else if ((ThermalMod == THERM_MOD_ISO15099) || (ThermalMod == THERM_MOD_CSM)) {
                     thick(i) = SlatThick(i);
-                    const Real64 slatAngRad = SlatAngle(i) * 2.0 * DataGlobals::Pi / 360.0;
+                    const Real64 slatAngRad = SlatAngle(i) * 2.0 * DataGlobalConstants::Pi() / 360.0;
                     Real64 C4_VENET(0);
                     if (LayerType(i) == VENETBLIND_HORIZ) {
                         C4_VENET = C4_VENET_HORIZONTAL;
@@ -686,7 +685,7 @@ namespace TARCOGArgs {
 
         hint = hin;
         houtt = hout;
-        tiltr = tilt * 2.0 * DataGlobals::Pi / 360.0; // convert tilt in degrees to radians
+        tiltr = tilt * 2.0 * DataGlobalConstants::Pi() / 360.0; // convert tilt in degrees to radians
 
         // external radiation term
         {

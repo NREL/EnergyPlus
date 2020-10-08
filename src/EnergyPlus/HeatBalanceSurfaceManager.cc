@@ -5819,7 +5819,7 @@ namespace HeatBalanceSurfaceManager {
                         //  Allow for modification of TemperatureCoefficient with unitary sine wave.
                         Real64 ConstantTempCoef; // Temperature Coefficient as input or modified using sine wave COP mod
                         if (OSC(OPtr).SinusoidalConstTempCoef) { // Sine wave C4
-                            ConstantTempCoef = std::sin(2 * Pi * CurrentTime / OSC(OPtr).SinusoidPeriod);
+                            ConstantTempCoef = std::sin(2 * DataGlobalConstants::Pi() * CurrentTime / OSC(OPtr).SinusoidPeriod);
                         } else {
                             ConstantTempCoef = OSC(OPtr).ConstTempCoef;
                         }
