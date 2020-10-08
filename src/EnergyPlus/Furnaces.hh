@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
@@ -131,7 +132,6 @@ namespace Furnaces {
 
     struct FurnaceEquipConditions
     { 
-        int MaxSpedLevels = 10; // Maximum number of speed that supports
         // Members
         std::string Name;                   // Name of the Furnace
         int FurnaceType_Num;                // Numeric Equivalent for Furnace Type
@@ -314,9 +314,9 @@ namespace Furnaces {
             LoopNumSupp(0), LoopSideSupp(0), BranchNumSupp(0), CompNumSupp(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0),
             EMSOverrideSensZoneLoadRequest(false), EMSSensibleZoneLoadValue(0.0), EMSOverrideMoistZoneLoadRequest(false),
             EMSMoistureZoneLoadValue(0.0), HeatCoolMode(0), NumOfSpeedCooling(0), NumOfSpeedHeating(0), IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0),
-            IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true), HeatVolumeFlowRate(MaxSpedLevels, 0.0),
-            HeatMassFlowRate(MaxSpedLevels, 0.0), CoolVolumeFlowRate(MaxSpedLevels, 0.0), CoolMassFlowRate(MaxSpedLevels, 0.0),
-            MSHeatingSpeedRatio(MaxSpedLevels, 0.0), MSCoolingSpeedRatio(MaxSpedLevels, 0.0), bIsIHP(false), CompSpeedNum(0), CompSpeedRatio(0.0),
+            IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true), HeatVolumeFlowRate(DataGlobalConstants::MaxSpedLevels, 0.0),
+            HeatMassFlowRate(DataGlobalConstants::MaxSpedLevels, 0.0), CoolVolumeFlowRate(DataGlobalConstants::MaxSpedLevels, 0.0), CoolMassFlowRate(DataGlobalConstants::MaxSpedLevels, 0.0),
+            MSHeatingSpeedRatio(DataGlobalConstants::MaxSpedLevels, 0.0), MSCoolingSpeedRatio(DataGlobalConstants::MaxSpedLevels, 0.0), bIsIHP(false), CompSpeedNum(0), CompSpeedRatio(0.0),
             ErrIndexCyc(0), ErrIndexVar(0), WaterCyclingMode(0), iterationCounter(0), iterationMode(0), FirstPass(true)
         {
         }

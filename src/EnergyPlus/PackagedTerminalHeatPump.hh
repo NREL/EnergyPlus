@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
@@ -116,7 +117,6 @@ namespace PackagedTerminalHeatPump {
 
     struct PTUnitData
     {
-        int MaxSpedLevels = 10; // Maximum number of speed that supports
         // Members
         // input data
         int UnitType_Num;                // paramter equivalent to type of unit
@@ -319,8 +319,8 @@ namespace PackagedTerminalHeatPump {
             SuppCoilCompNum(0), MaxSuppCoilFluidFlow(0.0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), ActualFanVolFlowRate(0.0),
             HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0), NoHeatCoolSpeedRatio(1.0), AvailStatus(0), HeatCoolMode(0), NumOfSpeedCooling(0),
             NumOfSpeedHeating(0), IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true),
-            HeatVolumeFlowRate(MaxSpedLevels, 0.0), HeatMassFlowRate(MaxSpedLevels, 0.0), CoolVolumeFlowRate(MaxSpedLevels, 0.0),
-            CoolMassFlowRate(MaxSpedLevels, 0.0), MSHeatingSpeedRatio(MaxSpedLevels, 0.0), MSCoolingSpeedRatio(MaxSpedLevels, 0.0), CompSpeedNum(0),
+            HeatVolumeFlowRate(DataGlobalConstants::MaxSpedLevels, 0.0), HeatMassFlowRate(DataGlobalConstants::MaxSpedLevels, 0.0), CoolVolumeFlowRate(DataGlobalConstants::MaxSpedLevels, 0.0),
+            CoolMassFlowRate(DataGlobalConstants::MaxSpedLevels, 0.0), MSHeatingSpeedRatio(DataGlobalConstants::MaxSpedLevels, 0.0), MSCoolingSpeedRatio(DataGlobalConstants::MaxSpedLevels, 0.0), CompSpeedNum(0),
             CompSpeedRatio(0.0), ErrIndexCyc(0), ErrIndexVar(0), ZonePtr(0), HVACSizingIndex(0), FirstPass(true), HeatCoilWaterFlowRate(0.0),
             ControlZoneMassFlowFrac(1.0),
             // variables used in SZVAV model:

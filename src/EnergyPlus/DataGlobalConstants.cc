@@ -309,6 +309,8 @@ namespace DataGlobalConstants {
     int const iEvapCoolerInDirectRDDSpecial(1004);
     int const iEvapCoolerDirectResearchSpecial(1005);
 
+    int const MaxSpedLevels(10); // Maximum number of speed that supports
+    
     // DERIVED TYPE DEFINITIONS:
     // na
 
