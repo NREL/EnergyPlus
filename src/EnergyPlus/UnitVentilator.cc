@@ -370,7 +370,7 @@ namespace UnitVentilator {
 
             {
                 auto const SELECT_CASE_var(Alphas(3));
-                if (SELECT_CASE_var == "VariablePercent") {
+                if (SELECT_CASE_var == "VARIABLEPERCENT") {
                     state.dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = state.dataUnitVentilators->VariablePercent;
                     state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName = Alphas(5);
                     state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr = GetScheduleIndex(state, Alphas(5)); // convert schedule name to pointer

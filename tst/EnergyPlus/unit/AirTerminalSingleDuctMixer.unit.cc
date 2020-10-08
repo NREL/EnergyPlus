@@ -6725,7 +6725,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     Real64 SecondaryAirMassFlowRate(0.0);
     Real64 LatOutputProvided(0.0);
     Real64 QUnitOut(0.0);
-    Real64 QZnReq(0.0);
+    state.dataUnitVentilators->QZnReq = 0.0;
     int ZoneNum(1);
     int UnitVentNum(1);
 
@@ -6933,7 +6933,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     CurDeadBandOrSetback(1) = false;
     ZoneSysEnergyDemand.allocate(1);
     ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputRequired;
+    state.dataUnitVentilators->QZnReq = ZoneSysEnergyDemand(1).RemainingOutputRequired;
 
     Schedule(state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
     Schedule(state.dataUnitVentilators->UnitVent(UnitVentNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
@@ -6948,7 +6948,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     // check the air mixer secondary air mass flow rate
     ASSERT_EQ(SecondaryAirMassFlowRate, Node(SysATMixer(1).SecInNode).MassFlowRate);
     // check the cooling output delivered is within 2.0 Watt of zone cooling load
-    ASSERT_NEAR(QZnReq, QUnitOut, 0.001);
+    ASSERT_NEAR(state.dataUnitVentilators->QZnReq, QUnitOut, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
