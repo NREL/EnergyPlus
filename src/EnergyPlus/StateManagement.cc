@@ -223,7 +223,6 @@
 #include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UnitarySystem.hh>
-#include <EnergyPlus/UserDefinedComponents.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -401,7 +400,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     UnitarySystems::clear_state();
     UnitHeater::clear_state();
     UnitVentilator::clear_state();
-    UserDefinedComponents::clear_state();
     UtilityRoutines::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();

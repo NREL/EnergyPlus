@@ -554,8 +554,6 @@ struct VariableSpeedCoilsData : BaseGlobalStruct {
     int const Timed = 1;    // defrost cycle is timed
     int const OnDemand = 2; // defrost cycle occurs only when required
 
-    //int const MaxSpedLevels = 10; // Maximum number of speed that supports
-
     int NumVarSpeedCoils = 0; // The Number of Water to Air Heat Pumps found in the Input
 
     bool MyOneTimeFlag = true;     // one time allocation flag
