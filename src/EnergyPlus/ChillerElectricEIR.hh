@@ -227,11 +227,11 @@ namespace ChillerElectricEIR {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 
@@ -245,7 +245,8 @@ namespace ChillerElectricEIR {
 
         void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void calcHeatRecovery(Real64 &QCond,        // Current condenser load [W]
+        void calcHeatRecovery(EnergyPlusData &state,
+                              Real64 &QCond,        // Current condenser load [W]
                               Real64 CondMassFlow,  // Current condenser mass flow [kg/s]
                               Real64 condInletTemp, // Current condenser inlet temp [C]
                               Real64 &QHeatRec      // Amount of heat recovered [W]

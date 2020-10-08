@@ -65,6 +65,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DElightManagerF.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDaylightingDevices.hh>
@@ -83,7 +84,6 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/Material.hh>
@@ -450,7 +450,7 @@ namespace DaylightingManager {
         }
     }
 
-    void CalcDayltgCoefficients(IOFiles &ioFiles)
+    void CalcDayltgCoefficients(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -558,7 +558,7 @@ namespace DaylightingManager {
 
         // FLOW:
         if (CalcDayltghCoefficients_firstTime) {
-            GetDaylightingParametersInput(ioFiles);
+            GetDaylightingParametersInput(state);
             CheckTDDsAndLightShelvesInDaylitZones();
             AssociateWindowShadingControlWithDaylighting();
             CalcDayltghCoefficients_firstTime = false;
@@ -700,7 +700,7 @@ namespace DaylightingManager {
             // Skip zones with no exterior windows in the zone or in adjacent zone with which an interior window is shared
             if (ZoneDaylight(ZoneNum).NumOfDayltgExtWins == 0) continue;
 
-            CalcDayltgCoeffsRefMapPoints(ZoneNum);
+            CalcDayltgCoeffsRefMapPoints(state, ZoneNum);
 
         } // End of zone loop, ZoneNum
 
@@ -712,7 +712,7 @@ namespace DaylightingManager {
                     // due to change in ground reflectance from month to month, or change in storm window status.
                     static constexpr auto Format_700(
                         "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor\n");
-                    print(ioFiles.eio, Format_700);
+                    print(state.files.eio, Format_700);
                     for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                         if (ZoneDaylight(ZoneNum).NumOfDayltgExtWins == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
                         for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
@@ -738,7 +738,7 @@ namespace DaylightingManager {
 
                                     for (int refPtNum = 1; refPtNum <= ZoneDaylight(ZoneNum).TotalDaylRefPoints; ++refPtNum) {
                                         DaylFac = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, static_cast<int>(skyType), refPtNum, loop);
-                                        print(ioFiles.eio,
+                                        print(state.files.eio,
                                               " Sky Daylight Factors,{},{},{},{},{},{:.4R}\n",
                                               skyTypeString,
                                               CurMnDy,
@@ -782,7 +782,7 @@ namespace DaylightingManager {
 
         // open a new file eplusout.dfs for saving the daylight factors
         if (CreateDFSReportFile) {
-            InputOutputFile &dfs = ioFiles.dfs.ensure_open("CalcDayltgCoefficients", ioFiles.outputControl.dfs);
+            InputOutputFile &dfs = state.files.dfs.ensure_open("CalcDayltgCoefficients", state.files.outputControl.dfs);
             print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
             print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
             print(dfs, "{}\n",
@@ -816,14 +816,14 @@ namespace DaylightingManager {
                     for (ISlatAngle = 1; ISlatAngle <= ISA; ++ISlatAngle) {
                         if (ISlatAngle == 1) {
                             // base window without shades, screens, or blinds
-                            print(ioFiles.dfs, "{},{},{},Base Window\n", CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
+                            print(state.files.dfs, "{},{},{},Base Window\n", CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
                         } else if (ISlatAngle == 2 && ISA == 2) {
                             // window shade or blind with fixed slat angle
-                            print(ioFiles.dfs, "{},{},{},Blind or Slat Applied\n", CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
+                            print(state.files.dfs, "{},{},{},Blind or Slat Applied\n", CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
                         } else {
                             // blind with variable slat angle
                             SlatAngle = 180.0 / double(MaxSlatAngs - 1) * double(ISlatAngle - 2);
-                            print(ioFiles.dfs, "{},{},{},{:.1R}\n", CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name, SlatAngle);
+                            print(state.files.dfs, "{},{},{},{:.1R}\n", CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name, SlatAngle);
                         }
 
                         for (IHR = 1; IHR <= 24; ++IHR) {
@@ -835,7 +835,7 @@ namespace DaylightingManager {
                                 DFOcSky = ZoneDaylight(ZoneNum).DaylIllFacSky(IHR, ISlatAngle, static_cast<int>(SkyType::Overcast), refPtNum, loop);
 
                                 // write daylight factors - 4 sky types for each daylight ref point
-                                print(ioFiles.dfs,
+                                print(state.files.dfs,
                                       "{},{},{:.5R},{:.5R},{:.5R},{:.5R}\n",
                                       IHR,
                                       DaylRefPt(ZoneDaylight(ZoneNum).DaylRefPtNum(refPtNum)).Name,
@@ -851,7 +851,7 @@ namespace DaylightingManager {
         }     // zone loop
     }
 
-    void CalcDayltgCoeffsRefMapPoints(int const ZoneNum)
+    void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -921,7 +921,7 @@ namespace DaylightingManager {
         }
 
         // Calc for daylighting reference points
-        CalcDayltgCoeffsRefPoints(ZoneNum);
+        CalcDayltgCoeffsRefPoints(state, ZoneNum);
         if (!DoingSizing && !KickOffSimulation) {
             // Calc for illuminance map
             if (TotIllumMaps > 0) {
@@ -933,12 +933,12 @@ namespace DaylightingManager {
                         DisplayString("Updating Daylighting Coefficients (Map Points), Zone=" + Zone(ZoneNum).Name);
                     }
                 }
-                CalcDayltgCoeffsMapPoints(ZoneNum);
+                CalcDayltgCoeffsMapPoints(state, ZoneNum);
             }
         }
     }
 
-    void CalcDayltgCoeffsRefPoints(int const ZoneNum)
+    void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1158,7 +1158,8 @@ namespace DaylightingManager {
 
                         ++WinEl;
 
-                        FigureDayltgCoeffsAtPointsForWindowElements(ZoneNum,
+                        FigureDayltgCoeffsAtPointsForWindowElements(state,
+                                                                    ZoneNum,
                                                                     IL,
                                                                     loopwin,
                                                                     CalledForRefPoint,
@@ -1211,7 +1212,8 @@ namespace DaylightingManager {
                             ISunPos = 0;
                             for (IHR = 1; IHR <= 24; ++IHR) {
 
-                                FigureDayltgCoeffsAtPointsForSunPosition(ZoneNum,
+                                FigureDayltgCoeffsAtPointsForSunPosition(state,
+                                                                         ZoneNum,
                                                                          IL,
                                                                          IX,
                                                                          NWX,
@@ -1261,7 +1263,8 @@ namespace DaylightingManager {
                                 ISunPos = -1;
                             }
 
-                            FigureDayltgCoeffsAtPointsForSunPosition(ZoneNum,
+                            FigureDayltgCoeffsAtPointsForSunPosition(state,
+                                                                     ZoneNum,
                                                                      IL,
                                                                      IX,
                                                                      NWX,
@@ -1332,7 +1335,7 @@ namespace DaylightingManager {
         } // End of reference point loop, IL
     }
 
-    void CalcDayltgCoeffsMapPoints(int const ZoneNum)
+    void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1566,7 +1569,8 @@ namespace DaylightingManager {
 
                             ++WinEl;
 
-                            FigureDayltgCoeffsAtPointsForWindowElements(ZoneNum,
+                            FigureDayltgCoeffsAtPointsForWindowElements(state,
+                                                                        ZoneNum,
                                                                         IL,
                                                                         loopwin,
                                                                         CalledForMapPoint,
@@ -1618,7 +1622,8 @@ namespace DaylightingManager {
                             if (!DetailedSolarTimestepIntegration) {
                                 ISunPos = 0;
                                 for (IHR = 1; IHR <= 24; ++IHR) {
-                                    FigureDayltgCoeffsAtPointsForSunPosition(ZoneNum,
+                                    FigureDayltgCoeffsAtPointsForSunPosition(state,
+                                                                             ZoneNum,
                                                                              IL,
                                                                              IX,
                                                                              NWX,
@@ -1668,7 +1673,8 @@ namespace DaylightingManager {
                                 } else if (!SunIsUp && !MySunIsUpFlag) {
                                     ISunPos = -1;
                                 }
-                                FigureDayltgCoeffsAtPointsForSunPosition(ZoneNum,
+                                FigureDayltgCoeffsAtPointsForSunPosition(state,
+                                                                         ZoneNum,
                                                                          IL,
                                                                          IX,
                                                                          NWX,
@@ -2171,6 +2177,7 @@ namespace DaylightingManager {
     }
 
     void FigureDayltgCoeffsAtPointsForWindowElements(
+        EnergyPlusData &state,
         int const ZoneNum,
         int const iRefPoint,
         int const loopwin,
@@ -2444,7 +2451,7 @@ namespace DaylightingManager {
                     // the IHR (now HourOfDay) here is/was not correct, this is outside of hour loop
                     // the hour is used to query schedule for transmission , not sure what to do
                     // it will work for detailed and never did work correctly before.
-                    DayltgHitObstruction(HourOfDay, IWin2, RWIN2, Ray, ObTrans);
+                    DayltgHitObstruction(state, HourOfDay, IWin2, RWIN2, Ray, ObTrans);
                     if (ObTrans < 1.0) hitExtObs = true;
                 } else {
                     // Transmittance from exterior obstruction surfaces is calculated here. This needs to be done for each timestep
@@ -2463,7 +2470,7 @@ namespace DaylightingManager {
                         }
                         RayVector = ComplexWind(IWin).Geom(CplxFenState).sInc(RayIndex);
                         // It will get product of all transmittances
-                        DayltgHitObstruction(HourOfDay, IWin, RWIN, RayVector, TransBeam);
+                        DayltgHitObstruction(state, HourOfDay, IWin, RWIN, RayVector, TransBeam);
                         // IF (TransBeam > 0.0d0) ObTrans = TransBeam
                         if (CalledFrom == CalledForRefPoint) {
                             ComplexWind(IWin).DaylghtGeom(CplxFenState).RefPoint(iRefPoint).TransOutSurf(ICplxFen, WinEl) = TransBeam;
@@ -3341,6 +3348,7 @@ namespace DaylightingManager {
     }
 
     void FigureDayltgCoeffsAtPointsForSunPosition(
+        EnergyPlusData &state,
         int const ZoneNum,
         int const iRefPoint,
         int const iXelement,
@@ -3511,7 +3519,7 @@ namespace DaylightingManager {
         //  new code would be -
         // IF (LSHCAL == 1 .AND. ExtWinType /= AdjZoneExtWin) CALL DayltgInterReflectedIllum(ISunPos,IHR,ZoneNum,IWin2)
         if (SurfWinWindowModelType(IWin) != WindowBSDFModel) {
-            if (LSHCAL == 1) DayltgInterReflectedIllum(ISunPos, iHour, ZoneNum, IWin2);
+            if (LSHCAL == 1) DayltgInterReflectedIllum(state, ISunPos, iHour, ZoneNum, IWin2);
         } else {
             if (LSHCAL == 1) DayltgInterReflectedIllumComplexFenestration(IWin2, WinEl, iHour, ZoneNum, iRefPoint, CalledFrom, MapNum);
             if (COSB <= 0.0) return;
@@ -3519,7 +3527,7 @@ namespace DaylightingManager {
             // Call direct sun component only once since calculation is done for entire window
             if (WinEl == (NWX * NWY)) {
                 DayltgDirectSunDiskComplexFenestration(
-                    IWin2, ZoneNum, iHour, iRefPoint, WinEl, AZVIEW, CalledFrom, MapNum, MapWindowSolidAngAtRefPtWtd);
+                    state, IWin2, ZoneNum, iHour, iRefPoint, WinEl, AZVIEW, CalledFrom, MapNum, MapWindowSolidAngAtRefPtWtd);
             }
             return;
         }
@@ -3776,7 +3784,7 @@ namespace DaylightingManager {
                     if (!hitIntObsDisk) { // No interior obstruction was hit
                         // Net transmittance of exterior obstructions encountered by RAYCOS
                         // ObTransDisk = 1.0 will be returned if no exterior obstructions are hit.
-                        DayltgHitObstruction(iHour, IWin2, RREF2, RAYCOS, ObTransDisk);
+                        DayltgHitObstruction(state, iHour, IWin2, RREF2, RAYCOS, ObTransDisk);
                         //						if ( ObTransDisk < 1.0 ) hitExtObsDisk = true; //Unused Set but never used
                         // RJH 08-26-07 However, if this is a case of interior window
                         // and vector to sun does not pass through interior window
@@ -4357,7 +4365,7 @@ namespace DaylightingManager {
         } // End of sky type loop, ISky
     }
 
-    void GetDaylightingParametersInput(IOFiles &ioFiles)
+    void GetDaylightingParametersInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4390,13 +4398,13 @@ namespace DaylightingManager {
         cCurrentModuleObject = "Daylighting:Controls";
         TotDaylightingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (TotDaylightingControls > 0) {
-            GetInputDayliteRefPt(ErrorsFound);
-            GetDaylightingControls(TotDaylightingControls, ErrorsFound);
-            GeometryTransformForDaylighting();
-            GetInputIlluminanceMap(ioFiles, ErrorsFound);
-            GetLightWellData(ErrorsFound);
+            GetInputDayliteRefPt(state, ErrorsFound);
+            GetDaylightingControls(state, TotDaylightingControls, ErrorsFound);
+            GeometryTransformForDaylighting(state);
+            GetInputIlluminanceMap(state, ErrorsFound);
+            GetLightWellData(state, ErrorsFound);
             if (ErrorsFound) ShowFatalError("Program terminated for above reasons, related to DAYLIGHTING");
-            DayltgSetupAdjZoneListsAndPointers(ioFiles);
+            DayltgSetupAdjZoneListsAndPointers(state);
         }
 
         maxNumRefPtInAnyZone = 0;
@@ -4532,13 +4540,13 @@ namespace DaylightingManager {
                     if (ZoneDaylight(zoneOfSurf).TotalDaylRefPoints > 0 && !Zone(zoneOfSurf).HasInterZoneWindow &&
                         ZoneDaylight(zoneOfSurf).DaylightMethod == SplitFluxDaylighting) {
                         for (int refPtNum = 1; refPtNum <= ZoneDaylight(zoneOfSurf).TotalDaylRefPoints; ++refPtNum) {
-                            SetupOutputVariable("Daylighting Window Reference Point " + std::to_string(refPtNum) + " Illuminance",
+                            SetupOutputVariable(state, "Daylighting Window Reference Point " + std::to_string(refPtNum) + " Illuminance",
                                                 OutputProcessor::Unit::lux,
                                                 SurfaceWindow(SurfLoop).IllumFromWinAtRefPtRep(refPtNum),
                                                 "Zone",
                                                 "Average",
                                                 Surface(SurfLoop).Name);
-                            SetupOutputVariable("Daylighting Window Reference Point " + std::to_string(refPtNum) + " View Luminance",
+                            SetupOutputVariable(state, "Daylighting Window Reference Point " + std::to_string(refPtNum) + " View Luminance",
                                                 OutputProcessor::Unit::cd_m2,
                                                 SurfaceWindow(SurfLoop).LumWinFromRefPtRep(refPtNum),
                                                 "Zone",
@@ -4560,13 +4568,13 @@ namespace DaylightingManager {
                                     ++refPtCount; // Count reference points across each zone in the same enclosure
                                     std::string const varKey =
                                         Surface(enclSurfNum).Name + " to " + DaylRefPt(ZoneDaylight(enclZoneNum).DaylRefPtNum(refPtNum)).Name;
-                                    SetupOutputVariable("Daylighting Window Reference Point Illuminance",
+                                    SetupOutputVariable(state, "Daylighting Window Reference Point Illuminance",
                                                         OutputProcessor::Unit::lux,
                                                         SurfaceWindow(enclSurfNum).IllumFromWinAtRefPtRep(refPtCount),
                                                         "Zone",
                                                         "Average",
                                                         varKey);
-                                    SetupOutputVariable("Daylighting Window Reference Point View Luminance",
+                                    SetupOutputVariable(state, "Daylighting Window Reference Point View Luminance",
                                                         OutputProcessor::Unit::cd_m2,
                                                         SurfaceWindow(enclSurfNum).LumWinFromRefPtRep(refPtCount),
                                                         "Zone",
@@ -4584,7 +4592,7 @@ namespace DaylightingManager {
         if (doesDayLightingUseDElight()) {
             dLatitude = Latitude;
             DisplayString("Calculating DElight Daylighting Factors");
-            DElightInputGenerator(ioFiles);
+            DElightInputGenerator(state);
             // Init Error Flag to 0 (no Warnings or Errors)
             DisplayString("ReturnFrom DElightInputGenerator");
             iErrorFlag = 0;
@@ -4595,7 +4603,7 @@ namespace DaylightingManager {
             DisplayString("ReturnFrom DElight DaylightCoefficients Calc");
             if (iErrorFlag != 0) {
                 // Open DElight Daylight Factors Error File for reading
-                auto iDElightErrorFile = ioFiles.outputDelightDfdmpFileName.try_open(ioFiles.outputControl.delightdfdmp);
+                auto iDElightErrorFile = state.files.outputDelightDfdmpFileName.try_open(state.files.outputControl.delightdfdmp);
 
                 // Sequentially read lines in DElight Daylight Factors Error File
                 // and process them using standard EPlus warning/error handling calls
@@ -4634,8 +4642,8 @@ namespace DaylightingManager {
                     ErrorsFound = true;
                 }
             } else {
-                if (FileSystem::fileExists(ioFiles.outputDelightDfdmpFileName.fileName)) {
-                    FileSystem::removeFile(ioFiles.outputDelightDfdmpFileName.fileName);
+                if (FileSystem::fileExists(state.files.outputDelightDfdmpFileName.fileName)) {
+                    FileSystem::removeFile(state.files.outputDelightDfdmpFileName.fileName);
                 }
             }
         }
@@ -4645,7 +4653,8 @@ namespace DaylightingManager {
         cCurrentModuleObject = "Output:DaylightFactors";
         NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (NumReports > 0) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           1,
                                           cAlphaArgs,
                                           NumNames,
@@ -4666,7 +4675,7 @@ namespace DaylightingManager {
         if (ErrorsFound) ShowFatalError("Program terminated for above reasons");
     }
 
-    void GetInputIlluminanceMap(IOFiles &ioFiles, bool &ErrorsFound)
+    void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
     {
         // Perform the GetInput function for the Output:IlluminanceMap
         // Glazer - June 2016 (moved from GetDaylightingControls)
@@ -4719,7 +4728,7 @@ namespace DaylightingManager {
         OldAspectRatio = 1.0;
         NewAspectRatio = 1.0;
 
-        CheckForGeometricTransform(doTransform, OldAspectRatio, NewAspectRatio);
+        CheckForGeometricTransform(state, doTransform, OldAspectRatio, NewAspectRatio);
 
         cCurrentModuleObject = "Output:IlluminanceMap";
         TotIllumMaps = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -4730,7 +4739,8 @@ namespace DaylightingManager {
 
         if (TotIllumMaps > 0) {
             for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               MapNum,
                                               cAlphaArgs,
                                               NumAlpha,
@@ -4801,7 +4811,8 @@ namespace DaylightingManager {
                 cAlphaArgs(1) = "COMMA";
                 MapColSep = CharComma; // comma
             } else if (MapStyleIn == 1) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               1,
                                               cAlphaArgs,
                                               NumAlpha,
@@ -4825,11 +4836,11 @@ namespace DaylightingManager {
                     cAlphaArgs(1) = "COMMA";
                 }
             }
-            print(ioFiles.eio, "! <Daylighting:Illuminance Maps>,#Maps,Style\n");
+            print(state.files.eio, "! <Daylighting:Illuminance Maps>,#Maps,Style\n");
             ConvertCaseToLower(cAlphaArgs(1), cAlphaArgs(2));
             cAlphaArgs(1).erase(1);
             cAlphaArgs(1) += cAlphaArgs(2).substr(1);
-            print(ioFiles.eio, "Daylighting:Illuminance Maps,{},{}\n", TotIllumMaps, cAlphaArgs(1));
+            print(state.files.eio, "Daylighting:Illuminance Maps,{},{}\n", TotIllumMaps, cAlphaArgs(1));
         }
         for (Loop1 = 1; Loop1 <= NumOfZones; ++Loop1) {
             ZoneDaylight(Loop1).ZoneToMap.allocate(ZoneMapCount(Loop1));
@@ -5025,11 +5036,11 @@ namespace DaylightingManager {
         ZoneMsgDone.deallocate();
 
         if (TotIllumMaps > 0) {
-            print(ioFiles.eio, "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {{m}},XMax {{m}},Xinc {{m}},#X Points,YMin "
+            print(state.files.eio, "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {{m}},XMax {{m}},Xinc {{m}},#X Points,YMin "
                                                  "{{m}},YMax {{m}},Yinc {{m}},#Y Points,Z {{m}}\n");
         }
         for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
-            print(ioFiles.eio,
+            print(state.files.eio,
                   "Daylighting:Illuminance Maps:Detail,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{},{:.2R}\n",
                   IllumMap(MapNum).Name,
                   Zone(IllumMap(MapNum).Zone).Name,
@@ -5047,7 +5058,8 @@ namespace DaylightingManager {
         if (ErrorsFound) return;
     }
 
-    void GetDaylightingControls(int const TotDaylightingControls, // Total daylighting inputs
+    void GetDaylightingControls(EnergyPlusData &state,
+                                int const TotDaylightingControls, // Total daylighting inputs
                                 bool &ErrorsFound)
     {
         //       AUTHOR         Fred Winkelmann
@@ -5071,7 +5083,8 @@ namespace DaylightingManager {
         for (int iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl) {
             cAlphaArgs = "";
             rNumericArgs = 0.0;
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           iDaylCntrl,
                                           cAlphaArgs,
                                           NumAlpha,
@@ -5105,7 +5118,7 @@ namespace DaylightingManager {
             }
 
             if (!lAlphaFieldBlanks(4)) { // Field: Availability Schedule Name
-                zone_daylight.AvailSchedNum = GetScheduleIndex(cAlphaArgs(4));
+                zone_daylight.AvailSchedNum = GetScheduleIndex(state, cAlphaArgs(4));
                 if (zone_daylight.AvailSchedNum == 0) {
                     ShowWarningError("Invalid " + cAlphaFieldNames(4) + " = " + cAlphaArgs(4) + ", occurs in " + cCurrentModuleObject +
                                      "object for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
@@ -5212,25 +5225,25 @@ namespace DaylightingManager {
                 zone_daylight.IllumSetPoint(refPtNum) = rNumericArgs(7 + refPtNum * 2);  // Field: Illuminance Setpoint at Reference Point
 
                 if (zone_daylight.DaylightMethod == SplitFluxDaylighting) {
-                    SetupOutputVariable("Daylighting Reference Point " + std::to_string(refPtNum) + " Illuminance",
+                    SetupOutputVariable(state, "Daylighting Reference Point " + std::to_string(refPtNum) + " Illuminance",
                                         OutputProcessor::Unit::lux,
                                         zone_daylight.DaylIllumAtRefPt(refPtNum),
                                         "Zone",
                                         "Average",
                                         zone_daylight.Name);
-                    SetupOutputVariable("Daylighting Reference Point " + std::to_string(refPtNum) + " Daylight Illuminance Setpoint Exceeded Time",
+                    SetupOutputVariable(state, "Daylighting Reference Point " + std::to_string(refPtNum) + " Daylight Illuminance Setpoint Exceeded Time",
                                         OutputProcessor::Unit::hr,
                                         zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt(refPtNum),
                                         "Zone",
                                         "Sum",
                                         zone_daylight.Name);
-                    SetupOutputVariable("Daylighting Reference Point " + std::to_string(refPtNum) + " Glare Index",
+                    SetupOutputVariable(state, "Daylighting Reference Point " + std::to_string(refPtNum) + " Glare Index",
                                         OutputProcessor::Unit::None,
                                         zone_daylight.GlareIndexAtRefPt(refPtNum),
                                         "Zone",
                                         "Average",
                                         zone_daylight.Name);
-                    SetupOutputVariable("Daylighting Reference Point " + std::to_string(refPtNum) + " Glare Index Setpoint Exceeded Time",
+                    SetupOutputVariable(state, "Daylighting Reference Point " + std::to_string(refPtNum) + " Glare Index Setpoint Exceeded Time",
                                         OutputProcessor::Unit::hr,
                                         zone_daylight.TimeExceedingGlareIndexSPAtRefPt(refPtNum),
                                         "Zone",
@@ -5261,7 +5274,7 @@ namespace DaylightingManager {
                 ShowContinueError("..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs(2) + "\", will use 1");
                 zone_daylight.LightControlSteps = 1;
             }
-            SetupOutputVariable("Daylighting Lighting Power Multiplier",
+            SetupOutputVariable(state, "Daylighting Lighting Power Multiplier",
                                 OutputProcessor::Unit::None,
                                 zone_daylight.ZonePowerReductionFactor,
                                 "Zone",
@@ -5270,7 +5283,7 @@ namespace DaylightingManager {
         }
     }
 
-    void GeometryTransformForDaylighting()
+    void GeometryTransformForDaylighting(EnergyPlusData &state)
     {
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   March 2002
@@ -5318,7 +5331,7 @@ namespace DaylightingManager {
         OldAspectRatio = 1.0;
         NewAspectRatio = 1.0;
 
-        CheckForGeometricTransform(doTransform, OldAspectRatio, NewAspectRatio);
+        CheckForGeometricTransform(state, doTransform, OldAspectRatio, NewAspectRatio);
         int zoneIndex = 0;
         for (auto &daylCntrl : ZoneDaylight) {
             zoneIndex++;
@@ -5430,7 +5443,7 @@ namespace DaylightingManager {
         }
     }
 
-    void GetInputDayliteRefPt(bool &ErrorsFound)
+    void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
     {
         // Perform GetInput function for the Daylighting:ReferencePoint object
         // Glazer - July 2016
@@ -5445,7 +5458,8 @@ namespace DaylightingManager {
         TotRefPoints = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         DaylRefPt.allocate(TotRefPoints);
         for (auto &pt : DaylRefPt) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           ++RefPtNum,
                                           cAlphaArgs,
                                           NumAlpha,
@@ -5580,7 +5594,7 @@ namespace DaylightingManager {
         }
     }
 
-    void GetLightWellData(bool &ErrorsFound) // If errors found in input
+    void GetLightWellData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -5627,7 +5641,8 @@ namespace DaylightingManager {
 
         for (loop = 1; loop <= TotLightWells; ++loop) {
 
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           loop,
                                           cAlphaArgs,
                                           NumAlpha,
@@ -5928,7 +5943,8 @@ namespace DaylightingManager {
         HISU = SPHSUN * 1.0;
     }
 
-    void DayltgHitObstruction(int const IHOUR,           // Hour number
+    void DayltgHitObstruction(EnergyPlusData &state,
+                              int const IHOUR,           // Hour number
                               int const IWin,            // Window index
                               Vector3<Real64> const &R1, // Origin of ray (m)
                               Vector3<Real64> const &RN, // Unit vector along ray
@@ -5989,7 +6005,7 @@ namespace DaylightingManager {
                     PierceSurface(ISurf, R1, RN, HP, hit);
                     if (hit) { // Shading surface is hit
                         // Get solar transmittance of the shading surface
-                        Real64 const Trans(surface.SchedShadowSurfIndex > 0 ? LookUpScheduleValue(surface.SchedShadowSurfIndex, IHOUR, 1) : 0.0);
+                        Real64 const Trans(surface.SchedShadowSurfIndex > 0 ? LookUpScheduleValue(state, surface.SchedShadowSurfIndex, IHOUR, 1) : 0.0);
                         if (Trans < 1.e-6) {
                             ObTrans = 0.0;
                             break;
@@ -6006,7 +6022,7 @@ namespace DaylightingManager {
             auto const window_base_p(&window_base);
 
             // Lambda function for the octree to test for surface hit and update transmittance if hit
-            auto solarTransmittance = [=, &R1, &RN, &hit, &ObTrans](SurfaceData const &surface) -> bool {
+            auto solarTransmittance = [=, &state, &R1, &RN, &hit, &ObTrans](SurfaceData const &surface) -> bool {
                 if (!surface.ShadowSurfPossibleObstruction) return false; // Do Consider separate octree without filtered surfaces
                 auto const sClass(surface.Class);
                 if ((sClass == SurfaceClass_Wall || sClass == SurfaceClass_Roof || sClass == SurfaceClass_Floor) && (&surface != window_base_p)) {
@@ -6019,7 +6035,7 @@ namespace DaylightingManager {
                     PierceSurface(surface, R1, RN, HP, hit);
                     if (hit) { // Shading surface is hit
                         // Get solar transmittance of the shading surface
-                        Real64 const Trans(surface.SchedShadowSurfIndex > 0 ? LookUpScheduleValue(surface.SchedShadowSurfIndex, IHOUR, 1) : 0.0);
+                        Real64 const Trans(surface.SchedShadowSurfIndex > 0 ? LookUpScheduleValue(state, surface.SchedShadowSurfIndex, IHOUR, 1) : 0.0);
                         if (Trans < 1.e-6) {
                             ObTrans = 0.0;
                             return true;
@@ -6034,7 +6050,7 @@ namespace DaylightingManager {
 
             // Check octree surface candidates for hits: short circuits if zero transmittance reached
             Vector3<Real64> const RN_inv(SurfaceOctreeCube::safe_inverse(RN));
-            surfaceOctree.processSomeSurfaceRayIntersectsCube(R1, RN, RN_inv, solarTransmittance);
+            surfaceOctree.processSomeSurfaceRayIntersectsCube(state, R1, RN, RN_inv, solarTransmittance);
         }
     }
 
@@ -7279,7 +7295,7 @@ namespace DaylightingManager {
         } // PipeNum
     }
 
-    void DayltgElecLightingControl(IOFiles &ioFiles, int &ZoneNum) // Zone number
+    void DayltgElecLightingControl(EnergyPlusData &state, int &ZoneNum) // Zone number
     {
 
         // SUBROUTINE INFORMATION:
@@ -7430,7 +7446,7 @@ namespace DaylightingManager {
                         mapResultsReported = true;
                     }
                 }
-                ReportIllumMap(ioFiles, MapNum);
+                ReportIllumMap(state, MapNum);
                 if (TimeStep == NumOfTimeStepInHour) {
                     IllumMapCalc(MapNum).DaylIllumAtMapPtHr = 0.0;
                     IllumMapCalc(MapNum).DaylIllumAtMapPt = 0.0;
@@ -7517,7 +7533,8 @@ namespace DaylightingManager {
         return DayltgGlarePositionFactor;
     }
 
-    void DayltgInterReflectedIllum(int const ISunPos, // Sun position counter; used to avoid calculating various
+    void DayltgInterReflectedIllum(EnergyPlusData &state,
+                                   int const ISunPos, // Sun position counter; used to avoid calculating various
                                    int const IHR,     // Hour of day
                                    int const ZoneNum, // Zone number
                                    int const IWin     // Window index
@@ -7838,7 +7855,7 @@ namespace DaylightingManager {
                 if (ISunPos == 1) { // Intersection calculation has to be done only for first sun position
                     // Determine net transmittance of obstructions that the ray hits. ObTrans will be 1.0
                     // if no obstructions are hit.
-                    DayltgHitObstruction(IHR, IWin, SurfaceWindow(IWin).WinCenter, U, ObTrans);
+                    DayltgHitObstruction(state, IHR, IWin, SurfaceWindow(IWin).WinCenter, U, ObTrans);
                     ObTransM(IPH, ITH) = ObTrans;
                 }
 
@@ -8914,7 +8931,8 @@ namespace DaylightingManager {
         // AVWLSUdisk(1,IHR) = AVWLSUdisk(1,IHR) + WinLumSUdisk
     }
 
-    void DayltgDirectSunDiskComplexFenestration(int const iWin,               // Window index
+    void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
+                                                int const iWin,               // Window index
                                                 int const EP_UNUSED(ZoneNum), // Zone number
                                                 int const iHour,              // Hour of day
                                                 int const iRefPoint,
@@ -9027,7 +9045,7 @@ namespace DaylightingManager {
                     RWin(2) = Surface(iWin).Centroid.y;
                     RWin(3) = Surface(iWin).Centroid.z;
 
-                    DayltgHitObstruction(iHour, iWin, RWin, V, TransBeam);
+                    DayltgHitObstruction(state, iHour, iWin, RWin, V, TransBeam);
 
                     WinLumSunDisk += (14700.0 * std::sqrt(0.000068 * PosFac) * double(NumEl) / std::pow(WindowSolidAngleDaylightPoint, 0.8)) *
                                      dirTrans * LambdaTrn * TransBeam;
@@ -9905,7 +9923,7 @@ namespace DaylightingManager {
         }
     }
 
-    void ReportIllumMap(IOFiles &ioFiles, int const MapNum)
+    void ReportIllumMap(EnergyPlusData &state, int const MapNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9990,13 +10008,13 @@ namespace DaylightingManager {
                 return outputFile;
             };
             if (MapColSep == CharTab) {
-                if (!openMapFile(ioFiles.outputMapTabFileName).good()) return;
+                if (!openMapFile(state.files.outputMapTabFileName).good()) return;
                 //				CommaDelimited = false; //Unused Set but never used
             } else if (MapColSep == CharComma) {
-                if (!openMapFile(ioFiles.outputMapCsvFileName).good()) return;
+                if (!openMapFile(state.files.outputMapCsvFileName).good()) return;
                 //				CommaDelimited = true; //Unused Set but never used
             } else {
-                if (!openMapFile(ioFiles.outputMapTxtFileName).good()) return;
+                if (!openMapFile(state.files.outputMapTxtFileName).good()) return;
                 //				CommaDelimited = false; //Unused Set but never used
             }
 
@@ -10115,7 +10133,7 @@ namespace DaylightingManager {
         }         // not Warmup
     }
 
-    void CloseReportIllumMaps(IOFiles &ioFiles)
+    void CloseReportIllumMaps(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10158,14 +10176,14 @@ namespace DaylightingManager {
         if (TotIllumMaps > 0) {
             // Write map header
             if (MapColSep == CharTab) {
-                ioFiles.map.fileName = ioFiles.outputMapTabFileName;
+                state.files.map.fileName = state.files.outputMapTabFileName;
             } else if (MapColSep == CharComma) {
-                ioFiles.map.fileName = ioFiles.outputMapCsvFileName;
+                state.files.map.fileName = state.files.outputMapCsvFileName;
             } else {
-                ioFiles.map.fileName = ioFiles.outputMapTxtFileName;
+                state.files.map.fileName = state.files.outputMapTxtFileName;
             }
 
-            ioFiles.map.ensure_open("CloseReportIllumMaps");
+            state.files.map.ensure_open("CloseReportIllumMaps");
 
             for (int MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
                 if (!IllumMap(MapNum).mapFile->good()) continue; // fatal error processing
@@ -10176,7 +10194,7 @@ namespace DaylightingManager {
                     break;
                 }
                 for(const auto &mapLine : mapLines) {
-                    print(ioFiles.map, "{}\n", mapLine);
+                    print(state.files.map, "{}\n", mapLine);
                 }
                 IllumMap(MapNum).mapFile->del();
             }
@@ -10185,13 +10203,13 @@ namespace DaylightingManager {
                 const auto message =
                     "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar.";
                 ShowSevereError(message);
-                print(ioFiles.map, "{}\n", message);
+                print(state.files.map, "{}\n", message);
             }
 
         }
     }
 
-    void CloseDFSFile(IOFiles &ioFiles)
+    void CloseDFSFile(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10228,10 +10246,10 @@ namespace DaylightingManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        ioFiles.dfs.close();
+        state.files.dfs.close();
     }
 
-    void DayltgSetupAdjZoneListsAndPointers(IOFiles &ioFiles)
+    void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10549,24 +10567,24 @@ namespace DaylightingManager {
 
         } // End of primary zone loop
         static constexpr auto Format_700("! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones\n");
-        print(ioFiles.eio, Format_700);
+        print(state.files.eio, Format_700);
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
             static constexpr auto Format_701("Zone/Window Adjacency Daylighting Counts, {},{},{}\n");
-            print(ioFiles.eio, Format_701, Zone(ZoneNum).Name, ZoneDaylight(ZoneNum).TotalExtWindows,
+            print(state.files.eio, Format_701, Zone(ZoneNum).Name, ZoneDaylight(ZoneNum).TotalExtWindows,
                   (ZoneDaylight(ZoneNum).NumOfDayltgExtWins - ZoneDaylight(ZoneNum).TotalExtWindows));
         }
         static constexpr auto Format_702("! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent "
                                               "Zone Names - 1st 100 (max)\n");
-        print(ioFiles.eio, Format_702);
+        print(state.files.eio, Format_702);
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
             static constexpr auto Format_703("Zone/Window Adjacency Daylighting Matrix, {},{}");
-            print(ioFiles.eio, Format_703, Zone(ZoneNum).Name, ZoneDaylight(ZoneNum).NumOfIntWinAdjZones);
+            print(state.files.eio, Format_703, Zone(ZoneNum).Name, ZoneDaylight(ZoneNum).NumOfIntWinAdjZones);
             for (int loop = 1, loop_end = min(ZoneDaylight(ZoneNum).NumOfIntWinAdjZones, 100); loop <= loop_end; ++loop) {
-                print(ioFiles.eio, ",{}", Zone(ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).Name);
+                print(state.files.eio, ",{}", Zone(ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).Name);
             }
-            print(ioFiles.eio, "\n");
+            print(state.files.eio, "\n");
         }
 
         ZoneExtWin.deallocate();
@@ -10818,7 +10836,7 @@ namespace DaylightingManager {
         }     // End of loop over zones
     }
 
-    void CheckForGeometricTransform(bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio)
+    void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10869,7 +10887,8 @@ namespace DaylightingManager {
         NewAspectRatio = 1.0;
 
         if (inputProcessor->getNumObjectsFound(CurrentModuleObject) == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           cAlphas,
                                           NAlphas,

@@ -289,7 +289,7 @@ TEST_F(EnergyPlusFixture, IdealLoadsAirSystem_GetInput)
 
     DataGlobals::DoWeathSim = true;
 
-    GetPurchasedAir();
+    GetPurchasedAir(state);
 
     EXPECT_EQ(PurchasedAirManager::PurchAir.size(), 1u);
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
@@ -390,7 +390,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
     DataGlobals::DoWeathSim = true;
 
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
@@ -500,7 +500,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
     DataGlobals::DoWeathSim = true;
 
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
@@ -630,7 +630,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     DataGlobals::DoWeathSim = true;
 
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
@@ -648,14 +648,14 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     ZoneEquipConfig(1).ExhaustNode(1) = 2;
     DataGlobals::TimeStepZone = 0.25;
 
-    EMSManager::CheckIfAnyEMS(state.files); // get EMS input
-    EMSManager::GetEMSInput(state, state.files);
+    EMSManager::CheckIfAnyEMS(state); // get EMS input
+    EMSManager::GetEMSInput(state);
     EMSManager::FinishProcessingUserInput = true;
 
     bool FirstHVACIteration(true);
 
     if (GetPurchAirInputFlag) {
-        GetPurchasedAir();
+        GetPurchasedAir(state);
         GetPurchAirInputFlag = false;
     }
 

@@ -56,6 +56,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -66,7 +67,6 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceHAMTManager.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -191,7 +191,7 @@ namespace HeatBalanceHAMTManager {
 
     // Functions
 
-    void ManageHeatBalHAMT(IOFiles &ioFiles, int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
+    void ManageHeatBalHAMT(EnergyPlusData &state, int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -231,14 +231,14 @@ namespace HeatBalanceHAMTManager {
         if (OneTimeFlag) {
             OneTimeFlag = false;
             DisplayString("Initialising Heat and Moisture Transfer Model");
-            GetHeatBalHAMTInput();
-            InitHeatBalHAMT(ioFiles);
+            GetHeatBalHAMTInput(state);
+            InitHeatBalHAMT(state);
         }
 
         CalcHeatBalHAMT(SurfNum, TempSurfInTmp, TempSurfOutTmp);
     }
 
-    void GetHeatBalHAMTInput()
+    void GetHeatBalHAMTInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -365,7 +365,8 @@ namespace HeatBalanceHAMTManager {
 
         HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject1); // MaterialProperty:HeatAndMoistureTransfer:Settings
         for (item = 1; item <= HAMTitems; ++item) {
-            inputProcessor->getObjectItem(cHAMTObject1,
+            inputProcessor->getObjectItem(state,
+                                          cHAMTObject1,
                                           item,
                                           AlphaArray,
                                           NumAlphas,
@@ -396,7 +397,8 @@ namespace HeatBalanceHAMTManager {
 
         HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject2); // MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm
         for (item = 1; item <= HAMTitems; ++item) {
-            inputProcessor->getObjectItem(cHAMTObject2,
+            inputProcessor->getObjectItem(state,
+                                          cHAMTObject2,
                                           item,
                                           AlphaArray,
                                           NumAlphas,
@@ -484,7 +486,8 @@ namespace HeatBalanceHAMTManager {
 
         HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject3); // MaterialProperty:HeatAndMoistureTransfer:Suction
         for (item = 1; item <= HAMTitems; ++item) {
-            inputProcessor->getObjectItem(cHAMTObject3,
+            inputProcessor->getObjectItem(state,
+                                          cHAMTObject3,
                                           item,
                                           AlphaArray,
                                           NumAlphas,
@@ -526,7 +529,8 @@ namespace HeatBalanceHAMTManager {
 
         HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject4); // MaterialProperty:HeatAndMoistureTransfer:Redistribution
         for (item = 1; item <= HAMTitems; ++item) {
-            inputProcessor->getObjectItem(cHAMTObject4,
+            inputProcessor->getObjectItem(state,
+                                          cHAMTObject4,
                                           item,
                                           AlphaArray,
                                           NumAlphas,
@@ -566,7 +570,8 @@ namespace HeatBalanceHAMTManager {
 
         HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject5); // MaterialProperty:HeatAndMoistureTransfer:Diffusion
         for (item = 1; item <= HAMTitems; ++item) {
-            inputProcessor->getObjectItem(cHAMTObject5,
+            inputProcessor->getObjectItem(state,
+                                          cHAMTObject5,
                                           item,
                                           AlphaArray,
                                           NumAlphas,
@@ -609,7 +614,8 @@ namespace HeatBalanceHAMTManager {
 
         HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject6); // MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
         for (item = 1; item <= HAMTitems; ++item) {
-            inputProcessor->getObjectItem(cHAMTObject6,
+            inputProcessor->getObjectItem(state,
+                                          cHAMTObject6,
                                           item,
                                           AlphaArray,
                                           NumAlphas,
@@ -652,7 +658,8 @@ namespace HeatBalanceHAMTManager {
         // Vapor Transfer coefficients
         HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject7); // SurfaceProperties:VaporCoefficients
         for (item = 1; item <= HAMTitems; ++item) {
-            inputProcessor->getObjectItem(cHAMTObject7,
+            inputProcessor->getObjectItem(state,
+                                          cHAMTObject7,
                                           item,
                                           AlphaArray,
                                           NumAlphas,
@@ -695,7 +702,7 @@ namespace HeatBalanceHAMTManager {
         }
     }
 
-    void InitHeatBalHAMT(IOFiles &ioFiles)
+    void InitHeatBalHAMT(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Phillip Biddulph
@@ -993,9 +1000,9 @@ namespace HeatBalanceHAMTManager {
 
         // Reset surface virtual cell origins and volumes. Initialize report variables.
         static constexpr auto Format_1966("! <HAMT cells>, Surface Name, Construction Name, Cell Numbers\n");
-        print(ioFiles.eio, Format_1966);
+        print(state.files.eio, Format_1966);
         static constexpr auto Format_1965("! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) \n");
-        print(ioFiles.eio, Format_1965);
+        print(state.files.eio, Format_1965);
         // cCurrentModuleObject='MaterialProperty:HeatAndMoistureTransfer:*'
         for (sid = 1; sid <= TotSurfaces; ++sid) {
             if (!Surface(sid).HeatTransSurf) continue;
@@ -1011,33 +1018,33 @@ namespace HeatBalanceHAMTManager {
             surftemp(sid) = 0.0;
             surfexttemp(sid) = 0.0;
             surfvp(sid) = 0.0;
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "HAMT Surface Average Water Content Ratio", OutputProcessor::Unit::kg_kg, watertot(sid), "Zone", "State", Surface(sid).Name);
-            SetupOutputVariable("HAMT Surface Inside Face Temperature", OutputProcessor::Unit::C, surftemp(sid), "Zone", "State", Surface(sid).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state, "HAMT Surface Inside Face Temperature", OutputProcessor::Unit::C, surftemp(sid), "Zone", "State", Surface(sid).Name);
+            SetupOutputVariable(state,
                 "HAMT Surface Inside Face Relative Humidity", OutputProcessor::Unit::Perc, surfrh(sid), "Zone", "State", Surface(sid).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "HAMT Surface Inside Face Vapor Pressure", OutputProcessor::Unit::Pa, surfvp(sid), "Zone", "State", Surface(sid).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "HAMT Surface Outside Face Temperature", OutputProcessor::Unit::C, surfexttemp(sid), "Zone", "State", Surface(sid).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "HAMT Surface Outside Face Relative Humidity", OutputProcessor::Unit::Perc, surfextrh(sid), "Zone", "State", Surface(sid).Name);
 
             // write cell origins to initialization output file
             conid = Surface(sid).Construction;
-            print(ioFiles.eio, "HAMT cells, {},{}", Surface(sid).Name, dataConstruction.Construct(conid).Name);
+            print(state.files.eio, "HAMT cells, {},{}", Surface(sid).Name, dataConstruction.Construct(conid).Name);
             for (int concell = 1, concell_end = Intcell(sid) - Extcell(sid) + 1; concell <= concell_end; ++concell) {
-                print(ioFiles.eio, ",{:4}", concell);
+                print(state.files.eio, ",{:4}", concell);
             }
-            print(ioFiles.eio, "\n");
-            print(ioFiles.eio, "HAMT origins,{},{}", Surface(sid).Name, dataConstruction.Construct(conid).Name);
+            print(state.files.eio, "\n");
+            print(state.files.eio, "HAMT origins,{},{}", Surface(sid).Name, dataConstruction.Construct(conid).Name);
             for (int cellid = Extcell(sid); cellid <= Intcell(sid); ++cellid) {
-                print(ioFiles.eio, ",{:10.7F}", cells(cellid).origin(1));
+                print(state.files.eio, ",{:10.7F}", cells(cellid).origin(1));
             }
-            print(ioFiles.eio, "\n");
+            print(state.files.eio, "\n");
 
             for (int cellid = Extcell(sid), concell = 1; cellid <= Intcell(sid); ++cellid, ++concell) {
-                SetupOutputVariable("HAMT Surface Temperature Cell " + TrimSigDigits(concell) + "",
+                SetupOutputVariable(state, "HAMT Surface Temperature Cell " + TrimSigDigits(concell) + "",
                                     OutputProcessor::Unit::C,
                                     cells(cellid).temp,
                                     "Zone",
@@ -1045,7 +1052,7 @@ namespace HeatBalanceHAMTManager {
                                     Surface(sid).Name);
             }
             for (int cellid = Extcell(sid), concell = 1; cellid <= Intcell(sid); ++cellid, ++concell) {
-                SetupOutputVariable("HAMT Surface Water Content Cell " + TrimSigDigits(concell) + "",
+                SetupOutputVariable(state, "HAMT Surface Water Content Cell " + TrimSigDigits(concell) + "",
                                     OutputProcessor::Unit::kg_kg,
                                     cells(cellid).wreport,
                                     "Zone",
@@ -1053,7 +1060,7 @@ namespace HeatBalanceHAMTManager {
                                     Surface(sid).Name);
             }
             for (int cellid = Extcell(sid), concell = 1; cellid <= Intcell(sid); ++cellid, ++concell) {
-                SetupOutputVariable("HAMT Surface Relative Humidity Cell " + TrimSigDigits(concell) + "",
+                SetupOutputVariable(state, "HAMT Surface Relative Humidity Cell " + TrimSigDigits(concell) + "",
                                     OutputProcessor::Unit::Perc,
                                     cells(cellid).rhp,
                                     "Zone",
@@ -1062,16 +1069,16 @@ namespace HeatBalanceHAMTManager {
             }
         }
 
-        ScanForReports("Constructions", DoReport, "Constructions");
+        ScanForReports(state, "Constructions", DoReport, "Constructions");
         if (DoReport) {
 
             static constexpr auto Format_108("! <Material Nominal Resistance>, Material Name,  Nominal R\n");
-            print(ioFiles.eio, Format_108);
+            print(state.files.eio, Format_108);
 
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
 
                 static constexpr auto Format_111("Material Nominal Resistance,{},{:.4R}\n");
-                print(ioFiles.eio, Format_111, dataMaterial.Material(MaterNum).Name, NominalR(MaterNum));
+                print(state.files.eio, Format_111, dataMaterial.Material(MaterNum).Name, NominalR(MaterNum));
             }
         }
     }

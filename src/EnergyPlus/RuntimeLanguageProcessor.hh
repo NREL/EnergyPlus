@@ -180,11 +180,11 @@ namespace RuntimeLanguageProcessor {
     // Functions
     void clear_state();
 
-    void InitializeRuntimeLanguage(EnergyPlusData &state, IOFiles &ioFiles);
+    void InitializeRuntimeLanguage(EnergyPlusData &state);
 
     void BeginEnvrnInitializeRuntimeLanguage();
 
-    void ParseStack(IOFiles &ioFiles, int const StackNum);
+    void ParseStack(EnergyPlusData &state, int const StackNum);
 
     int AddInstruction(int const StackNum,
                        int const LineNum,
@@ -197,10 +197,10 @@ namespace RuntimeLanguageProcessor {
                   std::string const &Error // error message to be added to ErlStack
     );
 
-    ErlValueType EvaluateStack(EnergyPlusData &state, IOFiles &ioFiles, int const StackNum);
+    ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum);
 
     void
-    WriteTrace(IOFiles &ioFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound);
+    WriteTrace(EnergyPlusData &state, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound);
 
     //******************************************************************************************
 
@@ -208,7 +208,7 @@ namespace RuntimeLanguageProcessor {
 
     //******************************************************************************************
 
-    void ParseExpression(IOFiles &ioFiles,
+    void ParseExpression(EnergyPlusData &state,
                          std::string const &InString, // String of expression text written in the Runtime Language
                          int const StackNum,          // Parent StackNum??
                          int &ExpressionNum,          // index of expression in structure
@@ -231,7 +231,7 @@ namespace RuntimeLanguageProcessor {
 
     int TodayTomorrowWeather(int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value);
 
-    void GetRuntimeLanguageUserInput(EnergyPlusData &state, IOFiles &ioFiles);
+    void GetRuntimeLanguageUserInput(EnergyPlusData &state);
 
     void ReportRuntimeLanguage();
 

@@ -67,11 +67,14 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace OutputReportTabularAnnual {
 
     // these functions are not in the class and act as an interface between procedural code and object oriented
 
-    void GetInputTabularAnnual();
+    void GetInputTabularAnnual(EnergyPlusData &state);
 
     void checkAggregationOrderForAnnual();
 
@@ -94,13 +97,13 @@ namespace OutputReportTabularAnnual {
         AnnualTable() : m_name(""), m_filter(""), m_scheduleName(""), m_scheduleNum(0){};
 
         // Member Constructor
-        AnnualTable(std::string name, std::string filter, std::string scheduleName)
+        AnnualTable(EnergyPlusData &state, std::string name, std::string filter, std::string scheduleName)
         {
             m_name = name;
             m_filter = filter;
             m_scheduleName = scheduleName;
             if (!m_scheduleName.empty()) {
-                m_scheduleNum = ScheduleManager::GetScheduleIndex(m_scheduleName); // index to the period schedule
+                m_scheduleNum = ScheduleManager::GetScheduleIndex(state, m_scheduleName); // index to the period schedule
             } else {
                 m_scheduleNum = 0;
             }
@@ -110,7 +113,7 @@ namespace OutputReportTabularAnnual {
 
         void addFieldSet(std::string, std::string, AnnualFieldSet::AggregationKind, int);
 
-        void setupGathering();
+        void setupGathering(EnergyPlusData &state);
 
         bool invalidAggregationOrder();
 

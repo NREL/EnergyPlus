@@ -254,13 +254,14 @@ namespace PipeHeatTransfer {
                     Real64 const DayOfSim // Current Simulation Day
         );
 
-        void CalcBuriedPipeSoil();
+        void CalcBuriedPipeSoil(EnergyPlusData &state);
 
-        void CalcPipesHeatTransfer(Optional_int_const LengthIndex = _);
+        void CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const LengthIndex = _);
 
         Real64 OutsidePipeHeatTransCoef();
 
-        Real64 CalcPipeHeatTransCoef(Real64 const Temperature,  // Temperature of water entering the surface, in C
+        Real64 CalcPipeHeatTransCoef(EnergyPlusData &state,
+                                     Real64 const Temperature,  // Temperature of water entering the surface, in C
                                      Real64 const MassFlowRate, // Mass flow rate, in kg/s
                                      Real64 const Diameter      // Pipe diameter, m
         );

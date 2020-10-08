@@ -449,7 +449,7 @@ namespace EnergyPlus {
             if (ErrorsFound) ShowFatalError(RoutineName + ": Preceding input errors cause program termination.");
 
             // Setup output variables
-            SetupPipingSystemOutputVariables();
+            SetupPipingSystemOutputVariables(state);
 
             // Validate DOMAIN-CIRCUIT cross references
             for (int DomainNum = 0; DomainNum < TotalNumDomains; ++DomainNum) {
@@ -523,7 +523,8 @@ namespace EnergyPlus {
             for (int DomainNum = IndexStart; DomainNum <= NumGeneralizedDomains; ++DomainNum) {
 
                 // Set up all the inputs for this domain object
-                inputProcessor->getObjectItem(ObjName_ug_GeneralDomain,
+                inputProcessor->getObjectItem(state,
+                                              ObjName_ug_GeneralDomain,
                                               DomainNum,
                                               DataIPShortCuts::cAlphaArgs,
                                               NumAlphas,
@@ -810,7 +811,7 @@ namespace EnergyPlus {
                 }
                 // then we can loop through and allow the factory to be called and carry on
                 for (auto &circuitNameToFind : circuitNamesToFind) {
-                    thisDomain.circuits.push_back(Circuit::factory(circuitNameToFind, ErrorsFound));
+                    thisDomain.circuits.push_back(Circuit::factory(state, circuitNameToFind, ErrorsFound));
                 }
 
                 // Initialize ground temperature model and get pointer reference
@@ -848,7 +849,8 @@ namespace EnergyPlus {
                 ++DomainCtr;
 
                 // Read all the inputs for this domain object
-                inputProcessor->getObjectItem(ObjName_ZoneCoupled_Slab,
+                inputProcessor->getObjectItem(state,
+                                              ObjName_ZoneCoupled_Slab,
                                               ZoneCoupledDomainCtr,
                                               DataIPShortCuts::cAlphaArgs,
                                               NumAlphas,
@@ -1127,7 +1129,7 @@ namespace EnergyPlus {
                 thisDomain.SimControls.MaxIterationsPerTS = 250;
 
                 // setup output variables
-                thisDomain.SetupZoneCoupledOutputVariables();
+                thisDomain.SetupZoneCoupledOutputVariables(state);
 
                 // add it to the main vector
                 // domains.push_back(thisDomain);
@@ -1163,7 +1165,8 @@ namespace EnergyPlus {
                 ++DomainNum;
 
                 // Read all the inputs for this domain object
-                inputProcessor->getObjectItem(ObjName_ZoneCoupled_Basement,
+                inputProcessor->getObjectItem(state,
+                                              ObjName_ZoneCoupled_Basement,
                                               BasementCtr,
                                               DataIPShortCuts::cAlphaArgs,
                                               NumAlphas,
@@ -1468,7 +1471,7 @@ namespace EnergyPlus {
                 thisDomain.HasZoneCoupledBasement = true;
 
                 // setup output variables
-                thisDomain.SetupZoneCoupledOutputVariables();
+                thisDomain.SetupZoneCoupledOutputVariables(state);
 
                 // add it to the main vector
                 // domains.push_back(thisDomain);
@@ -1498,7 +1501,7 @@ namespace EnergyPlus {
         }
 
 
-        void ReadPipeCircuitInputs(bool &ErrorsFound) {
+        void ReadPipeCircuitInputs(EnergyPlusData &state, bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -1521,7 +1524,8 @@ namespace EnergyPlus {
             for (int PipeCircuitCounter = 1; PipeCircuitCounter <= NumPipeCircuits; ++PipeCircuitCounter) {
 
                 // Read all the inputs for this pipe circuit
-                inputProcessor->getObjectItem(ObjName_Circuit,
+                inputProcessor->getObjectItem(state,
+                                              ObjName_Circuit,
                                               PipeCircuitCounter,
                                               DataIPShortCuts::cAlphaArgs,
                                               NumAlphas,
@@ -1564,7 +1568,7 @@ namespace EnergyPlus {
 
                 // Read inlet and outlet node names and validate them
                 thisCircuit.InletNodeName = DataIPShortCuts::cAlphaArgs(2);
-                thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(
+                thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                         DataIPShortCuts::cAlphaArgs(2), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
                         DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1,
                         DataLoopNode::ObjectIsNotParent);
@@ -1576,7 +1580,7 @@ namespace EnergyPlus {
                             "Bad node name.", ErrorsFound);
                 }
                 thisCircuit.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
-                thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(
+                thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                         DataIPShortCuts::cAlphaArgs(3), ErrorsFound, ObjName_Circuit, DataIPShortCuts::cAlphaArgs(1),
                         DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1,
                         DataLoopNode::ObjectIsNotParent);
@@ -1622,7 +1626,7 @@ namespace EnergyPlus {
                 }
                 // then we can loop through and allow the factory to be called and carry on
                 for (auto &segmentNameToFind : segmentNamesToFind) {
-                    thisCircuit.pipeSegments.push_back(Segment::factory(segmentNameToFind));
+                    thisCircuit.pipeSegments.push_back(Segment::factory(state, segmentNameToFind));
                 }
 
                 circuits.push_back(thisCircuit);
@@ -1637,7 +1641,8 @@ namespace EnergyPlus {
             for (int HorizontalGHXCtr = 1; HorizontalGHXCtr <= NumHorizontalTrenches; ++HorizontalGHXCtr) {
 
                 // Read all inputs for this pipe segment
-                inputProcessor->getObjectItem(ObjName_HorizTrench,
+                inputProcessor->getObjectItem(state,
+                                              ObjName_HorizTrench,
                                               HorizontalGHXCtr,
                                               DataIPShortCuts::cAlphaArgs,
                                               NumAlphas,
@@ -1676,7 +1681,7 @@ namespace EnergyPlus {
 
                 // Read inlet and outlet node names and validate them
                 thisCircuit.InletNodeName = DataIPShortCuts::cAlphaArgs(2);
-                thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(thisCircuit.InletNodeName,
+                thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state, thisCircuit.InletNodeName,
                                                                                ErrorsFound,
                                                                                ObjName_HorizTrench,
                                                                                thisTrenchName,
@@ -1690,7 +1695,7 @@ namespace EnergyPlus {
                     //                                DataIPShortCuts::cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
                 }
                 thisCircuit.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
-                thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(thisCircuit.OutletNodeName,
+                thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, thisCircuit.OutletNodeName,
                                                                                 ErrorsFound,
                                                                                 ObjName_HorizTrench,
                                                                                 thisTrenchName,
@@ -1724,10 +1729,10 @@ namespace EnergyPlus {
 
         }
 
-        Segment *Segment::factory(std::string segmentName) {
+        Segment *Segment::factory(EnergyPlusData &state, std::string segmentName) {
             if (GetSegmentInputFlag) {
                 bool errorsFound = false;
-                ReadPipeSegmentInputs(errorsFound);
+                ReadPipeSegmentInputs(state, errorsFound);
                 GetSegmentInputFlag = false;
             }
             // Now look for this particular segment in the list
@@ -1743,9 +1748,9 @@ namespace EnergyPlus {
             return nullptr; // LCOV_EXCL_LINE
         }
 
-        Circuit *Circuit::factory(std::string circuitName, bool & errorsFound) {
+        Circuit *Circuit::factory(EnergyPlusData &state, std::string circuitName, bool & errorsFound) {
             if (GetCircuitInputFlag) {
-                ReadPipeCircuitInputs(errorsFound);
+                ReadPipeCircuitInputs(state, errorsFound);
                 GetCircuitInputFlag = false;
             }
             // Now look for this particular segment in the list
@@ -1761,7 +1766,7 @@ namespace EnergyPlus {
             return nullptr; // LCOV_EXCL_LINE
         }
 
-        void ReadPipeSegmentInputs(bool &ErrorsFound) {
+        void ReadPipeSegmentInputs(EnergyPlusData &state, bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -1783,7 +1788,8 @@ namespace EnergyPlus {
             for (int SegmentCtr = 1; SegmentCtr <= NumPipeSegmentsInInput; ++SegmentCtr) {
 
                 // Read all inputs for this pipe segment
-                inputProcessor->getObjectItem(ObjName_Segment,
+                inputProcessor->getObjectItem(state,
+                                              ObjName_Segment,
                                               SegmentCtr,
                                               DataIPShortCuts::cAlphaArgs,
                                               NumAlphas,
@@ -1866,7 +1872,8 @@ namespace EnergyPlus {
                 ++CircuitCtr;
 
                 // Read all inputs for this pipe segment
-                inputProcessor->getObjectItem(ObjName_HorizTrench,
+                inputProcessor->getObjectItem(state,
+                                              ObjName_HorizTrench,
                                               HorizontalGHXCtr,
                                               DataIPShortCuts::cAlphaArgs,
                                               NumAlphas,
@@ -1923,7 +1930,7 @@ namespace EnergyPlus {
 
                 //******* We'll next set up the circuit ********
                 // then we can loop through and allow the factory to be called and carry on
-                thisDomain.circuits.push_back(Circuit::factory(thisTrenchName, ErrorsFound));
+                thisDomain.circuits.push_back(Circuit::factory(state, thisTrenchName, ErrorsFound));
 
                 // Farfield model parameters -- this is pushed down pretty low because it internally calls GetObjectItem
                 // using DataIPShortCuts, so it will overwrite the cAlphaArgs and rNumericArgs values
@@ -1958,7 +1965,7 @@ namespace EnergyPlus {
             }
         }
 
-        void SetupPipingSystemOutputVariables() {
+        void SetupPipingSystemOutputVariables(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -1970,20 +1977,20 @@ namespace EnergyPlus {
 
                 if (!thisSegment.IsActuallyPartOfAHorizontalTrench) {
 
-                    SetupOutputVariable("Pipe Segment Inlet Temperature",
+                    SetupOutputVariable(state, "Pipe Segment Inlet Temperature",
                                         OutputProcessor::Unit::C,
                                         thisSegment.InletTemperature,
                                         "Plant",
                                         "Average",
                                         thisSegment.Name);
-                    SetupOutputVariable("Pipe Segment Outlet Temperature",
+                    SetupOutputVariable(state, "Pipe Segment Outlet Temperature",
                                         OutputProcessor::Unit::C,
                                         thisSegment.OutletTemperature,
                                         "Plant",
                                         "Average",
                                         thisSegment.Name);
 
-                    SetupOutputVariable("Pipe Segment Fluid Heat Transfer Rate",
+                    SetupOutputVariable(state, "Pipe Segment Fluid Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
                                         thisSegment.FluidHeatLoss,
                                         "Plant",
@@ -1996,27 +2003,27 @@ namespace EnergyPlus {
 
                 if (!thisCircuit.IsActuallyPartOfAHorizontalTrench) {
 
-                    SetupOutputVariable("Pipe Circuit Mass Flow Rate",
+                    SetupOutputVariable(state, "Pipe Circuit Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         thisCircuit.CurCircuitFlowRate,
                                         "Plant",
                                         "Average",
                                         thisCircuit.Name);
 
-                    SetupOutputVariable("Pipe Circuit Inlet Temperature",
+                    SetupOutputVariable(state, "Pipe Circuit Inlet Temperature",
                                         OutputProcessor::Unit::C,
                                         thisCircuit.InletTemperature,
                                         "Plant",
                                         "Average",
                                         thisCircuit.Name);
-                    SetupOutputVariable("Pipe Circuit Outlet Temperature",
+                    SetupOutputVariable(state, "Pipe Circuit Outlet Temperature",
                                         OutputProcessor::Unit::C,
                                         thisCircuit.OutletTemperature,
                                         "Plant",
                                         "Average",
                                         thisCircuit.Name);
 
-                    SetupOutputVariable("Pipe Circuit Fluid Heat Transfer Rate",
+                    SetupOutputVariable(state, "Pipe Circuit Fluid Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
                                         thisCircuit.FluidHeatLoss,
                                         "Plant",
@@ -2025,27 +2032,27 @@ namespace EnergyPlus {
 
                 } else { // it is a horizontal trench
 
-                    SetupOutputVariable("Ground Heat Exchanger Mass Flow Rate",
+                    SetupOutputVariable(state, "Ground Heat Exchanger Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         thisCircuit.CurCircuitFlowRate,
                                         "Plant",
                                         "Average",
                                         thisCircuit.Name);
 
-                    SetupOutputVariable("Ground Heat Exchanger Inlet Temperature",
+                    SetupOutputVariable(state, "Ground Heat Exchanger Inlet Temperature",
                                         OutputProcessor::Unit::C,
                                         thisCircuit.InletTemperature,
                                         "Plant",
                                         "Average",
                                         thisCircuit.Name);
-                    SetupOutputVariable("Ground Heat Exchanger Outlet Temperature",
+                    SetupOutputVariable(state, "Ground Heat Exchanger Outlet Temperature",
                                         OutputProcessor::Unit::C,
                                         thisCircuit.OutletTemperature,
                                         "Plant",
                                         "Average",
                                         thisCircuit.Name);
 
-                    SetupOutputVariable("Ground Heat Exchanger Fluid Heat Transfer Rate",
+                    SetupOutputVariable(state, "Ground Heat Exchanger Fluid Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
                                         thisCircuit.FluidHeatLoss,
                                         "Plant",
@@ -2055,7 +2062,7 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::SetupZoneCoupledOutputVariables() {
+        void Domain::SetupZoneCoupledOutputVariables(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Matt Mitchell
@@ -2065,13 +2072,13 @@ namespace EnergyPlus {
 
             if (this->HasZoneCoupledSlab) {
                 // Zone-coupled slab outputs
-                SetupOutputVariable("GroundDomain Slab Zone Coupled Surface Heat Flux",
+                SetupOutputVariable(state, "GroundDomain Slab Zone Coupled Surface Heat Flux",
                                     OutputProcessor::Unit::W_m2,
                                     this->HeatFlux,
                                     "Zone",
                                     "Average",
                                     this->Name);
-                SetupOutputVariable("GroundDomain Slab Zone Coupled Surface Temperature",
+                SetupOutputVariable(state, "GroundDomain Slab Zone Coupled Surface Temperature",
                                     OutputProcessor::Unit::C,
                                     this->ZoneCoupledSurfaceTemp,
                                     "Zone",
@@ -2079,26 +2086,26 @@ namespace EnergyPlus {
                                     this->Name);
             } else if (this->HasZoneCoupledBasement) {
                 // Zone-coupled basement wall outputs
-                SetupOutputVariable("GroundDomain Basement Wall Interface Heat Flux",
+                SetupOutputVariable(state, "GroundDomain Basement Wall Interface Heat Flux",
                                     OutputProcessor::Unit::W_m2,
                                     this->WallHeatFlux,
                                     "Zone",
                                     "Average",
                                     this->Name);
-                SetupOutputVariable("GroundDomain Basement Wall Interface Temperature",
+                SetupOutputVariable(state, "GroundDomain Basement Wall Interface Temperature",
                                     OutputProcessor::Unit::C,
                                     this->BasementWallTemp,
                                     "Zone",
                                     "Average",
                                     this->Name);
                 // Zone-coupled basement floor outputs
-                SetupOutputVariable("GroundDomain Basement Floor Interface Heat Flux",
+                SetupOutputVariable(state, "GroundDomain Basement Floor Interface Heat Flux",
                                     OutputProcessor::Unit::W_m2,
                                     this->FloorHeatFlux,
                                     "Zone",
                                     "Average",
                                     this->Name);
-                SetupOutputVariable("GroundDomain Basement Floor Interface Temperature",
+                SetupOutputVariable(state, "GroundDomain Basement Floor Interface Temperature",
                                     OutputProcessor::Unit::C,
                                     this->BasementFloorTemp,
                                     "Zone",
@@ -2148,7 +2155,8 @@ namespace EnergyPlus {
                 }
 
                 // Once we find ourselves on the plant loop, we can do other things
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                               DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
                                                                DataGlobals::InitConvTemp,
                                                                DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
                                                                RoutineName);
@@ -4159,7 +4167,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             // Always do start of time step inits
-            this->DoStartOfTimeStepInitializations(thisCircuit);
+            this->DoStartOfTimeStepInitializations(state, thisCircuit);
 
             // Prepare the pipe circuit for calculations, but we'll actually do calcs at the iteration level
             if (this->HasAPipeCircuit) {
@@ -5764,7 +5772,7 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::DoStartOfTimeStepInitializations(Circuit * thisCircuit) {
+        void Domain::DoStartOfTimeStepInitializations(EnergyPlusData &state, Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -5787,20 +5795,24 @@ namespace EnergyPlus {
 
             // retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
             // but need to verify the value of inlet temperature during warm up, etc.
-            FluidCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+            FluidCp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
                                                              thisCircuit->InletTemperature,
                                                              DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
                                                              RoutineName);
-            FluidDensity = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+            FluidDensity = FluidProperties::GetDensityGlycol(state,
+                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
                                                              thisCircuit->InletTemperature,
                                                              DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
                                                              RoutineName);
             FluidConductivity = FluidProperties::GetConductivityGlycol(
+                    state,
                     DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
                     thisCircuit->InletTemperature,
                     DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
                     RoutineName);
             FluidViscosity = FluidProperties::GetViscosityGlycol(
+                    state,
                     DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
                     thisCircuit->InletTemperature,
                     DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,

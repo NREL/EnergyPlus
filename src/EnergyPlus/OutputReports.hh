@@ -56,24 +56,27 @@
 
 namespace EnergyPlus {
 
-void ReportSurfaces(IOFiles &ioFiles);
+// Forward declarations
+struct EnergyPlusData;
 
-void LinesOut(IOFiles &ioFiles, std::string const &option);
+void ReportSurfaces(EnergyPlusData &state);
 
-void DXFOut(IOFiles &ioFiles,
+void LinesOut(EnergyPlusData &state, std::string const &option);
+
+void DXFOut(EnergyPlusData &state,
             std::string const &PolygonAction,
             std::string const &ColorScheme // Name from user for color scheme or blank
 );
 
-void DXFOutLines(IOFiles &ioFiles, std::string const &ColorScheme);
+void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme);
 
-void DXFOutWireFrame(IOFiles &ioFiles, std::string const &ColorScheme);
+void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme);
 
-void DetailsForSurfaces(IOFiles &ioFiles, int const RptType); // (1=Vertices only, 10=Details only, 11=Details with vertices)
+void DetailsForSurfaces(EnergyPlusData &state, int const RptType); // (1=Vertices only, 10=Details only, 11=Details with vertices)
 
-void CostInfoOut(IOFiles &ioFiles);
+void CostInfoOut(EnergyPlusData &state);
 
-void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::string &ColorScheme);
+void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std::string &ColorScheme);
 
 } // namespace EnergyPlus
 

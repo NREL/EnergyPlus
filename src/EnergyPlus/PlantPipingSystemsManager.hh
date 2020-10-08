@@ -584,7 +584,7 @@ struct EnergyPlusData;
                 return this->Name == a;
             }
 
-            static Segment *factory(std::string segmentName);
+            static Segment *factory(EnergyPlusData &state, std::string segmentName);
         };
 
         struct Circuit : public PlantComponent {
@@ -649,7 +649,7 @@ struct EnergyPlusData;
                 return this->Name == a;
             }
 
-            static Circuit *factory(std::string circuit, bool & errorsFound);
+            static Circuit *factory(EnergyPlusData &state, std::string circuit, bool & errorsFound);
         };
 
         struct ZoneCoupledSurfaceData {
@@ -883,7 +883,7 @@ struct EnergyPlusData;
 
             void DoStartOfTimeStepInitializations();
 
-            void DoStartOfTimeStepInitializations(Circuit * thisCircuit);
+            void DoStartOfTimeStepInitializations(EnergyPlusData &state, Circuit * thisCircuit);
 
             Real64 GetFarfieldTemp(EnergyPlusData &state, CartesianCell const &cell);
 
@@ -919,7 +919,7 @@ struct EnergyPlusData;
 
             void UpdatePipingSystems(Circuit * thisCircuit);
 
-            void SetupZoneCoupledOutputVariables();
+            void SetupZoneCoupledOutputVariables(EnergyPlusData &state);
 
         };
 
@@ -951,16 +951,16 @@ struct EnergyPlusData;
                                             std::string const &UserInputField,
                                             std::string const &ObjectName);
 
-        void ReadPipeCircuitInputs(bool &ErrorsFound);
+        void ReadPipeCircuitInputs(EnergyPlusData &state, bool &ErrorsFound);
 
-        void ReadPipeSegmentInputs(bool &ErrorsFound);
+        void ReadPipeSegmentInputs(EnergyPlusData &state, bool &ErrorsFound);
 
         void ReadHorizontalTrenchInputs(EnergyPlusData &state,
                                         const int StartingDomainNumForHorizontal,
                                         const int StartingCircuitNumForHorizontal,
                                         bool &ErrorsFound);
 
-        void SetupPipingSystemOutputVariables();
+        void SetupPipingSystemOutputVariables(EnergyPlusData &state);
 
         void IssueSevereInputFieldError(std::string const &RoutineName,
                                         std::string const &ObjectName,

@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 
@@ -298,28 +297,32 @@ namespace BranchInputManager {
 
     void GetMixerInput(EnergyPlusData &state);
 
-    void FindPlantLoopBranchConnection(std::string const &BranchListName,
+    void FindPlantLoopBranchConnection(EnergyPlusData &state,
+                                       std::string const &BranchListName,
                                        std::string &FoundPlantLoopName,
                                        int &FoundPlantLoopNum,
                                        std::string &FoundSupplyDemand,
                                        Real64 &FoundVolFlowRate,
                                        bool &MatchedPlantLoop);
 
-    void FindCondenserLoopBranchConnection(std::string const &BranchListName,
+    void FindCondenserLoopBranchConnection(EnergyPlusData &state,
+                                           std::string const &BranchListName,
                                            std::string &FoundCondLoopName,
                                            int &FoundCondLoopNum,
                                            std::string &FoundSupplyDemand,
                                            Real64 &FoundVolFlowRate,
                                            bool &MatchedCondLoop);
 
-    void FindAirLoopBranchConnection(std::string const &BranchListName,
+    void FindAirLoopBranchConnection(EnergyPlusData &state,
+                                     std::string const &BranchListName,
                                      std::string &FoundAirLoopName,
                                      int &FoundAirLoopNum,
                                      std::string &FoundAir,
                                      Real64 &FoundVolFlowRate,
                                      bool &MatchedAirLoop);
 
-    void FindAirPlantCondenserLoopFromBranchList(std::string const &BranchListName, // Branch List Name
+    void FindAirPlantCondenserLoopFromBranchList(EnergyPlusData &state,
+                                                 std::string const &BranchListName, // Branch List Name
                                                  std::string &LoopType,             // LoopType (if found, Plant,Condenser or Air)
                                                  std::string &LoopSupplyDemandAir,  // Supply if "Supply" or Demand if "Demand" or Air if "Air"
                                                  bool &MatchedLoop                  // true if found
@@ -335,7 +338,7 @@ namespace BranchInputManager {
                        Optional_string_const CompName = _  // when mustprint (ScanPlantLoop)  use CompName in error message and scan
     );
 
-    void TestBranchIntegrity(EnergyPlusData &state, EnergyPlus::IOFiles &ioFiles, bool &ErrFound);              // ErrFound is a return value, true or false
+    void TestBranchIntegrity(EnergyPlusData &state, bool &ErrFound);              // ErrFound is a return value, true or false
 
 } // namespace BranchInputManager
 

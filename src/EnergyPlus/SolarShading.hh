@@ -205,11 +205,11 @@ namespace SolarShading {
     // Functions
     void clear_state();
 
-    void InitSolarCalculations(IOFiles &ioFiles);
+    void InitSolarCalculations(EnergyPlusData &state);
 
-    void GetShadowingInput(IOFiles &ioFiles);
+    void GetShadowingInput(EnergyPlusData &state);
 
-    void AllocateModuleArrays();
+    void AllocateModuleArrays(EnergyPlusData &state);
 
     void AnisoSkyViewFactors();
 
@@ -308,11 +308,12 @@ namespace SolarShading {
                           Real64 const CosSolarDeclin  // value of Cosine of Solar Declination for period
     );
 
-    void FigureSolarBeamAtTimestep(int const iHour, int const iTimeStep);
+    void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const iTimeStep);
 
     void DetermineShadowingCombinations();
 
-    void SHADOW(int const iHour, // Hour index
+    void SHADOW(EnergyPlusData &state,
+                int const iHour, // Hour index
                 int const TS     // Time Step
     );
 
@@ -322,7 +323,8 @@ namespace SolarShading {
                 int const HTS   // Heat transfer surface number of the general receiving surf
     );
 
-    void SHDGSS(int const NGRS,
+    void SHDGSS(EnergyPlusData &state,
+                int const NGRS,
                 int const iHour,   // Hour Counter
                 int const TS,      // TimeStep
                 int const CurSurf, // Current Surface
@@ -353,7 +355,7 @@ namespace SolarShading {
                                  int const ConstNum // Construction number
     );
 
-    void PerformSolarCalculations(EnergyPlusData &state, IOFiles &ioFiles);
+    void PerformSolarCalculations(EnergyPlusData &state);
 
     void SHDRVL(int const HTSS,  // Heat transfer surface number of the subsurface
                 int const SBSNR, // Subsurface number
@@ -385,7 +387,7 @@ namespace SolarShading {
 
     void WindowGapAirflowControl();
 
-    void SkyDifSolarShading();
+    void SkyDifSolarShading(EnergyPlusData &state);
 
     void CalcWindowProfileAngles();
 

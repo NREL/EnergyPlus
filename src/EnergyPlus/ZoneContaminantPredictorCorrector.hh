@@ -69,7 +69,7 @@ namespace ZoneContaminantPredictorCorrector {
 
     void GetZoneContaminanInputs(EnergyPlusData &state);
 
-    void GetZoneContaminanSetPoints();
+    void GetZoneContaminanSetPoints(EnergyPlusData &state);
 
     void InitZoneContSetPoints(EnergyPlusData &state);
 

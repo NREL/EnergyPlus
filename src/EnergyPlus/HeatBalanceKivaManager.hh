@@ -61,7 +61,6 @@
 namespace EnergyPlus {
 
 // Forward declarations
-class IOFiles;
 struct EnergyPlusData;
 
 namespace HeatBalanceKivaManager {
@@ -130,8 +129,8 @@ namespace HeatBalanceKivaManager {
     public:
         KivaManager();
         virtual ~KivaManager();
-        void readWeatherData(EnergyPlusData &state, IOFiles &ioFiles);
-        bool setupKivaInstances(EnergyPlusData &state, IOFiles &ioFiles);
+        void readWeatherData(EnergyPlusData &state);
+        bool setupKivaInstances(EnergyPlusData &state);
         void initKivaInstances(EnergyPlusData &state);
         void calcKivaInstances();
         void defineDefaultFoundation();
