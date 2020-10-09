@@ -126,7 +126,7 @@ namespace PluginManagement {
     }
 #endif
 
-    void PluginManager::setupOutputVariables(EnergyPlusData &EP_UNUSED(state))
+    void PluginManager::setupOutputVariables(EnergyPlusData &state)
     {
 #if LINK_WITH_PYTHON == 1
         // with the PythonPlugin:Variables all set in memory, we can now set them up as outputs as needed

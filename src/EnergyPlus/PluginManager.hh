@@ -180,7 +180,7 @@ namespace PluginManagement {
         static int numActiveCallbacks();
         static void addToPythonPath(const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
-        static void setupOutputVariables(EnergyPlusData &EP_UNUSED(state));
+        static void setupOutputVariables(EnergyPlusData &state);
 
         int maxGlobalVariableIndex = -1;
         void addGlobalVariable(const std::string& name);
