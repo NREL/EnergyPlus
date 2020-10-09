@@ -1094,12 +1094,12 @@ namespace General {
 
         // Return value
         Real64 InterpProfAng;
+        Real64 const DeltaAngRad(DataGlobals::Pi / 36.0); // Profile angle increment (rad) // DeltaAng = Pi/36
 
 
         if (ProfAng > DataGlobals::PiOvr2 || ProfAng < - DataGlobals::PiOvr2) {
             InterpProfAng = 0.0;
         } else {
-            Real64 const DeltaAngRad(DataGlobals::Pi / 36.0); // Profile angle increment (rad) // DeltaAng = Pi/36
             Real64 IAlpha = 1 + int((ProfAng + DataGlobals::PiOvr2) / DeltaAngRad); // Interpolation factor
             int InterpFac = (ProfAng - (- DataGlobals::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad; // Profile angle index
             InterpProfAng = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
@@ -1193,11 +1193,10 @@ namespace General {
         // Linear interpolation.
         // Return value
         Real64 InterpSlatAng;
+        static Real64 const DeltaAng(DataGlobals::Pi / (double(DataSurfaces::MaxSlatAngs) - 1.0));
+        static Real64 const DeltaAng_inv((double(DataSurfaces::MaxSlatAngs) - 1.0) / DataGlobals::Pi);
 
         if (VarSlats) { // Variable-angle slats
-            static Real64 const DeltaAng(DataGlobals::Pi / (double(DataSurfaces::MaxSlatAngs) - 1.0));
-            static Real64 const DeltaAng_inv((double(DataSurfaces::MaxSlatAngs) - 1.0) / DataGlobals::Pi);
-
             Real64 InterpFac; // Interpolation factor
             int IBeta;        // Slat angle index
             Real64 SlatAng1;
@@ -1215,6 +1214,7 @@ namespace General {
         } else { // Fixed-angle slats or shade
             InterpSlatAng = PropArray(1);
         }
+        DataGlobals::counter_1 += 1;
         return InterpSlatAng;
     }
 

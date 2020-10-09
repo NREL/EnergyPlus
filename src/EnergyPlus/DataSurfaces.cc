@@ -468,6 +468,7 @@ namespace DataSurfaces {
     std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
     std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
     std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
+    std::vector<int> AllShadingSurfList;        // List of all shading surfaces
 
     // Surface Window Heat Balance
     Array1D<Real64> SurfWinTransSolar;                    // Exterior beam plus diffuse solar transmitted through window, or window plus shade/blind, into zone (W)

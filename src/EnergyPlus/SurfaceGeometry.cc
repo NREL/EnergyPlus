@@ -1567,11 +1567,9 @@ namespace SurfaceGeometry {
             ShowSevereError(format("{}Reordered # of Surfaces ({}) not = Total # of Surfaces ({})", RoutineName, MovedSurfs, TotSurfaces));
             SurfError = true;
             for (int Loop = 1; Loop <= TotSurfaces; ++Loop) {
-                if (SurfaceTmpClassMoved(Loop)) {
-                    if (SurfaceTmpClassInvalid(Loop)) {
-                        ShowSevereError(RoutineName + "Error in Surface= \"" + SurfaceTmp(Loop).Name + "\" Class=" +
-                                        cSurfaceClass(SurfaceTmp(Loop).Class) + " indicated Zone=\"" + SurfaceTmp(Loop).ZoneName + "\"");
-                    }
+                if (SurfaceTmpClassMoved(Loop) && SurfaceTmpClassInvalid(Loop)) {
+                    ShowSevereError(RoutineName + "Error in Surface= \"" + SurfaceTmp(Loop).Name + "\" Class=" +
+                    cSurfaceClass(SurfaceTmp(Loop).Class) + " indicated Zone=\"" + SurfaceTmp(Loop).ZoneName + "\"");
                 }
             }
             ShowWarningError(RoutineName + "Remaining surface checks will use \"reordered number of surfaces\", not number of original surfaces");
@@ -2189,6 +2187,10 @@ namespace SurfaceGeometry {
         // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             Surface(SurfNum).ShadowSurfPossibleObstruction = false;
+
+            if (Surface(SurfNum).ShadowingSurf) {
+                DataSurfaces::AllShadingSurfList.push_back(SurfNum);
+            }
             if (Surface(SurfNum).HeatTransSurf) {
                 DataSurfaces::AllHTSurfaceList.push_back(SurfNum);
                 int const zoneNum(Surface(SurfNum).Zone);
@@ -2201,6 +2203,9 @@ namespace SurfaceGeometry {
                 } else {
                     DataSurfaces::AllHTNonWindowSurfaceList.push_back(SurfNum);
                     surfZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
+                }
+                if (Surface(SurfNum).ExtSolar) {
+                    surfZone.ZoneExtSolarSurfaceList.push_back(SurfNum);
                 }
                 int const surfExtBoundCond(Surface(SurfNum).ExtBoundCond);
                 // Build zone and interzone surface lists

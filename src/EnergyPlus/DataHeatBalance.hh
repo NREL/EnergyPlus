@@ -705,6 +705,7 @@ namespace DataHeatBalance {
         std::vector<int> ZoneIZSurfaceList;          // List of interzone surfaces in this zone
         std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneHTWindowSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
+        std::vector<int> ZoneExtSolarSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
         int RadiantEnclosureNum;                     // Radiant exchange enclosure this zone belongs to (related to air boundaries)
         int SolarEnclosureNum;                       // Solar distribution enclosure this zone belongs to (related to air boundaries)
 
