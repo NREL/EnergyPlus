@@ -4746,7 +4746,7 @@ namespace Furnaces {
             }
         }
         bool anyRan;
-        ManageEMS(state, emsCallFromComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
+        ManageEMS(state, DataGlobalConstants::EMSCallFrom::ComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
     }
 
     // End of Get Input subroutines for this Module
@@ -6059,7 +6059,6 @@ namespace Furnaces {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataGlobals::emsCallFromUnitarySystemSizing;
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
@@ -6086,7 +6085,7 @@ namespace Furnaces {
         Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
         int IHPCoilIndex(0);      // refer to cooling or heating coil in IHP
         bool anyRan;
-        ManageEMS(state, emsCallFromUnitarySystemSizing, anyRan, ObjexxFCL::Optional_int_const()); // calling point
+        ManageEMS(state, DataGlobalConstants::EMSCallFrom::UnitarySystemSizing, anyRan, ObjexxFCL::Optional_int_const()); // calling point
 
         ThisCtrlZoneNum = 0;
         DXCoolCap = 0.0;

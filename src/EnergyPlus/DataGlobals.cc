@@ -72,38 +72,7 @@ namespace DataGlobals {
     // This data-only module is a repository for all variables which are considered
     // to be "global" in nature in EnergyPlus.
 
-    // Parameters for EMS Calling Points
-    int const emsCallFromZoneSizing(1);                           // Identity where EMS called from
-    int const emsCallFromSystemSizing(2);                         // Identity where EMS called from
-    int const emsCallFromBeginNewEvironment(3);                   // Identity where EMS called from
-    int const emsCallFromBeginNewEvironmentAfterWarmUp(4);        // Identity where EMS called from
-    int const emsCallFromBeginTimestepBeforePredictor(5);         // Identity where EMS called from
-    int const emsCallFromBeforeHVACManagers(6);                   // Identity where EMS called from
-    int const emsCallFromAfterHVACManagers(7);                    // Identity where EMS called from
-    int const emsCallFromHVACIterationLoop(8);                    // Identity where EMS called from
-    int const emsCallFromEndSystemTimestepBeforeHVACReporting(9); // Identity where EMS called from
-    int const emsCallFromEndSystemTimestepAfterHVACReporting(10); // Identity where EMS called from
-    int const emsCallFromEndZoneTimestepBeforeZoneReporting(11);  // Identity where EMS called from
-    int const emsCallFromEndZoneTimestepAfterZoneReporting(12);   // Identity where EMS called from
-    int const emsCallFromSetupSimulation(13);                     // identify where EMS called from,
-    // this is for input processing only
-    int const emsCallFromExternalInterface(14);                        // Identity where EMS called from
-    int const emsCallFromComponentGetInput(15);                        // EMS called from end of get input for a component
-    int const emsCallFromUserDefinedComponentModel(16);                // EMS called from inside a custom user component model
-    int const emsCallFromUnitarySystemSizing(17);                      // EMS called from unitary system compound component
-    int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance(18);   // Identity where EMS called from
-    int const emsCallFromBeginZoneTimestepAfterInitHeatBalance(19);    // Identity where EMS called from
-    int const emsCallFromBeginZoneTimestepBeforeSetCurrentWeather(20); // Identity where EMS called from
-
     int const ScheduleAlwaysOn(-1); // Value when passed to schedule routines gives back 1.0 (on)
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // see DataOmterfaces fpr global interface statements
-
-    // MODULE VARIABLE DECLARATIONS:
 
     bool BeginDayFlag(false);           // True at the start of each day, False after first time step in day
     bool BeginEnvrnFlag(false);         // True at the start of each environment, False after first time step in environ

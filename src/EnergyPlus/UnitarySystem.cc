@@ -1527,7 +1527,7 @@ namespace UnitarySystems {
         EqSizing.OAVolFlow = 0.0; // UnitarySys doesn't have OA
 
         bool anyEMSRan;
-        EMSManager::ManageEMS(state, DataGlobals::emsCallFromUnitarySystemSizing, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+        EMSManager::ManageEMS(state, DataGlobalConstants::EMSCallFrom::UnitarySystemSizing, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
         bool HardSizeNoDesRun; // Indicator to a hard-sized field with no design sizing data
 
         // Initiate all reporting variables
@@ -7426,7 +7426,7 @@ namespace UnitarySystems {
                 }
                 // can this be called each time a system is gottem?
                 bool anyEMSRan;
-                EMSManager::ManageEMS(state, DataGlobals::emsCallFromComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
+                EMSManager::ManageEMS(state, DataGlobalConstants::EMSCallFrom::ComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
             }
         }
     }

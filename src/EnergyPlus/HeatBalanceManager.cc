@@ -318,9 +318,6 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using namespace HeatBalanceSurfaceManager;
-        using DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp;
-        using DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting;
-        using DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting;
         using EMSManager::ManageEMS;
         using EMSManager::UpdateEMSTrendVariables;
 
@@ -363,13 +360,13 @@ namespace HeatBalanceManager {
 
         bool anyRan;
         ManageEMS(state,
-                  DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance,
+                  DataGlobalConstants::EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance,
                   anyRan,
                   ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
         InitHeatBalance(state); // Initialize all heat balance related parameters
-        ManageEMS(state, DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
+        ManageEMS(state, DataGlobalConstants::EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
         // and then the Air Heat Balance Manager is called by the Surface Heat Balance
@@ -379,7 +376,7 @@ namespace HeatBalanceManager {
         // the HVAC system (called from the Air Heat Balance) and the zone (simulated
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance(state);
-        ManageEMS(state, emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
+        ManageEMS(state, DataGlobalConstants::EMSCallFrom::EndZoneTimestepBeforeZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
         RecKeepHeatBalance(state);                                             // Do any heat balance related record keeping
 
         // This call has been moved to the FanSystemModule and does effect the output file
@@ -388,7 +385,7 @@ namespace HeatBalanceManager {
 
         ReportHeatBalance(state); // Manage heat balance reporting until the new reporting is in place
 
-        ManageEMS(state, emsCallFromEndZoneTimestepAfterZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
+        ManageEMS(state, DataGlobalConstants::EMSCallFrom::EndZoneTimestepAfterZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
         UpdateEMSTrendVariables();
         EnergyPlus::PluginManagement::PluginManager::updatePluginValues();
@@ -400,7 +397,7 @@ namespace HeatBalanceManager {
                 DayOfSim = 0; // Reset DayOfSim if Warmup converged
                 state.dataGlobal->DayOfSimChr = "0";
 
-                ManageEMS(state, emsCallFromBeginNewEvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const()); // calling point
+                ManageEMS(state, DataGlobalConstants::EMSCallFrom::BeginNewEnvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const()); // calling point
             }
         }
 

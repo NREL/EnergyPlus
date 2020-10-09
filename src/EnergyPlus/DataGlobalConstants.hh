@@ -258,6 +258,31 @@ namespace DataGlobalConstants {
         ReadAllWeatherData = 6          // a weather period for reading all weather data prior to the simulation
     };
 
+    // Parameters for EMS Calling Points
+    enum class EMSCallFrom {
+        Unassigned,
+        ZoneSizing,
+        SystemSizing,
+        BeginNewEnvironment,
+        BeginNewEnvironmentAfterWarmUp,
+        BeginTimestepBeforePredictor,
+        BeforeHVACManagers,
+        AfterHVACManagers,
+        HVACIterationLoop,
+        EndSystemTimestepBeforeHVACReporting,
+        EndSystemTimestepAfterHVACReporting,
+        EndZoneTimestepBeforeZoneReporting,
+        EndZoneTimestepAfterZoneReporting,
+        SetupSimulation,
+        ExternalInterface,
+        ComponentGetInput,
+        UserDefinedComponentModel,
+        UnitarySystemSizing,
+        BeginZoneTimestepBeforeInitHeatBalance,
+        BeginZoneTimestepAfterInitHeatBalance,
+        BeginZoneTimestepBeforeSetCurrentWeather
+    };
+
     Real64 constexpr MaxEXPArg () { return 709.78; }                        // maximum exponent in EXP() function
     Real64 constexpr Pi () { return 3.14159265358979324; }                  // Pi 3.1415926535897932384626435
     Real64 constexpr PiOvr2 () { return Pi() / 2.0; }                       // Pi/2

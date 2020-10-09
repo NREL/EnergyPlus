@@ -168,7 +168,7 @@ namespace UserDefinedComponents {
         if (thisLoop > 0) {
             if (this->Loop(thisLoop).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(
-                    state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlInitProgramMngr);
+                    state, DataGlobalConstants::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlInitProgramMngr);
             } else if (this->Loop(thisLoop).initPluginLocation > -1) {
                 EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, this->Loop(thisLoop).initPluginLocation);
             }
@@ -238,14 +238,14 @@ namespace UserDefinedComponents {
         if (thisLoop > 0) {
             if (this->Loop(thisLoop).ErlSimProgramMngr > 0) {
                 EMSManager::ManageEMS(
-                    state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlSimProgramMngr);
+                    state, DataGlobalConstants::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlSimProgramMngr);
             } else if (this->Loop(thisLoop).simPluginLocation > -1) {
                 EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, this->Loop(thisLoop).simPluginLocation);
             }
         }
 
         if (this->ErlSimProgramMngr > 0) {
-            EMSManager::ManageEMS(state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->ErlSimProgramMngr);
+            EMSManager::ManageEMS(state, DataGlobalConstants::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this->ErlSimProgramMngr);
         } else if (this->simPluginLocation > -1) {
             EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, this->simPluginLocation);
         }
@@ -299,7 +299,7 @@ namespace UserDefinedComponents {
         if (DataGlobals::BeginEnvrnFlag) {
             if (UserCoil(CompNum).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(
-                    state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserCoil(CompNum).ErlInitProgramMngr);
+                    state, DataGlobalConstants::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, UserCoil(CompNum).ErlInitProgramMngr);
             } else if (UserCoil(CompNum).initPluginLocation > -1) {
                 EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, UserCoil(CompNum).initPluginLocation);
             }
@@ -322,7 +322,7 @@ namespace UserDefinedComponents {
         UserCoil(CompNum).initialize(state);
 
         if (UserCoil(CompNum).ErlSimProgramMngr > 0) {
-            EMSManager::ManageEMS(state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserCoil(CompNum).ErlSimProgramMngr);
+            EMSManager::ManageEMS(state, DataGlobalConstants::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, UserCoil(CompNum).ErlSimProgramMngr);
         } else if (UserCoil(CompNum).simPluginLocation > -1) {
             EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, UserCoil(CompNum).simPluginLocation);
         }
@@ -391,7 +391,7 @@ namespace UserDefinedComponents {
 
             if (UserZoneAirHVAC(CompNum).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(
-                    state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlInitProgramMngr);
+                    state, DataGlobalConstants::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlInitProgramMngr);
             } else if (UserZoneAirHVAC(CompNum).initPluginLocation > -1) {
                 EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, UserZoneAirHVAC(CompNum).initPluginLocation);
             }
@@ -418,7 +418,7 @@ namespace UserDefinedComponents {
 
         if (UserZoneAirHVAC(CompNum).ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(
-                state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlSimProgramMngr);
+                state, DataGlobalConstants::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlSimProgramMngr);
         } else if (UserZoneAirHVAC(CompNum).simPluginLocation > -1) {
             EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, UserZoneAirHVAC(CompNum).simPluginLocation);
         }
@@ -487,7 +487,7 @@ namespace UserDefinedComponents {
 
             if (UserAirTerminal(CompNum).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(
-                    state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlInitProgramMngr);
+                    state, DataGlobalConstants::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlInitProgramMngr);
             } else if (UserAirTerminal(CompNum).initPluginLocation > -1) {
                 EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, UserAirTerminal(CompNum).initPluginLocation);
             }
@@ -514,7 +514,7 @@ namespace UserDefinedComponents {
 
         if (UserAirTerminal(CompNum).ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(
-                state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlSimProgramMngr);
+                state, DataGlobalConstants::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlSimProgramMngr);
         } else if (UserAirTerminal(CompNum).simPluginLocation > -1) {
             EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, UserAirTerminal(CompNum).simPluginLocation);
         }

@@ -657,7 +657,7 @@ namespace HVACFan {
         isNumericFieldBlank.deallocate();
 
         bool anyEMSRan = false;
-        EMSManager::ManageEMS(state, DataGlobals::emsCallFromComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
+        EMSManager::ManageEMS(state, DataGlobalConstants::EMSCallFrom::ComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
     }
 
     void

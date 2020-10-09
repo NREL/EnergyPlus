@@ -733,7 +733,6 @@ namespace ExternalInterface {
         // This routine gets, sets and does the time integration in FMUs.
 
         // Using/Aliasing
-        using DataGlobals::emsCallFromExternalInterface;
         using DataGlobals::WarmupFlag;
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
@@ -943,7 +942,7 @@ namespace ExternalInterface {
         // If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
         if (useEMS) {
             bool anyRan;
-            ManageEMS(state, emsCallFromExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
+            ManageEMS(state, DataGlobalConstants::EMSCallFrom::ExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
         }
 
         FirstCallGetSetDoStep = false;
@@ -1985,7 +1984,6 @@ namespace ExternalInterface {
         // Using/Aliasing
         using DataEnvironment::TotalOverallSimDays;
         using DataEnvironment::TotDesDays;
-        using DataGlobals::emsCallFromExternalInterface;
         using DataGlobals::TimeStepZone;
         using DataGlobals::WarmupFlag;
         using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
@@ -2287,7 +2285,6 @@ namespace ExternalInterface {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataGlobals::emsCallFromExternalInterface;
         using DataGlobals::MinutesPerTimeStep;
         using DataGlobals::SimTimeSteps;
         using EMSManager::ManageEMS;
@@ -2411,7 +2408,7 @@ namespace ExternalInterface {
         // If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
         if (useEMS) {
             bool anyRan;
-            ManageEMS(state, emsCallFromExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
+            ManageEMS(state, DataGlobalConstants::EMSCallFrom::ExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
         }
 
         firstCall = false; // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui

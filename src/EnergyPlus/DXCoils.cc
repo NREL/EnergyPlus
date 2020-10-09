@@ -848,7 +848,6 @@ namespace DXCoils {
         using CurveManager::GetCurveIndex;
         using CurveManager::SetCurveOutputMinMaxValues;
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::emsCallFromComponentGetInput;
         using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilMultiSpeed;
         using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilSingleSpeed;
         using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilTwoSpeed;
@@ -6008,7 +6007,7 @@ namespace DXCoils {
         lAlphaBlanks2.deallocate();
         lNumericBlanks2.deallocate();
         bool anyEMSRan;
-        ManageEMS(state, emsCallFromComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
+        ManageEMS(state, DataGlobalConstants::EMSCallFrom::ComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
     }
 
     void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the current DX coil unit being simulated

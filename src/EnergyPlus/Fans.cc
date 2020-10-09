@@ -108,7 +108,6 @@ namespace Fans {
     using DataEnvironment::StdRhoAir;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::emsCallFromComponentGetInput;
     using DataGlobals::SysSizingCalc;
     using DataGlobals::WarmupFlag;
     using DataHVACGlobals::BalancedExhMassFlow;
@@ -1000,7 +999,7 @@ namespace Fans {
         }
 
         bool anyRan;
-        ManageEMS(state, emsCallFromComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
+        ManageEMS(state, DataGlobalConstants::EMSCallFrom::ComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
         MySizeFlag.dimension(state.dataFans->NumFans, true);
     }
 

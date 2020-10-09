@@ -630,8 +630,8 @@ TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_EMSPressureRiseResetTest)
 
     // reset the pressure rise to -100.0 using EMS program
     bool anyRan(false);
-    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
-    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
+    EMSManager::ManageEMS(state, DataGlobalConstants::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
+    EMSManager::ManageEMS(state, DataGlobalConstants::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
     EXPECT_TRUE(anyRan);
     // simulate the fan with -100.0 Pa fan pressure rise
     HVACFan::fanObjs[0]->simulate(state, _, _, _, _, massFlow1, runTimeFrac1, massFlow2, runTimeFrac2);

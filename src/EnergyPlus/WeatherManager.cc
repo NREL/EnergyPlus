@@ -145,7 +145,7 @@ namespace WeatherManager {
         // Cannot call this during sizing, because EMS will not initialize properly until after simulation kickoff
         if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
             EMSManager::ManageEMS(
-                state, DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+                state, DataGlobalConstants::EMSCallFrom::BeginZoneTimestepBeforeSetCurrentWeather, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
         }
         SetCurrentWeather(state);
 

@@ -1425,7 +1425,6 @@ namespace ZoneEquipmentManager {
         using DataEnvironment::StdBaroPress;
         using DataEnvironment::StdRhoAir;
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::emsCallFromZoneSizing;
         using DataGlobals::HourOfDay;
         using DataGlobals::isPulseZoneSizing;
         using DataGlobals::MinutesPerTimeStep;
@@ -1786,7 +1785,7 @@ namespace ZoneEquipmentManager {
 
                 // candidate EMS calling point to customize CalcFinalZoneSizing
                 bool anyEMSRan;
-                ManageEMS(state, emsCallFromZoneSizing, anyEMSRan, ObjexxFCL::Optional_int_const());
+                ManageEMS(state, DataGlobalConstants::EMSCallFrom::ZoneSizing, anyEMSRan, ObjexxFCL::Optional_int_const());
 
                 // now apply EMS overrides (if any)
 

@@ -66,29 +66,6 @@ struct EnergyPlusData;
 
 namespace DataGlobals {
 
-    // Parameters for EMS Calling Points
-    extern int const emsCallFromZoneSizing;                           // Identity where EMS called from
-    extern int const emsCallFromSystemSizing;                         // Identity where EMS called from
-    extern int const emsCallFromBeginNewEvironment;                   // Identity where EMS called from
-    extern int const emsCallFromBeginNewEvironmentAfterWarmUp;        // Identity where EMS called from
-    extern int const emsCallFromBeginTimestepBeforePredictor;         // Identity where EMS called from
-    extern int const emsCallFromBeforeHVACManagers;                   // Identity where EMS called from
-    extern int const emsCallFromAfterHVACManagers;                    // Identity where EMS called from
-    extern int const emsCallFromHVACIterationLoop;                    // Identity where EMS called from
-    extern int const emsCallFromEndSystemTimestepBeforeHVACReporting; // Identity where EMS called from
-    extern int const emsCallFromEndSystemTimestepAfterHVACReporting;  // Identity where EMS called from
-    extern int const emsCallFromEndZoneTimestepBeforeZoneReporting;   // Identity where EMS called from
-    extern int const emsCallFromEndZoneTimestepAfterZoneReporting;    // Identity where EMS called from
-    extern int const emsCallFromSetupSimulation;                      // identify where EMS called from,
-    // this is for input processing only
-    extern int const emsCallFromExternalInterface;                        // Identity where EMS called from
-    extern int const emsCallFromComponentGetInput;                        // EMS called from end of get input for a component
-    extern int const emsCallFromUserDefinedComponentModel;                // EMS called from inside a custom user component model
-    extern int const emsCallFromUnitarySystemSizing;                      // EMS called from unitary system compound component
-    extern int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance;   // Identity where EMS called from
-    extern int const emsCallFromBeginZoneTimestepAfterInitHeatBalance;    // Identity where EMS called from
-    extern int const emsCallFromBeginZoneTimestepBeforeSetCurrentWeather; // Identity where EMS called from
-
     extern int const ScheduleAlwaysOn; // Value when passed to schedule routines gives back 1.0 (on)
 
     extern bool BeginDayFlag;           // True at the start of each day, False after first time step in day

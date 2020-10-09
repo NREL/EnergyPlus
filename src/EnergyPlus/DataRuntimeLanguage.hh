@@ -353,12 +353,12 @@ namespace DataRuntimeLanguage {
         // Members
         // structure for Erl program calling managers
         std::string Name;          // user defined name for calling manager
-        int CallingPoint;          // EMS Calling point for this manager, see parameters emsCallFrom*
+        DataGlobalConstants::EMSCallFrom CallingPoint; // EMS Calling point for this manager, see parameters emsCallFrom*
         int NumErlPrograms;        // count of total number of Erl programs called by this manager
         Array1D_int ErlProgramARR; // list of integer pointers to Erl programs used by this manager
 
         // Default Constructor
-        EMSProgramCallManagementType() : CallingPoint(0), NumErlPrograms(0)
+        EMSProgramCallManagementType() : CallingPoint(DataGlobalConstants::EMSCallFrom::Unassigned), NumErlPrograms(0)
         {
         }
     };

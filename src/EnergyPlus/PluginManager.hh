@@ -76,8 +76,8 @@ struct EnergyPlusData;
 
 namespace PluginManagement {
 
-    void registerNewCallback(EnergyPlusData &state, int iCalledFrom, const std::function<void (void *)>& f);
-    void runAnyRegisteredCallbacks(EnergyPlusData &state, int iCalledFrom, bool &anyRan);
+    void registerNewCallback(EnergyPlusData &state, DataGlobalConstants::EMSCallFrom iCalledFrom, const std::function<void (void *)>& f);
+    void runAnyRegisteredCallbacks(EnergyPlusData &state, DataGlobalConstants::EMSCallFrom iCalledFrom, bool &anyRan);
     void onBeginEnvironment();
     std::string pythonStringForUsage();
 
@@ -108,7 +108,7 @@ namespace PluginManagement {
 
         // methods
         static void reportPythonError();
-        bool run(EnergyPlusData &state, int iCallingPoint) const; // calls main() on this plugin instance
+        bool run(EnergyPlusData &state, DataGlobalConstants::EMSCallFrom iCallingPoint) const; // calls main() on this plugin instance
 
         // plugin calling point hooks
         const char * sHookBeginNewEnvironment = "on_begin_new_environment";
