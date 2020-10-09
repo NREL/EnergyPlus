@@ -114,7 +114,6 @@ extern "C" {
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -308,12 +307,12 @@ namespace SimulationManager {
 
 
         state.files.outputControl.getInput();
-        ResultsFramework::resultsFramework->setupOutputOptions(state.files);
+        ResultsFramework::resultsFramework->setupOutputOptions(state);
 
         state.files.debug.ensure_open("OpenOutputFiles", state.files.outputControl.dbg);
 
         // CreateSQLiteDatabase();
-        sqlite = EnergyPlus::CreateSQLiteDatabase(state.files);
+        sqlite = EnergyPlus::CreateSQLiteDatabase(state);
 
         if (sqlite) {
             sqlite->sqliteBegin();
@@ -322,7 +321,7 @@ namespace SimulationManager {
         }
 
         // FLOW:
-        PostIPProcessing();
+        PostIPProcessing(state);
 
         InitializePsychRoutines();
 
@@ -335,17 +334,17 @@ namespace SimulationManager {
             (inputProcessor->getNumObjectsFound("RunPeriod") > 0 || inputProcessor->getNumObjectsFound("RunPeriod:CustomRange") > 0 || FullAnnualRun);
         AskForConnectionsReport = false; // set to false until sizing is finished
 
-        OpenOutputFiles(state.files);
+        OpenOutputFiles(state);
         GetProjectData(state);
-        CheckForMisMatchedEnvironmentSpecifications(state.files);
+        CheckForMisMatchedEnvironmentSpecifications(state);
         CheckForRequestedReporting();
         SetPredefinedTables();
-        SetPreConstructionInputParameters(); // establish array bounds for constructions early
+        SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
         SetupTimePointers("Zone", TimeStepZone); // Set up Time pointer for HB/Zone Simulation
         SetupTimePointers("HVAC", TimeStepSys);
 
-        CheckIfAnyEMS(state.files);
+        CheckIfAnyEMS(state);
         CheckIfAnyPlant();
         CheckIfAnySlabs();
         CheckIfAnyBasements(state);
@@ -416,23 +415,23 @@ namespace SimulationManager {
         if (DoOutputReporting) {
             DisplayString("Reporting Surfaces");
 
-            ReportSurfaces(state.files);
+            ReportSurfaces(state);
 
-            SetupNodeVarsForReporting(state.files);
+            SetupNodeVarsForReporting(state);
             MetersHaveBeenInitialized = true;
-            SetupPollutionMeterReporting();
-            SystemReports::AllocateAndSetUpVentReports();
+            SetupPollutionMeterReporting(state);
+            SystemReports::AllocateAndSetUpVentReports(state);
             if (EnergyPlus::PluginManagement::pluginManager) {
-                EnergyPlus::PluginManagement::PluginManager::setupOutputVariables();
+                EnergyPlus::PluginManagement::PluginManager::setupOutputVariables(state);
             }
-            UpdateMeterReporting(state.files);
+            UpdateMeterReporting(state);
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
-            SetupPollutionCalculations(state.files);
+            SetupPollutionCalculations(state);
             InitDemandManagers(state);
-            TestBranchIntegrity(state, state.files, ErrFound);
+            TestBranchIntegrity(state, ErrFound);
             if (ErrFound) TerminalError = true;
-            TestAirPathIntegrity(state, state.files, ErrFound);
+            TestAirPathIntegrity(state, ErrFound);
             if (ErrFound) TerminalError = true;
             CheckMarkedNodes(ErrFound);
             if (ErrFound) TerminalError = true;
@@ -444,9 +443,9 @@ namespace SimulationManager {
             if (ErrFound) TerminalError = true;
 
             if (DoDesDaySim || DoWeathSim) {
-                ReportLoopConnections(state, state.files);
-                ReportAirLoopConnections(state, state.files);
-                ReportNodeConnections(state.files);
+                ReportLoopConnections(state);
+                ReportAirLoopConnections(state);
+                ReportNodeConnections(state);
                 // Debug reports
                 //      CALL ReportCompSetMeterVariables
                 //      CALL ReportParentChildren
@@ -474,10 +473,10 @@ namespace SimulationManager {
             sqlite->sqliteCommit();
         }
 
-        GetInputForLifeCycleCost(); // must be prior to WriteTabularReports -- do here before big simulation stuff.
+        GetInputForLifeCycleCost(state); // must be prior to WriteTabularReports -- do here before big simulation stuff.
 
         // check for variable latitude/location/etc
-        WeatherManager::ReadVariableLocationOrientation();
+        WeatherManager::ReadVariableLocationOrientation(state);
 
         // if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
         if (DoHVACSizingSimulation) {
@@ -493,7 +492,7 @@ namespace SimulationManager {
         WarmupFlag = true;
 
         while (Available) {
-            if (stopSimulation) break;
+            if (state.dataGlobal->stopSimulation) break;
 
             GetNextEnvironment(state, Available, ErrorsFound);
 
@@ -548,7 +547,7 @@ namespace SimulationManager {
             ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
-                if (stopSimulation) break;
+                if (state.dataGlobal->stopSimulation) break;
 
                 if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
 
@@ -591,13 +590,13 @@ namespace SimulationManager {
                 }
 
                 for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
-                    if (stopSimulation) break;
+                    if (state.dataGlobal->stopSimulation) break;
 
                     BeginHourFlag = true;
                     EndHourFlag = false;
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
-                        if (stopSimulation) break;
+                        if (state.dataGlobal->stopSimulation) break;
 
                         if (AnySlabsInModel || AnyBasementsInModel) {
                             SimulateGroundDomains(state, false);
@@ -685,14 +684,14 @@ namespace SimulationManager {
 #endif
         SimCostEstimate(state);
 
-        ComputeTariff(state.files); //     Compute the utility bills
+        ComputeTariff(state); //     Compute the utility bills
 
         EMSManager::checkForUnusedActuatorsAtEnd();
         EMSManager::checkSetpointNodesAtEnd();
 
         ReportForTabularReports(); // For Energy Meters (could have other things that need to be pushed to after simulation)
 
-        OpenOutputTabularFile(state.files);
+        OpenOutputTabularFile(state);
 
         WriteTabularReports(state); //     Create the tabular reports at completion of each
 
@@ -707,10 +706,10 @@ namespace SimulationManager {
 #ifdef EP_Detailed_Timings
         epStopTime("Closeout Reporting=");
 #endif
-        CloseOutputFiles(state.files);
+        CloseOutputFiles(state);
 
         // sqlite->createZoneExtendedOutput();
-        CreateSQLiteZoneExtendedOutput();
+        CreateSQLiteZoneExtendedOutput(state);
 
         if (sqlite) {
             DisplayString("Writing final SQL reports");
@@ -777,7 +776,8 @@ namespace SimulationManager {
         CurrentModuleObject = "Version";
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           Alphas,
                                           NumAlpha,
@@ -810,7 +810,8 @@ namespace SimulationManager {
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         CondFDAlgo = false;
         if (Num > 0) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           Alphas,
                                           NumAlpha,
@@ -834,7 +835,8 @@ namespace SimulationManager {
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               Item,
                                               Alphas,
                                               NumAlpha,
@@ -859,7 +861,8 @@ namespace SimulationManager {
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               1,
                                               Alphas,
                                               NumAlpha,
@@ -883,7 +886,8 @@ namespace SimulationManager {
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               1,
                                               cAlphaArgs,
                                               NumAlpha,
@@ -907,7 +911,8 @@ namespace SimulationManager {
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num > 0) {
             for (Item = 1; Item <= Num; ++Item) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               1,
                                               cAlphaArgs,
                                               NumAlpha,
@@ -931,7 +936,8 @@ namespace SimulationManager {
         CurrentModuleObject = "Timestep";
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           Alphas,
                                           NumAlpha,
@@ -992,7 +998,8 @@ namespace SimulationManager {
         CurrentModuleObject = "ConvergenceLimits";
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           Alphas,
                                           NumAlpha,
@@ -1047,7 +1054,7 @@ namespace SimulationManager {
             ShowWarningError(CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
         }
         if (NumDebugOut > 0) {
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat);
+            inputProcessor->getObjectItem(state, CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat);
             if (NumAlpha >= 1) {
                 DebugOutput = UtilityRoutines::SameString(Alphas(1), "Yes");
             }
@@ -1150,7 +1157,7 @@ namespace SimulationManager {
         CurrentModuleObject = "OutputControl:ReportingTolerances";
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (Num > 0) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state, CurrentModuleObject,
                                           1,
                                           Alphas,
                                           NumAlpha,
@@ -1184,7 +1191,8 @@ namespace SimulationManager {
         NumRunControl = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumRunControl > 0) {
             RunControlInInput = true;
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           Alphas,
                                           NumAlpha,
@@ -1494,29 +1502,29 @@ namespace SimulationManager {
         // unused0909743 Format(' Display Extra Warnings',2(', ',A))
         //  ENDIF
         if (DataGlobals::createPerfLog) {
-            writeIntialPerfLogValues(state.files, overrideModeValue);
+            writeIntialPerfLogValues(state, overrideModeValue);
         }
     }
 
-    void writeIntialPerfLogValues(IOFiles &ioFiles, std::string const &currentOverrideModeValue)
+    void writeIntialPerfLogValues(EnergyPlusData &state, std::string const &currentOverrideModeValue)
     // write the input related portions of the .perflog
     // J.Glazer February 2020
     {
-        UtilityRoutines::appendPerfLog(ioFiles, "Program, Version, TimeStamp",
+        UtilityRoutines::appendPerfLog(state, "Program, Version, TimeStamp",
                                        DataStringGlobals::VerString); // this string already includes three portions and has commas
-        UtilityRoutines::appendPerfLog(ioFiles, "Use Coil Direct Solution", bool_to_string(DoCoilDirectSolutions));
+        UtilityRoutines::appendPerfLog(state, "Use Coil Direct Solution", bool_to_string(DoCoilDirectSolutions));
         if (HeatBalanceIntRadExchange::CarrollMethod) {
-            UtilityRoutines::appendPerfLog(ioFiles, "Zone Radiant Exchange Algorithm", "CarrollMRT");
+            UtilityRoutines::appendPerfLog(state, "Zone Radiant Exchange Algorithm", "CarrollMRT");
         } else {
-            UtilityRoutines::appendPerfLog(ioFiles, "Zone Radiant Exchange Algorithm", "ScriptF");
+            UtilityRoutines::appendPerfLog(state, "Zone Radiant Exchange Algorithm", "ScriptF");
         }
-        UtilityRoutines::appendPerfLog(ioFiles, "Override Mode", currentOverrideModeValue);
-        UtilityRoutines::appendPerfLog(ioFiles, "Number of Timesteps per Hour", General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour));
-        UtilityRoutines::appendPerfLog(ioFiles, "Minimum Number of Warmup Days", General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays));
-        UtilityRoutines::appendPerfLog(ioFiles, "SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
-        UtilityRoutines::appendPerfLog(ioFiles, "Minimum System Timestep", General::RoundSigDigits(DataConvergParams::MinTimeStepSys * 60.0, 1));
-        UtilityRoutines::appendPerfLog(ioFiles, "MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 2));
-        UtilityRoutines::appendPerfLog(ioFiles, "MaxAllowedDelTemp", General::RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4));
+        UtilityRoutines::appendPerfLog(state, "Override Mode", currentOverrideModeValue);
+        UtilityRoutines::appendPerfLog(state, "Number of Timesteps per Hour", General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour));
+        UtilityRoutines::appendPerfLog(state, "Minimum Number of Warmup Days", General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays));
+        UtilityRoutines::appendPerfLog(state, "SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
+        UtilityRoutines::appendPerfLog(state, "Minimum System Timestep", General::RoundSigDigits(DataConvergParams::MinTimeStepSys * 60.0, 1));
+        UtilityRoutines::appendPerfLog(state, "MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 2));
+        UtilityRoutines::appendPerfLog(state, "MaxAllowedDelTemp", General::RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4));
     }
 
     std::string bool_to_string(bool logical)
@@ -1528,7 +1536,7 @@ namespace SimulationManager {
         }
     }
 
-    void CheckForMisMatchedEnvironmentSpecifications(IOFiles &ioFiles)
+    void CheckForMisMatchedEnvironmentSpecifications(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1564,7 +1572,7 @@ namespace SimulationManager {
                              inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileConditionType");
         NumSizingDays = NumDesignDays + NumRunPeriodDesign;
 
-        WeatherFileAttached = FileSystem::fileExists(ioFiles.inputWeatherFileName.fileName);
+        WeatherFileAttached = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
 
         if (RunControlInInput) {
             if (DoZoneSizing) {
@@ -1808,7 +1816,7 @@ namespace SimulationManager {
         }
     }
 
-    void OpenOutputFiles(IOFiles &ioFiles)
+    void OpenOutputFiles(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1845,23 +1853,23 @@ namespace SimulationManager {
 
         // FLOW:
         StdOutputRecordCount = 0;
-        ioFiles.eso.ensure_open("OpenOutputFiles", ioFiles.outputControl.eso);
-        print(ioFiles.eso, "Program Version,{}\n", VerString);
+        state.files.eso.ensure_open("OpenOutputFiles", state.files.outputControl.eso);
+        print(state.files.eso, "Program Version,{}\n", VerString);
 
         // Open the Initialization Output File
-        ioFiles.eio.ensure_open("OpenOutputFiles", ioFiles.outputControl.eio);
-        print(ioFiles.eio, "Program Version,{}\n", VerString);
+        state.files.eio.ensure_open("OpenOutputFiles", state.files.outputControl.eio);
+        print(state.files.eio, "Program Version,{}\n", VerString);
 
         // Open the Meters Output File
-        ioFiles.mtr.ensure_open("OpenOutputFiles", ioFiles.outputControl.mtr);
-        print(ioFiles.mtr, "Program Version,{}\n", VerString);
+        state.files.mtr.ensure_open("OpenOutputFiles", state.files.outputControl.mtr);
+        print(state.files.mtr, "Program Version,{}\n", VerString);
 
         // Open the Branch-Node Details Output File
-        ioFiles.bnd.ensure_open("OpenOutputFiles", ioFiles.outputControl.bnd);
-        print(ioFiles.bnd, "Program Version,{}\n", VerString);
+        state.files.bnd.ensure_open("OpenOutputFiles", state.files.outputControl.bnd);
+        print(state.files.bnd, "Program Version,{}\n", VerString);
     }
 
-    void CloseOutputFiles(IOFiles &ioFiles)
+    void CloseOutputFiles(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1930,88 +1938,88 @@ namespace SimulationManager {
         std::string cepEnvSetThreads;
         std::string cIDFSetThreads;
 
-        ioFiles.audit.ensure_open("CloseOutputFiles", ioFiles.outputControl.audit);
+        state.files.audit.ensure_open("CloseOutputFiles", state.files.outputControl.audit);
         constexpr static auto variable_fmt{" {}={:12}\n"};
         // Record some items on the audit file
-        print(ioFiles.audit, variable_fmt, "NumOfRVariable", NumOfRVariable_Setup);
-        print(ioFiles.audit, variable_fmt, "NumOfRVariable(Total)", NumTotalRVariable);
-        print(ioFiles.audit, variable_fmt, "NumOfRVariable(Actual)", NumOfRVariable);
-        print(ioFiles.audit, variable_fmt, "NumOfRVariable(Summed)", NumOfRVariable_Sum);
-        print(ioFiles.audit, variable_fmt, "NumOfRVariable(Meter)", NumOfRVariable_Meter);
-        print(ioFiles.audit, variable_fmt, "NumOfIVariable", NumOfIVariable_Setup);
-        print(ioFiles.audit, variable_fmt, "NumOfIVariable(Total)", NumTotalIVariable);
-        print(ioFiles.audit, variable_fmt, "NumOfIVariable(Actual)", NumOfIVariable);
-        print(ioFiles.audit, variable_fmt, "NumOfIVariable(Summed)", NumOfIVariable_Sum);
-        print(ioFiles.audit, variable_fmt, "MaxRVariable", MaxRVariable);
-        print(ioFiles.audit, variable_fmt, "MaxIVariable", MaxIVariable);
-        print(ioFiles.audit, variable_fmt, "NumEnergyMeters", NumEnergyMeters);
-        print(ioFiles.audit, variable_fmt, "NumVarMeterArrays", NumVarMeterArrays);
-        print(ioFiles.audit, variable_fmt, "maxUniqueKeyCount", maxUniqueKeyCount);
-        print(ioFiles.audit, variable_fmt, "maxNumberOfFigures", maxNumberOfFigures);
-        print(ioFiles.audit, variable_fmt, "MAXHCArrayBounds", MAXHCArrayBounds);
-        print(ioFiles.audit, variable_fmt, "MaxVerticesPerSurface", MaxVerticesPerSurface);
-        print(ioFiles.audit, variable_fmt, "NumReportList", NumReportList);
-        print(ioFiles.audit, variable_fmt, "InstMeterCacheSize", InstMeterCacheSize);
+        print(state.files.audit, variable_fmt, "NumOfRVariable", NumOfRVariable_Setup);
+        print(state.files.audit, variable_fmt, "NumOfRVariable(Total)", NumTotalRVariable);
+        print(state.files.audit, variable_fmt, "NumOfRVariable(Actual)", NumOfRVariable);
+        print(state.files.audit, variable_fmt, "NumOfRVariable(Summed)", NumOfRVariable_Sum);
+        print(state.files.audit, variable_fmt, "NumOfRVariable(Meter)", NumOfRVariable_Meter);
+        print(state.files.audit, variable_fmt, "NumOfIVariable", NumOfIVariable_Setup);
+        print(state.files.audit, variable_fmt, "NumOfIVariable(Total)", NumTotalIVariable);
+        print(state.files.audit, variable_fmt, "NumOfIVariable(Actual)", NumOfIVariable);
+        print(state.files.audit, variable_fmt, "NumOfIVariable(Summed)", NumOfIVariable_Sum);
+        print(state.files.audit, variable_fmt, "MaxRVariable", MaxRVariable);
+        print(state.files.audit, variable_fmt, "MaxIVariable", MaxIVariable);
+        print(state.files.audit, variable_fmt, "NumEnergyMeters", NumEnergyMeters);
+        print(state.files.audit, variable_fmt, "NumVarMeterArrays", NumVarMeterArrays);
+        print(state.files.audit, variable_fmt, "maxUniqueKeyCount", maxUniqueKeyCount);
+        print(state.files.audit, variable_fmt, "maxNumberOfFigures", maxNumberOfFigures);
+        print(state.files.audit, variable_fmt, "MAXHCArrayBounds", MAXHCArrayBounds);
+        print(state.files.audit, variable_fmt, "MaxVerticesPerSurface", MaxVerticesPerSurface);
+        print(state.files.audit, variable_fmt, "NumReportList", NumReportList);
+        print(state.files.audit, variable_fmt, "InstMeterCacheSize", InstMeterCacheSize);
         if (SutherlandHodgman) {
             if (SlaterBarsky) {
-                print(ioFiles.audit, " {}\n", "ClippingAlgorithm=SlaterBarskyandSutherlandHodgman");
+                print(state.files.audit, " {}\n", "ClippingAlgorithm=SlaterBarskyandSutherlandHodgman");
             } else {
-                print(ioFiles.audit, " {}\n", "ClippingAlgorithm=SutherlandHodgman");
+                print(state.files.audit, " {}\n", "ClippingAlgorithm=SutherlandHodgman");
             }
         } else {
-            print(ioFiles.audit, "{}\n", "ClippingAlgorithm=ConvexWeilerAtherton");
+            print(state.files.audit, "{}\n", "ClippingAlgorithm=ConvexWeilerAtherton");
         }
-        print(ioFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
-        print(ioFiles.audit, variable_fmt, "NumConsideredOutputVariables", NumConsideredOutputVariables);
-        print(ioFiles.audit, variable_fmt, "MaxConsideredOutputVariables", MaxConsideredOutputVariables);
+        print(state.files.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
+        print(state.files.audit, variable_fmt, "NumConsideredOutputVariables", NumConsideredOutputVariables);
+        print(state.files.audit, variable_fmt, "MaxConsideredOutputVariables", MaxConsideredOutputVariables);
 
-        print(ioFiles.audit, variable_fmt, "numActuatorsUsed", numActuatorsUsed);
-        print(ioFiles.audit, variable_fmt, "numEMSActuatorsAvailable", numEMSActuatorsAvailable);
-        print(ioFiles.audit, variable_fmt, "maxEMSActuatorsAvailable", maxEMSActuatorsAvailable);
-        print(ioFiles.audit, variable_fmt, "numInternalVariablesUsed", NumInternalVariablesUsed);
-        print(ioFiles.audit, variable_fmt, "numEMSInternalVarsAvailable", numEMSInternalVarsAvailable);
-        print(ioFiles.audit, variable_fmt, "maxEMSInternalVarsAvailable", maxEMSInternalVarsAvailable);
+        print(state.files.audit, variable_fmt, "numActuatorsUsed", numActuatorsUsed);
+        print(state.files.audit, variable_fmt, "numEMSActuatorsAvailable", numEMSActuatorsAvailable);
+        print(state.files.audit, variable_fmt, "maxEMSActuatorsAvailable", maxEMSActuatorsAvailable);
+        print(state.files.audit, variable_fmt, "numInternalVariablesUsed", NumInternalVariablesUsed);
+        print(state.files.audit, variable_fmt, "numEMSInternalVarsAvailable", numEMSInternalVarsAvailable);
+        print(state.files.audit, variable_fmt, "maxEMSInternalVarsAvailable", maxEMSInternalVarsAvailable);
 
-        print(ioFiles.audit, variable_fmt, "NumOfNodeConnections", NumOfNodeConnections);
-        print(ioFiles.audit, variable_fmt, "MaxNumOfNodeConnections", MaxNumOfNodeConnections);
+        print(state.files.audit, variable_fmt, "NumOfNodeConnections", NumOfNodeConnections);
+        print(state.files.audit, variable_fmt, "MaxNumOfNodeConnections", MaxNumOfNodeConnections);
 #ifdef EP_Count_Calls
-        print(ioFiles.audit, variable_fmt, "NumShadow_Calls", NumShadow_Calls);
-        print(ioFiles.audit, variable_fmt, "NumShadowAtTS_Calls", NumShadowAtTS_Calls);
-        print(ioFiles.audit, variable_fmt, "NumClipPoly_Calls", NumClipPoly_Calls);
-        print(ioFiles.audit, variable_fmt, "NumInitSolar_Calls", NumInitSolar_Calls);
-        print(ioFiles.audit, variable_fmt, "NumAnisoSky_Calls", NumAnisoSky_Calls);
-        print(ioFiles.audit, variable_fmt, "NumDetPolyOverlap_Calls", NumDetPolyOverlap_Calls);
-        print(ioFiles.audit, variable_fmt, "NumCalcPerSolBeam_Calls", NumCalcPerSolBeam_Calls);
-        print(ioFiles.audit, variable_fmt, "NumDetShadowCombs_Calls", NumDetShadowCombs_Calls);
-        print(ioFiles.audit, variable_fmt, "NumIntSolarDist_Calls", NumIntSolarDist_Calls);
-        print(ioFiles.audit, variable_fmt, "NumIntRadExchange_Calls", NumIntRadExchange_Calls);
-        print(ioFiles.audit, variable_fmt, "NumIntRadExchangeZ_Calls", NumIntRadExchangeZ_Calls);
-        print(ioFiles.audit, variable_fmt, "NumIntRadExchangeMain_Calls", NumIntRadExchangeMain_Calls);
-        print(ioFiles.audit, variable_fmt, "NumIntRadExchangeOSurf_Calls", NumIntRadExchangeOSurf_Calls);
-        print(ioFiles.audit, variable_fmt, "NumIntRadExchangeISurf_Calls", NumIntRadExchangeISurf_Calls);
-        print(ioFiles.audit, variable_fmt, "NumMaxInsideSurfIterations", NumMaxInsideSurfIterations);
-        print(ioFiles.audit, variable_fmt, "NumCalcScriptF_Calls", NumCalcScriptF_Calls);
+        print(state.files.audit, variable_fmt, "NumShadow_Calls", NumShadow_Calls);
+        print(state.files.audit, variable_fmt, "NumShadowAtTS_Calls", NumShadowAtTS_Calls);
+        print(state.files.audit, variable_fmt, "NumClipPoly_Calls", NumClipPoly_Calls);
+        print(state.files.audit, variable_fmt, "NumInitSolar_Calls", NumInitSolar_Calls);
+        print(state.files.audit, variable_fmt, "NumAnisoSky_Calls", NumAnisoSky_Calls);
+        print(state.files.audit, variable_fmt, "NumDetPolyOverlap_Calls", NumDetPolyOverlap_Calls);
+        print(state.files.audit, variable_fmt, "NumCalcPerSolBeam_Calls", NumCalcPerSolBeam_Calls);
+        print(state.files.audit, variable_fmt, "NumDetShadowCombs_Calls", NumDetShadowCombs_Calls);
+        print(state.files.audit, variable_fmt, "NumIntSolarDist_Calls", NumIntSolarDist_Calls);
+        print(state.files.audit, variable_fmt, "NumIntRadExchange_Calls", NumIntRadExchange_Calls);
+        print(state.files.audit, variable_fmt, "NumIntRadExchangeZ_Calls", NumIntRadExchangeZ_Calls);
+        print(state.files.audit, variable_fmt, "NumIntRadExchangeMain_Calls", NumIntRadExchangeMain_Calls);
+        print(state.files.audit, variable_fmt, "NumIntRadExchangeOSurf_Calls", NumIntRadExchangeOSurf_Calls);
+        print(state.files.audit, variable_fmt, "NumIntRadExchangeISurf_Calls", NumIntRadExchangeISurf_Calls);
+        print(state.files.audit, variable_fmt, "NumMaxInsideSurfIterations", NumMaxInsideSurfIterations);
+        print(state.files.audit, variable_fmt, "NumCalcScriptF_Calls", NumCalcScriptF_Calls);
 #endif
 
-        print(ioFiles.eso, "{}\n", EndOfDataString);
+        print(state.files.eso, "{}\n", EndOfDataString);
         if (StdOutputRecordCount > 0) {
-            print(ioFiles.eso, variable_fmt, "Number of Records Written", StdOutputRecordCount);
-            ioFiles.eso.close();
+            print(state.files.eso, variable_fmt, "Number of Records Written", StdOutputRecordCount);
+            state.files.eso.close();
         } else {
-            ioFiles.eso.del();
+            state.files.eso.del();
         }
 
         if (DataHeatBalance::AnyCondFD) { // echo out relaxation factor, it may have been changed by the program
             print(
-                ioFiles.eio, "{}\n", "! <ConductionFiniteDifference Numerical Parameters>, Starting Relaxation Factor, Final Relaxation Factor");
-            print(ioFiles.eio, "ConductionFiniteDifference Numerical Parameters, {:.3R}, {:.3R}\n", CondFDRelaxFactorInput, CondFDRelaxFactor);
+                state.files.eio, "{}\n", "! <ConductionFiniteDifference Numerical Parameters>, Starting Relaxation Factor, Final Relaxation Factor");
+            print(state.files.eio, "ConductionFiniteDifference Numerical Parameters, {:.3R}, {:.3R}\n", CondFDRelaxFactorInput, CondFDRelaxFactor);
         }
         // Report number of threads to eio file
         static constexpr auto ThreadingHeader("! <Program Control Information:Threads/Parallel Sims>, Threading Supported,Maximum Number of "
                                               "Threads, Env Set Threads (OMP_NUM_THREADS), EP Env Set Threads (EP_OMP_NUM_THREADS), IDF Set "
                                               "Threads, Number of Threads Used (Interior Radiant Exchange), Number Nominal Surfaces, Number "
                                               "Parallel Sims");
-        print(ioFiles.eio, "{}\n", ThreadingHeader);
+        print(state.files.eio, "{}\n", ThreadingHeader);
         static constexpr auto ThreadReport("Program Control:Threads/Parallel Sims, {},{}, {}, {}, {}, {}, {}, {}\n");
         if (Threading) {
             if (iEnvSetThreads == 0) {
@@ -2030,7 +2038,7 @@ namespace SimulationManager {
                 cIDFSetThreads = RoundSigDigits(iIDFSetThreads);
             }
             if (lnumActiveSims) {
-                print(ioFiles.eio,
+                print(state.files.eio,
                       ThreadReport,
                       "Yes",
                       MaxNumberOfThreads,
@@ -2041,7 +2049,7 @@ namespace SimulationManager {
                       iNominalTotSurfaces,
                       inumActiveSims);
             } else {
-                print(ioFiles.eio,
+                print(state.files.eio,
                       ThreadReport,
                       "Yes",
                       MaxNumberOfThreads,
@@ -2054,27 +2062,27 @@ namespace SimulationManager {
             }
         } else { // no threading
             if (lnumActiveSims) {
-                print(ioFiles.eio, ThreadReport, "No", MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", inumActiveSims);
+                print(state.files.eio, ThreadReport, "No", MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", inumActiveSims);
             } else {
-                print(ioFiles.eio, ThreadReport, "No", MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", "N/A");
+                print(state.files.eio, ThreadReport, "No", MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", "N/A");
             }
         }
 
         // Close the Initialization Output File
-        print(ioFiles.eio, "{}\n", EndOfDataString);
-        ioFiles.eio.close();
+        print(state.files.eio, "{}\n", EndOfDataString);
+        state.files.eio.close();
 
         // Close the Meters Output File
-        print(ioFiles.mtr, "{}\n", EndOfDataString);
-        print(ioFiles.mtr, " Number of Records Written={:12}\n", StdMeterRecordCount);
+        print(state.files.mtr, "{}\n", EndOfDataString);
+        print(state.files.mtr, " Number of Records Written={:12}\n", StdMeterRecordCount);
         if (StdMeterRecordCount > 0) {
-            ioFiles.mtr.close();
+            state.files.mtr.close();
         } else {
-            ioFiles.mtr.del();
+            state.files.mtr.del();
         }
 
         // Close the External Shading Output File
-        ioFiles.shade.close();
+        state.files.shade.close();
     }
 
     void SetupSimulation(EnergyPlusData &state, bool &ErrorsFound)
@@ -2180,7 +2188,7 @@ namespace SimulationManager {
         if (ErrorsFound) ShowFatalError("Previous conditions cause program termination.");
     }
 
-    void ReportNodeConnections(IOFiles &ioFiles)
+    void ReportNodeConnections(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2215,15 +2223,15 @@ namespace SimulationManager {
         ParentNodeList.allocate(NumParents);
 
         //  Do Parent Objects
-        print(ioFiles.bnd, "{}\n", "! ===============================================================");
-        print(ioFiles.bnd, Format_702, "Parent");
-        print(ioFiles.bnd, " #Parent Node Connections,{}\n", NumParents);
-        print(ioFiles.bnd, Format_703, "Parent");
+        print(state.files.bnd, "{}\n", "! ===============================================================");
+        print(state.files.bnd, Format_702, "Parent");
+        print(state.files.bnd, " #Parent Node Connections,{}\n", NumParents);
+        print(state.files.bnd, Format_703, "Parent");
 
         for (int Loop = 1; Loop <= NumOfNodeConnections; ++Loop) {
             if (!NodeConnections(Loop).ObjectIsParent) continue;
             NonConnectedNodes(NodeConnections(Loop).NodeNumber) = false;
-            print(ioFiles.bnd,
+            print(state.files.bnd,
                   " Parent Node Connection,{},{},{},{},{}\n",
                   NodeConnections(Loop).NodeName,
                   NodeConnections(Loop).ObjectType,
@@ -2265,15 +2273,15 @@ namespace SimulationManager {
         }
 
         //  Do non-Parent Objects
-        print(ioFiles.bnd, "{}\n", "! ===============================================================");
-        print(ioFiles.bnd, Format_702, "Non-Parent");
-        print(ioFiles.bnd, " #Non-Parent Node Connections,{}\n", NumNonParents);
-        print(ioFiles.bnd, Format_703, "Non-Parent");
+        print(state.files.bnd, "{}\n", "! ===============================================================");
+        print(state.files.bnd, Format_702, "Non-Parent");
+        print(state.files.bnd, " #Non-Parent Node Connections,{}\n", NumNonParents);
+        print(state.files.bnd, Format_703, "Non-Parent");
 
         for (int Loop = 1; Loop <= NumOfNodeConnections; ++Loop) {
             if (NodeConnections(Loop).ObjectIsParent) continue;
             NonConnectedNodes(NodeConnections(Loop).NodeNumber) = false;
-            print(ioFiles.bnd,
+            print(state.files.bnd,
                   " Non-Parent Node Connection,{},{},{},{},{}\n",
                   NodeConnections(Loop).NodeName,
                   NodeConnections(Loop).ObjectType,
@@ -2288,21 +2296,21 @@ namespace SimulationManager {
         }
 
         if (NumNonConnected > 0) {
-            print(ioFiles.bnd, "{}\n", "! ===============================================================");
+            print(state.files.bnd, "{}\n", "! ===============================================================");
             static constexpr auto Format_705("! <#NonConnected Nodes>,<Number of NonConnected Nodes>\n #NonConnected Nodes,{}\n");
-            print(ioFiles.bnd, Format_705, NumNonConnected);
+            print(state.files.bnd, Format_705, NumNonConnected);
             static constexpr auto Format_706("! <NonConnected Node>,<NonConnected Node Number>,<NonConnected Node Name>");
-            print(ioFiles.bnd, "{}\n", Format_706);
+            print(state.files.bnd, "{}\n", Format_706);
             for (int Loop = 1; Loop <= NumOfNodes; ++Loop) {
                 if (!NonConnectedNodes(Loop)) continue;
-                print(ioFiles.bnd, " NonConnected Node,{},{}\n", Loop, NodeID(Loop));
+                print(state.files.bnd, " NonConnected Node,{},{}\n", Loop, NodeID(Loop));
             }
         }
 
         NonConnectedNodes.deallocate();
     }
 
-    void ReportLoopConnections(EnergyPlusData &state, IOFiles &ioFiles)
+    void ReportLoopConnections(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2345,23 +2353,23 @@ namespace SimulationManager {
                                          "Priority>,<Cooling Priority>");
 
         // Report outside air node names on the Branch-Node Details file
-        print(ioFiles.bnd, "{}\n", "! ===============================================================");
-        print(ioFiles.bnd, "{}\n", "! #Outdoor Air Nodes,<Number of Outdoor Air Nodes>");
-        print(ioFiles.bnd, " #Outdoor Air Nodes,{}\n", NumOutsideAirNodes);
+        print(state.files.bnd, "{}\n", "! ===============================================================");
+        print(state.files.bnd, "{}\n", "! #Outdoor Air Nodes,<Number of Outdoor Air Nodes>");
+        print(state.files.bnd, " #Outdoor Air Nodes,{}\n", NumOutsideAirNodes);
         if (NumOutsideAirNodes > 0) {
-            print(ioFiles.bnd, "{}\n", "! <Outdoor Air Node>,<NodeNumber>,<Node Name>");
+            print(state.files.bnd, "{}\n", "! <Outdoor Air Node>,<NodeNumber>,<Node Name>");
         }
         for (int Count = 1; Count <= NumOutsideAirNodes; ++Count) {
-            print(ioFiles.bnd, " Outdoor Air Node,{},{}\n", OutsideAirNodeList(Count), NodeID(OutsideAirNodeList(Count)));
+            print(state.files.bnd, " Outdoor Air Node,{},{}\n", OutsideAirNodeList(Count), NodeID(OutsideAirNodeList(Count)));
         }
         // Component Sets
-        print(ioFiles.bnd, "{}\n", "! ===============================================================");
-        print(ioFiles.bnd, "{}\n", Format_700);
-        print(ioFiles.bnd, " #Component Sets,{}\n", NumCompSets);
-        print(ioFiles.bnd, "{}\n", Format_702);
+        print(state.files.bnd, "{}\n", "! ===============================================================");
+        print(state.files.bnd, "{}\n", Format_700);
+        print(state.files.bnd, " #Component Sets,{}\n", NumCompSets);
+        print(state.files.bnd, "{}\n", Format_702);
 
         for (int Count = 1; Count <= NumCompSets; ++Count) {
-            print(ioFiles.bnd,
+            print(state.files.bnd,
                   " Component Set,{},{},{},{},{},{},{},{}\n",
                   Count,
                   CompSets(Count).ParentCType,
@@ -2423,26 +2431,26 @@ namespace SimulationManager {
             }
         }
         //  Plant Loops
-        print(ioFiles.bnd, "{}\n", "! ===============================================================");
-        print(ioFiles.bnd, "{}\n", "! <# Plant Loops>,<Number of Plant Loops>");
-        print(ioFiles.bnd, " #Plant Loops,{}\n", NumPlantLoops);
-        print(ioFiles.bnd,
+        print(state.files.bnd, "{}\n", "! ===============================================================");
+        print(state.files.bnd, "{}\n", "! <# Plant Loops>,<Number of Plant Loops>");
+        print(state.files.bnd, " #Plant Loops,{}\n", NumPlantLoops);
+        print(state.files.bnd,
               "{}\n",
               "! <Plant Loop>,<Plant Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>");
         print(
-            ioFiles.bnd, "{}\n", "! <Plant Loop Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>");
-        print(ioFiles.bnd,
+            state.files.bnd, "{}\n", "! <Plant Loop Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>");
+        print(state.files.bnd,
               "{}\n",
               "! <Plant Loop Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop "
               "Name>,<Loop Type>");
-        print(ioFiles.bnd,
+        print(state.files.bnd,
               "{}\n",
               "! <Plant Loop Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop "
               "Type>");
-        print(ioFiles.bnd,
+        print(state.files.bnd,
               "{}\n",
               "! <Plant Loop Supply Connection>,<Plant Loop Name>,<Supply Side Outlet Node Name>,<Demand Side Inlet Node Name>");
-        print(ioFiles.bnd,
+        print(state.files.bnd,
               "{}\n",
               "! <Plant Loop Return Connection>,<Plant Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>");
         for (int Count = 1; Count <= NumPlantLoops; ++Count) {
@@ -2459,7 +2467,7 @@ namespace SimulationManager {
                     }
                 }();
 
-                print(ioFiles.bnd,
+                print(state.files.bnd,
                       " Plant Loop,{},{},{},{},{},{}\n",
                       PlantLoop(Count).Name,
                       LoopString,
@@ -2469,30 +2477,30 @@ namespace SimulationManager {
                       PlantLoop(Count).LoopSide(LoopSideNum).ConnectList);
                 //  Plant Supply Side Splitter
                 if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
-                    print(ioFiles.bnd,
+                    print(state.files.bnd,
                           "   Plant Loop Connector,Splitter,{},{},{},{}\n",
                           PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
                           PlantLoop(Count).Name,
                           LoopString,
                           PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes);
                     for (int Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
-                        print(ioFiles.bnd,
+                        print(state.files.bnd,
                               "     Plant Loop Connector Branches,{},Splitter,{},",
                               Count1,
                               PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name);
 
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn <= 0) {
-                            print(ioFiles.bnd, "{},\n", errstring);
+                            print(state.files.bnd, "{},\n", errstring);
                         } else {
-                            print(ioFiles.bnd,
+                            print(state.files.bnd,
                                   "{},",
                                   PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn).Name);
                         }
 
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
-                            print(ioFiles.bnd, "{},{},{}\n", errstring, PlantLoop(Count).Name, LoopString);
+                            print(state.files.bnd, "{},{},{}\n", errstring, PlantLoop(Count).Name, LoopString);
                         } else {
-                            print(ioFiles.bnd,
+                            print(state.files.bnd,
                                   "{},{},{}\n",
                                   PlantLoop(Count)
                                       .LoopSide(LoopSideNum)
@@ -2502,7 +2510,7 @@ namespace SimulationManager {
                                   LoopString);
                         }
 
-                        print(ioFiles.bnd,
+                        print(state.files.bnd,
                               "     Plant Loop Connector Nodes,   {},Splitter,{},{},{},{},{}\n",
                               Count1,
                               PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
@@ -2515,7 +2523,7 @@ namespace SimulationManager {
 
                 //  Plant Supply Side Mixer
                 if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
-                    print(ioFiles.bnd,
+                    print(state.files.bnd,
                           "   Plant Loop Connector,Mixer,{},{},{},{}\n",
                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
                           PlantLoop(Count).Name,
@@ -2523,28 +2531,28 @@ namespace SimulationManager {
                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes); //',Supply,'//  &
 
                     for (int Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++Count1) {
-                        print(ioFiles.bnd,
+                        print(state.files.bnd,
                               "     Plant Loop Connector Branches,{},Mixer,{},",
                               Count1,
                               PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name);
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
-                            print(ioFiles.bnd, "{},", errstring);
+                            print(state.files.bnd, "{},", errstring);
                         } else {
                             print(
-                                ioFiles.bnd,
+                                state.files.bnd,
                                 "{},",
                                 PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1)).Name);
                         }
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
-                            print(ioFiles.bnd, "{},{},Supply\n", errstring, PlantLoop(Count).Name);
+                            print(state.files.bnd, "{},{},Supply\n", errstring, PlantLoop(Count).Name);
                         } else {
-                            print(ioFiles.bnd,
+                            print(state.files.bnd,
                                   "{},{},{}\n",
                                   PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut).Name,
                                   PlantLoop(Count).Name,
                                   LoopString);
                         }
-                        print(ioFiles.bnd,
+                        print(state.files.bnd,
                               "     Plant Loop Connector Nodes,   {},Mixer,{},{},{},{},{}\n",
                               Count1,
                               PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
@@ -2555,12 +2563,12 @@ namespace SimulationManager {
                     }
                 }
             }
-            print(ioFiles.bnd,
+            print(state.files.bnd,
                   " Plant Loop Supply Connection,{},{},{}\n",
                   PlantLoop(Count).Name,
                   PlantLoop(Count).LoopSide(SupplySide).NodeNameOut,
                   PlantLoop(Count).LoopSide(DemandSide).NodeNameIn);
-            print(ioFiles.bnd,
+            print(state.files.bnd,
                   " Plant Loop Return Connection,{},{},{}\n",
                   PlantLoop(Count).Name,
                   PlantLoop(Count).LoopSide(DemandSide).NodeNameOut,
@@ -2569,27 +2577,27 @@ namespace SimulationManager {
         } //  Plant Demand Side Loop
 
         //  Condenser Loops
-        print(ioFiles.bnd, "{}\n", "! ===============================================================");
-        print(ioFiles.bnd, "{}\n", "! <# Condenser Loops>,<Number of Condenser Loops>");
-        print(ioFiles.bnd, " #Condenser Loops,{}\n", NumCondLoops);
-        print(ioFiles.bnd,
+        print(state.files.bnd, "{}\n", "! ===============================================================");
+        print(state.files.bnd, "{}\n", "! <# Condenser Loops>,<Number of Condenser Loops>");
+        print(state.files.bnd, " #Condenser Loops,{}\n", NumCondLoops);
+        print(state.files.bnd,
               "{}\n",
               "! <Condenser Loop>,<Condenser Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>");
-        print(ioFiles.bnd,
+        print(state.files.bnd,
               "{}\n",
               "! <Condenser Loop Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>");
-        print(ioFiles.bnd,
+        print(state.files.bnd,
               "{}\n",
               "! <Condenser Loop Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop "
               "Name>,<Loop Type>");
-        print(ioFiles.bnd,
+        print(state.files.bnd,
               "{}\n",
               "! <Condenser Loop Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop "
               "Name>,<Loop Type>");
-        print(ioFiles.bnd,
+        print(state.files.bnd,
               "{}\n",
               "! <Condenser Loop Supply Connection>,<Condenser Loop Name>,<Supply Side Outlet Node Name>,<Demand Side Inlet Node Name>");
-        print(ioFiles.bnd,
+        print(state.files.bnd,
               "{}\n",
               "! <Condenser Loop Return Connection>,<Condenser Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>");
 
@@ -2607,7 +2615,7 @@ namespace SimulationManager {
                     }
                 }();
 
-                print(ioFiles.bnd,
+                print(state.files.bnd,
                       " Plant Loop,{},{},{},{},{},{}\n",
                       PlantLoop(Count).Name,
                       LoopString,
@@ -2617,30 +2625,30 @@ namespace SimulationManager {
                       PlantLoop(Count).LoopSide(LoopSideNum).ConnectList);
                 //  Plant Supply Side Splitter
                 if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
-                    print(ioFiles.bnd,
+                    print(state.files.bnd,
                           "   Plant Loop Connector,Splitter,{},{},{},{}\n",
                           PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
                           PlantLoop(Count).Name,
                           LoopString,
                           PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes);
                     for (int Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
-                        print(ioFiles.bnd,
+                        print(state.files.bnd,
                               "     Plant Loop Connector Branches,{},Splitter,{},",
                               Count1,
                               PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name);
 
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn <= 0) {
-                            print(ioFiles.bnd, "{},", errstring);
+                            print(state.files.bnd, "{},", errstring);
                         } else {
-                            print(ioFiles.bnd,
+                            print(state.files.bnd,
                                   "{},",
                                   PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn).Name);
                         }
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
-                            print(ioFiles.bnd, "{},{},{}\n", errstring, PlantLoop(Count).Name, LoopString);
+                            print(state.files.bnd, "{},{},{}\n", errstring, PlantLoop(Count).Name, LoopString);
                         } else {
 
-                            print(ioFiles.bnd,
+                            print(state.files.bnd,
                                   "{},{},{}\n",
                                   PlantLoop(Count)
                                       .LoopSide(LoopSideNum)
@@ -2650,7 +2658,7 @@ namespace SimulationManager {
                                   LoopString);
                         }
 
-                        print(ioFiles.bnd,
+                        print(state.files.bnd,
                               "     Plant Loop Connector Nodes,   {},Splitter,{},{},{},{},{}\n",
                               Count1,
                               PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
@@ -2664,7 +2672,7 @@ namespace SimulationManager {
                 //  Plant Supply Side Mixer
                 if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
                     const auto totalInletNodes = PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
-                    print(ioFiles.bnd,
+                    print(state.files.bnd,
                           "   Plant Loop Connector,Mixer,{},{},{},{}\n",
                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
                           PlantLoop(Count).Name,
@@ -2672,29 +2680,29 @@ namespace SimulationManager {
                           totalInletNodes); //',Supply,'//  &
 
                     for (int Count1 = 1; Count1 <= totalInletNodes; ++Count1) {
-                        print(ioFiles.bnd,
+                        print(state.files.bnd,
                               "     Plant Loop Connector Branches,{},Mixer,{},",
                               Count1,
                               PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name);
 
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
-                            print(ioFiles.bnd, "{},", errstring);
+                            print(state.files.bnd, "{},", errstring);
                         } else {
                             print(
-                                ioFiles.bnd,
+                                state.files.bnd,
                                 "{},",
                                 PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1)).Name);
                         }
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
-                            print(ioFiles.bnd, "{},{},{}\n", errstring, PlantLoop(Count).Name, LoopString);
+                            print(state.files.bnd, "{},{},{}\n", errstring, PlantLoop(Count).Name, LoopString);
                         } else {
-                            print(ioFiles.bnd,
+                            print(state.files.bnd,
                                   "{},{},{}\n",
                                   PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut).Name,
                                   PlantLoop(Count).Name,
                                   LoopString);
                         }
-                        print(ioFiles.bnd,
+                        print(state.files.bnd,
                               "     Plant Loop Connector Nodes,   {},Mixer,{},{},{},{},{}\n",
                               Count1,
                               PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
@@ -2705,12 +2713,12 @@ namespace SimulationManager {
                     }
                 }
             }
-            print(ioFiles.bnd,
+            print(state.files.bnd,
                   " Plant Loop Supply Connection,{},{},{}\n",
                   PlantLoop(Count).Name,
                   PlantLoop(Count).LoopSide(SupplySide).NodeNameOut,
                   PlantLoop(Count).LoopSide(DemandSide).NodeNameIn);
-            print(ioFiles.bnd,
+            print(state.files.bnd,
                   " Plant Loop Return Connection,{},{},{}\n",
                   PlantLoop(Count).Name,
                   PlantLoop(Count).LoopSide(DemandSide).NodeNameOut,
@@ -2718,7 +2726,7 @@ namespace SimulationManager {
 
         } //  Plant Demand Side Loop
 
-        print(ioFiles.bnd, "{}\n", "! ===============================================================");
+        print(state.files.bnd, "{}\n", "! ===============================================================");
         int NumOfControlledZones = 0;
         for (int Count = 1; Count <= NumOfZones; ++Count) {
             if (!allocated(ZoneEquipConfig)) continue;
@@ -2726,22 +2734,22 @@ namespace SimulationManager {
         }
 
         if (NumOfControlledZones > 0) {
-            print(ioFiles.bnd, "{}\n", "! <# Controlled Zones>,<Number of Controlled Zones>");
-            print(ioFiles.bnd, " #Controlled Zones,{}\n", NumOfControlledZones);
-            print(ioFiles.bnd,
+            print(state.files.bnd, "{}\n", "! <# Controlled Zones>,<Number of Controlled Zones>");
+            print(state.files.bnd, " #Controlled Zones,{}\n", NumOfControlledZones);
+            print(state.files.bnd,
                   "{}\n",
                   "! <Controlled Zone>,<Controlled Zone Name>,<Equip List Name>,<Control List Name>,<Zone Node Name>,<# Inlet Nodes>,<# Exhaust "
                   "Nodes>,<# Return Nodes>");
-            print(ioFiles.bnd,
+            print(state.files.bnd,
                   "{}\n",
                   "! <Controlled Zone Inlet>,<Inlet Node Count>,<Controlled Zone Name>,<Supply Air Inlet Node Name>,<SD Sys:Cooling/Heating "
                   "[DD:Cooling] Inlet Node Name>,<DD Sys:Heating Inlet Node Name>");
-            print(ioFiles.bnd, "{}\n", "! <Controlled Zone Exhaust>,<Exhaust Node Count>,<Controlled Zone Name>,<Exhaust Air Node Name>");
+            print(state.files.bnd, "{}\n", "! <Controlled Zone Exhaust>,<Exhaust Node Count>,<Controlled Zone Name>,<Exhaust Air Node Name>");
 
             for (int Count = 1; Count <= NumOfZones; ++Count) {
                 if (!ZoneEquipConfig(Count).IsControlled) continue;
 
-                print(ioFiles.bnd,
+                print(state.files.bnd,
                       " Controlled Zone,{},{},{},{},{},{},{}\n",
                       ZoneEquipConfig(Count).ZoneName,
                       ZoneEquipConfig(Count).EquipListName,
@@ -2753,7 +2761,7 @@ namespace SimulationManager {
                 for (int Count1 = 1; Count1 <= ZoneEquipConfig(Count).NumInletNodes; ++Count1) {
                     auto ChrName = NodeID(ZoneEquipConfig(Count).AirDistUnitHeat(Count1).InNode);
                     if (ChrName == "Undefined") ChrName = "N/A";
-                    print(ioFiles.bnd,
+                    print(state.files.bnd,
                           "   Controlled Zone Inlet,{},{},{},{},{}\n",
                           Count1,
                           ZoneEquipConfig(Count).ZoneName,
@@ -2762,14 +2770,14 @@ namespace SimulationManager {
                           ChrName);
                 }
                 for (int Count1 = 1; Count1 <= ZoneEquipConfig(Count).NumExhaustNodes; ++Count1) {
-                    print(ioFiles.bnd,
+                    print(state.files.bnd,
                           "   Controlled Zone Exhaust,{},{},{}\n",
                           Count1,
                           ZoneEquipConfig(Count).ZoneName,
                           NodeID(ZoneEquipConfig(Count).ExhaustNode(Count1)));
                 }
                 for (int Count1 = 1; Count1 <= ZoneEquipConfig(Count).NumReturnNodes; ++Count1) {
-                    print(ioFiles.bnd,
+                    print(state.files.bnd,
                           "   Controlled Zone Return,{},{},{}\n",
                           Count1,
                           ZoneEquipConfig(Count).ZoneName,
@@ -2778,18 +2786,18 @@ namespace SimulationManager {
             }
 
             // Report Zone Equipment Lists to BND File
-            print(ioFiles.bnd, "{}\n", "! ===============================================================");
-            print(ioFiles.bnd, "{}\n", Format_720);
-            print(ioFiles.bnd, " #Zone Equipment Lists,{}\n", NumOfControlledZones);
-            print(ioFiles.bnd, "{}\n", Format_722);
-            print(ioFiles.bnd, "{}\n", Format_723);
+            print(state.files.bnd, "{}\n", "! ===============================================================");
+            print(state.files.bnd, "{}\n", Format_720);
+            print(state.files.bnd, " #Zone Equipment Lists,{}\n", NumOfControlledZones);
+            print(state.files.bnd, "{}\n", Format_722);
+            print(state.files.bnd, "{}\n", Format_723);
 
             for (int Count = 1; Count <= NumOfZones; ++Count) {
                 // Zone equipment list array parallels controlled zone equipment array, so
                 // same index finds corresponding data from both arrays
                 if (!ZoneEquipConfig(Count).IsControlled) continue;
 
-                print(ioFiles.bnd,
+                print(state.files.bnd,
                       " Zone Equipment List,{},{},{},{}\n",
                       Count,
                       ZoneEquipList(Count).Name,
@@ -2797,7 +2805,7 @@ namespace SimulationManager {
                       ZoneEquipList(Count).NumOfEquipTypes);
 
                 for (int Count1 = 1; Count1 <= ZoneEquipList(Count).NumOfEquipTypes; ++Count1) {
-                    print(ioFiles.bnd,
+                    print(state.files.bnd,
                           "   Zone Equipment Component,{},{},{},{},{},{}\n",
                           Count1,
                           ZoneEquipList(Count).EquipType(Count1),
@@ -2810,7 +2818,7 @@ namespace SimulationManager {
         }
 
         // Report Dual Duct Dampers to BND File
-        ReportDualDuctConnections(state, ioFiles);
+        ReportDualDuctConnections(state);
 
         if (NumNodeConnectionErrors == 0) {
             ShowMessage("No node connection errors were found.");
@@ -2825,7 +2833,7 @@ namespace SimulationManager {
         AskForConnectionsReport = false;
     }
 
-    void ReportParentChildren(IOFiles &ioFiles)
+    void ReportParentChildren(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2876,7 +2884,7 @@ namespace SimulationManager {
         bool ErrorsFound;
 
         ErrorsFound = false;
-        print(ioFiles.debug, "{}\n", "Node Type,CompSet Name,Inlet Node,OutletNode");
+        print(state.files.debug, "{}\n", "Node Type,CompSet Name,Inlet Node,OutletNode");
         for (Loop = 1; Loop <= NumOfActualParents; ++Loop) {
             NumChildren = GetNumChildren(ParentNodeList(Loop).CType, ParentNodeList(Loop).CName);
             if (NumChildren > 0) {
@@ -2902,16 +2910,16 @@ namespace SimulationManager {
                                 ChildOutNodeName,
                                 ChildOutNodeNum,
                                 ErrorsFound);
-                if (Loop > 1) print(ioFiles.debug, "{}\n", std::string(60, '='));
+                if (Loop > 1) print(state.files.debug, "{}\n", std::string(60, '='));
 
-                print(ioFiles.debug,
+                print(state.files.debug,
                       " Parent Node,{}:{},{},{}\n",
                       ParentNodeList(Loop).CType,
                       ParentNodeList(Loop).CName,
                       ParentNodeList(Loop).InletNodeName,
                       ParentNodeList(Loop).OutletNodeName);
                 for (Loop1 = 1; Loop1 <= NumChildren; ++Loop1) {
-                    print(ioFiles.debug,
+                    print(state.files.debug,
                           "..ChildNode,{}:{},{},{}\n",
                           ChildCType(Loop1),
                           ChildCName(Loop1),
@@ -2925,8 +2933,8 @@ namespace SimulationManager {
                 ChildInNodeNum.deallocate();
                 ChildOutNodeNum.deallocate();
             } else {
-                if (Loop > 1) print(ioFiles.debug, "{}\n", std::string(60, '='));
-                print(ioFiles.debug,
+                if (Loop > 1) print(state.files.debug, "{}\n", std::string(60, '='));
+                print(state.files.debug,
                       " Parent Node (no children),{}:{},{},{}\n",
                       ParentNodeList(Loop).CType,
                       ParentNodeList(Loop).CName,
@@ -2936,7 +2944,7 @@ namespace SimulationManager {
         }
     }
 
-    void ReportCompSetMeterVariables(IOFiles &ioFiles)
+    void ReportCompSetMeterVariables(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2985,12 +2993,12 @@ namespace SimulationManager {
         Array1D_string EndUses;
         Array1D_string Groups;
 
-        print(ioFiles.debug, "{}\n", " CompSet,ComponentType,ComponentName,NumMeteredVariables");
-        print(ioFiles.debug, "{}\n", " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType");
+        print(state.files.debug, "{}\n", " CompSet,ComponentType,ComponentName,NumMeteredVariables");
+        print(state.files.debug, "{}\n", " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType");
 
         for (Loop = 1; Loop <= NumCompSets; ++Loop) {
             NumVariables = GetNumMeteredVariables(CompSets(Loop).CType, CompSets(Loop).CName);
-            print(ioFiles.debug, "CompSet, {}, {}, {:5}\n", CompSets(Loop).CType, CompSets(Loop).CName, NumVariables);
+            print(state.files.debug, "CompSet, {}, {}, {:5}\n", CompSets(Loop).CType, CompSets(Loop).CName, NumVariables);
             if (NumVariables <= 0) continue;
             VarIndexes.dimension(NumVariables, 0);
             VarIDs.dimension(NumVariables, 0);
@@ -3013,7 +3021,7 @@ namespace SimulationManager {
                                 VarNames,
                                 VarIDs);
             for (Loop1 = 1; Loop1 <= NumVariables; ++Loop1) {
-                print(ioFiles.debug,
+                print(state.files.debug,
                       "RepVar,{:5},{:5},{},[{}],{},{},{},{:5}\n",
                       VarIndexes(Loop1),
                       VarIDs(Loop1),
@@ -3038,7 +3046,7 @@ namespace SimulationManager {
         }
     }
 
-    void PostIPProcessing()
+    void PostIPProcessing(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -3057,16 +3065,16 @@ namespace SimulationManager {
 
         DoingInputProcessing = false;
 
-        inputProcessor->preProcessorCheck(PreP_Fatal); // Check Preprocessor objects for warning, severe, etc errors.
+        inputProcessor->preProcessorCheck(state, PreP_Fatal); // Check Preprocessor objects for warning, severe, etc errors.
 
         if (PreP_Fatal) {
             ShowFatalError("Preprocessor condition(s) cause termination.");
         }
 
         // Set up more globals - process fluid input.
-        FluidIndex_Water = FindGlycol("Water");
-        FluidIndex_EthyleneGlycol = FindGlycol("EthyleneGlycol");
-        FluidIndex_PropoleneGlycol = FindGlycol("PropoleneGlycol");
+        FluidIndex_Water = FindGlycol(state, "Water");
+        FluidIndex_EthyleneGlycol = FindGlycol(state, "EthyleneGlycol");
+        FluidIndex_PropoleneGlycol = FindGlycol(state, "PropoleneGlycol");
 
         inputProcessor->preScanReportingVariables();
     }
@@ -3168,7 +3176,7 @@ void Resimulate(EnergyPlusData &state,
     if (ResimHB) {
         // Surface simulation
         InitSurfaceHeatBalance(state);
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.files);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
         // Air simulation

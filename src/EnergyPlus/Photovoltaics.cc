@@ -55,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -142,7 +143,8 @@ namespace Photovoltaics {
         firstTime = true;
     }
 
-    void SimPVGenerator(int const EP_UNUSED(GeneratorType), // type of Generator !unused1208
+    void SimPVGenerator(EnergyPlusData &state,
+                        int const EP_UNUSED(GeneratorType), // type of Generator !unused1208
                         std::string const &GeneratorName,   // user specified name of Generator
                         int &GeneratorIndex,
                         bool const RunFlag,            // is PV ON or OFF as determined by schedules in ElecLoadCenter
@@ -169,7 +171,7 @@ namespace Photovoltaics {
 
         // Get PV data from input file
         if (GetInputFlag) {
-            GetPVInput(); // for all three types of models
+            GetPVInput(state); // for all three types of models
             GetInputFlag = false;
         }
 
@@ -276,7 +278,7 @@ namespace Photovoltaics {
 
     // *************
 
-    void GetPVInput()
+    void GetPVInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -335,7 +337,8 @@ namespace Photovoltaics {
 
         cCurrentModuleObject = cPVGeneratorObjectName;
         for (PVnum = 1; PVnum <= NumPVs; ++PVnum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           PVnum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -475,7 +478,8 @@ namespace Photovoltaics {
             tmpSimpleModuleParams.allocate(NumSimplePVModuleTypes);
             cCurrentModuleObject = cPVSimplePerfObjectName;
             for (ModNum = 1; ModNum <= NumSimplePVModuleTypes; ++ModNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               ModNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -511,7 +515,7 @@ namespace Photovoltaics {
                 }
                 tmpSimpleModuleParams(ModNum).PVEfficiency = rNumericArgs(2);
 
-                tmpSimpleModuleParams(ModNum).EffSchedPtr = GetScheduleIndex(cAlphaArgs(3));
+                tmpSimpleModuleParams(ModNum).EffSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if ((tmpSimpleModuleParams(ModNum).EffSchedPtr == 0) && (tmpSimpleModuleParams(ModNum).EfficencyInputMode == ScheduledEfficiency)) {
                     ShowSevereError("Invalid " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
                     ShowContinueError("Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
@@ -525,7 +529,8 @@ namespace Photovoltaics {
             tmpTNRSYSModuleParams.allocate(Num1DiodePVModuleTypes);
             cCurrentModuleObject = cPVEquiv1DiodePerfObjectName;
             for (ModNum = 1; ModNum <= Num1DiodePVModuleTypes; ++ModNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               ModNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -584,7 +589,8 @@ namespace Photovoltaics {
             cCurrentModuleObject = cPVSandiaPerfObjectName;
             for (ModNum = 1; ModNum <= NumSNLPVModuleTypes; ++ModNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               ModNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -688,13 +694,14 @@ namespace Photovoltaics {
             }
 
             // set up report variables CurrentModuleObject='Photovoltaics'
-            SetupOutputVariable("Generator Produced DC Electricity Rate",
+            SetupOutputVariable(state,
+                                "Generator Produced DC Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 PVarray(PVnum).Report.DCPower,
                                 "System",
                                 "Average",
                                 PVarray(PVnum).Name);
-            SetupOutputVariable("Generator Produced DC Electricity Energy",
+            SetupOutputVariable(state, "Generator Produced DC Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 PVarray(PVnum).Report.DCEnergy,
                                 "System",
@@ -705,7 +712,7 @@ namespace Photovoltaics {
                                 "Photovoltaics",
                                 _,
                                 "Plant");
-            SetupOutputVariable("Generator PV Array Efficiency",
+            SetupOutputVariable(state, "Generator PV Array Efficiency",
                                 OutputProcessor::Unit::None,
                                 PVarray(PVnum).Report.ArrayEfficiency,
                                 "System",
@@ -714,19 +721,19 @@ namespace Photovoltaics {
 
             // CurrentModuleObject='Equiv1Diode or Sandia Photovoltaics'
             if ((PVarray(PVnum).PVModelType == iTRNSYSPVModel) || (PVarray(PVnum).PVModelType == iSandiaPVModel)) {
-                SetupOutputVariable("Generator PV Cell Temperature",
+                SetupOutputVariable(state, "Generator PV Cell Temperature",
                                     OutputProcessor::Unit::C,
                                     PVarray(PVnum).Report.CellTemp,
                                     "System",
                                     "Average",
                                     PVarray(PVnum).Name);
-                SetupOutputVariable("Generator PV Short Circuit Current",
+                SetupOutputVariable(state, "Generator PV Short Circuit Current",
                                     OutputProcessor::Unit::A,
                                     PVarray(PVnum).Report.ArrayIsc,
                                     "System",
                                     "Average",
                                     PVarray(PVnum).Name);
-                SetupOutputVariable("Generator PV Open Circuit Voltage",
+                SetupOutputVariable(state, "Generator PV Open Circuit Voltage",
                                     OutputProcessor::Unit::V,
                                     PVarray(PVnum).Report.ArrayVoc,
                                     "System",
@@ -748,7 +755,7 @@ namespace Photovoltaics {
             }
 
             if (PVarray(PVnum).CellIntegrationMode == iTranspiredCollectorCellIntegration) {
-                GetTranspiredCollectorIndex(PVarray(PVnum).SurfacePtr, PVarray(PVnum).UTSCPtr);
+                GetTranspiredCollectorIndex(state, PVarray(PVnum).SurfacePtr, PVarray(PVnum).UTSCPtr);
             }
 
             if (PVarray(PVnum).CellIntegrationMode == iExteriorVentedCavityCellIntegration) {

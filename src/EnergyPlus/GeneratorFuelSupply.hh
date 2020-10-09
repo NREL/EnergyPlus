@@ -52,7 +52,10 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
+
+// Forward declarations
+struct EnergyPlusData;
+
 namespace GeneratorFuelSupply {
 
     // Data
@@ -73,11 +76,11 @@ namespace GeneratorFuelSupply {
 
     void clear_state();
 
-    void GetGeneratorFuelSupplyInput(EnergyPlusData &state, IOFiles &ioFiles);
+    void GetGeneratorFuelSupplyInput(EnergyPlusData &state);
 
     //******************************************************************************
 
-    void SetupFuelConstituentData(EnergyPlus::IOFiles &ioFiles, int const FuelSupplyNum, bool &ErrorsFound);
+    void SetupFuelConstituentData(EnergyPlusData &state, int const FuelSupplyNum, bool &ErrorsFound);
 
 } // namespace GeneratorFuelSupply
 

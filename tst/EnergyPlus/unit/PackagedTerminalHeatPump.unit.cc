@@ -446,7 +446,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     UnitarySystems::designSpecMSHP.push_back(fakeDesignSpecMSHP);
 
     bool ErrorsFound(false);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     GetZoneEquipmentData(state);
     GetPTUnit(state);
 
@@ -795,11 +795,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.files); // read schedules
+    ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
@@ -1147,11 +1147,11 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.files); // read schedules
+    ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);

@@ -167,7 +167,7 @@ namespace PVWatts {
         Real64 m_outputDCEnergy;
 
     public:
-        static PVWattsGenerator createFromIdfObj(int objNum);
+        static PVWattsGenerator createFromIdfObj(EnergyPlusData &state, int objNum);
 
         PVWattsGenerator(const std::string &name,
                          const Real64 dcSystemCapacity,
@@ -180,7 +180,7 @@ namespace PVWatts {
                          size_t surfaceNum = 0,
                          Real64 groundCoverageRatio = 0.4);
 
-        void setupOutputVariables();
+        void setupOutputVariables(EnergyPlusData &state);
 
         Real64 getDCSystemCapacity();
         ModuleType getModuleType();
@@ -219,7 +219,7 @@ namespace PVWatts {
 
     extern std::map<int, PVWattsGenerator> PVWattsGenerators;
 
-    PVWattsGenerator &GetOrCreatePVWattsGenerator(std::string const &GeneratorName);
+    PVWattsGenerator &GetOrCreatePVWattsGenerator(EnergyPlusData &state, std::string const &GeneratorName);
 
     void clear_state();
 

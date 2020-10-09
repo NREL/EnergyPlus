@@ -179,7 +179,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     int DualZoneNum(1);
@@ -190,9 +190,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     DataGlobals::TimeStep = 1;                  // must initialize this to get schedules initialized
     DataGlobals::NumOfTimeStepInHour = 1;       // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;       // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files);    // read schedules
+    ScheduleManager::ProcessScheduleInput(state);    // read schedules
 
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state, state.files);
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state);
 
     ScheduleManager::Schedule(DataZoneControls::TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::DualSetPointWithDeadBand;
 

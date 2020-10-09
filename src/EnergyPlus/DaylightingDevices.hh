@@ -52,7 +52,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DaylightingDevices {
 
@@ -68,11 +70,11 @@ namespace DaylightingDevices {
 
     // Functions
 
-    void InitDaylightingDevices(IOFiles &ioFiles);
+    void InitDaylightingDevices(EnergyPlusData &state);
 
-    void GetTDDInput();
+    void GetTDDInput(EnergyPlusData &state);
 
-    void GetShelfInput();
+    void GetShelfInput(EnergyPlusData &state);
 
     Real64 CalcPipeTransBeam(Real64 const R,    // Reflectance of surface, constant (can be made R = f(theta) later)
                              Real64 const A,    // Aspect ratio, L / d

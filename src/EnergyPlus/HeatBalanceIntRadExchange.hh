@@ -58,7 +58,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 #define EP_HBIRE_SEQ
 
@@ -90,15 +92,16 @@ namespace HeatBalanceIntRadExchange {
                                      int const SurfNum              // surface number of surface being investigated
     );
 
-    void InitInteriorRadExchange(IOFiles &ioFiles);
+    void InitInteriorRadExchange(EnergyPlusData &state);
 
-    void InitSolarViewFactors(IOFiles &ioFiles);
+    void InitSolarViewFactors(EnergyPlusData &state);
 
     void AlignInputViewFactors(std::string const &cCurrentModuleObject, // Object type
                                bool &ErrorsFound                        // True when errors are found
     );
 
-    void GetInputViewFactors(std::string const &EnclosureName, // Needed to check for user input view factors.
+    void GetInputViewFactors(EnergyPlusData &state,
+                             std::string const &EnclosureName, // Needed to check for user input view factors.
                              int const N,                      // NUMBER OF SURFACES
                              Array2A<Real64> F,                // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
                              const Array1D_int &SPtr,          // pointer to actual surface number
@@ -106,7 +109,8 @@ namespace HeatBalanceIntRadExchange {
                              bool &ErrorsFound                 // True when errors are found in number of fields vs max args
     );
 
-    void GetInputViewFactorsbyName(std::string const &ZoneName, // Needed to check for user input view factors.
+    void GetInputViewFactorsbyName(EnergyPlusData &state,
+                                   std::string const &ZoneName, // Needed to check for user input view factors.
                                    int const N,                 // NUMBER OF SURFACES
                                    Array2A<Real64> F,           // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
                                    const Array1D_int &SPtr,     // pointer to actual surface number

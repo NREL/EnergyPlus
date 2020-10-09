@@ -218,7 +218,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChang
 
     // create a materials data object and assign the phase change variable based on above IDF processing
     Material::MaterialProperties material;
-    material.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory("PCMNAME");
+    material.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory(state, "PCMNAME");
 
     // create local variables to calculate and call the new worker function
     Real64 newSpecificHeat, newDensity, newThermalConductivity;

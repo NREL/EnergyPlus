@@ -53,7 +53,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 
@@ -90,7 +89,7 @@ namespace EMSManager {
     // Functions
     void clear_state();
 
-    void CheckIfAnyEMS(IOFiles &ioFiles);
+    void CheckIfAnyEMS(EnergyPlusData &state);
 
     // MODULE SUBROUTINES:
 
@@ -100,19 +99,19 @@ namespace EMSManager {
                    Optional_int_const ProgramManagerToRun = _ // specific program manager to run
     );
 
-    void InitEMS(EnergyPlusData &state, IOFiles &ioFiles, int const iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
+    void InitEMS(EnergyPlusData &state, int const iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
 
     void ReportEMS();
 
-    void GetEMSInput(EnergyPlusData &state, IOFiles &ioFiles);
+    void GetEMSInput(EnergyPlusData &state);
 
-    void ProcessEMSInput(bool const reportErrors); // .  If true, then report out errors ,otherwise setup what we can
+    void ProcessEMSInput(EnergyPlusData &state, bool const reportErrors); // .  If true, then report out errors ,otherwise setup what we can
 
-    void GetVariableTypeAndIndex(std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex);
+    void GetVariableTypeAndIndex(EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex);
 
-    void EchoOutActuatorKeyChoices(IOFiles &ioFiles);
+    void EchoOutActuatorKeyChoices(EnergyPlusData &state);
 
-    void EchoOutInternalVariableChoices(IOFiles &ioFiles);
+    void EchoOutInternalVariableChoices(EnergyPlusData &state);
 
     void SetupNodeSetPointsAsActuators();
 

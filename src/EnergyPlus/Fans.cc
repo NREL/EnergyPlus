@@ -388,7 +388,8 @@ namespace Fans {
         for (SimpFanNum = 1; SimpFanNum <= NumSimpFan; ++SimpFanNum) {
             FanNum = SimpFanNum;
             cCurrentModuleObject = "Fan:ConstantVolume";
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           SimpFanNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -411,7 +412,7 @@ namespace Fans {
             if (lAlphaFieldBlanks(2)) {
                 Fan(FanNum).AvailSchedPtrNum = ScheduleAlwaysOn;
             } else {
-                Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(cAlphaArgs(2));
+                Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -432,9 +433,9 @@ namespace Fans {
             Fan(FanNum).MotInAirFrac = rNumericArgs(5);
             Fan(FanNum).MinAirFlowRate = 0.0;
 
-            Fan(FanNum).InletNodeNum = GetOnlySingleNode(
+            Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            Fan(FanNum).OutletNodeNum = GetOnlySingleNode(
+            Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             if (NumAlphas > 4) {
@@ -450,7 +451,8 @@ namespace Fans {
         for (VarVolFanNum = 1; VarVolFanNum <= NumVarVolFan; ++VarVolFanNum) {
             FanNum = NumSimpFan + VarVolFanNum;
             cCurrentModuleObject = "Fan:VariableVolume";
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           VarVolFanNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -473,7 +475,7 @@ namespace Fans {
             if (lAlphaFieldBlanks(2)) {
                 Fan(FanNum).AvailSchedPtrNum = ScheduleAlwaysOn;
             } else {
-                Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(cAlphaArgs(2));
+                Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -514,9 +516,9 @@ namespace Fans {
                 ShowWarningError("Fan Coefficients are all zero.  No Fan power will be reported.");
                 ShowContinueError("For " + cCurrentModuleObject + ", Fan=" + cAlphaArgs(1));
             }
-            Fan(FanNum).InletNodeNum = GetOnlySingleNode(
+            Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            Fan(FanNum).OutletNodeNum = GetOnlySingleNode(
+            Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             if (NumAlphas > 5) {
@@ -532,7 +534,8 @@ namespace Fans {
         for (ExhFanNum = 1; ExhFanNum <= NumZoneExhFan; ++ExhFanNum) {
             FanNum = NumSimpFan + NumVarVolFan + ExhFanNum;
             cCurrentModuleObject = "Fan:ZoneExhaust";
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           ExhFanNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -555,7 +558,7 @@ namespace Fans {
             if (lAlphaFieldBlanks(2)) {
                 Fan(FanNum).AvailSchedPtrNum = ScheduleAlwaysOn;
             } else {
-                Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(cAlphaArgs(2));
+                Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -584,9 +587,9 @@ namespace Fans {
                                  "\" has specified 0.0 max air flow rate. It will not be used in the simulation.");
             }
 
-            Fan(FanNum).InletNodeNum = GetOnlySingleNode(
+            Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            Fan(FanNum).OutletNodeNum = GetOnlySingleNode(
+            Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             if (NumAlphas > 4 && !lAlphaFieldBlanks(5)) {
@@ -596,7 +599,7 @@ namespace Fans {
             }
 
             if (NumAlphas > 5 && !lAlphaFieldBlanks(6)) {
-                Fan(FanNum).FlowFractSchedNum = GetScheduleIndex(cAlphaArgs(6));
+                Fan(FanNum).FlowFractSchedNum = GetScheduleIndex(state, cAlphaArgs(6));
                 if (Fan(FanNum).FlowFractSchedNum == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6) + " entered =" + cAlphaArgs(6) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -632,7 +635,7 @@ namespace Fans {
             }
 
             if (NumAlphas > 7 && !lAlphaFieldBlanks(8)) {
-                Fan(FanNum).MinTempLimitSchedNum = GetScheduleIndex(cAlphaArgs(8));
+                Fan(FanNum).MinTempLimitSchedNum = GetScheduleIndex(state, cAlphaArgs(8));
                 if (Fan(FanNum).MinTempLimitSchedNum == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(8) + " entered =" + cAlphaArgs(8) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -643,7 +646,7 @@ namespace Fans {
             }
 
             if (NumAlphas > 8 && !lAlphaFieldBlanks(9)) {
-                Fan(FanNum).BalancedFractSchedNum = GetScheduleIndex(cAlphaArgs(9));
+                Fan(FanNum).BalancedFractSchedNum = GetScheduleIndex(state, cAlphaArgs(9));
                 if (Fan(FanNum).BalancedFractSchedNum == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " entered =" + cAlphaArgs(9) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -669,7 +672,8 @@ namespace Fans {
         for (OnOffFanNum = 1; OnOffFanNum <= NumOnOff; ++OnOffFanNum) {
             FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + OnOffFanNum;
             cCurrentModuleObject = "Fan:OnOff";
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           OnOffFanNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -692,7 +696,7 @@ namespace Fans {
             if (lAlphaFieldBlanks(2)) {
                 Fan(FanNum).AvailSchedPtrNum = ScheduleAlwaysOn;
             } else {
-                Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(cAlphaArgs(2));
+                Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -718,9 +722,9 @@ namespace Fans {
             Fan(FanNum).MotInAirFrac = rNumericArgs(5);
             Fan(FanNum).MinAirFlowRate = 0.0;
 
-            Fan(FanNum).InletNodeNum = GetOnlySingleNode(
+            Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            Fan(FanNum).OutletNodeNum = GetOnlySingleNode(
+            Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             if (NumAlphas > 4 && !lAlphaFieldBlanks(5)) {
@@ -758,7 +762,8 @@ namespace Fans {
         }
         // input the night ventilation performance objects
         for (NVPerfNum = 1; NVPerfNum <= state.dataFans->NumNightVentPerf; ++NVPerfNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           NVPerfNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -796,7 +801,8 @@ namespace Fans {
             FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + NumOnOff + CompModelFanNum;
 
             cCurrentModuleObject = "Fan:ComponentModel";
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           CompModelFanNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -816,7 +822,7 @@ namespace Fans {
             Fan(FanNum).FanName = cAlphaArgs(1); // Fan name
             Fan(FanNum).FanType = cCurrentModuleObject;
 
-            Fan(FanNum).InletNodeNum = GetOnlySingleNode(cAlphaArgs(2),
+            Fan(FanNum).InletNodeNum = GetOnlySingleNode(state, cAlphaArgs(2),
                                                          ErrorsFound,
                                                          cCurrentModuleObject,
                                                          cAlphaArgs(1),
@@ -824,7 +830,7 @@ namespace Fans {
                                                          NodeConnectionType_Inlet,
                                                          1,
                                                          ObjectIsNotParent); // Air inlet node name
-            Fan(FanNum).OutletNodeNum = GetOnlySingleNode(cAlphaArgs(3),
+            Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state, cAlphaArgs(3),
                                                           ErrorsFound,
                                                           cCurrentModuleObject,
                                                           cAlphaArgs(1),
@@ -839,7 +845,7 @@ namespace Fans {
             if (lAlphaFieldBlanks(4)) {
                 Fan(FanNum).AvailSchedPtrNum = 0;
             } else {
-                Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(cAlphaArgs(4));
+                Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(4));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(4) + " entered =" + cAlphaArgs(4) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -929,12 +935,12 @@ namespace Fans {
 
         for (FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
             // Setup Report variables for the Fans  CurrentModuleObject='Fans'
-            SetupOutputVariable("Fan Electricity Rate", OutputProcessor::Unit::W, Fan(FanNum).FanPower, "System", "Average", Fan(FanNum).FanName);
-            SetupOutputVariable(
+            SetupOutputVariable(state, "Fan Electricity Rate", OutputProcessor::Unit::W, Fan(FanNum).FanPower, "System", "Average", Fan(FanNum).FanName);
+            SetupOutputVariable(state,
                 "Fan Rise in Air Temperature", OutputProcessor::Unit::deltaC, Fan(FanNum).DeltaTemp, "System", "Average", Fan(FanNum).FanName);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Fan Heat Gain to Air", OutputProcessor::Unit::W, Fan(FanNum).PowerLossToAir, "System", "Average", Fan(FanNum).FanName);
-            SetupOutputVariable("Fan Electricity Energy",
+            SetupOutputVariable(state, "Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 Fan(FanNum).FanEnergy,
                                 "System",
@@ -945,16 +951,16 @@ namespace Fans {
                                 "Fans",
                                 Fan(FanNum).EndUseSubcategoryName,
                                 "System");
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Fan Air Mass Flow Rate", OutputProcessor::Unit::kg_s, Fan(FanNum).OutletAirMassFlowRate, "System", "Average", Fan(FanNum).FanName);
             if ((Fan(FanNum).FanType_Num == FanType_ZoneExhaust) && (Fan(FanNum).BalancedFractSchedNum > 0)) {
-                SetupOutputVariable("Fan Unbalanced Air Mass Flow Rate",
+                SetupOutputVariable(state, "Fan Unbalanced Air Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     Fan(FanNum).UnbalancedOutletMassFlowRate,
                                     "System",
                                     "Average",
                                     Fan(FanNum).FanName);
-                SetupOutputVariable("Fan Balanced Air Mass Flow Rate",
+                SetupOutputVariable(state, "Fan Balanced Air Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     Fan(FanNum).BalancedOutletMassFlowRate,
                                     "System",
@@ -989,7 +995,7 @@ namespace Fans {
 
         for (OnOffFanNum = 1; OnOffFanNum <= NumOnOff; ++OnOffFanNum) {
             FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + OnOffFanNum;
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Fan Runtime Fraction", OutputProcessor::Unit::None, Fan(FanNum).FanRuntimeFraction, "System", "Average", Fan(FanNum).FanName);
         }
 

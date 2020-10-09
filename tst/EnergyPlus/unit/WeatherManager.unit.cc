@@ -129,23 +129,23 @@ TEST_F(EnergyPlusFixture, SkyTempTest)
     TomorrowSkyTemp = 0.0;
 
     // Febuary 27
-    ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 58, 3);
+    ScheduleManager::GetScheduleValuesForDay(state, 1, TomorrowSkyTemp, 58, 3);
     EXPECT_NEAR(2.27, TomorrowSkyTemp(1, 1), .001);
 
     // Febuary 28
-    ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 59, 4);
+    ScheduleManager::GetScheduleValuesForDay(state, 1, TomorrowSkyTemp, 59, 4);
     EXPECT_NEAR(2.28, TomorrowSkyTemp(1, 1), .001);
 
     // March 1
-    ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 60, 5);
+    ScheduleManager::GetScheduleValuesForDay(state, 1, TomorrowSkyTemp, 60, 5);
     EXPECT_NEAR(3.01, TomorrowSkyTemp(1, 1), .001);
 
     // Not March 2, this "Day" is ignored unless its a leap year, otherwise same data as March 1
-    ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 61, 6);
+    ScheduleManager::GetScheduleValuesForDay(state, 1, TomorrowSkyTemp, 61, 6);
     EXPECT_NEAR(3.01, TomorrowSkyTemp(1, 1), .001);
 
     // March 2
-    ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 62, 6);
+    ScheduleManager::GetScheduleValuesForDay(state, 1, TomorrowSkyTemp, 62, 6);
     EXPECT_NEAR(3.02, TomorrowSkyTemp(1, 1), .001);
 }
 
@@ -317,7 +317,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(state.files, errorsFound);
+    SurfaceGeometry::GetOSCMData(state, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -341,7 +341,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(state.files, errorsFound);
+    SurfaceGeometry::GetOSCMData(state, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -494,7 +494,7 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
     state.dataWeatherManager->OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
 
     // report water mains parameters to eio file
-    WeatherManager::ReportWaterMainsTempParameters(state, state.files);
+    WeatherManager::ReportWaterMainsTempParameters(state);
 
     std::string const eiooutput = delimited_string({"! <Site Water Mains Temperature Information>,"
                                                     "Calculation Method{},"
@@ -741,7 +741,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::OpenOutputFiles(state.files);
+    SimulationManager::OpenOutputFiles(state);
     // reset eio stream
     has_eio_output(true);
 
@@ -764,7 +764,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     WeatherManager::GetDesignDayData(state, DataEnvironment::TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    WeatherManager::SetUpDesignDay(state, state.files, 1);
+    WeatherManager::SetUpDesignDay(state, 1);
     EXPECT_EQ(state.dataWeatherManager->DesDayInput(1).HumIndType, DDHumIndType::Enthalpy);
     EXPECT_EQ(state.dataWeatherManager->DesDayInput(1).HumIndValue, 90500.0);
 
@@ -791,10 +791,10 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, false));
 
-    OutputReportTabular::WriteEioTables(state, state.files);
+    OutputReportTabular::WriteEioTables(state);
 
     // Close output files *after* the EIO has been written to
-    SimulationManager::CloseOutputFiles(state.files);
+    SimulationManager::CloseOutputFiles(state);
 
     EnergyPlus::sqlite->sqliteCommit();
 
@@ -1018,7 +1018,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
 
     AllocateWeatherData(state);
     OpenWeatherFile(state, ErrorsFound);
-    ReadWeatherForDay(state, state.files, 0, 1, false);
+    ReadWeatherForDay(state, 0, 1, false);
 
     Real64 expected_IRHorizSky = 345.73838855245953;
     EXPECT_NEAR(state.dataWeatherManager->TomorrowHorizIRSky(1, 1), expected_IRHorizSky, 0.001);
@@ -1071,7 +1071,7 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::PostIPProcessing();
+    SimulationManager::PostIPProcessing(state);
     bool ErrorsFound(false);
     ErrorsFound = false;
 
@@ -1114,7 +1114,7 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
 
     AllocateWeatherData(state);
     OpenWeatherFile(state, ErrorsFound);
-    ReadWeatherForDay(state, state.files, 1, 1, true);
+    ReadWeatherForDay(state, 1, 1, true);
 
     // Test the feature of interpolating some weather inputs to calc sky temp
     Real64 expected_SkyTemp = -20.8188538296;

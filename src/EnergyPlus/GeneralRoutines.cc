@@ -901,7 +901,8 @@ void CheckThisZoneForSizing(int const ZoneNum, // zone index to be checked
     }
 }
 
-void ValidateComponent(std::string const &CompType,  // Component Type (e.g. Chiller:Electric)
+void ValidateComponent(EnergyPlusData &state,
+                       std::string const &CompType,  // Component Type (e.g. Chiller:Electric)
                        std::string const &CompName,  // Component Name (e.g. Big Chiller)
                        bool &IsNotOK,                // .TRUE. if this component pair is invalid
                        std::string const &CallString // Context of this pair -- for error message
@@ -931,7 +932,7 @@ void ValidateComponent(std::string const &CompType,  // Component Type (e.g. Chi
 
     IsNotOK = false;
 
-    ItemNum = inputProcessor->getObjectItemNum(CompType, CompName);
+    ItemNum = inputProcessor->getObjectItemNum(state, CompType, CompName);
 
     if (ItemNum < 0) {
         ShowSevereError("During " + CallString + " Input, Invalid Component Type input=" + CompType);
@@ -944,7 +945,8 @@ void ValidateComponent(std::string const &CompType,  // Component Type (e.g. Chi
     }
 }
 
-void ValidateComponent(std::string const &CompType,    // Component Type (e.g. Chiller:Electric)
+void ValidateComponent(EnergyPlusData &state,
+                       std::string const &CompType,    // Component Type (e.g. Chiller:Electric)
                        std::string const &CompValType, // Component "name" field type
                        std::string const &CompName,    // Component Name (e.g. Big Chiller)
                        bool &IsNotOK,                  // .TRUE. if this component pair is invalid
@@ -975,7 +977,7 @@ void ValidateComponent(std::string const &CompType,    // Component Type (e.g. C
 
     IsNotOK = false;
 
-    ItemNum = inputProcessor->getObjectItemNum(CompType, CompValType, CompName);
+    ItemNum = inputProcessor->getObjectItemNum(state, CompType, CompValType, CompName);
 
     if (ItemNum < 0) {
         ShowSevereError("During " + CallString + " Input, Invalid Component Type input=" + CompType);
@@ -989,11 +991,10 @@ void ValidateComponent(std::string const &CompType,    // Component Type (e.g. C
 }
 
 void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
-                                  IOFiles &ioFiles,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,         // Area available for venting the gap [m2]
-                                  Real64 const Cv,               // Oriface coefficient for volume-based discharge, wind-driven [--]
-                                  Real64 const Cd,               // oriface coefficient for discharge,  bouyancy-driven [--]
+                                  Real64 const Cv,               // Orifice coefficient for volume-based discharge, wind-driven [--]
+                                  Real64 const Cd,               // Orifice coefficient for discharge,  bouyancy-driven [--]
                                   Real64 const HdeltaNPL,        // Height difference from neutral pressure level [m]
                                   Real64 const SolAbs,           // solar absorptivity of baffle [--]
                                   Real64 const AbsExt,           // thermal absorptance/emittance of baffle material [--]
@@ -1151,8 +1152,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         // Initializations for this surface
         HMovInsul = 0.0;
         LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
-        InitExteriorConvectionCoeff(state, ioFiles,
-            SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
+        InitExteriorConvectionCoeff(state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = Surface(SurfPtr).Construction;
         AbsThermSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
         TsoK = TH(1, 1, SurfPtr) + KelvinConv;
@@ -1429,7 +1429,7 @@ void CalcBasinHeaterPower(Real64 const Capacity,     // Basin heater capacity pe
     }
 }
 
-void TestAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound)
+void TestAirPathIntegrity(EnergyPlusData &state,  bool &ErrFound)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1485,9 +1485,9 @@ void TestAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFoun
     ValRetAPaths = 0;
     ValSupAPaths = 0;
 
-    TestSupplyAirPathIntegrity(state, ioFiles, errFlag);
+    TestSupplyAirPathIntegrity(state, errFlag);
     if (errFlag) ErrFound = true;
-    TestReturnAirPathIntegrity(state, ioFiles, errFlag, ValRetAPaths);
+    TestReturnAirPathIntegrity(state, errFlag, ValRetAPaths);
     if (errFlag) ErrFound = true;
 
     // Final tests, look for duplicate nodes
@@ -1523,7 +1523,7 @@ void TestAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFoun
     ValSupAPaths.deallocate();
 }
 
-void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound)
+void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1561,21 +1561,21 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
     ShowMessage("Testing Individual Supply Air Path Integrity");
     ErrFound = false;
 
-    print(ioFiles.bnd, "{}\n", "! ===============================================================");
+    print(state.files.bnd, "{}\n", "! ===============================================================");
     static constexpr auto Format_700("! <#Supply Air Paths>,<Number of Supply Air Paths>");
-    print(ioFiles.bnd, "{}\n", Format_700);
-    print(ioFiles.bnd, " #Supply Air Paths,{}\n", NumSupplyAirPaths);
+    print(state.files.bnd, "{}\n", Format_700);
+    print(state.files.bnd, " #Supply Air Paths,{}\n", NumSupplyAirPaths);
     static constexpr auto Format_702("! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>");
-    print(ioFiles.bnd, "{}\n", Format_702);
+    print(state.files.bnd, "{}\n", Format_702);
     static constexpr auto Format_703("! <#Components on Supply Air Path>,<Number of Components>");
-    print(ioFiles.bnd, "{}\n", Format_703);
+    print(state.files.bnd, "{}\n", Format_703);
     static constexpr auto Format_704("! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>");
-    print(ioFiles.bnd, "{}\n", Format_704);
+    print(state.files.bnd, "{}\n", Format_704);
     static constexpr auto Format_707("! <#Outlet Nodes on Supply Air Path Component>,<Number of Nodes>");
-    print(ioFiles.bnd, "{}\n", Format_707);
+    print(state.files.bnd, "{}\n", Format_707);
     static constexpr auto Format_708("! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet "
                                      "Node Name>,<AirLoopHVAC Name>");
-    print(ioFiles.bnd, "{}\n", Format_708);
+    print(state.files.bnd, "{}\n", Format_708);
 
     for (BCount = 1; BCount <= NumSupplyAirPaths; ++BCount) {
 
@@ -1591,14 +1591,14 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
         }
         if (Found == 0) PrimaryAirLoopName = "**Unknown**";
 
-        print(ioFiles.bnd, " Supply Air Path,{},{},{}\n", BCount, SupplyAirPath(BCount).Name, PrimaryAirLoopName);
-        print(ioFiles.bnd, "   #Components on Supply Air Path,{}\n", SupplyAirPath(BCount).NumOfComponents);
+        print(state.files.bnd, " Supply Air Path,{},{},{}\n", BCount, SupplyAirPath(BCount).Name, PrimaryAirLoopName);
+        print(state.files.bnd, "   #Components on Supply Air Path,{}\n", SupplyAirPath(BCount).NumOfComponents);
 
         AirPathNodeName = NodeID(SupplyAirPath(BCount).InletNodeNum);
 
         for (Count = 1; Count <= SupplyAirPath(BCount).NumOfComponents; ++Count) {
 
-            print(ioFiles.bnd,
+            print(state.files.bnd,
                   "   Supply Air Path Component,{},{},{},{}\n",
                   Count,
                   SupplyAirPath(BCount).ComponentType(Count),
@@ -1619,9 +1619,9 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
                             ErrFound = true;
                             ++NumErr;
                         }
-                        print(ioFiles.bnd, "     #Outlet Nodes on Supply Air Path Component,{}\n", state.dataZonePlenum->ZoneSupPlenCond(Count2).NumOutletNodes);
+                        print(state.files.bnd, "     #Outlet Nodes on Supply Air Path Component,{}\n", state.dataZonePlenum->ZoneSupPlenCond(Count2).NumOutletNodes);
                         for (Count1 = 1; Count1 <= state.dataZonePlenum->ZoneSupPlenCond(Count2).NumOutletNodes; ++Count1) {
-                            print(ioFiles.bnd,
+                            print(state.files.bnd,
                                   "     Supply Air Path Component Nodes,{},{},{},{},{},{}\n",
                                   Count1,
                                   SupplyAirPath(BCount).ComponentType(Count),
@@ -1643,9 +1643,9 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
                             ErrFound = true;
                             ++NumErr;
                         }
-                        print(ioFiles.bnd, "     #Outlet Nodes on Supply Air Path Component,{}\n", SplitterCond(Count2).NumOutletNodes);
+                        print(state.files.bnd, "     #Outlet Nodes on Supply Air Path Component,{}\n", SplitterCond(Count2).NumOutletNodes);
                         for (Count1 = 1; Count1 <= SplitterCond(Count2).NumOutletNodes; ++Count1) {
-                            print(ioFiles.bnd,
+                            print(state.files.bnd,
                                   "     Supply Air Path Component Nodes,{},{},{},{},{},{}\n",
                                   Count1,
                                   SupplyAirPath(BCount).ComponentType(Count),
@@ -1666,25 +1666,25 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
 
         if (SupplyAirPath(BCount).NumNodes > 0) {
             static constexpr auto Format_705("! <#Nodes on Supply Air Path>,<Number of Nodes>");
-            print(ioFiles.bnd, "{}\n", Format_705);
+            print(state.files.bnd, "{}\n", Format_705);
             static constexpr auto Format_706("! <Supply Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>");
-            print(ioFiles.bnd, "{}\n", Format_706);
-            print(ioFiles.bnd, "#Nodes on Supply Air Path,{}\n", SupplyAirPath(BCount).NumNodes);
+            print(state.files.bnd, "{}\n", Format_706);
+            print(state.files.bnd, "#Nodes on Supply Air Path,{}\n", SupplyAirPath(BCount).NumNodes);
             for (Count2 = 1; Count2 <= SupplyAirPath(BCount).NumNodes; ++Count2) {
                 if (SupplyAirPath(BCount).NodeType(Count2) == PathInlet) {
-                    print(ioFiles.bnd,
+                    print(state.files.bnd,
                           "   Supply Air Path Node,Inlet Node,{},{},{}\n",
                           Count2,
                           NodeID(SupplyAirPath(BCount).Node(Count2)),
                           PrimaryAirLoopName);
                 } else if (SupplyAirPath(BCount).NodeType(Count2) == Intermediate) {
-                    print(ioFiles.bnd,
+                    print(state.files.bnd,
                           "   Supply Air Path Node,Through Node,{},{},{}\n",
                           Count2,
                           NodeID(SupplyAirPath(BCount).Node(Count2)),
                           PrimaryAirLoopName);
                 } else if (SupplyAirPath(BCount).NodeType(Count2) == Outlet) {
-                    print(ioFiles.bnd,
+                    print(state.files.bnd,
                           "   Supply Air Path Node,Outlet Node,{},{},{}\n",
                           Count2,
                           NodeID(SupplyAirPath(BCount).Node(Count2)),
@@ -1696,7 +1696,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
 
     if (NumSplitters == 0) {
         if (inputProcessor->getNumObjectsFound("AirLoopHVAC:ZoneSplitter") > 0) {
-            GetZoneSplitterInput();
+            GetZoneSplitterInput(state);
         }
     }
     if (state.dataZonePlenum->NumZoneSupplyPlenums == 0 && state.dataZonePlenum->NumZoneReturnPlenums == 0) {
@@ -1775,7 +1775,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
     }
 }
 
-void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound, Array2S_int ValRetAPaths)
+void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_int ValRetAPaths)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1847,21 +1847,21 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
     ErrFound = false;
     NumErr = 0;
 
-    print(ioFiles.bnd, "{}\n", "! ===============================================================");
+    print(state.files.bnd, "{}\n", "! ===============================================================");
     static constexpr auto Format_700("! <#Return Air Paths>,<Number of Return Air Paths>");
-    print(ioFiles.bnd, "{}\n", Format_700);
-    print(ioFiles.bnd, " #Return Air Paths,{}\n", NumReturnAirPaths);
+    print(state.files.bnd, "{}\n", Format_700);
+    print(state.files.bnd, " #Return Air Paths,{}\n", NumReturnAirPaths);
     static constexpr auto Format_702("! <Return Air Path>,<Return Air Path Count>,<Return Air Path Name>,<AirLoopHVAC Name>");
-    print(ioFiles.bnd, "{}\n", Format_702);
+    print(state.files.bnd, "{}\n", Format_702);
     static constexpr auto Format_703("! <#Components on Return Air Path>,<Number of Components>");
-    print(ioFiles.bnd, "{}\n", Format_703);
+    print(state.files.bnd, "{}\n", Format_703);
     static constexpr auto Format_704("! <Return Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>");
-    print(ioFiles.bnd, "{}\n", Format_704);
+    print(state.files.bnd, "{}\n", Format_704);
     static constexpr auto Format_707("! <#Inlet Nodes on Return Air Path Component>,<Number of Nodes>");
-    print(ioFiles.bnd, "{}\n", Format_707);
+    print(state.files.bnd, "{}\n", Format_707);
     static constexpr auto Format_708("! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet "
                                      "Node Name>,<AirLoopHVAC Name>");
-    print(ioFiles.bnd, "{}\n", Format_708);
+    print(state.files.bnd, "{}\n", Format_708);
 
     AllNodes.allocate(NumOfNodes);
 
@@ -1878,16 +1878,16 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
         }
         if (Found == 0) PrimaryAirLoopName = "**Unknown**";
 
-        print(ioFiles.bnd, " Return Air Path,{},{},{}\n", BCount, ReturnAirPath(BCount).Name, PrimaryAirLoopName);
+        print(state.files.bnd, " Return Air Path,{},{},{}\n", BCount, ReturnAirPath(BCount).Name, PrimaryAirLoopName);
 
         NumComp = ReturnAirPath(BCount).NumOfComponents;
-        print(ioFiles.bnd, "   #Components on Return Air Path,{}\n", NumComp);
+        print(state.files.bnd, "   #Components on Return Air Path,{}\n", NumComp);
 
         AirPathNodeName = NodeID(ReturnAirPath(BCount).OutletNodeNum);
 
         MixerCount = 0;
         for (Count = 1; Count <= NumComp; ++Count) {
-            print(ioFiles.bnd,
+            print(state.files.bnd,
                   "   Return Air Path Component,{},{},{},{}\n",
                   Count,
                   ReturnAirPath(BCount).ComponentType(Count),
@@ -1933,9 +1933,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
                                 AllNodes(CountNodes) = MixerCond(Count2).InletNode(Loop);
                             }
                         }
-                        print(ioFiles.bnd, "     #Inlet Nodes on Return Air Path Component,{}\n", MixerCond(Count2).NumInletNodes);
+                        print(state.files.bnd, "     #Inlet Nodes on Return Air Path Component,{}\n", MixerCond(Count2).NumInletNodes);
                         for (Count1 = 1; Count1 <= MixerCond(Count2).NumInletNodes; ++Count1) {
-                            print(ioFiles.bnd,
+                            print(state.files.bnd,
                                   "     Return Air Path Component Nodes,{},{},{},{},{},{}\n",
                                   Count1,
                                   ReturnAirPath(BCount).ComponentType(NumComp),
@@ -1964,9 +1964,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
                                 AllNodes(CountNodes) = state.dataZonePlenum->ZoneRetPlenCond(Count2).InletNode(Loop);
                             }
                         }
-                        print(ioFiles.bnd, "     #Inlet Nodes on Return Air Path Component,{}\n", state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInletNodes);
+                        print(state.files.bnd, "     #Inlet Nodes on Return Air Path Component,{}\n", state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInletNodes);
                         for (Count1 = 1; Count1 <= state.dataZonePlenum->ZoneRetPlenCond(Count2).NumInletNodes; ++Count1) {
-                            print(ioFiles.bnd,
+                            print(state.files.bnd,
                                   "     Return Air Path Component Nodes,{},{},{},{},{},{}\n",
                                   Count1,
                                   ReturnAirPath(BCount).ComponentType(NumComp),
@@ -2014,15 +2014,15 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
         }
         if (CountNodes > 0) {
             static constexpr auto Format_705("! <#Nodes on Return Air Path>,<Number of Nodes>");
-            print(ioFiles.bnd, "{}\n", Format_705);
+            print(state.files.bnd, "{}\n", Format_705);
             static constexpr auto Format_706("! <Return Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>");
-            print(ioFiles.bnd, "{}\n", Format_706);
-            print(ioFiles.bnd, "   #Nodes on Return Air Path,{}\n", CountNodes);
+            print(state.files.bnd, "{}\n", Format_706);
+            print(state.files.bnd, "   #Nodes on Return Air Path,{}\n", CountNodes);
             for (Count2 = 1; Count2 <= CountNodes; ++Count2) {
                 if (Count2 == 1) {
-                    print(ioFiles.bnd, "   Return Air Path Node,Outlet Node,{},{},{}\n", Count2, NodeID(AllNodes(Count2)), PrimaryAirLoopName);
+                    print(state.files.bnd, "   Return Air Path Node,Outlet Node,{},{},{}\n", Count2, NodeID(AllNodes(Count2)), PrimaryAirLoopName);
                 } else {
-                    print(ioFiles.bnd, "   Return Air Path Node,Inlet Node,{},{},{}\n", Count2, NodeID(AllNodes(Count2)), PrimaryAirLoopName);
+                    print(state.files.bnd, "   Return Air Path Node,Inlet Node,{},{},{}\n", Count2, NodeID(AllNodes(Count2)), PrimaryAirLoopName);
                 }
             }
         }
@@ -2045,7 +2045,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
 
     if (NumMixers == 0) {
         if (inputProcessor->getNumObjectsFound("AirLoopHVAC:ZoneMixer") > 0) {
-            GetZoneMixerInput();
+            GetZoneMixerInput(state);
         }
     }
     if (state.dataZonePlenum->NumZoneSupplyPlenums == 0 && state.dataZonePlenum->NumZoneReturnPlenums == 0) {
@@ -2075,7 +2075,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
                 }
             }
         }
-        if (CheckPurchasedAirForReturnPlenum(Count1)) FoundReturnPlenum(Count1) = true;
+        if (CheckPurchasedAirForReturnPlenum(state, Count1)) FoundReturnPlenum(Count1) = true;
     }
     FoundNames.deallocate();
     FoundNames.allocate(NumMixers);

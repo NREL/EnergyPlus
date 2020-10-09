@@ -149,7 +149,7 @@ TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_Unittest)
     ASSERT_TRUE(process_idf(string));
     // setup environment
     bool ErrorsFound(false);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Initialize schedule values
     DataGlobals::TimeStep = 1;
@@ -164,26 +164,26 @@ TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_Unittest)
     DataEnvironment::HolidayIndex = 0;
     DataGlobals::WarmupFlag = false;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     // Initialize zone areas and volumes - too many other things need to be set up to do these in the normal routines
     DataHeatBalance::Zone(1).FloorArea = 232.26;
     DataEnvironment::StdRhoAir = 1.225;
     DataEnvironment::OutBaroPress = 101325;
     DataHeatBalance::ZoneIntGain.allocate(1);
 
-    SizingManager::GetOARequirements();
+    SizingManager::GetOARequirements(state);
     GetOAControllerInputs(state);
     using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
     // Setup performance tables
     using namespace EnergyPlus::DataEnvironment;
     // process schedules
-    ProcessScheduleInput(state.files); // read schedules
-    UpdateScheduleValues();
+    ProcessScheduleInput(state); // read schedules
+    UpdateScheduleValues(state);
     // Get Unitary system
     GetInputZoneHybridUnitaryAirConditioners(state, ErrorsFound);
     // All to get OA requirements
-    GetOARequirements();
+    GetOARequirements(state);
 
     EXPECT_FALSE(ErrorsFound);
     // Initialize unit
@@ -398,7 +398,7 @@ TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_Unittest)
     ZoneSysEnergyDemand.allocate(NumOfZones);
     DeadBandOrSetback.allocate(NumOfZones);
 
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
     DataZoneEquipment::GetZoneEquipmentData(state);    // read zone equipment    SystemReports::ReportMaxVentilationLoads();
     DataZoneEquipment::ZoneEquipInputsFilled = true;
@@ -420,18 +420,18 @@ TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_Unittest)
     ZoneEquipList(ZoneEquipConfig(1).EquipListIndex).EquipIndex(1) = 1;
     CreateEnergyReportStructure();
 
-    SizingManager::GetOARequirements();
+    SizingManager::GetOARequirements(state);
     using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
     // Setup performance tables
     using namespace EnergyPlus::DataEnvironment;
     // process schedules
-    ProcessScheduleInput(state.files); // read schedules
-    UpdateScheduleValues();
+    ProcessScheduleInput(state); // read schedules
+    UpdateScheduleValues(state);
     // Get Unitary system
     GetInputZoneHybridUnitaryAirConditioners(state, ErrorsFound);
     // All to get OA requirements
-    GetOARequirements();
+    GetOARequirements(state);
 
     Requestedheating = -122396.255;  // Watts (Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate
     RequestedCooling = -58469.99445; // Watts (Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate
@@ -822,7 +822,7 @@ TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_CalculateCur
 
     bool ErrorsFound(false);
     GetInputZoneHybridUnitaryAirConditioners(state, ErrorsFound);
-    GetOARequirements();
+    GetOARequirements(state);
     EXPECT_FALSE(ErrorsFound);
 
     InitZoneHybridUnitaryAirConditioners(1, 1);
@@ -1222,7 +1222,7 @@ TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_ModelOperati
 
     bool ErrorsFound(false);
     GetInputZoneHybridUnitaryAirConditioners(state, ErrorsFound);
-    GetOARequirements();
+    GetOARequirements(state);
     EXPECT_FALSE(ErrorsFound);
 
     InitZoneHybridUnitaryAirConditioners(1, 2);

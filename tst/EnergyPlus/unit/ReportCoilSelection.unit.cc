@@ -115,7 +115,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     Real64 waterVdot = 0.05;
     // First with no plant sizing objects defined
     isAutoSized = false; // true if autosized
-    coilSelectionReportObj->setCoilWaterFlowNodeNums(coil1Name, coil1Type, waterVdot, isAutoSized, chWInletNodeNum, chWOutletNodeNum, loopNum);
+    coilSelectionReportObj->setCoilWaterFlowNodeNums(state, coil1Name, coil1Type, waterVdot, isAutoSized, chWInletNodeNum, chWOutletNodeNum, loopNum);
     EXPECT_EQ(-999, c1->pltSizNum);
     EXPECT_EQ(loopNum, c1->waterLoopNum);
     EXPECT_EQ(DataPlant::PlantLoop(1).Name, c1->plantLoopName);
@@ -131,7 +131,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     std::string coil2Name("Coil 2");             // user-defined name of the coil
     std::string coil2Type("Coil:Cooling:Water"); // idf input object class name of coil
     int pltSizNum = -999;
-    coilSelectionReportObj->setCoilWaterFlowPltSizNum(coil2Name, coil2Type, waterVdot, isAutoSized, pltSizNum, loopNum);
+    coilSelectionReportObj->setCoilWaterFlowPltSizNum(state, coil2Name, coil2Type, waterVdot, isAutoSized, pltSizNum, loopNum);
     auto &c2(coilSelectionReportObj->coilSelectionDataObjs[1]);
     EXPECT_EQ(-999, c2->pltSizNum);
     EXPECT_EQ(loopNum, c2->waterLoopNum);
@@ -146,7 +146,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     DataSizing::PlantSizData.allocate(1);
     DataSizing::PlantSizData(1).PlantLoopName = "Chilled Water Loop";
     isAutoSized = true; // true if autosized
-    coilSelectionReportObj->setCoilWaterFlowNodeNums(coil1Name, coil1Type, waterVdot, isAutoSized, chWInletNodeNum, chWOutletNodeNum, loopNum);
+    coilSelectionReportObj->setCoilWaterFlowNodeNums(state, coil1Name, coil1Type, waterVdot, isAutoSized, chWInletNodeNum, chWOutletNodeNum, loopNum);
     auto &c1b(coilSelectionReportObj->coilSelectionDataObjs[0]);
     EXPECT_EQ(1, c1b->pltSizNum);
     EXPECT_EQ(loopNum, c1b->waterLoopNum);
@@ -266,7 +266,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_SteamCoil)
     Real64 waterVdot = 0.05;
     // First with no plant sizing objects defined
     isAutoSized = false; // true if autosized
-    coilSelectionReportObj->setCoilWaterFlowNodeNums(coil1Name, coil1Type, waterVdot, isAutoSized, wInletNodeNum, wOutletNodeNum, loopNum);
+    coilSelectionReportObj->setCoilWaterFlowNodeNums(state, coil1Name, coil1Type, waterVdot, isAutoSized, wInletNodeNum, wOutletNodeNum, loopNum);
     EXPECT_EQ(-999, c1->pltSizNum);
     EXPECT_EQ(loopNum, c1->waterLoopNum);
     EXPECT_EQ(DataPlant::PlantLoop(1).Name, c1->plantLoopName);
@@ -281,7 +281,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_SteamCoil)
     DataSizing::PlantSizData(1).PlantLoopName = "Steam Loop";
     DataSizing::PlantSizData(1).LoopType = DataSizing::SteamLoop;
     isAutoSized = true; // true if autosized
-    coilSelectionReportObj->setCoilWaterFlowNodeNums(coil1Name, coil1Type, waterVdot, isAutoSized, wInletNodeNum, wOutletNodeNum, loopNum);
+    coilSelectionReportObj->setCoilWaterFlowNodeNums(state, coil1Name, coil1Type, waterVdot, isAutoSized, wInletNodeNum, wOutletNodeNum, loopNum);
     auto &c1b(coilSelectionReportObj->coilSelectionDataObjs[0]);
     EXPECT_EQ(1, c1b->pltSizNum);
     EXPECT_EQ(loopNum, c1b->waterLoopNum);

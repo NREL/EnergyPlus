@@ -58,6 +58,7 @@
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -68,7 +69,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceMovableInsulation.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -199,7 +199,7 @@ namespace HeatBalFiniteDiffManager {
         MaterialFD.deallocate();
     }
 
-    void ManageHeatBalFiniteDiff(IOFiles &ioFiles,
+    void ManageHeatBalFiniteDiff(EnergyPlusData &state,
                                  int const SurfNum,
                                  Real64 &TempSurfInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
                                  Real64 &TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
@@ -220,14 +220,14 @@ namespace HeatBalFiniteDiffManager {
         // Get the moisture balance input at the beginning of the simulation only
         if (GetHBFiniteDiffInputFlag) {
             // Obtains conduction FD related parameters from input file
-            GetCondFDInput(ioFiles);
+            GetCondFDInput(state);
             GetHBFiniteDiffInputFlag = false;
         }
         // Solve the zone heat & moisture balance using a finite difference solution
         CalcHeatBalFiniteDiff(SurfNum, TempSurfInTmp, TempSurfOutTmp);
     }
 
-    void GetCondFDInput(IOFiles &ioFiles)
+    void GetCondFDInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Curtis Pedersen
@@ -269,7 +269,8 @@ namespace HeatBalFiniteDiffManager {
         cCurrentModuleObject = "HeatBalanceSettings:ConductionFiniteDifference";
 
         if (inputProcessor->getNumObjectsFound(cCurrentModuleObject) > 0) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           1,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -324,7 +325,8 @@ namespace HeatBalFiniteDiffManager {
             for (Loop = 1; Loop <= pcMat; ++Loop) {
 
                 // Call Input Get routine to retrieve material data
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               Loop,
                                               MaterialNames,
                                               MaterialNumAlpha,
@@ -414,7 +416,8 @@ namespace HeatBalFiniteDiffManager {
             for (Loop = 1; Loop <= vcMat; ++Loop) {
 
                 // Call Input Get routine to retrieve material data
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               Loop,
                                               MaterialNames,
                                               MaterialNumAlpha,
@@ -496,10 +499,10 @@ namespace HeatBalFiniteDiffManager {
             ShowFatalError("GetCondFDInput: Errors found getting ConductionFiniteDifference properties. Program terminates.");
         }
 
-        InitialInitHeatBalFiniteDiff(ioFiles);
+        InitialInitHeatBalFiniteDiff(state);
     }
 
-    void InitHeatBalFiniteDiff(IOFiles &ioFiles)
+    void InitHeatBalFiniteDiff(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -523,7 +526,7 @@ namespace HeatBalFiniteDiffManager {
 
         if (GetHBFiniteDiffInputFlag) {
             // Obtains conduction FD related parameters from input file
-            GetCondFDInput(ioFiles);
+            GetCondFDInput(state);
             GetHBFiniteDiffInputFlag = false;
         }
 
@@ -599,7 +602,7 @@ namespace HeatBalFiniteDiffManager {
         }
     }
 
-    void InitialInitHeatBalFiniteDiff(IOFiles &ioFiles)
+    void InitialInitHeatBalFiniteDiff(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -939,7 +942,7 @@ namespace HeatBalFiniteDiffManager {
             if (Surface(SurfNum).Class == SurfaceClass_Window) continue;
             if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
 
-            SetupOutputVariable("CondFD Inner Solver Loop Iteration Count",
+            SetupOutputVariable(state, "CondFD Inner Solver Loop Iteration Count",
                                 OutputProcessor::Unit::None,
                                 SurfaceFD(SurfNum).GSloopCounter,
                                 "Zone",
@@ -948,44 +951,44 @@ namespace HeatBalFiniteDiffManager {
 
             TotNodes = ConstructFD(Surface(SurfNum).Construction).TotNodes; // Full size nodes, start with outside face.
             for (Lay = 1; Lay <= TotNodes + 1; ++Lay) {                     // include inside face node
-                SetupOutputVariable("CondFD Surface Temperature Node " + TrimSigDigits(Lay) + "",
+                SetupOutputVariable(state, "CondFD Surface Temperature Node " + TrimSigDigits(Lay) + "",
                                     OutputProcessor::Unit::C,
                                     SurfaceFD(SurfNum).TDreport(Lay),
                                     "Zone",
                                     "State",
                                     Surface(SurfNum).Name);
-                SetupOutputVariable("CondFD Surface Heat Flux Node " + TrimSigDigits(Lay) + "",
+                SetupOutputVariable(state, "CondFD Surface Heat Flux Node " + TrimSigDigits(Lay) + "",
                                     OutputProcessor::Unit::W_m2,
                                     SurfaceFD(SurfNum).QDreport(Lay),
                                     "Zone",
                                     "State",
                                     Surface(SurfNum).Name);
-                SetupOutputVariable("CondFD Phase Change State " + TrimSigDigits(Lay) + "",
+                SetupOutputVariable(state, "CondFD Phase Change State " + TrimSigDigits(Lay) + "",
                                     OutputProcessor::Unit::None,
                                     SurfaceFD(SurfNum).PhaseChangeState(Lay),
                                     "Zone",
                                     "State",
                                     Surface(SurfNum).Name);
-                SetupOutputVariable("CondFD Phase Change Previous State " + TrimSigDigits(Lay) + "",
+                SetupOutputVariable(state, "CondFD Phase Change Previous State " + TrimSigDigits(Lay) + "",
                                     OutputProcessor::Unit::None,
                                     SurfaceFD(SurfNum).PhaseChangeStateOld(Lay),
                                     "Zone",
                                     "State",
                                     Surface(SurfNum).Name);
-                SetupOutputVariable("CondFD Phase Change Node Temperature " + TrimSigDigits(Lay) + "",
+                SetupOutputVariable(state, "CondFD Phase Change Node Temperature " + TrimSigDigits(Lay) + "",
                                     OutputProcessor::Unit::C,
                                     SurfaceFD(SurfNum).TDT(Lay),
                                     "Zone",
                                     "State",
                                     Surface(SurfNum).Name);
                 if (DisplayAdvancedReportVariables) {
-                    SetupOutputVariable("CondFD Surface Heat Capacitance Outer Half Node " + TrimSigDigits(Lay) + "",
+                    SetupOutputVariable(state, "CondFD Surface Heat Capacitance Outer Half Node " + TrimSigDigits(Lay) + "",
                                         OutputProcessor::Unit::W_m2K,
                                         SurfaceFD(SurfNum).CpDelXRhoS1(Lay),
                                         "Zone",
                                         "State",
                                         Surface(SurfNum).Name);
-                    SetupOutputVariable("CondFD Surface Heat Capacitance Inner Half Node " + TrimSigDigits(Lay) + "",
+                    SetupOutputVariable(state, "CondFD Surface Heat Capacitance Inner Half Node " + TrimSigDigits(Lay) + "",
                                         OutputProcessor::Unit::W_m2K,
                                         SurfaceFD(SurfNum).CpDelXRhoS2(Lay),
                                         "Zone",
@@ -996,7 +999,7 @@ namespace HeatBalFiniteDiffManager {
 
         } // End of the Surface Loop for Report Variable Setup
 
-        ReportFiniteDiffInits(ioFiles); // Report the results from the Finite Diff Inits
+        ReportFiniteDiffInits(state); // Report the results from the Finite Diff Inits
     }
 
     void relax_array(Array1D<Real64> &a,       // Array to relax
@@ -1189,7 +1192,7 @@ namespace HeatBalFiniteDiffManager {
         EnthOld = EnthNew;
     }
 
-    void ReportFiniteDiffInits(IOFiles &ioFiles)
+    void ReportFiniteDiffInits(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1223,30 +1226,30 @@ namespace HeatBalFiniteDiffManager {
         // Formats
         static constexpr auto Format_702(" ConductionFiniteDifference Node,{},{:.8R},{},{},{}\n");
 
-        print(ioFiles.eio,
+        print(state.files.eio,
               "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization Constant,Relaxation Factor,Inside Face Surface "
               "Temperature Convergence Criteria\n");
-        print(ioFiles.eio,
+        print(state.files.eio,
               " ConductionFiniteDifference HeatBalanceSettings,{},{:.2R},{:.2R},{:.4R}\n",
               cCondFDSchemeType(CondFDSchemeType),
               SpaceDescritConstant,
               CondFDRelaxFactorInput,
               MaxAllowedDelTempCondFD);
 
-        ScanForReports("Constructions", DoReport, "Constructions");
+        ScanForReports(state, "Constructions", DoReport, "Constructions");
 
         if (DoReport) {
 
             //                                      Write Descriptions
-            print(ioFiles.eio, "{}\n", "! <Construction CondFD>,Construction Name,Index,#Layers,#Nodes,Time Step {hours}");
-            print(ioFiles.eio,
+            print(state.files.eio, "{}\n", "! <Construction CondFD>,Construction Name,Index,#Layers,#Nodes,Time Step {hours}");
+            print(state.files.eio,
                   "{}\n",
                   "! <Material CondFD Summary>,Material Name,Thickness {m},#Layer Elements,Layer Delta X,Layer Alpha*Delt/Delx**2,Layer Moisture "
                   "Stability");
 
             // HT Algo issue
             if (DataHeatBalance::AnyCondFD) {
-                print(ioFiles.eio,
+                print(state.files.eio,
                       "{}\n",
                       "! <ConductionFiniteDifference Node>,Node Identifier, Node Distance From Outside Face {m}, Construction Name, Outward Material "
                       "Name (or Face), Inward Material Name (or Face)");
@@ -1259,7 +1262,7 @@ namespace HeatBalFiniteDiffManager {
                 if (dataConstruction.Construct(ThisNum).TypeIsAirBoundaryIRTSurface) continue;
 
                 static constexpr auto Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
-                print(ioFiles.eio,
+                print(state.files.eio,
                       Format_700,
                       dataConstruction.Construct(ThisNum).Name,
                       ThisNum,
@@ -1269,7 +1272,7 @@ namespace HeatBalFiniteDiffManager {
 
                 for (Layer = 1; Layer <= dataConstruction.Construct(ThisNum).TotLayers; ++Layer) {
                     static constexpr auto Format_701(" Material CondFD Summary,{},{:.4R},{},{:.8R},{:.8R},{:.8R}\n");
-                    print(ioFiles.eio,
+                    print(state.files.eio,
                           Format_701,
                           ConstructFD(ThisNum).Name(Layer),
                           ConstructFD(ThisNum).Thickness(Layer),
@@ -1287,7 +1290,7 @@ namespace HeatBalFiniteDiffManager {
                     for (LayerNode = 1; LayerNode <= ConstructFD(ThisNum).NodeNumPoint(Layer); ++LayerNode) {
                         ++Inodes;
                         if (Inodes == 1) {
-                            print(ioFiles.eio,
+                            print(state.files.eio,
                                   Format_702,
                                   format("Node #{}", Inodes),
                                   ConstructFD(ThisNum).NodeXlocation(Inodes),
@@ -1298,7 +1301,7 @@ namespace HeatBalFiniteDiffManager {
                         } else if (LayerNode == 1) {
 
                             if (OutwardMatLayerNum > 0 && OutwardMatLayerNum <= dataConstruction.Construct(ThisNum).TotLayers) {
-                                print(ioFiles.eio,
+                                print(state.files.eio,
                                       Format_702,
                                       format("Node #{}", Inodes),
                                       ConstructFD(ThisNum).NodeXlocation(Inodes),
@@ -1308,7 +1311,7 @@ namespace HeatBalFiniteDiffManager {
                             }
                         } else if (LayerNode > 1) {
                             OutwardMatLayerNum = Layer;
-                            print(ioFiles.eio,
+                            print(state.files.eio,
                                   Format_702,
                                   format("Node #{}", Inodes),
                                   ConstructFD(ThisNum).NodeXlocation(Inodes),
@@ -1321,7 +1324,7 @@ namespace HeatBalFiniteDiffManager {
 
                 Layer = dataConstruction.Construct(ThisNum).TotLayers;
                 ++Inodes;
-                print(ioFiles.eio,
+                print(state.files.eio,
                       Format_702,
                       format("Node #{}", Inodes),
                       ConstructFD(ThisNum).NodeXlocation(Inodes),

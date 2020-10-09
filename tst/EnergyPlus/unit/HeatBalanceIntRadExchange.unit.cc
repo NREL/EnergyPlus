@@ -374,7 +374,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest)
         });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataViewFactorInformation::NumOfRadiantEnclosures = 3;
@@ -454,7 +454,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest2)
         });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataViewFactorInformation::NumOfSolarEnclosures = 3;
@@ -533,7 +533,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest3)
         });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataViewFactorInformation::NumOfSolarEnclosures = 3;
@@ -613,7 +613,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest4)
         });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataViewFactorInformation::NumOfRadiantEnclosures = 3;

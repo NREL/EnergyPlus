@@ -61,7 +61,6 @@
 namespace EnergyPlus {
 
 // Forward declarations
-class IOFiles;
 struct EnergyPlusData;
 
 namespace WaterThermalTanks {
@@ -389,7 +388,7 @@ namespace WaterThermalTanks {
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
     };
 
     struct WaterThermalTankData : PlantComponent
@@ -634,13 +633,13 @@ namespace WaterThermalTanks {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void setupOutputVars(EnergyPlusData &state, IOFiles &ioFiles);
+        void setupOutputVars(EnergyPlusData &state);
 
         void setupZoneInternalGains();
 
-        void setupChilledWaterTankOutputVars(IOFiles &ioFiles);
+        void setupChilledWaterTankOutputVars(EnergyPlusData &state);
 
-        void setupWaterHeaterOutputVars(EnergyPlusData &state, IOFiles &ioFiles);
+        void setupWaterHeaterOutputVars(EnergyPlusData &state);
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -648,25 +647,25 @@ namespace WaterThermalTanks {
 
         void CalcNodeMassFlows(InletModeEnum inletMode);
 
-        void SetupStratifiedNodes();
+        void SetupStratifiedNodes(EnergyPlusData &state);
 
         void initialize(EnergyPlusData &state, bool FirstHVACIteration);
 
         bool SourceHeatNeed(EnergyPlusData &state, Real64 OutletTemp, Real64 DeadBandTemp, Real64 SetPointTemp_loc);
 
-        void SizeDemandSidePlantConnections();
+        void SizeDemandSidePlantConnections(EnergyPlusData &state);
 
-        void SizeTankForSupplySide();
+        void SizeTankForSupplySide(EnergyPlusData &state);
 
-        void SizeTankForDemandSide();
+        void SizeTankForDemandSide(EnergyPlusData &state);
 
         void MinePlantStructForInfo();
 
-        void SizeSupplySidePlantConnections(Optional_int_const LoopNum = _);
+        void SizeSupplySidePlantConnections(EnergyPlusData &state, Optional_int_const LoopNum = _);
 
         void CalcWaterThermalTank(EnergyPlusData &state);
 
-        void SizeStandAloneWaterHeater();
+        void SizeStandAloneWaterHeater(EnergyPlusData &state);
 
         void UpdateWaterThermalTank();
 
@@ -678,7 +677,7 @@ namespace WaterThermalTanks {
 
         void CalcStandardRatings(EnergyPlusData &state);
 
-        void ReportCWTankInits(EnergyPlusData &state, IOFiles &ioFiles);
+        void ReportCWTankInits(EnergyPlusData &state);
 
         Real64 GetHPWHSensedTankTemp(EnergyPlusData &state);
 
@@ -775,7 +774,7 @@ namespace WaterThermalTanks {
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
     };
 
     struct WaterHeaterDesuperheaterData

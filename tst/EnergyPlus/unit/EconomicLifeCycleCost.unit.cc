@@ -257,7 +257,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetInputForLifeCycleCost();
+    GetInputForLifeCycleCost(state);
 
     EXPECT_EQ(disConvEndOfYear, discountConvension);
     EXPECT_EQ(inflAppConstantDollar, inflationApproach);
@@ -394,7 +394,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ProcessMaxInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetInputForLifeCycleCost();
+    GetInputForLifeCycleCost(state);
 
     EXPECT_EQ(disConvEndOfYear, discountConvension);
     EXPECT_EQ(inflAppConstantDollar, inflationApproach);

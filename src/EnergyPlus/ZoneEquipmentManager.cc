@@ -92,7 +92,6 @@
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
@@ -830,7 +829,7 @@ namespace ZoneEquipmentManager {
                     ZoneSizingInput(ZoneSizIndex).ZoneNum = ZoneIndex;
                 }
                 if (ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod == FromDDCalc || ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod == FromDDCalc) {
-                    if (!VerifyThermostatInZone(state, state.files, ZoneSizingInput(ZoneSizIndex).ZoneName)) {
+                    if (!VerifyThermostatInZone(state, ZoneSizingInput(ZoneSizIndex).ZoneName)) {
                         if (!isPulseZoneSizing) {
                             ShowWarningError("SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput(ZoneSizIndex).ZoneName +
                                              "\", Zone has no thermostat (ref: ZoneControl:Thermostat, et al)");
@@ -847,7 +846,7 @@ namespace ZoneEquipmentManager {
         }
 
         // Put Auto Sizing of Sizing:Zone inputs here!
-        AutoCalcDOASControlStrategy(state, state.files);
+        AutoCalcDOASControlStrategy(state);
 
         ZoneSizing.allocate(TotDesDays + TotRunDesPersDays, NumOfZones);
         FinalZoneSizing.allocate(NumOfZones);
@@ -2679,7 +2678,7 @@ namespace ZoneEquipmentManager {
 
                         if (!(AirflowNetwork::AirflowNetworkFanActivated &&
                               AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
-                            SimAirLoopSplitter(SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
+                            SimAirLoopSplitter(state, SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                                FirstHVACIteration,
                                                FirstCall,
                                                SupPathInletChanged,
@@ -2779,7 +2778,7 @@ namespace ZoneEquipmentManager {
 
                 if (ZoneCompNum > 0 && ValidSAMComp) {
 
-                    GetZoneEqAvailabilityManager(ZoneEquipTypeNum, ZoneCompNum, ErrorFlag);
+                    GetZoneEqAvailabilityManager(state, ZoneEquipTypeNum, ZoneCompNum, ErrorFlag);
 
                     if (ZoneComp(ZoneEquipTypeNum).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == CycleOn) {
                         ZoneCompTurnFansOn = true;
@@ -3159,7 +3158,7 @@ namespace ZoneEquipmentManager {
 
                         if (!(AirflowNetwork::AirflowNetworkFanActivated &&
                               AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
-                            SimAirLoopSplitter(SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
+                            SimAirLoopSplitter(state, SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                                FirstHVACIteration,
                                                FirstCall,
                                                SupPathInletChanged,
@@ -4750,9 +4749,9 @@ namespace ZoneEquipmentManager {
             return;
         }
 
-        ManageEarthTube();
+        ManageEarthTube(state);
         ManageCoolTower(state);
-        ManageThermalChimney();
+        ManageThermalChimney(state);
 
         // Assign zone air temperature
         for (j = 1; j <= NumOfZones; ++j) {
@@ -5699,7 +5698,7 @@ namespace ZoneEquipmentManager {
         MassConservation(ZoneNum).MixingSourceMassFlowRate = ZoneSourceMassFlowRate;
     }
 
-    void AutoCalcDOASControlStrategy(EnergyPlusData &state, IOFiles &ioFiles)
+    void AutoCalcDOASControlStrategy(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -5730,7 +5729,6 @@ namespace ZoneEquipmentManager {
                         ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint + 2.8;
                     }
                     ReportZoneSizingDOASInputs(state,
-                                               ioFiles,
                                                ZoneSizingInput(ZoneSizIndex).ZoneName,
                                                "NeutralSupplyAir",
                                                ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
@@ -5745,7 +5743,6 @@ namespace ZoneEquipmentManager {
                         ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = 22.2;
                     }
                     ReportZoneSizingDOASInputs(state,
-                                               ioFiles,
                                                ZoneSizingInput(ZoneSizIndex).ZoneName,
                                                "NeutralDehumidifiedSupplyAir",
                                                ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
@@ -5760,7 +5757,6 @@ namespace ZoneEquipmentManager {
                         ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint + 2.2;
                     }
                     ReportZoneSizingDOASInputs(state,
-                                               ioFiles,
                                                ZoneSizingInput(ZoneSizIndex).ZoneName,
                                                "ColdSupplyAir",
                                                ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
@@ -5779,7 +5775,6 @@ namespace ZoneEquipmentManager {
     }
 
     void ReportZoneSizingDOASInputs(EnergyPlusData &state,
-                                    IOFiles &ioFiles,
                                     std::string const &ZoneName,         // the name of the zone
                                     std::string const &DOASCtrlStrategy, // DOAS control strategy
                                     Real64 const DOASLowTemp,            // DOAS design low setpoint temperature [C]
@@ -5806,12 +5801,12 @@ namespace ZoneEquipmentManager {
 
 
         if (state.dataZoneEquipmentManager->reportDOASZoneSizingHeader) {
-            print(ioFiles.eio, "{}\n", Format_990);
+            print(state.files.eio, "{}\n", Format_990);
             state.dataZoneEquipmentManager->reportDOASZoneSizingHeader = false;
         }
 
         static constexpr auto Format_991(" Zone Sizing DOAS Inputs, {}, {}, {:.3R}, {:.3R}\n");
-        print(ioFiles.eio, Format_991, ZoneName, DOASCtrlStrategy, DOASLowTemp, DOASHighTemp);
+        print(state.files.eio, Format_991, ZoneName, DOASCtrlStrategy, DOASLowTemp, DOASHighTemp);
 
         // BSLLC Start
         // if ( sqlite ) {

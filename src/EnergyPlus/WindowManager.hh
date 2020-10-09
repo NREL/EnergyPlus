@@ -66,7 +66,6 @@
 namespace EnergyPlus {
 
 // Forward declarations
-class IOFiles;
 struct EnergyPlusData;
 
 namespace WindowManager {
@@ -79,9 +78,9 @@ namespace WindowManager {
     //   Optical Calculation Routines
     //   Heat Balance Routines
 
-    void InitWindowOpticalCalculations(EnergyPlusData &state, IOFiles &ioFiles);
+    void InitWindowOpticalCalculations(EnergyPlusData &state);
 
-    void InitGlassOpticalCalculations(EnergyPlusData &state, IOFiles &ioFiles);
+    void InitGlassOpticalCalculations(EnergyPlusData &state);
 
     //*****************************************************************************************
 
@@ -350,7 +349,7 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void ReportGlass(EnergyPlusData &state, IOFiles &ioFiles);
+    void ReportGlass(EnergyPlusData &state);
 
     //*************************************************************************************
 
@@ -358,7 +357,7 @@ namespace WindowManager {
 
     //*************************************************************************************
 
-    void CalcWindowScreenProperties(IOFiles &ioFiles);
+    void CalcWindowScreenProperties(EnergyPlusData &state);
 
     void BlindOpticsDiffuse(int const BlindNum,      // Blind number
                             int const ISolVis,       // 1 = solar and IR calculation; 2 = visible calculation
