@@ -344,45 +344,45 @@ namespace InternalHeatGains {
         // CurrentModuleObject='Zone'
         for (Loop = 1; Loop <= NumOfZones; ++Loop) {
             // Overall Zone Variables
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Zone Total Internal Radiant Heating Energy", OutputProcessor::Unit::J, ZnRpt(Loop).TotRadiantGain, "Zone", "Sum", Zone(Loop).Name);
-            SetupOutputVariable("Zone Total Internal Radiant Heating Rate",
+            SetupOutputVariable(state, "Zone Total Internal Radiant Heating Rate",
                                 OutputProcessor::Unit::W,
                                 ZnRpt(Loop).TotRadiantGainRate,
                                 "Zone",
                                 "Average",
                                 Zone(Loop).Name);
-            SetupOutputVariable("Zone Total Internal Visible Radiation Heating Energy",
+            SetupOutputVariable(state, "Zone Total Internal Visible Radiation Heating Energy",
                                 OutputProcessor::Unit::J,
                                 ZnRpt(Loop).TotVisHeatGain,
                                 "Zone",
                                 "Sum",
                                 Zone(Loop).Name);
-            SetupOutputVariable("Zone Total Internal Visible Radiation Heating Rate",
+            SetupOutputVariable(state, "Zone Total Internal Visible Radiation Heating Rate",
                                 OutputProcessor::Unit::W,
                                 ZnRpt(Loop).TotVisHeatGainRate,
                                 "Zone",
                                 "Average",
                                 Zone(Loop).Name);
-            SetupOutputVariable("Zone Total Internal Convective Heating Energy",
+            SetupOutputVariable(state, "Zone Total Internal Convective Heating Energy",
                                 OutputProcessor::Unit::J,
                                 ZnRpt(Loop).TotConvectiveGain,
                                 "Zone",
                                 "Sum",
                                 Zone(Loop).Name);
-            SetupOutputVariable("Zone Total Internal Convective Heating Rate",
+            SetupOutputVariable(state, "Zone Total Internal Convective Heating Rate",
                                 OutputProcessor::Unit::W,
                                 ZnRpt(Loop).TotConvectiveGainRate,
                                 "Zone",
                                 "Average",
                                 Zone(Loop).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Zone Total Internal Latent Gain Energy", OutputProcessor::Unit::J, ZnRpt(Loop).TotLatentGain, "Zone", "Sum", Zone(Loop).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::W, ZnRpt(Loop).TotLatentGainRate, "Zone", "Average", Zone(Loop).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Zone Total Internal Total Heating Energy", OutputProcessor::Unit::J, ZnRpt(Loop).TotTotalHeatGain, "Zone", "Sum", Zone(Loop).Name);
-            SetupOutputVariable("Zone Total Internal Total Heating Rate",
+            SetupOutputVariable(state, "Zone Total Internal Total Heating Rate",
                                 OutputProcessor::Unit::W,
                                 ZnRpt(Loop).TotTotalHeatGainRate,
                                 "Zone",
@@ -399,7 +399,8 @@ namespace InternalHeatGains {
         TotPeople = 0;
         errFlag = false;
         for (Item = 1; Item <= NumPeopleStatements; ++Item) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Item,
                                           AlphaName,
                                           NumAlpha,
@@ -452,7 +453,8 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               Item,
                                               AlphaName,
                                               NumAlpha,
@@ -483,7 +485,7 @@ namespace InternalHeatGains {
                         if (errFlag) ErrorsFound = true;
                     }
 
-                    People(Loop).NumberOfPeoplePtr = GetScheduleIndex(AlphaName(3));
+                    People(Loop).NumberOfPeoplePtr = GetScheduleIndex(state, AlphaName(3));
                     SchMin = 0.0;
                     SchMax = 0.0;
                     if (People(Loop).NumberOfPeoplePtr == 0) {
@@ -615,7 +617,7 @@ namespace InternalHeatGains {
                         ErrorsFound = true;
                     }
 
-                    People(Loop).ActivityLevelPtr = GetScheduleIndex(AlphaName(5));
+                    People(Loop).ActivityLevelPtr = GetScheduleIndex(state, AlphaName(5));
                     if (People(Loop).ActivityLevelPtr == 0) {
                         if (Item1 == 1) {
                             if (lAlphaFieldBlanks(5)) {
@@ -794,7 +796,7 @@ namespace InternalHeatGains {
                             }
 
                             if (!lAlphaFieldBlanks(9)) {
-                                People(Loop).WorkEffPtr = GetScheduleIndex(AlphaName(9));
+                                People(Loop).WorkEffPtr = GetScheduleIndex(state, AlphaName(9));
                                 if (People(Loop).WorkEffPtr == 0) {
                                     if (Item1 == 1) {
                                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
@@ -846,7 +848,7 @@ namespace InternalHeatGains {
                                     auto const clothingType(AlphaName(10));
                                     if (clothingType == "CLOTHINGINSULATIONSCHEDULE") {
                                         People(Loop).ClothingType = 1;
-                                        People(Loop).ClothingPtr = GetScheduleIndex(AlphaName(12));
+                                        People(Loop).ClothingPtr = GetScheduleIndex(state, AlphaName(12));
                                         if (People(Loop).ClothingPtr == 0 && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
@@ -891,7 +893,7 @@ namespace InternalHeatGains {
 
                                     } else if (clothingType == "CALCULATIONMETHODSCHEDULE") {
                                         People(Loop).ClothingType = 3;
-                                        People(Loop).ClothingMethodPtr = GetScheduleIndex(AlphaName(11));
+                                        People(Loop).ClothingMethodPtr = GetScheduleIndex(state, AlphaName(11));
                                         if (People(Loop).ClothingMethodPtr == 0) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
@@ -900,7 +902,7 @@ namespace InternalHeatGains {
                                             }
                                         }
                                         if (CheckScheduleValue(People(Loop).ClothingMethodPtr, 1)) {
-                                            People(Loop).ClothingPtr = GetScheduleIndex(AlphaName(12));
+                                            People(Loop).ClothingPtr = GetScheduleIndex(state, AlphaName(12));
                                             if (People(Loop).ClothingPtr == 0) {
                                                 if (Item1 == 1) {
                                                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
@@ -921,7 +923,7 @@ namespace InternalHeatGains {
                             }
 
                             if (!lAlphaFieldBlanks(13)) {
-                                People(Loop).AirVelocityPtr = GetScheduleIndex(AlphaName(13));
+                                People(Loop).AirVelocityPtr = GetScheduleIndex(state, AlphaName(13));
                                 if (People(Loop).AirVelocityPtr == 0) {
                                     if (Item1 == 1) {
                                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
@@ -967,31 +969,31 @@ namespace InternalHeatGains {
                     if (People(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     // Object report variables
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "People Occupant Count", OutputProcessor::Unit::None, People(Loop).NumOcc, "Zone", "Average", People(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "People Radiant Heating Energy", OutputProcessor::Unit::J, People(Loop).RadGainEnergy, "Zone", "Sum", People(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "People Radiant Heating Rate", OutputProcessor::Unit::W, People(Loop).RadGainRate, "Zone", "Average", People(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "People Convective Heating Energy", OutputProcessor::Unit::J, People(Loop).ConGainEnergy, "Zone", "Sum", People(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "People Convective Heating Rate", OutputProcessor::Unit::W, People(Loop).ConGainRate, "Zone", "Average", People(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "People Sensible Heating Energy", OutputProcessor::Unit::J, People(Loop).SenGainEnergy, "Zone", "Sum", People(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "People Sensible Heating Rate", OutputProcessor::Unit::W, People(Loop).SenGainRate, "Zone", "Average", People(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "People Latent Gain Energy", OutputProcessor::Unit::J, People(Loop).LatGainEnergy, "Zone", "Sum", People(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "People Latent Gain Rate", OutputProcessor::Unit::W, People(Loop).LatGainRate, "Zone", "Average", People(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "People Total Heating Energy", OutputProcessor::Unit::J, People(Loop).TotGainEnergy, "Zone", "Sum", People(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "People Total Heating Rate", OutputProcessor::Unit::W, People(Loop).TotGainRate, "Zone", "Average", People(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "People Air Temperature", OutputProcessor::Unit::C, People(Loop).TemperatureInZone, "Zone", "Average", People(Loop).Name);
-                    SetupOutputVariable("People Air Relative Humidity",
+                    SetupOutputVariable(state, "People Air Relative Humidity",
                                         OutputProcessor::Unit::Perc,
                                         People(Loop).RelativeHumidityInZone,
                                         "Zone",
@@ -1001,67 +1003,67 @@ namespace InternalHeatGains {
                     // Zone total report variables
                     if (RepVarSet(People(Loop).ZonePtr)) {
                         RepVarSet(People(Loop).ZonePtr) = false;
-                        SetupOutputVariable("Zone People Occupant Count",
+                        SetupOutputVariable(state, "Zone People Occupant Count",
                                             OutputProcessor::Unit::None,
                                             ZnRpt(People(Loop).ZonePtr).PeopleNumOcc,
                                             "Zone",
                                             "Average",
                                             Zone(People(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone People Radiant Heating Energy",
+                        SetupOutputVariable(state, "Zone People Radiant Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(People(Loop).ZonePtr).PeopleRadGain,
                                             "Zone",
                                             "Sum",
                                             Zone(People(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone People Radiant Heating Rate",
+                        SetupOutputVariable(state, "Zone People Radiant Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(People(Loop).ZonePtr).PeopleRadGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(People(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone People Convective Heating Energy",
+                        SetupOutputVariable(state, "Zone People Convective Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(People(Loop).ZonePtr).PeopleConGain,
                                             "Zone",
                                             "Sum",
                                             Zone(People(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone People Convective Heating Rate",
+                        SetupOutputVariable(state, "Zone People Convective Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(People(Loop).ZonePtr).PeopleConGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(People(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone People Sensible Heating Energy",
+                        SetupOutputVariable(state, "Zone People Sensible Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(People(Loop).ZonePtr).PeopleSenGain,
                                             "Zone",
                                             "Sum",
                                             Zone(People(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone People Sensible Heating Rate",
+                        SetupOutputVariable(state, "Zone People Sensible Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(People(Loop).ZonePtr).PeopleSenGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(People(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone People Latent Gain Energy",
+                        SetupOutputVariable(state, "Zone People Latent Gain Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(People(Loop).ZonePtr).PeopleLatGain,
                                             "Zone",
                                             "Sum",
                                             Zone(People(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone People Latent Gain Rate",
+                        SetupOutputVariable(state, "Zone People Latent Gain Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(People(Loop).ZonePtr).PeopleLatGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(People(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone People Total Heating Energy",
+                        SetupOutputVariable(state, "Zone People Total Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(People(Loop).ZonePtr).PeopleTotGain,
                                             "Zone",
                                             "Sum",
                                             Zone(People(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone People Total Heating Rate",
+                        SetupOutputVariable(state, "Zone People Total Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(People(Loop).ZonePtr).PeopleTotGainRate,
                                             "Zone",
@@ -1122,7 +1124,7 @@ namespace InternalHeatGains {
                         ShowContinueError("Occupant Density=[" + RoundSigDigits(Zone(Loop).FloorArea / maxOccupLoad, 3) +
                                           "] m2/person. Problems in Temperature Out of Bounds may result.");
                         ShowContinueError("Check values in People=" + People(OptionNum).Name +
-                                          ", Number of People Schedule=" + GetScheduleName(MaxNumber));
+                                          ", Number of People Schedule=" + GetScheduleName(state, MaxNumber));
                     }
                 }
             }
@@ -1144,7 +1146,8 @@ namespace InternalHeatGains {
         TotLights = 0;
         errFlag = false;
         for (Item = 1; Item <= NumLightsStatements; ++Item) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Item,
                                           AlphaName,
                                           NumAlpha,
@@ -1197,7 +1200,8 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               Item,
                                               AlphaName,
                                               NumAlpha,
@@ -1228,7 +1232,7 @@ namespace InternalHeatGains {
                         if (errFlag) ErrorsFound = true;
                     }
 
-                    Lights(Loop).SchedPtr = GetScheduleIndex(AlphaName(3));
+                    Lights(Loop).SchedPtr = GetScheduleIndex(state, AlphaName(3));
                     SchMin = 0.0;
                     SchMax = 0.0;
                     if (Lights(Loop).SchedPtr == 0) {
@@ -1400,46 +1404,46 @@ namespace InternalHeatGains {
                     if (Lights(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     // Object report variables
-                    SetupOutputVariable("Lights Electricity Rate", OutputProcessor::Unit::W, Lights(Loop).Power, "Zone", "Average", Lights(Loop).Name);
+                    SetupOutputVariable(state, "Lights Electricity Rate", OutputProcessor::Unit::W, Lights(Loop).Power, "Zone", "Average", Lights(Loop).Name);
 
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "Lights Radiant Heating Energy", OutputProcessor::Unit::J, Lights(Loop).RadGainEnergy, "Zone", "Sum", Lights(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "Lights Radiant Heating Rate", OutputProcessor::Unit::W, Lights(Loop).RadGainRate, "Zone", "Average", Lights(Loop).Name);
-                    SetupOutputVariable("Lights Visible Radiation Heating Energy",
+                    SetupOutputVariable(state, "Lights Visible Radiation Heating Energy",
                                         OutputProcessor::Unit::J,
                                         Lights(Loop).VisGainEnergy,
                                         "Zone",
                                         "Sum",
                                         Lights(Loop).Name);
 
-                    SetupOutputVariable("Lights Visible Radiation Heating Rate",
+                    SetupOutputVariable(state, "Lights Visible Radiation Heating Rate",
                                         OutputProcessor::Unit::W,
                                         Lights(Loop).VisGainRate,
                                         "Zone",
                                         "Average",
                                         Lights(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "Lights Convective Heating Energy", OutputProcessor::Unit::J, Lights(Loop).ConGainEnergy, "Zone", "Sum", Lights(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "Lights Convective Heating Rate", OutputProcessor::Unit::W, Lights(Loop).ConGainRate, "Zone", "Average", Lights(Loop).Name);
-                    SetupOutputVariable("Lights Return Air Heating Energy",
+                    SetupOutputVariable(state, "Lights Return Air Heating Energy",
                                         OutputProcessor::Unit::J,
                                         Lights(Loop).RetAirGainEnergy,
                                         "Zone",
                                         "Sum",
                                         Lights(Loop).Name);
-                    SetupOutputVariable("Lights Return Air Heating Rate",
+                    SetupOutputVariable(state, "Lights Return Air Heating Rate",
                                         OutputProcessor::Unit::W,
                                         Lights(Loop).RetAirGainRate,
                                         "Zone",
                                         "Average",
                                         Lights(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "Lights Total Heating Energy", OutputProcessor::Unit::J, Lights(Loop).TotGainEnergy, "Zone", "Sum", Lights(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "Lights Total Heating Rate", OutputProcessor::Unit::W, Lights(Loop).TotGainRate, "Zone", "Average", Lights(Loop).Name);
-                    SetupOutputVariable("Lights Electricity Energy",
+                    SetupOutputVariable(state, "Lights Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         Lights(Loop).Consumption,
                                         "Zone",
@@ -1457,73 +1461,73 @@ namespace InternalHeatGains {
                     // Zone total report variables
                     if (RepVarSet(Lights(Loop).ZonePtr)) {
                         RepVarSet(Lights(Loop).ZonePtr) = false;
-                        SetupOutputVariable("Zone Lights Electricity Rate",
+                        SetupOutputVariable(state, "Zone Lights Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsPower,
                                             "Zone",
                                             "Average",
                                             Zone(Lights(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Lights Electricity Energy",
+                        SetupOutputVariable(state, "Zone Lights Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsElecConsump,
                                             "Zone",
                                             "Sum",
                                             Zone(Lights(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Lights Radiant Heating Energy",
+                        SetupOutputVariable(state, "Zone Lights Radiant Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsRadGain,
                                             "Zone",
                                             "Sum",
                                             Zone(Lights(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Lights Radiant Heating Rate",
+                        SetupOutputVariable(state, "Zone Lights Radiant Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsRadGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(Lights(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Lights Visible Radiation Heating Energy",
+                        SetupOutputVariable(state, "Zone Lights Visible Radiation Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsVisGain,
                                             "Zone",
                                             "Sum",
                                             Zone(Lights(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Lights Visible Radiation Heating Rate",
+                        SetupOutputVariable(state, "Zone Lights Visible Radiation Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsVisGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(Lights(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Lights Convective Heating Energy",
+                        SetupOutputVariable(state, "Zone Lights Convective Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsConGain,
                                             "Zone",
                                             "Sum",
                                             Zone(Lights(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Lights Convective Heating Rate",
+                        SetupOutputVariable(state, "Zone Lights Convective Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsConGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(Lights(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Lights Return Air Heating Energy",
+                        SetupOutputVariable(state, "Zone Lights Return Air Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsRetAirGain,
                                             "Zone",
                                             "Sum",
                                             Zone(Lights(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Lights Return Air Heating Rate",
+                        SetupOutputVariable(state, "Zone Lights Return Air Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsRetAirGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(Lights(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Lights Total Heating Energy",
+                        SetupOutputVariable(state, "Zone Lights Total Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsTotGain,
                                             "Zone",
                                             "Sum",
                                             Zone(Lights(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Lights Total Heating Rate",
+                        SetupOutputVariable(state, "Zone Lights Total Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsTotGainRate,
                                             "Zone",
@@ -1572,7 +1576,7 @@ namespace InternalHeatGains {
                     PreDefTableEntry(pdchInLtArea, liteName, Zone(zonePt).FloorArea * mult);
                     PreDefTableEntry(pdchInLtPower, liteName, Lights(Loop).DesignLevel * mult);
                     PreDefTableEntry(pdchInLtEndUse, liteName, Lights(Loop).EndUseSubcategory);
-                    PreDefTableEntry(pdchInLtSchd, liteName, GetScheduleName(Lights(Loop).SchedPtr));
+                    PreDefTableEntry(pdchInLtSchd, liteName, GetScheduleName(state, Lights(Loop).SchedPtr));
                     PreDefTableEntry(pdchInLtRetAir, liteName, Lights(Loop).FractionReturnAir, 4);
                 } // Item1 - zones
             }     // Item = Number of Lights Objects
@@ -1594,7 +1598,8 @@ namespace InternalHeatGains {
         TotElecEquip = 0;
         errFlag = false;
         for (Item = 1; Item <= NumZoneElectricStatements; ++Item) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Item,
                                           AlphaName,
                                           NumAlpha,
@@ -1647,7 +1652,8 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               Item,
                                               AlphaName,
                                               NumAlpha,
@@ -1678,7 +1684,7 @@ namespace InternalHeatGains {
                         if (errFlag) ErrorsFound = true;
                     }
 
-                    ZoneElectric(Loop).SchedPtr = GetScheduleIndex(AlphaName(3));
+                    ZoneElectric(Loop).SchedPtr = GetScheduleIndex(state, AlphaName(3));
                     SchMin = 0.0;
                     SchMax = 0.0;
                     if (ZoneElectric(Loop).SchedPtr == 0) {
@@ -1794,13 +1800,13 @@ namespace InternalHeatGains {
                     if (ZoneElectric(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     // Object report variables
-                    SetupOutputVariable("Electric Equipment Electricity Rate",
+                    SetupOutputVariable(state, "Electric Equipment Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneElectric(Loop).Power,
                                         "Zone",
                                         "Average",
                                         ZoneElectric(Loop).Name);
-                    SetupOutputVariable("Electric Equipment Electricity Energy",
+                    SetupOutputVariable(state, "Electric Equipment Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneElectric(Loop).Consumption,
                                         "Zone",
@@ -1815,61 +1821,61 @@ namespace InternalHeatGains {
                                         Zone(ZoneElectric(Loop).ZonePtr).Multiplier,
                                         Zone(ZoneElectric(Loop).ZonePtr).ListMultiplier);
 
-                    SetupOutputVariable("Electric Equipment Radiant Heating Energy",
+                    SetupOutputVariable(state, "Electric Equipment Radiant Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneElectric(Loop).RadGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneElectric(Loop).Name);
-                    SetupOutputVariable("Electric Equipment Radiant Heating Rate",
+                    SetupOutputVariable(state, "Electric Equipment Radiant Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneElectric(Loop).RadGainRate,
                                         "Zone",
                                         "Average",
                                         ZoneElectric(Loop).Name);
-                    SetupOutputVariable("Electric Equipment Convective Heating Energy",
+                    SetupOutputVariable(state, "Electric Equipment Convective Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneElectric(Loop).ConGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneElectric(Loop).Name);
-                    SetupOutputVariable("Electric Equipment Convective Heating Rate",
+                    SetupOutputVariable(state, "Electric Equipment Convective Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneElectric(Loop).ConGainRate,
                                         "Zone",
                                         "Average",
                                         ZoneElectric(Loop).Name);
-                    SetupOutputVariable("Electric Equipment Latent Gain Energy",
+                    SetupOutputVariable(state, "Electric Equipment Latent Gain Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneElectric(Loop).LatGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneElectric(Loop).Name);
-                    SetupOutputVariable("Electric Equipment Latent Gain Rate",
+                    SetupOutputVariable(state, "Electric Equipment Latent Gain Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneElectric(Loop).LatGainRate,
                                         "Zone",
                                         "Average",
                                         ZoneElectric(Loop).Name);
-                    SetupOutputVariable("Electric Equipment Lost Heat Energy",
+                    SetupOutputVariable(state, "Electric Equipment Lost Heat Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneElectric(Loop).LostEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneElectric(Loop).Name);
-                    SetupOutputVariable("Electric Equipment Lost Heat Rate",
+                    SetupOutputVariable(state, "Electric Equipment Lost Heat Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneElectric(Loop).LostRate,
                                         "Zone",
                                         "Average",
                                         ZoneElectric(Loop).Name);
-                    SetupOutputVariable("Electric Equipment Total Heating Energy",
+                    SetupOutputVariable(state, "Electric Equipment Total Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneElectric(Loop).TotGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneElectric(Loop).Name);
-                    SetupOutputVariable("Electric Equipment Total Heating Rate",
+                    SetupOutputVariable(state, "Electric Equipment Total Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneElectric(Loop).TotGainRate,
                                         "Zone",
@@ -1879,74 +1885,74 @@ namespace InternalHeatGains {
                     // Zone total report variables
                     if (RepVarSet(ZoneElectric(Loop).ZonePtr)) {
                         RepVarSet(ZoneElectric(Loop).ZonePtr) = false;
-                        SetupOutputVariable("Zone Electric Equipment Electricity Rate",
+                        SetupOutputVariable(state, "Zone Electric Equipment Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecPower,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Electric Equipment Electricity Energy",
+                        SetupOutputVariable(state, "Zone Electric Equipment Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecConsump,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneElectric(Loop).ZonePtr).Name);
 
-                        SetupOutputVariable("Zone Electric Equipment Radiant Heating Energy",
+                        SetupOutputVariable(state, "Zone Electric Equipment Radiant Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecRadGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Electric Equipment Radiant Heating Rate",
+                        SetupOutputVariable(state, "Zone Electric Equipment Radiant Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecRadGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Electric Equipment Convective Heating Energy",
+                        SetupOutputVariable(state, "Zone Electric Equipment Convective Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecConGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Electric Equipment Convective Heating Rate",
+                        SetupOutputVariable(state, "Zone Electric Equipment Convective Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecConGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Electric Equipment Latent Gain Energy",
+                        SetupOutputVariable(state, "Zone Electric Equipment Latent Gain Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecLatGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Electric Equipment Latent Gain Rate",
+                        SetupOutputVariable(state, "Zone Electric Equipment Latent Gain Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecLatGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Electric Equipment Lost Heat Energy",
+                        SetupOutputVariable(state, "Zone Electric Equipment Lost Heat Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecLost,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Electric Equipment Lost Heat Rate",
+                        SetupOutputVariable(state, "Zone Electric Equipment Lost Heat Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecLostRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Electric Equipment Total Heating Energy",
+                        SetupOutputVariable(state, "Zone Electric Equipment Total Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecTotGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Electric Equipment Total Heating Rate",
+                        SetupOutputVariable(state, "Zone Electric Equipment Total Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecTotGainRate,
                                             "Zone",
@@ -1987,7 +1993,8 @@ namespace InternalHeatGains {
         TotGasEquip = 0;
         errFlag = false;
         for (Item = 1; Item <= NumZoneGasStatements; ++Item) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Item,
                                           AlphaName,
                                           NumAlpha,
@@ -2040,7 +2047,8 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               Item,
                                               AlphaName,
                                               NumAlpha,
@@ -2071,7 +2079,7 @@ namespace InternalHeatGains {
                         if (errFlag) ErrorsFound = true;
                     }
 
-                    ZoneGas(Loop).SchedPtr = GetScheduleIndex(AlphaName(3));
+                    ZoneGas(Loop).SchedPtr = GetScheduleIndex(state, AlphaName(3));
                     SchMin = 0.0;
                     SchMax = 0.0;
                     if (ZoneGas(Loop).SchedPtr == 0) {
@@ -2209,9 +2217,9 @@ namespace InternalHeatGains {
                     if (ZoneGas(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     // Object report variables
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "Gas Equipment NaturalGas Rate", OutputProcessor::Unit::W, ZoneGas(Loop).Power, "Zone", "Average", ZoneGas(Loop).Name);
-                    SetupOutputVariable("Gas Equipment NaturalGas Energy",
+                    SetupOutputVariable(state, "Gas Equipment NaturalGas Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneGas(Loop).Consumption,
                                         "Zone",
@@ -2226,45 +2234,45 @@ namespace InternalHeatGains {
                                         Zone(ZoneGas(Loop).ZonePtr).Multiplier,
                                         Zone(ZoneGas(Loop).ZonePtr).ListMultiplier);
 
-                    SetupOutputVariable("Gas Equipment Radiant Heating Energy",
+                    SetupOutputVariable(state, "Gas Equipment Radiant Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneGas(Loop).RadGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneGas(Loop).Name);
-                    SetupOutputVariable("Gas Equipment Convective Heating Energy",
+                    SetupOutputVariable(state, "Gas Equipment Convective Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneGas(Loop).ConGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneGas(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "Gas Equipment Latent Gain Energy", OutputProcessor::Unit::J, ZoneGas(Loop).LatGainEnergy, "Zone", "Sum", ZoneGas(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "Gas Equipment Lost Heat Energy", OutputProcessor::Unit::J, ZoneGas(Loop).LostEnergy, "Zone", "Sum", ZoneGas(Loop).Name);
-                    SetupOutputVariable("Gas Equipment Total Heating Energy",
+                    SetupOutputVariable(state, "Gas Equipment Total Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneGas(Loop).TotGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneGas(Loop).Name);
-                    SetupOutputVariable("Gas Equipment Radiant Heating Rate",
+                    SetupOutputVariable(state, "Gas Equipment Radiant Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneGas(Loop).RadGainRate,
                                         "Zone",
                                         "Average",
                                         ZoneGas(Loop).Name);
-                    SetupOutputVariable("Gas Equipment Convective Heating Rate",
+                    SetupOutputVariable(state, "Gas Equipment Convective Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneGas(Loop).ConGainRate,
                                         "Zone",
                                         "Average",
                                         ZoneGas(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "Gas Equipment Latent Gain Rate", OutputProcessor::Unit::W, ZoneGas(Loop).LatGainRate, "Zone", "Average", ZoneGas(Loop).Name);
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "Gas Equipment Lost Heat Rate", OutputProcessor::Unit::W, ZoneGas(Loop).LostRate, "Zone", "Average", ZoneGas(Loop).Name);
-                    SetupOutputVariable("Gas Equipment Total Heating Rate",
+                    SetupOutputVariable(state, "Gas Equipment Total Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneGas(Loop).TotGainRate,
                                         "Zone",
@@ -2275,74 +2283,74 @@ namespace InternalHeatGains {
                     if (RepVarSet(ZoneGas(Loop).ZonePtr)) {
                         RepVarSet(ZoneGas(Loop).ZonePtr) = false;
 
-                        SetupOutputVariable("Zone Gas Equipment NaturalGas Rate",
+                        SetupOutputVariable(state, "Zone Gas Equipment NaturalGas Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasPower,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Gas Equipment NaturalGas Energy",
+                        SetupOutputVariable(state, "Zone Gas Equipment NaturalGas Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasConsump,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneGas(Loop).ZonePtr).Name);
 
-                        SetupOutputVariable("Zone Gas Equipment Radiant Heating Energy",
+                        SetupOutputVariable(state, "Zone Gas Equipment Radiant Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasRadGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Gas Equipment Radiant Heating Rate",
+                        SetupOutputVariable(state, "Zone Gas Equipment Radiant Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasRadGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Gas Equipment Convective Heating Energy",
+                        SetupOutputVariable(state, "Zone Gas Equipment Convective Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasConGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Gas Equipment Convective Heating Rate",
+                        SetupOutputVariable(state, "Zone Gas Equipment Convective Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasConGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Gas Equipment Latent Gain Energy",
+                        SetupOutputVariable(state, "Zone Gas Equipment Latent Gain Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasLatGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Gas Equipment Latent Gain Rate",
+                        SetupOutputVariable(state, "Zone Gas Equipment Latent Gain Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasLatGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Gas Equipment Lost Heat Energy",
+                        SetupOutputVariable(state, "Zone Gas Equipment Lost Heat Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasLost,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Gas Equipment Lost Heat Rate",
+                        SetupOutputVariable(state, "Zone Gas Equipment Lost Heat Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasLostRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Gas Equipment Total Heating Energy",
+                        SetupOutputVariable(state, "Zone Gas Equipment Total Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasTotGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Gas Equipment Total Heating Rate",
+                        SetupOutputVariable(state, "Zone Gas Equipment Total Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasTotGainRate,
                                             "Zone",
@@ -2384,7 +2392,8 @@ namespace InternalHeatGains {
         TotHWEquip = 0;
         errFlag = false;
         for (Item = 1; Item <= NumHotWaterEqStatements; ++Item) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Item,
                                           AlphaName,
                                           NumAlpha,
@@ -2437,7 +2446,8 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               Item,
                                               AlphaName,
                                               NumAlpha,
@@ -2468,7 +2478,7 @@ namespace InternalHeatGains {
                         if (errFlag) ErrorsFound = true;
                     }
 
-                    ZoneHWEq(Loop).SchedPtr = GetScheduleIndex(AlphaName(3));
+                    ZoneHWEq(Loop).SchedPtr = GetScheduleIndex(state, AlphaName(3));
                     SchMin = 0.0;
                     SchMax = 0.0;
                     if (ZoneHWEq(Loop).SchedPtr == 0) {
@@ -2584,13 +2594,13 @@ namespace InternalHeatGains {
                     if (ZoneHWEq(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     // Object report variables
-                    SetupOutputVariable("Hot Water Equipment District Heating Rate",
+                    SetupOutputVariable(state, "Hot Water Equipment District Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneHWEq(Loop).Power,
                                         "Zone",
                                         "Average",
                                         ZoneHWEq(Loop).Name);
-                    SetupOutputVariable("Hot Water Equipment District Heating Energy",
+                    SetupOutputVariable(state, "Hot Water Equipment District Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneHWEq(Loop).Consumption,
                                         "Zone",
@@ -2605,61 +2615,61 @@ namespace InternalHeatGains {
                                         Zone(ZoneHWEq(Loop).ZonePtr).Multiplier,
                                         Zone(ZoneHWEq(Loop).ZonePtr).ListMultiplier);
 
-                    SetupOutputVariable("Hot Water Equipment Radiant Heating Energy",
+                    SetupOutputVariable(state, "Hot Water Equipment Radiant Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneHWEq(Loop).RadGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneHWEq(Loop).Name);
-                    SetupOutputVariable("Hot Water Equipment Radiant Heating Rate",
+                    SetupOutputVariable(state, "Hot Water Equipment Radiant Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneHWEq(Loop).RadGainRate,
                                         "Zone",
                                         "Average",
                                         ZoneHWEq(Loop).Name);
-                    SetupOutputVariable("Hot Water Equipment Convective Heating Energy",
+                    SetupOutputVariable(state, "Hot Water Equipment Convective Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneHWEq(Loop).ConGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneHWEq(Loop).Name);
-                    SetupOutputVariable("Hot Water Equipment Convective Heating Rate",
+                    SetupOutputVariable(state, "Hot Water Equipment Convective Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneHWEq(Loop).ConGainRate,
                                         "Zone",
                                         "Average",
                                         ZoneHWEq(Loop).Name);
-                    SetupOutputVariable("Hot Water Equipment Latent Gain Energy",
+                    SetupOutputVariable(state, "Hot Water Equipment Latent Gain Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneHWEq(Loop).LatGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneHWEq(Loop).Name);
-                    SetupOutputVariable("Hot Water Equipment Latent Gain Rate",
+                    SetupOutputVariable(state, "Hot Water Equipment Latent Gain Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneHWEq(Loop).LatGainRate,
                                         "Zone",
                                         "Average",
                                         ZoneHWEq(Loop).Name);
-                    SetupOutputVariable("Hot Water Equipment Lost Heat Energy",
+                    SetupOutputVariable(state, "Hot Water Equipment Lost Heat Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneHWEq(Loop).LostEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneHWEq(Loop).Name);
-                    SetupOutputVariable("Hot Water Equipment Lost Heat Rate",
+                    SetupOutputVariable(state, "Hot Water Equipment Lost Heat Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneHWEq(Loop).LostRate,
                                         "Zone",
                                         "Average",
                                         ZoneHWEq(Loop).Name);
-                    SetupOutputVariable("Hot Water Equipment Total Heating Energy",
+                    SetupOutputVariable(state, "Hot Water Equipment Total Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneHWEq(Loop).TotGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneHWEq(Loop).Name);
-                    SetupOutputVariable("Hot Water Equipment Total Heating Rate",
+                    SetupOutputVariable(state, "Hot Water Equipment Total Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneHWEq(Loop).TotGainRate,
                                         "Zone",
@@ -2669,74 +2679,74 @@ namespace InternalHeatGains {
                     // Zone total report variables
                     if (RepVarSet(ZoneHWEq(Loop).ZonePtr)) {
                         RepVarSet(ZoneHWEq(Loop).ZonePtr) = false;
-                        SetupOutputVariable("Zone Hot Water Equipment District Heating Rate",
+                        SetupOutputVariable(state, "Zone Hot Water Equipment District Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneHWEq(Loop).ZonePtr).HWPower,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Hot Water Equipment District Heating Energy",
+                        SetupOutputVariable(state, "Zone Hot Water Equipment District Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneHWEq(Loop).ZonePtr).HWConsump,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneHWEq(Loop).ZonePtr).Name);
 
-                        SetupOutputVariable("Zone Hot Water Equipment Radiant Heating Energy",
+                        SetupOutputVariable(state, "Zone Hot Water Equipment Radiant Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneHWEq(Loop).ZonePtr).HWRadGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Hot Water Equipment Radiant Heating Rate",
+                        SetupOutputVariable(state, "Zone Hot Water Equipment Radiant Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneHWEq(Loop).ZonePtr).HWRadGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Hot Water Equipment Convective Heating Energy",
+                        SetupOutputVariable(state, "Zone Hot Water Equipment Convective Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneHWEq(Loop).ZonePtr).HWConGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Hot Water Equipment Convective Heating Rate",
+                        SetupOutputVariable(state, "Zone Hot Water Equipment Convective Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneHWEq(Loop).ZonePtr).HWConGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Hot Water Equipment Latent Gain Energy",
+                        SetupOutputVariable(state, "Zone Hot Water Equipment Latent Gain Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneHWEq(Loop).ZonePtr).HWLatGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Hot Water Equipment Latent Gain Rate",
+                        SetupOutputVariable(state, "Zone Hot Water Equipment Latent Gain Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneHWEq(Loop).ZonePtr).HWLatGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Hot Water Equipment Lost Heat Energy",
+                        SetupOutputVariable(state, "Zone Hot Water Equipment Lost Heat Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneHWEq(Loop).ZonePtr).HWLost,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Hot Water Equipment Lost Heat Rate",
+                        SetupOutputVariable(state, "Zone Hot Water Equipment Lost Heat Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneHWEq(Loop).ZonePtr).HWLostRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Hot Water Equipment Total Heating Energy",
+                        SetupOutputVariable(state, "Zone Hot Water Equipment Total Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneHWEq(Loop).ZonePtr).HWTotGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Hot Water Equipment Total Heating Rate",
+                        SetupOutputVariable(state, "Zone Hot Water Equipment Total Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneHWEq(Loop).ZonePtr).HWTotGainRate,
                                             "Zone",
@@ -2776,7 +2786,8 @@ namespace InternalHeatGains {
         TotStmEquip = 0;
         errFlag = false;
         for (Item = 1; Item <= NumSteamEqStatements; ++Item) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Item,
                                           AlphaName,
                                           NumAlpha,
@@ -2829,7 +2840,8 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               Item,
                                               AlphaName,
                                               NumAlpha,
@@ -2860,7 +2872,7 @@ namespace InternalHeatGains {
                         if (errFlag) ErrorsFound = true;
                     }
 
-                    ZoneSteamEq(Loop).SchedPtr = GetScheduleIndex(AlphaName(3));
+                    ZoneSteamEq(Loop).SchedPtr = GetScheduleIndex(state, AlphaName(3));
                     SchMin = 0.0;
                     SchMax = 0.0;
                     if (ZoneSteamEq(Loop).SchedPtr == 0) {
@@ -2976,13 +2988,13 @@ namespace InternalHeatGains {
                     if (ZoneSteamEq(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     // Object report variables
-                    SetupOutputVariable("Steam Equipment District Heating Rate",
+                    SetupOutputVariable(state, "Steam Equipment District Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneSteamEq(Loop).Power,
                                         "Zone",
                                         "Average",
                                         ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable("Steam Equipment District Heating Energy",
+                    SetupOutputVariable(state, "Steam Equipment District Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneSteamEq(Loop).Consumption,
                                         "Zone",
@@ -2997,61 +3009,61 @@ namespace InternalHeatGains {
                                         Zone(ZoneSteamEq(Loop).ZonePtr).Multiplier,
                                         Zone(ZoneSteamEq(Loop).ZonePtr).ListMultiplier);
 
-                    SetupOutputVariable("Steam Equipment Radiant Heating Energy",
+                    SetupOutputVariable(state, "Steam Equipment Radiant Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneSteamEq(Loop).RadGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable("Steam Equipment Radiant Heating Rate",
+                    SetupOutputVariable(state, "Steam Equipment Radiant Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneSteamEq(Loop).RadGainRate,
                                         "Zone",
                                         "Average",
                                         ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable("Steam Equipment Convective Heating Energy",
+                    SetupOutputVariable(state, "Steam Equipment Convective Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneSteamEq(Loop).ConGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable("Steam Equipment Convective Heating Rate",
+                    SetupOutputVariable(state, "Steam Equipment Convective Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneSteamEq(Loop).ConGainRate,
                                         "Zone",
                                         "Average",
                                         ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable("Steam Equipment Latent Gain Energy",
+                    SetupOutputVariable(state, "Steam Equipment Latent Gain Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneSteamEq(Loop).LatGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable("Steam Equipment Latent Gain Rate",
+                    SetupOutputVariable(state, "Steam Equipment Latent Gain Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneSteamEq(Loop).LatGainRate,
                                         "Zone",
                                         "Average",
                                         ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable("Steam Equipment Lost Heat Energy",
+                    SetupOutputVariable(state, "Steam Equipment Lost Heat Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneSteamEq(Loop).LostEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable("Steam Equipment Lost Heat Rate",
+                    SetupOutputVariable(state, "Steam Equipment Lost Heat Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneSteamEq(Loop).LostRate,
                                         "Zone",
                                         "Average",
                                         ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable("Steam Equipment Total Heating Energy",
+                    SetupOutputVariable(state, "Steam Equipment Total Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneSteamEq(Loop).TotGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable("Steam Equipment Total Heating Rate",
+                    SetupOutputVariable(state, "Steam Equipment Total Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneSteamEq(Loop).TotGainRate,
                                         "Zone",
@@ -3061,74 +3073,74 @@ namespace InternalHeatGains {
                     // Zone total report variables
                     if (RepVarSet(ZoneSteamEq(Loop).ZonePtr)) {
                         RepVarSet(ZoneSteamEq(Loop).ZonePtr) = false;
-                        SetupOutputVariable("Zone Steam Equipment District Heating Rate",
+                        SetupOutputVariable(state, "Zone Steam Equipment District Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneSteamEq(Loop).ZonePtr).SteamPower,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Steam Equipment District Heating Energy",
+                        SetupOutputVariable(state, "Zone Steam Equipment District Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneSteamEq(Loop).ZonePtr).SteamConsump,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneSteamEq(Loop).ZonePtr).Name);
 
-                        SetupOutputVariable("Zone Steam Equipment Radiant Heating Energy",
+                        SetupOutputVariable(state, "Zone Steam Equipment Radiant Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneSteamEq(Loop).ZonePtr).SteamRadGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Steam Equipment Radiant Heating Rate",
+                        SetupOutputVariable(state, "Zone Steam Equipment Radiant Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneSteamEq(Loop).ZonePtr).SteamRadGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Steam Equipment Convective Heating Energy",
+                        SetupOutputVariable(state, "Zone Steam Equipment Convective Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneSteamEq(Loop).ZonePtr).SteamConGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Steam Equipment Convective Heating Rate",
+                        SetupOutputVariable(state, "Zone Steam Equipment Convective Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneSteamEq(Loop).ZonePtr).SteamConGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Steam Equipment Latent Gain Energy",
+                        SetupOutputVariable(state, "Zone Steam Equipment Latent Gain Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneSteamEq(Loop).ZonePtr).SteamLatGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Steam Equipment Latent Gain Rate",
+                        SetupOutputVariable(state, "Zone Steam Equipment Latent Gain Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneSteamEq(Loop).ZonePtr).SteamLatGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Steam Equipment Lost Heat Energy",
+                        SetupOutputVariable(state, "Zone Steam Equipment Lost Heat Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneSteamEq(Loop).ZonePtr).SteamLost,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Steam Equipment Lost Heat Rate",
+                        SetupOutputVariable(state, "Zone Steam Equipment Lost Heat Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneSteamEq(Loop).ZonePtr).SteamLostRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Steam Equipment Total Heating Energy",
+                        SetupOutputVariable(state, "Zone Steam Equipment Total Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneSteamEq(Loop).ZonePtr).SteamTotGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Steam Equipment Total Heating Rate",
+                        SetupOutputVariable(state, "Zone Steam Equipment Total Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneSteamEq(Loop).ZonePtr).SteamTotGainRate,
                                             "Zone",
@@ -3169,7 +3181,8 @@ namespace InternalHeatGains {
         TotOthEquip = 0;
         errFlag = false;
         for (Item = 1; Item <= NumOtherEqStatements; ++Item) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Item,
                                           AlphaName,
                                           NumAlpha,
@@ -3222,7 +3235,8 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               Item,
                                               AlphaName,
                                               NumAlpha,
@@ -3272,7 +3286,7 @@ namespace InternalHeatGains {
                         }
                     }
 
-                    ZoneOtherEq(Loop).SchedPtr = GetScheduleIndex(AlphaName(4));
+                    ZoneOtherEq(Loop).SchedPtr = GetScheduleIndex(state, AlphaName(4));
                     SchMin = 0.0;
                     SchMax = 0.0;
                     if (ZoneOtherEq(Loop).SchedPtr == 0) {
@@ -3393,13 +3407,13 @@ namespace InternalHeatGains {
 
                     // Object report variables
                     if (ZoneOtherEq(Loop).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
-                        SetupOutputVariable("Other Equipment " + FuelTypeString + " Rate",
+                        SetupOutputVariable(state, "Other Equipment " + FuelTypeString + " Rate",
                                             OutputProcessor::Unit::W,
                                             ZoneOtherEq(Loop).Power,
                                             "Zone",
                                             "Average",
                                             ZoneOtherEq(Loop).Name);
-                        SetupOutputVariable("Other Equipment " + FuelTypeString + " Energy",
+                        SetupOutputVariable(state, "Other Equipment " + FuelTypeString + " Energy",
                                             OutputProcessor::Unit::J,
                                             ZoneOtherEq(Loop).Consumption,
                                             "Zone",
@@ -3415,61 +3429,61 @@ namespace InternalHeatGains {
                                             Zone(ZoneOtherEq(Loop).ZonePtr).ListMultiplier);
                     }
 
-                    SetupOutputVariable("Other Equipment Radiant Heating Energy",
+                    SetupOutputVariable(state, "Other Equipment Radiant Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneOtherEq(Loop).RadGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable("Other Equipment Radiant Heating Rate",
+                    SetupOutputVariable(state, "Other Equipment Radiant Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneOtherEq(Loop).RadGainRate,
                                         "Zone",
                                         "Average",
                                         ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable("Other Equipment Convective Heating Energy",
+                    SetupOutputVariable(state, "Other Equipment Convective Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneOtherEq(Loop).ConGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable("Other Equipment Convective Heating Rate",
+                    SetupOutputVariable(state, "Other Equipment Convective Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneOtherEq(Loop).ConGainRate,
                                         "Zone",
                                         "Average",
                                         ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable("Other Equipment Latent Gain Energy",
+                    SetupOutputVariable(state, "Other Equipment Latent Gain Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneOtherEq(Loop).LatGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable("Other Equipment Latent Gain Rate",
+                    SetupOutputVariable(state, "Other Equipment Latent Gain Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneOtherEq(Loop).LatGainRate,
                                         "Zone",
                                         "Average",
                                         ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable("Other Equipment Lost Heat Energy",
+                    SetupOutputVariable(state, "Other Equipment Lost Heat Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneOtherEq(Loop).LostEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable("Other Equipment Lost Heat Rate",
+                    SetupOutputVariable(state, "Other Equipment Lost Heat Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneOtherEq(Loop).LostRate,
                                         "Zone",
                                         "Average",
                                         ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable("Other Equipment Total Heating Energy",
+                    SetupOutputVariable(state, "Other Equipment Total Heating Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneOtherEq(Loop).TotGainEnergy,
                                         "Zone",
                                         "Sum",
                                         ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable("Other Equipment Total Heating Rate",
+                    SetupOutputVariable(state, "Other Equipment Total Heating Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneOtherEq(Loop).TotGainRate,
                                         "Zone",
@@ -3481,13 +3495,13 @@ namespace InternalHeatGains {
                         RepVarSet(ZoneOtherEq(Loop).ZonePtr) = false;
 
                         if (ZoneOtherEq(Loop).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
-                            SetupOutputVariable("Zone Other Equipment " + FuelTypeString + " Rate",
+                            SetupOutputVariable(state, "Zone Other Equipment " + FuelTypeString + " Rate",
                                                 OutputProcessor::Unit::W,
                                                 ZnRpt(ZoneOtherEq(Loop).ZonePtr).OtherPower,
                                                 "Zone",
                                                 "Average",
                                                 Zone(ZoneOtherEq(Loop).ZonePtr).Name);
-                            SetupOutputVariable("Zone Other Equipment " + FuelTypeString + " Energy",
+                            SetupOutputVariable(state, "Zone Other Equipment " + FuelTypeString + " Energy",
                                                 OutputProcessor::Unit::J,
                                                 ZnRpt(ZoneOtherEq(Loop).ZonePtr).OtherConsump,
                                                 "Zone",
@@ -3495,61 +3509,61 @@ namespace InternalHeatGains {
                                                 Zone(ZoneOtherEq(Loop).ZonePtr).Name);
                         }
 
-                        SetupOutputVariable("Zone Other Equipment Radiant Heating Energy",
+                        SetupOutputVariable(state, "Zone Other Equipment Radiant Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneOtherEq(Loop).ZonePtr).OtherRadGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Other Equipment Radiant Heating Rate",
+                        SetupOutputVariable(state, "Zone Other Equipment Radiant Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneOtherEq(Loop).ZonePtr).OtherRadGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Other Equipment Convective Heating Energy",
+                        SetupOutputVariable(state, "Zone Other Equipment Convective Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneOtherEq(Loop).ZonePtr).OtherConGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Other Equipment Convective Heating Rate",
+                        SetupOutputVariable(state, "Zone Other Equipment Convective Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneOtherEq(Loop).ZonePtr).OtherConGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Other Equipment Latent Gain Energy",
+                        SetupOutputVariable(state, "Zone Other Equipment Latent Gain Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneOtherEq(Loop).ZonePtr).OtherLatGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Other Equipment Latent Gain Rate",
+                        SetupOutputVariable(state, "Zone Other Equipment Latent Gain Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneOtherEq(Loop).ZonePtr).OtherLatGainRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Other Equipment Lost Heat Energy",
+                        SetupOutputVariable(state, "Zone Other Equipment Lost Heat Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneOtherEq(Loop).ZonePtr).OtherLost,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Other Equipment Lost Heat Rate",
+                        SetupOutputVariable(state, "Zone Other Equipment Lost Heat Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneOtherEq(Loop).ZonePtr).OtherLostRate,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Other Equipment Total Heating Energy",
+                        SetupOutputVariable(state, "Zone Other Equipment Total Heating Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneOtherEq(Loop).ZonePtr).OtherTotGain,
                                             "Zone",
                                             "Sum",
                                             Zone(ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Other Equipment Total Heating Rate",
+                        SetupOutputVariable(state, "Zone Other Equipment Total Heating Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneOtherEq(Loop).ZonePtr).OtherTotGainRate,
                                             "Zone",
@@ -3594,7 +3608,8 @@ namespace InternalHeatGains {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               Loop,
                                               AlphaName,
                                               NumAlpha,
@@ -3668,7 +3683,7 @@ namespace InternalHeatGains {
                 if (lAlphaFieldBlanks(5)) {
                     ZoneITEq(Loop).OperSchedPtr = ScheduleAlwaysOn;
                 } else {
-                    ZoneITEq(Loop).OperSchedPtr = GetScheduleIndex(AlphaName(5));
+                    ZoneITEq(Loop).OperSchedPtr = GetScheduleIndex(state, AlphaName(5));
                 }
                 SchMin = 0.0;
                 SchMax = 0.0;
@@ -3700,7 +3715,7 @@ namespace InternalHeatGains {
                 if (lAlphaFieldBlanks(6)) {
                     ZoneITEq(Loop).CPULoadSchedPtr = ScheduleAlwaysOn;
                 } else {
-                    ZoneITEq(Loop).CPULoadSchedPtr = GetScheduleIndex(AlphaName(6));
+                    ZoneITEq(Loop).CPULoadSchedPtr = GetScheduleIndex(state, AlphaName(6));
                 }
                 SchMin = 0.0;
                 SchMax = 0.0;
@@ -3846,7 +3861,7 @@ namespace InternalHeatGains {
                         ErrorsFound = true;
                     }
                 } else {
-                    ZoneITEq(Loop).SupplyAirNodeNum = GetOnlySingleNode(
+                    ZoneITEq(Loop).SupplyAirNodeNum = GetOnlySingleNode(state,
                         AlphaName(14), ErrorsFound, CurrentModuleObject, AlphaName(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
                 }
 
@@ -3896,7 +3911,7 @@ namespace InternalHeatGains {
                 }
                 if (ZoneITEq(Loop).FlowControlWithApproachTemps) {
                     if (!lAlphaFieldBlanks(20)) {
-                        ZoneITEq(Loop).SupplyApproachTempSch = GetScheduleIndex(AlphaName(20));
+                        ZoneITEq(Loop).SupplyApproachTempSch = GetScheduleIndex(state, AlphaName(20));
                         if (ZoneITEq(Loop).SupplyApproachTempSch == 0) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(20) +
                                             " entered=" + AlphaName(20));
@@ -3912,7 +3927,7 @@ namespace InternalHeatGains {
                     }
 
                     if (!lAlphaFieldBlanks(21)) {
-                        ZoneITEq(Loop).ReturnApproachTempSch = GetScheduleIndex(AlphaName(21));
+                        ZoneITEq(Loop).ReturnApproachTempSch = GetScheduleIndex(state, AlphaName(21));
                         if (ZoneITEq(Loop).ReturnApproachTempSch == 0) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(20) +
                                             " entered=" + AlphaName(20));
@@ -3942,38 +3957,38 @@ namespace InternalHeatGains {
                 }
 
                 // Object report variables
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "ITE CPU Electricity Rate", OutputProcessor::Unit::W, ZoneITEq(Loop).CPUPower, "Zone", "Average", ZoneITEq(Loop).Name);
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "ITE Fan Electricity Rate", OutputProcessor::Unit::W, ZoneITEq(Loop).FanPower, "Zone", "Average", ZoneITEq(Loop).Name);
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "ITE UPS Electricity Rate", OutputProcessor::Unit::W, ZoneITEq(Loop).UPSPower, "Zone", "Average", ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE CPU Electricity Rate at Design Inlet Conditions",
+                SetupOutputVariable(state, "ITE CPU Electricity Rate at Design Inlet Conditions",
                                     OutputProcessor::Unit::W,
                                     ZoneITEq(Loop).CPUPowerAtDesign,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Fan Electricity Rate at Design Inlet Conditions",
+                SetupOutputVariable(state, "ITE Fan Electricity Rate at Design Inlet Conditions",
                                     OutputProcessor::Unit::W,
                                     ZoneITEq(Loop).FanPowerAtDesign,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE UPS Heat Gain to Zone Rate",
+                SetupOutputVariable(state, "ITE UPS Heat Gain to Zone Rate",
                                     OutputProcessor::Unit::W,
                                     ZoneITEq(Loop).UPSGainRateToZone,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Total Heat Gain to Zone Rate",
+                SetupOutputVariable(state, "ITE Total Heat Gain to Zone Rate",
                                     OutputProcessor::Unit::W,
                                     ZoneITEq(Loop).ConGainRateToZone,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
 
-                SetupOutputVariable("ITE CPU Electricity Energy",
+                SetupOutputVariable(state, "ITE CPU Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).CPUConsumption,
                                     "Zone",
@@ -3987,7 +4002,7 @@ namespace InternalHeatGains {
                                     Zone(ZoneITEq(Loop).ZonePtr).Name,
                                     Zone(ZoneITEq(Loop).ZonePtr).Multiplier,
                                     Zone(ZoneITEq(Loop).ZonePtr).ListMultiplier);
-                SetupOutputVariable("ITE Fan Electricity Energy",
+                SetupOutputVariable(state, "ITE Fan Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).FanConsumption,
                                     "Zone",
@@ -4001,7 +4016,7 @@ namespace InternalHeatGains {
                                     Zone(ZoneITEq(Loop).ZonePtr).Name,
                                     Zone(ZoneITEq(Loop).ZonePtr).Multiplier,
                                     Zone(ZoneITEq(Loop).ZonePtr).ListMultiplier);
-                SetupOutputVariable("ITE UPS Electricity Energy",
+                SetupOutputVariable(state, "ITE UPS Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).UPSConsumption,
                                     "Zone",
@@ -4015,146 +4030,146 @@ namespace InternalHeatGains {
                                     Zone(ZoneITEq(Loop).ZonePtr).Name,
                                     Zone(ZoneITEq(Loop).ZonePtr).Multiplier,
                                     Zone(ZoneITEq(Loop).ZonePtr).ListMultiplier);
-                SetupOutputVariable("ITE CPU Electricity Energy at Design Inlet Conditions",
+                SetupOutputVariable(state, "ITE CPU Electricity Energy at Design Inlet Conditions",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).CPUEnergyAtDesign,
                                     "Zone",
                                     "Sum",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Fan Electricity Energy at Design Inlet Conditions",
+                SetupOutputVariable(state, "ITE Fan Electricity Energy at Design Inlet Conditions",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).FanEnergyAtDesign,
                                     "Zone",
                                     "Sum",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE UPS Heat Gain to Zone Energy",
+                SetupOutputVariable(state, "ITE UPS Heat Gain to Zone Energy",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).UPSGainEnergyToZone,
                                     "Zone",
                                     "Sum",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Total Heat Gain to Zone Energy",
+                SetupOutputVariable(state, "ITE Total Heat Gain to Zone Energy",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).ConGainEnergyToZone,
                                     "Zone",
                                     "Sum",
                                     ZoneITEq(Loop).Name);
 
-                SetupOutputVariable("ITE Standard Density Air Volume Flow Rate",
+                SetupOutputVariable(state, "ITE Standard Density Air Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     ZoneITEq(Loop).AirVolFlowStdDensity,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Current Density Air Volume Flow Rate",
+                SetupOutputVariable(state, "ITE Current Density Air Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     ZoneITEq(Loop).AirVolFlowCurDensity,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "ITE Air Mass Flow Rate", OutputProcessor::Unit::kg_s, ZoneITEq(Loop).AirMassFlow, "Zone", "Average", ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Inlet Dry-Bulb Temperature",
+                SetupOutputVariable(state, "ITE Air Inlet Dry-Bulb Temperature",
                                     OutputProcessor::Unit::C,
                                     ZoneITEq(Loop).AirInletDryBulbT,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Inlet Dewpoint Temperature",
+                SetupOutputVariable(state, "ITE Air Inlet Dewpoint Temperature",
                                     OutputProcessor::Unit::C,
                                     ZoneITEq(Loop).AirInletDewpointT,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Inlet Relative Humidity",
+                SetupOutputVariable(state, "ITE Air Inlet Relative Humidity",
                                     OutputProcessor::Unit::Perc,
                                     ZoneITEq(Loop).AirInletRelHum,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Outlet Dry-Bulb Temperature",
+                SetupOutputVariable(state, "ITE Air Outlet Dry-Bulb Temperature",
                                     OutputProcessor::Unit::C,
                                     ZoneITEq(Loop).AirOutletDryBulbT,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
                 if (ZoneITEq(Loop).SupplyAirNodeNum != 0) {
-                    SetupOutputVariable(
+                    SetupOutputVariable(state,
                         "ITE Supply Heat Index", OutputProcessor::Unit::None, ZoneITEq(Loop).SHI, "Zone", "Average", ZoneITEq(Loop).Name);
                 }
-                SetupOutputVariable("ITE Air Inlet Operating Range Exceeded Time",
+                SetupOutputVariable(state, "ITE Air Inlet Operating Range Exceeded Time",
                                     OutputProcessor::Unit::hr,
                                     ZoneITEq(Loop).TimeOutOfOperRange,
                                     "Zone",
                                     "Sum",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time",
+                SetupOutputVariable(state, "ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time",
                                     OutputProcessor::Unit::hr,
                                     ZoneITEq(Loop).TimeAboveDryBulbT,
                                     "Zone",
                                     "Sum",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time",
+                SetupOutputVariable(state, "ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time",
                                     OutputProcessor::Unit::hr,
                                     ZoneITEq(Loop).TimeBelowDryBulbT,
                                     "Zone",
                                     "Sum",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Inlet Dewpoint Temperature Above Operating Range Time",
+                SetupOutputVariable(state, "ITE Air Inlet Dewpoint Temperature Above Operating Range Time",
                                     OutputProcessor::Unit::hr,
                                     ZoneITEq(Loop).TimeAboveDewpointT,
                                     "Zone",
                                     "Sum",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Inlet Dewpoint Temperature Below Operating Range Time",
+                SetupOutputVariable(state, "ITE Air Inlet Dewpoint Temperature Below Operating Range Time",
                                     OutputProcessor::Unit::hr,
                                     ZoneITEq(Loop).TimeBelowDewpointT,
                                     "Zone",
                                     "Sum",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Inlet Relative Humidity Above Operating Range Time",
+                SetupOutputVariable(state, "ITE Air Inlet Relative Humidity Above Operating Range Time",
                                     OutputProcessor::Unit::hr,
                                     ZoneITEq(Loop).TimeAboveRH,
                                     "Zone",
                                     "Sum",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Inlet Relative Humidity Below Operating Range Time",
+                SetupOutputVariable(state, "ITE Air Inlet Relative Humidity Below Operating Range Time",
                                     OutputProcessor::Unit::hr,
                                     ZoneITEq(Loop).TimeBelowRH,
                                     "Zone",
                                     "Sum",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range",
+                SetupOutputVariable(state, "ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range",
                                     OutputProcessor::Unit::deltaC,
                                     ZoneITEq(Loop).DryBulbTAboveDeltaT,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range",
+                SetupOutputVariable(state, "ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range",
                                     OutputProcessor::Unit::deltaC,
                                     ZoneITEq(Loop).DryBulbTBelowDeltaT,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Inlet Dewpoint Temperature Difference Above Operating Range",
+                SetupOutputVariable(state, "ITE Air Inlet Dewpoint Temperature Difference Above Operating Range",
                                     OutputProcessor::Unit::deltaC,
                                     ZoneITEq(Loop).DewpointTAboveDeltaT,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Inlet Dewpoint Temperature Difference Below Operating Range",
+                SetupOutputVariable(state, "ITE Air Inlet Dewpoint Temperature Difference Below Operating Range",
                                     OutputProcessor::Unit::deltaC,
                                     ZoneITEq(Loop).DewpointTBelowDeltaT,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Inlet Relative Humidity Difference Above Operating Range",
+                SetupOutputVariable(state, "ITE Air Inlet Relative Humidity Difference Above Operating Range",
                                     OutputProcessor::Unit::Perc,
                                     ZoneITEq(Loop).RHAboveDeltaRH,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Air Inlet Relative Humidity Difference Below Operating Range",
+                SetupOutputVariable(state, "ITE Air Inlet Relative Humidity Difference Below Operating Range",
                                     OutputProcessor::Unit::Perc,
                                     ZoneITEq(Loop).RHBelowDeltaRH,
                                     "Zone",
@@ -4164,153 +4179,153 @@ namespace InternalHeatGains {
                 // Zone total report variables
                 if (RepVarSet(ZoneITEq(Loop).ZonePtr)) {
                     RepVarSet(ZoneITEq(Loop).ZonePtr) = false;
-                    SetupOutputVariable("Zone ITE CPU Electricity Rate",
+                    SetupOutputVariable(state, "Zone ITE CPU Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqCPUPower,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Fan Electricity Rate",
+                    SetupOutputVariable(state, "Zone ITE Fan Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqFanPower,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE UPS Electricity Rate",
+                    SetupOutputVariable(state, "Zone ITE UPS Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqUPSPower,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE CPU Electricity Rate at Design Inlet Conditions",
+                    SetupOutputVariable(state, "Zone ITE CPU Electricity Rate at Design Inlet Conditions",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqCPUPowerAtDesign,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Fan Electricity Rate at Design Inlet Conditions",
+                    SetupOutputVariable(state, "Zone ITE Fan Electricity Rate at Design Inlet Conditions",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqFanPowerAtDesign,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE UPS Heat Gain to Zone Rate",
+                    SetupOutputVariable(state, "Zone ITE UPS Heat Gain to Zone Rate",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqUPSGainRateToZone,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Total Heat Gain to Zone Rate",
+                    SetupOutputVariable(state, "Zone ITE Total Heat Gain to Zone Rate",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqConGainRateToZone,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Adjusted Return Air Temperature",
+                    SetupOutputVariable(state, "Zone ITE Adjusted Return Air Temperature",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEAdjReturnTemp,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
 
-                    SetupOutputVariable("Zone ITE CPU Electricity Energy",
+                    SetupOutputVariable(state, "Zone ITE CPU Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqCPUConsumption,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Fan Electricity Energy",
+                    SetupOutputVariable(state, "Zone ITE Fan Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqFanConsumption,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE UPS Electricity Energy",
+                    SetupOutputVariable(state, "Zone ITE UPS Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqUPSConsumption,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE CPU Electricity Energy at Design Inlet Conditions",
+                    SetupOutputVariable(state, "Zone ITE CPU Electricity Energy at Design Inlet Conditions",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqCPUEnergyAtDesign,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Fan Electricity Energy at Design Inlet Conditions",
+                    SetupOutputVariable(state, "Zone ITE Fan Electricity Energy at Design Inlet Conditions",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqFanEnergyAtDesign,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE UPS Heat Gain to Zone Energy",
+                    SetupOutputVariable(state, "Zone ITE UPS Heat Gain to Zone Energy",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqUPSGainEnergyToZone,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Total Heat Gain to Zone Energy",
+                    SetupOutputVariable(state, "Zone ITE Total Heat Gain to Zone Energy",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqConGainEnergyToZone,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
 
-                    SetupOutputVariable("Zone ITE Standard Density Air Volume Flow Rate",
+                    SetupOutputVariable(state, "Zone ITE Standard Density Air Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqAirVolFlowStdDensity,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Air Mass Flow Rate",
+                    SetupOutputVariable(state, "Zone ITE Air Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqAirMassFlow,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Average Supply Heat Index",
+                    SetupOutputVariable(state, "Zone ITE Average Supply Heat Index",
                                         OutputProcessor::Unit::None,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqSHI,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Any Air Inlet Operating Range Exceeded Time",
+                    SetupOutputVariable(state, "Zone ITE Any Air Inlet Operating Range Exceeded Time",
                                         OutputProcessor::Unit::hr,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqTimeOutOfOperRange,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Any Air Inlet Dry-Bulb Temperature Above Operating Range Time",
+                    SetupOutputVariable(state, "Zone ITE Any Air Inlet Dry-Bulb Temperature Above Operating Range Time",
                                         OutputProcessor::Unit::hr,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqTimeAboveDryBulbT,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Any Air Inlet Dry-Bulb Temperature Below Operating Range Time",
+                    SetupOutputVariable(state, "Zone ITE Any Air Inlet Dry-Bulb Temperature Below Operating Range Time",
                                         OutputProcessor::Unit::hr,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqTimeBelowDryBulbT,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Any Air Inlet Dewpoint Temperature Above Operating Range Time",
+                    SetupOutputVariable(state, "Zone ITE Any Air Inlet Dewpoint Temperature Above Operating Range Time",
                                         OutputProcessor::Unit::hr,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqTimeAboveDewpointT,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time",
+                    SetupOutputVariable(state, "Zone ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time",
                                         OutputProcessor::Unit::hr,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqTimeBelowDewpointT,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Any Air Inlet Relative Humidity Above Operating Range Time",
+                    SetupOutputVariable(state, "Zone ITE Any Air Inlet Relative Humidity Above Operating Range Time",
                                         OutputProcessor::Unit::hr,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqTimeAboveRH,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time",
+                    SetupOutputVariable(state, "Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time",
                                         OutputProcessor::Unit::hr,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqTimeBelowRH,
                                         "Zone",
@@ -4350,7 +4365,8 @@ namespace InternalHeatGains {
         for (Loop = 1; Loop <= TotBBHeat; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           AlphaName,
                                           NumAlpha,
@@ -4372,7 +4388,7 @@ namespace InternalHeatGains {
                 ErrorsFound = true;
             }
 
-            ZoneBBHeat(Loop).SchedPtr = GetScheduleIndex(AlphaName(3));
+            ZoneBBHeat(Loop).SchedPtr = GetScheduleIndex(state, AlphaName(3));
             if (ZoneBBHeat(Loop).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
@@ -4422,9 +4438,9 @@ namespace InternalHeatGains {
             if (ZoneBBHeat(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
             // Object report variables
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Baseboard Electricity Rate", OutputProcessor::Unit::W, ZoneBBHeat(Loop).Power, "Zone", "Average", ZoneBBHeat(Loop).Name);
-            SetupOutputVariable("Baseboard Electricity Energy",
+            SetupOutputVariable(state, "Baseboard Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 ZoneBBHeat(Loop).Consumption,
                                 "Zone",
@@ -4439,74 +4455,74 @@ namespace InternalHeatGains {
                                 Zone(ZoneBBHeat(Loop).ZonePtr).Multiplier,
                                 Zone(ZoneBBHeat(Loop).ZonePtr).ListMultiplier);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Baseboard Radiant Heating Energy", OutputProcessor::Unit::J, ZoneBBHeat(Loop).RadGainEnergy, "Zone", "Sum", ZoneBBHeat(Loop).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Baseboard Radiant Heating Rate", OutputProcessor::Unit::W, ZoneBBHeat(Loop).RadGainRate, "Zone", "Average", ZoneBBHeat(Loop).Name);
-            SetupOutputVariable("Baseboard Convective Heating Energy",
+            SetupOutputVariable(state, "Baseboard Convective Heating Energy",
                                 OutputProcessor::Unit::J,
                                 ZoneBBHeat(Loop).ConGainEnergy,
                                 "Zone",
                                 "Sum",
                                 ZoneBBHeat(Loop).Name);
-            SetupOutputVariable("Baseboard Convective Heating Rate",
+            SetupOutputVariable(state, "Baseboard Convective Heating Rate",
                                 OutputProcessor::Unit::W,
                                 ZoneBBHeat(Loop).ConGainRate,
                                 "Zone",
                                 "Average",
                                 ZoneBBHeat(Loop).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Baseboard Total Heating Energy", OutputProcessor::Unit::J, ZoneBBHeat(Loop).TotGainEnergy, "Zone", "Sum", ZoneBBHeat(Loop).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Baseboard Total Heating Rate", OutputProcessor::Unit::W, ZoneBBHeat(Loop).TotGainRate, "Zone", "Average", ZoneBBHeat(Loop).Name);
 
             // Zone total report variables
             if (RepVarSet(ZoneBBHeat(Loop).ZonePtr)) {
                 RepVarSet(ZoneBBHeat(Loop).ZonePtr) = false;
-                SetupOutputVariable("Zone Baseboard Electricity Rate",
+                SetupOutputVariable(state, "Zone Baseboard Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     ZnRpt(ZoneBBHeat(Loop).ZonePtr).BaseHeatPower,
                                     "Zone",
                                     "Average",
                                     Zone(ZoneBBHeat(Loop).ZonePtr).Name);
-                SetupOutputVariable("Zone Baseboard Electricity Energy",
+                SetupOutputVariable(state, "Zone Baseboard Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     ZnRpt(ZoneBBHeat(Loop).ZonePtr).BaseHeatElecCons,
                                     "Zone",
                                     "Sum",
                                     Zone(ZoneBBHeat(Loop).ZonePtr).Name);
 
-                SetupOutputVariable("Zone Baseboard Radiant Heating Energy",
+                SetupOutputVariable(state, "Zone Baseboard Radiant Heating Energy",
                                     OutputProcessor::Unit::J,
                                     ZnRpt(ZoneBBHeat(Loop).ZonePtr).BaseHeatRadGain,
                                     "Zone",
                                     "Sum",
                                     Zone(ZoneBBHeat(Loop).ZonePtr).Name);
-                SetupOutputVariable("Zone Baseboard Radiant Heating Rate",
+                SetupOutputVariable(state, "Zone Baseboard Radiant Heating Rate",
                                     OutputProcessor::Unit::W,
                                     ZnRpt(ZoneBBHeat(Loop).ZonePtr).BaseHeatRadGainRate,
                                     "Zone",
                                     "Average",
                                     Zone(ZoneBBHeat(Loop).ZonePtr).Name);
-                SetupOutputVariable("Zone Baseboard Convective Heating Energy",
+                SetupOutputVariable(state, "Zone Baseboard Convective Heating Energy",
                                     OutputProcessor::Unit::J,
                                     ZnRpt(ZoneBBHeat(Loop).ZonePtr).BaseHeatConGain,
                                     "Zone",
                                     "Sum",
                                     Zone(ZoneBBHeat(Loop).ZonePtr).Name);
-                SetupOutputVariable("Zone Baseboard Convective Heating Rate",
+                SetupOutputVariable(state, "Zone Baseboard Convective Heating Rate",
                                     OutputProcessor::Unit::W,
                                     ZnRpt(ZoneBBHeat(Loop).ZonePtr).BaseHeatConGainRate,
                                     "Zone",
                                     "Average",
                                     Zone(ZoneBBHeat(Loop).ZonePtr).Name);
-                SetupOutputVariable("Zone Baseboard Total Heating Energy",
+                SetupOutputVariable(state, "Zone Baseboard Total Heating Energy",
                                     OutputProcessor::Unit::J,
                                     ZnRpt(ZoneBBHeat(Loop).ZonePtr).BaseHeatTotGain,
                                     "Zone",
                                     "Sum",
                                     Zone(ZoneBBHeat(Loop).ZonePtr).Name);
-                SetupOutputVariable("Zone Baseboard Total Heating Rate",
+                SetupOutputVariable(state, "Zone Baseboard Total Heating Rate",
                                     OutputProcessor::Unit::W,
                                     ZnRpt(ZoneBBHeat(Loop).ZonePtr).BaseHeatTotGainRate,
                                     "Zone",
@@ -4544,7 +4560,8 @@ namespace InternalHeatGains {
         for (Loop = 1; Loop <= TotCO2Gen; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           AlphaName,
                                           NumAlpha,
@@ -4566,7 +4583,7 @@ namespace InternalHeatGains {
                 ErrorsFound = true;
             }
 
-            ZoneCO2Gen(Loop).SchedPtr = GetScheduleIndex(AlphaName(3));
+            ZoneCO2Gen(Loop).SchedPtr = GetScheduleIndex(state, AlphaName(3));
             if (ZoneCO2Gen(Loop).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) + " is required.");
@@ -4601,7 +4618,7 @@ namespace InternalHeatGains {
             if (ZoneCO2Gen(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
             // Object report variables
-            SetupOutputVariable("Contaminant Source or Sink CO2 Gain Volume Flow Rate",
+            SetupOutputVariable(state, "Contaminant Source or Sink CO2 Gain Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 ZoneCO2Gen(Loop).CO2GainRate,
                                 "Zone",
@@ -4612,7 +4629,7 @@ namespace InternalHeatGains {
             if (RepVarSet(ZoneCO2Gen(Loop).ZonePtr)) {
                 RepVarSet(ZoneCO2Gen(Loop).ZonePtr) = false;
 
-                SetupOutputVariable("Zone Contaminant Source or Sink CO2 Gain Volume Flow Rate",
+                SetupOutputVariable(state, "Zone Contaminant Source or Sink CO2 Gain Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     ZnRpt(ZoneCO2Gen(Loop).ZonePtr).CO2Rate,
                                     "Zone",
@@ -4733,7 +4750,7 @@ namespace InternalHeatGains {
                   Format_722,
                   "People",
                   People(Loop).Name,
-                  GetScheduleName(People(Loop).NumberOfPeoplePtr),
+                  GetScheduleName(state, People(Loop).NumberOfPeoplePtr),
                   Zone(ZoneNum).Name,
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
@@ -4755,7 +4772,7 @@ namespace InternalHeatGains {
             } else {
                 print(state.files.eio, "{:.3R},", People(Loop).UserSpecSensFrac);
             }
-            print(state.files.eio, "{},", GetScheduleName(People(Loop).ActivityLevelPtr));
+            print(state.files.eio, "{},", GetScheduleName(state, People(Loop).ActivityLevelPtr));
 
             if (People(Loop).Show55Warning) {
                 print(state.files.eio, "Yes,");
@@ -4777,7 +4794,7 @@ namespace InternalHeatGains {
                 } else {
                     print(state.files.eio, "N/A,");
                 }
-                print(state.files.eio, "{},", GetScheduleName(People(Loop).WorkEffPtr));
+                print(state.files.eio, "{},", GetScheduleName(state, People(Loop).WorkEffPtr));
 
                 if (People(Loop).ClothingType == 1) {
                     print(state.files.eio, "Clothing Insulation Schedule,");
@@ -4790,13 +4807,13 @@ namespace InternalHeatGains {
                 }
 
                 if (People(Loop).ClothingType == 3) {
-                    print(state.files.eio, "{},", GetScheduleName(People(Loop).ClothingMethodPtr));
+                    print(state.files.eio, "{},", GetScheduleName(state, People(Loop).ClothingMethodPtr));
                 } else {
                     print(state.files.eio, "N/A,");
                 }
 
-                print(state.files.eio, "{},", GetScheduleName(People(Loop).ClothingPtr));
-                print(state.files.eio, "{},", GetScheduleName(People(Loop).AirVelocityPtr));
+                print(state.files.eio, "{},", GetScheduleName(state, People(Loop).ClothingPtr));
+                print(state.files.eio, "{},", GetScheduleName(state, People(Loop).AirVelocityPtr));
 
                 if (People(Loop).Fanger) {
                     print(state.files.eio, "Yes,");
@@ -4837,7 +4854,7 @@ namespace InternalHeatGains {
                   Format_722,
                   "Lights",
                   Lights(Loop).Name,
-                  GetScheduleName(Lights(Loop).SchedPtr),
+                  GetScheduleName(state, Lights(Loop).SchedPtr),
                   Zone(ZoneNum).Name,
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
@@ -4875,7 +4892,7 @@ namespace InternalHeatGains {
                   Format_722,
                   "ElectricEquipment",
                   ZoneElectric(Loop).Name,
-                  GetScheduleName(ZoneElectric(Loop).SchedPtr),
+                  GetScheduleName(state, ZoneElectric(Loop).SchedPtr),
                   Zone(ZoneNum).Name,
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
@@ -4913,7 +4930,7 @@ namespace InternalHeatGains {
                   Format_722,
                   "GasEquipment",
                   ZoneGas(Loop).Name,
-                  GetScheduleName(ZoneGas(Loop).SchedPtr),
+                  GetScheduleName(state, ZoneGas(Loop).SchedPtr),
                   Zone(ZoneNum).Name,
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
@@ -4952,7 +4969,7 @@ namespace InternalHeatGains {
                   Format_722,
                   "HotWaterEquipment",
                   ZoneHWEq(Loop).Name,
-                  GetScheduleName(ZoneHWEq(Loop).SchedPtr),
+                  GetScheduleName(state, ZoneHWEq(Loop).SchedPtr),
                   Zone(ZoneNum).Name,
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
@@ -4991,7 +5008,7 @@ namespace InternalHeatGains {
                   Format_722,
                   "SteamEquipment",
                   ZoneSteamEq(Loop).Name,
-                  GetScheduleName(ZoneSteamEq(Loop).SchedPtr),
+                  GetScheduleName(state, ZoneSteamEq(Loop).SchedPtr),
                   Zone(ZoneNum).Name,
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
@@ -5030,7 +5047,7 @@ namespace InternalHeatGains {
                   Format_722,
                   "OtherEquipment",
                   ZoneOtherEq(Loop).Name,
-                  GetScheduleName(ZoneOtherEq(Loop).SchedPtr),
+                  GetScheduleName(state, ZoneOtherEq(Loop).SchedPtr),
                   Zone(ZoneNum).Name,
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
@@ -5069,7 +5086,7 @@ namespace InternalHeatGains {
                   Format_722,
                   "ElectricEquipment:ITE:AirCooled",
                   ZoneITEq(Loop).Name,
-                  GetScheduleName(ZoneITEq(Loop).OperSchedPtr),
+                  GetScheduleName(state, ZoneITEq(Loop).OperSchedPtr),
                   Zone(ZoneNum).Name,
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
@@ -5108,7 +5125,7 @@ namespace InternalHeatGains {
                   Format_722,
                   "Outdoor Controlled Baseboard Heat",
                   ZoneBBHeat(Loop).Name,
-                  GetScheduleName(ZoneBBHeat(Loop).SchedPtr),
+                  GetScheduleName(state, ZoneBBHeat(Loop).SchedPtr),
                   Zone(ZoneNum).Name,
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);

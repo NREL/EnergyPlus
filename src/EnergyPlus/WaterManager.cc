@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/General.hh>
@@ -81,7 +80,6 @@ namespace WaterManager {
     //       MODIFIED       DJS to add ecoroof irrigation Jan 2007
     //       RE-ENGINEERED  na
 
-    using namespace DataPrecisionGlobals;
     using DataGlobals::BigNumber;
     using namespace DataWater;
 
@@ -122,7 +120,7 @@ namespace WaterManager {
         int RainColNum(0);
         int TankNum(0);
         int WellNum(0);
-        
+
         if (state.dataWaterManager->GetInputFlag) {
             GetWaterManagerInput(state);
             state.dataWaterManager->GetInputFlag = false;
@@ -261,7 +259,8 @@ namespace WaterManager {
                 if (!(allocated(WaterStorage))) WaterStorage.allocate(NumWaterStorageTanks);
 
                 for (Item = 1; Item <= NumWaterStorageTanks; ++Item) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   Item,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -363,7 +362,7 @@ namespace WaterManager {
                     }
 
                     if (WaterStorage(Item).ThermalMode == ScheduledTankTemp) {
-                        WaterStorage(Item).TempSchedID = GetScheduleIndex(cAlphaArgs(7));
+                        WaterStorage(Item).TempSchedID = GetScheduleIndex(state, cAlphaArgs(7));
                         if (WaterStorage(Item).TempSchedID == 0) {
                             ShowSevereError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                             ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -397,7 +396,7 @@ namespace WaterManager {
                             ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
                         }
-                        WaterStorage(Item).AmbientTempSchedule = GetScheduleIndex(cAlphaArgs(9));
+                        WaterStorage(Item).AmbientTempSchedule = GetScheduleIndex(state, cAlphaArgs(9));
                         if ((WaterStorage(Item).AmbientTempSchedule == 0) && (WaterStorage(Item).AmbientTempIndicator == AmbientTempSchedule)) {
                             ShowSevereError("Invalid " + cAlphaFieldNames(9) + '=' + cAlphaArgs(9));
                             ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -425,7 +424,8 @@ namespace WaterManager {
                 AnyWaterSystemsInModel = true;
 
                 for (Item = 1; Item <= NumRainCollectors; ++Item) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   Item,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -471,7 +471,7 @@ namespace WaterManager {
                     }
 
                     if (RainCollector(Item).LossFactorMode == ScheduledRainLossFactor) {
-                        RainCollector(Item).LossFactorSchedID = GetScheduleIndex(cAlphaArgs(4));
+                        RainCollector(Item).LossFactorSchedID = GetScheduleIndex(state, cAlphaArgs(4));
                         if (RainCollector(Item).LossFactorSchedID == 0) {
                             ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                             ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -538,7 +538,8 @@ namespace WaterManager {
                 AnyWaterSystemsInModel = true;
                 GroundwaterWell.allocate(NumGroundWaterWells);
                 for (Item = 1; Item <= NumGroundWaterWells; ++Item) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   Item,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -585,7 +586,7 @@ namespace WaterManager {
                     //  N8, \field water table depth
                     GroundwaterWell(Item).WaterTableDepth = rNumericArgs(8);
                     // A4; \field water table depth schedule
-                    GroundwaterWell(Item).WaterTableDepthSchedID = GetScheduleIndex(cAlphaArgs(4));
+                    GroundwaterWell(Item).WaterTableDepthSchedID = GetScheduleIndex(state, cAlphaArgs(4));
                     if ((GroundwaterWell(Item).GroundwaterTableMode == ScheduledWaterTable) && (GroundwaterWell(Item).WaterTableDepthSchedID == 0)) {
                         ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -659,7 +660,7 @@ namespace WaterManager {
 
             if (NumSiteRainFall == 1) {
                 AnyWaterSystemsInModel = true;
-                inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+                inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
 
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "ScheduleAndDesignLevel")) {
                     RainFall.ModeID = RainSchedDesign;
@@ -668,7 +669,7 @@ namespace WaterManager {
                     ShowContinueError("Only available option is ScheduleAndDesignLevel.");
                     ErrorsFound = true;
                 }
-                RainFall.RainSchedID = GetScheduleIndex(cAlphaArgs(2));
+                RainFall.RainSchedID = GetScheduleIndex(state, cAlphaArgs(2));
                 if ((RainFall.RainSchedID == 0) && (RainFall.ModeID == RainSchedDesign)) {
                     ShowSevereError("Schedule not found for " + cCurrentModuleObject + " object");
                     ErrorsFound = true;
@@ -692,7 +693,7 @@ namespace WaterManager {
 
             if (NumIrrigation == 1) {
                 AnyIrrigationInModel = true;
-                inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+                inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
                 if (UtilityRoutines::SameString(cAlphaArgs(1), "Schedule")) {
                     Irrigation.ModeID = IrrSchedDesign;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(1), "SmartSchedule")) {
@@ -701,7 +702,7 @@ namespace WaterManager {
                     ShowSevereError("Type of " + cCurrentModuleObject + " is incorrect. Options are Schedule or SmartSchedule");
                     ErrorsFound = true;
                 }
-                Irrigation.IrrSchedID = GetScheduleIndex(cAlphaArgs(2));
+                Irrigation.IrrSchedID = GetScheduleIndex(state, cAlphaArgs(2));
                 if ((Irrigation.IrrSchedID == 0) && ((Irrigation.ModeID == IrrSchedDesign) || Irrigation.ModeID == IrrSmartSched)) {
                     ShowSevereError("Schedule not found for " + cCurrentModuleObject + " object");
                     ErrorsFound = true;
@@ -743,31 +744,31 @@ namespace WaterManager {
             // <SetupOutputVariables here...>, CurrentModuleObject='WaterUse:Storage'
             for (Item = 1; Item <= NumWaterStorageTanks; ++Item) {
                 // this next one is a measure of the state of water in the tank, not a flux of m3 that needs to be summed
-                SetupOutputVariable("Water System Storage Tank Volume",
+                SetupOutputVariable(state, "Water System Storage Tank Volume",
                                     OutputProcessor::Unit::m3,
                                     WaterStorage(Item).ThisTimeStepVolume,
                                     "System",
                                     "Average",
                                     WaterStorage(Item).Name);
-                SetupOutputVariable("Water System Storage Tank Net Volume Flow Rate",
+                SetupOutputVariable(state, "Water System Storage Tank Net Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     WaterStorage(Item).NetVdot,
                                     "System",
                                     "Average",
                                     WaterStorage(Item).Name);
-                SetupOutputVariable("Water System Storage Tank Inlet Volume Flow Rate",
+                SetupOutputVariable(state, "Water System Storage Tank Inlet Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     WaterStorage(Item).VdotToTank,
                                     "System",
                                     "Average",
                                     WaterStorage(Item).Name);
-                SetupOutputVariable("Water System Storage Tank Outlet Volume Flow Rate",
+                SetupOutputVariable(state, "Water System Storage Tank Outlet Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     WaterStorage(Item).VdotFromTank,
                                     "System",
                                     "Average",
                                     WaterStorage(Item).Name);
-                SetupOutputVariable("Water System Storage Tank Mains Water Volume",
+                SetupOutputVariable(state, "Water System Storage Tank Mains Water Volume",
                                     OutputProcessor::Unit::m3,
                                     WaterStorage(Item).MainsDrawVol,
                                     "System",
@@ -778,26 +779,26 @@ namespace WaterManager {
                                     "WaterSystem",
                                     WaterStorage(Item).QualitySubCategoryName,
                                     "System");
-                SetupOutputVariable("Water System Storage Tank Mains Water Volume Flow Rate",
+                SetupOutputVariable(state, "Water System Storage Tank Mains Water Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     WaterStorage(Item).MainsDrawVdot,
                                     "System",
                                     "Average",
                                     WaterStorage(Item).Name);
-                SetupOutputVariable("Water System Storage Tank Water Temperature",
+                SetupOutputVariable(state, "Water System Storage Tank Water Temperature",
                                     OutputProcessor::Unit::C,
                                     WaterStorage(Item).Twater,
                                     "System",
                                     "Average",
                                     WaterStorage(Item).Name);
-                SetupOutputVariable("Water System Storage Tank Overflow Volume Flow Rate",
+                SetupOutputVariable(state, "Water System Storage Tank Overflow Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     WaterStorage(Item).VdotOverflow,
                                     "System",
                                     "Average",
                                     WaterStorage(Item).Name);
                 if (WaterStorage(Item).OverflowMode == OverflowDiscarded) {
-                    SetupOutputVariable("Water System Storage Tank Overflow Water Volume",
+                    SetupOutputVariable(state, "Water System Storage Tank Overflow Water Volume",
                                         OutputProcessor::Unit::m3,
                                         WaterStorage(Item).VolOverflow,
                                         "System",
@@ -808,14 +809,14 @@ namespace WaterManager {
                     //     EndUseSubkey=WaterStorage(item)%QualitySubCategoryName ,&
                     //     GroupKey='System')
                 } else {
-                    SetupOutputVariable("Water System Storage Tank Overflow Water Volume",
+                    SetupOutputVariable(state, "Water System Storage Tank Overflow Water Volume",
                                         OutputProcessor::Unit::m3,
                                         WaterStorage(Item).VolOverflow,
                                         "System",
                                         "Sum",
                                         WaterStorage(Item).Name);
                 }
-                SetupOutputVariable("Water System Storage Tank Overflow Temperature",
+                SetupOutputVariable(state, "Water System Storage Tank Overflow Temperature",
                                     OutputProcessor::Unit::C,
                                     WaterStorage(Item).TwaterOverflow,
                                     "System",
@@ -824,20 +825,20 @@ namespace WaterManager {
             }
 
             if (NumSiteRainFall == 1) { // CurrentModuleObject='Site:Precipitation'
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "Site Precipitation Rate", OutputProcessor::Unit::m_s, RainFall.CurrentRate, "System", "Average", "Site:Precipitation");
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "Site Precipitation Depth", OutputProcessor::Unit::m, RainFall.CurrentAmount, "System", "Sum", "Site:Precipitation");
             }
 
             if (NumIrrigation == 1) { // CurrentModuleObject='RoofIrrigation'
-                SetupOutputVariable("Water System Roof Irrigation Scheduled Depth",
+                SetupOutputVariable(state, "Water System Roof Irrigation Scheduled Depth",
                                     OutputProcessor::Unit::m,
                                     Irrigation.ScheduledAmount,
                                     "System",
                                     "Sum",
                                     "RoofIrrigation");
-                SetupOutputVariable("Water System Roof Irrigation Actual Depth",
+                SetupOutputVariable(state, "Water System Roof Irrigation Actual Depth",
                                     OutputProcessor::Unit::m,
                                     Irrigation.ActualAmount,
                                     "System",
@@ -846,13 +847,13 @@ namespace WaterManager {
             }
 
             for (Item = 1; Item <= NumRainCollectors; ++Item) { // CurrentModuleObject='WaterUse:RainCollector'
-                SetupOutputVariable("Water System Rainwater Collector Volume Flow Rate",
+                SetupOutputVariable(state, "Water System Rainwater Collector Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     RainCollector(Item).VdotAvail,
                                     "System",
                                     "Average",
                                     RainCollector(Item).Name);
-                SetupOutputVariable("Water System Rainwater Collector Volume",
+                SetupOutputVariable(state, "Water System Rainwater Collector Volume",
                                     OutputProcessor::Unit::m3,
                                     RainCollector(Item).VolCollected,
                                     "System",
@@ -866,19 +867,19 @@ namespace WaterManager {
             }
 
             for (Item = 1; Item <= NumGroundWaterWells; ++Item) { // CurrentModuleObject='WaterUse:Well'
-                SetupOutputVariable("Water System Groundwater Well Requested Volume Flow Rate",
+                SetupOutputVariable(state, "Water System Groundwater Well Requested Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     GroundwaterWell(Item).VdotRequest,
                                     "System",
                                     "Average",
                                     GroundwaterWell(Item).Name);
-                SetupOutputVariable("Water System Groundwater Well Volume Flow Rate",
+                SetupOutputVariable(state, "Water System Groundwater Well Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     GroundwaterWell(Item).VdotDelivered,
                                     "System",
                                     "Average",
                                     GroundwaterWell(Item).Name);
-                SetupOutputVariable("Water System Groundwater Well Volume",
+                SetupOutputVariable(state, "Water System Groundwater Well Volume",
                                     OutputProcessor::Unit::m3,
                                     GroundwaterWell(Item).VolDelivered,
                                     "System",
@@ -889,13 +890,13 @@ namespace WaterManager {
                                     "Wellwater",
                                     _,
                                     "System");
-                SetupOutputVariable("Water System Groundwater Well Pump Electricity Rate",
+                SetupOutputVariable(state, "Water System Groundwater Well Pump Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     GroundwaterWell(Item).PumpPower,
                                     "System",
                                     "Average",
                                     GroundwaterWell(Item).Name);
-                SetupOutputVariable("Water System Groundwater Well Pump Electricity Energy",
+                SetupOutputVariable(state, "Water System Groundwater Well Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     GroundwaterWell(Item).PumpEnergy,
                                     "System",

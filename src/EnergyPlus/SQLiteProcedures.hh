@@ -69,6 +69,9 @@
 
 namespace EnergyPlus {
 
+// Forward
+struct EnergyPlusData;
+
 class SQLiteProcedures
 {
 protected:
@@ -994,9 +997,9 @@ private:
 
 extern std::unique_ptr<SQLite> sqlite;
 
-std::unique_ptr<SQLite> CreateSQLiteDatabase(IOFiles & ioFiles);
+std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state);
 
-void CreateSQLiteZoneExtendedOutput();
+void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state);
 
 } // namespace EnergyPlus
 

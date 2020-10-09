@@ -51,9 +51,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixerComponent.hh>
@@ -88,11 +86,9 @@ namespace MixerComponent {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::BeginDayFlag;
     using DataGlobals::BeginEnvrnFlag;
     using namespace DataLoopNode;
-    using namespace DataHVACGlobals;
     using DataEnvironment::OutBaroPress;
 
     // Use statements for access to subroutines in other modules
@@ -135,7 +131,7 @@ namespace MixerComponent {
         MixerCond.deallocate();
     }
 
-    void SimAirMixer(std::string const &CompName, int &CompIndex)
+    void SimAirMixer(EnergyPlusData &state, std::string const &CompName, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -162,7 +158,7 @@ namespace MixerComponent {
 
         // Obtains and Allocates Mixer related parameters from input file
         if (SimAirMixerInputFlag) { // First time subroutine has been entered
-            GetMixerInput();
+            GetMixerInput(state);
             SimAirMixerInputFlag = false;
         }
 
@@ -203,7 +199,7 @@ namespace MixerComponent {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetMixerInput()
+    void GetMixerInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -259,7 +255,8 @@ namespace MixerComponent {
         NumArray.dimension(NumNums, 0.0);
 
         for (MixerNum = 1; MixerNum <= NumMixers; ++MixerNum) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           MixerNum,
                                           AlphArray,
                                           NumAlphas,
@@ -274,7 +271,7 @@ namespace MixerComponent {
 
             MixerCond(MixerNum).MixerName = AlphArray(1);
 
-            MixerCond(MixerNum).OutletNode = GetOnlySingleNode(
+            MixerCond(MixerNum).OutletNode = GetOnlySingleNode(state,
                 AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             MixerCond(MixerNum).NumInletNodes = NumAlphas - 2;
 
@@ -308,7 +305,7 @@ namespace MixerComponent {
 
             for (NodeNum = 1; NodeNum <= MixerCond(MixerNum).NumInletNodes; ++NodeNum) {
 
-                MixerCond(MixerNum).InletNode(NodeNum) = GetOnlySingleNode(AlphArray(2 + NodeNum),
+                MixerCond(MixerNum).InletNode(NodeNum) = GetOnlySingleNode(state, AlphArray(2 + NodeNum),
                                                                            ErrorsFound,
                                                                            CurrentModuleObject,
                                                                            AlphArray(1),
@@ -654,7 +651,7 @@ namespace MixerComponent {
     // Beginning of Utility subroutines for the Mixer Component
     // *****************************************************************************
 
-    void GetZoneMixerIndex(std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType)
+    void GetZoneMixerIndex(EnergyPlusData &state, std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType)
     {
 
         // SUBROUTINE INFORMATION:
@@ -668,7 +665,7 @@ namespace MixerComponent {
         // is not legal mixer.
 
         if (GetZoneMixerIndexInputFlag) { // First time subroutine has been entered
-            GetMixerInput();
+            GetMixerInput(state);
             GetZoneMixerIndexInputFlag = false;
         }
 
@@ -683,7 +680,7 @@ namespace MixerComponent {
         }
     }
 
-    int getZoneMixerIndexFromInletNode(int const &InNodeNum)
+    int getZoneMixerIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum)
     {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -692,7 +689,7 @@ namespace MixerComponent {
         int thisMixer;
 
         if (GetZoneMixerIndexInputFlag) { // First time subroutine has been entered
-            GetMixerInput();
+            GetMixerInput(state);
             GetZoneMixerIndexInputFlag = false;
         }
 

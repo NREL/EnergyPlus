@@ -53,6 +53,7 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -140,7 +141,7 @@ namespace RoomAirModelUserTempPattern {
         MyOneTimeFlag2 = true;
     }
 
-    void ManageUserDefinedPatterns(int const ZoneNum) // index number for the specified zone
+    void ManageUserDefinedPatterns(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -184,7 +185,7 @@ namespace RoomAirModelUserTempPattern {
         GetSurfHBDataForTempDistModel(ZoneNum);
 
         // perform TempDist model calculations
-        CalcTempDistModel(ZoneNum);
+        CalcTempDistModel(state, ZoneNum);
 
         // transfer data from air domain back to surface domain for the specified zone
         SetSurfHBDataForTempDistModel(ZoneNum);
@@ -308,7 +309,7 @@ namespace RoomAirModelUserTempPattern {
 
     //*****************************************************************************************
 
-    void CalcTempDistModel(int const ZoneNum) // index number for the specified zone
+    void CalcTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -331,14 +332,6 @@ namespace RoomAirModelUserTempPattern {
         Real64 AvailTest;
         int CurntPatternKey;
         int CurPatrnID;
-        // unused    INTEGER    :: thisZoneInfoSurf
-        // unused    INTEGER    :: lowSideID
-        // unused    INTEGER    :: highSideID
-        // unused    REAL(r64)  :: thisZeta
-        // unused    REAL(r64)  :: lowSideZeta
-        // unused    REAL(r64)  :: hiSideZeta
-        // unused    REAL(r64)  :: fractBtwn
-        // unused    REAL(r64)  :: tmpDeltaTai
 
         // first determine availability
         AvailTest = GetCurrentScheduleValue(AirPatternZoneInfo(ZoneNum).AvailSchedID);
@@ -375,7 +368,7 @@ namespace RoomAirModelUserTempPattern {
 
                 } else if (SELECT_CASE_var == TwoGradInterpPattern) {
 
-                    FigureTwoGradInterpPattern(CurPatrnID, ZoneNum);
+                    FigureTwoGradInterpPattern(state, CurPatrnID, ZoneNum);
 
                 } else if (SELECT_CASE_var == NonDimenHeightPattern) {
 
@@ -533,7 +526,7 @@ namespace RoomAirModelUserTempPattern {
         AirPatternZoneInfo(ZoneNum).Texhaust = RoomAirPattern(PattrnID).DeltaTexhaust + Tmean;
     }
 
-    void FigureTwoGradInterpPattern(int const PattrnID, int const ZoneNum)
+    void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -592,7 +585,7 @@ namespace RoomAirModelUserTempPattern {
         }
 
         if (SetupOutputFlag(ZoneNum)) {
-            SetupOutputVariable("Room Air Zone Vertical Temperature Gradient",
+            SetupOutputVariable(state, "Room Air Zone Vertical Temperature Gradient",
                                 OutputProcessor::Unit::K_m,
                                 AirPatternZoneInfo(ZoneNum).Gradient,
                                 "HVAC",

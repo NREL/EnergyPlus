@@ -717,27 +717,27 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputTabularMonthly(IOFiles & ioFiles);
+    void GetInputTabularMonthly(EnergyPlusData &state);
 
     int AddMonthlyReport(std::string const &inReportName, int const inNumDigitsShown);
 
     void AddMonthlyFieldSetInput(int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, int const inAggregate);
 
-    void InitializeTabularMonthly();
+    void InitializeTabularMonthly(EnergyPlusData &state);
 
     bool isInvalidAggregationOrder();
 
-    void GetInputTabularTimeBins(IOFiles & ioFiles);
+    void GetInputTabularTimeBins(EnergyPlusData &state);
 
     bool warningAboutKeyNotFound(int foundIndex, int inObjIndex, std::string const &moduleName);
 
-    void GetInputTabularStyle(IOFiles &ioFiles);
+    void GetInputTabularStyle(EnergyPlusData &state);
 
     int SetUnitsStyleFromString(std::string const &unitStringIn);
 
-    void GetInputOutputTableSummaryReports(IOFiles & ioFiles);
+    void GetInputOutputTableSummaryReports(EnergyPlusData &state);
 
-    bool isCompLoadRepReq();
+    bool isCompLoadRepReq(EnergyPlusData &state);
 
     bool hasSizingPeriodsDays();
 
@@ -745,7 +745,7 @@ namespace OutputReportTabular {
 
     void CreatePredefinedMonthlyReports();
 
-    void GetInputFuelAndPollutionFactors();
+    void GetInputFuelAndPollutionFactors(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -755,7 +755,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void OpenOutputTabularFile(IOFiles & ioFiles);
+    void OpenOutputTabularFile(EnergyPlusData &state);
 
     void CloseOutputTabularFile();
 
@@ -797,7 +797,7 @@ namespace OutputReportTabular {
 
     void parseStatLine(const std::string & lineIn, StatLineType &lineType, bool & desConditionlinepassed, bool & heatingDesignlinepassed, bool & coolingDesignlinepassed, bool & isKoppen);
 
-    void FillWeatherPredefinedEntries(IOFiles &ioFiles);
+    void FillWeatherPredefinedEntries(EnergyPlusData &state);
 
     std::string GetColumnUsingTabs(std::string const &inString, // Input String
                                    int const colNum             // Column number
@@ -809,7 +809,7 @@ namespace OutputReportTabular {
 
     void WriteTimeBinTables(EnergyPlusData &state);
 
-    void WriteBEPSTable(EnergyPlusData &state, IOFiles &ioFiles);
+    void WriteBEPSTable(EnergyPlusData &state);
 
     std::string ResourceWarningMessage(std::string resource);
 
@@ -821,7 +821,7 @@ namespace OutputReportTabular {
 
     void WriteCompCostTable(EnergyPlusData &state);
 
-    void WriteVeriSumTable(EnergyPlusData &state, IOFiles &ioFiles);
+    void WriteVeriSumTable(EnergyPlusData &state);
 
     void WriteAdaptiveComfortTable(EnergyPlusData &state);
 
@@ -847,7 +847,7 @@ namespace OutputReportTabular {
 
     void WriteSurfaceShadowing(EnergyPlusData &state);
 
-    void WriteEioTables(EnergyPlusData &state, IOFiles &ioFiles);
+    void WriteEioTables(EnergyPlusData &state);
 
     int unitsFromHeading(std::string &heading);
 
@@ -859,7 +859,7 @@ namespace OutputReportTabular {
 
     void DeallocateLoadComponentArrays();
 
-    void ComputeLoadComponentDecayCurve(IOFiles &ioFiles);
+    void ComputeLoadComponentDecayCurve(EnergyPlusData &state);
 
     void GatherComponentLoadsSurface();
 

@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -61,11 +62,9 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -112,7 +111,6 @@ namespace MoistureBalanceEMPDManager {
     // USE STATEMENTS:
     // Use statements for data used in the module
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataEnvironment::OutBaroPress;
     using namespace DataHeatBalance;
     using namespace DataGlobals;
@@ -170,7 +168,7 @@ namespace MoistureBalanceEMPDManager {
         return PenetrationDepth;
     }
 
-    void GetMoistureBalanceEMPDInput(IOFiles &ioFiles)
+    void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -217,7 +215,8 @@ namespace MoistureBalanceEMPDManager {
         for (Loop = 1; Loop <= EMPDMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Loop,
                                           MaterialNames,
                                           MaterialNumAlpha,
@@ -340,14 +339,14 @@ namespace MoistureBalanceEMPDManager {
 
         EMPDzone.deallocate();
 
-        ReportMoistureBalanceEMPD(ioFiles);
+        ReportMoistureBalanceEMPD(state);
 
         if (ErrorsFound) {
             ShowFatalError("GetMoistureBalanceEMPDInput: Errors found getting EMPD material properties, program terminated.");
         }
     }
 
-    void InitMoistureBalanceEMPD(IOFiles &ioFiles)
+    void InitMoistureBalanceEMPD(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -411,37 +410,37 @@ namespace MoistureBalanceEMPDManager {
         if (!InitEnvrnFlag) return;
         // Initialize the report variable
 
-        GetMoistureBalanceEMPDInput(ioFiles);
+        GetMoistureBalanceEMPDInput(state);
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue;
             if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
             EMPDReportVarsData &rvd = EMPDReportVars(SurfNum);
             const std::string surf_name = Surface(SurfNum).Name;
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "EMPD Surface Inside Face Water Vapor Density", OutputProcessor::Unit::kg_m3, rvd.rv_surface, "Zone", "State", surf_name);
-            SetupOutputVariable("EMPD Surface Layer Moisture Content", OutputProcessor::Unit::kg_m3, rvd.u_surface_layer, "Zone", "State", surf_name);
-            SetupOutputVariable("EMPD Deep Layer Moisture Content", OutputProcessor::Unit::kg_m3, rvd.u_deep_layer, "Zone", "State", surf_name);
-            SetupOutputVariable(
+            SetupOutputVariable(state, "EMPD Surface Layer Moisture Content", OutputProcessor::Unit::kg_m3, rvd.u_surface_layer, "Zone", "State", surf_name);
+            SetupOutputVariable(state, "EMPD Deep Layer Moisture Content", OutputProcessor::Unit::kg_m3, rvd.u_deep_layer, "Zone", "State", surf_name);
+            SetupOutputVariable(state,
                 "EMPD Surface Layer Equivalent Relative Humidity", OutputProcessor::Unit::Perc, rvd.RH_surface_layer, "Zone", "State", surf_name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "EMPD Deep Layer Equivalent Relative Humidity", OutputProcessor::Unit::Perc, rvd.RH_deep_layer, "Zone", "State", surf_name);
-            SetupOutputVariable("EMPD Surface Layer Equivalent Humidity Ratio",
+            SetupOutputVariable(state, "EMPD Surface Layer Equivalent Humidity Ratio",
                                 OutputProcessor::Unit::kgWater_kgDryAir,
                                 rvd.w_surface_layer,
                                 "Zone",
                                 "State",
                                 surf_name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "EMPD Deep Layer Equivalent Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, rvd.w_deep_layer, "Zone", "State", surf_name);
-            SetupOutputVariable("EMPD Surface Moisture Flux to Zone", OutputProcessor::Unit::kg_m2s, rvd.mass_flux_zone, "Zone", "State", surf_name);
-            SetupOutputVariable("EMPD Deep Layer Moisture Flux", OutputProcessor::Unit::kg_m2s, rvd.mass_flux_deep, "Zone", "State", surf_name);
+            SetupOutputVariable(state, "EMPD Surface Moisture Flux to Zone", OutputProcessor::Unit::kg_m2s, rvd.mass_flux_zone, "Zone", "State", surf_name);
+            SetupOutputVariable(state, "EMPD Deep Layer Moisture Flux", OutputProcessor::Unit::kg_m2s, rvd.mass_flux_deep, "Zone", "State", surf_name);
         }
 
         if (InitEnvrnFlag) InitEnvrnFlag = false;
     }
 
-    void CalcMoistureBalanceEMPD(IOFiles &ioFiles,
+    void CalcMoistureBalanceEMPD(EnergyPlusData &state,
                                  int const SurfNum,
                                  Real64 const TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
                                  Real64 const TempZone,   // Zone temperature at current time step.
@@ -513,7 +512,7 @@ namespace MoistureBalanceEMPDManager {
         Real64 RH_deep_layer;
 
         if (BeginEnvrnFlag && OneTimeFlag) {
-            InitMoistureBalanceEMPD(ioFiles);
+            InitMoistureBalanceEMPD(state);
             OneTimeFlag = false;
         }
 
@@ -747,7 +746,7 @@ namespace MoistureBalanceEMPDManager {
         RVSurfLayerOld(SurfNum) = RVSurfLayer(SurfNum);
     }
 
-    void ReportMoistureBalanceEMPD(IOFiles &ioFiles)
+    void ReportMoistureBalanceEMPD(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -787,11 +786,11 @@ namespace MoistureBalanceEMPDManager {
         int ConstrNum;
         int MatNum;
 
-        ScanForReports("Constructions", DoReport, "Constructions");
+        ScanForReports(state, "Constructions", DoReport, "Constructions");
 
         if (!DoReport) return;
         //   Write Descriptions
-        print(ioFiles.eio,
+        print(state.files.eio,
               "{}",
               "! <Construction EMPD>, Construction Name, Inside Layer Material Name, Vapor Resistance Factor, a, b, "
               "c, d, Surface Penetration Depth {m}, Deep Penetration Depth {m}, Coating Vapor Resistance Factor, "
@@ -803,7 +802,7 @@ namespace MoistureBalanceEMPDManager {
             if (dataMaterial.Material(MatNum).EMPDMaterialProps) {
                 static constexpr auto Format_700(
                     " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
-                print(ioFiles.eio,
+                print(state.files.eio,
                       Format_700,
                       dataConstruction.Construct(ConstrNum).Name,
                       dataMaterial.Material(MatNum).Name,

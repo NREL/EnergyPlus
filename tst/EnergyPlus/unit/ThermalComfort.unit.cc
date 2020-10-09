@@ -703,7 +703,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    DataGlobals::DDOnlySimulation = true;
+    state.dataGlobal->DDOnlySimulation = true;
 
     ManageSimulation(state);
 
@@ -878,7 +878,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveASH55Test)
 
     DataGlobals::BeginDayFlag = true;
 
-    CalcThermalComfortAdaptiveASH55(state.files, false);
+    CalcThermalComfortAdaptiveASH55(state, false);
     EXPECT_NEAR(ThermalComfort::runningAverageASH, 9.29236111, 0.001);
     useEpwData = false;
     DataGlobals::BeginDayFlag = false;

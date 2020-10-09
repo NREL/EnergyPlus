@@ -57,6 +57,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace EarthTube {
 
     // Using/Aliasing
@@ -164,9 +167,9 @@ namespace EarthTube {
     // Functions
     void clear_state();
 
-    void ManageEarthTube();
+    void ManageEarthTube(EnergyPlusData &state);
 
-    void GetEarthTube(bool &ErrorsFound); // If errors found in input
+    void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void CheckEarthTubesInZones(std::string const ZoneName,  // name of zone for error reporting
                                 std::string const FieldName, // name of earth tube in input

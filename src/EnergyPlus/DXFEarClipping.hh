@@ -54,7 +54,9 @@
 #include "DataSurfaces.hh"
 
 namespace EnergyPlus {
-    class IOFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DXFEarClipping {
 
@@ -79,7 +81,7 @@ namespace DXFEarClipping {
 
     Real64 Modulus(Vector const &point);
 
-    int Triangulate(IOFiles &ioFiles,
+    int Triangulate(EnergyPlusData &state,
                     int const nsides, // number of sides to polygon
                     Array1D<Vector> &polygon,
                     Array1D<dTriangle> &outtriangles,
@@ -102,7 +104,7 @@ namespace DXFEarClipping {
                                    Vector_2d const &point       // point to be tested
     );
 
-    void generate_ears(IOFiles &ioFiles,
+    void generate_ears(EnergyPlusData &state,
                        int const nvert, // number of vertices in polygon
                        Array1D<Vector_2d> &vertex,
                        Array1D_int &ears,       // number of ears possible (dimensioned to nvert)

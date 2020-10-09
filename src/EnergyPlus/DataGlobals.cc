@@ -87,17 +87,17 @@ namespace DataGlobals {
     // Data
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
-    bool runReadVars(false);
-    bool DDOnlySimulation(false);
-    bool outputEpJSONConversion(false);
-    bool outputEpJSONConversionOnly(false);
-    bool isEpJSON(false);
-    bool isCBOR(false);
-    bool isMsgPack(false);
-    bool isUBJSON(false);
-    bool isBSON(false);
-    bool preserveIDFOrder(true);
-    bool stopSimulation(false);
+//    bool runReadVars(false);
+//    bool DDOnlySimulation(false);
+//    bool outputEpJSONConversion(false);
+//    bool outputEpJSONConversionOnly(false);
+//    bool isEpJSON(false);
+//    bool isCBOR(false);
+//    bool isMsgPack(false);
+//    bool isUBJSON(false);
+//    bool isBSON(false);
+//    bool preserveIDFOrder(true);
+//    bool stopSimulation(false);
     std::function<void (void *)> externalHVACManager;
     bool externalHVACManagerInitialized(false);
 
@@ -264,15 +264,6 @@ namespace DataGlobals {
     // Needed for unit tests, should not be normally called.
     void clear_state(IOFiles &ioFiles)
     {
-        runReadVars = false;
-        DDOnlySimulation = false;
-        outputEpJSONConversion = false;
-        outputEpJSONConversionOnly = false;
-        isEpJSON = false;
-        isCBOR = false;
-        isMsgPack = false;
-        preserveIDFOrder = true;
-        stopSimulation = false;
         externalHVACManager = nullptr;
         externalHVACManagerInitialized = false;
         BeginDayFlag = false;

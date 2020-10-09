@@ -195,7 +195,7 @@ namespace BaseboardElectric {
         int ZoneEquipTypeNum; // index to zone equipment in a zone equipment list
 
         auto & baseboard = state.dataBaseboardElectric;
-        
+
         cCurrentModuleObject = cCMO_BBRadiator_Electric;
 
         NumConvElecBaseboards = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -210,7 +210,8 @@ namespace BaseboardElectric {
             BaseboardNum = 0;
             for (ConvElecBBNum = 1; ConvElecBBNum <= NumConvElecBaseboards; ++ConvElecBBNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               ConvElecBBNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -241,7 +242,7 @@ namespace BaseboardElectric {
                 if (lAlphaFieldBlanks(2)) {
                     thisBaseboard.SchedPtr = ScheduleAlwaysOn;
                 } else {
-                    thisBaseboard.SchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                    thisBaseboard.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                     if (thisBaseboard.SchedPtr == 0) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) +
                                         " for " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -333,7 +334,7 @@ namespace BaseboardElectric {
             // CurrentModuleObject='ZoneHVAC:Baseboard:Convective:Electric'
 
             auto &thisBaseboard = baseboard->Baseboard(BaseboardNum);
-            SetupOutputVariable("Baseboard Total Heating Energy",
+            SetupOutputVariable(state, "Baseboard Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 thisBaseboard.Energy,
                                 "System",
@@ -345,10 +346,10 @@ namespace BaseboardElectric {
                                 _,
                                 "System");
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Baseboard Total Heating Rate", OutputProcessor::Unit::W, thisBaseboard.Power, "System", "Average", thisBaseboard.EquipName);
 
-            SetupOutputVariable("Baseboard Electricity Energy",
+            SetupOutputVariable(state, "Baseboard Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 thisBaseboard.ElecUseLoad,
                                 "System",
@@ -360,7 +361,7 @@ namespace BaseboardElectric {
                                 _,
                                 "System");
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Baseboard Electricity Rate", OutputProcessor::Unit::W, thisBaseboard.ElecUseRate, "System", "Average", thisBaseboard.EquipName);
         }
     }
@@ -386,7 +387,7 @@ namespace BaseboardElectric {
         int ZoneNode;
         int Loop;
         static Array1D_bool MyEnvrnFlag;
-        
+
         auto & baseboard = state.dataBaseboardElectric;
 
         // Do the one time initializations

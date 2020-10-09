@@ -62,7 +62,6 @@
 namespace EnergyPlus {
 
 // Forward declarations
-class IOFiles;
 struct EnergyPlusData;
 
 // Derived class for Site:GroundTemperature:BuildingSurface
@@ -78,7 +77,7 @@ public:
     }
 
     static std::shared_ptr<SiteBuildingSurfaceGroundTemps>
-    BuildingSurfaceGTMFactory(IOFiles &ioFiles, int objectType, std::string objectName);
+    BuildingSurfaceGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
 
     Real64 getGroundTemp(EnergyPlusData &state) override;
 

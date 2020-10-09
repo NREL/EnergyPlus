@@ -53,8 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-#include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MatrixDataManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -85,9 +84,6 @@ namespace MatrixDataManager {
     // OTHER NOTES:
     // first implemented for complex fenestration
 
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // MODULE PARAMETER DEFINITIONS:
     // INTEGER, PARAMETER :: OneDimensional = 1
@@ -116,7 +112,7 @@ namespace MatrixDataManager {
 
     // Functions
 
-    void GetMatrixInput()
+    void GetMatrixInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -130,7 +126,6 @@ namespace MatrixDataManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
-        using General::RoundSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumTwoDimMatrix;            // count of Matrix:TwoDimension objects
@@ -153,7 +148,8 @@ namespace MatrixDataManager {
 
         MatNum = 0;
         for (MatIndex = 1; MatIndex <= NumTwoDimMatrix; ++MatIndex) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           MatIndex,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -202,7 +198,7 @@ namespace MatrixDataManager {
         }
     }
 
-    int MatrixIndex(std::string const &MatrixName)
+    int MatrixIndex(EnergyPlusData &state, std::string const &MatrixName)
     {
 
         // FUNCTION INFORMATION:
@@ -225,7 +221,7 @@ namespace MatrixDataManager {
         static bool GetInputFlag(true); // First time, input is "gotten"
 
         if (GetInputFlag) {
-            GetMatrixInput();
+            GetMatrixInput(state);
             GetInputFlag = false;
         }
 

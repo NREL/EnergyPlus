@@ -485,7 +485,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetReturnAirPathInput();
+    GetReturnAirPathInput(state);
     GetAirPathData(state);
     ASSERT_EQ(SimAirServingZones::HeatXchngr, PrimaryAirSystem(1).Branch(1).Comp(4).CompType_Num);
 }
@@ -3924,7 +3924,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_AirFlowSizing)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // get heat recovery heat exchanger generic
-    GetHeatRecoveryInput();
+    GetHeatRecoveryInput(state);
 
     // initialize
     DataSizing::CurZoneEqNum = 1;
@@ -4046,7 +4046,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     // get OA Controller
     MixedAir::GetOAControllerInputs(state);
     int OAContrllerNum = 1;
@@ -4061,7 +4061,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     EXPECT_EQ(1, state.dataAirLoop->NumOASystems);
     EXPECT_EQ("VAV WITH REHEAT_OA", thisOASys.Name);
     // get HR HX generic
-    GetHeatRecoveryInput();
+    GetHeatRecoveryInput(state);
     int ExchNum = 1;
     auto &thisHX = HeatRecovery::ExchCond(ExchNum);
     EXPECT_EQ(1, HeatRecovery::NumAirToAirGenericExchs);
@@ -4167,7 +4167,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // get HR HX generic
-    GetHeatRecoveryInput();
+    GetHeatRecoveryInput(state);
     int ExchNum = 1;
     auto &thisHX = HeatRecovery::ExchCond(ExchNum);
     // check inputs

@@ -277,7 +277,7 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 int commonRun(EnergyPlus::EnergyPlusData &state) {
     using namespace EnergyPlus;
 
-    int errStatus = initErrorFile(state.files);
+    int errStatus = initErrorFile(state);
     if (errStatus) {
         return errStatus;
     }
@@ -289,10 +289,10 @@ int commonRun(EnergyPlus::EnergyPlusData &state) {
 
     try {
         EnergyPlus::inputProcessor = InputProcessor::factory();
-        EnergyPlus::inputProcessor->processInput();
-        if (DataGlobals::outputEpJSONConversionOnly) {
+        EnergyPlus::inputProcessor->processInput(state);
+        if (state.dataGlobal->outputEpJSONConversionOnly) {
             DisplayString("Converted input file format. Exiting.");
-            return EndEnergyPlus(state.files);
+            return EndEnergyPlus(state);
         }
     } catch (const FatalError &e) {
         return AbortEnergyPlus(state);
@@ -357,12 +357,12 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
             EnergyPlus::inputProcessor.reset();
         }
 
-        if (DataGlobals::runReadVars) {
+        if (state.dataGlobal->runReadVars) {
 //            state.files.outputControl.csv = true;
              if (state.files.outputControl.csv) {
                  ShowWarningMessage("Native CSV output requested in input file, but running ReadVarsESO due to command line argument.");
              }
-             int status = CommandLineInterface::runReadVarsESO(state.files);
+             int status = CommandLineInterface::runReadVarsESO(state);
              if (status) {
                  return status;
              }
@@ -374,12 +374,11 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         return AbortEnergyPlus(state);
     }
 
-    return EndEnergyPlus(state.files);
+    return EndEnergyPlus(state);
 }
 
 int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepath)
 {
-
 
     // PROGRAM INFORMATION:
     //       AUTHOR         Linda K. Lawrie, et al
@@ -396,7 +395,7 @@ int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepat
     // as possible and contain all "simulation" code in other modules and files.
 
     int status = initializeEnergyPlus(state, filepath);
-    if (status || EnergyPlus::DataGlobals::outputEpJSONConversionOnly) return status;
+    if (status || state.dataGlobal->outputEpJSONConversionOnly) return status;
     try {
         EnergyPlus::SimulationManager::ManageSimulation(state);
     } catch (const EnergyPlus::FatalError &e) {
@@ -436,7 +435,7 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const ch
     EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv );
 
     int status = initializeAsLibrary(state);
-    if (status || EnergyPlus::DataGlobals::outputEpJSONConversionOnly) return status;
+    if (status || state.dataGlobal->outputEpJSONConversionOnly) return status;
     try {
         EnergyPlus::SimulationManager::ManageSimulation(state);
     } catch (const EnergyPlus::FatalError &e) {

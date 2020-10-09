@@ -154,7 +154,7 @@ namespace ElectricBaseboardRadiator {
                           Real64 &PowerMet,
                           int &CompIndex);
 
-    void GetElectricBaseboardInput();
+    void GetElectricBaseboardInput(EnergyPlusData &state);
 
     void InitElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
 

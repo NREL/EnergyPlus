@@ -186,7 +186,7 @@ namespace HWBaseboardRadiator {
                         Real64 &PowerMet,
                         int &CompIndex);
 
-    void GetHWBaseboardInput();
+    void GetHWBaseboardInput(EnergyPlusData &state);
 
     void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
 
