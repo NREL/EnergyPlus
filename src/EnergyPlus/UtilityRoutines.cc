@@ -140,12 +140,19 @@ namespace UtilityRoutines {
 
         Real64 rProcessNumber = 0.0;
         //  Make sure the string has all what we think numerics should have
-        std::string const PString(stripped(String));
+        std::string PString(stripped(String));
         std::string::size_type const StringLen(PString.length());
         ErrorFlag = false;
         if (StringLen == 0) return rProcessNumber;
         bool parseFailed = false;
         if (PString.find_first_not_of(ValidNumerics) == std::string::npos) {
+            // make FORTRAN floating point number (containing 'd' or 'D')
+            // standardized by replacing 'd' or 'D' with 'e'
+            std::replace_if(std::begin(PString),
+                            std::end(PString),
+                            [](const char c){ return c == 'D' || c == 'd'; },
+                            'e');
+            // then parse as a normal floating point value
             parseFailed = !readItem(PString, rProcessNumber);
             ErrorFlag = false;
         } else {

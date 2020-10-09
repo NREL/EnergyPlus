@@ -61,9 +61,10 @@ TEST_F(EnergyPlusFixture, readItem)
   EXPECT_TRUE(EnergyPlus::readItem("12", i));
   EXPECT_EQ(i, 12);
 
-  // should read until first number
-  EXPECT_TRUE(EnergyPlus::readItem("1234fgq", i));
-  EXPECT_EQ(i, 1234);
+  // should fail if unable to process entire input string
+  EXPECT_FALSE(EnergyPlus::readItem("1234fgq", i));
+  // value is in an unknown state if read failed
+  // EXPECT_EQ(i, 12);
 
   // should read nothing
   EXPECT_FALSE(EnergyPlus::readItem("abc123", i));

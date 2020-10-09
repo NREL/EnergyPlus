@@ -81,7 +81,7 @@ template <typename Param> bool readItem(std::string input, Param &&param)
 {
     auto stream = stringReader(std::move(input));
     stream >> param;
-    return !stream.fail();
+    return !stream.fail() && stream.eof();
 }
 
 template <typename... Param> bool readList(std::string input, Param &&... param)
