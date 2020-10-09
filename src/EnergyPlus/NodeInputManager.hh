@@ -58,7 +58,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace NodeInputManager {
 
@@ -114,7 +116,8 @@ namespace NodeInputManager {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void GetNodeNums(std::string const &Name,                      // Name for which to obtain information
+    void GetNodeNums(EnergyPlusData &state,
+                     std::string const &Name,                      // Name for which to obtain information
                      int &NumNodes,                                // Number of nodes accompanying this Name
                      Array1D_int &NodeNumbers,                     // Node Numbers accompanying this Name
                      bool &ErrorsFound,                            // True when errors are found...
@@ -128,15 +131,16 @@ namespace NodeInputManager {
                      Optional_string_const InputFieldName = _      // Input Field Name
     );
 
-    void SetupNodeVarsForReporting(IOFiles &ioFiles);
+    void SetupNodeVarsForReporting(EnergyPlusData &state);
 
-    void GetNodeListsInput(bool &ErrorsFound);                // Set to true when requested Node List not found, unchanged otherwise
+    void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound);                // Set to true when requested Node List not found, unchanged otherwise
 
     int AssignNodeNumber(std::string const &Name, // Name for assignment
                          int const NodeFluidType, // must be valid
                          bool &ErrorsFound);
 
-    int GetOnlySingleNode(std::string const &NodeName,
+    int GetOnlySingleNode(EnergyPlusData &state,
+                          std::string const &NodeName,
                           bool &errFlag,
                           std::string const &NodeObjectType,       // Node Object Type (i.e. "Chiller:Electric")
                           std::string const &NodeObjectName,       // Node Object Name (i.e. "MyChiller")
@@ -147,7 +151,7 @@ namespace NodeInputManager {
                           Optional_string_const InputFieldName = _ // Input Field Name
     );
 
-    void InitUniqueNodeCheck(std::string const &ContextName);
+    void InitUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName);
 
     void CheckUniqueNodes(std::string const &NodeTypes,
                           std::string const &CheckType,
@@ -158,7 +162,7 @@ namespace NodeInputManager {
 
     void EndUniqueNodeCheck(std::string const &ContextName);
 
-    void CalcMoreNodeInfo();
+    void CalcMoreNodeInfo(EnergyPlusData &state);
 
     void MarkNode(int const NodeNumber, // Node Number to be marked
                   std::string const &ObjectType,

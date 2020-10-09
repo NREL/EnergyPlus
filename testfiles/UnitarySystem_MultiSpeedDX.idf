@@ -1778,6 +1778,10 @@
   Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
+  
+  Output:Variable,*,System Node Temperature, hourly;
+
+  Output:Variable,*,System Node Mass Flow Rate, hourly;
 
   Output:Variable,*,Unitary System DX Coil Speed Ratio,hourly; !- HVAC Average []
 

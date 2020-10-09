@@ -348,13 +348,13 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.files);  // read schedules
+    ProcessScheduleInput(state);  // read schedules
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetPTUnit(state);
 
     ASSERT_EQ(1, NumATMixers);
@@ -596,15 +596,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.files); // read schedules
+    ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
@@ -927,15 +927,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.files); // read schedules
+    ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
@@ -1341,15 +1341,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.files); // read schedules
+    ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
@@ -1754,15 +1754,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.files); // read schedules
+    ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
@@ -2426,15 +2426,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.files); // read schedules
+    ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
 
     GetVRFInput(state);
     GetVRFInputFlag = false;
@@ -3105,15 +3105,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.files); // read schedules
+    ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
 
     GetVRFInput(state);
     GetVRFInputFlag = false;
@@ -4855,15 +4855,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.files); // read schedules
+    ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
 
     GetVRFInput(state);
     GetVRFInputFlag = false;
@@ -6609,15 +6609,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.files); // read schedules
+    ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
 
     GetVRFInput(state);
     GetVRFInputFlag = false;
@@ -6856,15 +6856,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.files); // read schedules
+    ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetUnitVentilatorInput(state);
     GetUnitVentilatorInputFlag = false;
 
@@ -7093,15 +7093,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.files); // read schedules
+    ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetUnitVentilatorInput(state);
     GetUnitVentilatorInputFlag = false;
 
@@ -7336,15 +7336,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputDOASpecs)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    SizingManager::GetOARequirements();
-    SizingManager::GetZoneSizingInput();
+    SizingManager::GetOARequirements(state);
+    SizingManager::GetZoneSizingInput(state);
     GetZoneEquipmentData1(state);
     ZoneEquipmentManager::SetUpZoneSizingArrays(state);
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
-    GetATMixers(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
+    GetATMixers(state);
 
     ASSERT_EQ(2, NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", SysATMixer(1).Name);            // single duct air terminal mixer name
@@ -7533,14 +7533,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.files); // read schedules
+    ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
     GetFanCoilUnits(state);
 
@@ -7625,8 +7625,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     BeginEnvrnFlag = true;
     DataGlobals::DoingSizing = true;
-    state.fans.LocalTurnFansOff = false;
-    state.fans.LocalTurnFansOn = true;
+    state.dataFans->LocalTurnFansOff = false;
+    state.dataFans->LocalTurnFansOn = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     DataGlobals::HourOfDay = 1;
@@ -7634,7 +7634,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-    UpdateScheduleValues();
+    UpdateScheduleValues(state);
 
     ZoneEqSizing.allocate(1);
     auto &zoneEqSizing(ZoneEqSizing(1));
@@ -7961,17 +7961,17 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(state.files); // read schedules
+    ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
     GetFanCoilUnits(state);
-    SystemAvailabilityManager::GetSysAvailManagerInputs();
+    SystemAvailabilityManager::GetSysAvailManagerInputs(state);
 
     auto &thisFanCoil(FanCoil(1));
     auto &thisATMixer(SysATMixer(1));
@@ -8056,8 +8056,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     BeginEnvrnFlag = true;
     DataGlobals::DoingSizing = true;
-    state.fans.LocalTurnFansOff = false;
-    state.fans.LocalTurnFansOn = true;
+    state.dataFans->LocalTurnFansOff = false;
+    state.dataFans->LocalTurnFansOn = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     DataGlobals::HourOfDay = 1;
@@ -8065,7 +8065,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-    UpdateScheduleValues();
+    UpdateScheduleValues(state);
 
     ZoneEqSizing.allocate(1);
     auto &zoneEqSizing(ZoneEqSizing(1));

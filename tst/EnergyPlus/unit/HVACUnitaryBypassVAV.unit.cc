@@ -646,24 +646,24 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     SimulationManager::GetProjectData(state);
     HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(state);
     HeatBalanceManager::AllocateHeatBalArrays();
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
-    ZoneTempPredictorCorrector::InitZoneAirSetPoints(*state.dataZoneTempPredictorCorrector);
+    ZoneTempPredictorCorrector::InitZoneAirSetPoints(state);
     bool simZone = false;
     bool simAir = false;
     DataHeatBalance::MassConservation.allocate(DataGlobals::NumOfZones);
     ZoneEquipmentManager::ManageZoneEquipment(state, firstHVACIteration, simZone, simAir);
     SimAirServingZones::GetAirPathData(state);
-    SplitterComponent::GetSplitterInput();
+    SplitterComponent::GetSplitterInput(state);
     SimAirServingZones::InitAirLoops(state, firstHVACIteration);
 
     // set up zone load indicators

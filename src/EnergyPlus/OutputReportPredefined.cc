@@ -49,7 +49,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 

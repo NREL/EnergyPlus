@@ -58,6 +58,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace MoistureBalanceEMPDManager {
 
     // Data
@@ -93,11 +96,11 @@ namespace MoistureBalanceEMPDManager {
                                Material::MaterialProperties const &mat // material
     );
 
-    void GetMoistureBalanceEMPDInput(IOFiles &ioFiles);
+    void GetMoistureBalanceEMPDInput(EnergyPlusData &state);
 
-    void InitMoistureBalanceEMPD(IOFiles &ioFiles);
+    void InitMoistureBalanceEMPD(EnergyPlusData &state);
 
-    void CalcMoistureBalanceEMPD(IOFiles &ioFiles,
+    void CalcMoistureBalanceEMPD(EnergyPlusData &state,
                                  int const SurfNum,
                                  Real64 const TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
                                  Real64 const TempZone,   // Zone temperature at current time step.
@@ -108,7 +111,7 @@ namespace MoistureBalanceEMPDManager {
 
     void UpdateMoistureBalanceEMPD(int const SurfNum); // Surface number
 
-    void ReportMoistureBalanceEMPD(IOFiles &ioFiles);
+    void ReportMoistureBalanceEMPD(EnergyPlusData &state);
 
 } // namespace MoistureBalanceEMPDManager
 

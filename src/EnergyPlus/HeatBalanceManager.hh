@@ -56,12 +56,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward Declarations
-    struct EnergyPlusData;
-    struct WindowComplexManagerData;
-    struct WindowEquivalentLayerData;
-    struct WindowManagerData;
-    class IOFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HeatBalanceManager {
 
@@ -153,34 +150,35 @@ namespace HeatBalanceManager {
 
     void GetHeatBalanceInput(EnergyPlusData &state);
 
-    void CheckUsedConstructions(bool &ErrorsFound);
+    void CheckUsedConstructions(EnergyPlusData &state, bool &ErrorsFound);
 
     bool CheckValidSimulationObjects();
 
-    void SetPreConstructionInputParameters();
+    void SetPreConstructionInputParameters(EnergyPlusData &state);
 
     void GetProjectControlData(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors detected during getting data
 
-    void GetSiteAtmosphereData(EnergyPlus::IOFiles &ioFiles, bool &ErrorsFound);
+    void GetSiteAtmosphereData(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetMaterialData(EnergyPlusData &state, WindowEquivalentLayerData &dataWindowEquivalentLayer, IOFiles &ioFiles, bool &ErrorsFound); // set to true if errors found in input
+    void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
 
-    void GetWindowGlassSpectralData(bool &ErrorsFound); // set to true if errors found in input
+    void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
 
     void ValidateMaterialRoughness(int const MaterNum,           // Which Material number being validated.
                                    std::string const &Roughness, // Roughness String
                                    bool &ErrorsFound             // If errors found
     );
 
-    void GetConstructData(IOFiles &ioFiles, bool &ErrorsFound); // If errors found in input
+    void GetConstructData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void GetBuildingData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void GetZoneData(bool &ErrorsFound); // If errors found in input
+    void GetZoneData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void GetZoneLocalEnvData(bool &ErrorsFound); // If errors found in input
+    void GetZoneLocalEnvData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void ProcessZoneData(std::string const &cCurrentModuleObject,
+    void ProcessZoneData(EnergyPlusData &state,
+                         std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
                          Array1D_string const &cAlphaArgs,
                          int &NumAlphas,
@@ -199,7 +197,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(EnergyPlusData &state, IOFiles &ioFiles);
+    void InitHeatBalance(EnergyPlusData &state);
 
     void AllocateHeatBalArrays();
 
@@ -209,11 +207,11 @@ namespace HeatBalanceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void RecKeepHeatBalance(IOFiles &ioFiles);
+    void RecKeepHeatBalance(EnergyPlusData &state);
 
     void CheckWarmupConvergence();
 
-    void ReportWarmupConvergence(IOFiles &ioFiles);
+    void ReportWarmupConvergence(EnergyPlusData &state);
 
     void UpdateWindowFaceTempsNonBSDFWin();
 
@@ -223,15 +221,15 @@ namespace HeatBalanceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportHeatBalance(EnergyPlusData &state, IOFiles &ioFiles);
+    void ReportHeatBalance(EnergyPlusData &state);
 
     //        End of Reporting subroutines for the HB Module
 
-    void OpenShadingFile(IOFiles &ioFiles);
+    void OpenShadingFile(EnergyPlusData &state);
 
-    void GetFrameAndDividerData(bool &ErrorsFound); // set to true if errors found in input
+    void GetFrameAndDividerData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
 
-    void SearchWindow5DataFile(IOFiles &ioFiles,
+    void SearchWindow5DataFile(EnergyPlusData &state,
                                std::string const &DesiredFileName,         // File name that contains the Window5 constructions.
                                std::string const &DesiredConstructionName, // Name that will be searched for in the Window5 data file
                                bool &ConstructionFound,                    // True if DesiredConstructionName is in the Window5 data file
@@ -241,15 +239,17 @@ namespace HeatBalanceManager {
 
     void SetStormWindowControl();
 
-    void CreateFCfactorConstructions(int &ConstrNum,   // Counter for Constructions
+    void CreateFCfactorConstructions(EnergyPlusData &state,
+                                     int &ConstrNum,   // Counter for Constructions
                                      bool &ErrorsFound // If errors found in input
     );
 
-    void CreateAirBoundaryConstructions(int &ConstrNum,   // Counter for Constructions
-        bool &ErrorsFound // If errors found in input
+    void CreateAirBoundaryConstructions(EnergyPlusData &state,
+                                        int &ConstrNum,   // Counter for Constructions
+                                        bool &ErrorsFound // If errors found in input
     );
 
-    void GetScheduledSurfaceGains(bool &ErrorsFound); // If errors found in input
+    void GetScheduledSurfaceGains(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void CheckScheduledSurfaceGains(int const ZoneNum); // Zone number for which error check will be performed
 
@@ -257,13 +257,15 @@ namespace HeatBalanceManager {
 
     void SetupSimpleWindowGlazingSystem(int &MaterNum);
 
-    void SetupComplexFenestrationMaterialInput(int &MaterNum, // num of material items thus far
+    void SetupComplexFenestrationMaterialInput(EnergyPlusData &state,
+                                               int &MaterNum, // num of material items thus far
                                                bool &ErrorsFound);
 
-    void SetupComplexFenestrationStateInput(int &ConstrNum, // num of construction items thus far
+    void SetupComplexFenestrationStateInput(EnergyPlusData &state,
+                                            int &ConstrNum, // num of construction items thus far
                                             bool &ErrorsFound);
 
-    void InitConductionTransferFunctions(IOFiles &ioFiles);
+    void InitConductionTransferFunctions(EnergyPlusData &state);
 
 } // namespace HeatBalanceManager
 

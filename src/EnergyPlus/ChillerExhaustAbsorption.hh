@@ -218,7 +218,7 @@ namespace ChillerExhaustAbsorption {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &SizFac) override;
 
@@ -228,9 +228,9 @@ namespace ChillerExhaustAbsorption {
 
         void initialize(EnergyPlusData &state);
 
-        void setupOutputVariables();
+        void setupOutputVariables(EnergyPlusData &state);
 
-        void size();
+        void size(EnergyPlusData &state);
 
         void calcChiller(EnergyPlusData &state, Real64 &MyLoad);
 
@@ -248,10 +248,11 @@ namespace ChillerExhaustAbsorption {
     struct ChillerExhaustAbsorptionData : BaseGlobalStruct {
         bool Sim_GetInput = true;
         Array1D<ChillerExhaustAbsorption::ExhaustAbsorberSpecs> ExhaustAbsorber;
+
         void clear_state() override
         {
-            Sim_GetInput = true;
-            ExhaustAbsorber.deallocate();
+            this->Sim_GetInput = true;
+            this->ExhaustAbsorber.deallocate();
         }
     };
 

@@ -58,6 +58,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace ThermalChimney {
 
     // Using/Aliasing
@@ -142,9 +145,9 @@ namespace ThermalChimney {
 
     void clear_state();
 
-    void ManageThermalChimney();
+    void ManageThermalChimney(EnergyPlusData &state);
 
-    void GetThermalChimney(bool &ErrorsFound); // If errors found in input
+    void GetThermalChimney(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void CalcThermalChimney();
 

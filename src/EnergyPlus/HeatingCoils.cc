@@ -415,7 +415,8 @@ namespace HeatingCoils {
             CurrentModuleObject = "Coil:Heating:Electric";
             HeatingCoil(CoilNum).FuelType_Num = iRT_Electricity;
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           ElecCoilNum,
                                           Alphas,
                                           NumAlphas,
@@ -441,7 +442,7 @@ namespace HeatingCoils {
             if (lAlphaBlanks(2)) {
                 HeatingCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
             } else {
-                HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(Alphas(2));
+                HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
@@ -457,23 +458,23 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).NominalCapacity = Numbers(2);
             errFlag = false;
             HeatingCoil(CoilNum).AirInletNodeNum =
-                GetOnlySingleNode(Alphas(3), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
             errFlag = false;
             HeatingCoil(CoilNum).AirOutletNodeNum =
-                GetOnlySingleNode(Alphas(4), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             errFlag = false;
             HeatingCoil(CoilNum).TempSetPointNodeNum =
-                GetOnlySingleNode(Alphas(5), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             // Setup Report variables for the Electric Coils
             // CurrentModuleObject = "Coil:Heating:Electric"
-            SetupOutputVariable("Heating Coil Heating Energy",
+            SetupOutputVariable(state, "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).HeatingCoilLoad,
                                 "System",
@@ -484,13 +485,13 @@ namespace HeatingCoils {
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil Heating Rate",
+            SetupOutputVariable(state, "Heating Coil Heating Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).HeatingCoilRate,
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable("Heating Coil Electricity Energy",
+            SetupOutputVariable(state, "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).ElecUseLoad,
                                 "System",
@@ -501,7 +502,7 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil Electricity Rate",
+            SetupOutputVariable(state, "Heating Coil Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).ElecUseRate,
                                 "System",
@@ -517,7 +518,8 @@ namespace HeatingCoils {
             CurrentModuleObject = "Coil:Heating:Electric:MultiStage";
             HeatingCoil(CoilNum).FuelType_Num = iRT_Electricity;
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           ElecCoilNum,
                                           Alphas,
                                           NumAlphas,
@@ -541,7 +543,7 @@ namespace HeatingCoils {
             if (lAlphaBlanks(2)) {
                 HeatingCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
             } else {
-                HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(Alphas(2));
+                HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
@@ -566,23 +568,23 @@ namespace HeatingCoils {
 
             errFlag = false;
             HeatingCoil(CoilNum).AirInletNodeNum =
-                GetOnlySingleNode(Alphas(3), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
             errFlag = false;
             HeatingCoil(CoilNum).AirOutletNodeNum =
-                GetOnlySingleNode(Alphas(4), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             errFlag = false;
             HeatingCoil(CoilNum).TempSetPointNodeNum =
-                GetOnlySingleNode(Alphas(5), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             // Setup Report variables for the Electric Coils
             // CurrentModuleObject = "Coil:Heating:Electric:MultiStage"
-            SetupOutputVariable("Heating Coil Heating Energy",
+            SetupOutputVariable(state, "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).HeatingCoilLoad,
                                 "System",
@@ -593,13 +595,13 @@ namespace HeatingCoils {
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil Heating Rate",
+            SetupOutputVariable(state, "Heating Coil Heating Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).HeatingCoilRate,
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable("Heating Coil Electricity Energy",
+            SetupOutputVariable(state, "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).ElecUseLoad,
                                 "System",
@@ -610,7 +612,7 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil Electricity Rate",
+            SetupOutputVariable(state, "Heating Coil Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).ElecUseRate,
                                 "System",
@@ -626,7 +628,8 @@ namespace HeatingCoils {
 
             CurrentModuleObject = "Coil:Heating:Fuel";
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           FuelCoilNum,
                                           Alphas,
                                           NumAlphas,
@@ -650,7 +653,7 @@ namespace HeatingCoils {
             if (lAlphaBlanks(2)) {
                 coil.SchedPtr = ScheduleAlwaysOn;
             } else {
-                coil.SchedPtr = GetScheduleIndex(Alphas(2));
+                coil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (coil.SchedPtr == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
@@ -677,18 +680,18 @@ namespace HeatingCoils {
             coil.NominalCapacity = Numbers(2);
             errFlag = false;
             coil.AirInletNodeNum =
-                GetOnlySingleNode(Alphas(4), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
             errFlag = false;
             coil.AirOutletNodeNum =
-                GetOnlySingleNode(Alphas(5), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             TestCompSet(CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Air Nodes");
 
             errFlag = false;
             coil.TempSetPointNodeNum =
-                GetOnlySingleNode(Alphas(6), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(6), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             // parasitic electric load associated with the fuel heating coil
@@ -702,7 +705,7 @@ namespace HeatingCoils {
             // Setup Report variables for the Fuel Coils
             // CurrentModuleObject = "Coil:Heating:OtherFuel"
 
-            SetupOutputVariable("Heating Coil Heating Energy",
+            SetupOutputVariable(state, "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 coil.HeatingCoilLoad,
                                 "System",
@@ -713,8 +716,8 @@ namespace HeatingCoils {
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil Heating Rate", OutputProcessor::Unit::W, coil.HeatingCoilRate, "System", "Average", coil.Name);
-            SetupOutputVariable("Heating Coil " + FuelType + " Energy",
+            SetupOutputVariable(state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, coil.HeatingCoilRate, "System", "Average", coil.Name);
+            SetupOutputVariable(state, "Heating Coil " + FuelType + " Energy",
                                 OutputProcessor::Unit::J,
                                 coil.FuelUseLoad,
                                 "System",
@@ -725,8 +728,8 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil " + FuelType + " Rate", OutputProcessor::Unit::W, coil.FuelUseRate, "System", "Average", coil.Name);
-            SetupOutputVariable("Heating Coil Electricity Energy",
+            SetupOutputVariable(state, "Heating Coil " + FuelType + " Rate", OutputProcessor::Unit::W, coil.FuelUseRate, "System", "Average", coil.Name);
+            SetupOutputVariable(state, "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 coil.ElecUseLoad,
                                 "System",
@@ -737,11 +740,11 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil Electricity Rate", OutputProcessor::Unit::W, coil.ElecUseRate, "System", "Average", coil.Name);
-            SetupOutputVariable("Heating Coil Runtime Fraction", OutputProcessor::Unit::None, coil.RTF, "System", "Average", coil.Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state, "Heating Coil Electricity Rate", OutputProcessor::Unit::W, coil.ElecUseRate, "System", "Average", coil.Name);
+            SetupOutputVariable(state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, coil.RTF, "System", "Average", coil.Name);
+            SetupOutputVariable(state,
                 "Heating Coil Ancillary " + FuelType + " Rate", OutputProcessor::Unit::W, coil.ParasiticFuelRate, "System", "Average", coil.Name);
-            SetupOutputVariable("Heating Coil Ancillary " + FuelType + " Energy",
+            SetupOutputVariable(state, "Heating Coil Ancillary " + FuelType + " Energy",
                                 OutputProcessor::Unit::J,
                                 coil.ParasiticFuelLoad,
                                 "System",
@@ -762,7 +765,8 @@ namespace HeatingCoils {
             CurrentModuleObject = "Coil:Heating:Gas:MultiStage";
             HeatingCoil(CoilNum).FuelType_Num = iRT_Natural_Gas;
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           FuelCoilNum,
                                           Alphas,
                                           NumAlphas,
@@ -786,7 +790,7 @@ namespace HeatingCoils {
             if (lAlphaBlanks(2)) {
                 HeatingCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
             } else {
-                HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(Alphas(2));
+                HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
@@ -815,18 +819,18 @@ namespace HeatingCoils {
 
             errFlag = false;
             HeatingCoil(CoilNum).AirInletNodeNum =
-                GetOnlySingleNode(Alphas(3), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
             errFlag = false;
             HeatingCoil(CoilNum).AirOutletNodeNum =
-                GetOnlySingleNode(Alphas(4), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             errFlag = false;
             HeatingCoil(CoilNum).TempSetPointNodeNum =
-                GetOnlySingleNode(Alphas(5), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(5), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             // parasitic electric load associated with the gas heating coil
@@ -838,7 +842,7 @@ namespace HeatingCoils {
 
             // Setup Report variables for the Gas Coils
             // CurrentModuleObject = "Coil:Heating:Gas:MultiStage"
-            SetupOutputVariable("Heating Coil Heating Energy",
+            SetupOutputVariable(state, "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).HeatingCoilLoad,
                                 "System",
@@ -849,13 +853,13 @@ namespace HeatingCoils {
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil Heating Rate",
+            SetupOutputVariable(state, "Heating Coil Heating Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).HeatingCoilRate,
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable("Heating Coil NaturalGas Energy",
+            SetupOutputVariable(state, "Heating Coil NaturalGas Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).FuelUseLoad,
                                 "System",
@@ -866,13 +870,13 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil NaturalGas Rate",
+            SetupOutputVariable(state, "Heating Coil NaturalGas Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).FuelUseRate,
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable("Heating Coil Electricity Energy",
+            SetupOutputVariable(state, "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).ElecUseLoad,
                                 "System",
@@ -883,25 +887,25 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil Electricity Rate",
+            SetupOutputVariable(state, "Heating Coil Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).ElecUseRate,
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable("Heating Coil Runtime Fraction",
+            SetupOutputVariable(state, "Heating Coil Runtime Fraction",
                                 OutputProcessor::Unit::None,
                                 HeatingCoil(CoilNum).RTF,
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable("Heating Coil Ancillary NaturalGas Rate",
+            SetupOutputVariable(state, "Heating Coil Ancillary NaturalGas Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).ParasiticFuelRate,
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable("Heating Coil Ancillary NaturalGas Energy",
+            SetupOutputVariable(state, "Heating Coil Ancillary NaturalGas Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).ParasiticFuelLoad,
                                 "System",
@@ -922,7 +926,8 @@ namespace HeatingCoils {
             CurrentModuleObject = "Coil:Heating:Desuperheater";
             HeatingCoil(CoilNum).FuelType_Num = iRT_Electricity;
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           DesuperheaterCoilNum,
                                           Alphas,
                                           NumAlphas,
@@ -946,7 +951,7 @@ namespace HeatingCoils {
             if (lAlphaBlanks(2)) {
                 HeatingCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
             } else {
-                HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(Alphas(2));
+                HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
@@ -974,11 +979,11 @@ namespace HeatingCoils {
 
             errFlag = false;
             HeatingCoil(CoilNum).AirInletNodeNum =
-                GetOnlySingleNode(Alphas(3), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(3), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
             errFlag = false;
             HeatingCoil(CoilNum).AirOutletNodeNum =
-                GetOnlySingleNode(Alphas(4), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(4), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
@@ -1158,7 +1163,7 @@ namespace HeatingCoils {
 
             errFlag = false;
             HeatingCoil(CoilNum).TempSetPointNodeNum =
-                GetOnlySingleNode(Alphas(7), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                GetOnlySingleNode(state, Alphas(7), errFlag, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             InputErrorsFound = errFlag || InputErrorsFound;
 
             // parasitic electric load associated with the desuperheater heating coil
@@ -1171,7 +1176,7 @@ namespace HeatingCoils {
 
             // Setup Report variables for the Desuperheater Heating Coils
             // CurrentModuleObject = "Coil:Heating:Desuperheater"
-            SetupOutputVariable("Heating Coil Heating Energy",
+            SetupOutputVariable(state, "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).HeatingCoilLoad,
                                 "HVAC",
@@ -1182,13 +1187,13 @@ namespace HeatingCoils {
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil Heating Rate",
+            SetupOutputVariable(state, "Heating Coil Heating Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).HeatingCoilRate,
                                 "HVAC",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable("Heating Coil Electricity Energy",
+            SetupOutputVariable(state, "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).ElecUseLoad,
                                 "HVAC",
@@ -1199,13 +1204,13 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil Electricity Rate",
+            SetupOutputVariable(state, "Heating Coil Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).ElecUseRate,
                                 "HVAC",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, HeatingCoil(CoilNum).RTF, "HVAC", "Average", HeatingCoil(CoilNum).Name);
         }
 

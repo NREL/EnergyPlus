@@ -265,21 +265,21 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(state, errorsFound); // read construction data
     EXPECT_FALSE(errorsFound);                         // expect no errors
 
-    HeatBalanceManager::GetZoneData(errorsFound);
+    HeatBalanceManager::GetZoneData(state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(2);
@@ -291,12 +291,12 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state, state.files, errorsFound);
+    SurfaceGeometry::GetSurfaceData(state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    ElectricBaseboardRadiator::GetElectricBaseboardInput();
+    ElectricBaseboardRadiator::GetElectricBaseboardInput(state);
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(1).ZonePtr, 1);
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(2).ZonePtr, 2);
 }
@@ -556,21 +556,21 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(state, errorsFound); // read construction data
     EXPECT_FALSE(errorsFound);                         // expect no errors
 
-    HeatBalanceManager::GetZoneData(errorsFound);
+    HeatBalanceManager::GetZoneData(state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(3);
@@ -585,12 +585,12 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state, state.files, errorsFound);
+    SurfaceGeometry::GetSurfaceData(state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
     // get electric baseboard inputs
-    ElectricBaseboardRadiator::GetElectricBaseboardInput();
+    ElectricBaseboardRadiator::GetElectricBaseboardInput(state);
 
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(1).ZonePtr, 1);
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(2).ZonePtr, 2);

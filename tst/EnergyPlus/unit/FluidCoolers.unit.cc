@@ -268,7 +268,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test4)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetFluidCoolerInput();
+    GetFluidCoolerInput(state);
     auto &thisFluidCooler = FluidCoolers::SimpleFluidCooler(FluidCoolerNum);
     EXPECT_TRUE(thisFluidCooler.HighSpeedFluidCoolerUAWasAutoSized);
     EXPECT_EQ(thisFluidCooler.HighSpeedFluidCoolerUA, DataSizing::AutoSize);
@@ -322,9 +322,9 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test5)
 }
 
 TEST_F(EnergyPlusFixture, SizeFunctionTestWhenPlantSizingIndexIsZero)
-{  
+{
     int FluidCoolerNum(1);
-        
+
     std::string const idf_objects = delimited_string({
         "   FluidCooler:SingleSpeed,",
         "     Dry Cooler,              !- Name",
@@ -343,18 +343,18 @@ TEST_F(EnergyPlusFixture, SizeFunctionTestWhenPlantSizingIndexIsZero)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetFluidCoolerInput();
-    
+    GetFluidCoolerInput(state);
+
     auto &thisFluidCooler = FluidCoolers::SimpleFluidCooler(FluidCoolerNum);
 
     DataPlant::PlantLoop.allocate(FluidCoolerNum);
     SimpleFluidCooler.allocate(FluidCoolerNum);
     SimpleFluidCooler(FluidCoolerNum).LoopNum = 1;
     DataPlant::PlantLoop(FluidCoolerNum).PlantSizNum = 0;
-    
+
     EXPECT_FALSE(thisFluidCooler.HighSpeedFanPowerWasAutoSized);
     EXPECT_FALSE(thisFluidCooler.HighSpeedAirFlowRateWasAutoSized);
     EXPECT_FALSE(thisFluidCooler.HighSpeedFluidCoolerUAWasAutoSized);
 
-    thisFluidCooler.size();
+    thisFluidCooler.size(state);
 }

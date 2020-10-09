@@ -61,7 +61,6 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct CTElectricGeneratorData;
 struct EnergyPlusData;
 
 namespace CTElectricGenerator {
@@ -147,7 +146,7 @@ namespace CTElectricGenerator {
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
         void InitCTGenerators(EnergyPlusData &state,
                               bool RunFlag, bool FirstHVACIteration);
@@ -169,9 +168,9 @@ namespace CTElectricGenerator {
 
         void clear_state() override
         {
-            NumCTGenerators = 0;
-            getCTInputFlag = true;
-            CTGenerator.deallocate();
+            this->NumCTGenerators = 0;
+            this->getCTInputFlag = true;
+            this->CTGenerator.deallocate();
         }
     };
 

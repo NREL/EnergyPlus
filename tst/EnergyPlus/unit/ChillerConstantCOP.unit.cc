@@ -108,9 +108,9 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
         loopsidebranch.Comp.allocate(1);
     }
 
-    ConstCOPChillerSpecs::getInput(state.dataPlantChillers);
+    ConstCOPChillerSpecs::getInput(state);
 
-    auto &thisChiller = state.dataPlantChillers.ConstCOPChiller(1);
+    auto &thisChiller = state.dataPlantChillers->ConstCOPChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";
@@ -148,7 +148,7 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
 
     Psychrometrics::InitializePsychRoutines();
     thisChiller.initialize(state, RunFlag, MyLoad);
-    thisChiller.size();
+    thisChiller.size(state);
 
     // run init again after sizing is complete to set mass flow rate
     DataGlobals::BeginEnvrnFlag = true;

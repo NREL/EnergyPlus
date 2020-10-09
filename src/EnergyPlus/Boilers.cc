@@ -99,12 +99,12 @@ namespace Boilers {
     PlantComponent *BoilerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for boilers if it hasn't been done already
-        if (state.dataBoilers.getBoilerInputFlag) {
+        if (state.dataBoilers->getBoilerInputFlag) {
             GetBoilerInput(state);
-            state.dataBoilers.getBoilerInputFlag = false;
+            state.dataBoilers->getBoilerInputFlag = false;
         }
         // Now look for this particular pipe in the list
-        for (auto &boiler : state.dataBoilers.Boiler) {
+        for (auto &boiler : state.dataBoilers->Boiler) {
             if (boiler.Name == objectName) {
                 return &boiler;
             }
@@ -127,7 +127,7 @@ namespace Boilers {
         this->UpdateBoilerRecords(CurLoad, RunFlag);
     }
 
-    void BoilerSpecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void BoilerSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MinLoad = this->NomCap * this->MinPartLoadRat;
         MaxLoad = this->NomCap * this->MaxPartLoadRat;
@@ -142,7 +142,7 @@ namespace Boilers {
     void BoilerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->InitBoiler(state);
-        this->SizeBoiler();
+        this->SizeBoiler(state);
     }
 
     void GetBoilerInput(EnergyPlusData &state)
@@ -167,25 +167,26 @@ namespace Boilers {
 
         // GET NUMBER OF ALL EQUIPMENT
         DataIPShortCuts::cCurrentModuleObject = "Boiler:HotWater";
-        state.dataBoilers.numBoilers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataBoilers->numBoilers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (state.dataBoilers.numBoilers <= 0) {
+        if (state.dataBoilers->numBoilers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " Equipment specified in input file");
             ErrorsFound = true;
         }
 
         // See if load distribution manager has already gotten the input
-        if (allocated(state.dataBoilers.Boiler)) return;
+        if (allocated(state.dataBoilers->Boiler)) return;
 
-        state.dataBoilers.Boiler.allocate(state.dataBoilers.numBoilers);
+        state.dataBoilers->Boiler.allocate(state.dataBoilers->numBoilers);
 
         // LOAD ARRAYS WITH CURVE FIT Boiler DATA
 
-        for (int BoilerNum = 1; BoilerNum <= state.dataBoilers.numBoilers; ++BoilerNum) {
+        for (int BoilerNum = 1; BoilerNum <= state.dataBoilers->numBoilers; ++BoilerNum) {
             int NumAlphas; // Number of elements in the alpha array
             int NumNums;   // Number of elements in the numeric array
             int IOStat;    // IO Status when calling get input subroutine
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           BoilerNum,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -200,7 +201,7 @@ namespace Boilers {
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueBoilerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
-            auto &thisBoiler = state.dataBoilers.Boiler(BoilerNum);
+            auto &thisBoiler = state.dataBoilers->Boiler(BoilerNum);
             thisBoiler.Name = DataIPShortCuts::cAlphaArgs(1);
             thisBoiler.TypeNum = DataPlant::TypeOf_Boiler_Simple;
 
@@ -302,7 +303,8 @@ namespace Boilers {
             thisBoiler.SizFac = DataIPShortCuts::rNumericArgs(9);
             if (thisBoiler.SizFac == 0.0) thisBoiler.SizFac = 1.0;
 
-            thisBoiler.BoilerInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+            thisBoiler.BoilerInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                                DataIPShortCuts::cAlphaArgs(5),
                                                                                 ErrorsFound,
                                                                                 DataIPShortCuts::cCurrentModuleObject,
                                                                                 DataIPShortCuts::cAlphaArgs(1),
@@ -310,7 +312,8 @@ namespace Boilers {
                                                                                 DataLoopNode::NodeConnectionType_Inlet,
                                                                                 1,
                                                                                 DataLoopNode::ObjectIsNotParent);
-            thisBoiler.BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+            thisBoiler.BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                                 DataIPShortCuts::cAlphaArgs(6),
                                                                                  ErrorsFound,
                                                                                  DataIPShortCuts::cCurrentModuleObject,
                                                                                  DataIPShortCuts::cAlphaArgs(1),
@@ -352,10 +355,10 @@ namespace Boilers {
         }
     }
 
-    void BoilerSpecs::SetupOutputVars()
+    void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, this->BoilerLoad, "System", "Average", this->Name);
-        SetupOutputVariable("Boiler Heating Energy",
+        SetupOutputVariable(state, "Boiler Heating Rate", OutputProcessor::Unit::W, this->BoilerLoad, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Boiler Heating Energy",
                             OutputProcessor::Unit::J,
                             this->BoilerEnergy,
                             "System",
@@ -366,9 +369,9 @@ namespace Boilers {
                             "BOILERS",
                             _,
                             "Plant");
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate", OutputProcessor::Unit::W, this->FuelUsed, "System", "Average", this->Name);
-        SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Energy",
+        SetupOutputVariable(state, "Boiler " + this->BoilerFuelTypeForOutputVariable + " Energy",
                             OutputProcessor::Unit::J,
                             this->FuelConsumed,
                             "System",
@@ -379,11 +382,11 @@ namespace Boilers {
                             "Heating",
                             this->EndUseSubcategory,
                             "Plant");
-        SetupOutputVariable("Boiler Inlet Temperature", OutputProcessor::Unit::C, this->BoilerInletTemp, "System", "Average", this->Name);
-        SetupOutputVariable("Boiler Outlet Temperature", OutputProcessor::Unit::C, this->BoilerOutletTemp, "System", "Average", this->Name);
-        SetupOutputVariable("Boiler Mass Flow Rate", OutputProcessor::Unit::kg_s, this->BoilerMassFlowRate, "System", "Average", this->Name);
-        SetupOutputVariable("Boiler Ancillary Electricity Rate", OutputProcessor::Unit::W, this->ParasiticElecPower, "System", "Average", this->Name);
-        SetupOutputVariable("Boiler Ancillary Electricity Energy",
+        SetupOutputVariable(state, "Boiler Inlet Temperature", OutputProcessor::Unit::C, this->BoilerInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Boiler Outlet Temperature", OutputProcessor::Unit::C, this->BoilerOutletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Boiler Mass Flow Rate", OutputProcessor::Unit::kg_s, this->BoilerMassFlowRate, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Boiler Ancillary Electricity Rate", OutputProcessor::Unit::W, this->ParasiticElecPower, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Boiler Ancillary Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->ParasiticElecConsumption,
                             "System",
@@ -394,8 +397,8 @@ namespace Boilers {
                             "Heating",
                             "Boiler Parasitic",
                             "Plant");
-        SetupOutputVariable("Boiler Part Load Ratio", OutputProcessor::Unit::None, this->BoilerPLR, "System", "Average", this->Name);
-        SetupOutputVariable("Boiler Efficiency", OutputProcessor::Unit::None, this->BoilerEff, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Boiler Part Load Ratio", OutputProcessor::Unit::None, this->BoilerPLR, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Boiler Efficiency", OutputProcessor::Unit::None, this->BoilerEff, "System", "Average", this->Name);
         if (DataGlobals::AnyEnergyManagementSystemInModel) {
             SetupEMSInternalVariable("Boiler Nominal Capacity", this->Name, "[W]", this->NomCap);
         }
@@ -423,7 +426,7 @@ namespace Boilers {
         if (this->MyFlag) {
 
             // setup the output variable pointers
-            this->SetupOutputVars();
+            this->SetupOutputVars(state);
 
             // Locate the boilers on the plant loops for later usage
             bool errFlag = false;
@@ -455,7 +458,8 @@ namespace Boilers {
 
         if (this->MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
             // if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
-            Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
+            Real64 const rho = FluidProperties::GetDensityGlycol(state,
+                                                                 DataPlant::PlantLoop(this->LoopNum).FluidName,
                                                                  DataGlobals::HWInitConvTemp,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                  RoutineName);
@@ -523,7 +527,7 @@ namespace Boilers {
         }
     }
 
-    void BoilerSpecs::SizeBoiler()
+    void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -555,11 +559,13 @@ namespace Boilers {
         if (PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
 
-                Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
+                Real64 const rho = FluidProperties::GetDensityGlycol(state,
+                                                                     DataPlant::PlantLoop(this->LoopNum).FluidName,
                                                                      DataGlobals::HWInitConvTemp,
                                                                      DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                      RoutineName);
-                Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
+                Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                         DataPlant::PlantLoop(this->LoopNum).FluidName,
                                                                          DataGlobals::HWInitConvTemp,
                                                                          DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                          RoutineName);
@@ -722,7 +728,8 @@ namespace Boilers {
         Real64 const TempUpLimitBout = this->TempUpLimitBoilerOut;  // C - boiler high temperature limit
         Real64 const BoilerMassFlowRateMax = this->DesMassFlowRate; // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
 
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           DataPlant::PlantLoop(this->LoopNum).FluidName,
                                                            DataLoopNode::Node(BoilerInletNode).Temp,
                                                            DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                            RoutineName);

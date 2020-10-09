@@ -99,9 +99,9 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     state.dataCurveManager->NumCurves = 1;
     state.dataCurveManager->PerfCurve.allocate(state.dataCurveManager->NumCurves);
 
-    state.fans.NumFans = 2;
-    Fan.allocate(state.fans.NumFans);
-    FaultsFouledAirFilters.allocate(state.fans.NumFans);
+    state.dataFans->NumFans = 2;
+    Fan.allocate(state.dataFans->NumFans);
+    FaultsFouledAirFilters.allocate(state.dataFans->NumFans);
 
     // Inputs: fan curve
     CurveNum = 1;
@@ -354,8 +354,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     state.dataCurveManager->NumCurves = 1;
     state.dataCurveManager->PerfCurve.allocate(state.dataCurveManager->NumCurves);
 
-    state.fans.NumFans = 1;
-    Fan.allocate(state.fans.NumFans);
+    state.dataFans->NumFans = 1;
+    Fan.allocate(state.dataFans->NumFans);
 
     // Inputs: fan curve
     CurveNum = 1;
@@ -651,7 +651,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
     MixedAir::GetOAControllerInputs(state);
 
@@ -881,10 +881,10 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
 
-    ScheduleManager::ProcessScheduleInput(state.files);  // read schedule data
-    int avaiSchedIndex = ScheduleManager::GetScheduleIndex("AVAILSCHED");
+    ScheduleManager::ProcessScheduleInput(state);  // read schedule data
+    int avaiSchedIndex = ScheduleManager::GetScheduleIndex(state, "AVAILSCHED");
     EXPECT_EQ(1, avaiSchedIndex);
-    int severitySchedIndex = ScheduleManager::GetScheduleIndex("SEVERITYSCHED");
+    int severitySchedIndex = ScheduleManager::GetScheduleIndex(state, "SEVERITYSCHED");
     EXPECT_EQ(2, severitySchedIndex);
 
 
@@ -900,7 +900,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     DataGlobals::HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 1;
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     EXPECT_EQ(2, FaultsManager::NumFouledCoil);
     // This should also have called WaterCoil::GetWaterCoilInput

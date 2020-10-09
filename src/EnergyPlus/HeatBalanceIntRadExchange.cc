@@ -56,6 +56,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -66,7 +67,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceMovableInsulation.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -489,7 +489,7 @@ namespace HeatBalanceIntRadExchange {
         }
     }
 
-    void InitInteriorRadExchange(IOFiles &ioFiles)
+    void InitInteriorRadExchange(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -524,16 +524,16 @@ namespace HeatBalanceIntRadExchange {
 
         // FLOW:
 
-        ScanForReports("ViewFactorInfo", ViewFactorReport, _, Option1);
+        ScanForReports(state, "ViewFactorInfo", ViewFactorReport, _, Option1);
 
         if (ViewFactorReport) { // Print heading
-            print(ioFiles.eio, "{}\n", "! <Surface View Factor and Grey Interchange Information>");
-            print(ioFiles.eio, "{}\n", "! <View Factor - Zone/Enclosure Information>,Zone/Enclosure Name,Number of Surfaces");
-            print(ioFiles.eio,
+            print(state.files.eio, "{}\n", "! <Surface View Factor and Grey Interchange Information>");
+            print(state.files.eio, "{}\n", "! <View Factor - Zone/Enclosure Information>,Zone/Enclosure Name,Number of Surfaces");
+            print(state.files.eio,
                   "{}\n",
                   "! <View Factor - Surface Information>,Surface Name,Surface Class,Area {m2},Azimuth,Tilt,Thermal Emissivity,#Sides,Vertices");
-            print(ioFiles.eio, "{}\n", "! <View Factor / Grey Interchange Type>,Surface Name(s)");
-            print(ioFiles.eio, "{}\n", "! <View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface");
+            print(state.files.eio, "{}\n", "! <View Factor / Grey Interchange Type>,Surface Name(s)");
+            print(state.files.eio, "{}\n", "! <View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface");
         }
 
         MaxNumOfRadEnclosureSurfs = 0;
@@ -541,7 +541,7 @@ namespace HeatBalanceIntRadExchange {
             auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
             if (enclosureNum == 1) {
                 if (DisplayAdvancedReportVariables) {
-                    print(ioFiles.eio,
+                    print(state.files.eio,
                           "{}\n",
                           "! <Surface View Factor Check Values>,Zone/Enclosure Name,Original Check Value,Calculated Fixed Check Value,Final Check "
                           "Value,Number of Iterations,Fixed RowSum Convergence,Used RowSum Convergence");
@@ -604,7 +604,7 @@ namespace HeatBalanceIntRadExchange {
                 thisEnclosure.Fp = 0.0;
                 thisEnclosure.FMRT = 0.0;
                 if (DisplayAdvancedReportVariables)
-                    print(ioFiles.eio, "Surface View Factor Check Values,{},0,0,0,-1,0,0\n", thisEnclosure.Name);
+                    print(state.files.eio, "Surface View Factor Check Values,{},0,0,0,-1,0,0\n", thisEnclosure.Name);
                 continue; // Go to the next enclosure in the loop
             }
 
@@ -627,7 +627,8 @@ namespace HeatBalanceIntRadExchange {
                 int NumZonesWithUserFbyS = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
                 if (NumZonesWithUserFbyS > 0) {
 
-                    GetInputViewFactorsbyName(thisEnclosure.Name,
+                    GetInputViewFactorsbyName(state,
+                                              thisEnclosure.Name,
                                               thisEnclosure.NumOfSurfaces,
                                               thisEnclosure.F,
                                               thisEnclosure.SurfacePtr,
@@ -667,10 +668,10 @@ namespace HeatBalanceIntRadExchange {
                 if (ViewFactorReport) { // Write to SurfInfo File
                     // Zone Surface Information Output
                     print(
-                        ioFiles.eio, "Surface View Factor - Zone/Enclosure Information,{},{}\n", thisEnclosure.Name, thisEnclosure.NumOfSurfaces);
+                        state.files.eio, "Surface View Factor - Zone/Enclosure Information,{},{}\n", thisEnclosure.Name, thisEnclosure.NumOfSurfaces);
 
                     for (int SurfNum : thisEnclosure.SurfaceReportNums) {
-                        print(ioFiles.eio,
+                        print(state.files.eio,
                               "Surface View Factor - Surface Information,{},{},{:.4R},{:.4R},{:.4R},{:.4R},{}",
                               Surface(thisEnclosure.SurfacePtr(SurfNum)).Name,
                               cSurfaceClass(Surface(thisEnclosure.SurfacePtr(SurfNum)).Class),
@@ -681,107 +682,107 @@ namespace HeatBalanceIntRadExchange {
                               Surface(thisEnclosure.SurfacePtr(SurfNum)).Sides);
                         for (int Vindex = 1; Vindex <= Surface(thisEnclosure.SurfacePtr(SurfNum)).Sides; ++Vindex) {
                             auto &Vertex = Surface(thisEnclosure.SurfacePtr(SurfNum)).Vertex(Vindex);
-                            print(ioFiles.eio, ",{:.4R},{:.4R},{:.4R}", Vertex.x, Vertex.y, Vertex.z);
+                            print(state.files.eio, ",{:.4R},{:.4R},{:.4R}", Vertex.x, Vertex.y, Vertex.z);
                         }
-                        print(ioFiles.eio, "\n");
+                        print(state.files.eio, "\n");
                     }
 
-                    print(ioFiles.eio, "Approximate or User Input ViewFactors,To Surface,Surface Class,RowSum");
+                    print(state.files.eio, "Approximate or User Input ViewFactors,To Surface,Surface Class,RowSum");
                     for (int SurfNum : thisEnclosure.SurfaceReportNums) {
-                        print(ioFiles.eio, ",{}", Surface(thisEnclosure.SurfacePtr(SurfNum)).Name);
+                        print(state.files.eio, ",{}", Surface(thisEnclosure.SurfacePtr(SurfNum)).Name);
                     }
-                    print(ioFiles.eio, "\n");
+                    print(state.files.eio, "\n");
 
                     for (int Findex : thisEnclosure.SurfaceReportNums) {
                         RowSum = sum(SaveApproximateViewFactors(_, Findex));
-                        print(ioFiles.eio,
+                        print(state.files.eio,
                               "{},{},{},{:.4R}",
                               "View Factor",
                               Surface(thisEnclosure.SurfacePtr(Findex)).Name,
                               cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class),
                               RowSum);
                         for (int SurfNum : thisEnclosure.SurfaceReportNums) {
-                            print(ioFiles.eio, ",{:.4R}", SaveApproximateViewFactors(SurfNum, Findex));
+                            print(state.files.eio, ",{:.4R}", SaveApproximateViewFactors(SurfNum, Findex));
                         }
-                        print(ioFiles.eio, "\n");
+                        print(state.files.eio, "\n");
                     }
                 }
 
                 if (ViewFactorReport) {
-                    print(ioFiles.eio, "Final ViewFactors,To Surface,Surface Class,RowSum");
+                    print(state.files.eio, "Final ViewFactors,To Surface,Surface Class,RowSum");
                     for (int SurfNum : thisEnclosure.SurfaceReportNums) {
-                        print(ioFiles.eio, ",{}", Surface(thisEnclosure.SurfacePtr(SurfNum)).Name);
+                        print(state.files.eio, ",{}", Surface(thisEnclosure.SurfacePtr(SurfNum)).Name);
                     }
-                    print(ioFiles.eio, "\n");
+                    print(state.files.eio, "\n");
 
                     for (int Findex : thisEnclosure.SurfaceReportNums) {
                         RowSum = sum(thisEnclosure.F(_, Findex));
-                        print(ioFiles.eio,
+                        print(state.files.eio,
                               "{},{},{},{:.4R}",
                               "View Factor",
                               Surface(thisEnclosure.SurfacePtr(Findex)).Name,
                               cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class),
                               RowSum);
                         for (int SurfNum : thisEnclosure.SurfaceReportNums) {
-                            print(ioFiles.eio, ",{:.4R}", thisEnclosure.F(SurfNum, Findex));
+                            print(state.files.eio, ",{:.4R}", thisEnclosure.F(SurfNum, Findex));
                         }
-                        print(ioFiles.eio, "\n");
+                        print(state.files.eio, "\n");
                     }
 
                     if (Option1 == "IDF") {
                         // TODO Both "original" and "final" print the same output. This is likely a bug
                         // (discovered while updating output to {fmt}
                         // see: https://github.com/NREL/EnergyPlusArchive/commit/1c08247853c297dce59f3f53cde47ccfa67720c0#diff-124964a7e9b73ce494c1952ab1acdeeb
-                        print(ioFiles.debug, "{}\n", "!======== original input factors ===========================");
-                        print(ioFiles.debug, "ZoneProperty:UserViewFactors:BySurfaceName,{},\n", thisEnclosure.Name);
+                        print(state.files.debug, "{}\n", "!======== original input factors ===========================");
+                        print(state.files.debug, "ZoneProperty:UserViewFactors:BySurfaceName,{},\n", thisEnclosure.Name);
                         for (int SurfNum : thisEnclosure.SurfaceReportNums) {
                             for (int Findex : thisEnclosure.SurfaceReportNums) {
-                                print(ioFiles.debug,
+                                print(state.files.debug,
                                       "  {},{},{:.6R}",
                                       Surface(thisEnclosure.SurfacePtr(SurfNum)).Name,
                                       Surface(thisEnclosure.SurfacePtr(Findex)).Name,
                                       thisEnclosure.F(Findex, SurfNum));
                                 if (!(SurfNum == thisEnclosure.NumOfSurfaces && Findex == thisEnclosure.NumOfSurfaces)) {
-                                    print(ioFiles.debug, ",\n");
+                                    print(state.files.debug, ",\n");
                                 } else {
-                                    print(ioFiles.debug, ";\n");
+                                    print(state.files.debug, ";\n");
                                 }
                             }
                         }
-                        print(ioFiles.debug, "{}\n", "!============= end of data ======================");
+                        print(state.files.debug, "{}\n", "!============= end of data ======================");
 
-                        print(ioFiles.debug, "{}\n", "!============ final view factors =======================");
-                        print(ioFiles.debug, "ZoneProperty:UserViewFactors:BySurfaceName,{},\n", thisEnclosure.Name);
+                        print(state.files.debug, "{}\n", "!============ final view factors =======================");
+                        print(state.files.debug, "ZoneProperty:UserViewFactors:BySurfaceName,{},\n", thisEnclosure.Name);
                         for (int SurfNum : thisEnclosure.SurfaceReportNums) {
                             for (int Findex : thisEnclosure.SurfaceReportNums) {
-                                print(ioFiles.debug,
+                                print(state.files.debug,
                                       "  {},{},{:.6R}",
                                       Surface(thisEnclosure.SurfacePtr(SurfNum)).Name,
                                       Surface(thisEnclosure.SurfacePtr(Findex)).Name,
                                       thisEnclosure.F(Findex, SurfNum));
                                 if (!(SurfNum == thisEnclosure.SurfaceReportNums.back() && Findex == thisEnclosure.SurfaceReportNums.back())) {
-                                    print(ioFiles.debug, ",\n");
+                                    print(state.files.debug, ",\n");
                                 } else {
-                                    print(ioFiles.debug, ";\n");
+                                    print(state.files.debug, ";\n");
                                 }
                             }
                         }
-                        print(ioFiles.debug, "{}\n", "!============= end of data ======================");
+                        print(state.files.debug, "{}\n", "!============= end of data ======================");
                     }
                 }
 
                 if (ViewFactorReport) {
-                    print(ioFiles.eio, "Script F Factors,X Surface");
+                    print(state.files.eio, "Script F Factors,X Surface");
                     for (int SurfNum : thisEnclosure.SurfaceReportNums) {
-                        print(ioFiles.eio, ",{}", Surface(thisEnclosure.SurfacePtr(SurfNum)).Name);
+                        print(state.files.eio, ",{}", Surface(thisEnclosure.SurfacePtr(SurfNum)).Name);
                     }
-                    print(ioFiles.eio, "\n");
+                    print(state.files.eio, "\n");
                     for (int Findex : thisEnclosure.SurfaceReportNums) {
-                        print(ioFiles.eio, "{},{}", "Script F Factor", Surface(thisEnclosure.SurfacePtr(Findex)).Name);
+                        print(state.files.eio, "{},{}", "Script F Factor", Surface(thisEnclosure.SurfacePtr(Findex)).Name);
                         for (int SurfNum : thisEnclosure.SurfaceReportNums) {
-                            print(ioFiles.eio,  ",{:.4R}", thisEnclosure.ScriptF(Findex, SurfNum));
+                            print(state.files.eio,  ",{:.4R}", thisEnclosure.ScriptF(Findex, SurfNum));
                         }
-                        print(ioFiles.eio, "\n");
+                        print(state.files.eio, "\n");
                     }
                 }
 
@@ -796,7 +797,7 @@ namespace HeatBalanceIntRadExchange {
                 RowSum = std::abs(RowSum - thisEnclosure.NumOfSurfaces);
                 FixedRowSum = std::abs(FixedRowSum - thisEnclosure.NumOfSurfaces);
                 if (DisplayAdvancedReportVariables) {
-                    print(ioFiles.eio,
+                    print(state.files.eio,
                           "Surface View Factor Check Values,{},{:.6R},{:.6R},{:.6R},{},{:.6R},{:.6R}\n",
                           thisEnclosure.Name,
                           CheckValue1,
@@ -815,7 +816,7 @@ namespace HeatBalanceIntRadExchange {
         }
     }
 
-    void InitSolarViewFactors(IOFiles &ioFiles)
+    void InitSolarViewFactors(EnergyPlusData &state)
     {
 
         // Initializes view factors for diffuse solar distribution between surfaces in an enclosure.
@@ -825,14 +826,14 @@ namespace HeatBalanceIntRadExchange {
 
         bool ErrorsFound = false;
         bool ViewFactorReport = false;
-        General::ScanForReports("ViewFactorInfo", ViewFactorReport, _, Option1);
+        General::ScanForReports(state, "ViewFactorInfo", ViewFactorReport, _, Option1);
 
         if (ViewFactorReport) { // Print heading
-            print(ioFiles.eio, "{}\n", "! <Solar View Factor Information>");
-            print(ioFiles.eio, "{}\n", "! <Solar View Factor - Zone/Enclosure Information>,Zone/Enclosure Name,Number of Surfaces");
-            print(ioFiles.eio, "{}\n", "! <Solar View Factor - Surface Information>,Surface Name,Surface Class,Area {m2},Azimuth,Tilt,Solar Absorbtance,#Sides,Vertices");
-            print(ioFiles.eio, "{}\n", "! <Solar View Factor / Interchange Type>,Surface Name(s)");
-            print(ioFiles.eio, "{}\n", "! <Solar View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface");
+            print(state.files.eio, "{}\n", "! <Solar View Factor Information>");
+            print(state.files.eio, "{}\n", "! <Solar View Factor - Zone/Enclosure Information>,Zone/Enclosure Name,Number of Surfaces");
+            print(state.files.eio, "{}\n", "! <Solar View Factor - Surface Information>,Surface Name,Surface Class,Area {m2},Azimuth,Tilt,Solar Absorbtance,#Sides,Vertices");
+            print(state.files.eio, "{}\n", "! <Solar View Factor / Interchange Type>,Surface Name(s)");
+            print(state.files.eio, "{}\n", "! <Solar View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface");
         }
 
         std::string cCurrentModuleObject = "ZoneProperty:UserViewFactors:BySurfaceName";
@@ -843,7 +844,7 @@ namespace HeatBalanceIntRadExchange {
             auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             if (enclosureNum == 1) {
                 if (DisplayAdvancedReportVariables)
-                    print(ioFiles.eio, "{}\n", "! <Solar View Factor Check Values>,Zone/Enclosure Name,Original Check Value,Calculated Fixed Check "
+                    print(state.files.eio, "{}\n", "! <Solar View Factor Check Values>,Zone/Enclosure Name,Original Check Value,Calculated Fixed Check "
                            "Value,Final Check Value,Number of Iterations,Fixed RowSum Convergence,Used RowSum "
                            "Convergence");
             }
@@ -914,7 +915,7 @@ namespace HeatBalanceIntRadExchange {
             if (thisEnclosure.NumOfSurfaces == 1) {
                 // If there is only one surface in a zone, then there is no solar distribution
                 if (DisplayAdvancedReportVariables)
-                    print(ioFiles.eio, "Solar View Factor Check Values,{},0,0,0,-1,0,0\n", thisEnclosure.Name);
+                    print(state.files.eio, "Solar View Factor Check Values,{},0,0,0,-1,0,0\n", thisEnclosure.Name);
                 continue; // Go to the next enclosure in the loop
             }
 
@@ -924,7 +925,8 @@ namespace HeatBalanceIntRadExchange {
 
             if (NumZonesWithUserFbyS > 0) {
 
-                GetInputViewFactorsbyName(thisEnclosure.Name,
+                GetInputViewFactorsbyName(state,
+                                          thisEnclosure.Name,
                                           thisEnclosure.NumOfSurfaces,
                                           thisEnclosure.F,
                                           thisEnclosure.SurfacePtr,
@@ -967,10 +969,10 @@ namespace HeatBalanceIntRadExchange {
 
             if (ViewFactorReport) { // Write to SurfInfo File
                 // Zone Surface Information Output
-                print(ioFiles.eio, "Solar View Factor - Zone/Enclosure Information,{},{}\n", thisEnclosure.Name, thisEnclosure.NumOfSurfaces);
+                print(state.files.eio, "Solar View Factor - Zone/Enclosure Information,{},{}\n", thisEnclosure.Name, thisEnclosure.NumOfSurfaces);
 
                 for (int SurfNum : thisEnclosure.SurfaceReportNums) {
-                    print(ioFiles.eio,
+                    print(state.files.eio,
                           "Solar View Factor - Surface Information,{},{},{:.4R},{:.4R},{:.4R},{:.4R},{}",
                           Surface(thisEnclosure.SurfacePtr(SurfNum)).Name,
                           cSurfaceClass(Surface(thisEnclosure.SurfacePtr(SurfNum)).Class),
@@ -982,90 +984,90 @@ namespace HeatBalanceIntRadExchange {
 
                     for (int Vindex = 1; Vindex <= Surface(thisEnclosure.SurfacePtr(SurfNum)).Sides; ++Vindex) {
                         auto &Vertex = Surface(thisEnclosure.SurfacePtr(SurfNum)).Vertex(Vindex);
-                        print(ioFiles.eio, ",{:.4R},{:.4R},{:.4R}", Vertex.x, Vertex.y, Vertex.z);
+                        print(state.files.eio, ",{:.4R},{:.4R},{:.4R}", Vertex.x, Vertex.y, Vertex.z);
                     }
-                    print(ioFiles.eio, "\n");
+                    print(state.files.eio, "\n");
                 }
 
-                print(ioFiles.eio, "Approximate or User Input Solar ViewFactors,To Surface,Surface Class,RowSum");
+                print(state.files.eio, "Approximate or User Input Solar ViewFactors,To Surface,Surface Class,RowSum");
                 for (int SurfNum : thisEnclosure.SurfaceReportNums) {
-                    print(ioFiles.eio, ",{}", Surface(thisEnclosure.SurfacePtr(SurfNum)).Name);
+                    print(state.files.eio, ",{}", Surface(thisEnclosure.SurfacePtr(SurfNum)).Name);
                 }
-                print(ioFiles.eio, "\n");
+                print(state.files.eio, "\n");
 
                 for (int Findex : thisEnclosure.SurfaceReportNums) {
                     Real64 RowSum = sum(SaveApproximateViewFactors(_, Findex));
-                    print(ioFiles.eio,
+                    print(state.files.eio,
                           "Solar View Factor,{},{},{:.4R}",
                           Surface(thisEnclosure.SurfacePtr(Findex)).Name,
                           cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class),
                           RowSum);
                     for (int SurfNum : thisEnclosure.SurfaceReportNums) {
-                        print(ioFiles.eio, ",{:.4R}", SaveApproximateViewFactors(SurfNum, Findex));
+                        print(state.files.eio, ",{:.4R}", SaveApproximateViewFactors(SurfNum, Findex));
                     }
-                    print(ioFiles.eio, "\n");
+                    print(state.files.eio, "\n");
                 }
             }
 
             if (ViewFactorReport) {
-                print(ioFiles.eio, "Final Solar ViewFactors,To Surface,Surface Class,RowSum");
+                print(state.files.eio, "Final Solar ViewFactors,To Surface,Surface Class,RowSum");
                 for (int SurfNum : thisEnclosure.SurfaceReportNums) {
-                    print(ioFiles.eio, ",{}", Surface(thisEnclosure.SurfacePtr(SurfNum)).Name);
+                    print(state.files.eio, ",{}", Surface(thisEnclosure.SurfacePtr(SurfNum)).Name);
                 }
-                print(ioFiles.eio, "\n");
+                print(state.files.eio, "\n");
 
                 for (int Findex : thisEnclosure.SurfaceReportNums) {
                     Real64 RowSum = sum(thisEnclosure.F(_, Findex));
-                    print(ioFiles.eio,
+                    print(state.files.eio,
                           "{},{},{},{:.4R}",
                           "Solar View Factor",
                           Surface(thisEnclosure.SurfacePtr(Findex)).Name,
                           cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class),
                           RowSum);
                     for (int SurfNum : thisEnclosure.SurfaceReportNums) {
-                        print(ioFiles.eio, ",{:.4R}", thisEnclosure.F(SurfNum, Findex));
+                        print(state.files.eio, ",{:.4R}", thisEnclosure.F(SurfNum, Findex));
                     }
-                    print(ioFiles.eio, "\n");
+                    print(state.files.eio, "\n");
                 }
 
                 if (Option1 == "IDF") {
                     // TODO Both "original" and "final" print the same output. This is likely a bug
                     // see: https://github.com/NREL/EnergyPlusArchive/commit/1c08247853c297dce59f3f53cde47ccfa67720c0#diff-124964a7e9b73ce494c1952ab1acdeeb
-                    print(ioFiles.debug, "{}\n", "!======== original input factors ===========================");
-                    print(ioFiles.debug, "ZoneProperty:UserViewFactors:BySurfaceName,{},\n", thisEnclosure.Name);
+                    print(state.files.debug, "{}\n", "!======== original input factors ===========================");
+                    print(state.files.debug, "ZoneProperty:UserViewFactors:BySurfaceName,{},\n", thisEnclosure.Name);
                     for (int SurfNum : thisEnclosure.SurfaceReportNums) {
                         for (int Findex : thisEnclosure.SurfaceReportNums) {
-                            print(ioFiles.debug,
+                            print(state.files.debug,
                                   "  {},{},{:.6R}",
                                   Surface(thisEnclosure.SurfacePtr(SurfNum)).Name,
                                   Surface(thisEnclosure.SurfacePtr(Findex)).Name,
                                   thisEnclosure.F(Findex, SurfNum));
                             if (!(SurfNum == thisEnclosure.NumOfSurfaces && Findex == thisEnclosure.NumOfSurfaces)) {
-                                print(ioFiles.debug, ",\n");
+                                print(state.files.debug, ",\n");
                             } else {
-                                print(ioFiles.debug, ";\n");
+                                print(state.files.debug, ";\n");
                             }
                         }
                     }
-                    print(ioFiles.debug, "{}\n", "!============= end of data ======================");
+                    print(state.files.debug, "{}\n", "!============= end of data ======================");
 
-                    print(ioFiles.debug, "{}\n", "!============ final view factors =======================");
-                    print(ioFiles.debug, "ZoneProperty:UserViewFactors:BySurfaceName,{},\n", thisEnclosure.Name);
+                    print(state.files.debug, "{}\n", "!============ final view factors =======================");
+                    print(state.files.debug, "ZoneProperty:UserViewFactors:BySurfaceName,{},\n", thisEnclosure.Name);
                     for (int SurfNum : thisEnclosure.SurfaceReportNums) {
                         for (int Findex : thisEnclosure.SurfaceReportNums) {
-                            print(ioFiles.debug,
+                            print(state.files.debug,
                                   "  {},{},{:.6R}",
                                   Surface(thisEnclosure.SurfacePtr(SurfNum)).Name,
                                   Surface(thisEnclosure.SurfacePtr(Findex)).Name,
                                   thisEnclosure.F(Findex, SurfNum));
                             if (!(SurfNum == thisEnclosure.NumOfSurfaces && Findex == thisEnclosure.NumOfSurfaces)) {
-                                print(ioFiles.debug, ",\n");
+                                print(state.files.debug, ",\n");
                             } else {
-                                print(ioFiles.debug, ";\n");
+                                print(state.files.debug, ";\n");
                             }
                         }
                     }
-                    print(ioFiles.debug, "{}\n", "!============= end of data ======================");
+                    print(state.files.debug, "{}\n", "!============= end of data ======================");
                 }
             }
 
@@ -1080,7 +1082,7 @@ namespace HeatBalanceIntRadExchange {
             RowSum = std::abs(RowSum - thisEnclosure.NumOfSurfaces);
             FixedRowSum = std::abs(FixedRowSum - thisEnclosure.NumOfSurfaces);
             if (DisplayAdvancedReportVariables) {
-                print(ioFiles.eio,
+                print(state.files.eio,
                       "Solar View Factor Check Values,{},{:.6R},{:.6R},{:.6R},{},{:.6R},{:.6R}\n",
                       thisEnclosure.Name,
                       CheckValue1,
@@ -1097,7 +1099,8 @@ namespace HeatBalanceIntRadExchange {
         }
     }
 
-    void GetInputViewFactors(std::string const &ZoneName, // Needed to check for user input view factors.
+    void GetInputViewFactors(EnergyPlusData &state,
+                             std::string const &ZoneName, // Needed to check for user input view factors.
                              int const N,                 // NUMBER OF SURFACES
                              Array2A<Real64> F,           // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
                              const Array1D_int &EP_UNUSED(SPtr),     // pointer to actual surface number
@@ -1135,12 +1138,13 @@ namespace HeatBalanceIntRadExchange {
         // unused  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: ZoneSurfaceNames
 
         NoUserInputF = true;
-        UserFZoneIndex = inputProcessor->getObjectItemNum("ZoneProperty:UserViewFactors", ZoneName);
+        UserFZoneIndex = inputProcessor->getObjectItemNum(state, "ZoneProperty:UserViewFactors", ZoneName);
 
         if (UserFZoneIndex > 0) {
             NoUserInputF = false;
 
-            inputProcessor->getObjectItem("ZoneProperty:UserViewFactors",
+            inputProcessor->getObjectItem(state,
+                                          "ZoneProperty:UserViewFactors",
                                           UserFZoneIndex,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1283,7 +1287,8 @@ namespace HeatBalanceIntRadExchange {
         }
     }
 
-    void GetInputViewFactorsbyName(std::string const &EnclosureName, // Needed to check for user input view factors.
+    void GetInputViewFactorsbyName(EnergyPlusData &state,
+                                   std::string const &EnclosureName, // Needed to check for user input view factors.
                                    int const N,                      // NUMBER OF SURFACES
                                    Array2A<Real64> F,                // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
                                    const Array1D_int &SPtr,          // pointer to actual surface number
@@ -1320,7 +1325,7 @@ namespace HeatBalanceIntRadExchange {
         Array1D_string enclosureSurfaceNames;
 
         NoUserInputF = true;
-        UserFZoneIndex = inputProcessor->getObjectItemNum("ZoneProperty:UserViewFactors:BySurfaceName", "zone_or_zonelist_name", EnclosureName);
+        UserFZoneIndex = inputProcessor->getObjectItemNum(state, "ZoneProperty:UserViewFactors:BySurfaceName", "zone_or_zonelist_name", EnclosureName);
 
         if (UserFZoneIndex > 0) {
             enclosureSurfaceNames.allocate(N);
@@ -1329,7 +1334,8 @@ namespace HeatBalanceIntRadExchange {
             }
             NoUserInputF = false;
 
-            inputProcessor->getObjectItem("ZoneProperty:UserViewFactors:BySurfaceName",
+            inputProcessor->getObjectItem(state,
+                                          "ZoneProperty:UserViewFactors:BySurfaceName",
                                           UserFZoneIndex,
                                           cAlphaArgs,
                                           NumAlphas,

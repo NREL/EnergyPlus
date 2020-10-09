@@ -109,7 +109,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(4).y = 0.0;
     Surface(ThisSurf).Vertex(4).z = 2.0;
 
-    ProcessSurfaceVertices(state.files, ThisSurf, ErrorsFound);
+    ProcessSurfaceVertices(state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Rectangle, Surface(ThisSurf).Shape);
 
@@ -136,7 +136,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(4).y = 0.0;
     Surface(ThisSurf).Vertex(4).z = 2.0;
 
-    ProcessSurfaceVertices(state.files, ThisSurf, ErrorsFound);
+    ProcessSurfaceVertices(state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Quadrilateral, Surface(ThisSurf).Shape);
 
@@ -163,7 +163,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(4).y = 0.0;
     Surface(ThisSurf).Vertex(4).z = 2.0;
 
-    ProcessSurfaceVertices(state.files, ThisSurf, ErrorsFound);
+    ProcessSurfaceVertices(state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Quadrilateral, Surface(ThisSurf).Shape);
 
@@ -186,7 +186,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(3).y = 0.0;
     Surface(ThisSurf).Vertex(3).z = 2.0;
 
-    ProcessSurfaceVertices(state.files, ThisSurf, ErrorsFound);
+    ProcessSurfaceVertices(state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Triangle, Surface(ThisSurf).Shape);
 
@@ -217,7 +217,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(5).y = 0.0;
     Surface(ThisSurf).Vertex(5).z = 3.0;
 
-    ProcessSurfaceVertices(state.files, ThisSurf, ErrorsFound);
+    ProcessSurfaceVertices(state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Polygonal, Surface(ThisSurf).Shape);
 }
@@ -470,13 +470,13 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
-    GetConstructData(state.files, ErrorsFound); // read construction data
+    GetConstructData(state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
+    GetZoneData(state, ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     CosZoneRelNorth.allocate(1);
@@ -487,12 +487,12 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(state, state.files, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     // compare_err_stream( "" ); // just for debugging
 
-    AllocateModuleArrays();
+    SurfaceGeometry::AllocateModuleArrays();
 
     //  Adding additional surfaces will change the index of the following based on where the surfaces are added in the array.
     //	If adding new tests, break here and look at EnergyPlus::DataSurfaces::Surface to see the order.
@@ -500,61 +500,61 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     //	enum surfaceShape:Triangle = 1
     //	"Surface 1 - Triangle"
     int surfNum = UtilityRoutines::FindItemInList("SURFACE 1 - TRIANGLE", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
+    ProcessSurfaceVertices(state, surfNum, ErrorsFound);
     EXPECT_EQ(SurfaceShape::Triangle, Surface(surfNum).Shape);
 
     //	enum surfaceShape:Quadrilateral = 2
     //	"Surface 2 - Quadrilateral"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 2 - QUADRILATERAL", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
+    ProcessSurfaceVertices(state, surfNum, ErrorsFound);
     EXPECT_EQ(SurfaceShape::Quadrilateral, Surface(surfNum).Shape);
 
     //	enum surfaceShape:Rectangle = 3
     //	"Surface 3 - Rectangle"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 3 - RECTANGLE", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
+    ProcessSurfaceVertices(state, surfNum, ErrorsFound);
     EXPECT_EQ(SurfaceShape::Rectangle, Surface(surfNum).Shape);
 
     //	enum surfaceShape:RectangularDoorWindow = 4
     //	"Surface 4 - RectangularDoorWindow"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 4 - RECTANGULARDOORWINDOW", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
+    ProcessSurfaceVertices(state, surfNum, ErrorsFound);
     EXPECT_EQ(SurfaceShape::RectangularDoorWindow, Surface(surfNum).Shape);
 
     //	enum surfaceShape:RectangularOverhang = 5
     //	"Surface 5 - RectangularOverhang"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 5 - RECTANGULAROVERHANG", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
+    ProcessSurfaceVertices(state, surfNum, ErrorsFound);
     EXPECT_NE(SurfaceShape::RectangularOverhang, Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularLeftFin = 6
     //	"Surface 6 - RectangularLeftFin"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 6 - RECTANGULARLEFTFIN Left", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
+    ProcessSurfaceVertices(state, surfNum, ErrorsFound);
     EXPECT_NE(SurfaceShape::RectangularLeftFin, Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularRightFin = 7
     //	"Surface 7 - RectangularRightFin"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 7 - RECTANGULARRIGHTFIN Right", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
+    ProcessSurfaceVertices(state, surfNum, ErrorsFound);
     EXPECT_NE(SurfaceShape::RectangularRightFin, Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:TriangularWindow = 8
     //	"Surface 8 - TriangularWindow"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 8 - TRIANGULARWINDOW", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
+    ProcessSurfaceVertices(state, surfNum, ErrorsFound);
     EXPECT_EQ(SurfaceShape::TriangularWindow, Surface(surfNum).Shape);
 
     //	enum surfaceShape:TriangularDoor = 9
     //	"Surface 9 - TriangularDoor"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 9 - TRIANGULARDOOR", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
+    ProcessSurfaceVertices(state, surfNum, ErrorsFound);
     EXPECT_EQ(SurfaceShape::TriangularDoor, Surface(surfNum).Shape);
 
     //	enum surfaceShape:Polygonal = 10
     //	"Surface 10 - Polygonal"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 10 - POLYGONAL", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
+    ProcessSurfaceVertices(state, surfNum, ErrorsFound);
     EXPECT_EQ(SurfaceShape::Polygonal, Surface(surfNum).Shape);
 }
 
@@ -691,9 +691,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool FoundError = false;
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, FoundError);
-    GetConstructData(state.files, FoundError);
-    GetZoneData(FoundError); // Read Zone data from input file
+    GetMaterialData(state, FoundError);
+    GetConstructData(state, FoundError);
+    GetZoneData(state, FoundError); // Read Zone data from input file
     DataHeatBalance::AnyCTF = true;
     SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
 
@@ -924,11 +924,11 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
 
     // Prepare data for the test
     ASSERT_TRUE(process_idf(idf_objects));
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);
-    GetConstructData(state.files, ErrorsFound); // read construction data
+    GetConstructData(state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);
-    GetZoneData(ErrorsFound); // read zone data
+    GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
     GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
@@ -938,7 +938,7 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
     SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
-    GetSurfaceData(state, state.files, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     // For each surface Run the test then Check the result
@@ -2557,7 +2557,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
     Surface(6).Vertex(3) = Vector(10., 0., 3.);
     Surface(6).Vertex(4) = Vector(10., 8., 3.);
 
-    CalculateZoneVolume(state.files, enteredCeilingHeight);
+    CalculateZoneVolume(state, enteredCeilingHeight);
     EXPECT_EQ(240., Zone(1).Volume);
 }
 
@@ -2623,7 +2623,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
     Zone(1).FloorArea = 80.;
     Zone(1).CeilingHeight = 3.;
 
-    CalculateZoneVolume(state.files, enteredCeilingHeight);
+    CalculateZoneVolume(state, enteredCeilingHeight);
     EXPECT_EQ(240., Zone(1).Volume);
 }
 
@@ -2689,7 +2689,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
     Zone(1).FloorArea = 80.;
     Zone(1).CeilingHeight = 3.;
 
-    CalculateZoneVolume(state.files, enteredCeilingHeight);
+    CalculateZoneVolume(state, enteredCeilingHeight);
     EXPECT_EQ(240., Zone(1).Volume);
 }
 
@@ -2755,7 +2755,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
     Zone(1).CeilingArea = 80.;
     Zone(1).CeilingHeight = 3.;
 
-    CalculateZoneVolume(state.files, enteredCeilingHeight);
+    CalculateZoneVolume(state, enteredCeilingHeight);
     EXPECT_EQ(240., Zone(1).Volume);
 }
 
@@ -2816,7 +2816,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
     Surface(4).Vertex(3) = Vector(10., 8., 0.);
     Surface(4).Vertex(4) = Vector(10., 8., 3.);
 
-    CalculateZoneVolume(state.files, enteredCeilingHeight);
+    CalculateZoneVolume(state, enteredCeilingHeight);
     EXPECT_EQ(240., Zone(1).Volume);
 }
 
@@ -2845,7 +2845,7 @@ TEST_F(EnergyPlusFixture, MakeRectangularVertices)
 
     // facing north
 
-    MakeRectangularVertices(1, 0., 0., 0., 5., 3., false);
+    MakeRectangularVertices(state, 1, 0., 0., 0., 5., 3., false);
 
     EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(1).x, 0.001);
     EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(1).y, 0.001);
@@ -2867,7 +2867,7 @@ TEST_F(EnergyPlusFixture, MakeRectangularVertices)
 
     SurfaceTmp(surfNum).Azimuth = 90.;
 
-    MakeRectangularVertices(1, 0., 0., 0., 5., 3., false);
+    MakeRectangularVertices(state, 1, 0., 0., 0., 5., 3., false);
 
     EXPECT_NEAR(0, SurfaceTmp(surfNum).Vertex(1).x, 0.001);
     EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(1).y, 0.001);
@@ -2889,7 +2889,7 @@ TEST_F(EnergyPlusFixture, MakeRectangularVertices)
 
     SurfaceTmp(surfNum).Azimuth = 180.;
 
-    MakeRectangularVertices(1, 0., 0., 0., 5., 3., false);
+    MakeRectangularVertices(state, 1, 0., 0., 0., 5., 3., false);
 
     EXPECT_NEAR(0, SurfaceTmp(surfNum).Vertex(1).x, 0.001);
     EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(1).y, 0.001);
@@ -2911,7 +2911,7 @@ TEST_F(EnergyPlusFixture, MakeRectangularVertices)
 
     SurfaceTmp(surfNum).Azimuth = 270.;
 
-    MakeRectangularVertices(1, 0., 0., 0., 5., 3., false);
+    MakeRectangularVertices(state, 1, 0., 0., 0., 5., 3., false);
 
     EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(1).x, 0.001);
     EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(1).y, 0.001);
@@ -2997,7 +2997,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     Array1D_int const BaseSurfIDs(3, {1, 2, 3});
     int NeedToAddSurfaces;
 
-    GetGeometryParameters(state.files, ErrorsFound);
+    GetGeometryParameters(state, ErrorsFound);
     CosZoneRelNorth.allocate(2);
     SinZoneRelNorth.allocate(2);
 
@@ -3006,7 +3006,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     SinBldgRelNorth = 0.0;
     CosBldgRelNorth = 1.0;
 
-    GetHTSurfaceData(state, state.files, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    GetHTSurfaceData(state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
 
     EXPECT_EQ(2, SurfNum);
     std::string const error_string =
@@ -3489,7 +3489,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     WindowShadingControl(1).DaylightingControlName = "TheDaylightingControl";
     WindowShadingControl(1).DaylightControlIndex = 7;
     WindowShadingControl(1).MultiSurfaceCtrlIsGroup = false;
-        
+
     WindowShadingControl(1).FenestrationCount = 3;
     WindowShadingControl(1).FenestrationName.allocate(WindowShadingControl(1).FenestrationCount);
     WindowShadingControl(1).FenestrationName(1) = "Fene-01";
@@ -3505,7 +3505,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     //no changes
     EXPECT_TRUE(isWindowShadingControlSimilar(1, 2));
 
-    //changes to portions of struct that are not "similar" 
+    //changes to portions of struct that are not "similar"
     // these should not impact similarity so changes are ignored
 
     WindowShadingControl(2).Name = "Different";
@@ -3616,7 +3616,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWin
     WindowShadingControl(1).DaylightingControlName = "TheDaylightingControl";
     WindowShadingControl(1).DaylightControlIndex = 7;
     WindowShadingControl(1).MultiSurfaceCtrlIsGroup = false;
-        
+
     WindowShadingControl(1).FenestrationCount = 3;
     WindowShadingControl(1).FenestrationName.allocate(WindowShadingControl(1).FenestrationCount);
     WindowShadingControl(1).FenestrationName(1) = "Fene-01";
@@ -3878,13 +3878,13 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
-    GetConstructData(state.files, ErrorsFound); // read construction data
+    GetConstructData(state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
+    GetZoneData(state, ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     CosZoneRelNorth.allocate(2);
@@ -3897,7 +3897,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(state, state.files, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     int surfNum = UtilityRoutines::FindItemInList("DATATELCOM_CEILING_1_0_0", DataSurfaces::Surface);
@@ -3991,9 +3991,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Read Material and Construction, and expect no errors
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    GetConstructData(state.files, ErrorsFound);
+    GetConstructData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataGlobals::NumOfZones = 2;
@@ -4007,7 +4007,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     Array1D_int const BaseSurfIDs(3, {1, 2, 3});
     int NeedToAddSurfaces;
 
-    GetGeometryParameters(state.files, ErrorsFound);
+    GetGeometryParameters(state, ErrorsFound);
     CosZoneRelNorth.allocate(1);
     SinZoneRelNorth.allocate(1);
 
@@ -4016,7 +4016,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     SinBldgRelNorth = 0.0;
     CosBldgRelNorth = 1.0;
 
-    GetHTSurfaceData(state, state.files, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    GetHTSurfaceData(state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
 
     // We expect one surface, but an error since Surface B cannot be located
     EXPECT_EQ(1, SurfNum);
@@ -4346,13 +4346,13 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_InternalMassSurfacesCount)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Read Materials
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Construction
-    GetConstructData(state.files, ErrorsFound);
+    GetConstructData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Read Zones
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     // Read InternalMass Object Count
@@ -4361,7 +4361,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_InternalMassSurfacesCount)
     EXPECT_EQ(3, TotIntMass);
 
     // Read InternalMass Surfaces Count
-    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces();
+    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces(state);
     // check the 24 internal mass surfaces created from the three zoneLists
     EXPECT_EQ(24, TotalNumOfInternalMassSurfaces);
 }
@@ -4684,13 +4684,13 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Read Materials
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Construction
-    GetConstructData(state.files, ErrorsFound);
+    GetConstructData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Read Zones
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     // Read InternalMass Object Count
@@ -4698,14 +4698,14 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
     EXPECT_EQ(3, TotIntMass);
 
     // Read InternalMass Surfaces Count
-    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces();
+    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces(state);
     EXPECT_EQ(24, TotalNumOfInternalMassSurfaces);
 
     DataSurfaces::TotSurfaces = TotalNumOfInternalMassSurfaces;
     SurfaceTmp.allocate(TotSurfaces);
 
     int SurfNum = 0;
-    GetIntMassSurfaceData(ErrorsFound, SurfNum);
+    GetIntMassSurfaceData(state, ErrorsFound, SurfNum);
     ASSERT_FALSE(ErrorsFound);
 
     // check internal mass surface count and object names
@@ -4760,7 +4760,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test1)
     Zone(1).OriginY = 0;
     Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(state.files, ErrorsFound);
+    GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(has_err_output(true));
 }
 
@@ -4790,7 +4790,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test2)
     Zone(1).OriginY = 0;
     Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(state.files, ErrorsFound);
+    GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(has_err_output(true));
 }
 
@@ -4820,7 +4820,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test3)
     Zone(1).OriginY = 6;
     Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(state.files, ErrorsFound);
+    GetGeometryParameters(state, ErrorsFound);
     EXPECT_TRUE(has_err_output(false));
 
     std::string error_string = delimited_string({
@@ -4855,7 +4855,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
     Zone(1).OriginY = 6;
     Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(state.files, ErrorsFound);
+    GetGeometryParameters(state, ErrorsFound);
     EXPECT_TRUE(has_err_output(false));
 
     std::string error_string = delimited_string({
@@ -5116,13 +5116,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
-    GetConstructData(state.files, ErrorsFound); // read construction data
+    GetConstructData(state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
+    GetZoneData(state, ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     SetupZoneGeometry(state, ErrorsFound);
@@ -5254,13 +5254,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
-    GetConstructData(state.files, ErrorsFound); // read construction data
+    GetConstructData(state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
+    GetZoneData(state, ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     SetupZoneGeometry(state, ErrorsFound);
@@ -5395,13 +5395,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
-    GetConstructData(state.files, ErrorsFound); // read construction data
+    GetConstructData(state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
+    GetZoneData(state, ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     SetupZoneGeometry(state, ErrorsFound);
@@ -5643,13 +5643,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
-    GetConstructData(state.files, ErrorsFound); // read construction data
+    GetConstructData(state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
+    GetZoneData(state, ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     SetupZoneGeometry(state, ErrorsFound);
@@ -6520,19 +6520,19 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);                             // expect no errors
 
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);                       // expect no errors
 
-    GetConstructData(state.files, ErrorsFound); // read construction data
+    GetConstructData(state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
+    GetZoneData(state, ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     SetupZoneGeometry(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    GetSurfaceData(state, state.files, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);                                                            // expect no errors
 
     // compare_err_stream( "" ); // just for debugging

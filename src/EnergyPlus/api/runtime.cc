@@ -67,8 +67,9 @@ int energyplus(EnergyPlusState state, int argc, const char *argv[]) {
     return runEnergyPlusAsLibrary(*this_state, argc, argv);
 }
 
-void stopSimulation(EnergyPlusState) {
-  EnergyPlus::DataGlobals::stopSimulation = true;
+void stopSimulation(EnergyPlusState state) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    thisState->dataGlobal->stopSimulation = true;
 }
 
 void issueWarning(EnergyPlusState, const char * message) {

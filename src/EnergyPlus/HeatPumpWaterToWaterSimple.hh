@@ -195,15 +195,15 @@ namespace HeatPumpWaterToWaterSimple {
 
         virtual ~GshpSpecs() = default;
 
-        static PlantComponent *factory(int wwhp_type, std::string eir_wwhp_name);
+        static PlantComponent *factory(EnergyPlusData &state, int wwhp_type, std::string eir_wwhp_name);
 
         static void clear_state();
 
-        static void GetWatertoWaterHPInput();
+        static void GetWatertoWaterHPInput(EnergyPlusData &state);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &sizingFactor) override;
 
@@ -214,13 +214,13 @@ namespace HeatPumpWaterToWaterSimple {
                                 Real64 const MyLoad // Demand Load
         );
 
-        void sizeCoolingWaterToWaterHP();
+        void sizeCoolingWaterToWaterHP(EnergyPlusData &state);
 
-        void sizeHeatingWaterToWaterHP();
+        void sizeHeatingWaterToWaterHP(EnergyPlusData &state);
 
-        void CalcWatertoWaterHPCooling(Real64 const MyLoad); // Operating Load
+        void CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const MyLoad); // Operating Load
 
-        void CalcWatertoWaterHPHeating(Real64 const MyLoad); // Operating Load
+        void CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const MyLoad); // Operating Load
 
         void UpdateGSHPRecords();
 

@@ -125,11 +125,12 @@ namespace BoilerSteam {
 
         void initialize(EnergyPlusData &state);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
-        void autosize();
+        void autosize(EnergyPlusData &state);
 
-        void calculate(Real64 &MyLoad,   // W - hot water demand to be met by boiler
+        void calculate(EnergyPlusData &state,
+                       Real64 &MyLoad,   // W - hot water demand to be met by boiler
                        bool RunFlag,     // TRUE if boiler operating
                        int EquipFlowCtrl // Flow control mode for the equipment
         );
@@ -141,7 +142,7 @@ namespace BoilerSteam {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &sizFac) override;
 
@@ -158,11 +159,12 @@ namespace BoilerSteam {
         int numBoilers = 0;
         bool getSteamBoilerInput = true;
         Array1D<BoilerSteam::BoilerSpecs> Boiler;
+
         void clear_state() override
         {
-            numBoilers = 0;
-            getSteamBoilerInput = true;
-            Boiler.deallocate();
+            this->numBoilers = 0;
+            this->getSteamBoilerInput = true;
+            this->Boiler.deallocate();
         }
     };
 

@@ -350,7 +350,8 @@ namespace UnitHeater {
 
         for (UnitHeatNum = 1; UnitHeatNum <= NumOfUnitHeats; ++UnitHeatNum) { // Begin looping over all of the unit heaters found in the input file...
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           UnitHeatNum,
                                           Alphas,
                                           NumAlphas,
@@ -372,7 +373,7 @@ namespace UnitHeater {
             if (lAlphaBlanks(2)) {
                 UnitHeat(UnitHeatNum).SchedPtr = ScheduleAlwaysOn;
             } else {
-                UnitHeat(UnitHeatNum).SchedPtr = GetScheduleIndex(Alphas(2)); // convert schedule name to pointer
+                UnitHeat(UnitHeatNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (UnitHeat(UnitHeatNum).SchedPtr == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
@@ -382,10 +383,10 @@ namespace UnitHeater {
 
             // Main air nodes (except outside air node):
             UnitHeat(UnitHeatNum).AirInNode =
-                GetOnlySingleNode(Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
 
             UnitHeat(UnitHeatNum).AirOutNode =
-                GetOnlySingleNode(Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
 
             // Fan information:
             UnitHeat(UnitHeatNum).FanType = Alphas(5);
@@ -393,7 +394,7 @@ namespace UnitHeater {
             UnitHeat(UnitHeatNum).MaxAirVolFlow = Numbers(1);
 
             errFlag = false;
-            ValidateComponent(UnitHeat(UnitHeatNum).FanType, UnitHeat(UnitHeatNum).FanName, errFlag, CurrentModuleObject);
+            ValidateComponent(state, UnitHeat(UnitHeatNum).FanType, UnitHeat(UnitHeatNum).FanName, errFlag, CurrentModuleObject);
             if (errFlag) {
                 ShowContinueError("specified in " + CurrentModuleObject + " = \"" + UnitHeat(UnitHeatNum).Name + "\".");
                 ErrorsFound = true;
@@ -500,7 +501,7 @@ namespace UnitHeater {
             if (!errFlag) {
                 UnitHeat(UnitHeatNum).HCoilTypeCh = Alphas(7);
                 UnitHeat(UnitHeatNum).HCoilName = Alphas(8);
-                ValidateComponent(Alphas(7), UnitHeat(UnitHeatNum).HCoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Alphas(7), UnitHeat(UnitHeatNum).HCoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("specified in " + CurrentModuleObject + " = \"" + UnitHeat(UnitHeatNum).Name + "\"");
                     ErrorsFound = true;
@@ -514,9 +515,9 @@ namespace UnitHeater {
                             UnitHeat(UnitHeatNum).HotControlNode =
                                 GetCoilWaterInletNode(state, "Coil:Heating:Water", UnitHeat(UnitHeatNum).HCoilName, errFlag);
                         } else { // its a steam coil
-                            UnitHeat(UnitHeatNum).HCoil_Index = GetSteamCoilIndex("COIL:HEATING:STEAM", UnitHeat(UnitHeatNum).HCoilName, errFlag);
+                            UnitHeat(UnitHeatNum).HCoil_Index = GetSteamCoilIndex(state, "COIL:HEATING:STEAM", UnitHeat(UnitHeatNum).HCoilName, errFlag);
                             UnitHeat(UnitHeatNum).HotControlNode =
-                                GetCoilSteamInletNode(UnitHeat(UnitHeatNum).HCoil_Index, UnitHeat(UnitHeatNum).HCoilName, errFlag);
+                                GetCoilSteamInletNode(state, UnitHeat(UnitHeatNum).HCoil_Index, UnitHeat(UnitHeatNum).HCoilName, errFlag);
                         }
                         // Other error checks should trap before it gets to this point in the code, but including just in case.
                         if (errFlag) {
@@ -527,7 +528,7 @@ namespace UnitHeater {
                 }
             }
 
-            UnitHeat(UnitHeatNum).FanSchedPtr = GetScheduleIndex(Alphas(9));
+            UnitHeat(UnitHeatNum).FanSchedPtr = GetScheduleIndex(state, Alphas(9));
             // Default to cycling fan when fan operating mode schedule is not present
             if (!lAlphaBlanks(9) && UnitHeat(UnitHeatNum).FanSchedPtr == 0) {
                 ShowSevereError(CurrentModuleObject + " \"" + UnitHeat(UnitHeatNum).Name + "\" " + cAlphaFields(9) + " not found: " + Alphas(9));
@@ -655,39 +656,39 @@ namespace UnitHeater {
 
         // Setup Report variables for the Unit Heaters, CurrentModuleObject='ZoneHVAC:UnitHeater'
         for (UnitHeatNum = 1; UnitHeatNum <= NumOfUnitHeats; ++UnitHeatNum) {
-            SetupOutputVariable("Zone Unit Heater Heating Rate",
+            SetupOutputVariable(state, "Zone Unit Heater Heating Rate",
                                 OutputProcessor::Unit::W,
                                 UnitHeat(UnitHeatNum).HeatPower,
                                 "System",
                                 "Average",
                                 UnitHeat(UnitHeatNum).Name);
-            SetupOutputVariable("Zone Unit Heater Heating Energy",
+            SetupOutputVariable(state, "Zone Unit Heater Heating Energy",
                                 OutputProcessor::Unit::J,
                                 UnitHeat(UnitHeatNum).HeatEnergy,
                                 "System",
                                 "Sum",
                                 UnitHeat(UnitHeatNum).Name);
-            SetupOutputVariable("Zone Unit Heater Fan Electricity Rate",
+            SetupOutputVariable(state, "Zone Unit Heater Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 UnitHeat(UnitHeatNum).ElecPower,
                                 "System",
                                 "Average",
                                 UnitHeat(UnitHeatNum).Name);
             // Note that the unit heater fan electric is NOT metered because this value is already metered through the fan component
-            SetupOutputVariable("Zone Unit Heater Fan Electricity Energy",
+            SetupOutputVariable(state, "Zone Unit Heater Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 UnitHeat(UnitHeatNum).ElecEnergy,
                                 "System",
                                 "Sum",
                                 UnitHeat(UnitHeatNum).Name);
-            SetupOutputVariable("Zone Unit Heater Fan Availability Status",
+            SetupOutputVariable(state, "Zone Unit Heater Fan Availability Status",
                                 OutputProcessor::Unit::None,
                                 UnitHeat(UnitHeatNum).AvailStatus,
                                 "System",
                                 "Average",
                                 UnitHeat(UnitHeatNum).Name);
             if (UnitHeat(UnitHeatNum).FanType_Num == FanType_SimpleOnOff) {
-                SetupOutputVariable("Zone Unit Heater Fan Part Load Ratio",
+                SetupOutputVariable(state, "Zone Unit Heater Fan Part Load Ratio",
                                     OutputProcessor::Unit::None,
                                     UnitHeat(UnitHeatNum).FanPartLoadRatio,
                                     "System",
@@ -862,7 +863,7 @@ namespace UnitHeater {
             Node(InNode).MassFlowRateMin = 0.0;
 
             if (UnitHeat(UnitHeatNum).HCoilType == WaterHeatingCoil) {
-                rho = GetDensityGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                rho = GetDensityGlycol(state, PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
                                        DataGlobals::HWInitConvTemp,
                                        PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                        RoutineName);
@@ -880,7 +881,7 @@ namespace UnitHeater {
             }
             if (UnitHeat(UnitHeatNum).HCoilType == SteamCoil) {
                 TempSteamIn = 100.00;
-                SteamDensity = GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, UnitHeat(UnitHeatNum).HCoil_FluidIndex, RoutineName);
+                SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, UnitHeat(UnitHeatNum).HCoil_FluidIndex, RoutineName);
                 UnitHeat(UnitHeatNum).MaxHotSteamFlow = SteamDensity * UnitHeat(UnitHeatNum).MaxVolHotSteamFlow;
                 UnitHeat(UnitHeatNum).MinHotSteamFlow = SteamDensity * UnitHeat(UnitHeatNum).MinVolHotSteamFlow;
 
@@ -1222,11 +1223,11 @@ namespace UnitHeater {
                             }
 
                             if (DesCoilLoad >= SmallLoad) {
-                                rho = GetDensityGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                rho = GetDensityGlycol(state, PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
                                                        DataGlobals::HWInitConvTemp,
                                                        PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
-                                Cp = GetSpecificHeatGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                Cp = GetSpecificHeatGlycol(state, PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
                                                            DataGlobals::HWInitConvTemp,
                                                            PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
@@ -1287,8 +1288,8 @@ namespace UnitHeater {
                 } else {
                     CheckZoneSizing("ZoneHVAC:UnitHeater", UnitHeat(UnitHeatNum).Name);
 
-                    CoilSteamInletNode = GetCoilSteamInletNode("Coil:Heating:Steam", UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
-                    CoilSteamOutletNode = GetCoilSteamInletNode("Coil:Heating:Steam", UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
+                    CoilSteamInletNode = GetCoilSteamInletNode(state, "Coil:Heating:Steam", UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
+                    CoilSteamOutletNode = GetCoilSteamInletNode(state, "Coil:Heating:Steam", UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum = MyPlantSizingIndex(
                             "Coil:Heating:Steam", UnitHeat(UnitHeatNum).HCoilName, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound);
@@ -1332,10 +1333,10 @@ namespace UnitHeater {
                             }
                             if (DesCoilLoad >= SmallLoad) {
                                 TempSteamIn = 100.00;
-                                EnthSteamInDry = GetSatEnthalpyRefrig(fluidNameSteam, TempSteamIn, 1.0, RefrigIndex, RoutineName);
-                                EnthSteamOutWet = GetSatEnthalpyRefrig(fluidNameSteam, TempSteamIn, 0.0, RefrigIndex, RoutineName);
+                                EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, RefrigIndex, RoutineName);
+                                EnthSteamOutWet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, RefrigIndex, RoutineName);
                                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-                                SteamDensity = GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, RefrigIndex, RoutineName);
+                                SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, RefrigIndex, RoutineName);
                                 MaxVolHotSteamFlowDes =
                                     DesCoilLoad / (SteamDensity * (LatentHeatSteam +
                                                                    PlantSizData(PltSizHeatNum).DeltaT * CPHW(PlantSizData(PltSizHeatNum).ExitTemp)));

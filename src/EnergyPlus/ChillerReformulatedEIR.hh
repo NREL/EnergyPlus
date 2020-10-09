@@ -253,7 +253,7 @@ namespace ChillerReformulatedEIR {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 
@@ -263,15 +263,15 @@ namespace ChillerReformulatedEIR {
 
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
-        void size(EnergyPlusData &state, IOFiles &ioFiles);
+        void size(EnergyPlusData &state);
 
         void control(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, bool FirstIteration);
 
         void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, Real64 FalsiCondOutTemp);
 
-        void calcHeatRecovery(Real64 &QCond, Real64 CondMassFlow, Real64 condInletTemp, Real64 &QHeatRec);
+        void calcHeatRecovery(EnergyPlusData &state, Real64 &QCond, Real64 CondMassFlow, Real64 condInletTemp, Real64 &QHeatRec);
 
         void update(Real64 MyLoad, bool RunFlag);
 
@@ -288,11 +288,12 @@ namespace ChillerReformulatedEIR {
         int NumElecReformEIRChillers = 0;
         bool GetInputREIR = true;
         Array1D<ChillerReformulatedEIR::ReformulatedEIRChillerSpecs> ElecReformEIRChiller;
+
         void clear_state() override
         {
-            NumElecReformEIRChillers = 0;
-            GetInputREIR = true;
-            ElecReformEIRChiller.deallocate();
+            this->NumElecReformEIRChillers = 0;
+            this->GetInputREIR = true;
+            this->ElecReformEIRChiller.deallocate();
         }
     };
 

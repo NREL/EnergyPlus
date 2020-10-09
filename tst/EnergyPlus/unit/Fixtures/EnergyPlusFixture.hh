@@ -63,7 +63,8 @@
 #include <ostream>
 
 namespace EnergyPlus {
-    class IOFiles;
+
+struct EnergyPlusData;
 
 // This is a helper struct to redirect std::cout. This makes sure std::cout is redirected back and
 // everything is cleaned up properly
@@ -275,7 +276,7 @@ protected:
                      std::vector<bool> const &numbers_blank);
 
     // Opens output files as stringstreams
-    void openOutputFiles(IOFiles &ioFiles);
+    void openOutputFiles(EnergyPlusData &state);
 
 public:
     EnergyPlusData state;

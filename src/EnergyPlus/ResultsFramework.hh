@@ -65,8 +65,10 @@
 
 namespace EnergyPlus {
 
-    class EnergyPlusFixture;
-    class ResultsFrameworkFixture;
+// Forward declarations
+class EnergyPlusFixture;
+class ResultsFrameworkFixture;
+struct EnergyPlusData;
 
 namespace ResultsFramework {
 
@@ -345,7 +347,7 @@ namespace ResultsFramework {
 
         virtual ~ResultsFramework() = default;
 
-        void setupOutputOptions(IOFiles &ioFiles);
+        void setupOutputOptions(EnergyPlusData &state);
 
         bool timeSeriesEnabled() const;
 
@@ -385,7 +387,7 @@ namespace ResultsFramework {
         MeterDataFrame SMMeters = MeterDataFrame("RunPeriod");
         MeterDataFrame YRMeters = MeterDataFrame("Yearly");
 
-        void writeOutputs(IOFiles & ioFiles);
+        void writeOutputs(EnergyPlusData &state);
 
         void addReportVariable(std::string const &keyedValue,
                                std::string const &variableName,
@@ -414,7 +416,7 @@ namespace ResultsFramework {
 
         void writeReport(JsonOutputStreams &jsonOutputStreams);
 
-        void writeCSVOutput(IOFiles & ioFiles);
+        void writeCSVOutput(EnergyPlusData &state);
 
     private:
         friend class EnergyPlus::EnergyPlusFixture;

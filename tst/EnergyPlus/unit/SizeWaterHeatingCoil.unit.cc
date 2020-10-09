@@ -248,15 +248,15 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
-    GetOARequirements();      // get the OA requirements object
-    GetZoneAirDistribution(); // get zone air distribution objects
-    GetZoneSizingInput();
+    GetOARequirements(state);      // get the OA requirements object
+    GetZoneAirDistribution(state); // get zone air distribution objects
+    GetZoneSizingInput(state);
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetWaterCoilInput(state);
     state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     state.dataWaterCoils->MySizeFlag(1) = true;
@@ -486,15 +486,15 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
-    GetOARequirements();      // get the OA requirements object
-    GetZoneAirDistribution(); // get zone air distribution objects
-    GetZoneSizingInput();
+    GetOARequirements(state);      // get the OA requirements object
+    GetZoneAirDistribution(state); // get zone air distribution objects
+    GetZoneSizingInput(state);
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetWaterCoilInput(state);
     state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     state.dataWaterCoils->MySizeFlag(1) = true;
@@ -723,15 +723,15 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
-    GetOARequirements();      // get the OA requirements object
-    GetZoneAirDistribution(); // get zone air distribution objects
-    GetZoneSizingInput();
+    GetOARequirements(state);      // get the OA requirements object
+    GetZoneAirDistribution(state); // get zone air distribution objects
+    GetZoneSizingInput(state);
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetWaterCoilInput(state);
     state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     state.dataWaterCoils->MySizeFlag(1) = true;
@@ -960,15 +960,15 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
-    GetOARequirements();      // get the OA requirements object
-    GetZoneAirDistribution(); // get zone air distribution objects
-    GetZoneSizingInput();
+    GetOARequirements(state);      // get the OA requirements object
+    GetZoneAirDistribution(state); // get zone air distribution objects
+    GetZoneSizingInput(state);
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetWaterCoilInput(state);
     state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     state.dataWaterCoils->MySizeFlag(1) = true;
@@ -1161,9 +1161,9 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
     GetWaterCoilInput(state);
     state.dataWaterCoils->GetWaterCoilsInputFlag = false;
@@ -1371,15 +1371,15 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
-    GetOARequirements();      // get the OA requirements object
-    GetZoneAirDistribution(); // get zone air distribution objects
-    GetZoneSizingInput();
+    GetOARequirements(state);      // get the OA requirements object
+    GetZoneAirDistribution(state); // get zone air distribution objects
+    GetZoneSizingInput(state);
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetWaterCoilInput(state);
     state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     state.dataWaterCoils->MySizeFlag(1) = true;

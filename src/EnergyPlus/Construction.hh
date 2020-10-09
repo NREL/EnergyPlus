@@ -59,6 +59,7 @@
 namespace EnergyPlus {
 
 // Forward declarations
+struct EnergyPlusData;
 struct ConstructionData;
 
 namespace Construction {
@@ -321,7 +322,7 @@ namespace Construction {
 
         void calculateFinalCoefficients();
 
-        void reportTransferFunction(IOFiles &ioFiles, int const cCounter);
+        void reportTransferFunction(EnergyPlusData &state, int const cCounter);
 
         bool isGlazingConstruction() const;
 
@@ -331,14 +332,14 @@ namespace Construction {
     };
 }   // namespace Construction
 
-struct ConstructionData : BaseGlobalStruct {
-    Array1D<Construction::ConstructionProps> Construct;
+    struct ConstructionData : BaseGlobalStruct {
+        Array1D<Construction::ConstructionProps> Construct;
 
-    void clear_state() override
-    {
-        Construct.deallocate();
-    }
-};
+        void clear_state() override
+        {
+            this->Construct.deallocate();
+        }
+    };
 
 extern ConstructionData dataConstruction;
 

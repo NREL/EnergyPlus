@@ -63,11 +63,10 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    class BaseGroundTempsModel;
-    class IOFiles;
-    struct EnergyPlusData;
-    struct WeatherManagerData;
+
+// Forward declarations
+class BaseGroundTempsModel;
+struct EnergyPlusData;
 
 namespace WeatherManager {
 
@@ -528,7 +527,7 @@ namespace WeatherManager {
 
     void UpdateUnderwaterBoundaries(EnergyPlusData &state);
 
-    void ReadVariableLocationOrientation();
+    void ReadVariableLocationOrientation(EnergyPlusData &state);
 
     void UpdateLocationAndOrientation();
 
@@ -552,19 +551,19 @@ namespace WeatherManager {
 
     void SetSpecialDayDates(EnergyPlusData &state, Array1D_int const &MonWeekDay); // Weekday of each day 1 of month
 
-    void InitializeWeather(EnergyPlusData &state, IOFiles &ioFiles, bool &printEnvrnStamp); // Set to true when the environment header should be printed
+    void InitializeWeather(EnergyPlusData &state, bool &printEnvrnStamp); // Set to true when the environment header should be printed
 
     void UpdateWeatherData(EnergyPlusData &state);
 
     void SetCurrentWeather(EnergyPlusData &state);
 
-    void ReadWeatherForDay(EnergyPlusData &state, IOFiles &ioFiles,
+    void ReadWeatherForDay(EnergyPlusData &state,
                            int DayToRead,          // =1 when starting out, otherwise signifies next day
                            int Environ,            // Environment being simulated
                            bool BackSpaceAfterRead // True if weather file is to be backspaced after read
     );
 
-    void ReadEPlusWeatherForDay(EnergyPlusData &state, IOFiles &ioFiles,
+    void ReadEPlusWeatherForDay(EnergyPlusData &state,
                                 int DayToRead,          // =1 when starting out, otherwise signifies next day
                                 int Environ,            // Environment being simulated
                                 bool BackSpaceAfterRead // True if weather file is to be backspaced after read
@@ -615,7 +614,7 @@ namespace WeatherManager {
                                   Real64 &LiquidPrecip       // LiquidPrecip
     );
 
-    void SetUpDesignDay(EnergyPlusData &state, IOFiles &ioFiles, int EnvrnNum); // Environment number passed into the routine
+    void SetUpDesignDay(EnergyPlusData &state, int EnvrnNum); // Environment number passed into the routine
 
     Real64 AirMass(Real64 CosZen); // COS( solar zenith), 0 - 1
 
@@ -659,17 +658,17 @@ namespace WeatherManager {
                               bool ProcessHeader // Set to true when headers should be processed (rather than just read)
     );
 
-    void CloseWeatherFile(IOFiles &ioFiles);
+    void CloseWeatherFile(EnergyPlusData &state);
 
-    void ResolveLocationInformation(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound); // Set to true if no location evident
+    void ResolveLocationInformation(EnergyPlusData &state, bool &ErrorsFound); // Set to true if no location evident
 
     void CheckLocationValidity();
 
     void CheckWeatherFileValidity(EnergyPlusData &state);
 
-    void ReportOutputFileHeaders(EnergyPlusData &state, IOFiles &ioFiles);
+    void ReportOutputFileHeaders(EnergyPlusData &state);
 
-    void ReportWeatherAndTimeInformation(EnergyPlusData &state, IOFiles &ioFiles,
+    void ReportWeatherAndTimeInformation(EnergyPlusData &state,
                                          bool &printEnvrnStamp); // Set to true when the environment header should be printed
 
     void ReadUserWeatherInput(EnergyPlusData &state);
@@ -694,9 +693,9 @@ namespace WeatherManager {
 
     void GetGroundTemps(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetGroundReflectances(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound);
+    void GetGroundReflectances(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetSnowGroundRefModifiers(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound);
+    void GetSnowGroundRefModifiers(EnergyPlusData &state, bool &ErrorsFound);
 
     void GetWaterMainsTemperatures(EnergyPlusData &state, bool &ErrorsFound);
 
@@ -706,7 +705,7 @@ namespace WeatherManager {
                                          Real64 MonthlyOAAvgDryBulbTempMaxDiff // monthly daily average OA drybulb temperature maximum difference
     );
 
-    void GetWeatherStation(IOFiles &ioFiles, bool &ErrorsFound);
+    void GetWeatherStation(EnergyPlusData &state, bool &ErrorsFound);
 
     void DayltgCurrentExtHorizIllum();
 
@@ -716,9 +715,9 @@ namespace WeatherManager {
 
     Real64 GetSTM(Real64 Longitude); // Longitude from user input
 
-    void ProcessEPWHeader(EnergyPlusData &state, IOFiles &ioFiles, std::string const &HeaderString, std::string &Line, bool &ErrorsFound);
+    void ProcessEPWHeader(EnergyPlusData &state, std::string const &HeaderString, std::string &Line, bool &ErrorsFound);
 
-    void SkipEPlusWFHeader(EnergyPlusData &EP_UNUSED(state), IOFiles &ioFiles);
+    void SkipEPlusWFHeader(EnergyPlusData &state);
 
     void ReportMissing_RangeData(EnergyPlusData &state);
 
@@ -766,12 +765,12 @@ namespace WeatherManager {
               MonthlyDailyAverageDryBulbTemp(12, 0.0)
         {
         }
-        void CalcAnnualAndMonthlyDryBulbTemp(EnergyPlusData &state, IOFiles &ioFiles); // true if this is CorrelationFromWeatherFile
+        void CalcAnnualAndMonthlyDryBulbTemp(EnergyPlusData &state); // true if this is CorrelationFromWeatherFile
     };
 
     extern AnnualMonthlyDryBulbWeatherData OADryBulbAverage;
 
-    void ReportWaterMainsTempParameters(EnergyPlusData &state, IOFiles &ioFiles);
+    void ReportWaterMainsTempParameters(EnergyPlusData &state);
     void calcSky(EnergyPlusData &state, Real64 &TmrHorizIRSky, Real64 &TmrSkyTemp, Real64 OpaqueSkyCover, Real64 DryBulb, Real64 DewPoint, Real64 RelHum, Real64 IRHoriz);
 
 } // namespace WeatherManager
@@ -984,202 +983,202 @@ namespace WeatherManager {
 
         void clear_state() override
         {
-            YearOfSim = 1;             // The Present year of Simulation.
-            EnvironmentReportNbr = 0;  // Report number for the environment stamp
-            EnvironmentReportChr = ""; // Report number for the environment stamp (character -- for printing)
-            WeatherFileExists = false; // Set to true if a weather file exists
-            LocationTitle = "";        // Location Title from input File
-            LocationGathered = false;  // flag to show if Location exists on Input File (we assume one is
+            this->YearOfSim = 1;             // The Present year of Simulation.
+            this->EnvironmentReportNbr = 0;  // Report number for the environment stamp
+            this->EnvironmentReportChr = ""; // Report number for the environment stamp (character -- for printing)
+            this->WeatherFileExists = false; // Set to true if a weather file exists
+            this->LocationTitle = "";        // Location Title from input File
+            this->LocationGathered = false;  // flag to show if Location exists on Input File (we assume one is
 
-            GetBranchInputOneTimeFlag = true;
-            GetEnvironmentFirstCall = true;
-            PrntEnvHeaders = true;
-            WeatherFileLatitude = 0.0;
-            WeatherFileLongitude = 0.0;
-            WeatherFileTimeZone = 0.0;
-            WeatherFileElevation = 0.0;
-            siteShallowGroundTempsPtr.reset();
-            siteBuildingSurfaceGroundTempsPtr.reset();
-            siteFCFactorMethodGroundTempsPtr.reset();
-            siteDeepGroundTempsPtr.reset();
-            GroundTempsFCFromEPWHeader = Array1D<Real64>(12, 0.0);
-            GroundReflectances = Array1D<Real64>(12, 0.2);
+            this->GetBranchInputOneTimeFlag = true;
+            this->GetEnvironmentFirstCall = true;
+            this->PrntEnvHeaders = true;
+            this->WeatherFileLatitude = 0.0;
+            this->WeatherFileLongitude = 0.0;
+            this->WeatherFileTimeZone = 0.0;
+            this->WeatherFileElevation = 0.0;
+            this->siteShallowGroundTempsPtr.reset();
+            this->siteBuildingSurfaceGroundTempsPtr.reset();
+            this->siteFCFactorMethodGroundTempsPtr.reset();
+            this->siteDeepGroundTempsPtr.reset();
+            this->GroundTempsFCFromEPWHeader = Array1D<Real64>(12, 0.0);
+            this->GroundReflectances = Array1D<Real64>(12, 0.2);
 
-            SnowGndRefModifier = 1.0;              // Modifier to ground reflectance during snow
-            SnowGndRefModifierForDayltg = 1.0;     // Modifier to ground reflectance during snow for daylighting
-            WaterMainsTempsSchedule = 0;           // Water mains temperature schedule
-            WaterMainsTempsAnnualAvgAirTemp = 0.0; // Annual average outdoor air temperature (C)
-            WaterMainsTempsMaxDiffAirTemp = 0.0;   // Maximum difference in monthly average outdoor air temperatures (deltaC)
-            WaterMainsTempsScheduleName = "";      // water mains tempeature schedule name
-            wthFCGroundTemps = false;
-            TotRunPers = 0;    // Total number of Run Periods (Weather data) to Setup
-            TotRunDesPers = 0; // Total number of Run Design Periods (Weather data) to Setup
-            NumSpecialDays = 0;
+            this->SnowGndRefModifier = 1.0;              // Modifier to ground reflectance during snow
+            this->SnowGndRefModifierForDayltg = 1.0;     // Modifier to ground reflectance during snow for daylighting
+            this->WaterMainsTempsSchedule = 0;           // Water mains temperature schedule
+            this->WaterMainsTempsAnnualAvgAirTemp = 0.0; // Annual average outdoor air temperature (C)
+            this->WaterMainsTempsMaxDiffAirTemp = 0.0;   // Maximum difference in monthly average outdoor air temperatures (deltaC)
+            this->WaterMainsTempsScheduleName = "";      // water mains tempeature schedule name
+            this->wthFCGroundTemps = false;
+            this->TotRunPers = 0;    // Total number of Run Periods (Weather data) to Setup
+            this->TotRunDesPers = 0; // Total number of Run Design Periods (Weather data) to Setup
+            this->NumSpecialDays = 0;
 
-            SpecialDayTypes = Array1D<int>(366, 0);
-            WeekDayTypes = Array1D<int>(366, 0);
-            DSTIndex = Array1D<int>(366, 0);
+            this->SpecialDayTypes = Array1D<int>(366, 0);
+            this->WeekDayTypes = Array1D<int>(366, 0);
+            this->DSTIndex = Array1D<int>(366, 0);
 
-            NumDataPeriods = 0;
-            NumIntervalsPerHour = 1;
-            UseDaylightSaving = true;             // True if user says to use Weather File specified DaylightSaving Period
-            UseSpecialDays = true;                // True if user says to use Weather File specified Special Days for current RunPeriod
-            UseRainValues = true;                 // True if rain values from weather file are to be used
-            UseSnowValues = true;                 // True if snow values from weather file are to be used
-            EPWDaylightSaving = false;            // True if a DaylightSaving Time Period is input (EPW files)
-            IDFDaylightSaving = false;            // True if a DaylightSaving Time Period is input (IDF files)
-            DaylightSavingIsActive = false;       // True if a DaylightSavingPeriod should be used for Environment
-            WFAllowsLeapYears = false;            // True if the Weather File (WF) header has "Yes" for Leap Years
-            curSimDayForEndOfRunPeriod = 0;       // normal=number days in sim, but different when repeating runperiods or multi-year files
-            Envrn = 0;                            // Counter for environments
-            NumOfEnvrn = 0;                       // Number of environments to be simulated
-            NumEPWTypExtSets = 0;                 // Number of Typical/Extreme on weather file.
-            NumWPSkyTemperatures = 0;             // Number of WeatherProperty:SkyTemperature items in input file
-            TodayIsRain.deallocate();             // Rain indicator, true=rain
-            TodayIsSnow.deallocate();             // Snow indicator, true=snow
-            TodayOutDryBulbTemp.deallocate();     // Dry bulb temperature of outside air
-            TodayOutDewPointTemp.deallocate();    // Dew Point Temperature of outside air
-            TodayOutBaroPress.deallocate();       // Barometric pressure of outside air
-            TodayOutRelHum.deallocate();          // Relative Humidity of outside air
-            TodayWindSpeed.deallocate();          // Wind speed of outside air
-            TodayWindDir.deallocate();            // Wind direction of outside air
-            TodaySkyTemp.deallocate();            // Sky temperature
-            TodayHorizIRSky.deallocate();         // Horizontal IR from Sky
-            TodayBeamSolarRad.deallocate();       // Direct normal solar irradiance
-            TodayDifSolarRad.deallocate();        // Sky diffuse horizontal solar irradiance
-            TodayAlbedo.deallocate();             // Albedo
-            TodayLiquidPrecip.deallocate();       // Liquid Precipitation Depth (mm)
-            TodayTotalSkyCover.deallocate();      // Total Sky Cover
-            TomorrowOpaqueSkyCover.deallocate();  // Opaque Sky Cover {tenth of sky}
-            TomorrowIsRain.deallocate();          // Rain indicator, true=rain
-            TomorrowIsSnow.deallocate();          // Snow indicator, true=snow
-            TomorrowOutDryBulbTemp.deallocate();  // Dry bulb temperature of outside air
-            TomorrowOutDewPointTemp.deallocate(); // Dew Point Temperature of outside air
-            TomorrowOutBaroPress.deallocate();    // Barometric pressure of outside air
-            TomorrowOutRelHum.deallocate();       // Relative Humidity of outside air
-            TomorrowWindSpeed.deallocate();       // Wind speed of outside air
-            TomorrowWindDir.deallocate();         // Wind direction of outside air
-            TomorrowSkyTemp.deallocate();         // Sky temperature
-            TomorrowHorizIRSky.deallocate();      // Horizontal IR from Sky
-            TomorrowBeamSolarRad.deallocate();    // Direct normal solar irradiance
-            TomorrowDifSolarRad.deallocate();     // Sky diffuse horizontal solar irradiance
-            TomorrowAlbedo.deallocate();          // Albedo
-            TomorrowLiquidPrecip.deallocate();    // Liquid Precipitation Depth
-            TomorrowTotalSkyCover.deallocate();   // Total Sky Cover {tenth of sky}
-            TomorrowOpaqueSkyCover.deallocate();  // Opaque Sky Cover {tenth of sky}
-            DDDBRngModifier.deallocate();         // Design Day Dry-bulb Temperature Range Modifier
-            DDHumIndModifier.deallocate();        // Design Day relative humidity values
-            DDBeamSolarValues.deallocate();       // Design Day Beam Solar Values
-            DDDiffuseSolarValues.deallocate();    // Design Day Relative Humidity Values
-            DDSkyTempScheduleValues.deallocate(); // Sky temperature - DesignDay input
-            RptIsRain = 0;                        // Rain Report Value
-            RptIsSnow = 0;                        // Snow Report Value
-            RptDayType = 0;                       // DayType Report Value
+            this->NumDataPeriods = 0;
+            this->NumIntervalsPerHour = 1;
+            this->UseDaylightSaving = true;             // True if user says to use Weather File specified DaylightSaving Period
+            this->UseSpecialDays = true;                // True if user says to use Weather File specified Special Days for current RunPeriod
+            this->UseRainValues = true;                 // True if rain values from weather file are to be used
+            this->UseSnowValues = true;                 // True if snow values from weather file are to be used
+            this->EPWDaylightSaving = false;            // True if a DaylightSaving Time Period is input (EPW files)
+            this->IDFDaylightSaving = false;            // True if a DaylightSaving Time Period is input (IDF files)
+            this->DaylightSavingIsActive = false;       // True if a DaylightSavingPeriod should be used for Environment
+            this->WFAllowsLeapYears = false;            // True if the Weather File (WF) header has "Yes" for Leap Years
+            this->curSimDayForEndOfRunPeriod = 0;       // normal=number days in sim, but different when repeating runperiods or multi-year files
+            this->Envrn = 0;                            // Counter for environments
+            this->NumOfEnvrn = 0;                       // Number of environments to be simulated
+            this->NumEPWTypExtSets = 0;                 // Number of Typical/Extreme on weather file.
+            this->NumWPSkyTemperatures = 0;             // Number of WeatherProperty:SkyTemperature items in input file
+            this->TodayIsRain.deallocate();             // Rain indicator, true=rain
+            this->TodayIsSnow.deallocate();             // Snow indicator, true=snow
+            this->TodayOutDryBulbTemp.deallocate();     // Dry bulb temperature of outside air
+            this->TodayOutDewPointTemp.deallocate();    // Dew Point Temperature of outside air
+            this->TodayOutBaroPress.deallocate();       // Barometric pressure of outside air
+            this->TodayOutRelHum.deallocate();          // Relative Humidity of outside air
+            this->TodayWindSpeed.deallocate();          // Wind speed of outside air
+            this->TodayWindDir.deallocate();            // Wind direction of outside air
+            this->TodaySkyTemp.deallocate();            // Sky temperature
+            this->TodayHorizIRSky.deallocate();         // Horizontal IR from Sky
+            this->TodayBeamSolarRad.deallocate();       // Direct normal solar irradiance
+            this->TodayDifSolarRad.deallocate();        // Sky diffuse horizontal solar irradiance
+            this->TodayAlbedo.deallocate();             // Albedo
+            this->TodayLiquidPrecip.deallocate();       // Liquid Precipitation Depth (mm)
+            this->TodayTotalSkyCover.deallocate();      // Total Sky Cover
+            this->TomorrowOpaqueSkyCover.deallocate();  // Opaque Sky Cover {tenth of sky}
+            this->TomorrowIsRain.deallocate();          // Rain indicator, true=rain
+            this->TomorrowIsSnow.deallocate();          // Snow indicator, true=snow
+            this->TomorrowOutDryBulbTemp.deallocate();  // Dry bulb temperature of outside air
+            this->TomorrowOutDewPointTemp.deallocate(); // Dew Point Temperature of outside air
+            this->TomorrowOutBaroPress.deallocate();    // Barometric pressure of outside air
+            this->TomorrowOutRelHum.deallocate();       // Relative Humidity of outside air
+            this->TomorrowWindSpeed.deallocate();       // Wind speed of outside air
+            this->TomorrowWindDir.deallocate();         // Wind direction of outside air
+            this->TomorrowSkyTemp.deallocate();         // Sky temperature
+            this->TomorrowHorizIRSky.deallocate();      // Horizontal IR from Sky
+            this->TomorrowBeamSolarRad.deallocate();    // Direct normal solar irradiance
+            this->TomorrowDifSolarRad.deallocate();     // Sky diffuse horizontal solar irradiance
+            this->TomorrowAlbedo.deallocate();          // Albedo
+            this->TomorrowLiquidPrecip.deallocate();    // Liquid Precipitation Depth
+            this->TomorrowTotalSkyCover.deallocate();   // Total Sky Cover {tenth of sky}
+            this->TomorrowOpaqueSkyCover.deallocate();  // Opaque Sky Cover {tenth of sky}
+            this->DDDBRngModifier.deallocate();         // Design Day Dry-bulb Temperature Range Modifier
+            this->DDHumIndModifier.deallocate();        // Design Day relative humidity values
+            this->DDBeamSolarValues.deallocate();       // Design Day Beam Solar Values
+            this->DDDiffuseSolarValues.deallocate();    // Design Day Relative Humidity Values
+            this->DDSkyTempScheduleValues.deallocate(); // Sky temperature - DesignDay input
+            this->RptIsRain = 0;                        // Rain Report Value
+            this->RptIsSnow = 0;                        // Snow Report Value
+            this->RptDayType = 0;                       // DayType Report Value
 
-            HrAngle = 0.0;                                     // Current Hour Angle
-            SolarAltitudeAngle = 0.0;                          // Angle of Solar Altitude (degrees)
-            SolarAzimuthAngle = 0.0;                           // Angle of Solar Azimuth (degrees)
-            HorizIRSky = 0.0;                                  // Horizontal Infrared Radiation Intensity (W/m2)
-            TimeStepFraction = 0.0;                            // Fraction of hour each time step represents
-            SPSiteDryBulbRangeModScheduleValue.deallocate();   // reporting Drybulb Temperature Range Modifier Schedule Value
-            SPSiteHumidityConditionScheduleValue.deallocate(); // reporting Humidity Condition Schedule Value
-            SPSiteBeamSolarScheduleValue.deallocate();         // reporting Beam Solar Schedule Value
-            SPSiteDiffuseSolarScheduleValue.deallocate();      // reporting Diffuse Solar Schedule Value
-            SPSiteSkyTemperatureScheduleValue.deallocate();    // reporting SkyTemperature Modifier Schedule Value
-            SPSiteScheduleNamePtr.deallocate();                // SP Site Schedule Name Ptrs
-            SPSiteScheduleUnits.deallocate();                  // SP Site Schedule Units
-            NumSPSiteScheduleNamePtrs = 0;                     // Number of SP Site Schedules (DesignDay only)
-            Interpolation.deallocate();                        // Interpolation values based on Number of Time Steps in Hour
-            SolarInterpolation.deallocate();                   // Solar Interpolation values based on
+            this->HrAngle = 0.0;                                     // Current Hour Angle
+            this->SolarAltitudeAngle = 0.0;                          // Angle of Solar Altitude (degrees)
+            this->SolarAzimuthAngle = 0.0;                           // Angle of Solar Azimuth (degrees)
+            this->HorizIRSky = 0.0;                                  // Horizontal Infrared Radiation Intensity (W/m2)
+            this->TimeStepFraction = 0.0;                            // Fraction of hour each time step represents
+            this->SPSiteDryBulbRangeModScheduleValue.deallocate();   // reporting Drybulb Temperature Range Modifier Schedule Value
+            this->SPSiteHumidityConditionScheduleValue.deallocate(); // reporting Humidity Condition Schedule Value
+            this->SPSiteBeamSolarScheduleValue.deallocate();         // reporting Beam Solar Schedule Value
+            this->SPSiteDiffuseSolarScheduleValue.deallocate();      // reporting Diffuse Solar Schedule Value
+            this->SPSiteSkyTemperatureScheduleValue.deallocate();    // reporting SkyTemperature Modifier Schedule Value
+            this->SPSiteScheduleNamePtr.deallocate();                // SP Site Schedule Name Ptrs
+            this->SPSiteScheduleUnits.deallocate();                  // SP Site Schedule Units
+            this->NumSPSiteScheduleNamePtrs = 0;                     // Number of SP Site Schedules (DesignDay only)
+            this->Interpolation.deallocate();                        // Interpolation values based on Number of Time Steps in Hour
+            this->SolarInterpolation.deallocate();                   // Solar Interpolation values based on
 
-            LeapYearAdd = 0;
-            DatesShouldBeReset = false;
-            StartDatesCycleShouldBeReset = false; // True when start dates on repeat should be reset
-            Jan1DatesShouldBeReset = false;       // True if Jan 1 should signal reset of dates
-            TodayVariables = WeatherManager::DayWeatherVariables();
-            TomorrowVariables = WeatherManager::DayWeatherVariables();
-            DesignDay.deallocate();
-            Missing = WeatherManager::MissingData();
-            Missed = WeatherManager::MissingDataCounts();
-            OutOfRange = WeatherManager::RangeDataCounts();
-            DesDayInput.deallocate(); // Design day Input Data
-            Environment.deallocate(); // Environment data
-            RunPeriodInput.deallocate();
-            RunPeriodInputUniqueNames.clear();
-            RunPeriodDesignInput.deallocate();
-            RunPeriodDesignInputUniqueNames.clear();
-            TypicalExtremePeriods.deallocate();
+            this->LeapYearAdd = 0;
+            this->DatesShouldBeReset = false;
+            this->StartDatesCycleShouldBeReset = false; // True when start dates on repeat should be reset
+            this->Jan1DatesShouldBeReset = false;       // True if Jan 1 should signal reset of dates
+            this->TodayVariables = WeatherManager::DayWeatherVariables();
+            this->TomorrowVariables = WeatherManager::DayWeatherVariables();
+            this->DesignDay.deallocate();
+            this->Missing = WeatherManager::MissingData();
+            this->Missed = WeatherManager::MissingDataCounts();
+            this->OutOfRange = WeatherManager::RangeDataCounts();
+            this->DesDayInput.deallocate(); // Design day Input Data
+            this->Environment.deallocate(); // Environment data
+            this->RunPeriodInput.deallocate();
+            this->RunPeriodInputUniqueNames.clear();
+            this->RunPeriodDesignInput.deallocate();
+            this->RunPeriodDesignInputUniqueNames.clear();
+            this->TypicalExtremePeriods.deallocate();
 
-            EPWDST.StDateType = WeatherManager::DateType::InvalidDate;
-            EPWDST.StWeekDay = 0;
-            EPWDST.StMon = 0;
-            EPWDST.StDay = 0;
-            EPWDST.EnDateType = WeatherManager::DateType::InvalidDate;
-            EPWDST.EnMon = 0;
-            EPWDST.EnDay = 0;
-            EPWDST.EnWeekDay = 0;
+            this->EPWDST.StDateType = WeatherManager::DateType::InvalidDate;
+            this->EPWDST.StWeekDay = 0;
+            this->EPWDST.StMon = 0;
+            this->EPWDST.StDay = 0;
+            this->EPWDST.EnDateType = WeatherManager::DateType::InvalidDate;
+            this->EPWDST.EnMon = 0;
+            this->EPWDST.EnDay = 0;
+            this->EPWDST.EnWeekDay = 0;
 
-            IDFDST.StDateType = WeatherManager::DateType::InvalidDate;
-            IDFDST.StWeekDay = 0;
-            IDFDST.StMon = 0;
-            IDFDST.StDay = 0;
-            IDFDST.EnDateType = WeatherManager::DateType::InvalidDate;
-            IDFDST.EnMon = 0;
-            IDFDST.EnDay = 0;
-            IDFDST.EnWeekDay = 0;
+            this->IDFDST.StDateType = WeatherManager::DateType::InvalidDate;
+            this->IDFDST.StWeekDay = 0;
+            this->IDFDST.StMon = 0;
+            this->IDFDST.StDay = 0;
+            this->IDFDST.EnDateType = WeatherManager::DateType::InvalidDate;
+            this->IDFDST.EnMon = 0;
+            this->IDFDST.EnDay = 0;
+            this->IDFDST.EnWeekDay = 0;
 
-            DST.StDateType = WeatherManager::DateType::InvalidDate;
-            DST.StWeekDay = 0;
-            DST.StMon = 0;
-            DST.StDay = 0;
-            DST.EnDateType = WeatherManager::DateType::InvalidDate;
-            DST.EnMon = 0;
-            DST.EnDay = 0;
-            DST.EnWeekDay = 0;
-            WPSkyTemperature.deallocate();
-            SpecialDays.deallocate();
-            DataPeriods.deallocate();
+            this->DST.StDateType = WeatherManager::DateType::InvalidDate;
+            this->DST.StWeekDay = 0;
+            this->DST.StMon = 0;
+            this->DST.StDay = 0;
+            this->DST.EnDateType = WeatherManager::DateType::InvalidDate;
+            this->DST.EnMon = 0;
+            this->DST.EnDay = 0;
+            this->DST.EnWeekDay = 0;
+            this->WPSkyTemperature.deallocate();
+            this->SpecialDays.deallocate();
+            this->DataPeriods.deallocate();
 
-            underwaterBoundaries.clear();
+            this->underwaterBoundaries.clear();
 
             // ManageWeather static vars
-            PrintEnvrnStamp = false;
+            this->PrintEnvrnStamp = false;
 
             // InitializeWeather static vars
-            FirstCall = true;
-            WaterMainsParameterReport = true;
+            this->FirstCall = true;
+            this->WaterMainsParameterReport = true;
 
             // SetCurrentWeather static vars
-            NextHour = 1;
+            this->NextHour = 1;
 
             // ReadEPlusWeatherForDay static vars
-            CurDayOfWeek = 1;
-            ReadEPlusWeatherCurTime = 1.0;
-            LastHourSet = false;
+            this->CurDayOfWeek = 1;
+            this->ReadEPlusWeatherCurTime = 1.0;
+            this->LastHourSet = false;
 
             // SetUpDesignDay static vars
-            PrintDDHeader = true;
+            this->PrintDDHeader = true;
 
-            LastHrOutDryBulbTemp = 0.0;
-            LastHrOutDewPointTemp = 0.0;
-            LastHrOutBaroPress = 0.0;
-            LastHrOutRelHum = 0.0;
-            LastHrWindSpeed = 0.0;
-            LastHrWindDir = 0.0;
-            LastHrSkyTemp = 0.0;
-            LastHrHorizIRSky = 0.0;
-            LastHrBeamSolarRad = 0.0;
-            LastHrDifSolarRad = 0.0;
-            LastHrAlbedo = 0.0;
-            LastHrLiquidPrecip = 0.0;
-            LastHrTotalSkyCover = 0.0;
-            LastHrOpaqueSkyCover = 0.0;
-            NextHrBeamSolarRad = 0.0;
-            NextHrDifSolarRad = 0.0;
-            NextHrLiquidPrecip = 0.0;
+            this->LastHrOutDryBulbTemp = 0.0;
+            this->LastHrOutDewPointTemp = 0.0;
+            this->LastHrOutBaroPress = 0.0;
+            this->LastHrOutRelHum = 0.0;
+            this->LastHrWindSpeed = 0.0;
+            this->LastHrWindDir = 0.0;
+            this->LastHrSkyTemp = 0.0;
+            this->LastHrHorizIRSky = 0.0;
+            this->LastHrBeamSolarRad = 0.0;
+            this->LastHrDifSolarRad = 0.0;
+            this->LastHrAlbedo = 0.0;
+            this->LastHrLiquidPrecip = 0.0;
+            this->LastHrTotalSkyCover = 0.0;
+            this->LastHrOpaqueSkyCover = 0.0;
+            this->NextHrBeamSolarRad = 0.0;
+            this->NextHrDifSolarRad = 0.0;
+            this->NextHrLiquidPrecip = 0.0;
 
             // ProcessEPWHeader static vars
-            EPWHeaderTitle = "";
+            this->EPWHeaderTitle = "";
         }
 
         // Default Constructor

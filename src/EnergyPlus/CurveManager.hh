@@ -73,8 +73,8 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace CurveManager {
 
@@ -239,11 +239,11 @@ namespace CurveManager {
     {
     public:
         TableFile() = default;
-        TableFile(IOFiles &ioFiles, std::string path);
+        TableFile(EnergyPlusData &state, std::string path);
         std::string filePath;
         std::vector<std::vector<std::string>> contents;
         std::map<std::pair<std::size_t, std::size_t>, std::vector<double>> arrays;
-        void load(IOFiles &ioFiles, std::string path);
+        void load(EnergyPlusData &state, std::string path);
         std::vector<double>& getArray(std::pair<std::size_t, std::size_t> colAndRow);
 
     private:
@@ -391,17 +391,25 @@ namespace CurveManager {
 
 } // namespace CurveManager
 
-struct CurveManagerData : BaseGlobalStruct {
-    int NumCurves = 0;
-    bool GetCurvesInputFlag = true;
-    Array1D<CurveManager::PerformanceCurveData> PerfCurve;
-    CurveManager::BtwxtManager btwxtManager;
-    std::unordered_map<std::string, std::string> UniqueCurveNames;
-    bool CurveValueMyBeginTimeStepFlag;
-    bool FrictionFactorErrorHasOccurred = false;
+    struct CurveManagerData : BaseGlobalStruct {
+        int NumCurves;
+        bool GetCurvesInputFlag;
+        Array1D<CurveManager::PerformanceCurveData> PerfCurve;
+        CurveManager::BtwxtManager btwxtManager;
+        std::unordered_map<std::string, std::string> UniqueCurveNames;
+        bool CurveValueMyBeginTimeStepFlag;
+        bool FrictionFactorErrorHasOccurred;
 
-    void clear_state() override;
-};
+        CurveManagerData()
+            : NumCurves(0), GetCurvesInputFlag(true), CurveValueMyBeginTimeStepFlag(false), FrictionFactorErrorHasOccurred(false)
+        {
+        }
+
+        void clear_state() override
+        {
+            *this = CurveManagerData();
+        }
+    };
 
 } // namespace EnergyPlus
 

@@ -55,6 +55,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -62,7 +63,6 @@
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 // TODO: move DetermineMinuteForReporting to avoid bringing this one in
@@ -2617,7 +2617,7 @@ namespace General {
 
     // END SUBROUTINE SaveCompDesWaterFlow
 
-    void Invert3By3Matrix(IOFiles &ioFiles,
+    void Invert3By3Matrix(EnergyPlusData &state,
                           Array2A<Real64> const A, // Input 3X3 Matrix
                           Array2A<Real64> InverseA // Output 3X3 Matrix - Inverse Of A
     )
@@ -2664,7 +2664,7 @@ namespace General {
                       A(1, 2) * A(2, 1) * A(3, 3) - A(1, 3) * A(2, 2) * A(3, 1);
 
         if (std::abs(Determinant) < .1E-12) {
-            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{ioFiles.eso});
+            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{state.files.eso});
         }
 
         // Compute Inverse
@@ -3356,7 +3356,7 @@ namespace General {
     }
 
     void
-    ScanForReports(std::string const &reportName, bool &DoReport, Optional_string_const ReportKey, Optional_string Option1, Optional_string Option2)
+    ScanForReports(EnergyPlusData &state, std::string const &reportName, bool &DoReport, Optional_string_const ReportKey, Optional_string Option1, Optional_string Option2)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3408,7 +3408,8 @@ namespace General {
 
             NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               RepNum,
                                               cAlphaArgs,
                                               NumNames,
@@ -3465,7 +3466,8 @@ namespace General {
 
             NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               RepNum,
                                               cAlphaArgs,
                                               NumNames,
@@ -3517,7 +3519,8 @@ namespace General {
 
             NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               RepNum,
                                               cAlphaArgs,
                                               NumNames,
@@ -3536,7 +3539,8 @@ namespace General {
             cCurrentModuleObject = "Output:Constructions";
             NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               RepNum,
                                               cAlphaArgs,
                                               NumNames,
@@ -3564,7 +3568,8 @@ namespace General {
             cCurrentModuleObject = "Output:EnergyManagementSystem";
             NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               RepNum,
                                               cAlphaArgs,
                                               NumNames,
@@ -3654,16 +3659,6 @@ namespace General {
                     }
                 }
             }
-
-            //    cCurrentModuleObject='Output:Schedules'
-            //    NumReports=inputProcessor->getNumObjectsFound(cCurrentModuleObject)
-            //    DO RepNum=1,NumReports
-            //      CALL inputProcessor->getObjectItem(cCurrentModuleObject,RepNum,cAlphaArgs,NumNames,rNumericArgs,NumNumbers,IOStat,  &
-            //                     AlphaBlank=lAlphaFieldBlanks,NumBlank=lNumericFieldBlanks,  &
-            //                     AlphaFieldNames=cAlphaFieldNames,NumericFieldNames=cNumericFieldNames)
-            //      SchRpt=.TRUE.
-            //      SchRptOption=cAlphaArgs(1)
-            //    ENDDO
 
             GetReportInput = false;
         }

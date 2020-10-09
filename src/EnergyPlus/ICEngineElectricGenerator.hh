@@ -160,13 +160,13 @@ namespace ICEngineElectricGenerator {
 
         void CalcICEngineGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
-        void CalcICEngineGenHeatRecovery(Real64 EnergyRecovered, Real64 HeatRecMdot, Real64 &HRecRatio);
+        void CalcICEngineGenHeatRecovery(EnergyPlusData &state, Real64 EnergyRecovered, Real64 HeatRecMdot, Real64 &HRecRatio);
 
         void update();
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };

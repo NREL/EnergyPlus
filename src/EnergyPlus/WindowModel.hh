@@ -54,6 +54,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 template <typename T> class EnumParser
 {
     std::map<std::string, T> m_Map;
@@ -86,7 +89,7 @@ namespace WindowManager {
     public:
         CWindowModel();
 
-        static std::unique_ptr<CWindowModel> WindowModelFactory(std::string const &objectName);
+        static std::unique_ptr<CWindowModel> WindowModelFactory(EnergyPlusData &state, std::string const &objectName);
 
         WindowsModel getWindowsModel() const;
         bool isExternalLibraryModel() const;

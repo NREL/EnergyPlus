@@ -51,19 +51,39 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
+#include <EnergyPlus/Boilers.hh>
+#include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
+#include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/ChillerExhaustAbsorption.hh>
+#include <EnergyPlus/ChillerGasAbsorption.hh>
+#include <EnergyPlus/ChillerIndirectAbsorption.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
+#include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/CoolTower.hh>
+#include <EnergyPlus/CostEstimateManager.hh>
+#include <EnergyPlus/CrossVentMgr.hh>
+#include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -391,7 +411,7 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest)
 
     EXPECT_DOUBLE_EQ(0.002, PlantLoop(1).MaxVolFlowRate); //  m3/s
 
-    TestAnalysisObj.ResolveDesignFlowRate(state, state.files, 1);
+    TestAnalysisObj.ResolveDesignFlowRate(state, 1);
 
     EXPECT_DOUBLE_EQ(0.0015, PlantLoop(1).MaxVolFlowRate); //  m3/s
     EXPECT_DOUBLE_EQ(1.5, PlantLoop(1).MaxMassFlowRate);   //  m3/s
@@ -547,7 +567,7 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTestNullMassFlowRateTim
 
     EXPECT_DOUBLE_EQ(0.002, PlantLoop(1).MaxVolFlowRate); //  m3/s
 
-    TestAnalysisObj.ResolveDesignFlowRate(state, state.files, 1);
+    TestAnalysisObj.ResolveDesignFlowRate(state, 1);
 
     EXPECT_NEAR(0.00015, PlantLoop(1).MaxVolFlowRate, 0.00001); //  m3/s
     EXPECT_NEAR(0.15, PlantLoop(1).MaxMassFlowRate, 0.001);     //  m3/s

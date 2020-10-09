@@ -103,7 +103,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
+    ProcessInputOARequirements(state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
                                cNumericFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
@@ -124,7 +124,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
+    ProcessInputOARequirements(state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
                                cNumericFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
@@ -145,7 +145,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
+    ProcessInputOARequirements(state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
                                cNumericFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
@@ -166,7 +166,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;              // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
+    ProcessInputOARequirements(state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
                                cNumericFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
@@ -187,7 +187,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
+    ProcessInputOARequirements(state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
                                cNumericFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
@@ -208,7 +208,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
+    ProcessInputOARequirements(state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields,
                                cNumericFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
@@ -305,16 +305,16 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    SizingManager::GetOARequirements();
-    SizingManager::GetZoneSizingInput();
+    SizingManager::GetOARequirements(state);
+    SizingManager::GetZoneSizingInput(state);
     ASSERT_EQ(1, NumZoneSizingInput);
     ASSERT_EQ(DOANeutralSup, ZoneSizingInput(1).DOASControlStrategy);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values
-    ZoneEquipmentManager::AutoCalcDOASControlStrategy(*state.dataZoneEquipmentManager, state.files);
+    ZoneEquipmentManager::AutoCalcDOASControlStrategy(state);
     // check default low and high set point values
     ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
@@ -374,16 +374,16 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    SizingManager::GetOARequirements();
-    SizingManager::GetZoneSizingInput();
+    SizingManager::GetOARequirements(state);
+    SizingManager::GetZoneSizingInput(state);
     ASSERT_EQ(1, NumZoneSizingInput);
     ASSERT_EQ(DOANeutralSup, ZoneSizingInput(1).DOASControlStrategy);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values
-    ZoneEquipmentManager::AutoCalcDOASControlStrategy(*state.dataZoneEquipmentManager, state.files);
+    ZoneEquipmentManager::AutoCalcDOASControlStrategy(state);
     // check default low and high set point values
     ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
@@ -481,5 +481,5 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     DaySim = 2;
     Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
     ASSERT_FALSE(Answer);
-    
+
 }

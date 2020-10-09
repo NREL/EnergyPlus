@@ -57,8 +57,8 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace Humidifiers {
 
@@ -157,9 +157,9 @@ namespace Humidifiers {
         {
         }
 
-        void InitHumidifier(); // number of the current humidifier being simulated
+        void InitHumidifier(EnergyPlusData &state); // number of the current humidifier being simulated
 
-        void SizeHumidifier(); // number of the current humidifier being sized
+        void SizeHumidifier(EnergyPlusData &state); // number of the current humidifier being sized
 
         void ControlHumidifier(Real64 &WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
         );

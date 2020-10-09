@@ -291,12 +291,12 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
 //		DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
 //		ScheduleManager::ProcessScheduleInput(); // read schedules
 //
-//		HeatBalanceManager::GetZoneData( ErrorsFound );
+//		HeatBalanceManager::GetZoneData(state,  ErrorsFound );
 //		ASSERT_FALSE( ErrorsFound );
 //
 //		DataZoneEquipment::GetZoneEquipmentData1();
 //		ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
-//		DualDuct::GetDualDuctInput();
+//		DualDuct::GetDualDuctInput(state);
 //
 //		EXPECT_EQ(3u, dd_airterminal.size());
 //		EXPECT_EQ( DualDuct::DualDuct_ConstantVolume, dd_airterminal( 1 ).dd_airterminalType );
@@ -346,8 +346,8 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_GetInputs)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
-    DualDuct::GetDualDuctInput();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
+    DualDuct::GetDualDuctInput(state);
 
     //dual duct  VAV air terminal get input test
     EXPECT_EQ(dd_airterminal(1).DamperType, DualDuct_VariableVolume); // dual duct VAV Type
@@ -429,7 +429,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
 
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -440,15 +440,15 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
-    DualDuct::GetDualDuctInput();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
+    DualDuct::GetDualDuctInput(state);
 
     auto &thisDDAirTerminal = DualDuct::dd_airterminal(DDNum);
 

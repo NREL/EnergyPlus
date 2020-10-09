@@ -111,7 +111,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
-        inputProcessor->getObjectItem(cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
         if (objectName == cAlphaArgs(1)) {
             // Read input into object here
@@ -205,7 +205,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     bool EndMonthFlag_reset = EndMonthFlag;
     bool WarmupFlag_reset = WarmupFlag;
     int DayOfSim_reset = DayOfSim;
-    std::string DayOfSimChr_reset = state.dataGlobals.DayOfSimChr;
+    std::string DayOfSimChr_reset = state.dataGlobal->DayOfSimChr;
     int NumOfWarmupDays_reset = NumOfWarmupDays;
     bool BeginDayFlag_reset = BeginDayFlag;
     bool EndDayFlag_reset = EndDayFlag;
@@ -253,7 +253,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     EndMonthFlag = false;
     WarmupFlag = false;
     DayOfSim = 0;
-    state.dataGlobals.DayOfSimChr = "0";
+    state.dataGlobal->DayOfSimChr = "0";
     NumOfWarmupDays = 0;
 
     annualAveAirTemp_num = 0.0;
@@ -361,7 +361,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     EndMonthFlag = EndMonthFlag_reset;
     WarmupFlag = WarmupFlag_reset;
     DayOfSim = DayOfSim_reset;
-    state.dataGlobals.DayOfSimChr = DayOfSimChr_reset;
+    state.dataGlobal->DayOfSimChr = DayOfSimChr_reset;
     NumOfWarmupDays = NumOfWarmupDays_reset;
     BeginDayFlag = BeginDayFlag_reset;
     EndDayFlag = EndDayFlag_reset;

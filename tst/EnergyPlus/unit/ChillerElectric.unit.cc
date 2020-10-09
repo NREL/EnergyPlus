@@ -121,27 +121,27 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
         loopsidebranch.Comp.allocate(1);
     }
 
-    ElectricChillerSpecs::getInput(state.dataPlantChillers);
+    ElectricChillerSpecs::getInput(state);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";
     DataPlant::PlantLoop(1).FluidIndex = 1;
     DataPlant::PlantLoop(1).PlantSizNum = 1;
     DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataPlantChillers.ElectricChiller(1).Name;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataPlantChillers->ElectricChiller(1).Name;
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataPlantChillers.ElectricChiller(1).EvapInletNodeNum;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataPlantChillers.ElectricChiller(1).EvapOutletNodeNum;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataPlantChillers->ElectricChiller(1).EvapInletNodeNum;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataPlantChillers->ElectricChiller(1).EvapOutletNodeNum;
 
     DataPlant::PlantLoop(2).Name = "CondenserWaterLoop";
     DataPlant::PlantLoop(2).FluidName = "CondenserWater";
     DataPlant::PlantLoop(2).FluidIndex = 1;
     DataPlant::PlantLoop(2).PlantSizNum = 2;
     DataPlant::PlantLoop(2).FluidName = "WATER";
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state.dataPlantChillers.ElectricChiller(1).Name;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state.dataPlantChillers->ElectricChiller(1).Name;
     DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataPlantChillers.ElectricChiller(1).CondInletNodeNum;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataPlantChillers.ElectricChiller(1).CondOutletNodeNum;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataPlantChillers->ElectricChiller(1).CondInletNodeNum;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataPlantChillers->ElectricChiller(1).CondOutletNodeNum;
 
     DataSizing::PlantSizData.allocate(2);
     DataSizing::PlantSizData(1).DesVolFlowRate = 0.001;
@@ -158,37 +158,37 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
     Real64 MyLoad(-20000.0);
 
     Psychrometrics::InitializePsychRoutines();
-    auto &thisChiller = state.dataPlantChillers.ElectricChiller(1);
+    auto &thisChiller = state.dataPlantChillers->ElectricChiller(1);
     thisChiller.initialize(state, RunFlag, MyLoad);
-    thisChiller.size();
+    thisChiller.size(state);
     // run init again after sizing is complete to set mass flow rate
     DataGlobals::BeginEnvrnFlag = true;
     thisChiller.initialize(state, RunFlag, MyLoad);
     // check hardsized chiller nominal capacity
-    EXPECT_DOUBLE_EQ(state.dataPlantChillers.ElectricChiller(1).NomCap, 100000.00);
+    EXPECT_DOUBLE_EQ(state.dataPlantChillers->ElectricChiller(1).NomCap, 100000.00);
     // check hardsized chiller evap water vol flow rate
-    EXPECT_DOUBLE_EQ(state.dataPlantChillers.ElectricChiller(1).EvapVolFlowRate, 0.0011);
+    EXPECT_DOUBLE_EQ(state.dataPlantChillers->ElectricChiller(1).EvapVolFlowRate, 0.0011);
     // check hardsized chiller cond water vol flow rate
-    EXPECT_DOUBLE_EQ(state.dataPlantChillers.ElectricChiller(1).CondVolFlowRate, 0.0011);
+    EXPECT_DOUBLE_EQ(state.dataPlantChillers->ElectricChiller(1).CondVolFlowRate, 0.0011);
 
     // Reset nom cap, Evap Vol Flow Rate and Cond Vol FLow Rate to autosize
-    state.dataPlantChillers.ElectricChiller(1).NomCap = DataSizing::AutoSize;
-    state.dataPlantChillers.ElectricChiller(1).EvapVolFlowRate = DataSizing::AutoSize;
-    state.dataPlantChillers.ElectricChiller(1).CondVolFlowRate = DataSizing::AutoSize;
+    state.dataPlantChillers->ElectricChiller(1).NomCap = DataSizing::AutoSize;
+    state.dataPlantChillers->ElectricChiller(1).EvapVolFlowRate = DataSizing::AutoSize;
+    state.dataPlantChillers->ElectricChiller(1).CondVolFlowRate = DataSizing::AutoSize;
     // Reset outosize flags
-    state.dataPlantChillers.ElectricChiller(1).NomCapWasAutoSized = true;
-    state.dataPlantChillers.ElectricChiller(1).EvapVolFlowRateWasAutoSized = true;
-    state.dataPlantChillers.ElectricChiller(1).CondVolFlowRateWasAutoSized = true;
+    state.dataPlantChillers->ElectricChiller(1).NomCapWasAutoSized = true;
+    state.dataPlantChillers->ElectricChiller(1).EvapVolFlowRateWasAutoSized = true;
+    state.dataPlantChillers->ElectricChiller(1).CondVolFlowRateWasAutoSized = true;
 
     // do autosizing calc
     thisChiller.initialize(state, RunFlag, MyLoad);
-    thisChiller.size();
+    thisChiller.size(state);
     // check autocalculate chiller nominal capacity
-    EXPECT_DOUBLE_EQ(state.dataPlantChillers.ElectricChiller(1).NomCap, 20987.509055700004);
+    EXPECT_DOUBLE_EQ(state.dataPlantChillers->ElectricChiller(1).NomCap, 20987.509055700004);
     // check autocalculate chiller evap water vol flow rate
-    EXPECT_DOUBLE_EQ(state.dataPlantChillers.ElectricChiller(1).EvapVolFlowRate, 0.0010000000000000000);
+    EXPECT_DOUBLE_EQ(state.dataPlantChillers->ElectricChiller(1).EvapVolFlowRate, 0.0010000000000000000);
     // check autocalculate chiller cond water vol flow rate
-    EXPECT_DOUBLE_EQ(state.dataPlantChillers.ElectricChiller(1).CondVolFlowRate, 0.0012208075356136608);
+    EXPECT_DOUBLE_EQ(state.dataPlantChillers->ElectricChiller(1).CondVolFlowRate, 0.0012208075356136608);
 }
 
 TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
@@ -248,27 +248,27 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
         loopsidebranch.Comp.allocate(1);
     }
 
-    ElectricChillerSpecs::getInput(state.dataPlantChillers);
+    ElectricChillerSpecs::getInput(state);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";
     DataPlant::PlantLoop(1).FluidIndex = 1;
     DataPlant::PlantLoop(1).PlantSizNum = 1;
     DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataPlantChillers.ElectricChiller(1).Name;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataPlantChillers->ElectricChiller(1).Name;
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataPlantChillers.ElectricChiller(1).EvapInletNodeNum;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataPlantChillers.ElectricChiller(1).EvapOutletNodeNum;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataPlantChillers->ElectricChiller(1).EvapInletNodeNum;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataPlantChillers->ElectricChiller(1).EvapOutletNodeNum;
 
     DataPlant::PlantLoop(2).Name = "CondenserWaterLoop";
     DataPlant::PlantLoop(2).FluidName = "CondenserWater";
     DataPlant::PlantLoop(2).FluidIndex = 1;
     DataPlant::PlantLoop(2).PlantSizNum = 2;
     DataPlant::PlantLoop(2).FluidName = "WATER";
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state.dataPlantChillers.ElectricChiller(1).Name;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state.dataPlantChillers->ElectricChiller(1).Name;
     DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataPlantChillers.ElectricChiller(1).CondInletNodeNum;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataPlantChillers.ElectricChiller(1).CondOutletNodeNum;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataPlantChillers->ElectricChiller(1).CondInletNodeNum;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataPlantChillers->ElectricChiller(1).CondOutletNodeNum;
 
     DataSizing::PlantSizData.allocate(2);
     DataSizing::PlantSizData(1).DesVolFlowRate = 0.001;
@@ -285,31 +285,31 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     Real64 MyLoad(-20000.0);
 
     Psychrometrics::InitializePsychRoutines();
-    auto &thisChiller = state.dataPlantChillers.ElectricChiller(1);
+    auto &thisChiller = state.dataPlantChillers->ElectricChiller(1);
     thisChiller.initialize(state, RunFlag, MyLoad);
-    thisChiller.size();
+    thisChiller.size(state);
     // run init again after sizing is complete to set mass flow rate
     DataGlobals::BeginEnvrnFlag = true;
     thisChiller.initialize(state, RunFlag, MyLoad);
     // check hardsized chiller nominal capacity
-    EXPECT_DOUBLE_EQ(state.dataPlantChillers.ElectricChiller(1).NomCap, 100000.00);
+    EXPECT_DOUBLE_EQ(state.dataPlantChillers->ElectricChiller(1).NomCap, 100000.00);
     // check hardsized chiller evap water vol flow rate
-    EXPECT_DOUBLE_EQ(state.dataPlantChillers.ElectricChiller(1).EvapVolFlowRate, 0.0011);
+    EXPECT_DOUBLE_EQ(state.dataPlantChillers->ElectricChiller(1).EvapVolFlowRate, 0.0011);
     // check hardsized chiller cond water vol flow rate
-    EXPECT_DOUBLE_EQ(state.dataPlantChillers.ElectricChiller(1).CondVolFlowRate, 0.0011);
+    EXPECT_DOUBLE_EQ(state.dataPlantChillers->ElectricChiller(1).CondVolFlowRate, 0.0011);
 
     // Reset nom cap, Evap Vol Flow Rate and Cond Vol FLow Rate to autosize
-    state.dataPlantChillers.ElectricChiller(1).NomCap = DataSizing::AutoSize;
-    state.dataPlantChillers.ElectricChiller(1).EvapVolFlowRate = DataSizing::AutoSize;
-    state.dataPlantChillers.ElectricChiller(1).CondVolFlowRate = DataSizing::AutoSize;
+    state.dataPlantChillers->ElectricChiller(1).NomCap = DataSizing::AutoSize;
+    state.dataPlantChillers->ElectricChiller(1).EvapVolFlowRate = DataSizing::AutoSize;
+    state.dataPlantChillers->ElectricChiller(1).CondVolFlowRate = DataSizing::AutoSize;
     // Reset autosize flags
-    state.dataPlantChillers.ElectricChiller(1).NomCapWasAutoSized = true;
-    state.dataPlantChillers.ElectricChiller(1).EvapVolFlowRateWasAutoSized = true;
-    state.dataPlantChillers.ElectricChiller(1).CondVolFlowRateWasAutoSized = true;
+    state.dataPlantChillers->ElectricChiller(1).NomCapWasAutoSized = true;
+    state.dataPlantChillers->ElectricChiller(1).EvapVolFlowRateWasAutoSized = true;
+    state.dataPlantChillers->ElectricChiller(1).CondVolFlowRateWasAutoSized = true;
 
     // Do autosizing calcs
     thisChiller.initialize(state, RunFlag, MyLoad);
-    thisChiller.size();
+    thisChiller.size(state);
 
     // simulate
     PlantLocation loc(1, 1, 1, 1);

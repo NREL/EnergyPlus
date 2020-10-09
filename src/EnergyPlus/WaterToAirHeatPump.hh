@@ -58,8 +58,8 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace WaterToAirHeatPump {
 
@@ -196,7 +196,8 @@ namespace WaterToAirHeatPump {
                                  int const CompOp,
                                  Real64 const PartLoadRatio);
 
-    Real64 CalcCompSuctionTempResidual(Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
+    Real64 CalcCompSuctionTempResidual(EnergyPlusData &state,
+                                       Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
                                        Array1D<Real64> const &Par    // Function parameters
     );
 
@@ -267,20 +268,20 @@ namespace WaterToAirHeatPump {
 
         void clear_state() override
         {
-            NumWatertoAirHPs = 0;
-            CheckEquipName.clear();
-            RefrigIndex = 0;
-            WaterIndex = 0;
-            GetCoilsInputFlag = true;
-            MyOneTimeFlag = true;
-            firstTime = true;
-            WatertoAirHP.clear();
+            this->NumWatertoAirHPs = 0;
+            this->CheckEquipName.clear();
+            this->RefrigIndex = 0;
+            this->WaterIndex = 0;
+            this->GetCoilsInputFlag = true;
+            this->MyOneTimeFlag = true;
+            this->firstTime = true;
+            this->WatertoAirHP.clear();
         }
 
         // Default Constructor
         WaterToAirHeatPumpData()
             : CompressorType_Reciprocating(1), CompressorType_Rotary(2), CompressorType_Scroll(3),
-              NumWatertoAirHPs(0), RefrigIndex(0), WaterIndex(0), GetCoilsInputFlag(true), 
+              NumWatertoAirHPs(0), RefrigIndex(0), WaterIndex(0), GetCoilsInputFlag(true),
               MyOneTimeFlag(true), firstTime(true)
         {
         }

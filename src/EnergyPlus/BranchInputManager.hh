@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 
@@ -298,28 +297,32 @@ namespace BranchInputManager {
 
     void GetMixerInput(EnergyPlusData &state);
 
-    void FindPlantLoopBranchConnection(std::string const &BranchListName,
+    void FindPlantLoopBranchConnection(EnergyPlusData &state,
+                                       std::string const &BranchListName,
                                        std::string &FoundPlantLoopName,
                                        int &FoundPlantLoopNum,
                                        std::string &FoundSupplyDemand,
                                        Real64 &FoundVolFlowRate,
                                        bool &MatchedPlantLoop);
 
-    void FindCondenserLoopBranchConnection(std::string const &BranchListName,
+    void FindCondenserLoopBranchConnection(EnergyPlusData &state,
+                                           std::string const &BranchListName,
                                            std::string &FoundCondLoopName,
                                            int &FoundCondLoopNum,
                                            std::string &FoundSupplyDemand,
                                            Real64 &FoundVolFlowRate,
                                            bool &MatchedCondLoop);
 
-    void FindAirLoopBranchConnection(std::string const &BranchListName,
+    void FindAirLoopBranchConnection(EnergyPlusData &state,
+                                     std::string const &BranchListName,
                                      std::string &FoundAirLoopName,
                                      int &FoundAirLoopNum,
                                      std::string &FoundAir,
                                      Real64 &FoundVolFlowRate,
                                      bool &MatchedAirLoop);
 
-    void FindAirPlantCondenserLoopFromBranchList(std::string const &BranchListName, // Branch List Name
+    void FindAirPlantCondenserLoopFromBranchList(EnergyPlusData &state,
+                                                 std::string const &BranchListName, // Branch List Name
                                                  std::string &LoopType,             // LoopType (if found, Plant,Condenser or Air)
                                                  std::string &LoopSupplyDemandAir,  // Supply if "Supply" or Demand if "Demand" or Air if "Air"
                                                  bool &MatchedLoop                  // true if found
@@ -335,55 +338,53 @@ namespace BranchInputManager {
                        Optional_string_const CompName = _  // when mustprint (ScanPlantLoop)  use CompName in error message and scan
     );
 
-    void TestBranchIntegrity(EnergyPlusData &state, EnergyPlus::IOFiles &ioFiles, bool &ErrFound);              // ErrFound is a return value, true or false
+    void TestBranchIntegrity(EnergyPlusData &state, bool &ErrFound);              // ErrFound is a return value, true or false
 
 } // namespace BranchInputManager
 
-struct BranchInputManagerData : BaseGlobalStruct
-{
-    int NumOfBranchLists = 0;                                   // Number of Branch Lists found in IDF
-    int NumOfBranches = 0;                                      // Number of Branches found in IDF
-    int NumOfConnectorLists = 0;                                // Number of Connector Lists found in IDF
-    int NumSplitters = 0;                                       // Number of Splitters found in IDF
-    int NumMixers = 0;                                          // Number of Mixers found in IDF
-
-    bool GetBranchInputFlag = true;                             // Flag used to retrieve Input
-    bool GetBranchListInputFlag = true;                         // Flag used to retrieve Input
-    bool GetSplitterInputFlag = true;                           // Flag used to retrieve Input
-    bool GetMixerInputFlag = true;                              // Flag used to retrieve Input
-    bool GetConnectorListInputFlag = true;                      // Flag used to retrieve Input
-    bool InvalidBranchDefinitions = false;
-    bool GetBranchInputOneTimeFlag = true;
-
-    Array1D<BranchInputManager::BranchListData> BranchList;     // Branch List data for each Branch List
-    Array1D<BranchInputManager::BranchData> Branch;             // Branch Data for each Branch
-    Array1D<BranchInputManager::ConnectorData> ConnectorLists;  // Connector List data for each Connector List
-    Array1D<BranchInputManager::SplitterData> Splitters;        // Splitter Data for each Splitter
-    Array1D<BranchInputManager::MixerData> Mixers;              // Mixer Data for each Mixer
-
-    void clear_state() override
+    struct BranchInputManagerData : BaseGlobalStruct
     {
-        NumOfBranchLists = 0;
-        NumOfBranches = 0;
-        NumOfConnectorLists = 0;
-        NumSplitters = 0;
-        NumMixers = 0;
+        int NumOfBranchLists = 0;                                   // Number of Branch Lists found in IDF
+        int NumOfBranches = 0;                                      // Number of Branches found in IDF
+        int NumOfConnectorLists = 0;                                // Number of Connector Lists found in IDF
+        int NumSplitters = 0;                                       // Number of Splitters found in IDF
+        int NumMixers = 0;                                          // Number of Mixers found in IDF
 
-        GetBranchInputFlag = true;
-        GetBranchListInputFlag = true;
-        GetSplitterInputFlag = true;
-        GetMixerInputFlag = true;
-        GetConnectorListInputFlag = true;
-        InvalidBranchDefinitions = false;
-        GetBranchInputOneTimeFlag = true;
+        bool GetBranchInputFlag = true;                             // Flag used to retrieve Input
+        bool GetBranchListInputFlag = true;                         // Flag used to retrieve Input
+        bool GetSplitterInputFlag = true;                           // Flag used to retrieve Input
+        bool GetMixerInputFlag = true;                              // Flag used to retrieve Input
+        bool GetConnectorListInputFlag = true;                      // Flag used to retrieve Input
+        bool InvalidBranchDefinitions = false;
+        bool GetBranchInputOneTimeFlag = true;
 
-        BranchList.deallocate();
-        Branch.deallocate();
-        ConnectorLists.deallocate();
-        Splitters.deallocate();
-        Mixers.deallocate();
-    }
-};
+        Array1D<BranchInputManager::BranchListData> BranchList;     // Branch List data for each Branch List
+        Array1D<BranchInputManager::BranchData> Branch;             // Branch Data for each Branch
+        Array1D<BranchInputManager::ConnectorData> ConnectorLists;  // Connector List data for each Connector List
+        Array1D<BranchInputManager::SplitterData> Splitters;        // Splitter Data for each Splitter
+        Array1D<BranchInputManager::MixerData> Mixers;              // Mixer Data for each Mixer
+
+        void clear_state() override
+        {
+            this->NumOfBranchLists = 0;
+            this->NumOfBranches = 0;
+            this->NumOfConnectorLists = 0;
+            this->NumSplitters = 0;
+            this->NumMixers = 0;
+            this->GetBranchInputFlag = true;
+            this->GetBranchListInputFlag = true;
+            this->GetSplitterInputFlag = true;
+            this->GetMixerInputFlag = true;
+            this->GetConnectorListInputFlag = true;
+            this->InvalidBranchDefinitions = false;
+            this->GetBranchInputOneTimeFlag = true;
+            this->BranchList.deallocate();
+            this->Branch.deallocate();
+            this->ConnectorLists.deallocate();
+            this->Splitters.deallocate();
+            this->Mixers.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

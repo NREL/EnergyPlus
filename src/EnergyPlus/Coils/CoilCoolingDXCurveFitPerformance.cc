@@ -55,7 +55,6 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -66,7 +65,7 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
+void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
 {
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
@@ -92,7 +91,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlusData &
     if (input_data.basin_heater_operating_schedule_name.empty()) {
         this->evapCondBasinHeatSchedulIndex = DataGlobals::ScheduleAlwaysOn;
     } else {
-        this->evapCondBasinHeatSchedulIndex = ScheduleManager::GetScheduleIndex(input_data.basin_heater_operating_schedule_name);
+        this->evapCondBasinHeatSchedulIndex = ScheduleManager::GetScheduleIndex(state, input_data.basin_heater_operating_schedule_name);
     }
     if (this->evapCondBasinHeatSchedulIndex == 0) {
         ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
@@ -122,7 +121,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlusData &
     }
 }
 
-CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlusData &state, const std::string &name_to_find)
+CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::EnergyPlusData &state, const std::string &name_to_find)
 {
     int numPerformances = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitPerformance::object_name);
     if (numPerformances <= 0) {
@@ -134,7 +133,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlusDat
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
         inputProcessor->getObjectItem(
-            CoilCoolingDXCurveFitPerformance::object_name, perfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks);
+            state, CoilCoolingDXCurveFitPerformance::object_name, perfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks);
         if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }
@@ -173,7 +172,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlusDat
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const DataLoopNode::NodeData &inletNode,
+void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &state, const DataLoopNode::NodeData &inletNode,
                                                 DataLoopNode::NodeData &outletNode,
                                                 int useAlternateMode,
                                                 Real64 &PLR,
@@ -359,7 +358,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const Dat
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::size(EnergyPlusData &state)
+void CoilCoolingDXCurveFitPerformance::size(EnergyPlus::EnergyPlusData &state)
 {
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
         this->normalMode.parentName = this->parentName;
@@ -375,7 +374,7 @@ void CoilCoolingDXCurveFitPerformance::size(EnergyPlusData &state)
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlusData &state,
+void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlus::EnergyPlusData &state,
                                                  CoilCoolingDXCurveFitOperatingMode &currentMode,
                                                  const DataLoopNode::NodeData &inletNode,
                                                  DataLoopNode::NodeData &outletNode,
@@ -392,7 +391,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlusData &state,
     currentMode.CalcOperatingMode(state, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
 }
 
-void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlusData& state) {
+void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::EnergyPlusData& state) {
 
     // for now this will provide standard ratings for the coil at the normal mode at speed N
     // future iterations will extend the inputs to give the user the flexibility to select different standards to

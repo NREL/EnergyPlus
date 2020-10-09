@@ -66,7 +66,7 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitSpeedInputSpecification& input_data)
+void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, const CoilCoolingDXCurveFitSpeedInputSpecification& input_data)
 {
     bool errorsFound(false);
     static const std::string routineName("CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec: ");
@@ -197,7 +197,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlusData &state,
     }
 }
 
-bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlusData &state,
+bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlus::EnergyPlusData &state,
                                               const std::string& curveName,
                                               int &curveIndex,
                                               std::vector<int> validDims,
@@ -235,7 +235,7 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlusData &state,
     }
 }
 
-CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlusData &state, const std::string& name_to_find)
+CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusData &state, const std::string& name_to_find)
     :
       // model inputs
       indexCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexSHRFT(0), indexSHRFFF(0),
@@ -289,7 +289,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlusData &state, co
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        inputProcessor->getObjectItem(CoilCoolingDXCurveFitSpeed::object_name, speedNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+        inputProcessor->getObjectItem(state, CoilCoolingDXCurveFitSpeed::object_name, speedNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
         if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }
@@ -326,7 +326,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlusData &state, co
     }
 }
 
-void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state, int const speedNum, int const maxSpeeds)
+void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state, int const speedNum, int const maxSpeeds)
 {
 
     std::string RoutineName = "sizeSpeed";
@@ -349,7 +349,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state, int const speedNum,
 
     CoolingAirFlowSizer sizingCoolingAirFlow;
     std::string stringOverride = "Rated Air Flow Rate [m3/s]";
-    if (DataGlobals::isEpJSON) stringOverride = "rated_air_flow_rate [m3/s]";
+    if (state.dataGlobal->isEpJSON) stringOverride = "rated_air_flow_rate [m3/s]";
     std::string preFixString;
     //if (maxSpeeds > 1) preFixString = "Speed " + std::to_string(speedNum + 1) + " ";
     //stringOverride = preFixString + stringOverride;
@@ -403,7 +403,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state, int const speedNum,
     DataSizing::DataConstantUsedForSizing = 0.0;
 }
 
-void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlusData &state,
+void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &state,
     const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &_PLR, int const fanOpMode, const Real64 condInletTemp)
 {
 

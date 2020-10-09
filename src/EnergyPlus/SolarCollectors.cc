@@ -117,11 +117,11 @@ namespace SolarCollectors {
         UniqueParametersNames.clear();
     }
 
-    PlantComponent *CollectorData::factory(std::string const &objectName)
+    PlantComponent *CollectorData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data
         if (GetInputFlag) {
-            GetSolarCollectorInput();
+            GetSolarCollectorInput(state);
             GetInputFlag = false;
         }
         // Now look for this particular object
@@ -136,7 +136,7 @@ namespace SolarCollectors {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void GetSolarCollectorInput()
+    void GetSolarCollectorInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -211,7 +211,8 @@ namespace SolarCollectors {
             for (int FlatPlateParamNum = 1; FlatPlateParamNum <= NumOfFlatPlateParam; ++FlatPlateParamNum) {
 
                 int ParametersNum = FlatPlateParamNum;
-                inputProcessor->getObjectItem(CurrentModuleParamObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleParamObject,
                                               ParametersNum,
                                               DataIPShortCuts::cAlphaArgs,
                                               NumAlphas,
@@ -304,7 +305,7 @@ namespace SolarCollectors {
                 int CollectorNum = FlatPlateUnitsNum;
 
                 inputProcessor->getObjectItem(
-                    CurrentModuleObject, CollectorNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNumbers, IOStatus);
+                    state, CurrentModuleObject, CollectorNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNumbers, IOStatus);
 
                 // Collector name
                 GlobalNames::VerifyUniqueInterObjectName(UniqueCollectorNames, DataIPShortCuts::cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
@@ -370,7 +371,7 @@ namespace SolarCollectors {
                     ShowContinueError("Area of surface object will be used in all calculations.");
                 }
 
-                Collector(CollectorNum).InletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
+                Collector(CollectorNum).InletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(4),
                                                                                         ErrorsFound,
                                                                                         CurrentModuleObject,
                                                                                         DataIPShortCuts::cAlphaArgs(1),
@@ -378,7 +379,7 @@ namespace SolarCollectors {
                                                                                         DataLoopNode::NodeConnectionType_Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
-                Collector(CollectorNum).OutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+                Collector(CollectorNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                          ErrorsFound,
                                                                                          CurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
@@ -410,7 +411,8 @@ namespace SolarCollectors {
 
                 int ParametersNum = ICSParamNum + NumOfFlatPlateParam;
 
-                inputProcessor->getObjectItem(CurrentModuleParamObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleParamObject,
                                               ICSParamNum,
                                               DataIPShortCuts::cAlphaArgs,
                                               NumAlphas,
@@ -507,7 +509,8 @@ namespace SolarCollectors {
 
                 int CollectorNum = ICSUnitsNum + NumFlatPlateUnits;
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               ICSUnitsNum,
                                               DataIPShortCuts::cAlphaArgs,
                                               NumAlphas,
@@ -626,7 +629,7 @@ namespace SolarCollectors {
                     Collector(CollectorNum).VentCavIndex = VentCavIndex;
                 }
 
-                Collector(CollectorNum).InletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+                Collector(CollectorNum).InletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
                                                                                         ErrorsFound,
                                                                                         CurrentModuleObject,
                                                                                         DataIPShortCuts::cAlphaArgs(1),
@@ -634,7 +637,7 @@ namespace SolarCollectors {
                                                                                         DataLoopNode::NodeConnectionType_Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
-                Collector(CollectorNum).OutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(7),
+                Collector(CollectorNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
                                                                                          ErrorsFound,
                                                                                          CurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
@@ -667,22 +670,22 @@ namespace SolarCollectors {
         }
     }
 
-    void CollectorData::setupOutputVars()
+    void CollectorData::setupOutputVars(EnergyPlusData &state)
     {
         if (this->TypeNum == DataPlant::TypeOf_SolarCollectorFlatPlate) {
             // Setup report variables
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Solar Collector Incident Angle Modifier", OutputProcessor::Unit::None, this->IncidentAngleModifier, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Efficiency", OutputProcessor::Unit::None, this->Efficiency, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Solar Collector Efficiency", OutputProcessor::Unit::None, this->Efficiency, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Heat Transfer Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Solar Collector Heat Transfer Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Heat Gain Rate", OutputProcessor::Unit::W, this->HeatGain, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Solar Collector Heat Gain Rate", OutputProcessor::Unit::W, this->HeatGain, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Heat Loss Rate", OutputProcessor::Unit::W, this->HeatLoss, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Solar Collector Heat Loss Rate", OutputProcessor::Unit::W, this->HeatLoss, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Heat Transfer Energy",
+            SetupOutputVariable(state, "Solar Collector Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 this->Energy,
                                 "System",
@@ -695,24 +698,24 @@ namespace SolarCollectors {
                                 "Plant");
         } else if (this->TypeNum == DataPlant::TypeOf_SolarCollectorICS) {
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Solar Collector Transmittance Absorptance Product", OutputProcessor::Unit::None, this->TauAlpha, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Solar Collector Overall Top Heat Loss Coefficient", OutputProcessor::Unit::W_m2C, this->UTopLoss, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Solar Collector Absorber Plate Temperature", OutputProcessor::Unit::C, this->TempOfAbsPlate, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Solar Collector Storage Water Temperature", OutputProcessor::Unit::C, this->TempOfWater, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Thermal Efficiency", OutputProcessor::Unit::None, this->Efficiency, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Solar Collector Thermal Efficiency", OutputProcessor::Unit::None, this->Efficiency, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Solar Collector Storage Heat Transfer Rate", OutputProcessor::Unit::W, this->StoredHeatRate, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Storage Heat Transfer Energy",
+            SetupOutputVariable(state, "Solar Collector Storage Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 this->StoredHeatEnergy,
                                 "System",
@@ -724,10 +727,10 @@ namespace SolarCollectors {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Solar Collector Skin Heat Transfer Rate", OutputProcessor::Unit::W, this->SkinHeatLossRate, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Skin Heat Transfer Energy",
+            SetupOutputVariable(state, "Solar Collector Skin Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 this->CollHeatLossEnergy,
                                 "System",
@@ -739,9 +742,9 @@ namespace SolarCollectors {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable("Solar Collector Heat Transfer Rate", OutputProcessor::Unit::W, this->HeatRate, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Solar Collector Heat Transfer Rate", OutputProcessor::Unit::W, this->HeatRate, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Heat Transfer Energy",
+            SetupOutputVariable(state, "Solar Collector Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 this->HeatEnergy,
                                 "System",
@@ -766,15 +769,15 @@ namespace SolarCollectors {
             auto const SELECT_CASE_var(this->TypeNum);
             // Select and CALL models based on collector type
             if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorFlatPlate) {
-                this->CalcSolarCollector();
+                this->CalcSolarCollector(state);
             } else if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorICS) {
-                this->CalcICSSolarCollector();
+                this->CalcICSSolarCollector(state);
             } else {
                 assert(false); // LCOV_EXCL_LINE
             }
         }
 
-        this->update();
+        this->update(state);
 
         this->report();
     }
@@ -799,7 +802,7 @@ namespace SolarCollectors {
 
         // Do the one time initializations
         if (this->MyOneTimeFlag) {
-            this->setupOutputVars();
+            this->setupOutputVars(state);
             this->MyOneTimeFlag = false;
         }
 
@@ -823,7 +826,8 @@ namespace SolarCollectors {
         if (DataGlobals::BeginEnvrnFlag && this->Init) {
             // Clear node initial conditions
             if (this->VolFlowRateMax > 0) {
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->WLoopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                               DataPlant::PlantLoop(this->WLoopNum).FluidName,
                                                                DataGlobals::InitConvTemp,
                                                                DataPlant::PlantLoop(this->WLoopNum).FluidIndex,
                                                                RoutineName);
@@ -936,7 +940,7 @@ namespace SolarCollectors {
         }
     }
 
-    void CollectorData::CalcSolarCollector()
+    void CollectorData::CalcSolarCollector(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1009,7 +1013,7 @@ namespace SolarCollectors {
 
         // Specific heat of collector fluid (J/kg-K)
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->WLoopNum).FluidName, inletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, DataPlant::PlantLoop(this->WLoopNum).FluidName, inletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
         // Gross area of collector (m2)
         Real64 area = DataSurfaces::Surface(SurfNum).Area;
@@ -1231,7 +1235,7 @@ namespace SolarCollectors {
         return IAM;
     }
 
-    void CollectorData::CalcICSSolarCollector()
+    void CollectorData::CalcICSSolarCollector(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1281,11 +1285,11 @@ namespace SolarCollectors {
 
         // Specific heat of collector fluid (J/kg-K)
         Real64 Cpw = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->WLoopNum).FluidName, inletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, DataPlant::PlantLoop(this->WLoopNum).FluidName, inletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
         // density of collector fluid (kg/m3)
         Real64 Rhow = FluidProperties::GetDensityGlycol(
-            DataPlant::PlantLoop(this->WLoopNum).FluidName, inletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, DataPlant::PlantLoop(this->WLoopNum).FluidName, inletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
         // calculate heat transfer coefficients and covers temperature:
         this->CalcHeatTransCoeffAndCoverTemp();
@@ -1294,7 +1298,7 @@ namespace SolarCollectors {
 
         // convection coeff between absorber plate and water [W/m2K]
         Real64 hConvCoefA2W =
-            EnergyPlus::SolarCollectors::CollectorData::CalcConvCoeffAbsPlateAndWater(TempAbsPlate, TempWater, this->Length, this->TiltR2V);
+            EnergyPlus::SolarCollectors::CollectorData::CalcConvCoeffAbsPlateAndWater(state, TempAbsPlate, TempWater, this->Length, this->TiltR2V);
         Real64 TempWaterOld = TempWater;
         Real64 TempAbsPlateOld = TempAbsPlate;
 
@@ -1896,7 +1900,8 @@ namespace SolarCollectors {
         return hConvCoef;
     }
 
-    Real64 CollectorData::CalcConvCoeffAbsPlateAndWater(Real64 const TAbsorber, // temperature of absorber plate [C]
+    Real64 CollectorData::CalcConvCoeffAbsPlateAndWater(EnergyPlusData &state,
+                                                        Real64 const TAbsorber, // temperature of absorber plate [C]
                                                         Real64 const TWater,    // temperature of water [C]
                                                         Real64 const Lc,        // characteristic length [m]
                                                         Real64 const TiltR2V    // collector tilt angle relative to the vertical [degree]
@@ -1923,17 +1928,17 @@ namespace SolarCollectors {
         Real64 DeltaT = std::abs(TAbsorber - TWater);
         Real64 TReference = TAbsorber - 0.25 * (TAbsorber - TWater);
         // record fluid prop index for water
-        int WaterIndex = FluidProperties::FindGlycol(fluidNameWater);
+        int WaterIndex = FluidProperties::FindGlycol(state, fluidNameWater);
         // find properties of water - always assume water
-        Real64 WaterSpecHeat = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
-        Real64 CondOfWater = FluidProperties::GetConductivityGlycol(fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
-        Real64 VisOfWater = FluidProperties::GetViscosityGlycol(fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
-        Real64 DensOfWater = FluidProperties::GetDensityGlycol(fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
+        Real64 WaterSpecHeat = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
+        Real64 CondOfWater = FluidProperties::GetConductivityGlycol(state, fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
+        Real64 VisOfWater = FluidProperties::GetViscosityGlycol(state, fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
+        Real64 DensOfWater = FluidProperties::GetDensityGlycol(state, fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
         Real64 PrOfWater = VisOfWater * WaterSpecHeat / CondOfWater;
         // Requires a different reference temperature for volumetric expansion coefficient
         TReference = TWater - 0.25 * (TWater - TAbsorber);
-        Real64 VolExpWater = -(FluidProperties::GetDensityGlycol(fluidNameWater, max(TReference, 10.0) + 5.0, WaterIndex, CalledFrom) -
-                               FluidProperties::GetDensityGlycol(fluidNameWater, max(TReference, 10.0) - 5.0, WaterIndex, CalledFrom)) /
+        Real64 VolExpWater = -(FluidProperties::GetDensityGlycol(state, fluidNameWater, max(TReference, 10.0) + 5.0, WaterIndex, CalledFrom) -
+                               FluidProperties::GetDensityGlycol(state, fluidNameWater, max(TReference, 10.0) - 5.0, WaterIndex, CalledFrom)) /
                              (10.0 * DensOfWater);
 
         // Grashof number
@@ -1975,7 +1980,7 @@ namespace SolarCollectors {
         return hConvA2W;
     }
 
-    void CollectorData::update()
+    void CollectorData::update(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1991,7 +1996,7 @@ namespace SolarCollectors {
         // Set outlet node variables that are possibly changed
         DataLoopNode::Node(this->OutletNode).Temp = this->OutletTemp;
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->WLoopNum).FluidName, this->OutletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, DataPlant::PlantLoop(this->WLoopNum).FluidName, this->OutletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
         DataLoopNode::Node(this->OutletNode).Enthalpy = Cp * DataLoopNode::Node(this->OutletNode).Temp;
     }
 

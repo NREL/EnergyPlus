@@ -115,10 +115,10 @@ public:
         std::vector<Real64> m_timeInBin; // amount of time in each bin (usually 10 bins)
     };
 
-    int getVariableKeyCountandTypeFromFldSt(int &typeVar, OutputProcessor::StoreType &avgSumVar,
+    int getVariableKeyCountandTypeFromFldSt(EnergyPlusData &state, int &typeVar, OutputProcessor::StoreType &avgSumVar,
                                             OutputProcessor::TimeStepType &stepTypeVar, OutputProcessor::Unit &unitsVar);
 
-    void getVariableKeysFromFldSt(int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int> &indexesForKeyVar);
+    void getVariableKeysFromFldSt(EnergyPlusData &state, int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int> &indexesForKeyVar);
 
     std::string m_variMeter;          // the name of the variable or meter
     std::string m_colHead;            // the column header to use instead of the variable name (only for predefined)

@@ -88,7 +88,6 @@
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -105,8 +104,6 @@
 #include <EnergyPlus/ZoneDehumidifier.hh>
 
 namespace EnergyPlus {
-
-AirflowNetworkBalanceManagerData dataAirflowNetworkBalanceManager;
 
 namespace AirflowNetworkBalanceManager {
 
@@ -234,9 +231,9 @@ namespace AirflowNetworkBalanceManager {
         int i;
         int AFNSupplyFanType = 0;
 
-        if (dataAirflowNetworkBalanceManager.AirflowNetworkGetInputFlag) {
+        if (state.dataAirflowNetworkBalanceManager->AirflowNetworkGetInputFlag) {
             GetAirflowNetworkInput(state);
-            dataAirflowNetworkBalanceManager.AirflowNetworkGetInputFlag = false;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkGetInputFlag = false;
             return;
         }
 
@@ -250,7 +247,7 @@ namespace AirflowNetworkBalanceManager {
             TurnFansOn = false; // The FAN should be off when BeginEnvrnFlag = .True.
         }
 
-        dataAirflowNetworkBalanceManager.initialize(state);
+        state.dataAirflowNetworkBalanceManager->initialize(state);
 
         NetworkNumOfNodes = NumOfNodesMultiZone;
         NetworkNumOfLinks = NumOfLinksMultiZone;
@@ -260,7 +257,7 @@ namespace AirflowNetworkBalanceManager {
         if (present(FirstHVACIteration) && SimulateAirflowNetwork >= AirflowNetworkControlSimpleADS) {
             if (FirstHVACIteration) {
                 if (allocated(state.dataAirLoop->AirLoopAFNInfo)) {
-                    for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; i++) {
+                    for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
                         state.dataAirLoop->AirLoopAFNInfo(i).AFNLoopHeatingCoilMaxRTF = 0.0;
                         state.dataAirLoop->AirLoopAFNInfo(i).AFNLoopOnOffFanRTF = 0.0;
                         state.dataAirLoop->AirLoopAFNInfo(i).AFNLoopDXCoilRTF = 0.0;
@@ -272,7 +269,7 @@ namespace AirflowNetworkBalanceManager {
             int FanOperModeCyc = 0;
             AFNSupplyFanType = 0;
 
-            for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; i++) {
+            for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
                 AFNSupplyFanType = DisSysCompCVFData(i).FanTypeNum;
                 FanMassFlowRate = max(FanMassFlowRate, Node(DisSysCompCVFData(i).OutletNode).MassFlowRate);
                 // VAV take high priority
@@ -302,8 +299,8 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
         }
-        if (allocated(ZoneEquipConfig) && NumHybridVentSysAvailMgrs > 0 && allocated(PrimaryAirSystem)) HybridVentilationControl();
-        if (dataAirflowNetworkBalanceManager.VentilationCtrl == 1 && NumHybridVentSysAvailMgrs > 0) AirflowNetworkFanActivated = false;
+        if (allocated(ZoneEquipConfig) && NumHybridVentSysAvailMgrs > 0 && allocated(PrimaryAirSystem)) HybridVentilationControl(state);
+        if (state.dataAirflowNetworkBalanceManager->VentilationCtrl == 1 && NumHybridVentSysAvailMgrs > 0) AirflowNetworkFanActivated = false;
 
         if (present(Iter) && present(ResimulateAirZone) && SimulateAirflowNetwork >= AirflowNetworkControlSimpleADS) {
             if (AirflowNetworkFanActivated && Iter < 3 && AFNSupplyFanType == FanType_SimpleOnOff) {
@@ -321,41 +318,41 @@ namespace AirflowNetworkBalanceManager {
             NetworkNumOfLinks = AirflowNetworkNumOfLinks;
         }
 
-        if (allocated(ZoneEquipConfig)) ValidateExhaustFanInput();
+        if (allocated(ZoneEquipConfig)) ValidateExhaustFanInput(state);
 
         // VAV terminal set only
         if (present(FirstHVACIteration) && FirstHVACIteration) VAVTerminalRatio = 0.0;
 
         // Set AirLoop Number for fans
-        if (FirstHVACIteration && dataAirflowNetworkBalanceManager.AssignFanAirLoopNumFlag) {
-            AssignFanAirLoopNum();
-            dataAirflowNetworkBalanceManager.AssignFanAirLoopNumFlag = false;
+        if (FirstHVACIteration && state.dataAirflowNetworkBalanceManager->AssignFanAirLoopNumFlag) {
+            AssignFanAirLoopNum(state);
+            state.dataAirflowNetworkBalanceManager->AssignFanAirLoopNumFlag = false;
         }
 
         if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
-            if (dataAirflowNetworkBalanceManager.ValidateDistributionSystemFlag) {
+            if (state.dataAirflowNetworkBalanceManager->ValidateDistributionSystemFlag) {
                 ValidateDistributionSystem(state);
                 ValidateFanFlowRate();
-                dataAirflowNetworkBalanceManager.ValidateDistributionSystemFlag = false;
+                state.dataAirflowNetworkBalanceManager->ValidateDistributionSystemFlag = false;
             }
         }
         CalcAirflowNetworkAirBalance(state);
 
         if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
 
-            dataAirflowNetworkBalanceManager.LoopOnOffFlag = false;
-            for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; i++) {
+            state.dataAirflowNetworkBalanceManager->LoopOnOffFlag = false;
+            for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
                 if (DisSysCompCVFData(i).AirLoopNum > 0) {
                     if (Node(DisSysCompCVFData(i).InletNode).MassFlowRate > 0.0) {
-                        dataAirflowNetworkBalanceManager.LoopOnOffFlag(DisSysCompCVFData(i).AirLoopNum) = true;
+                        state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(DisSysCompCVFData(i).AirLoopNum) = true;
                     }
                 }
             }
 
-            CalcAirflowNetworkHeatBalance();
-            CalcAirflowNetworkMoisBalance();
-            if (Contaminant.CO2Simulation) CalcAirflowNetworkCO2Balance();
-            if (Contaminant.GenericContamSimulation) CalcAirflowNetworkGCBalance();
+            CalcAirflowNetworkHeatBalance(state);
+            CalcAirflowNetworkMoisBalance(state);
+            if (Contaminant.CO2Simulation) CalcAirflowNetworkCO2Balance(state);
+            if (Contaminant.GenericContamSimulation) CalcAirflowNetworkGCBalance(state);
         }
 
         UpdateAirflowNetwork(state, FirstHVACIteration);
@@ -425,11 +422,11 @@ namespace AirflowNetworkBalanceManager {
 
         // *** Read AirflowNetwork simulation surface crack component
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:Crack";
-        dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSurCracks = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurCracks = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                                        // Temporary workaround
-            MultizoneSurfaceCrackData.allocate(dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSurCracks); // Temporary workaround
+            MultizoneSurfaceCrackData.allocate(state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurCracks); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -478,7 +475,7 @@ namespace AirflowNetworkBalanceManager {
         // *** Read AirflowNetwork simulation zone exhaust fan component
         CurrentModuleObject = "AirflowNetwork:MultiZone:Component:ZoneExhaustFan";
         AirflowNetworkNumOfExhFan = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
-        dataAirflowNetworkBalanceManager.NumOfExhaustFans = inputProcessor->getNumObjectsFound("Fan:ZoneExhaust");            // Temporary workaround
+        state.dataAirflowNetworkBalanceManager->NumOfExhaustFans = inputProcessor->getNumObjectsFound("Fan:ZoneExhaust");            // Temporary workaround
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                                       // Temporary workaround
@@ -568,11 +565,11 @@ namespace AirflowNetworkBalanceManager {
 
         // Read Outdoor Airflow object
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:OutdoorAirFlow";
-        dataAirflowNetworkBalanceManager.NumOfOAFans = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        state.dataAirflowNetworkBalanceManager->NumOfOAFans = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                      // Temporary workaround
-            DisSysCompOutdoorAirData.allocate(dataAirflowNetworkBalanceManager.NumOfOAFans); // Temporary workaround
+            DisSysCompOutdoorAirData.allocate(state.dataAirflowNetworkBalanceManager->NumOfOAFans); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -586,7 +583,7 @@ namespace AirflowNetworkBalanceManager {
                     expnt = fields.at("air_mass_flow_exponent_when_no_outdoor_air_flow");
                 }
 
-                int OAMixerNum = MixedAir::GetOAMixerNumber(mixer_name);
+                int OAMixerNum = MixedAir::GetOAMixerNumber(state, mixer_name);
                 if (OAMixerNum == 0) {
                     ShowSevereError(RoutineName + ": " + CurrentModuleObject + " object " + thisObjectName + ". Invalid " + "Outdoor Air Mixer Name" +
                                     " \"" + mixer_name + "\" given.");
@@ -638,11 +635,11 @@ namespace AirflowNetworkBalanceManager {
 
         // Read Relief Airflow object
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:ReliefAirFlow";
-        dataAirflowNetworkBalanceManager.NumOfReliefFans = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        state.dataAirflowNetworkBalanceManager->NumOfReliefFans = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                         // Temporary workaround
-            DisSysCompReliefAirData.allocate(dataAirflowNetworkBalanceManager.NumOfReliefFans); // Temporary workaround
+            DisSysCompReliefAirData.allocate(state.dataAirflowNetworkBalanceManager->NumOfReliefFans); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -656,7 +653,7 @@ namespace AirflowNetworkBalanceManager {
                     expnt = fields.at("air_mass_flow_exponent_when_no_outdoor_air_flow");
                 }
 
-                int OAMixerNum{MixedAir::GetOAMixerNumber(mixer_name)};
+                int OAMixerNum{MixedAir::GetOAMixerNumber(state, mixer_name)};
                 if (OAMixerNum == 0) {
                     ShowSevereError(RoutineName + ": " + CurrentModuleObject + " object " + thisObjectName + ". Invalid " + "Outdoor Air Mixer Name" +
                                     " \"" + mixer_name + "\" given.");
@@ -706,11 +703,11 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork simulation detailed openings
         CurrentModuleObject = "AirflowNetwork:MultiZone:Component:DetailedOpening";
-        dataAirflowNetworkBalanceManager.AirflowNetworkNumOfDetOpenings = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfDetOpenings = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                                            // Temporary workaround
-            MultizoneCompDetOpeningData.allocate(dataAirflowNetworkBalanceManager.AirflowNetworkNumOfDetOpenings); // Temporary workaround
+            MultizoneCompDetOpeningData.allocate(state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfDetOpenings); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -979,11 +976,11 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork simulation simple openings
         CurrentModuleObject = "AirflowNetwork:MultiZone:Component:SimpleOpening";
-        dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSimOpenings = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSimOpenings = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                                               // Temporary workaround
-            MultizoneCompSimpleOpeningData.allocate(dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSimOpenings); // Temporary workaround
+            MultizoneCompSimpleOpeningData.allocate(state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSimOpenings); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -1019,11 +1016,11 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork simulation horizontal openings
         CurrentModuleObject = "AirflowNetwork:MultiZone:Component:HorizontalOpening";
-        dataAirflowNetworkBalanceManager.AirflowNetworkNumOfHorOpenings = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfHorOpenings = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                                            // Temporary workaround
-            MultizoneCompHorOpeningData.allocate(dataAirflowNetworkBalanceManager.AirflowNetworkNumOfHorOpenings); // Temporary workaround
+            MultizoneCompHorOpeningData.allocate(state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfHorOpenings); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -1062,11 +1059,11 @@ namespace AirflowNetworkBalanceManager {
 
         // *** Read AirflowNetwork simulation surface effective leakage area component
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea";
-        dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSurELA = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurELA = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                                   // Temporary workaround
-            MultizoneSurfaceELAData.allocate(dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSurELA); // Temporary workaround
+            MultizoneSurfaceELAData.allocate(state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurELA); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -1110,11 +1107,11 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork Distribution system component: duct leakage
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Leak";
-        dataAirflowNetworkBalanceManager.DisSysNumOfLeaks = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        state.dataAirflowNetworkBalanceManager->DisSysNumOfLeaks = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                     // Temporary workaround
-            DisSysCompLeakData.allocate(dataAirflowNetworkBalanceManager.DisSysNumOfLeaks); // Temporary workaround
+            DisSysCompLeakData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfLeaks); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -1146,11 +1143,11 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork Distribution system component: duct effective leakage ratio
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:LeakageRatio";
-        dataAirflowNetworkBalanceManager.DisSysNumOfELRs = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        state.dataAirflowNetworkBalanceManager->DisSysNumOfELRs = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                   // Temporary workaround
-            DisSysCompELRData.allocate(dataAirflowNetworkBalanceManager.DisSysNumOfELRs); // Temporary workaround
+            DisSysCompELRData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfELRs); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -1186,11 +1183,11 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork Distribution system component: duct
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Duct";
-        dataAirflowNetworkBalanceManager.DisSysNumOfDucts = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        state.dataAirflowNetworkBalanceManager->DisSysNumOfDucts = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                     // Temporary workaround
-            DisSysCompDuctData.allocate(dataAirflowNetworkBalanceManager.DisSysNumOfDucts); // Temporary workaround
+            DisSysCompDuctData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfDucts); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -1260,9 +1257,9 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork Distribution system component: constant volume fan
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Fan";
-        dataAirflowNetworkBalanceManager.DisSysNumOfCVFs = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (dataAirflowNetworkBalanceManager.DisSysNumOfCVFs > 0 && dataAirflowNetworkBalanceManager.DisSysNumOfCVFs != inputProcessor->getNumObjectsFound("AirLoopHVAC")) {
-            ShowSevereError("The number of entered AirflowNetwork:Distribution:Component:Fan objects is " + RoundSigDigits(dataAirflowNetworkBalanceManager.DisSysNumOfCVFs));
+        state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs > 0 && state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs != inputProcessor->getNumObjectsFound("AirLoopHVAC")) {
+            ShowSevereError("The number of entered AirflowNetwork:Distribution:Component:Fan objects is " + RoundSigDigits(state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs));
             ShowSevereError("The number of entered AirLoopHVAC objects is " + RoundSigDigits(inputProcessor->getNumObjectsFound("AirLoopHVAC")));
             ShowContinueError("Both numbers should be equal. Please check your inputs.");
             success = false;
@@ -1271,7 +1268,7 @@ namespace AirflowNetworkBalanceManager {
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                   // Temporary workaround
-            DisSysCompCVFData.allocate(dataAirflowNetworkBalanceManager.DisSysNumOfCVFs); // Temporary workaround
+            DisSysCompCVFData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -1306,7 +1303,7 @@ namespace AirflowNetworkBalanceManager {
                         } else {
                             fanType_Num = FanType_SimpleOnOff;
                         }
-                        dataAirflowNetworkBalanceManager.SupplyFanType = fanType_Num;
+                        state.dataAirflowNetworkBalanceManager->SupplyFanType = fanType_Num;
                     }
 
                 } else {
@@ -1322,7 +1319,7 @@ namespace AirflowNetworkBalanceManager {
                     flowRate *= StdRhoAir;
 
                     GetFanType(state, fan_name, fanType_Num, FanErrorFound);
-                    dataAirflowNetworkBalanceManager.SupplyFanType = fanType_Num;
+                    state.dataAirflowNetworkBalanceManager->SupplyFanType = fanType_Num;
                 }
 
                 if (!(fanType_Num == FanType_SimpleConstVolume || fanType_Num == FanType_SimpleOnOff || fanType_Num == FanType_SimpleVAV)) {
@@ -1384,11 +1381,11 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork Distribution system component: coil
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Coil";
-        dataAirflowNetworkBalanceManager.DisSysNumOfCoils = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        state.dataAirflowNetworkBalanceManager->DisSysNumOfCoils = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                     // Temporary workaround
-            DisSysCompCoilData.allocate(dataAirflowNetworkBalanceManager.DisSysNumOfCoils); // Temporary workaround
+            DisSysCompCoilData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfCoils); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -1420,11 +1417,11 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork Distribution system component: heat exchanger
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:HeatExchanger";
-        dataAirflowNetworkBalanceManager.DisSysNumOfHXs = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        state.dataAirflowNetworkBalanceManager->DisSysNumOfHXs = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                 // Temporary workaround
-            DisSysCompHXData.allocate(dataAirflowNetworkBalanceManager.DisSysNumOfHXs); // Temporary workaround
+            DisSysCompHXData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfHXs); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -1456,11 +1453,11 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork Distribution system component: terminal unit
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:TerminalUnit";
-        dataAirflowNetworkBalanceManager.DisSysNumOfTermUnits = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        state.dataAirflowNetworkBalanceManager->DisSysNumOfTermUnits = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                             // Temporary workaround
-            DisSysCompTermUnitData.allocate(dataAirflowNetworkBalanceManager.DisSysNumOfTermUnits); // Temporary workaround
+            DisSysCompTermUnitData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfTermUnits); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -1492,11 +1489,11 @@ namespace AirflowNetworkBalanceManager {
 
         // Get input data of constant pressure drop component
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:ConstantPressureDrop";
-        dataAirflowNetworkBalanceManager.DisSysNumOfCPDs = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
+        state.dataAirflowNetworkBalanceManager->DisSysNumOfCPDs = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Temporary workaround
         instances = inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != inputProcessor->epJSON.end()) {
             int i = 1;                                   // Temporary workaround
-            DisSysCompCPDData.allocate(dataAirflowNetworkBalanceManager.DisSysNumOfCPDs); // Temporary workaround
+            DisSysCompCPDData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfCPDs); // Temporary workaround
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
@@ -1663,11 +1660,12 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork OccupantVentilationControl before reading other AirflowNetwork objects, so that this object can be called by other
         // simple ventilation objects
         CurrentModuleObject = "AirflowNetwork:OccupantVentilationControl";
-        dataAirflowNetworkBalanceManager.AirflowNetworkNumOfOccuVentCtrls = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfOccuVentCtrls > 0) {
-            dataAirflowNetworkBalanceManager.OccupantVentilationControl.allocate(dataAirflowNetworkBalanceManager.AirflowNetworkNumOfOccuVentCtrls);
-            for (int i = 1; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfOccuVentCtrls; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+        state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOccuVentCtrls = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOccuVentCtrls > 0) {
+            state.dataAirflowNetworkBalanceManager->OccupantVentilationControl.allocate(state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOccuVentCtrls);
+            for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOccuVentCtrls; ++i) {
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               i,
                                               Alphas,
                                               NumAlphas,
@@ -1679,99 +1677,99 @@ namespace AirflowNetworkBalanceManager {
                                               cAlphaFields,
                                               cNumericFields);
                 UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-                dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).Name = Alphas(1); // Name of object
-                dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MinOpeningTime = Numbers(1);
-                if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MinOpeningTime < 0.0) {
+                state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).Name = Alphas(1); // Name of object
+                state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinOpeningTime = Numbers(1);
+                if (state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinOpeningTime < 0.0) {
                     ShowWarningError(RoutineName + CurrentModuleObject + " object, " + cNumericFields(1) + " < 0.0");
-                    ShowContinueError("..Input value = " + RoundSigDigits(dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MinOpeningTime, 1) +
+                    ShowContinueError("..Input value = " + RoundSigDigits(state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinOpeningTime, 1) +
                                       ", Value will be reset to 0.0");
-                    ShowContinueError("..for " + cAlphaFields(1) + " = \"" + dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).Name);
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MinOpeningTime = 0.0;
+                    ShowContinueError("..for " + cAlphaFields(1) + " = \"" + state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).Name);
+                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinOpeningTime = 0.0;
                 }
-                dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MinClosingTime = Numbers(2);
-                if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MinClosingTime < 0.0) {
+                state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinClosingTime = Numbers(2);
+                if (state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinClosingTime < 0.0) {
                     ShowWarningError(RoutineName + CurrentModuleObject + " object, " + cNumericFields(2) + " < 0.0");
-                    ShowContinueError("..Input value = " + RoundSigDigits(dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MinClosingTime, 1) +
+                    ShowContinueError("..Input value = " + RoundSigDigits(state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinClosingTime, 1) +
                                       ", Value will be reset to 0.0");
-                    ShowContinueError("..for " + cAlphaFields(1) + " = \"" + dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).Name);
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MinClosingTime = 0.0;
+                    ShowContinueError("..for " + cAlphaFields(1) + " = \"" + state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).Name);
+                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinClosingTime = 0.0;
                 }
                 if (NumAlphas == 1 && NumNumbers == 2) {
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MinTimeControlOnly = true;
+                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinTimeControlOnly = true;
                 }
                 if (!lAlphaBlanks(2)) {
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveName = Alphas(2);
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum = GetCurveIndex(state, Alphas(2)); // convert curve name to number
-                    if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum == 0) {
-                        dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MinTimeControlOnly = true;
+                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortLowTempCurveName = Alphas(2);
+                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortLowTempCurveNum = GetCurveIndex(state, Alphas(2)); // convert curve name to number
+                    if (state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortLowTempCurveNum == 0) {
+                        state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MinTimeControlOnly = true;
                         ShowWarningError(RoutineName + CurrentModuleObject + " object, " + cAlphaFields(2) +
-                                         " not found = " + dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveName);
+                                         " not found = " + state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortLowTempCurveName);
                         ShowContinueError("..for specified " + cAlphaFields(1) + " = " + Alphas(1));
                         ShowContinueError(
                             "Thermal comfort will not be performed and minimum opening and closing times are checked only. Simulation continues.");
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(state, dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state, state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortLowTempCurveNum, // Curve index
                                                                     {1},                                                  // Valid dimensions
                                                                     RoutineName,                                          // Routine name
                                                                     CurrentModuleObject,                                  // Object Type
-                                                                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).Name,                   // Object Name
+                                                                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).Name,                   // Object Name
                                                                     cAlphaFields(2));                                     // Field Name
                     }
                 }
                 if (!lAlphaBlanks(3)) {
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveName = Alphas(3);
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum = GetCurveIndex(state, Alphas(3)); // convert curve name to number
-                    if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum > 0) {
+                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortHighTempCurveName = Alphas(3);
+                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortHighTempCurveNum = GetCurveIndex(state, Alphas(3)); // convert curve name to number
+                    if (state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortHighTempCurveNum > 0) {
                         ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum, // Curve index
+                                                                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortHighTempCurveNum, // Curve index
                                                                     {1},                                                   // Valid dimensions
                                                                     RoutineName,                                           // Routine name
                                                                     CurrentModuleObject,                                   // Object Type
-                                                                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).Name,                    // Object Name
+                                                                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).Name,                    // Object Name
                                                                     cAlphaFields(3));                                      // Field Name
                     } else {
                         ShowWarningError(RoutineName + CurrentModuleObject + " object, " + cAlphaFields(3) +
-                                         " not found = " + dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveName);
+                                         " not found = " + state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortHighTempCurveName);
                         ShowContinueError("..for specified " + cAlphaFields(1) + " = " + Alphas(1));
                         ShowContinueError("A single curve of thermal comfort low temperature is used only. Simulation continues.");
                     }
                 }
-                if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum > 0) {
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortBouPoint = Numbers(3);
-                    if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortBouPoint < 0.0) {
+                if (state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortHighTempCurveNum > 0) {
+                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortBouPoint = Numbers(3);
+                    if (state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortBouPoint < 0.0) {
                         ShowWarningError(RoutineName + CurrentModuleObject + " object, " + cNumericFields(3) + " < 0.0");
-                        ShowContinueError("..Input value = " + RoundSigDigits(dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortBouPoint, 1) +
+                        ShowContinueError("..Input value = " + RoundSigDigits(state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortBouPoint, 1) +
                                           ", Value will be reset to 10.0 as default");
-                        ShowContinueError("..for " + cAlphaFields(1) + " = \"" + dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).Name);
-                        dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortBouPoint = 10.0;
+                        ShowContinueError("..for " + cAlphaFields(1) + " = \"" + state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).Name);
+                        state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortBouPoint = 10.0;
                     }
                 }
                 // Check continuity of both curves at boundary point
-                if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum > 0 && dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum) {
-                    if (std::abs(CurveValue(state, dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum, Numbers(3)) -
-                                 CurveValue(state, dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum, Numbers(3))) > 0.1) {
+                if (state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortLowTempCurveNum > 0 && state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortHighTempCurveNum) {
+                    if (std::abs(CurveValue(state, state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortLowTempCurveNum, Numbers(3)) -
+                                 CurveValue(state, state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortHighTempCurveNum, Numbers(3))) > 0.1) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " object: The difference of both curve values at boundary point > 0.1");
                         ShowContinueError("Both curve names are = " + cAlphaFields(2) + " and " + cAlphaFields(3));
                         ShowContinueError("The input value of " + cNumericFields(3) + " = " +
-                                          RoundSigDigits(dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortBouPoint, 1));
+                                          RoundSigDigits(state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ComfortBouPoint, 1));
                         ErrorsFound = true;
                     }
                 }
                 if (!lNumericBlanks(4)) {
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MaxPPD = Numbers(4);
-                    if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MaxPPD < 0.0 || dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MaxPPD > 100.0) {
+                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MaxPPD = Numbers(4);
+                    if (state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MaxPPD < 0.0 || state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MaxPPD > 100.0) {
                         ShowWarningError(RoutineName + CurrentModuleObject + " object, " + cNumericFields(4) + " beyond 0.0 and 100.0");
-                        ShowContinueError("..Input value = " + RoundSigDigits(dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MaxPPD, 1) +
+                        ShowContinueError("..Input value = " + RoundSigDigits(state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MaxPPD, 1) +
                                           ", Value will be reset to 10.0 as default");
-                        ShowContinueError("..for " + cAlphaFields(1) + " = \"" + dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).Name);
-                        dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MaxPPD = 10.0;
+                        ShowContinueError("..for " + cAlphaFields(1) + " = \"" + state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).Name);
+                        state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).MaxPPD = 10.0;
                     }
                 }
                 if (!lAlphaBlanks(4)) {
                     if (UtilityRoutines::SameString(Alphas(4), "Yes")) {
-                        dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).OccupancyCheck = true;
+                        state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).OccupancyCheck = true;
                     } else if (UtilityRoutines::SameString(Alphas(4), "No")) {
-                        dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).OccupancyCheck = false;
+                        state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).OccupancyCheck = false;
                     } else {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" invalid " + cAlphaFields(2) + "=\"" + Alphas(2) +
                                         "\" illegal key.");
@@ -1780,21 +1778,21 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
                 if (!lAlphaBlanks(5)) {
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).OpeningProbSchName = Alphas(5); // a schedule name for opening probability
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).OpeningProbSchNum = GetScheduleIndex(dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).OpeningProbSchName);
-                    if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).OpeningProbSchNum == 0) {
+                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).OpeningProbSchName = Alphas(5); // a schedule name for opening probability
+                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).OpeningProbSchNum = GetScheduleIndex(state, state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).OpeningProbSchName);
+                    if (state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).OpeningProbSchNum == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " object, " + cAlphaFields(5) +
-                                        " not found = " + dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).OpeningProbSchName);
+                                        " not found = " + state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).OpeningProbSchName);
                         ShowContinueError("..for specified " + cAlphaFields(1) + " = " + Alphas(1));
                         ErrorsFound = true;
                     }
                 }
                 if (!lAlphaBlanks(6)) {
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ClosingProbSchName = Alphas(6); // a schedule name for closing probability
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ClosingProbSchNum = GetScheduleIndex(dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ClosingProbSchName);
-                    if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).OpeningProbSchNum == 0) {
+                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ClosingProbSchName = Alphas(6); // a schedule name for closing probability
+                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ClosingProbSchNum = GetScheduleIndex(state, state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ClosingProbSchName);
+                    if (state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).OpeningProbSchNum == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " object, " + cAlphaFields(6) +
-                                        " not found = " + dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ClosingProbSchName);
+                                        " not found = " + state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(i).ClosingProbSchName);
                         ShowContinueError("..for specified " + cAlphaFields(1) + " = " + Alphas(1));
                         ErrorsFound = true;
                     }
@@ -1808,20 +1806,21 @@ namespace AirflowNetworkBalanceManager {
 
         // *** Read AirflowNetwork simulation parameters
         CurrentModuleObject = "AirflowNetwork:SimulationControl";
-        dataAirflowNetworkBalanceManager.NumAirflowNetwork = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (dataAirflowNetworkBalanceManager.NumAirflowNetwork == 0) {
+        state.dataAirflowNetworkBalanceManager->NumAirflowNetwork = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (state.dataAirflowNetworkBalanceManager->NumAirflowNetwork == 0) {
             SimulateAirflowNetwork = AirflowNetworkControlSimple;
             print(state.files.eio, Format_110);
             print(state.files.eio, Format_120, "NoMultizoneOrDistribution");
             return;
         }
-        if (dataAirflowNetworkBalanceManager.NumAirflowNetwork > 1) {
+        if (state.dataAirflowNetworkBalanceManager->NumAirflowNetwork > 1) {
             ShowFatalError(RoutineName + "Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed.");
         }
 
         SimObjectError = false;
-        inputProcessor->getObjectItem(CurrentModuleObject,
-                                      dataAirflowNetworkBalanceManager.NumAirflowNetwork,
+        inputProcessor->getObjectItem(state,
+                                      CurrentModuleObject,
+                                      state.dataAirflowNetworkBalanceManager->NumAirflowNetwork,
                                       Alphas,
                                       NumAlphas,
                                       Numbers,
@@ -1868,12 +1867,12 @@ namespace AirflowNetworkBalanceManager {
         if (SimulateAirflowNetwork == AirflowNetworkControlSimpleADS || SimulateAirflowNetwork == AirflowNetworkControlMultiADS) {
             NumAPL = inputProcessor->getNumObjectsFound("AirLoopHVAC");
             if (NumAPL > 0) {
-                dataAirflowNetworkBalanceManager.LoopPartLoadRatio.allocate(NumAPL);
-                dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction.allocate(NumAPL);
-                dataAirflowNetworkBalanceManager.LoopOnOffFlag.allocate(NumAPL);
-                dataAirflowNetworkBalanceManager.LoopPartLoadRatio = 0.0;
-                dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction = 0.0;
-                dataAirflowNetworkBalanceManager.LoopOnOffFlag = false;
+                state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio.allocate(NumAPL);
+                state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction.allocate(NumAPL);
+                state.dataAirflowNetworkBalanceManager->LoopOnOffFlag.allocate(NumAPL);
+                state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio = 0.0;
+                state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction = 0.0;
+                state.dataAirflowNetworkBalanceManager->LoopOnOffFlag = false;
             }
         }
         print(state.files.eio, Format_110);
@@ -1938,7 +1937,7 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        SetOutAirNodes();
+        SetOutAirNodes(state);
 
         if (UtilityRoutines::SameString(AirflowNetworkSimu.WPCCntr, "Input")) {
             AirflowNetworkSimu.iWPCCntr = iWPCCntr_Input;
@@ -2039,7 +2038,8 @@ namespace AirflowNetworkBalanceManager {
             MultizoneZoneData.allocate(AirflowNetworkNumOfZones);
             AirflowNetworkZoneFlag.dimension(NumOfZones, false); // AirflowNetwork zone flag
             for (int i = 1; i <= AirflowNetworkNumOfZones; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               i,
                                               Alphas,
                                               NumAlphas,
@@ -2073,7 +2073,7 @@ namespace AirflowNetworkBalanceManager {
                 if (!lAlphaBlanks(6)) {
                     MultizoneZoneData(i).OccupantVentilationControlName = Alphas(6);
                     MultizoneZoneData(i).OccupantVentilationControlNum =
-                        UtilityRoutines::FindItemInList(MultizoneZoneData(i).OccupantVentilationControlName, dataAirflowNetworkBalanceManager.OccupantVentilationControl);
+                        UtilityRoutines::FindItemInList(MultizoneZoneData(i).OccupantVentilationControlName, state.dataAirflowNetworkBalanceManager->OccupantVentilationControl);
                     if (MultizoneZoneData(i).OccupantVentilationControlNum == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " object, " + cAlphaFields(6) +
                                         " not found = " + MultizoneZoneData(i).OccupantVentilationControlName);
@@ -2093,7 +2093,7 @@ namespace AirflowNetworkBalanceManager {
                 if (MultizoneZoneData(i).VentCtrNum < NumOfVentCtrTypes) {
                     if (NumAlphas >= 4 && (!lAlphaBlanks(4))) {
                         MultizoneZoneData(i).VentingSchName = Alphas(4);
-                        MultizoneZoneData(i).VentingSchNum = GetScheduleIndex(MultizoneZoneData(i).VentingSchName);
+                        MultizoneZoneData(i).VentingSchNum = GetScheduleIndex(state, MultizoneZoneData(i).VentingSchName);
                         if (MultizoneZoneData(i).VentingSchNum == 0) {
                             ShowSevereError(RoutineName + CurrentModuleObject + " object, " + cAlphaFields(4) +
                                             " not found = " + MultizoneZoneData(i).VentingSchName);
@@ -2135,7 +2135,7 @@ namespace AirflowNetworkBalanceManager {
                 // .or. &
                 // UtilityRoutines::SameString(MultizoneZoneData(i)%VentControl,'ASHRAE55Adaptive') .or. &
                 // UtilityRoutines::SameString(MultizoneZoneData(i)%VentControl,'CEN15251Adaptive')) then
-                MultizoneZoneData(i).VentSchNum = GetScheduleIndex(MultizoneZoneData(i).VentSchName);
+                MultizoneZoneData(i).VentSchNum = GetScheduleIndex(state, MultizoneZoneData(i).VentSchName);
                 if (MultizoneZoneData(i).VentSchName == std::string()) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " object, No " + cAlphaFields(3) + " was found, but is required when " +
                                     cAlphaFields(2) + " is Temperature or Enthalpy.");
@@ -2151,7 +2151,7 @@ namespace AirflowNetworkBalanceManager {
                     ErrorsFound = true;
                 }
             } else {
-                MultizoneZoneData(i).VentSchNum = GetScheduleIndex(MultizoneZoneData(i).VentSchName);
+                MultizoneZoneData(i).VentSchNum = GetScheduleIndex(state, MultizoneZoneData(i).VentSchName);
                 if (MultizoneZoneData(i).VentSchNum > 0) {
                     ShowWarningError(RoutineName + CurrentModuleObject + " object, " + cAlphaFields(3) + " not required, when " + cAlphaFields(2) +
                                      " is neither Temperature nor Enthalpy.");
@@ -2245,17 +2245,18 @@ namespace AirflowNetworkBalanceManager {
         // *** Read AirflowNetwork external node
         if (AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) {
             // Wind coefficient == Surface-Average does not need inputs of external nodes
-            dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode = inputProcessor->getNumObjectsFound("AirflowNetwork:MultiZone:ExternalNode");
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode = inputProcessor->getNumObjectsFound("AirflowNetwork:MultiZone:ExternalNode");
             if (AnyLocalEnvironmentsInModel) {
-                dataAirflowNetworkBalanceManager.AirflowNetworkNumOfOutAirNode = inputProcessor->getNumObjectsFound("OutdoorAir:Node");
-                dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode += dataAirflowNetworkBalanceManager.AirflowNetworkNumOfOutAirNode;
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode = inputProcessor->getNumObjectsFound("OutdoorAir:Node");
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode += state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode;
             }
 
-            if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode > 0) {
-                MultizoneExternalNodeData.allocate(dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode);
+            if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode > 0) {
+                MultizoneExternalNodeData.allocate(state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode);
                 CurrentModuleObject = "AirflowNetwork:MultiZone:ExternalNode";
-                for (int i = 1; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode - dataAirflowNetworkBalanceManager.AirflowNetworkNumOfOutAirNode; ++i) {
-                    inputProcessor->getObjectItem(CurrentModuleObject,
+                for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode - state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode; ++i) {
+                    inputProcessor->getObjectItem(state,
+                                                  CurrentModuleObject,
                                                   i,
                                                   Alphas,
                                                   NumAlphas,
@@ -2301,9 +2302,10 @@ namespace AirflowNetworkBalanceManager {
                 if (AnyLocalEnvironmentsInModel) {
 
                     CurrentModuleObject = "OutdoorAir:Node";
-                    for (int i = dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode - dataAirflowNetworkBalanceManager.AirflowNetworkNumOfOutAirNode + 1; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode; ++i) {
-                        inputProcessor->getObjectItem(CurrentModuleObject,
-                                                      i - (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode - dataAirflowNetworkBalanceManager.AirflowNetworkNumOfOutAirNode),
+                    for (int i = state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode - state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode + 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode; ++i) {
+                        inputProcessor->getObjectItem(state,
+                                                      CurrentModuleObject,
+                                                      i - (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode - state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode),
                                                       Alphas,
                                                       NumAlphas,
                                                       Numbers,
@@ -2344,7 +2346,8 @@ namespace AirflowNetworkBalanceManager {
                         }
 
                         MultizoneExternalNodeData(i).Name = Alphas(1); // Name of external node
-                        NodeNum = GetOnlySingleNode(Alphas(1),
+                        NodeNum = GetOnlySingleNode(state,
+                                                    Alphas(1),
                                                     ErrorsFound,
                                                     CurrentModuleObject,
                                                     "AirflowNetwork:Multizone:Surface",
@@ -2373,7 +2376,8 @@ namespace AirflowNetworkBalanceManager {
         if (AirflowNetworkNumOfSurfaces > 0) {
             MultizoneSurfaceData.allocate(AirflowNetworkNumOfSurfaces);
             for (int i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               i,
                                               Alphas,
                                               NumAlphas,
@@ -2464,7 +2468,7 @@ namespace AirflowNetworkBalanceManager {
                 if (!lAlphaBlanks(7)) {
                     MultizoneSurfaceData(i).OccupantVentilationControlName = Alphas(7);
                     MultizoneSurfaceData(i).OccupantVentilationControlNum =
-                        UtilityRoutines::FindItemInList(MultizoneSurfaceData(i).OccupantVentilationControlName, dataAirflowNetworkBalanceManager.OccupantVentilationControl);
+                        UtilityRoutines::FindItemInList(MultizoneSurfaceData(i).OccupantVentilationControlName, state.dataAirflowNetworkBalanceManager->OccupantVentilationControl);
                     if (MultizoneSurfaceData(i).OccupantVentilationControlNum == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " object, " + cAlphaFields(7) +
                                         " not found = " + MultizoneSurfaceData(i).OccupantVentilationControlName);
@@ -2502,8 +2506,8 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // remove extra OutdoorAir:Node, not assigned to External Node Name
-        if (AnyLocalEnvironmentsInModel && dataAirflowNetworkBalanceManager.AirflowNetworkNumOfOutAirNode > 0) {
-            for (int i = dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode - dataAirflowNetworkBalanceManager.AirflowNetworkNumOfOutAirNode + 1; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode; ++i) {
+        if (AnyLocalEnvironmentsInModel && state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode > 0) {
+            for (int i = state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode - state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode + 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode; ++i) {
                 found = false;
                 for (j = 1; j <= AirflowNetworkNumOfSurfaces; ++j) {
                     if (UtilityRoutines::SameString(MultizoneSurfaceData(j).ExternalNodeName, MultizoneExternalNodeData(i).Name)) {
@@ -2511,8 +2515,8 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
                 if (!found) {
-                    if (i < dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode) {
-                        for (k = i; k <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode - 1; ++k) {
+                    if (i < state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode) {
+                        for (k = i; k <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode - 1; ++k) {
                             MultizoneExternalNodeData(k).Name = MultizoneExternalNodeData(k + 1).Name;
                             MultizoneExternalNodeData(k).OutAirNodeNum = MultizoneExternalNodeData(k + 1).OutAirNodeNum;
                             MultizoneExternalNodeData(k).height = MultizoneExternalNodeData(k + 1).height;
@@ -2520,15 +2524,15 @@ namespace AirflowNetworkBalanceManager {
                         }
                         i -= 1;
                     }
-                    dataAirflowNetworkBalanceManager.AirflowNetworkNumOfOutAirNode -= 1;
-                    dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode -= 1;
-                    MultizoneExternalNodeData.redimension(dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode);
+                    state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOutAirNode -= 1;
+                    state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode -= 1;
+                    MultizoneExternalNodeData.redimension(state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode);
                 }
             }
         }
 
         // ==> Validate AirflowNetwork simulation surface data
-        dataAirflowNetworkBalanceManager.NumOfExtNodes = 0;
+        state.dataAirflowNetworkBalanceManager->NumOfExtNodes = 0;
         for (int i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
             // Check a valid surface defined earlier
             MultizoneSurfaceData(i).SurfNum = UtilityRoutines::FindItemInList(MultizoneSurfaceData(i).SurfName, Surface);
@@ -2686,17 +2690,17 @@ namespace AirflowNetworkBalanceManager {
             if (Surface(MultizoneSurfaceData(i).SurfNum).ExtBoundCond == ExternalEnvironment ||
                 (Surface(MultizoneSurfaceData(i).SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt &&
                  Surface(MultizoneSurfaceData(i).SurfNum).ExtWind)) {
-                ++dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtSurfaces;
+                ++state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtSurfaces;
             }
 
             // Outside face environment
             if (AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) {
                 n = Surface(MultizoneSurfaceData(i).SurfNum).ExtBoundCond;
                 if (n == ExternalEnvironment || (n == OtherSideCoefNoCalcExt && Surface(MultizoneSurfaceData(i).SurfNum).ExtWind)) {
-                    ++dataAirflowNetworkBalanceManager.NumOfExtNodes;
-                    if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode > 0) {
+                    ++state.dataAirflowNetworkBalanceManager->NumOfExtNodes;
+                    if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode > 0) {
                         found = false;
-                        for (j = 1; j <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode; ++j) {
+                        for (j = 1; j <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode; ++j) {
                             if (UtilityRoutines::SameString(MultizoneSurfaceData(i).ExternalNodeName, MultizoneExternalNodeData(j).Name)) {
                                 MultizoneSurfaceData(i).NodeNums[1] = MultizoneExternalNodeData(j).ExtNum;
                                 found = true;
@@ -2812,14 +2816,14 @@ namespace AirflowNetworkBalanceManager {
 
         // Ensure the number of external node = the number of external surface with HeightOption choice = OpeningHeight
         if (UtilityRoutines::SameString(AirflowNetworkSimu.HeightOption, "OpeningHeight") && AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) {
-            if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtSurfaces != dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode) {
+            if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtSurfaces != state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode) {
                 ShowSevereError(RoutineName +
                                 "When the choice of Height Selection for Local Wind Speed Calculation is OpeningHeight, the number of external "
                                 "surfaces defined in " +
                                 CurrentModuleObject + " objects ");
                 ShowContinueError("has to be equal to the number of AirflowNetwork:MultiZone:ExternalNode objects.");
-                ShowContinueError("The entered number of external nodes is " + RoundSigDigits(dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode) +
-                                  ". The entered number of external surfaces is " + RoundSigDigits(dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtSurfaces) + '.');
+                ShowContinueError("The entered number of external nodes is " + RoundSigDigits(state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode) +
+                                  ". The entered number of external surfaces is " + RoundSigDigits(state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtSurfaces) + '.');
                 ErrorsFound = true;
             }
         }
@@ -2828,8 +2832,8 @@ namespace AirflowNetworkBalanceManager {
         // Moved into getAirflowElementInput
 
         // Validate opening component and assign opening dimension
-        if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfDetOpenings > 0) {
-            for (int i = 1; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfDetOpenings; ++i) {
+        if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfDetOpenings > 0) {
+            for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfDetOpenings; ++i) {
                 found = false;
                 for (j = 1; j <= AirflowNetworkNumOfSurfaces; ++j) {
                     if (MultizoneCompDetOpeningData(i).name == MultizoneSurfaceData(j).OpeningName) {
@@ -2875,7 +2879,7 @@ namespace AirflowNetworkBalanceManager {
                     MultizoneSurfaceData(i).IndVentControl = true;
                 }
                 if (!MultizoneSurfaceData(i).VentingSchName.empty()) {
-                    MultizoneSurfaceData(i).VentingSchNum = GetScheduleIndex(MultizoneSurfaceData(i).VentingSchName);
+                    MultizoneSurfaceData(i).VentingSchNum = GetScheduleIndex(state, MultizoneSurfaceData(i).VentingSchName);
                     if (MultizoneSurfaceData(i).VentingSchNum == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData(i).SurfName + "\", invalid schedule.");
                         ShowContinueError("Venting Schedule not found=\"" + MultizoneSurfaceData(i).VentingSchName + "\".");
@@ -2894,7 +2898,7 @@ namespace AirflowNetworkBalanceManager {
                 {
                     auto const SELECT_CASE_var(MultizoneSurfaceData(i).VentSurfCtrNum);
                     if ((SELECT_CASE_var == VentControlType::Temp) || (SELECT_CASE_var == VentControlType::AdjTemp)) {
-                        MultizoneSurfaceData(i).VentSchNum = GetScheduleIndex(MultizoneSurfaceData(i).VentSchName);
+                        MultizoneSurfaceData(i).VentSchNum = GetScheduleIndex(state, MultizoneSurfaceData(i).VentSchName);
                         if (MultizoneSurfaceData(i).VentSchName == std::string()) {
                             ShowSevereError(RoutineName + CurrentModuleObject +
                                             " object, No Ventilation Schedule was found, but is required when ventilation control is Temperature.");
@@ -2930,7 +2934,7 @@ namespace AirflowNetworkBalanceManager {
                         }
 
                     } else if ((SELECT_CASE_var == VentControlType::Enth) || (SELECT_CASE_var == VentControlType::AdjEnth)) {
-                        MultizoneSurfaceData(i).VentSchNum = GetScheduleIndex(MultizoneSurfaceData(i).VentSchName);
+                        MultizoneSurfaceData(i).VentSchNum = GetScheduleIndex(state, MultizoneSurfaceData(i).VentSchName);
                         if (MultizoneSurfaceData(i).VentSchName == std::string()) {
                             ShowSevereError(RoutineName + CurrentModuleObject +
                                             " object, No Ventilation Schedule was found, but is required when ventilation control is Enthalpy.");
@@ -2992,8 +2996,8 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Validate opening component and assign opening dimension
-        if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSimOpenings > 0) {
-            for (int i = 1; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSimOpenings; ++i) {
+        if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSimOpenings > 0) {
+            for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSimOpenings; ++i) {
                 found = false;
                 for (j = 1; j <= AirflowNetworkNumOfSurfaces; ++j) {
                     if (MultizoneCompSimpleOpeningData(i).name == MultizoneSurfaceData(j).OpeningName) {
@@ -3007,12 +3011,12 @@ namespace AirflowNetworkBalanceManager {
 
         // Calculate CP values
         if (UtilityRoutines::SameString(AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation")) {
-            dataAirflowNetworkBalanceManager.calculateWindPressureCoeffs(state);
+            state.dataAirflowNetworkBalanceManager->calculateWindPressureCoeffs(state);
             // Ensure automatic generation is OK
             n = 0;
             for (j = 1; j <= 5; ++j) {
                 found = false;
-                for (int i = 1; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode; ++i) {
+                for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode; ++i) {
                     if (MultizoneExternalNodeData(i).facadeNum == j) {
                         found = true;
                         break;
@@ -3041,7 +3045,7 @@ namespace AirflowNetworkBalanceManager {
         // Assign external node height
         if (UtilityRoutines::SameString(AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation") ||
             UtilityRoutines::SameString(AirflowNetworkSimu.HeightOption, "OpeningHeight")) {
-            for (int i = 1; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode; ++i) {
+            for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode; ++i) {
                 for (j = 1; j <= AirflowNetworkNumOfSurfaces; ++j) {
                     if (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == ExternalEnvironment ||
                         (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt &&
@@ -3056,7 +3060,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Assign external node azimuth, should consider combining this with the above to avoid the repeated search
-        for (int i = 1; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode; ++i) {
+        for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode; ++i) {
             for (j = 1; j <= AirflowNetworkNumOfSurfaces; ++j) {
                 if (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == ExternalEnvironment ||
                     (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt &&
@@ -3077,7 +3081,7 @@ namespace AirflowNetworkBalanceManager {
 
         int numWinDirs = 11;
         Real64 angleDelta = 30.0;
-        if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSingleSideZones > 0) {
+        if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSingleSideZones > 0) {
             numWinDirs = 35;
             angleDelta = 10.0;
         }
@@ -3091,7 +3095,7 @@ namespace AirflowNetworkBalanceManager {
 
         // The old version used to write info with single-sided natural ventilation specific labeling, this version no longer does that.
         std::set<int> curves;
-        for (int i = 1; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode; ++i) {
+        for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode; ++i) {
             curves.insert(MultizoneExternalNodeData(i).curve);
         }
         for (auto index : curves) {
@@ -3103,7 +3107,7 @@ namespace AirflowNetworkBalanceManager {
             print(state.files.eio, "{:.2R}\n", CurveManager::CurveValue(state, index, numWinDirs * angleDelta));
         }
 
-        if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSingleSideZones > 0) {
+        if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSingleSideZones > 0) {
             for (int i = 1; i <= AirflowNetworkNumOfZones; ++i) {
                 if (MultizoneZoneData(i).SingleSidedCpType == "ADVANCED") {
                     print(state.files.eio,
@@ -3191,7 +3195,7 @@ namespace AirflowNetworkBalanceManager {
             // Ensure different curve is used to avoid a single side boundary condition
             found = false;
             bool differentAngle = false;
-            for (j = 2; j <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode; ++j) {
+            for (j = 2; j <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode; ++j) {
                 if (MultizoneExternalNodeData(j - 1).curve != MultizoneExternalNodeData(j).curve) {
                     found = true;
                     break;
@@ -3227,11 +3231,12 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork Intra zone node
         CurrentModuleObject = "AirflowNetwork:IntraZone:Node";
-        dataAirflowNetworkBalanceManager.IntraZoneNumOfNodes = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (dataAirflowNetworkBalanceManager.IntraZoneNumOfNodes > 0) {
-            IntraZoneNodeData.allocate(dataAirflowNetworkBalanceManager.IntraZoneNumOfNodes);
-            for (int i = 1; i <= dataAirflowNetworkBalanceManager.IntraZoneNumOfNodes; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+        state.dataAirflowNetworkBalanceManager->IntraZoneNumOfNodes = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (state.dataAirflowNetworkBalanceManager->IntraZoneNumOfNodes > 0) {
+            IntraZoneNodeData.allocate(state.dataAirflowNetworkBalanceManager->IntraZoneNumOfNodes);
+            for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->IntraZoneNumOfNodes; ++i) {
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               i,
                                               Alphas,
                                               NumAlphas,
@@ -3271,7 +3276,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // check model compatibility
-        if (dataAirflowNetworkBalanceManager.IntraZoneNumOfNodes > 0) {
+        if (state.dataAirflowNetworkBalanceManager->IntraZoneNumOfNodes > 0) {
             if (!UtilityRoutines::SameString(SimAirNetworkKey, "MultizoneWithoutDistribution")) {
                 ShowSevereError(RoutineName + CurrentModuleObject +
                                 " model requires Simulation Control = MultizoneWithoutDistribution, while the input choice is " + SimAirNetworkKey +
@@ -3283,12 +3288,12 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        NumOfNodesIntraZone = dataAirflowNetworkBalanceManager.IntraZoneNumOfNodes;
+        NumOfNodesIntraZone = state.dataAirflowNetworkBalanceManager->IntraZoneNumOfNodes;
         // check zone node
-        dataAirflowNetworkBalanceManager.IntraZoneNumOfZones = 0;
+        state.dataAirflowNetworkBalanceManager->IntraZoneNumOfZones = 0;
         for (int i = 1; i <= AirflowNetworkNumOfZones; ++i) {
             if (MultizoneZoneData(i).RAFNNodeNum > 0) {
-                dataAirflowNetworkBalanceManager.IntraZoneNumOfZones += 1;
+                state.dataAirflowNetworkBalanceManager->IntraZoneNumOfZones += 1;
             }
         }
 
@@ -3296,12 +3301,13 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork Intra linkage
         CurrentModuleObject = "AirflowNetwork:IntraZone:Linkage";
-        dataAirflowNetworkBalanceManager.IntraZoneNumOfLinks = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (dataAirflowNetworkBalanceManager.IntraZoneNumOfLinks > 0) {
-            IntraZoneLinkageData.allocate(dataAirflowNetworkBalanceManager.IntraZoneNumOfLinks);
-            dataAirflowNetworkBalanceManager.UniqueAirflowNetworkSurfaceName.reserve(dataAirflowNetworkBalanceManager.IntraZoneNumOfLinks);
-            for (int i = 1; i <= dataAirflowNetworkBalanceManager.IntraZoneNumOfLinks; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+        state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks > 0) {
+            IntraZoneLinkageData.allocate(state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks);
+            state.dataAirflowNetworkBalanceManager->UniqueAirflowNetworkSurfaceName.reserve(state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks);
+            for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks; ++i) {
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               i,
                                               Alphas,
                                               NumAlphas,
@@ -3331,7 +3337,7 @@ namespace AirflowNetworkBalanceManager {
                         ErrorsFound = true;
                     }
                     GlobalNames::VerifyUniqueInterObjectName(
-                        dataAirflowNetworkBalanceManager.UniqueAirflowNetworkSurfaceName, Alphas(5), CurrentModuleObject, cAlphaFields(5), ErrorsFound);
+                        state.dataAirflowNetworkBalanceManager->UniqueAirflowNetworkSurfaceName, Alphas(5), CurrentModuleObject, cAlphaFields(5), ErrorsFound);
                 }
                 if (UtilityRoutines::SameString(Alphas(2), Alphas(3))) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "='" + Alphas(1) + "': Invalid inputs of both node name with " + Alphas(2) +
@@ -3339,7 +3345,7 @@ namespace AirflowNetworkBalanceManager {
                     ErrorsFound = true;
                 }
                 // Check valid node names
-                IntraZoneLinkageData(i).NodeNums[0] = UtilityRoutines::FindItemInList(Alphas(2), IntraZoneNodeData, dataAirflowNetworkBalanceManager.IntraZoneNumOfNodes);
+                IntraZoneLinkageData(i).NodeNums[0] = UtilityRoutines::FindItemInList(Alphas(2), IntraZoneNodeData, state.dataAirflowNetworkBalanceManager->IntraZoneNumOfNodes);
                 if (IntraZoneLinkageData(i).NodeNums[0] == 0) {
                     IntraZoneLinkageData(i).NodeNums[0] =
                         UtilityRoutines::FindItemInList(Alphas(2), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones);
@@ -3351,9 +3357,9 @@ namespace AirflowNetworkBalanceManager {
                     }
                 } else {
                     IntraZoneLinkageData(i).NodeHeights[0] = IntraZoneNodeData(IntraZoneLinkageData(i).NodeNums[0]).Height;
-                    IntraZoneLinkageData(i).NodeNums[0] = IntraZoneLinkageData(i).NodeNums[0] + AirflowNetworkNumOfZones + dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode;
+                    IntraZoneLinkageData(i).NodeNums[0] = IntraZoneLinkageData(i).NodeNums[0] + AirflowNetworkNumOfZones + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode;
                 }
-                IntraZoneLinkageData(i).NodeNums[1] = UtilityRoutines::FindItemInList(Alphas(3), IntraZoneNodeData, dataAirflowNetworkBalanceManager.IntraZoneNumOfNodes);
+                IntraZoneLinkageData(i).NodeNums[1] = UtilityRoutines::FindItemInList(Alphas(3), IntraZoneNodeData, state.dataAirflowNetworkBalanceManager->IntraZoneNumOfNodes);
                 if (IntraZoneLinkageData(i).NodeNums[1] == 0) {
                     IntraZoneLinkageData(i).NodeNums[1] =
                         UtilityRoutines::FindItemInList(Alphas(3), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones);
@@ -3382,7 +3388,7 @@ namespace AirflowNetworkBalanceManager {
                     }
                 } else {
                     IntraZoneLinkageData(i).NodeHeights[1] = IntraZoneNodeData(IntraZoneLinkageData(i).NodeNums[1]).Height;
-                    IntraZoneLinkageData(i).NodeNums[1] = IntraZoneLinkageData(i).NodeNums[1] + AirflowNetworkNumOfZones + dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode;
+                    IntraZoneLinkageData(i).NodeNums[1] = IntraZoneLinkageData(i).NodeNums[1] + AirflowNetworkNumOfZones + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode;
                 }
                 // Ensure the both linked nodes for a surface are not zone nodes.One of nodes has to be an intrazone node
                 if (IntraZoneLinkageData(i).NodeNums[1] <= AirflowNetworkNumOfZones &&
@@ -3392,9 +3398,9 @@ namespace AirflowNetworkBalanceManager {
                     ErrorsFound = true;
                 }
                 if (IntraZoneLinkageData(i).NodeNums[0] <= AirflowNetworkNumOfZones &&
-                    IntraZoneLinkageData(i).NodeNums[1] > AirflowNetworkNumOfZones + dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode && lAlphaBlanks(5)) {
+                    IntraZoneLinkageData(i).NodeNums[1] > AirflowNetworkNumOfZones + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode && lAlphaBlanks(5)) {
                     if (IntraZoneLinkageData(i).NodeNums[0] !=
-                        IntraZoneNodeData(IntraZoneLinkageData(i).NodeNums[1] - AirflowNetworkNumOfZones - dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode).ZoneNum) {
+                        IntraZoneNodeData(IntraZoneLinkageData(i).NodeNums[1] - AirflowNetworkNumOfZones - state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode).ZoneNum) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "='" + Alphas(1) + ": Invalid zone inputs between Node and Link " +
                                         Alphas(2) + " and " +
                                         MultizoneZoneData(IntraZoneNodeData(IntraZoneLinkageData(i).NodeNums[0]).ZoneNum).ZoneName);
@@ -3402,9 +3408,9 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
                 if (IntraZoneLinkageData(i).NodeNums[1] <= AirflowNetworkNumOfZones &&
-                    IntraZoneLinkageData(i).NodeNums[0] > AirflowNetworkNumOfZones + dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode && lAlphaBlanks(5)) {
+                    IntraZoneLinkageData(i).NodeNums[0] > AirflowNetworkNumOfZones + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode && lAlphaBlanks(5)) {
                     if (IntraZoneLinkageData(i).NodeNums[1] !=
-                        IntraZoneNodeData(IntraZoneLinkageData(i).NodeNums[0] - AirflowNetworkNumOfZones - dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode).ZoneNum) {
+                        IntraZoneNodeData(IntraZoneLinkageData(i).NodeNums[0] - AirflowNetworkNumOfZones - state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode).ZoneNum) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "='" + Alphas(1) + ": Invalid zone inputs between Node and Link " +
                                         Alphas(3) + " and " +
                                         MultizoneZoneData(IntraZoneNodeData(IntraZoneLinkageData(i).NodeNums[1]).ZoneNum).ZoneName);
@@ -3414,19 +3420,19 @@ namespace AirflowNetworkBalanceManager {
             }
 
             // Reset the number of intrazone links for a given surface
-            NumOfLinksIntraZone = dataAirflowNetworkBalanceManager.IntraZoneNumOfLinks;
-            for (int i = 1; i <= dataAirflowNetworkBalanceManager.IntraZoneNumOfLinks; ++i) {
+            NumOfLinksIntraZone = state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks;
+            for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks; ++i) {
                 j = IntraZoneLinkageData(i).LinkNum;
                 if (j > 0) {
                     // Revise data in multizone object
                     NumOfLinksIntraZone = NumOfLinksIntraZone - 1;
                     if (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == 0) {
                         // Exterior surface NodeNums[1] should be equal
-                        if (IntraZoneLinkageData(i).NodeNums[0] > AirflowNetworkNumOfZones + dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode) {
+                        if (IntraZoneLinkageData(i).NodeNums[0] > AirflowNetworkNumOfZones + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode) {
                             MultizoneSurfaceData(j).RAFNflag = true;
                             MultizoneSurfaceData(j).ZonePtr = MultizoneSurfaceData(j).NodeNums[0];
                             MultizoneSurfaceData(j).NodeNums[0] = IntraZoneLinkageData(i).NodeNums[0];
-                        } else if (IntraZoneLinkageData(i).NodeNums[1] > AirflowNetworkNumOfZones + dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode) {
+                        } else if (IntraZoneLinkageData(i).NodeNums[1] > AirflowNetworkNumOfZones + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode) {
                             MultizoneSurfaceData(j).RAFNflag = true;
                             MultizoneSurfaceData(j).ZonePtr = MultizoneSurfaceData(j).NodeNums[0];
                             MultizoneSurfaceData(j).NodeNums[0] = IntraZoneLinkageData(i).NodeNums[1];
@@ -3438,11 +3444,11 @@ namespace AirflowNetworkBalanceManager {
                         }
                     } else {
                         // Interior surface
-                        if (IntraZoneLinkageData(i).NodeNums[0] > AirflowNetworkNumOfZones + dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode &&
-                            IntraZoneLinkageData(i).NodeNums[1] > AirflowNetworkNumOfZones + dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode) {
+                        if (IntraZoneLinkageData(i).NodeNums[0] > AirflowNetworkNumOfZones + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode &&
+                            IntraZoneLinkageData(i).NodeNums[1] > AirflowNetworkNumOfZones + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode) {
                             MultizoneSurfaceData(j).RAFNflag = true;
                             if (MultizoneZoneData(MultizoneSurfaceData(j).NodeNums[0]).ZoneNum ==
-                                IntraZoneNodeData(IntraZoneLinkageData(i).NodeNums[0] - AirflowNetworkNumOfZones - dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode)
+                                IntraZoneNodeData(IntraZoneLinkageData(i).NodeNums[0] - AirflowNetworkNumOfZones - state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode)
                                     .ZoneNum) {
                                 MultizoneSurfaceData(j).ZonePtr = MultizoneSurfaceData(j).NodeNums[0];
                                 MultizoneSurfaceData(j).NodeNums[0] = IntraZoneLinkageData(i).NodeNums[0];
@@ -3452,7 +3458,7 @@ namespace AirflowNetworkBalanceManager {
                                 MultizoneSurfaceData(j).NodeNums[0] = IntraZoneLinkageData(i).NodeNums[1];
                                 MultizoneSurfaceData(j).NodeNums[1] = IntraZoneLinkageData(i).NodeNums[0];
                             }
-                        } else if (IntraZoneLinkageData(i).NodeNums[0] > AirflowNetworkNumOfZones + dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode) {
+                        } else if (IntraZoneLinkageData(i).NodeNums[0] > AirflowNetworkNumOfZones + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode) {
                             MultizoneSurfaceData(j).RAFNflag = true;
                             if (IntraZoneLinkageData(i).NodeNums[1] == MultizoneSurfaceData(j).NodeNums[0]) {
                                 MultizoneSurfaceData(j).NodeNums[1] = IntraZoneLinkageData(i).NodeNums[0];
@@ -3465,7 +3471,7 @@ namespace AirflowNetworkBalanceManager {
                                                 " and AirflowNetwork:Multizone:Surface = " + MultizoneSurfaceData(j).SurfName);
                                 ErrorsFound = true;
                             }
-                        } else if (IntraZoneLinkageData(i).NodeNums[1] > AirflowNetworkNumOfZones + dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode) {
+                        } else if (IntraZoneLinkageData(i).NodeNums[1] > AirflowNetworkNumOfZones + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode) {
                             MultizoneSurfaceData(j).RAFNflag = true;
                             if (IntraZoneLinkageData(i).NodeNums[0] == MultizoneSurfaceData(j).NodeNums[0]) {
                                 MultizoneSurfaceData(j).NodeNums[1] = IntraZoneLinkageData(i).NodeNums[1];
@@ -3484,14 +3490,14 @@ namespace AirflowNetworkBalanceManager {
             }
             // Remove links with surface defined in Multizone : Surface objects
             int link = 1;
-            if (NumOfLinksIntraZone < dataAirflowNetworkBalanceManager.IntraZoneNumOfLinks) {
+            if (NumOfLinksIntraZone < state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks) {
                 while (link <= NumOfLinksIntraZone) {
                     if (IntraZoneLinkageData(link).LinkNum > 0) {
                         if (DisplayExtraWarnings) {
                             ShowWarningError(RoutineName + CurrentModuleObject + "='" + IntraZoneLinkageData(link).Name +
                                              " is reomoved from the list due to the surface conncetion from Intrazone to Interzone.");
                         }
-                        for (j = link; j <= dataAirflowNetworkBalanceManager.IntraZoneNumOfLinks - 1; ++j) {
+                        for (j = link; j <= state.dataAirflowNetworkBalanceManager->IntraZoneNumOfLinks - 1; ++j) {
                             IntraZoneLinkageData(j) = IntraZoneLinkageData(j + 1);
                         }
                     }
@@ -3508,11 +3514,12 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork Distribution system node
         CurrentModuleObject = "AirflowNetwork:Distribution:Node";
-        dataAirflowNetworkBalanceManager.DisSysNumOfNodes = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (dataAirflowNetworkBalanceManager.DisSysNumOfNodes > 0) {
-            DisSysNodeData.allocate(dataAirflowNetworkBalanceManager.DisSysNumOfNodes);
-            for (int i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfNodes; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+        state.dataAirflowNetworkBalanceManager->DisSysNumOfNodes = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (state.dataAirflowNetworkBalanceManager->DisSysNumOfNodes > 0) {
+            DisSysNodeData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfNodes);
+            for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfNodes; ++i) {
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               i,
                                               Alphas,
                                               NumAlphas,
@@ -3562,7 +3569,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Duct";
-        if (dataAirflowNetworkBalanceManager.DisSysNumOfDucts == 0) {
+        if (state.dataAirflowNetworkBalanceManager->DisSysNumOfDucts == 0) {
             if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
                 ShowSevereError(RoutineName + "An " + CurrentModuleObject + " object is required but not found.");
                 ErrorsFound = true;
@@ -3571,11 +3578,12 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork distribution system component: DuctViewFactors
         CurrentModuleObject = "AirflowNetwork:Distribution:DuctViewFactors";
-        dataAirflowNetworkBalanceManager.DisSysNumOfDuctViewFactors = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (dataAirflowNetworkBalanceManager.DisSysNumOfDuctViewFactors > 0) {
-            AirflowNetworkLinkageViewFactorData.allocate(dataAirflowNetworkBalanceManager.DisSysNumOfDuctViewFactors);
-            for (int i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfDuctViewFactors; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+        state.dataAirflowNetworkBalanceManager->DisSysNumOfDuctViewFactors = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (state.dataAirflowNetworkBalanceManager->DisSysNumOfDuctViewFactors > 0) {
+            AirflowNetworkLinkageViewFactorData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfDuctViewFactors);
+            for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfDuctViewFactors; ++i) {
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               i,
                                               Alphas,
                                               NumAlphas,
@@ -3661,7 +3669,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Fan";
-        if (dataAirflowNetworkBalanceManager.DisSysNumOfCVFs == 0) {
+        if (state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs == 0) {
             if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
                 ShowSevereError(RoutineName + "An " + CurrentModuleObject + " object is required but not found.");
                 ErrorsFound = true;
@@ -3670,17 +3678,18 @@ namespace AirflowNetworkBalanceManager {
 
         // Read PressureController
         CurrentModuleObject = "AirflowNetwork:ZoneControl:PressureController";
-        dataAirflowNetworkBalanceManager.NumOfPressureControllers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (dataAirflowNetworkBalanceManager.NumOfPressureControllers > 1) {
+        state.dataAirflowNetworkBalanceManager->NumOfPressureControllers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (state.dataAirflowNetworkBalanceManager->NumOfPressureControllers > 1) {
             ShowSevereError(RoutineName + "More " + CurrentModuleObject + " are found. Currently only one( \"1\") " + CurrentModuleObject +
                             " object per simulation is allowed when using AirflowNetwork Distribution Systems.");
             ShowFatalError(RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination.");
         }
 
-        if (dataAirflowNetworkBalanceManager.NumOfPressureControllers > 0) {
-            PressureControllerData.allocate(dataAirflowNetworkBalanceManager.NumOfPressureControllers);
-            for (int i = 1; i <= dataAirflowNetworkBalanceManager.NumOfPressureControllers; ++i) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+        if (state.dataAirflowNetworkBalanceManager->NumOfPressureControllers > 0) {
+            PressureControllerData.allocate(state.dataAirflowNetworkBalanceManager->NumOfPressureControllers);
+            for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->NumOfPressureControllers; ++i) {
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               i,
                                               Alphas,
                                               NumAlphas,
@@ -3753,14 +3762,14 @@ namespace AirflowNetworkBalanceManager {
                 if (lAlphaBlanks(5)) {
                     PressureControllerData(i).AvailSchedPtr = ScheduleAlwaysOn;
                 } else {
-                    PressureControllerData(i).AvailSchedPtr = GetScheduleIndex(Alphas(5));
+                    PressureControllerData(i).AvailSchedPtr = GetScheduleIndex(state, Alphas(5));
                     if (PressureControllerData(i).AvailSchedPtr == 0) {
                         ShowSevereError(CurrentModuleObject + ", \"" + PressureControllerData(i).Name + "\" " + cAlphaFields(5) +
                                         " not found: " + Alphas(5));
                         ErrorsFound = true;
                     }
                 }
-                PressureControllerData(i).PresSetpointSchedPtr = GetScheduleIndex(Alphas(6));
+                PressureControllerData(i).PresSetpointSchedPtr = GetScheduleIndex(state, Alphas(6));
                 if (PressureControllerData(i).PresSetpointSchedPtr == 0) {
                     ShowSevereError(CurrentModuleObject + ", \"" + PressureControllerData(i).Name + "\" " + cAlphaFields(6) +
                                     " not found: " + Alphas(6));
@@ -3772,9 +3781,9 @@ namespace AirflowNetworkBalanceManager {
         // Assign numbers of nodes and linkages
         if (SimulateAirflowNetwork > AirflowNetworkControlSimple) {
             if (AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) {
-                NumOfNodesMultiZone = AirflowNetworkNumOfZones + dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode;
+                NumOfNodesMultiZone = AirflowNetworkNumOfZones + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode;
             } else {
-                NumOfNodesMultiZone = AirflowNetworkNumOfZones + dataAirflowNetworkBalanceManager.NumOfExtNodes;
+                NumOfNodesMultiZone = AirflowNetworkNumOfZones + state.dataAirflowNetworkBalanceManager->NumOfExtNodes;
             }
             NumOfLinksMultiZone = AirflowNetworkNumOfSurfaces;
             AirflowNetworkNumOfNodes = NumOfNodesMultiZone;
@@ -3783,7 +3792,7 @@ namespace AirflowNetworkBalanceManager {
             if (NumOfLinksIntraZone > 0) AirflowNetworkNumOfLinks = AirflowNetworkNumOfLinks + NumOfLinksIntraZone;
         }
         if (SimulateAirflowNetwork > AirflowNetworkControlMultizone + 1) {
-            AirflowNetworkNumOfNodes = NumOfNodesMultiZone + dataAirflowNetworkBalanceManager.DisSysNumOfNodes + NumOfNodesIntraZone;
+            AirflowNetworkNumOfNodes = NumOfNodesMultiZone + state.dataAirflowNetworkBalanceManager->DisSysNumOfNodes + NumOfNodesIntraZone;
         }
 
         // Assign node data
@@ -3870,14 +3879,14 @@ namespace AirflowNetworkBalanceManager {
                 // Get OA system inlet information 'OAMixerOutdoorAirStreamNode' was specified as an outdoor air node implicitly
                 if (UtilityRoutines::SameString(DisSysNodeData(i - NumOfNodesMultiZone).EPlusType, "OAMixerOutdoorAirStreamNode")) {
                     AirflowNetworkNodeData(i).EPlusTypeNum = EPlusTypeNum_EXT;
-                    AirflowNetworkNodeData(i).ExtNodeNum = dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode + 1;
+                    AirflowNetworkNodeData(i).ExtNodeNum = state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode + 1;
                     AirflowNetworkNodeData(i).NodeTypeNum = 1;
                 }
                 if (UtilityRoutines::SameString(DisSysNodeData(i - NumOfNodesMultiZone).EPlusType, "OutdoorAir:NodeList") ||
                     UtilityRoutines::SameString(DisSysNodeData(i - NumOfNodesMultiZone).EPlusType, "OutdoorAir:Node")) {
                     if (j > 1) {
                         AirflowNetworkNodeData(i).EPlusTypeNum = EPlusTypeNum_EXT;
-                        AirflowNetworkNodeData(i).ExtNodeNum = dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode + 1;
+                        AirflowNetworkNodeData(i).ExtNodeNum = state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode + 1;
                         AirflowNetworkNodeData(i).NodeTypeNum = 1;
                     } else {
                         ShowSevereError(RoutineName + "AirflowNetwork:Distribution:Node: The outdoor air node is found at " +
@@ -3890,13 +3899,13 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Start to assembly AirflowNetwork Components
-        AirflowNetworkNumOfComps = dataAirflowNetworkBalanceManager.AirflowNetworkNumOfDetOpenings + dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSimOpenings + dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSurCracks +
-                                   dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSurELA + dataAirflowNetworkBalanceManager.DisSysNumOfLeaks + dataAirflowNetworkBalanceManager.DisSysNumOfELRs + dataAirflowNetworkBalanceManager.DisSysNumOfDucts + dataAirflowNetworkBalanceManager.DisSysNumOfDampers +
-                                   dataAirflowNetworkBalanceManager.DisSysNumOfCVFs + dataAirflowNetworkBalanceManager.DisSysNumOfDetFans + dataAirflowNetworkBalanceManager.DisSysNumOfCPDs + dataAirflowNetworkBalanceManager.DisSysNumOfCoils + dataAirflowNetworkBalanceManager.DisSysNumOfTermUnits +
-                                   AirflowNetworkNumOfExhFan + dataAirflowNetworkBalanceManager.DisSysNumOfHXs + dataAirflowNetworkBalanceManager.AirflowNetworkNumOfHorOpenings + dataAirflowNetworkBalanceManager.NumOfOAFans + dataAirflowNetworkBalanceManager.NumOfReliefFans;
+        AirflowNetworkNumOfComps = state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfDetOpenings + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSimOpenings + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurCracks +
+                                   state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurELA + state.dataAirflowNetworkBalanceManager->DisSysNumOfLeaks + state.dataAirflowNetworkBalanceManager->DisSysNumOfELRs + state.dataAirflowNetworkBalanceManager->DisSysNumOfDucts + state.dataAirflowNetworkBalanceManager->DisSysNumOfDampers +
+                                   state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs + state.dataAirflowNetworkBalanceManager->DisSysNumOfDetFans + state.dataAirflowNetworkBalanceManager->DisSysNumOfCPDs + state.dataAirflowNetworkBalanceManager->DisSysNumOfCoils + state.dataAirflowNetworkBalanceManager->DisSysNumOfTermUnits +
+                                   AirflowNetworkNumOfExhFan + state.dataAirflowNetworkBalanceManager->DisSysNumOfHXs + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfHorOpenings + state.dataAirflowNetworkBalanceManager->NumOfOAFans + state.dataAirflowNetworkBalanceManager->NumOfReliefFans;
         AirflowNetworkCompData.allocate(AirflowNetworkNumOfComps);
 
-        for (int i = 1; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfDetOpenings; ++i) { // Detailed opening component
+        for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfDetOpenings; ++i) { // Detailed opening component
             AirflowNetworkCompData(i).Name = MultizoneCompDetOpeningData(i).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
             AirflowNetworkCompData(i).CompTypeNum = CompTypeNum_DOP;
@@ -3907,8 +3916,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).CompNum = i;
         }
 
-        j = dataAirflowNetworkBalanceManager.AirflowNetworkNumOfDetOpenings;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSimOpenings + j; ++i) { // Simple opening component
+        j = state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfDetOpenings;
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSimOpenings + j; ++i) { // Simple opening component
             n = i - j;
             AirflowNetworkCompData(i).Name = MultizoneCompSimpleOpeningData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -3920,8 +3929,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).CompNum = i;
         }
 
-        j += dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSimOpenings;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSurCracks + j; ++i) { // Surface crack component
+        j += state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSimOpenings;
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurCracks + j; ++i) { // Surface crack component
             n = i - j;
             AirflowNetworkCompData(i).Name = MultizoneSurfaceCrackData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -3933,8 +3942,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).CompNum = i;
         }
 
-        j += dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSurCracks;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSurELA + j; ++i) { // Surface crack component
+        j += state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurCracks;
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurELA + j; ++i) { // Surface crack component
             n = i - j;
             AirflowNetworkCompData(i).Name = MultizoneSurfaceELAData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -3946,7 +3955,7 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).CompNum = i;
         }
 
-        j += dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSurELA;
+        j += state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurELA;
         for (int i = 1 + j; i <= AirflowNetworkNumOfExhFan + j; ++i) { // Zone exhaust fan component
             n = i - j;
             AirflowNetworkCompData(i).Name = MultizoneCompExhaustFanData(n).name;
@@ -3960,7 +3969,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         j += AirflowNetworkNumOfExhFan;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfHorOpenings + j; ++i) { // Distribution system crack component
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfHorOpenings + j; ++i) { // Distribution system crack component
             n = i - j;
             AirflowNetworkCompData(i).Name = MultizoneCompHorOpeningData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -3972,8 +3981,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).CompNum = i;
         }
 
-        j += dataAirflowNetworkBalanceManager.AirflowNetworkNumOfHorOpenings;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfLeaks + j; ++i) { // Distribution system crack component
+        j += state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfHorOpenings;
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfLeaks + j; ++i) { // Distribution system crack component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompLeakData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -3985,8 +3994,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).CompNum = i;
         }
 
-        j += dataAirflowNetworkBalanceManager.DisSysNumOfLeaks;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfELRs + j; ++i) { // Distribution system effective leakage ratio component
+        j += state.dataAirflowNetworkBalanceManager->DisSysNumOfLeaks;
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfELRs + j; ++i) { // Distribution system effective leakage ratio component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompELRData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -3998,8 +4007,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).CompNum = i;
         }
 
-        j += dataAirflowNetworkBalanceManager.DisSysNumOfELRs;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfDucts + j; ++i) { // Distribution system effective leakage ratio component
+        j += state.dataAirflowNetworkBalanceManager->DisSysNumOfELRs;
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfDucts + j; ++i) { // Distribution system effective leakage ratio component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompDuctData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -4011,8 +4020,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).CompNum = i;
         }
 
-        j += dataAirflowNetworkBalanceManager.DisSysNumOfDucts;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfDampers + j; ++i) { // Distribution system effective leakage ratio component
+        j += state.dataAirflowNetworkBalanceManager->DisSysNumOfDucts;
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfDampers + j; ++i) { // Distribution system effective leakage ratio component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompDamperData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -4024,8 +4033,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).CompNum = i;
         }
 
-        j += dataAirflowNetworkBalanceManager.DisSysNumOfDampers;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs + j; ++i) { // Distribution system constant volume fan component
+        j += state.dataAirflowNetworkBalanceManager->DisSysNumOfDampers;
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs + j; ++i) { // Distribution system constant volume fan component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompCVFData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -4038,8 +4047,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).EPlusTypeNum = EPlusTypeNum_FAN;
         }
 
-        j += dataAirflowNetworkBalanceManager.DisSysNumOfCVFs;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfDetFans + j; ++i) { // Distribution system fan component
+        j += state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs;
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfDetFans + j; ++i) { // Distribution system fan component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompDetFanData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -4052,8 +4061,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).EPlusTypeNum = EPlusTypeNum_FAN;
         }
 
-        j += dataAirflowNetworkBalanceManager.DisSysNumOfDetFans;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCPDs + j; ++i) { // Distribution system constant pressure drop component
+        j += state.dataAirflowNetworkBalanceManager->DisSysNumOfDetFans;
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCPDs + j; ++i) { // Distribution system constant pressure drop component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompCPDData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -4065,8 +4074,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).CompNum = i;
         }
 
-        j += dataAirflowNetworkBalanceManager.DisSysNumOfCPDs;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCoils + j; ++i) { // Distribution system coil component
+        j += state.dataAirflowNetworkBalanceManager->DisSysNumOfCPDs;
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCoils + j; ++i) { // Distribution system coil component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompCoilData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -4079,8 +4088,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).EPlusTypeNum = EPlusTypeNum_COI;
         }
 
-        j += dataAirflowNetworkBalanceManager.DisSysNumOfCoils;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfTermUnits + j; ++i) { // Terminal unit component
+        j += state.dataAirflowNetworkBalanceManager->DisSysNumOfCoils;
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfTermUnits + j; ++i) { // Terminal unit component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompTermUnitData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -4093,8 +4102,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).EPlusTypeNum = EPlusTypeNum_RHT;
         }
 
-        j += dataAirflowNetworkBalanceManager.DisSysNumOfTermUnits;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.DisSysNumOfHXs + j; ++i) { // Distribution system heat exchanger component
+        j += state.dataAirflowNetworkBalanceManager->DisSysNumOfTermUnits;
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfHXs + j; ++i) { // Distribution system heat exchanger component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompHXData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -4107,8 +4116,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).EPlusTypeNum = EPlusTypeNum_HEX;
         }
 
-        j += dataAirflowNetworkBalanceManager.DisSysNumOfHXs;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.NumOfOAFans + j; ++i) { // OA fan component
+        j += state.dataAirflowNetworkBalanceManager->DisSysNumOfHXs;
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->NumOfOAFans + j; ++i) { // OA fan component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompOutdoorAirData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -4120,8 +4129,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkCompData(i).CompNum = i;
         }
 
-        j += dataAirflowNetworkBalanceManager.NumOfOAFans;
-        for (int i = 1 + j; i <= dataAirflowNetworkBalanceManager.NumOfReliefFans + j; ++i) { // OA fan component
+        j += state.dataAirflowNetworkBalanceManager->NumOfOAFans;
+        for (int i = 1 + j; i <= state.dataAirflowNetworkBalanceManager->NumOfReliefFans + j; ++i) { // OA fan component
             n = i - j;
             AirflowNetworkCompData(i).Name = DisSysCompReliefAirData(n).name;
             solver.compnum[AirflowNetworkCompData(i).Name] = i;
@@ -4137,10 +4146,10 @@ namespace AirflowNetworkBalanceManager {
 
         // Read AirflowNetwork linkage data
         CurrentModuleObject = "AirflowNetwork:Distribution:Linkage";
-        dataAirflowNetworkBalanceManager.DisSysNumOfLinks = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (dataAirflowNetworkBalanceManager.DisSysNumOfLinks > 0 && SimulateAirflowNetwork > AirflowNetworkControlMultizone) { // Multizone + Distribution
-            AirflowNetworkNumOfLinks = NumOfLinksMultiZone + dataAirflowNetworkBalanceManager.DisSysNumOfLinks;
-            AirflowNetworkLinkageData.allocate(dataAirflowNetworkBalanceManager.DisSysNumOfLinks + AirflowNetworkNumOfSurfaces);
+        state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks > 0 && SimulateAirflowNetwork > AirflowNetworkControlMultizone) { // Multizone + Distribution
+            AirflowNetworkNumOfLinks = NumOfLinksMultiZone + state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks;
+            AirflowNetworkLinkageData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks + AirflowNetworkNumOfSurfaces);
         } else { // Multizone + IntraZone only
             //	AirflowNetworkLinkageData.allocate( AirflowNetworkNumOfSurfaces );
             AirflowNetworkLinkageData.allocate(AirflowNetworkNumOfLinks);
@@ -4373,14 +4382,15 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        if (dataAirflowNetworkBalanceManager.DisSysNumOfLinks > 0 && SimulateAirflowNetwork > AirflowNetworkControlMultizone) { // Distribution
+        if (state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks > 0 && SimulateAirflowNetwork > AirflowNetworkControlMultizone) { // Distribution
 
             for (auto &e : AirflowNetworkLinkageData)
                 e.ZoneNum = 0;
 
             for (count = AirflowNetworkNumOfSurfaces + 1; count <= AirflowNetworkNumOfLinks; ++count) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               count - AirflowNetworkNumOfSurfaces,
                                               Alphas,
                                               NumAlphas,
@@ -4401,7 +4411,7 @@ namespace AirflowNetworkBalanceManager {
                 AirflowNetworkLinkageData(count).ZoneName = Alphas(5);
                 AirflowNetworkLinkageData(count).LinkNum = count;
 
-                for (int i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfDuctViewFactors; ++i) {
+                for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfDuctViewFactors; ++i) {
                     if (AirflowNetworkLinkageData(count).Name == AirflowNetworkLinkageViewFactorData(i).LinkageName) {
                         AirflowNetworkLinkageData(count).LinkageViewFactorObjectNum = AirflowNetworkLinkageViewFactorData(i).ObjectNum;
                         break;
@@ -4667,7 +4677,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Ensure the name of each heat exchanger is shown either once or twice in the field of
         if (SimulateAirflowNetwork == AirflowNetworkControlSimpleADS || SimulateAirflowNetwork == AirflowNetworkControlMultiADS) {
-            for (int i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfHXs; ++i) {
+            for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfHXs; ++i) {
                 count = 0;
                 for (j = 1; j <= AirflowNetworkNumOfLinks; ++j) {
                     if (UtilityRoutines::SameString(AirflowNetworkLinkageData(j).CompName, DisSysCompHXData(i).name)) {
@@ -4756,7 +4766,7 @@ namespace AirflowNetworkBalanceManager {
         lNumericBlanks.deallocate();
 
         if (!ErrorsFound) {
-            AllocateAndInitData();
+            AllocateAndInitData(state);
         }
     }
 
@@ -4783,7 +4793,7 @@ namespace AirflowNetworkBalanceManager {
 
         if (initializeOneTimeFlag) {
             exchangeData.allocate(AirflowNetworkBalanceManager::NumOfZones); // AirflowNetwork exchange data due to air-forced system
-            for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; i++) {
+            for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
                 if (AirflowNetworkBalanceManager::DisSysCompCVFData(i).FanTypeNum == AirflowNetworkBalanceManager::FanType_SimpleOnOff) {
                     multiExchangeData.allocate(AirflowNetworkBalanceManager::NumOfZones);
                     break;
@@ -4793,31 +4803,36 @@ namespace AirflowNetworkBalanceManager {
             initializeOneTimeFlag = false;
             if (AirflowNetworkBalanceManager::Contaminant.CO2Simulation) {
                 for (i = 1; i <= AirflowNetworkBalanceManager::NumOfZones; ++i) {
-                    SetupOutputVariable("AFN Zone Outdoor Air Mass Flow Rate",
+                    SetupOutputVariable(state,
+                                        "AFN Zone Outdoor Air Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).SumMHr,
                                         "System",
                                         "Average",
                                         AirflowNetworkBalanceManager::Zone(i).Name);
-                    SetupOutputVariable("AFN Zone Mixing Mass Flow Rate",
+                    SetupOutputVariable(state,
+                                        "AFN Zone Mixing Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).SumMMHr,
                                         "System",
                                         "Average",
                                         AirflowNetworkBalanceManager::Zone(i).Name);
-                    SetupOutputVariable("AFN Zone Outdoor Air CO2 Mass Flow Rate",
+                    SetupOutputVariable(state,
+                                        "AFN Zone Outdoor Air CO2 Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).SumMHrCO,
                                         "System",
                                         "Average",
                                         AirflowNetworkBalanceManager::Zone(i).Name);
-                    SetupOutputVariable("AFN Zone Mixing CO2 Mass Flow Rate",
+                    SetupOutputVariable(state,
+                                        "AFN Zone Mixing CO2 Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).SumMMHrCO,
                                         "System",
                                         "Average",
                                         AirflowNetworkBalanceManager::Zone(i).Name);
-                    SetupOutputVariable("AFN Zone Total CO2 Mass Flow Rate",
+                    SetupOutputVariable(state,
+                                        "AFN Zone Total CO2 Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).TotalCO2,
                                         "System",
@@ -4828,32 +4843,37 @@ namespace AirflowNetworkBalanceManager {
             if (AirflowNetworkBalanceManager::Contaminant.GenericContamSimulation) {
                 for (i = 1; i <= AirflowNetworkBalanceManager::NumOfZones; ++i) {
                     if (!AirflowNetworkBalanceManager::Contaminant.CO2Simulation) {
-                        SetupOutputVariable("AFN Zone Outdoor Air Mass Flow Rate",
+                        SetupOutputVariable(state,
+                                            "AFN Zone Outdoor Air Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
                                             exchangeData(i).SumMHr,
                                             "System",
                                             "Average",
                                             AirflowNetworkBalanceManager::Zone(i).Name);
-                        SetupOutputVariable("AFN Zone Mixing Mass Flow Rate",
+                        SetupOutputVariable(state,
+                                            "AFN Zone Mixing Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
                                             exchangeData(i).SumMMHr,
                                             "System",
                                             "Average",
                                             AirflowNetworkBalanceManager::Zone(i).Name);
                     }
-                    SetupOutputVariable("AFN Zone Outdoor Air Generic Air Contaminant Mass Flow Rate",
+                    SetupOutputVariable(state,
+                                        "AFN Zone Outdoor Air Generic Air Contaminant Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).SumMHrGC,
                                         "System",
                                         "Average",
                                         AirflowNetworkBalanceManager::Zone(i).Name);
-                    SetupOutputVariable("AFN Zone Mixing Generic Air Contaminant Mass Flow Rate",
+                    SetupOutputVariable(state,
+                                        "AFN Zone Mixing Generic Air Contaminant Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).SumMMHrGC,
                                         "System",
                                         "Average",
                                         AirflowNetworkBalanceManager::Zone(i).Name);
-                    SetupOutputVariable("AFN Zone Total Generic Air Contaminant Mass Flow Rate",
+                    SetupOutputVariable(state,
+                                        "AFN Zone Total Generic Air Contaminant Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).TotalGC,
                                         "System",
@@ -4897,7 +4917,7 @@ namespace AirflowNetworkBalanceManager {
                 if (AirflowNetworkBalanceManager::Contaminant.CO2Simulation) AirflowNetworkBalanceManager::ANCO(i) = AirflowNetworkBalanceManager::ZoneAirCO2(i);
                 if (AirflowNetworkBalanceManager::Contaminant.GenericContamSimulation) AirflowNetworkBalanceManager::ANGC(i) = AirflowNetworkBalanceManager::ZoneAirGC(i);
             }
-            if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfOccuVentCtrls > 0) {
+            if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOccuVentCtrls > 0) {
                 for (i = 1; i <= AirflowNetworkBalanceManager::AirflowNetworkNumOfSurfaces; ++i) {
                     if (AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OccupantVentilationControlNum > 0) {
                         AirflowNetworkBalanceManager::MultizoneSurfaceData(i).PrevOpeningstatus = AirflowNetwork::OpenStatus::FreeOperation;
@@ -4983,21 +5003,21 @@ namespace AirflowNetworkBalanceManager {
 
         // Occupant ventilation control
         Real64 CurrentEndTime = AirflowNetworkBalanceManager::CurrentTime + AirflowNetworkBalanceManager::SysTimeElapsed;
-        if (CurrentEndTime > dataAirflowNetworkBalanceManager.CurrentEndTimeLast && TimeStepSys >= dataAirflowNetworkBalanceManager.TimeStepSysLast) {
+        if (CurrentEndTime > state.dataAirflowNetworkBalanceManager->CurrentEndTimeLast && TimeStepSys >= state.dataAirflowNetworkBalanceManager->TimeStepSysLast) {
             for (i = 1; i <= AirflowNetworkBalanceManager::AirflowNetworkNumOfSurfaces; ++i) {
                 if (i > AirflowNetworkBalanceManager::AirflowNetworkNumOfSurfaces - AirflowNetworkBalanceManager::NumOfLinksIntraZone) continue;
                 if (AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OccupantVentilationControlNum > 0) {
                     AirflowNetworkBalanceManager::MultizoneSurfaceData(i).PrevOpeningstatus = AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OpeningStatus;
                     AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OpenFactorLast = AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OpenFactor;
                     if (AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OpenFactor > 0.0) {
-                        AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OpenElapsedTime += (CurrentEndTime - dataAirflowNetworkBalanceManager.CurrentEndTimeLast) * 60.0;
+                        AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OpenElapsedTime += (CurrentEndTime - state.dataAirflowNetworkBalanceManager->CurrentEndTimeLast) * 60.0;
                         AirflowNetworkBalanceManager::MultizoneSurfaceData(i).CloseElapsedTime = 0.0;
                     } else {
                         AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OpenElapsedTime = 0.0;
-                        AirflowNetworkBalanceManager::MultizoneSurfaceData(i).CloseElapsedTime += (CurrentEndTime - dataAirflowNetworkBalanceManager.CurrentEndTimeLast) * 60.0;
+                        AirflowNetworkBalanceManager::MultizoneSurfaceData(i).CloseElapsedTime += (CurrentEndTime - state.dataAirflowNetworkBalanceManager->CurrentEndTimeLast) * 60.0;
                     }
                     j = AirflowNetworkBalanceManager::MultizoneSurfaceData(i).SurfNum;
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OccupantVentilationControlNum)
+                    state.dataAirflowNetworkBalanceManager->OccupantVentilationControl(AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OccupantVentilationControlNum)
                         .calc(state,
                               AirflowNetworkBalanceManager::Surface(j).Zone,
                               AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OpenElapsedTime,
@@ -5020,7 +5040,7 @@ namespace AirflowNetworkBalanceManager {
 
 namespace AirflowNetworkBalanceManager {
 
-    void AllocateAndInitData()
+    void AllocateAndInitData(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5043,22 +5063,22 @@ namespace AirflowNetworkBalanceManager {
 
         AirflowNetworkNodeSimu.allocate(AirflowNetworkNumOfNodes);   // Node simulation variable in air distribution system
         AirflowNetworkLinkSimu.allocate(AirflowNetworkNumOfLinks);   // Link simulation variable in air distribution system
-        dataAirflowNetworkBalanceManager.linkReport.allocate(AirflowNetworkNumOfLinks); // Report link simulation variable in air distribution system
+        state.dataAirflowNetworkBalanceManager->linkReport.allocate(AirflowNetworkNumOfLinks); // Report link simulation variable in air distribution system
 
-        for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; i++) {
+        for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
             if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff) {
-                dataAirflowNetworkBalanceManager.nodeReport.allocate(AirflowNetworkNumOfZones);
-                dataAirflowNetworkBalanceManager.linkReport1.allocate(AirflowNetworkNumOfSurfaces);
+                state.dataAirflowNetworkBalanceManager->nodeReport.allocate(AirflowNetworkNumOfZones);
+                state.dataAirflowNetworkBalanceManager->linkReport1.allocate(AirflowNetworkNumOfSurfaces);
                 break;
             }
         }
 
-        dataAirflowNetworkBalanceManager.MA.allocate(AirflowNetworkNumOfNodes * AirflowNetworkNumOfNodes);
-        dataAirflowNetworkBalanceManager.MV.allocate(AirflowNetworkNumOfNodes);
-        dataAirflowNetworkBalanceManager.IVEC.allocate(AirflowNetworkNumOfNodes + 20);
+        state.dataAirflowNetworkBalanceManager->MA.allocate(AirflowNetworkNumOfNodes * AirflowNetworkNumOfNodes);
+        state.dataAirflowNetworkBalanceManager->MV.allocate(AirflowNetworkNumOfNodes);
+        state.dataAirflowNetworkBalanceManager->IVEC.allocate(AirflowNetworkNumOfNodes + 20);
 
         AirflowNetworkReportData.allocate(NumOfZones); // Report variables
-        dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt.allocate(NumOfZones);      // Report variables
+        state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt.allocate(NumOfZones);      // Report variables
 
         ANZT.allocate(NumOfZones);                                          // Local zone air temperature for rollback use
         ANZW.allocate(NumOfZones);                                          // Local zone humidity ratio for rollback use
@@ -5068,7 +5088,7 @@ namespace AirflowNetworkBalanceManager {
         solver.allocate();
 
         bool OnOffFanFlag = false;
-        for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; i++) {
+        for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
             if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff) {
                 OnOffFanFlag = true;
             }
@@ -5077,15 +5097,17 @@ namespace AirflowNetworkBalanceManager {
         // CurrentModuleObject='AirflowNetwork Simulations'
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             SetupOutputVariable(
-                "AFN Node Temperature", OutputProcessor::Unit::C, AirflowNetworkNodeSimu(i).TZ, "System", "Average", AirflowNetworkNodeData(i).Name);
-            SetupOutputVariable("AFN Node Humidity Ratio",
+                state, "AFN Node Temperature", OutputProcessor::Unit::C, AirflowNetworkNodeSimu(i).TZ, "System", "Average", AirflowNetworkNodeData(i).Name);
+            SetupOutputVariable(state,
+                                "AFN Node Humidity Ratio",
                                 OutputProcessor::Unit::kgWater_kgDryAir,
                                 AirflowNetworkNodeSimu(i).WZ,
                                 "System",
                                 "Average",
                                 AirflowNetworkNodeData(i).Name);
             if (Contaminant.CO2Simulation) {
-                SetupOutputVariable("AFN Node CO2 Concentration",
+                SetupOutputVariable(state,
+                                    "AFN Node CO2 Concentration",
                                     OutputProcessor::Unit::ppm,
                                     AirflowNetworkNodeSimu(i).CO2Z,
                                     "System",
@@ -5093,15 +5115,17 @@ namespace AirflowNetworkBalanceManager {
                                     AirflowNetworkNodeData(i).Name);
             }
             if (Contaminant.GenericContamSimulation) {
-                SetupOutputVariable("AFN Node Generic Air Contaminant Concentration",
+                SetupOutputVariable(state,
+                                    "AFN Node Generic Air Contaminant Concentration",
                                     OutputProcessor::Unit::ppm,
                                     AirflowNetworkNodeSimu(i).GCZ,
                                     "System",
                                     "Average",
                                     AirflowNetworkNodeData(i).Name);
             }
-            if (!(dataAirflowNetworkBalanceManager.SupplyFanType == FanType_SimpleOnOff && i <= AirflowNetworkNumOfZones)) {
-                SetupOutputVariable("AFN Node Total Pressure",
+            if (!(state.dataAirflowNetworkBalanceManager->SupplyFanType == FanType_SimpleOnOff && i <= AirflowNetworkNumOfZones)) {
+                SetupOutputVariable(state,
+                                    "AFN Node Total Pressure",
                                     OutputProcessor::Unit::Pa,
                                     AirflowNetworkNodeSimu(i).PZ,
                                     "System",
@@ -5109,7 +5133,8 @@ namespace AirflowNetworkBalanceManager {
                                     AirflowNetworkNodeData(i).Name);
             }
             if (AirflowNetworkNodeData(i).ExtNodeNum > 0) {
-                SetupOutputVariable("AFN Node Wind Pressure",
+                SetupOutputVariable(state,
+                                    "AFN Node Wind Pressure",
                                     OutputProcessor::Unit::Pa,
                                     AirflowNetworkNodeSimu(i).PZ,
                                     "System",
@@ -5119,32 +5144,37 @@ namespace AirflowNetworkBalanceManager {
         }
 
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
-            if (!(dataAirflowNetworkBalanceManager.SupplyFanType == FanType_SimpleOnOff && i <= AirflowNetworkNumOfSurfaces)) {
-                SetupOutputVariable("AFN Linkage Node 1 to Node 2 Mass Flow Rate",
+            if (!(state.dataAirflowNetworkBalanceManager->SupplyFanType == FanType_SimpleOnOff && i <= AirflowNetworkNumOfSurfaces)) {
+                SetupOutputVariable(state,
+                                    "AFN Linkage Node 1 to Node 2 Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    dataAirflowNetworkBalanceManager.linkReport(i).FLOW,
+                                    state.dataAirflowNetworkBalanceManager->linkReport(i).FLOW,
                                     "System",
                                     "Average",
                                     AirflowNetworkLinkageData(i).Name);
-                SetupOutputVariable("AFN Linkage Node 2 to Node 1 Mass Flow Rate",
+                SetupOutputVariable(state,
+                                    "AFN Linkage Node 2 to Node 1 Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    dataAirflowNetworkBalanceManager.linkReport(i).FLOW2,
+                                    state.dataAirflowNetworkBalanceManager->linkReport(i).FLOW2,
                                     "System",
                                     "Average",
                                     AirflowNetworkLinkageData(i).Name);
-                SetupOutputVariable("AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+                SetupOutputVariable(state,
+                                    "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW,
+                                    state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW,
                                     "System",
                                     "Average",
                                     AirflowNetworkLinkageData(i).Name);
-                SetupOutputVariable("AFN Linkage Node 2 to Node 1 Volume Flow Rate",
+                SetupOutputVariable(state,
+                                    "AFN Linkage Node 2 to Node 1 Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW2,
+                                    state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW2,
                                     "System",
                                     "Average",
                                     AirflowNetworkLinkageData(i).Name);
-                SetupOutputVariable("AFN Linkage Node 1 to Node 2 Pressure Difference",
+                SetupOutputVariable(state,
+                                    "AFN Linkage Node 1 to Node 2 Pressure Difference",
                                     OutputProcessor::Unit::Pa,
                                     AirflowNetworkLinkSimu(i).DP,
                                     "System",
@@ -5163,7 +5193,8 @@ namespace AirflowNetworkBalanceManager {
                 AirflowNetworkLinkageData(i).element->type() == ComponentType::SOP ||
                 AirflowNetworkLinkageData(i).element->type() == ComponentType::HOP) {
                 SurfNum = MultizoneSurfaceData(i).SurfNum;
-                SetupOutputVariable("AFN Surface Venting Window or Door Opening Factor",
+                SetupOutputVariable(state,
+                                    "AFN Surface Venting Window or Door Opening Factor",
                                     OutputProcessor::Unit::None,
                                     MultizoneSurfaceData(i).OpenFactor,
                                     "System",
@@ -5177,62 +5208,68 @@ namespace AirflowNetworkBalanceManager {
                                      MultizoneSurfaceData(i).EMSOpenFactorActuated,
                                      MultizoneSurfaceData(i).EMSOpenFactor);
                 }
-                SetupOutputVariable("AFN Surface Venting Window or Door Opening Modulation Multiplier",
+                SetupOutputVariable(state,
+                                    "AFN Surface Venting Window or Door Opening Modulation Multiplier",
                                     OutputProcessor::Unit::None,
                                     DataSurfaces::SurfWinVentingOpenFactorMultRep(SurfNum),
                                     "System",
                                     "Average",
                                     Surface(SurfNum).Name);
-                SetupOutputVariable("AFN Surface Venting Inside Setpoint Temperature",
+                SetupOutputVariable(state,
+                                    "AFN Surface Venting Inside Setpoint Temperature",
                                     OutputProcessor::Unit::C,
                                     DataSurfaces::SurfWinInsideTempForVentingRep(SurfNum),
                                     "System",
                                     "Average",
                                     Surface(SurfNum).Name);
-                SetupOutputVariable("AFN Surface Venting Availability Status",
+                SetupOutputVariable(state,
+                                    "AFN Surface Venting Availability Status",
                                     OutputProcessor::Unit::None,
                                     DataSurfaces::SurfWinVentingAvailabilityRep(SurfNum),
                                     "System",
                                     "Average",
                                     Surface(SurfNum).Name);
                 if (MultizoneSurfaceData(i).OccupantVentilationControlNum > 0) {
-                    SetupOutputVariable("AFN Surface Venting Window or Door Opening Factor at Previous Time Step",
+                    SetupOutputVariable(state,
+                                        "AFN Surface Venting Window or Door Opening Factor at Previous Time Step",
                                         OutputProcessor::Unit::None,
                                         MultizoneSurfaceData(i).OpenFactorLast,
                                         "System",
                                         "Average",
                                         MultizoneSurfaceData(i).SurfName);
-                    SetupOutputVariable("AFN Surface Opening Elapsed Time",
+                    SetupOutputVariable(state,
+                                        "AFN Surface Opening Elapsed Time",
                                         OutputProcessor::Unit::min,
                                         MultizoneSurfaceData(i).OpenElapsedTime,
                                         "System",
                                         "Average",
                                         MultizoneSurfaceData(i).SurfName);
-                    SetupOutputVariable("AFN Surface Closing Elapsed Time",
+                    SetupOutputVariable(state,
+                                        "AFN Surface Closing Elapsed Time",
                                         OutputProcessor::Unit::min,
                                         MultizoneSurfaceData(i).CloseElapsedTime,
                                         "System",
                                         "Average",
                                         MultizoneSurfaceData(i).SurfName);
-                    SetupOutputVariable("AFN Surface Opening Status at Previous Time Step",
+                    SetupOutputVariable(state, "AFN Surface Opening Status at Previous Time Step",
                                         OutputProcessor::Unit::None,
                                         MultizoneSurfaceData(i).PrevOpeningstatus,
                                         "System",
                                         "Average",
                                         MultizoneSurfaceData(i).SurfName);
-                    SetupOutputVariable("AFN Surface Opening Status",
+                    SetupOutputVariable(state, "AFN Surface Opening Status",
                                         OutputProcessor::Unit::None,
                                         MultizoneSurfaceData(i).OpeningStatus,
                                         "System",
                                         "Average",
                                         MultizoneSurfaceData(i).SurfName);
-                    SetupOutputVariable("AFN Surface Opening Probability Status",
+                    SetupOutputVariable(state, "AFN Surface Opening Probability Status",
                                         OutputProcessor::Unit::None,
                                         MultizoneSurfaceData(i).OpeningProbStatus,
                                         "System",
                                         "Average",
                                         MultizoneSurfaceData(i).SurfName);
-                    SetupOutputVariable("AFN Surface Closing Probability Status",
+                    SetupOutputVariable(state, "AFN Surface Closing Probability Status",
                                         OutputProcessor::Unit::None,
                                         MultizoneSurfaceData(i).ClosingProbStatus,
                                         "System",
@@ -5244,317 +5281,317 @@ namespace AirflowNetworkBalanceManager {
 
         for (i = 1; i <= NumOfZones; ++i) {
             // Multizone losses due to force air systems
-            SetupOutputVariable("AFN Zone Infiltration Sensible Heat Gain Rate",
+            SetupOutputVariable(state, "AFN Zone Infiltration Sensible Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneInfiSenGainW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Infiltration Sensible Heat Gain Energy",
+            SetupOutputVariable(state, "AFN Zone Infiltration Sensible Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneInfiSenGainJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Ventilation Sensible Heat Gain Rate",
+            SetupOutputVariable(state, "AFN Zone Ventilation Sensible Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneVentSenGainW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Ventilation Sensible Heat Gain Energy",
+            SetupOutputVariable(state, "AFN Zone Ventilation Sensible Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneVentSenGainJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Mixing Sensible Heat Gain Rate",
+            SetupOutputVariable(state, "AFN Zone Mixing Sensible Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneMixSenGainW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Mixing Sensible Heat Gain Energy",
+            SetupOutputVariable(state, "AFN Zone Mixing Sensible Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneMixSenGainJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Infiltration Sensible Heat Loss Rate",
+            SetupOutputVariable(state, "AFN Zone Infiltration Sensible Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneInfiSenLossW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Infiltration Sensible Heat Loss Energy",
+            SetupOutputVariable(state, "AFN Zone Infiltration Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneInfiSenLossJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Ventilation Sensible Heat Loss Rate",
+            SetupOutputVariable(state, "AFN Zone Ventilation Sensible Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneVentSenLossW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Ventilation Sensible Heat Loss Energy",
+            SetupOutputVariable(state, "AFN Zone Ventilation Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneVentSenLossJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Mixing Sensible Heat Loss Rate",
+            SetupOutputVariable(state, "AFN Zone Mixing Sensible Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneMixSenLossW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Mixing Sensible Heat Loss Energy",
+            SetupOutputVariable(state, "AFN Zone Mixing Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneMixSenLossJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Infiltration Latent Heat Gain Rate",
+            SetupOutputVariable(state, "AFN Zone Infiltration Latent Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneInfiLatGainW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Infiltration Latent Heat Gain Energy",
+            SetupOutputVariable(state, "AFN Zone Infiltration Latent Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneInfiLatGainJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Infiltration Latent Heat Loss Rate",
+            SetupOutputVariable(state, "AFN Zone Infiltration Latent Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneInfiLatLossW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Infiltration Latent Heat Loss Energy",
+            SetupOutputVariable(state, "AFN Zone Infiltration Latent Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneInfiLatLossJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Ventilation Latent Heat Gain Rate",
+            SetupOutputVariable(state, "AFN Zone Ventilation Latent Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneVentLatGainW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Ventilation Latent Heat Gain Energy",
+            SetupOutputVariable(state, "AFN Zone Ventilation Latent Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneVentLatGainJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Ventilation Latent Heat Loss Rate",
+            SetupOutputVariable(state, "AFN Zone Ventilation Latent Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneVentLatLossW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Ventilation Latent Heat Loss Energy",
+            SetupOutputVariable(state, "AFN Zone Ventilation Latent Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneVentLatLossJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Mixing Latent Heat Gain Rate",
+            SetupOutputVariable(state, "AFN Zone Mixing Latent Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneMixLatGainW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Mixing Latent Heat Gain Energy",
+            SetupOutputVariable(state, "AFN Zone Mixing Latent Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneMixLatGainJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Mixing Latent Heat Loss Rate",
+            SetupOutputVariable(state, "AFN Zone Mixing Latent Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneMixLatLossW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Mixing Latent Heat Loss Energy",
+            SetupOutputVariable(state, "AFN Zone Mixing Latent Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneInfiLatLossJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
             // Supply leak losses due to force air systems
-            SetupOutputVariable("AFN Zone Duct Leaked Air Sensible Heat Gain Rate",
+            SetupOutputVariable(state, "AFN Zone Duct Leaked Air Sensible Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).LeakSenGainW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Leaked Air Sensible Heat Gain Energy",
+            SetupOutputVariable(state, "AFN Zone Duct Leaked Air Sensible Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).LeakSenGainJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Leaked Air Sensible Heat Loss Rate",
+            SetupOutputVariable(state, "AFN Zone Duct Leaked Air Sensible Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).LeakSenLossW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Leaked Air Sensible Heat Loss Energy",
+            SetupOutputVariable(state, "AFN Zone Duct Leaked Air Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).LeakSenLossJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Leaked Air Latent Heat Gain Rate",
+            SetupOutputVariable(state, "AFN Zone Duct Leaked Air Latent Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).LeakLatGainW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Leaked Air Latent Heat Gain Energy",
+            SetupOutputVariable(state, "AFN Zone Duct Leaked Air Latent Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).LeakLatGainJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Leaked Air Latent Heat Loss Rate",
+            SetupOutputVariable(state, "AFN Zone Duct Leaked Air Latent Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).LeakLatLossW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Leaked Air Latent Heat Loss Energy",
+            SetupOutputVariable(state, "AFN Zone Duct Leaked Air Latent Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).LeakLatLossJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
             // Conduction losses due to force air systems
-            SetupOutputVariable("AFN Zone Duct Conduction Sensible Heat Gain Rate",
+            SetupOutputVariable(state, "AFN Zone Duct Conduction Sensible Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).CondSenGainW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Conduction Sensible Heat Gain Energy",
+            SetupOutputVariable(state, "AFN Zone Duct Conduction Sensible Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).CondSenGainJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Conduction Sensible Heat Loss Rate",
+            SetupOutputVariable(state, "AFN Zone Duct Conduction Sensible Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).CondSenLossW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Conduction Sensible Heat Loss Energy",
+            SetupOutputVariable(state, "AFN Zone Duct Conduction Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).CondSenLossJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Diffusion Latent Heat Gain Rate",
+            SetupOutputVariable(state, "AFN Zone Duct Diffusion Latent Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).DiffLatGainW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Diffusion Latent Heat Gain Energy",
+            SetupOutputVariable(state, "AFN Zone Duct Diffusion Latent Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).DiffLatGainJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Diffusion Latent Heat Loss Rate",
+            SetupOutputVariable(state, "AFN Zone Duct Diffusion Latent Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).DiffLatLossW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Diffusion Latent Heat Loss Energy",
+            SetupOutputVariable(state, "AFN Zone Duct Diffusion Latent Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).DiffLatLossJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
             // Radiation losses due to forced air systems
-            SetupOutputVariable("AFN Zone Duct Radiation Heat Gain Rate",
+            SetupOutputVariable(state, "AFN Zone Duct Radiation Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).RadGainW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Radiation Sensible Heat Gain Energy",
+            SetupOutputVariable(state, "AFN Zone Duct Radiation Sensible Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).RadGainJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Radiation Heat Loss Rate",
+            SetupOutputVariable(state, "AFN Zone Duct Radiation Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).RadLossW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Duct Radiation Sensible Heat Loss Energy",
+            SetupOutputVariable(state, "AFN Zone Duct Radiation Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).RadLossJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
             // Total losses due to force air systems
-            SetupOutputVariable("AFN Distribution Sensible Heat Gain Rate",
+            SetupOutputVariable(state, "AFN Distribution Sensible Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).TotalSenGainW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Distribution Sensible Heat Gain Energy",
+            SetupOutputVariable(state, "AFN Distribution Sensible Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).TotalSenGainJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Distribution Sensible Heat Loss Rate",
+            SetupOutputVariable(state, "AFN Distribution Sensible Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).TotalSenLossW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Distribution Sensible Heat Loss Energy",
+            SetupOutputVariable(state, "AFN Distribution Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).TotalSenLossJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Distribution Latent Heat Gain Rate",
+            SetupOutputVariable(state, "AFN Distribution Latent Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).TotalLatGainW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Distribution Latent Heat Gain Energy",
+            SetupOutputVariable(state, "AFN Distribution Latent Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).TotalLatGainJ,
                                 "System",
                                 "Sum",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Distribution Latent Heat Loss Rate",
+            SetupOutputVariable(state, "AFN Distribution Latent Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).TotalLatLossW,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Distribution Latent Heat Loss Energy",
+            SetupOutputVariable(state, "AFN Distribution Latent Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).TotalLatLossJ,
                                 "System",
@@ -5563,34 +5600,34 @@ namespace AirflowNetworkBalanceManager {
         }
 
         for (i = 1; i <= NumOfZones; ++i) {
-            SetupOutputVariable(
-                "AFN Zone Infiltration Volume", OutputProcessor::Unit::m3, dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).InfilVolume, "System", "Sum", Zone(i).Name);
-            SetupOutputVariable(
-                "AFN Zone Infiltration Mass", OutputProcessor::Unit::kg, dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).InfilMass, "System", "Sum", Zone(i).Name);
-            SetupOutputVariable("AFN Zone Infiltration Air Change Rate",
+            SetupOutputVariable(state,
+                "AFN Zone Infiltration Volume", OutputProcessor::Unit::m3, state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume, "System", "Sum", Zone(i).Name);
+            SetupOutputVariable(state,
+                "AFN Zone Infiltration Mass", OutputProcessor::Unit::kg, state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilMass, "System", "Sum", Zone(i).Name);
+            SetupOutputVariable(state, "AFN Zone Infiltration Air Change Rate",
                                 OutputProcessor::Unit::ach,
-                                dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).InfilAirChangeRate,
+                                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilAirChangeRate,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Mixing Volume", OutputProcessor::Unit::m3, dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).MixVolume, "System", "Sum", Zone(i).Name);
-            SetupOutputVariable("AFN Zone Mixing Mass", OutputProcessor::Unit::kg, dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).MixMass, "System", "Sum", Zone(i).Name);
+            SetupOutputVariable(state, "AFN Zone Mixing Volume", OutputProcessor::Unit::m3, state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixVolume, "System", "Sum", Zone(i).Name);
+            SetupOutputVariable(state, "AFN Zone Mixing Mass", OutputProcessor::Unit::kg, state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixMass, "System", "Sum", Zone(i).Name);
 
-            SetupOutputVariable("AFN Zone Exfiltration Heat Transfer Rate",
+            SetupOutputVariable(state, "AFN Zone Exfiltration Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).ExfilTotalLoss,
+                                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilTotalLoss,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Exfiltration Sensible Heat Transfer Rate",
+            SetupOutputVariable(state, "AFN Zone Exfiltration Sensible Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).ExfilSensiLoss,
+                                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilSensiLoss,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
-            SetupOutputVariable("AFN Zone Exfiltration Latent Heat Transfer Rate",
+            SetupOutputVariable(state, "AFN Zone Exfiltration Latent Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).ExfilLatentLoss,
+                                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilLatentLoss,
                                 "System",
                                 "Average",
                                 Zone(i).Name);
@@ -5598,53 +5635,53 @@ namespace AirflowNetworkBalanceManager {
 
         if (OnOffFanFlag) {
             for (i = 1; i <= AirflowNetworkNumOfZones; ++i) {
-                SetupOutputVariable(
-                    "AFN Zone Average Pressure", OutputProcessor::Unit::Pa, dataAirflowNetworkBalanceManager.nodeReport(i).PZ, "System", "Average", Zone(i).Name);
-                SetupOutputVariable(
-                    "AFN Zone On Cycle Pressure", OutputProcessor::Unit::Pa, dataAirflowNetworkBalanceManager.nodeReport(i).PZON, "System", "Average", Zone(i).Name);
-                SetupOutputVariable(
-                    "AFN Zone Off Cycle Pressure", OutputProcessor::Unit::Pa, dataAirflowNetworkBalanceManager.nodeReport(i).PZOFF, "System", "Average", Zone(i).Name);
+                SetupOutputVariable(state,
+                    "AFN Zone Average Pressure", OutputProcessor::Unit::Pa, state.dataAirflowNetworkBalanceManager->nodeReport(i).PZ, "System", "Average", Zone(i).Name);
+                SetupOutputVariable(state,
+                    "AFN Zone On Cycle Pressure", OutputProcessor::Unit::Pa, state.dataAirflowNetworkBalanceManager->nodeReport(i).PZON, "System", "Average", Zone(i).Name);
+                SetupOutputVariable(state,
+                    "AFN Zone Off Cycle Pressure", OutputProcessor::Unit::Pa, state.dataAirflowNetworkBalanceManager->nodeReport(i).PZOFF, "System", "Average", Zone(i).Name);
             }
             for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
-                SetupOutputVariable("AFN Linkage Node 1 to 2 Average Mass Flow Rate",
+                SetupOutputVariable(state, "AFN Linkage Node 1 to 2 Average Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    dataAirflowNetworkBalanceManager.linkReport1(i).FLOW,
+                                    state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW,
                                     "System",
                                     "Average",
                                     MultizoneSurfaceData(i).SurfName);
-                SetupOutputVariable("AFN Linkage Node 2 to 1 Average Mass Flow Rate",
+                SetupOutputVariable(state, "AFN Linkage Node 2 to 1 Average Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2,
+                                    state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2,
                                     "System",
                                     "Average",
                                     MultizoneSurfaceData(i).SurfName);
-                SetupOutputVariable("AFN Linkage Node 1 to 2 Average Volume Flow Rate",
+                SetupOutputVariable(state, "AFN Linkage Node 1 to 2 Average Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    dataAirflowNetworkBalanceManager.linkReport1(i).VolFLOW,
+                                    state.dataAirflowNetworkBalanceManager->linkReport1(i).VolFLOW,
                                     "System",
                                     "Average",
                                     MultizoneSurfaceData(i).SurfName);
-                SetupOutputVariable("AFN Linkage Node 2 to 1 Average Volume Flow Rate",
+                SetupOutputVariable(state, "AFN Linkage Node 2 to 1 Average Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    dataAirflowNetworkBalanceManager.linkReport1(i).VolFLOW2,
+                                    state.dataAirflowNetworkBalanceManager->linkReport1(i).VolFLOW2,
                                     "System",
                                     "Average",
                                     MultizoneSurfaceData(i).SurfName);
-                SetupOutputVariable("AFN Surface Average Pressure Difference",
+                SetupOutputVariable(state, "AFN Surface Average Pressure Difference",
                                     OutputProcessor::Unit::Pa,
-                                    dataAirflowNetworkBalanceManager.linkReport1(i).DP,
+                                    state.dataAirflowNetworkBalanceManager->linkReport1(i).DP,
                                     "System",
                                     "Average",
                                     MultizoneSurfaceData(i).SurfName);
-                SetupOutputVariable("AFN Surface On Cycle Pressure Difference",
+                SetupOutputVariable(state, "AFN Surface On Cycle Pressure Difference",
                                     OutputProcessor::Unit::Pa,
-                                    dataAirflowNetworkBalanceManager.linkReport1(i).DPON,
+                                    state.dataAirflowNetworkBalanceManager->linkReport1(i).DPON,
                                     "System",
                                     "Average",
                                     MultizoneSurfaceData(i).SurfName);
-                SetupOutputVariable("AFN Surface Off Cycle Pressure Difference",
+                SetupOutputVariable(state, "AFN Surface Off Cycle Pressure Difference",
                                     OutputProcessor::Unit::Pa,
-                                    dataAirflowNetworkBalanceManager.linkReport1(i).DPOFF,
+                                    state.dataAirflowNetworkBalanceManager->linkReport1(i).DPOFF,
                                     "System",
                                     "Average",
                                     MultizoneSurfaceData(i).SurfName);
@@ -5718,9 +5755,9 @@ namespace AirflowNetworkBalanceManager {
         int AirLoopNum;
 
         // Validate supply and return connections
-        if (dataAirflowNetworkBalanceManager.CalcAirflowNetworkAirBalanceOneTimeFlag) {
-            dataAirflowNetworkBalanceManager.CalcAirflowNetworkAirBalanceOneTimeFlag = false;
-            if (dataAirflowNetworkBalanceManager.CalcAirflowNetworkAirBalanceErrorsFound) {
+        if (state.dataAirflowNetworkBalanceManager->CalcAirflowNetworkAirBalanceOneTimeFlag) {
+            state.dataAirflowNetworkBalanceManager->CalcAirflowNetworkAirBalanceOneTimeFlag = false;
+            if (state.dataAirflowNetworkBalanceManager->CalcAirflowNetworkAirBalanceErrorsFound) {
                 ShowFatalError("GetAirflowNetworkInput: Program terminates for preceding reason(s).");
             }
         }
@@ -5734,7 +5771,7 @@ namespace AirflowNetworkBalanceManager {
                 if (i > 0) {
                     AirflowNetworkNodeSimu(n).TZ = OutDryBulbTempAt(AirflowNetworkNodeData(n).NodeHeight);
                     AirflowNetworkNodeSimu(n).WZ = OutHumRat;
-                    if (i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode) {
+                    if (i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode) {
                         if (MultizoneExternalNodeData(i).OutAirNodeNum == 0) {
                             LocalWindSpeed = WindSpeedAt(MultizoneExternalNodeData(i).height);
                             LocalDryBulb = OutDryBulbTempAt(AirflowNetworkNodeData(n).NodeHeight);
@@ -5774,7 +5811,7 @@ namespace AirflowNetworkBalanceManager {
                 } else {
                     ShowSevereError("GetAirflowNetworkInput: AIRFLOWNETWORK:DISTRIBUTION:NODE: Invalid external node = " +
                                     AirflowNetworkNodeData(n).Name);
-                    dataAirflowNetworkBalanceManager.CalcAirflowNetworkAirBalanceErrorsFound = true;
+                    state.dataAirflowNetworkBalanceManager->CalcAirflowNetworkAirBalanceErrorsFound = true;
                 }
             }
         }
@@ -5876,7 +5913,7 @@ namespace AirflowNetworkBalanceManager {
 
         PressureSetFlag = 0;
 
-        if (dataAirflowNetworkBalanceManager.NumOfPressureControllers == 1) {
+        if (state.dataAirflowNetworkBalanceManager->NumOfPressureControllers == 1) {
             if (PressureControllerData(1).AvailSchedPtr == ScheduleAlwaysOn) {
                 PressureSetFlag = PressureControllerData(1).ControlTypeSet;
             } else {
@@ -6409,7 +6446,7 @@ namespace AirflowNetworkBalanceManager {
                     WtSR * (WtAng * CPHighRiseRoof(ISR, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR, IAng + 1)) +
                     (1.0 - WtSR) * (WtAng * CPHighRiseRoof(ISR + 1, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR + 1, IAng + 1));
             }
-            AirflowNetworkBalanceManager::CalcSingleSidedCps(valsByFacade); // run the advanced single sided subroutine if at least one zone calls for it
+            AirflowNetworkBalanceManager::CalcSingleSidedCps(state, valsByFacade); // run the advanced single sided subroutine if at least one zone calls for it
             // Resize the curve index array
             curveIndex.resize(valsByFacade.size());
             // Create the curves
@@ -6541,7 +6578,8 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    Real64 CalcDuctOutsideConvResist(Real64 const Ts,      // Surface temperature
+    Real64 CalcDuctOutsideConvResist(EnergyPlusData &state,
+                                     Real64 const Ts,      // Surface temperature
                                      Real64 const Tamb,    // Free air temperature
                                      Real64 const Wamb,    // Free air humidity ratio
                                      Real64 const Pamb,    // Free air barometric pressure
@@ -6589,7 +6627,7 @@ namespace AirflowNetworkBalanceManager {
             Real64 V = 0;
             // Forced convection
             if (ZoneNum > 0) {
-                Real64 ACH = GetZoneInfilAirChangeRate(ZoneNum); // Zone air change rate [1/hr]
+                Real64 ACH = GetZoneInfilAirChangeRate(state, ZoneNum); // Zone air change rate [1/hr]
                 Real64 Vol = Zone(ZoneNum).Volume;               // Zone volume [m3]
                 V = pow(Vol, 0.333) * ACH / 3600;                // Average air speed in zone [m/s]
             } else {
@@ -6633,7 +6671,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void CalcAirflowNetworkHeatBalance()
+    void CalcAirflowNetworkHeatBalance(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -6677,8 +6715,8 @@ namespace AirflowNetworkBalanceManager {
         bool found;
         bool OANode;
 
-        dataAirflowNetworkBalanceManager.MA = 0.0;
-        dataAirflowNetworkBalanceManager.MV = 0.0;
+        state.dataAirflowNetworkBalanceManager->MA = 0.0;
+        state.dataAirflowNetworkBalanceManager->MV = 0.0;
 
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
             CompNum = AirflowNetworkLinkageData(i).CompNum;
@@ -6701,7 +6739,7 @@ namespace AirflowNetworkBalanceManager {
                 }
                 // Fatal error when return flow is opposite to the desired direction
                 if (AirflowNetworkLinkSimu(i).FLOW == 0.0 && AirflowNetworkLinkSimu(i).FLOW2 > 0.0) {
-                    if (dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) {
+                    if (state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) {
                         ShowSevereError("AirflowNetwork: The airflow direction is opposite to the intended direction (from node 1 to node 2) in "
                                         "AirflowNetwork:Distribution:Linkage = " +
                                         AirflowNetworkLinkageData(i).Name);
@@ -6755,7 +6793,8 @@ namespace AirflowNetworkBalanceManager {
                                                                            AirflowNetworkLinkSimu(i).FLOW,
                                                                            DisSysCompDuctData(TypeNum).hydraulicDiameter,
                                                                            DisSysCompDuctData(TypeNum).InsideConvCoeff);
-                            Real64 RThermConvOut = CalcDuctOutsideConvResist(TDuctSurf,
+                            Real64 RThermConvOut = CalcDuctOutsideConvResist(state,
+                                                                             TDuctSurf,
                                                                              Tamb,
                                                                              Wamb,
                                                                              Pamb,
@@ -6777,7 +6816,8 @@ namespace AirflowNetworkBalanceManager {
                                                                        AirflowNetworkLinkSimu(i).FLOW,
                                                                        DisSysCompDuctData(TypeNum).hydraulicDiameter,
                                                                        DisSysCompDuctData(TypeNum).InsideConvCoeff);
-                        Real64 RThermConvOut = CalcDuctOutsideConvResist(TDuctSurf,
+                        Real64 RThermConvOut = CalcDuctOutsideConvResist(state,
+                                                                         TDuctSurf,
                                                                          Tamb,
                                                                          Wamb,
                                                                          Pamb,
@@ -6807,7 +6847,8 @@ namespace AirflowNetworkBalanceManager {
                                                                        AirflowNetworkLinkSimu(i).FLOW,
                                                                        DisSysCompDuctData(TypeNum).hydraulicDiameter,
                                                                        DisSysCompDuctData(TypeNum).InsideConvCoeff);
-                        Real64 RThermConvOut = CalcDuctOutsideConvResist(TDuctSurf,
+                        Real64 RThermConvOut = CalcDuctOutsideConvResist(state,
+                                                                         TDuctSurf,
                                                                          Tamb,
                                                                          Wamb,
                                                                          Pamb,
@@ -6882,16 +6923,16 @@ namespace AirflowNetworkBalanceManager {
                     UThermal = (VFObj.QRad + VFObj.QConv) / (DuctSurfArea * std::abs(Tsurr - Tin));
                 }
 
-                if (!dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
+                if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
                     Ei = General::epexp(-UThermal * DuctSurfArea,  (AirflowNetworkLinkSimu(i).FLOW2 * CpAir));
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * Ei;
-                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Tsurr * (1.0 - Ei) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * Ei;
+                    state.dataAirflowNetworkBalanceManager->MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Tsurr * (1.0 - Ei) * CpAir;
                 } else {
                     Ei = General::epexp(-UThermal * DuctSurfArea, (DirSign * AirflowNetworkLinkSimu(i).FLOW * CpAir));
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir * Ei;
-                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Tsurr * (1.0 - Ei) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir * Ei;
+                    state.dataAirflowNetworkBalanceManager->MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Tsurr * (1.0 - Ei) * CpAir;
                 }
             }
             if (CompTypeNum == CompTypeNum_TMU) { // Reheat unit: SINGLE DUCT:CONST VOLUME:REHEAT
@@ -6908,16 +6949,16 @@ namespace AirflowNetworkBalanceManager {
                 Ei = General::epexp(-0.001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Pi,
                               (DirSign * AirflowNetworkLinkSimu(i).FLOW * CpAir));
                 Tamb = AirflowNetworkNodeSimu(LT).TZ;
-                if (!dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
+                if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
                     Ei = General::epexp(-0.001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Pi,
                                             (AirflowNetworkLinkSimu(i).FLOW2 * CpAir));
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * Ei;
-                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Tamb * (1.0 - Ei) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * Ei;
+                    state.dataAirflowNetworkBalanceManager->MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Tamb * (1.0 - Ei) * CpAir;
                 } else {
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir * Ei;
-                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Tamb * (1.0 - Ei) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir * Ei;
+                    state.dataAirflowNetworkBalanceManager->MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Tamb * (1.0 - Ei) * CpAir;
                 }
             }
             if (CompTypeNum == CompTypeNum_COI) { // heating or cooling coil
@@ -6941,14 +6982,14 @@ namespace AirflowNetworkBalanceManager {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                 }
-                if (!dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
                 } else {
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
                 }
-                dataAirflowNetworkBalanceManager.MV(LT) = 0.0;
+                state.dataAirflowNetworkBalanceManager->MV(LT) = 0.0;
             }
             // Calculate return leak
             if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == std::string()) {
@@ -6957,29 +6998,29 @@ namespace AirflowNetworkBalanceManager {
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * CpAir;
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
                 }
             }
             // Check reheat unit or coil
@@ -7006,7 +7047,7 @@ namespace AirflowNetworkBalanceManager {
                     load = Node(NF).Temp - Node(NT).Temp;
                 }
                 CpAir = PsyCpAirFnW(Node(NT).HumRat);
-                dataAirflowNetworkBalanceManager.MV(LT) += AirflowNetworkLinkSimu(i).FLOW * CpAir * load;
+                state.dataAirflowNetworkBalanceManager->MV(LT) += AirflowNetworkLinkSimu(i).FLOW * CpAir * load;
             }
         }
 
@@ -7049,31 +7090,31 @@ namespace AirflowNetworkBalanceManager {
 
             if (j > 0 && (AirflowNetworkNodeData(i).EPlusZoneNum > 0 || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_FOU ||
                           AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_COU || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_HXO)) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = Node(j).Temp * 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = Node(j).Temp * 1.0e10;
             }
             if (j > 0 && OANode) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = Node(j).Temp * 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = Node(j).Temp * 1.0e10;
             }
-            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
+            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = ANZT(ZoneNum) * 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = ANZT(ZoneNum) * 1.0e10;
             }
-            if (AirflowNetworkNodeData(i).ExtNodeNum > 0 && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+            if (AirflowNetworkNodeData(i).ExtNodeNum > 0 && state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
                 if (AirflowNetworkNodeData(i).OutAirNodeNum > 0) {
-                    dataAirflowNetworkBalanceManager.MV(i) = Node(AirflowNetworkNodeData(i).OutAirNodeNum).OutAirDryBulb * 1.0e10;
+                    state.dataAirflowNetworkBalanceManager->MV(i) = Node(AirflowNetworkNodeData(i).OutAirNodeNum).OutAirDryBulb * 1.0e10;
                 } else {
-                    dataAirflowNetworkBalanceManager.MV(i) = OutDryBulbTempAt(AirflowNetworkNodeData(i).NodeHeight) * 1.0e10;
+                    state.dataAirflowNetworkBalanceManager->MV(i) = OutDryBulbTempAt(AirflowNetworkNodeData(i).NodeHeight) * 1.0e10;
                 }
             }
-            if (AirflowNetworkNodeData(i).RAFNNodeNum > 0 && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+            if (AirflowNetworkNodeData(i).RAFNNodeNum > 0 && state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
                 if (RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirflowNetworkNodeID == i) {
-                    dataAirflowNetworkBalanceManager.MV(i) = RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirTemp * 1.0e10;
+                    state.dataAirflowNetworkBalanceManager->MV(i) = RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirTemp * 1.0e10;
                 }
             }
         }
@@ -7081,22 +7122,22 @@ namespace AirflowNetworkBalanceManager {
         // Assign node value to distribution nodes with fan off
         for (i = 1 + NumOfNodesMultiZone; i <= AirflowNetworkNumOfNodes; ++i) {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
-            if (j > 0 && !dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = Node(j).Temp * 1.0e10;
+            if (j > 0 && !state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = Node(j).Temp * 1.0e10;
             }
-            if (j == 0 && i > NumOfNodesMultiZone && !dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = AirflowNetworkNodeSimu(i).TZlast * 1.0e10;
+            if (j == 0 && i > NumOfNodesMultiZone && !state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = AirflowNetworkNodeSimu(i).TZlast * 1.0e10;
             }
         }
 
         // Check singularity
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
-            if (dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-6) {
-                if (i > NumOfNodesMultiZone && !dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
-                    dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                    dataAirflowNetworkBalanceManager.MV(i) = AirflowNetworkNodeSimu(i).TZlast * 1.0e10;
+            if (state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-6) {
+                if (i > NumOfNodesMultiZone && !state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
+                    state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                    state.dataAirflowNetworkBalanceManager->MV(i) = AirflowNetworkNodeSimu(i).TZlast * 1.0e10;
                 } else {
                     ShowFatalError("CalcAirflowNetworkHeatBalance: A diagonal entity is zero in AirflowNetwork matrix at node " +
                                    AirflowNetworkNodeData(i).Name);
@@ -7105,19 +7146,19 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Get an inverse matrix
-        MRXINV(AirflowNetworkNumOfNodes);
+        MRXINV(state, AirflowNetworkNumOfNodes);
 
         // Calculate node temperatures
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             TZON = 0.0;
             for (j = 1; j <= AirflowNetworkNumOfNodes; ++j) {
-                TZON += dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + j) * dataAirflowNetworkBalanceManager.MV(j);
+                TZON += state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + j) * state.dataAirflowNetworkBalanceManager->MV(j);
             }
             AirflowNetworkNodeSimu(i).TZ = TZON;
         }
     }
 
-    void CalcAirflowNetworkMoisBalance()
+    void CalcAirflowNetworkMoisBalance(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -7148,8 +7189,8 @@ namespace AirflowNetworkBalanceManager {
         bool found;
         bool OANode;
 
-        dataAirflowNetworkBalanceManager.MA = 0.0;
-        dataAirflowNetworkBalanceManager.MV = 0.0;
+        state.dataAirflowNetworkBalanceManager->MA = 0.0;
+        state.dataAirflowNetworkBalanceManager->MV = 0.0;
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
             CompNum = AirflowNetworkLinkageData(i).CompNum;
             CompTypeNum = AirflowNetworkCompData(CompNum).CompTypeNum;
@@ -7175,16 +7216,16 @@ namespace AirflowNetworkBalanceManager {
                 } else {
                     Wamb = ANZW(AirflowNetworkLinkageData(i).ZoneNum);
                 }
-                if (!dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
+                if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
                     Ei = General::epexp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L *
                                             DisSysCompDuctData(TypeNum).hydraulicDiameter * Pi, (AirflowNetworkLinkSimu(i).FLOW2));
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Ei;
-                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Wamb * (1.0 - Ei);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Ei;
+                    state.dataAirflowNetworkBalanceManager->MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Wamb * (1.0 - Ei);
                 } else {
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * Ei;
-                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Wamb * (1.0 - Ei);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * Ei;
+                    state.dataAirflowNetworkBalanceManager->MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Wamb * (1.0 - Ei);
                 }
             }
             if (CompTypeNum == CompTypeNum_TMU) { // Reheat unit: SINGLE DUCT:CONST VOLUME:REHEAT
@@ -7201,17 +7242,17 @@ namespace AirflowNetworkBalanceManager {
                 Ei = General::epexp(-0.0001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Pi,
                                         (DirSign * AirflowNetworkLinkSimu(i).FLOW));
                 Wamb = AirflowNetworkNodeSimu(LT).WZ;
-                if (!dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
+                if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
 
                     Ei = General::epexp(-0.0001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Pi,
                                             (AirflowNetworkLinkSimu(i).FLOW2));
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Ei;
-                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Wamb * (1.0 - Ei);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Ei;
+                    state.dataAirflowNetworkBalanceManager->MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Wamb * (1.0 - Ei);
                 } else {
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * Ei;
-                    dataAirflowNetworkBalanceManager.MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Wamb * (1.0 - Ei);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW) * Ei;
+                    state.dataAirflowNetworkBalanceManager->MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW) * Wamb * (1.0 - Ei);
                 }
             }
             if (CompTypeNum == CompTypeNum_COI) { // heating or cooling coil
@@ -7235,14 +7276,14 @@ namespace AirflowNetworkBalanceManager {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                 }
-                if (!dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                 } else {
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
                 }
-                dataAirflowNetworkBalanceManager.MV(LT) = 0.0;
+                state.dataAirflowNetworkBalanceManager->MV(LT) = 0.0;
             }
             // Calculate return leak
             if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == std::string()) {
@@ -7251,29 +7292,29 @@ namespace AirflowNetworkBalanceManager {
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                 }
             }
             // Check reheat unit
@@ -7299,7 +7340,7 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     load = Node(NF).HumRat - Node(NT).HumRat;
                 }
-                dataAirflowNetworkBalanceManager.MV(LT) += AirflowNetworkLinkSimu(i).FLOW * load;
+                state.dataAirflowNetworkBalanceManager->MV(LT) += AirflowNetworkLinkSimu(i).FLOW * load;
             }
         }
 
@@ -7341,27 +7382,27 @@ namespace AirflowNetworkBalanceManager {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
             if (j > 0 && (AirflowNetworkNodeData(i).EPlusZoneNum > 0 || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_FOU ||
                           AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_COU || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_HXO)) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = Node(j).HumRat * 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = Node(j).HumRat * 1.0e10;
             }
             if (j > 0 && OANode) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = Node(j).HumRat * 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = Node(j).HumRat * 1.0e10;
             }
-            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
+            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = ANZW(ZoneNum) * 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = ANZW(ZoneNum) * 1.0e10;
             }
             if (AirflowNetworkNodeData(i).ExtNodeNum > 0) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = OutHumRat * 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = OutHumRat * 1.0e10;
             }
-            if (AirflowNetworkNodeData(i).RAFNNodeNum > 0 && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+            if (AirflowNetworkNodeData(i).RAFNNodeNum > 0 && state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
                 if (RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirflowNetworkNodeID == i) {
-                    dataAirflowNetworkBalanceManager.MV(i) = RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).HumRat * 1.0e10;
+                    state.dataAirflowNetworkBalanceManager->MV(i) = RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).HumRat * 1.0e10;
                 }
             }
         }
@@ -7369,38 +7410,38 @@ namespace AirflowNetworkBalanceManager {
         // Assign node value to distribution nodes with fan off
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
-            if (j > 0 && !dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = Node(j).HumRat * 1.0e10;
+            if (j > 0 && !state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = Node(j).HumRat * 1.0e10;
             }
-            if (j == 0 && i > NumOfNodesMultiZone && !dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = AirflowNetworkNodeSimu(i).WZlast * 1.0e10;
+            if (j == 0 && i > NumOfNodesMultiZone && !state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = AirflowNetworkNodeSimu(i).WZlast * 1.0e10;
             }
         }
 
         // Check singularity
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
-            if (dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-8) {
+            if (state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-8) {
                 ShowFatalError("CalcAirflowNetworkMoisBalance: A diagonal entity is zero in AirflowNetwork matrix at node " +
                                AirflowNetworkNodeData(i).Name);
             }
         }
 
         // Get an inverse matrix
-        MRXINV(AirflowNetworkNumOfNodes);
+        MRXINV(state, AirflowNetworkNumOfNodes);
 
         // Calculate node temperatures
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             WZON = 0.0;
             for (j = 1; j <= AirflowNetworkNumOfNodes; ++j) {
-                WZON += dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + j) * dataAirflowNetworkBalanceManager.MV(j);
+                WZON += state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + j) * state.dataAirflowNetworkBalanceManager->MV(j);
             }
             AirflowNetworkNodeSimu(i).WZ = WZON;
         }
     }
 
-    void CalcAirflowNetworkCO2Balance()
+    void CalcAirflowNetworkCO2Balance(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -7426,8 +7467,8 @@ namespace AirflowNetworkBalanceManager {
         bool found;
         bool OANode;
 
-        dataAirflowNetworkBalanceManager.MA = 0.0;
-        dataAirflowNetworkBalanceManager.MV = 0.0;
+        state.dataAirflowNetworkBalanceManager->MA = 0.0;
+        state.dataAirflowNetworkBalanceManager->MV = 0.0;
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
             CompNum = AirflowNetworkLinkageData(i).CompNum;
             CompTypeNum = AirflowNetworkCompData(CompNum).CompTypeNum;
@@ -7444,8 +7485,8 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     DirSign = -1.0;
                 }
-                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
             }
             if (CompTypeNum == CompTypeNum_TMU) { // Reheat unit: SINGLE DUCT:CONST VOLUME:REHEAT
                 TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
@@ -7458,8 +7499,8 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     DirSign = -1.0;
                 }
-                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
             }
             if (CompTypeNum == CompTypeNum_COI) { // heating or cooling coil
                 TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
@@ -7482,9 +7523,9 @@ namespace AirflowNetworkBalanceManager {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                 }
-                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                dataAirflowNetworkBalanceManager.MV(LT) = 0.0;
+                state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                state.dataAirflowNetworkBalanceManager->MV(LT) = 0.0;
             }
             // Calculate return leak
             if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == std::string()) {
@@ -7493,29 +7534,29 @@ namespace AirflowNetworkBalanceManager {
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                 }
             }
         }
@@ -7558,59 +7599,59 @@ namespace AirflowNetworkBalanceManager {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
             if (j > 0 && (AirflowNetworkNodeData(i).EPlusZoneNum > 0 || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_FOU ||
                           AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_COU || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_HXO)) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = Node(j).CO2 * 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = Node(j).CO2 * 1.0e10;
             }
             if (j > 0 && OANode) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = Node(j).CO2 * 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = Node(j).CO2 * 1.0e10;
             }
-            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
+            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = ANCO(ZoneNum) * 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = ANCO(ZoneNum) * 1.0e10;
             }
             if (AirflowNetworkNodeData(i).ExtNodeNum > 0) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = OutdoorCO2 * 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = OutdoorCO2 * 1.0e10;
             }
         }
 
         // Assign node value to distribution nodes with fan off
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
-            if (j > 0 && !dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = Node(j).CO2 * 1.0e10;
+            if (j > 0 && !state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = Node(j).CO2 * 1.0e10;
             }
-            if (j == 0 && i > NumOfNodesMultiZone && !dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = AirflowNetworkNodeSimu(i).CO2Zlast * 1.0e10;
+            if (j == 0 && i > NumOfNodesMultiZone && !state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = AirflowNetworkNodeSimu(i).CO2Zlast * 1.0e10;
             }
         }
 
         // Check singularity
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
-            if (dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-6) {
+            if (state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-6) {
                 ShowFatalError("CalcAirflowNetworkCO2Balance: A diagonal entity is zero in AirflowNetwork matrix at node " +
                                AirflowNetworkNodeData(i).Name);
             }
         }
 
         // Get an inverse matrix
-        MRXINV(AirflowNetworkNumOfNodes);
+        MRXINV(state, AirflowNetworkNumOfNodes);
 
         // Calculate node temperatures
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             COZN = 0.0;
             for (j = 1; j <= AirflowNetworkNumOfNodes; ++j) {
-                COZN += dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + j) * dataAirflowNetworkBalanceManager.MV(j);
+                COZN += state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + j) * state.dataAirflowNetworkBalanceManager->MV(j);
             }
             AirflowNetworkNodeSimu(i).CO2Z = COZN;
         }
     }
 
-    void CalcAirflowNetworkGCBalance()
+    void CalcAirflowNetworkGCBalance(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -7636,8 +7677,8 @@ namespace AirflowNetworkBalanceManager {
         bool found;
         bool OANode;
 
-        dataAirflowNetworkBalanceManager.MA = 0.0;
-        dataAirflowNetworkBalanceManager.MV = 0.0;
+        state.dataAirflowNetworkBalanceManager->MA = 0.0;
+        state.dataAirflowNetworkBalanceManager->MV = 0.0;
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
             CompNum = AirflowNetworkLinkageData(i).CompNum;
             CompTypeNum = AirflowNetworkCompData(CompNum).CompTypeNum;
@@ -7654,8 +7695,8 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     DirSign = -1.0;
                 }
-                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
             }
             if (CompTypeNum == CompTypeNum_TMU) { // Reheat unit: SINGLE DUCT:CONST VOLUME:REHEAT
                 TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
@@ -7668,8 +7709,8 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     DirSign = -1.0;
                 }
-                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
             }
             if (CompTypeNum == CompTypeNum_COI) { // heating or cooling coil
                 TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
@@ -7692,9 +7733,9 @@ namespace AirflowNetworkBalanceManager {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                 }
-                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                dataAirflowNetworkBalanceManager.MV(LT) = 0.0;
+                state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                state.dataAirflowNetworkBalanceManager->MV(LT) = 0.0;
             }
             // Calculate return leak
             if ((CompTypeNum == CompTypeNum_PLR || CompTypeNum == CompTypeNum_ELR) && CompName == std::string()) {
@@ -7703,29 +7744,29 @@ namespace AirflowNetworkBalanceManager {
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
                     LT = AirflowNetworkLinkageData(i).NodeNums[1];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusZoneNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                 }
                 if ((AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).ExtNodeNum > 0) &&
                     (AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum == 0) && (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     LF = AirflowNetworkLinkageData(i).NodeNums[1];
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
-                    dataAirflowNetworkBalanceManager.MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
+                    state.dataAirflowNetworkBalanceManager->MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                 }
             }
         }
@@ -7768,59 +7809,59 @@ namespace AirflowNetworkBalanceManager {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
             if (j > 0 && (AirflowNetworkNodeData(i).EPlusZoneNum > 0 || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_FOU ||
                           AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_COU || AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_HXO)) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = Node(j).GenContam * 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = Node(j).GenContam * 1.0e10;
             }
             if (j > 0 && OANode) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = Node(j).GenContam * 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = Node(j).GenContam * 1.0e10;
             }
-            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
+            if (AirflowNetworkNodeData(i).EPlusZoneNum > 0 && state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = ANGC(ZoneNum) * 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = ANGC(ZoneNum) * 1.0e10;
             }
             if (AirflowNetworkNodeData(i).ExtNodeNum > 0) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = OutdoorGC * 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = OutdoorGC * 1.0e10;
             }
         }
 
         // Assign node value to distribution nodes with fan off
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
-            if (j > 0 && !dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = Node(j).GenContam * 1.0e10;
+            if (j > 0 && !state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = Node(j).GenContam * 1.0e10;
             }
-            if (j == 0 && i > NumOfNodesMultiZone && !dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
-                dataAirflowNetworkBalanceManager.MV(i) = AirflowNetworkNodeSimu(i).GCZlast * 1.0e10;
+            if (j == 0 && i > NumOfNodesMultiZone && !state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
+                state.dataAirflowNetworkBalanceManager->MV(i) = AirflowNetworkNodeSimu(i).GCZlast * 1.0e10;
             }
         }
 
         // Check singularity
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
-            if (dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-6) {
+            if (state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e-6) {
                 ShowFatalError("CalcAirflowNetworkGCBalance: A diagonal entity is zero in AirflowNetwork matrix at node " +
                                AirflowNetworkNodeData(i).Name);
             }
         }
 
         // Get an inverse matrix
-        MRXINV(AirflowNetworkNumOfNodes);
+        MRXINV(state, AirflowNetworkNumOfNodes);
 
         // Calculate node temperatures
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             COZN = 0.0;
             for (j = 1; j <= AirflowNetworkNumOfNodes; ++j) {
-                COZN += dataAirflowNetworkBalanceManager.MA((i - 1) * AirflowNetworkNumOfNodes + j) * dataAirflowNetworkBalanceManager.MV(j);
+                COZN += state.dataAirflowNetworkBalanceManager->MA((i - 1) * AirflowNetworkNumOfNodes + j) * state.dataAirflowNetworkBalanceManager->MV(j);
             }
             AirflowNetworkNodeSimu(i).GCZ = COZN;
         }
     }
 
-    void MRXINV(int const NORDER)
+    void MRXINV(EnergyPlusData &state, int const NORDER)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7840,61 +7881,61 @@ namespace AirflowNetworkBalanceManager {
         Real64 R1;
         Real64 S;
 
-        dataAirflowNetworkBalanceManager.IVEC = 0;
+        state.dataAirflowNetworkBalanceManager->IVEC = 0;
         for (i = 1; i <= NORDER; ++i) {
-            dataAirflowNetworkBalanceManager.IVEC(i + 20) = i;
+            state.dataAirflowNetworkBalanceManager->IVEC(i + 20) = i;
         }
         for (i = 1; i <= NORDER; ++i) {
             R1 = 0.0;
             M = i;
             for (j = i; j <= NORDER; ++j) {
-                if (std::abs(R1) < std::abs(dataAirflowNetworkBalanceManager.MA((i - 1) * NORDER + j))) {
+                if (std::abs(R1) < std::abs(state.dataAirflowNetworkBalanceManager->MA((i - 1) * NORDER + j))) {
                     M = j;
-                    R1 = dataAirflowNetworkBalanceManager.MA((i - 1) * NORDER + j);
+                    R1 = state.dataAirflowNetworkBalanceManager->MA((i - 1) * NORDER + j);
                 }
             }
             if (i != M) {
-                K = dataAirflowNetworkBalanceManager.IVEC(M + 20);
-                dataAirflowNetworkBalanceManager.IVEC(M + 20) = dataAirflowNetworkBalanceManager.IVEC(i + 20);
-                dataAirflowNetworkBalanceManager.IVEC(i + 20) = K;
+                K = state.dataAirflowNetworkBalanceManager->IVEC(M + 20);
+                state.dataAirflowNetworkBalanceManager->IVEC(M + 20) = state.dataAirflowNetworkBalanceManager->IVEC(i + 20);
+                state.dataAirflowNetworkBalanceManager->IVEC(i + 20) = K;
                 for (j = 1; j <= NORDER; ++j) {
-                    S = dataAirflowNetworkBalanceManager.MA((j - 1) * NORDER + i);
-                    dataAirflowNetworkBalanceManager.MA((j - 1) * NORDER + i) = dataAirflowNetworkBalanceManager.MA((j - 1) * NORDER + M);
-                    dataAirflowNetworkBalanceManager.MA((j - 1) * NORDER + M) = S;
+                    S = state.dataAirflowNetworkBalanceManager->MA((j - 1) * NORDER + i);
+                    state.dataAirflowNetworkBalanceManager->MA((j - 1) * NORDER + i) = state.dataAirflowNetworkBalanceManager->MA((j - 1) * NORDER + M);
+                    state.dataAirflowNetworkBalanceManager->MA((j - 1) * NORDER + M) = S;
                 }
             }
-            dataAirflowNetworkBalanceManager.MA((i - 1) * NORDER + i) = 1.0;
+            state.dataAirflowNetworkBalanceManager->MA((i - 1) * NORDER + i) = 1.0;
             for (j = 1; j <= NORDER; ++j) {
-                dataAirflowNetworkBalanceManager.MA((i - 1) * NORDER + j) /= R1;
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * NORDER + j) /= R1;
             }
             for (j = 1; j <= NORDER; ++j) {
                 if (i == j) continue;
-                R1 = dataAirflowNetworkBalanceManager.MA((j - 1) * NORDER + i);
+                R1 = state.dataAirflowNetworkBalanceManager->MA((j - 1) * NORDER + i);
                 if (std::abs(R1) <= 1.0E-20) continue;
-                dataAirflowNetworkBalanceManager.MA((j - 1) * NORDER + i) = 0.0;
+                state.dataAirflowNetworkBalanceManager->MA((j - 1) * NORDER + i) = 0.0;
                 for (K = 1; K <= NORDER; ++K) {
-                    dataAirflowNetworkBalanceManager.MA((j - 1) * NORDER + K) -= R1 * dataAirflowNetworkBalanceManager.MA((i - 1) * NORDER + K);
+                    state.dataAirflowNetworkBalanceManager->MA((j - 1) * NORDER + K) -= R1 * state.dataAirflowNetworkBalanceManager->MA((i - 1) * NORDER + K);
                 }
             }
         }
         for (i = 1; i <= NORDER; ++i) {
-            if (dataAirflowNetworkBalanceManager.IVEC(i + 20) == i) continue;
+            if (state.dataAirflowNetworkBalanceManager->IVEC(i + 20) == i) continue;
             M = i;
             while (NORDER > M) {
                 ++M;
-                if (dataAirflowNetworkBalanceManager.IVEC(M + 20) == i) break;
+                if (state.dataAirflowNetworkBalanceManager->IVEC(M + 20) == i) break;
             }
-            dataAirflowNetworkBalanceManager.IVEC(M + 20) = dataAirflowNetworkBalanceManager.IVEC(i + 20);
+            state.dataAirflowNetworkBalanceManager->IVEC(M + 20) = state.dataAirflowNetworkBalanceManager->IVEC(i + 20);
             for (j = 1; j <= NORDER; ++j) {
-                R1 = dataAirflowNetworkBalanceManager.MA((i - 1) * NORDER + j);
-                dataAirflowNetworkBalanceManager.MA((i - 1) * NORDER + j) = dataAirflowNetworkBalanceManager.MA((M - 1) * NORDER + j);
-                dataAirflowNetworkBalanceManager.MA((M - 1) * NORDER + j) = R1;
+                R1 = state.dataAirflowNetworkBalanceManager->MA((i - 1) * NORDER + j);
+                state.dataAirflowNetworkBalanceManager->MA((i - 1) * NORDER + j) = state.dataAirflowNetworkBalanceManager->MA((M - 1) * NORDER + j);
+                state.dataAirflowNetworkBalanceManager->MA((M - 1) * NORDER + j) = R1;
             }
-            dataAirflowNetworkBalanceManager.IVEC(i + 20) = i;
+            state.dataAirflowNetworkBalanceManager->IVEC(i + 20) = i;
         }
     }
 
-    void ReportAirflowNetwork()
+    void ReportAirflowNetwork(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8174,61 +8215,61 @@ namespace AirflowNetworkBalanceManager {
         // Assign data for report
         if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
             for (i = 1; i <= NumOfZones; ++i) {
-                if (dataAirflowNetworkBalanceManager.exchangeData(i).LeakSen > 0.0) {
-                    AirflowNetworkReportData(i).LeakSenGainW = dataAirflowNetworkBalanceManager.exchangeData(i).LeakSen;
-                    AirflowNetworkReportData(i).LeakSenGainJ = dataAirflowNetworkBalanceManager.exchangeData(i).LeakSen * ReportingConstant;
+                if (state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakSen > 0.0) {
+                    AirflowNetworkReportData(i).LeakSenGainW = state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakSen;
+                    AirflowNetworkReportData(i).LeakSenGainJ = state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakSen * ReportingConstant;
                 } else {
-                    AirflowNetworkReportData(i).LeakSenLossW = -dataAirflowNetworkBalanceManager.exchangeData(i).LeakSen;
-                    AirflowNetworkReportData(i).LeakSenLossJ = -dataAirflowNetworkBalanceManager.exchangeData(i).LeakSen * ReportingConstant;
+                    AirflowNetworkReportData(i).LeakSenLossW = -state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakSen;
+                    AirflowNetworkReportData(i).LeakSenLossJ = -state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakSen * ReportingConstant;
                 }
-                if (dataAirflowNetworkBalanceManager.exchangeData(i).LeakLat > 0.0) {
-                    AirflowNetworkReportData(i).LeakLatGainW = dataAirflowNetworkBalanceManager.exchangeData(i).LeakLat * Lam;
-                    AirflowNetworkReportData(i).LeakLatGainJ = dataAirflowNetworkBalanceManager.exchangeData(i).LeakLat * Lam * ReportingConstant;
+                if (state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakLat > 0.0) {
+                    AirflowNetworkReportData(i).LeakLatGainW = state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakLat * Lam;
+                    AirflowNetworkReportData(i).LeakLatGainJ = state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakLat * Lam * ReportingConstant;
                 } else {
-                    AirflowNetworkReportData(i).LeakLatLossW = -dataAirflowNetworkBalanceManager.exchangeData(i).LeakLat * Lam;
-                    AirflowNetworkReportData(i).LeakLatLossJ = -dataAirflowNetworkBalanceManager.exchangeData(i).LeakLat * Lam * ReportingConstant;
+                    AirflowNetworkReportData(i).LeakLatLossW = -state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakLat * Lam;
+                    AirflowNetworkReportData(i).LeakLatLossJ = -state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakLat * Lam * ReportingConstant;
                 }
-                if (dataAirflowNetworkBalanceManager.exchangeData(i).CondSen > 0.0) {
-                    AirflowNetworkReportData(i).CondSenGainW = dataAirflowNetworkBalanceManager.exchangeData(i).CondSen;
-                    AirflowNetworkReportData(i).CondSenGainJ = dataAirflowNetworkBalanceManager.exchangeData(i).CondSen * ReportingConstant;
+                if (state.dataAirflowNetworkBalanceManager->exchangeData(i).CondSen > 0.0) {
+                    AirflowNetworkReportData(i).CondSenGainW = state.dataAirflowNetworkBalanceManager->exchangeData(i).CondSen;
+                    AirflowNetworkReportData(i).CondSenGainJ = state.dataAirflowNetworkBalanceManager->exchangeData(i).CondSen * ReportingConstant;
                 } else {
-                    AirflowNetworkReportData(i).CondSenLossW = -dataAirflowNetworkBalanceManager.exchangeData(i).CondSen;
-                    AirflowNetworkReportData(i).CondSenLossJ = -dataAirflowNetworkBalanceManager.exchangeData(i).CondSen * ReportingConstant;
+                    AirflowNetworkReportData(i).CondSenLossW = -state.dataAirflowNetworkBalanceManager->exchangeData(i).CondSen;
+                    AirflowNetworkReportData(i).CondSenLossJ = -state.dataAirflowNetworkBalanceManager->exchangeData(i).CondSen * ReportingConstant;
                 }
-                if (dataAirflowNetworkBalanceManager.exchangeData(i).DiffLat > 0.0) {
-                    AirflowNetworkReportData(i).DiffLatGainW = dataAirflowNetworkBalanceManager.exchangeData(i).DiffLat * Lam;
-                    AirflowNetworkReportData(i).DiffLatGainJ = dataAirflowNetworkBalanceManager.exchangeData(i).DiffLat * Lam * ReportingConstant;
+                if (state.dataAirflowNetworkBalanceManager->exchangeData(i).DiffLat > 0.0) {
+                    AirflowNetworkReportData(i).DiffLatGainW = state.dataAirflowNetworkBalanceManager->exchangeData(i).DiffLat * Lam;
+                    AirflowNetworkReportData(i).DiffLatGainJ = state.dataAirflowNetworkBalanceManager->exchangeData(i).DiffLat * Lam * ReportingConstant;
                 } else {
-                    AirflowNetworkReportData(i).DiffLatLossW = -dataAirflowNetworkBalanceManager.exchangeData(i).DiffLat * Lam;
-                    AirflowNetworkReportData(i).DiffLatLossJ = -dataAirflowNetworkBalanceManager.exchangeData(i).DiffLat * Lam * ReportingConstant;
+                    AirflowNetworkReportData(i).DiffLatLossW = -state.dataAirflowNetworkBalanceManager->exchangeData(i).DiffLat * Lam;
+                    AirflowNetworkReportData(i).DiffLatLossJ = -state.dataAirflowNetworkBalanceManager->exchangeData(i).DiffLat * Lam * ReportingConstant;
                 }
-                if (dataAirflowNetworkBalanceManager.exchangeData(i).RadGain < 0.0) {
-                    AirflowNetworkReportData(i).RadGainW = -dataAirflowNetworkBalanceManager.exchangeData(i).RadGain;
-                    AirflowNetworkReportData(i).RadGainJ = -dataAirflowNetworkBalanceManager.exchangeData(i).RadGain * ReportingConstant;
+                if (state.dataAirflowNetworkBalanceManager->exchangeData(i).RadGain < 0.0) {
+                    AirflowNetworkReportData(i).RadGainW = -state.dataAirflowNetworkBalanceManager->exchangeData(i).RadGain;
+                    AirflowNetworkReportData(i).RadGainJ = -state.dataAirflowNetworkBalanceManager->exchangeData(i).RadGain * ReportingConstant;
                 } else {
-                    AirflowNetworkReportData(i).RadLossW = dataAirflowNetworkBalanceManager.exchangeData(i).RadGain;
-                    AirflowNetworkReportData(i).RadLossJ = dataAirflowNetworkBalanceManager.exchangeData(i).RadGain * ReportingConstant;
+                    AirflowNetworkReportData(i).RadLossW = state.dataAirflowNetworkBalanceManager->exchangeData(i).RadGain;
+                    AirflowNetworkReportData(i).RadLossJ = state.dataAirflowNetworkBalanceManager->exchangeData(i).RadGain * ReportingConstant;
                 }
-                if (dataAirflowNetworkBalanceManager.exchangeData(i).TotalSen > 0.0) {
-                    AirflowNetworkReportData(i).TotalSenGainW = dataAirflowNetworkBalanceManager.exchangeData(i).TotalSen;
-                    AirflowNetworkReportData(i).TotalSenGainJ = dataAirflowNetworkBalanceManager.exchangeData(i).TotalSen * ReportingConstant;
+                if (state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalSen > 0.0) {
+                    AirflowNetworkReportData(i).TotalSenGainW = state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalSen;
+                    AirflowNetworkReportData(i).TotalSenGainJ = state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalSen * ReportingConstant;
                 } else {
-                    AirflowNetworkReportData(i).TotalSenLossW = -dataAirflowNetworkBalanceManager.exchangeData(i).TotalSen;
-                    AirflowNetworkReportData(i).TotalSenLossJ = -dataAirflowNetworkBalanceManager.exchangeData(i).TotalSen * ReportingConstant;
+                    AirflowNetworkReportData(i).TotalSenLossW = -state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalSen;
+                    AirflowNetworkReportData(i).TotalSenLossJ = -state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalSen * ReportingConstant;
                 }
-                if (dataAirflowNetworkBalanceManager.exchangeData(i).TotalLat > 0.0) {
-                    AirflowNetworkReportData(i).TotalLatGainW = dataAirflowNetworkBalanceManager.exchangeData(i).TotalLat * Lam;
-                    AirflowNetworkReportData(i).TotalLatGainJ = dataAirflowNetworkBalanceManager.exchangeData(i).TotalLat * Lam * ReportingConstant;
+                if (state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalLat > 0.0) {
+                    AirflowNetworkReportData(i).TotalLatGainW = state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalLat * Lam;
+                    AirflowNetworkReportData(i).TotalLatGainJ = state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalLat * Lam * ReportingConstant;
                 } else {
-                    AirflowNetworkReportData(i).TotalLatLossW = -dataAirflowNetworkBalanceManager.exchangeData(i).TotalLat * Lam;
-                    AirflowNetworkReportData(i).TotalLatLossJ = -dataAirflowNetworkBalanceManager.exchangeData(i).TotalLat * Lam * ReportingConstant;
+                    AirflowNetworkReportData(i).TotalLatLossW = -state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalLat * Lam;
+                    AirflowNetworkReportData(i).TotalLatLossJ = -state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalLat * Lam * ReportingConstant;
                 }
             }
         }
 
         // Zone report
 
-        for (auto &e : dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt) {
+        for (auto &e : state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt) {
             e.InfilVolume = 0.0;
             e.InfilMass = 0.0;
             e.InfilAirChangeRate = 0.0;
@@ -8237,21 +8278,21 @@ namespace AirflowNetworkBalanceManager {
         }
 
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            if (dataAirflowNetworkBalanceManager.DisSysNumOfCVFs == 0) continue;
-            for (FanNum = 1; FanNum <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; ++FanNum) {
+            if (state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs == 0) continue;
+            for (FanNum = 1; FanNum <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; ++FanNum) {
                 if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
             }
-            if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
-                dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum) > 0.0) {
+            if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
+                state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum) > 0.0) {
                 // ON Cycle calculation
                 onceZoneFlag = false;
                 for (i = 1; i <= NumOfZones; ++i) {
                     if (AirflowNetworkNodeData(i).AirLoopNum > 0 && AirflowNetworkNodeData(i).AirLoopNum != AirLoopNum) continue;
                     if (AirflowNetworkNodeData(i).AirLoopNum == AirLoopNum) {
-                        RepOnOffFanRunTimeFraction = dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum);
+                        RepOnOffFanRunTimeFraction = state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum);
                     }
                     if (AirflowNetworkNodeData(i).AirLoopNum == 0) {
-                        RepOnOffFanRunTimeFraction = dataAirflowNetworkBalanceManager.MaxOnOffFanRunTimeFraction;
+                        RepOnOffFanRunTimeFraction = state.dataAirflowNetworkBalanceManager->MaxOnOffFanRunTimeFraction;
                     }
                     if (AirflowNetworkNodeData(i).AirLoopNum == 0 && onceZoneFlag(i)) continue;
                     AirflowNetworkReportData(i).MultiZoneInfiSenGainW *= RepOnOffFanRunTimeFraction;
@@ -8293,10 +8334,10 @@ namespace AirflowNetworkBalanceManager {
                     if (ZN1 > 0 && ZN2 == 0) {
                         if (AirflowNetworkNodeData(n).AirLoopNum > 0 && AirflowNetworkNodeData(n).AirLoopNum != AirLoopNum) continue;
                         if (AirflowNetworkNodeData(n).AirLoopNum == AirLoopNum) {
-                            RepOnOffFanRunTimeFraction = dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum);
+                            RepOnOffFanRunTimeFraction = state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum);
                         }
                         if (AirflowNetworkNodeData(n).AirLoopNum == 0) {
-                            RepOnOffFanRunTimeFraction = dataAirflowNetworkBalanceManager.MaxOnOffFanRunTimeFraction;
+                            RepOnOffFanRunTimeFraction = state.dataAirflowNetworkBalanceManager->MaxOnOffFanRunTimeFraction;
                         }
                         if (AirflowNetworkNodeData(n).AirLoopNum == 0 && onceSurfFlag(i)) continue;
                         ReportingFraction = (1.0 - RepOnOffFanRunTimeFraction);
@@ -8306,51 +8347,51 @@ namespace AirflowNetworkBalanceManager {
                             AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_SEL) {
                             if (Tamb > MAT(ZN1)) {
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiSenGainW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * CpAir * (Tamb - MAT(ZN1))) * (1.0 - RepOnOffFanRunTimeFraction);
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * CpAir * (Tamb - MAT(ZN1))) * (1.0 - RepOnOffFanRunTimeFraction);
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiSenGainJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * CpAir * (Tamb - MAT(ZN1))) * ReportingConstant * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * CpAir * (Tamb - MAT(ZN1))) * ReportingConstant * ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiSenLossW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - Tamb)) * (1.0 - RepOnOffFanRunTimeFraction);
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - Tamb)) * (1.0 - RepOnOffFanRunTimeFraction);
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiSenLossJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - Tamb)) * ReportingConstant * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - Tamb)) * ReportingConstant * ReportingFraction;
                             }
                             if (OutHumRat > ZoneAirHumRat(ZN1)) {
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiLatGainW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * (OutHumRat - ZoneAirHumRat(ZN1))) * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * (OutHumRat - ZoneAirHumRat(ZN1))) * ReportingFraction;
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiLatGainJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * (OutHumRat - ZoneAirHumRat(ZN1))) * ReportingConstant *
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * (OutHumRat - ZoneAirHumRat(ZN1))) * ReportingConstant *
                                     ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiLatLossW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN1) - OutHumRat)) * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN1) - OutHumRat)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN1).MultiZoneInfiLatLossJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN1) - OutHumRat)) * ReportingConstant *
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN1) - OutHumRat)) * ReportingConstant *
                                     ReportingFraction;
                             }
                         } else {
                             if (Tamb > MAT(ZN1)) {
                                 AirflowNetworkReportData(ZN1).MultiZoneVentSenGainW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * CpAir * (Tamb - MAT(ZN1))) * (1.0 - RepOnOffFanRunTimeFraction);
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * CpAir * (Tamb - MAT(ZN1))) * (1.0 - RepOnOffFanRunTimeFraction);
                                 AirflowNetworkReportData(ZN1).MultiZoneVentSenGainJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * CpAir * (Tamb - MAT(ZN1))) * ReportingConstant * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * CpAir * (Tamb - MAT(ZN1))) * ReportingConstant * ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN1).MultiZoneVentSenLossW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - Tamb)) * (1.0 - RepOnOffFanRunTimeFraction);
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - Tamb)) * (1.0 - RepOnOffFanRunTimeFraction);
                                 AirflowNetworkReportData(ZN1).MultiZoneVentSenLossJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - Tamb)) * ReportingConstant * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - Tamb)) * ReportingConstant * ReportingFraction;
                             }
                             if (OutHumRat > ZoneAirHumRat(ZN1)) {
                                 AirflowNetworkReportData(ZN1).MultiZoneVentLatGainW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * (OutHumRat - ZoneAirHumRat(ZN1))) * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * (OutHumRat - ZoneAirHumRat(ZN1))) * ReportingFraction;
                                 AirflowNetworkReportData(ZN1).MultiZoneVentLatGainJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * (OutHumRat - ZoneAirHumRat(ZN1))) * ReportingConstant *
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * (OutHumRat - ZoneAirHumRat(ZN1))) * ReportingConstant *
                                     ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN1).MultiZoneVentLatLossW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN1) - OutHumRat)) * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN1) - OutHumRat)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN1).MultiZoneVentLatLossJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN1) - OutHumRat)) * ReportingConstant *
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN1) - OutHumRat)) * ReportingConstant *
                                     ReportingFraction;
                             }
                         }
@@ -8361,10 +8402,10 @@ namespace AirflowNetworkBalanceManager {
                     if (ZN1 == 0 && ZN2 > 0) {
                         if (AirflowNetworkNodeData(M).AirLoopNum > 0 && AirflowNetworkNodeData(M).AirLoopNum != AirLoopNum) continue;
                         if (AirflowNetworkNodeData(M).AirLoopNum == AirLoopNum) {
-                            RepOnOffFanRunTimeFraction = dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum);
+                            RepOnOffFanRunTimeFraction = state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum);
                         }
                         if (AirflowNetworkNodeData(M).AirLoopNum == 0) {
-                            RepOnOffFanRunTimeFraction = dataAirflowNetworkBalanceManager.MaxOnOffFanRunTimeFraction;
+                            RepOnOffFanRunTimeFraction = state.dataAirflowNetworkBalanceManager->MaxOnOffFanRunTimeFraction;
                         }
                         if (AirflowNetworkNodeData(M).AirLoopNum == 0 && onceSurfFlag(i)) continue;
                         ReportingFraction = (1.0 - RepOnOffFanRunTimeFraction);
@@ -8374,48 +8415,48 @@ namespace AirflowNetworkBalanceManager {
                             AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_SEL) {
                             if (Tamb > MAT(ZN2)) {
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiSenGainW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * CpAir * (Tamb - MAT(ZN2))) * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * CpAir * (Tamb - MAT(ZN2))) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiSenGainJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * CpAir * (Tamb - MAT(ZN2))) * ReportingConstant * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * CpAir * (Tamb - MAT(ZN2))) * ReportingConstant * ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiSenLossW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * CpAir * (MAT(ZN2) - Tamb)) * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * CpAir * (MAT(ZN2) - Tamb)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiSenLossJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * CpAir * (MAT(ZN2) - Tamb)) * ReportingConstant * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * CpAir * (MAT(ZN2) - Tamb)) * ReportingConstant * ReportingFraction;
                             }
                             if (OutHumRat > ZoneAirHumRat(ZN2)) {
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiLatGainW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * (OutHumRat - ZoneAirHumRat(ZN2))) * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * (OutHumRat - ZoneAirHumRat(ZN2))) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiLatGainJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * (OutHumRat - ZoneAirHumRat(ZN2))) * ReportingConstant * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * (OutHumRat - ZoneAirHumRat(ZN2))) * ReportingConstant * ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiLatLossW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN2) - OutHumRat)) * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN2) - OutHumRat)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneInfiLatLossJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN2) - OutHumRat)) * ReportingConstant * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN2) - OutHumRat)) * ReportingConstant * ReportingFraction;
                             }
                         } else {
                             if (Tamb > MAT(ZN2)) {
                                 AirflowNetworkReportData(ZN2).MultiZoneVentSenGainW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * CpAir * (Tamb - MAT(ZN2))) * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * CpAir * (Tamb - MAT(ZN2))) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneVentSenGainJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * CpAir * (Tamb - MAT(ZN2))) * ReportingConstant * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * CpAir * (Tamb - MAT(ZN2))) * ReportingConstant * ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN2).MultiZoneVentSenLossW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * CpAir * (MAT(ZN2) - Tamb)) * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * CpAir * (MAT(ZN2) - Tamb)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneVentSenLossJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * CpAir * (MAT(ZN2) - Tamb)) * ReportingConstant * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * CpAir * (MAT(ZN2) - Tamb)) * ReportingConstant * ReportingFraction;
                             }
                             if (OutHumRat > ZoneAirHumRat(ZN2)) {
                                 AirflowNetworkReportData(ZN2).MultiZoneVentLatGainW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * (OutHumRat - ZoneAirHumRat(ZN2))) * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * (OutHumRat - ZoneAirHumRat(ZN2))) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneVentLatGainJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * (OutHumRat - ZoneAirHumRat(ZN2))) * ReportingConstant * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * (OutHumRat - ZoneAirHumRat(ZN2))) * ReportingConstant * ReportingFraction;
                             } else {
                                 AirflowNetworkReportData(ZN2).MultiZoneVentLatLossW +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN2) - OutHumRat)) * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN2) - OutHumRat)) * ReportingFraction;
                                 AirflowNetworkReportData(ZN2).MultiZoneVentLatLossJ +=
-                                    (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN2) - OutHumRat)) * ReportingConstant * ReportingFraction;
+                                    (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN2) - OutHumRat)) * ReportingConstant * ReportingFraction;
                             }
                         }
                         if (AirflowNetworkNodeData(M).AirLoopNum == 0) {
@@ -8424,56 +8465,56 @@ namespace AirflowNetworkBalanceManager {
                     }
 
                     if (ZN1 > 0 && ZN2 > 0) {
-                        ReportingFraction = (1.0 - dataAirflowNetworkBalanceManager.MaxOnOffFanRunTimeFraction);
+                        ReportingFraction = (1.0 - state.dataAirflowNetworkBalanceManager->MaxOnOffFanRunTimeFraction);
                         CpAir = PsyCpAirFnW(ZoneAirHumRat(ZN1));
                         if (MAT(ZN1) > MAT(ZN2)) {
                             AirflowNetworkReportData(ZN2).MultiZoneMixSenGainW +=
-                                (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * CpAir * (MAT(ZN1) - MAT(ZN2))) * ReportingFraction;
+                                (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * CpAir * (MAT(ZN1) - MAT(ZN2))) * ReportingFraction;
                             AirflowNetworkReportData(ZN2).MultiZoneMixSenGainJ +=
-                                (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * CpAir * (MAT(ZN1) - MAT(ZN2))) * ReportingConstant * ReportingFraction;
+                                (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * CpAir * (MAT(ZN1) - MAT(ZN2))) * ReportingConstant * ReportingFraction;
                         } else {
                             AirflowNetworkReportData(ZN2).MultiZoneMixSenLossW +=
-                                (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * CpAir * (MAT(ZN2) - MAT(ZN1))) * ReportingFraction;
+                                (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * CpAir * (MAT(ZN2) - MAT(ZN1))) * ReportingFraction;
                             AirflowNetworkReportData(ZN2).MultiZoneMixSenLossJ +=
-                                (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * CpAir * (MAT(ZN2) - MAT(ZN1))) * ReportingConstant * ReportingFraction;
+                                (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * CpAir * (MAT(ZN2) - MAT(ZN1))) * ReportingConstant * ReportingFraction;
                         }
                         if (ZoneAirHumRat(ZN1) > ZoneAirHumRat(ZN2)) {
                             AirflowNetworkReportData(ZN2).MultiZoneMixLatGainW +=
-                                (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN1) - ZoneAirHumRat(ZN2))) * ReportingFraction;
+                                (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN1) - ZoneAirHumRat(ZN2))) * ReportingFraction;
                             AirflowNetworkReportData(ZN2).MultiZoneMixLatGainJ +=
-                                (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN1) - ZoneAirHumRat(ZN2))) * ReportingConstant *
+                                (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN1) - ZoneAirHumRat(ZN2))) * ReportingConstant *
                                 ReportingFraction;
                         } else {
                             AirflowNetworkReportData(ZN2).MultiZoneMixLatLossW +=
-                                (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN2) - ZoneAirHumRat(ZN1))) * ReportingFraction;
+                                (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN2) - ZoneAirHumRat(ZN1))) * ReportingFraction;
                             AirflowNetworkReportData(ZN2).MultiZoneMixLatLossJ +=
-                                (dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN2) - ZoneAirHumRat(ZN1))) * ReportingConstant *
+                                (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN2) - ZoneAirHumRat(ZN1))) * ReportingConstant *
                                 ReportingFraction;
                         }
                         CpAir = PsyCpAirFnW(ZoneAirHumRat(ZN2));
                         if (MAT(ZN2) > MAT(ZN1)) {
                             AirflowNetworkReportData(ZN1).MultiZoneMixSenGainW +=
-                                (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN2) - MAT(ZN1))) * ReportingFraction;
+                                (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN2) - MAT(ZN1))) * ReportingFraction;
                             AirflowNetworkReportData(ZN1).MultiZoneMixSenGainJ +=
-                                (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN2) - MAT(ZN1))) * ReportingConstant * ReportingFraction;
+                                (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN2) - MAT(ZN1))) * ReportingConstant * ReportingFraction;
                         } else {
                             AirflowNetworkReportData(ZN1).MultiZoneMixSenLossW +=
-                                (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - MAT(ZN2))) * ReportingFraction;
+                                (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - MAT(ZN2))) * ReportingFraction;
                             AirflowNetworkReportData(ZN1).MultiZoneMixSenLossJ +=
-                                (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - MAT(ZN2))) * ReportingConstant * ReportingFraction;
+                                (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * CpAir * (MAT(ZN1) - MAT(ZN2))) * ReportingConstant * ReportingFraction;
                         }
 
                         if (ZoneAirHumRat(ZN2) > ZoneAirHumRat(ZN1)) {
                             AirflowNetworkReportData(ZN1).MultiZoneMixLatGainW +=
-                                (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN2) - ZoneAirHumRat(ZN1))) * ReportingFraction;
+                                (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN2) - ZoneAirHumRat(ZN1))) * ReportingFraction;
                             AirflowNetworkReportData(ZN1).MultiZoneMixLatGainJ +=
-                                (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN2) - ZoneAirHumRat(ZN1))) * ReportingConstant *
+                                (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN2) - ZoneAirHumRat(ZN1))) * ReportingConstant *
                                 ReportingFraction;
                         } else {
                             AirflowNetworkReportData(ZN1).MultiZoneMixLatLossW +=
-                                std::abs(dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN1) - ZoneAirHumRat(ZN2))) * ReportingFraction;
+                                std::abs(state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN1) - ZoneAirHumRat(ZN2))) * ReportingFraction;
                             AirflowNetworkReportData(ZN1).MultiZoneMixLatLossJ +=
-                                (dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN1) - ZoneAirHumRat(ZN2))) * ReportingConstant *
+                                (state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * (ZoneAirHumRat(ZN1) - ZoneAirHumRat(ZN2))) * ReportingConstant *
                                 ReportingFraction;
                         }
                     }
@@ -8488,47 +8529,47 @@ namespace AirflowNetworkBalanceManager {
             CpAir = PsyCpAirFnW(ZoneAirHumRatAvg(i));
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(i), ZoneAirHumRatAvg(i));
 
-            dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).InfilVolume = (dataAirflowNetworkBalanceManager.exchangeData(i).SumMCp / CpAir / AirDensity) * ReportingConstant;
-            dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).InfilAirChangeRate = dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).InfilVolume / (TimeStepSys * Zone(i).Volume);
-            dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).InfilMass = (dataAirflowNetworkBalanceManager.exchangeData(i).SumMCp / CpAir) * ReportingConstant;
-            dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).MixVolume = (dataAirflowNetworkBalanceManager.exchangeData(i).SumMMCp / CpAir / AirDensity) * ReportingConstant;
-            dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).MixMass = (dataAirflowNetworkBalanceManager.exchangeData(i).SumMMCp / CpAir) * ReportingConstant;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir / AirDensity) * ReportingConstant;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilAirChangeRate = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume / (TimeStepSys * Zone(i).Volume);
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilMass = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir) * ReportingConstant;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp / CpAir / AirDensity) * ReportingConstant;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixMass = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp / CpAir) * ReportingConstant;
             // save values for predefined report
             if (ZonePreDefRep(i).isOccupied) {
-                ZonePreDefRep(i).AFNInfilVolTotal += dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
-                if (dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).InfilVolume < ZonePreDefRep(i).AFNInfilVolMin) {
-                    ZonePreDefRep(i).AFNInfilVolMin = dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
+                ZonePreDefRep(i).AFNInfilVolTotal += state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
+                if (state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume < ZonePreDefRep(i).AFNInfilVolMin) {
+                    ZonePreDefRep(i).AFNInfilVolMin = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
                 }
             }
 
             Real64 H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(OutHumRat, Zone(i).OutDryBulbTemp);
-            dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).InletMass = 0;
-            dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).OutletMass = 0;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InletMass = 0;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).OutletMass = 0;
             if (ZoneEquipConfig(i).IsControlled) {
                 for (int j = 1; j <= ZoneEquipConfig(i).NumInletNodes; ++j) {
-                    dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).InletMass += Node(ZoneEquipConfig(i).InletNode(j)).MassFlowRate * ReportingConstant;
+                    state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InletMass += Node(ZoneEquipConfig(i).InletNode(j)).MassFlowRate * ReportingConstant;
                 }
                 for (int j = 1; j <= ZoneEquipConfig(i).NumExhaustNodes; ++j) {
-                    dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).OutletMass += Node(ZoneEquipConfig(i).ExhaustNode(j)).MassFlowRate * ReportingConstant;
+                    state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).OutletMass += Node(ZoneEquipConfig(i).ExhaustNode(j)).MassFlowRate * ReportingConstant;
                 }
                 for (int j = 1; j <= ZoneEquipConfig(i).NumReturnNodes; ++j) {
-                    dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).OutletMass += Node(ZoneEquipConfig(i).ReturnNode(j)).MassFlowRate * ReportingConstant;
+                    state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).OutletMass += Node(ZoneEquipConfig(i).ReturnNode(j)).MassFlowRate * ReportingConstant;
                 }
             }
-            dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).ExfilMass = dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).InfilMass + dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).VentilMass + dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).MixMass +
-                                               dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).InletMass - dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).OutletMass;
-            dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).ExfilSensiLoss = dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (MAT(i) - Tamb) * CpAir;
-            dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).ExfilLatentLoss =
-                dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (ZoneAirHumRat(i) - OutHumRat) * H2OHtOfVap;
-            dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).ExfilTotalLoss = dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).ExfilSensiLoss + dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).ExfilLatentLoss;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilMass = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilMass + state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).VentilMass + state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixMass +
+                                               state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InletMass - state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).OutletMass;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilSensiLoss = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (MAT(i) - Tamb) * CpAir;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilLatentLoss =
+                state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (ZoneAirHumRat(i) - OutHumRat) * H2OHtOfVap;
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilTotalLoss = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilSensiLoss + state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilLatentLoss;
 
-            ZoneTotalExfiltrationHeatLoss += dataAirflowNetworkBalanceManager.AirflowNetworkZnRpt(i).ExfilTotalLoss * ReportingConstant;
+            ZoneTotalExfiltrationHeatLoss += state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilTotalLoss * ReportingConstant;
         } // ... end of zone loads report variable update loop.
 
         // Rewrite AirflowNetwork airflow rate
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            if (dataAirflowNetworkBalanceManager.DisSysNumOfCVFs == 0) continue;
-            for (FanNum = 1; FanNum <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; ++FanNum) {
+            if (state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs == 0) continue;
+            for (FanNum = 1; FanNum <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; ++FanNum) {
                 if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
             }
             onceSurfFlag = false;
@@ -8538,13 +8579,13 @@ namespace AirflowNetworkBalanceManager {
                 if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) {
                     Tamb = OutDryBulbTempAt(AirflowNetworkLinkageData(i).NodeHeights[0]);
                     AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Tamb, OutHumRat);
-                    if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
-                        dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum) > 0.0) {
-                        dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW = dataAirflowNetworkBalanceManager.linkReport1(i).FLOW / AirDensity;
-                        dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW2 = dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2 / AirDensity;
+                    if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
+                        state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum) > 0.0) {
+                        state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW = state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW / AirDensity;
+                        state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW2 = state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2 / AirDensity;
                     } else {
-                        dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW = dataAirflowNetworkBalanceManager.linkReport(i).FLOW / AirDensity;
-                        dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW2 = dataAirflowNetworkBalanceManager.linkReport(i).FLOW2 / AirDensity;
+                        state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW = state.dataAirflowNetworkBalanceManager->linkReport(i).FLOW / AirDensity;
+                        state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW2 = state.dataAirflowNetworkBalanceManager->linkReport(i).FLOW2 / AirDensity;
                     }
                     onceSurfFlag(i) = true;
                 }
@@ -8559,16 +8600,16 @@ namespace AirflowNetworkBalanceManager {
                         AirDensity = PsyRhoAirFnPbTdbW((AirflowNetworkNodeSimu(n).PZ + AirflowNetworkNodeSimu(M).PZ) / 2.0 + OutBaroPress,
                                                        (AirflowNetworkNodeSimu(n).TZ + AirflowNetworkNodeSimu(M).TZ) / 2.0,
                                                        (AirflowNetworkNodeSimu(n).WZ + AirflowNetworkNodeSimu(M).WZ) / 2.0);
-                        if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
-                            dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum) > 0.0) {
-                            dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW =
-                                dataAirflowNetworkBalanceManager.linkReport(i).FLOW / AirDensity * (1.0 - dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum));
-                            dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW2 =
-                                dataAirflowNetworkBalanceManager.linkReport(i).FLOW2 / AirDensity * (1.0 - dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum));
+                        if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
+                            state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum) > 0.0) {
+                            state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW =
+                                state.dataAirflowNetworkBalanceManager->linkReport(i).FLOW / AirDensity * (1.0 - state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum));
+                            state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW2 =
+                                state.dataAirflowNetworkBalanceManager->linkReport(i).FLOW2 / AirDensity * (1.0 - state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum));
                             onceSurfFlag(i) = true;
                         } else {
-                            dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW = dataAirflowNetworkBalanceManager.linkReport(i).FLOW / AirDensity;
-                            dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW2 = dataAirflowNetworkBalanceManager.linkReport(i).FLOW2 / AirDensity;
+                            state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW = state.dataAirflowNetworkBalanceManager->linkReport(i).FLOW / AirDensity;
+                            state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW2 = state.dataAirflowNetworkBalanceManager->linkReport(i).FLOW2 / AirDensity;
                         }
                     }
                 }
@@ -8616,7 +8657,7 @@ namespace AirflowNetworkBalanceManager {
         bool WriteFlag;
 
 
-        for (auto &e : dataAirflowNetworkBalanceManager.exchangeData) {
+        for (auto &e : state.dataAirflowNetworkBalanceManager->exchangeData) {
             e.SumMCp = 0.0;
             e.SumMCpT = 0.0;
             e.SumMHr = 0.0;
@@ -8627,13 +8668,13 @@ namespace AirflowNetworkBalanceManager {
             e.SumMMHrW = 0.0;
         }
         if (Contaminant.CO2Simulation) {
-            for (auto &e : dataAirflowNetworkBalanceManager.exchangeData) {
+            for (auto &e : state.dataAirflowNetworkBalanceManager->exchangeData) {
                 e.SumMHrCO = 0.0;
                 e.SumMMHrCO = 0.0;
             }
         }
         if (Contaminant.GenericContamSimulation) {
-            for (auto &e : dataAirflowNetworkBalanceManager.exchangeData) {
+            for (auto &e : state.dataAirflowNetworkBalanceManager->exchangeData) {
                 e.SumMHrGC = 0.0;
                 e.SumMMHrGC = 0.0;
             }
@@ -8651,55 +8692,55 @@ namespace AirflowNetworkBalanceManager {
                     // Find a linkage from outdoors to this zone
                     Tamb = Zone(ZN1).OutDryBulbTemp;
                     CpAir = PsyCpAirFnW(OutHumRat);
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN1).SumMCp += AirflowNetworkLinkSimu(i).FLOW2 * CpAir;
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN1).SumMCpT += AirflowNetworkLinkSimu(i).FLOW2 * CpAir * Tamb;
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN1).SumMHr += AirflowNetworkLinkSimu(i).FLOW2;
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN1).SumMHrW += AirflowNetworkLinkSimu(i).FLOW2 * OutHumRat;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMCp += AirflowNetworkLinkSimu(i).FLOW2 * CpAir;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMCpT += AirflowNetworkLinkSimu(i).FLOW2 * CpAir * Tamb;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMHr += AirflowNetworkLinkSimu(i).FLOW2;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMHrW += AirflowNetworkLinkSimu(i).FLOW2 * OutHumRat;
                     if (Contaminant.CO2Simulation) {
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN1).SumMHrCO += AirflowNetworkLinkSimu(i).FLOW2 * OutdoorCO2;
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMHrCO += AirflowNetworkLinkSimu(i).FLOW2 * OutdoorCO2;
                     }
                     if (Contaminant.GenericContamSimulation) {
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN1).SumMHrGC += AirflowNetworkLinkSimu(i).FLOW2 * OutdoorGC;
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMHrGC += AirflowNetworkLinkSimu(i).FLOW2 * OutdoorGC;
                     }
                 }
                 if (ZN1 == 0 && ZN2 > 0) {
                     // Find a linkage from outdoors to this zone
                     Tamb = Zone(ZN2).OutDryBulbTemp;
                     CpAir = PsyCpAirFnW(OutHumRat);
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN2).SumMCp += AirflowNetworkLinkSimu(i).FLOW * CpAir;
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN2).SumMCpT += AirflowNetworkLinkSimu(i).FLOW * CpAir * Tamb;
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN2).SumMHr += AirflowNetworkLinkSimu(i).FLOW;
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN2).SumMHrW += AirflowNetworkLinkSimu(i).FLOW * OutHumRat;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMCp += AirflowNetworkLinkSimu(i).FLOW * CpAir;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMCpT += AirflowNetworkLinkSimu(i).FLOW * CpAir * Tamb;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMHr += AirflowNetworkLinkSimu(i).FLOW;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMHrW += AirflowNetworkLinkSimu(i).FLOW * OutHumRat;
                     if (Contaminant.CO2Simulation) {
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN2).SumMHrCO += AirflowNetworkLinkSimu(i).FLOW * OutdoorCO2;
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMHrCO += AirflowNetworkLinkSimu(i).FLOW * OutdoorCO2;
                     }
                     if (Contaminant.GenericContamSimulation) {
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN2).SumMHrGC += AirflowNetworkLinkSimu(i).FLOW * OutdoorGC;
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMHrGC += AirflowNetworkLinkSimu(i).FLOW * OutdoorGC;
                     }
                 }
                 if (ZN1 > 0 && ZN2 > 0) {
                     // Find a linkage from outdoors to this zone
                     CpAir = PsyCpAirFnW(ANZW(ZN1));
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN2).SumMMCp += AirflowNetworkLinkSimu(i).FLOW * CpAir;
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN2).SumMMCpT += AirflowNetworkLinkSimu(i).FLOW * CpAir * ANZT(ZN1);
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN2).SumMMHr += AirflowNetworkLinkSimu(i).FLOW;
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN2).SumMMHrW += AirflowNetworkLinkSimu(i).FLOW * ANZW(ZN1);
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMMCp += AirflowNetworkLinkSimu(i).FLOW * CpAir;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMMCpT += AirflowNetworkLinkSimu(i).FLOW * CpAir * ANZT(ZN1);
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMMHr += AirflowNetworkLinkSimu(i).FLOW;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMMHrW += AirflowNetworkLinkSimu(i).FLOW * ANZW(ZN1);
                     if (Contaminant.CO2Simulation) {
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN2).SumMMHrCO += AirflowNetworkLinkSimu(i).FLOW * ANCO(ZN1);
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMMHrCO += AirflowNetworkLinkSimu(i).FLOW * ANCO(ZN1);
                     }
                     if (Contaminant.GenericContamSimulation) {
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN2).SumMMHrGC += AirflowNetworkLinkSimu(i).FLOW * ANGC(ZN1);
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMMHrGC += AirflowNetworkLinkSimu(i).FLOW * ANGC(ZN1);
                     }
                     CpAir = PsyCpAirFnW(ANZW(ZN2));
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN1).SumMMCp += AirflowNetworkLinkSimu(i).FLOW2 * CpAir;
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN1).SumMMCpT += AirflowNetworkLinkSimu(i).FLOW2 * CpAir * ANZT(ZN2);
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN1).SumMMHr += AirflowNetworkLinkSimu(i).FLOW2;
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN1).SumMMHrW += AirflowNetworkLinkSimu(i).FLOW2 * ANZW(ZN2);
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMMCp += AirflowNetworkLinkSimu(i).FLOW2 * CpAir;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMMCpT += AirflowNetworkLinkSimu(i).FLOW2 * CpAir * ANZT(ZN2);
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMMHr += AirflowNetworkLinkSimu(i).FLOW2;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMMHrW += AirflowNetworkLinkSimu(i).FLOW2 * ANZW(ZN2);
                     if (Contaminant.CO2Simulation) {
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN1).SumMMHrCO += AirflowNetworkLinkSimu(i).FLOW2 * ANCO(ZN2);
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMMHrCO += AirflowNetworkLinkSimu(i).FLOW2 * ANCO(ZN2);
                     }
                     if (Contaminant.GenericContamSimulation) {
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN1).SumMMHrGC += AirflowNetworkLinkSimu(i).FLOW2 * ANGC(ZN2);
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMMHrGC += AirflowNetworkLinkSimu(i).FLOW2 * ANGC(ZN2);
                     }
                 }
             }
@@ -8707,7 +8748,7 @@ namespace AirflowNetworkBalanceManager {
         // End of update of multizone airflow calculations
 
         // Initialize these values
-        for (auto &e : dataAirflowNetworkBalanceManager.exchangeData) {
+        for (auto &e : state.dataAirflowNetworkBalanceManager->exchangeData) {
             e.LeakSen = 0.0;
             e.CondSen = 0.0;
             e.LeakLat = 0.0;
@@ -8725,8 +8766,8 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkLinkSimu(i).VolFLOW2 = AirflowNetworkLinkSimu(i).FLOW2 / AirDensity;
         }
 
-        for (std::size_t i = 0; i < dataAirflowNetworkBalanceManager.linkReport.size(); ++i) {
-            auto &r(dataAirflowNetworkBalanceManager.linkReport[i]);
+        for (std::size_t i = 0; i < state.dataAirflowNetworkBalanceManager->linkReport.size(); ++i) {
+            auto &r(state.dataAirflowNetworkBalanceManager->linkReport[i]);
             auto &s(AirflowNetworkLinkSimu[i]);
             r.FLOW = s.FLOW;
             r.FLOW2 = s.FLOW2;
@@ -8736,7 +8777,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Save zone loads from multizone calculation for later summation
         bool OnOffFanFlag = false;
-        for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; i++) {
+        for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
             if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff) {
                 OnOffFanFlag = true;
                 break;
@@ -8744,24 +8785,24 @@ namespace AirflowNetworkBalanceManager {
         }
         if (present(FirstHVACIteration)) {
             if (FirstHVACIteration && OnOffFanFlag) {
-                dataAirflowNetworkBalanceManager.multiExchangeData = dataAirflowNetworkBalanceManager.exchangeData;
+                state.dataAirflowNetworkBalanceManager->multiExchangeData = state.dataAirflowNetworkBalanceManager->exchangeData;
                 for (i = 1; i <= AirflowNetworkNumOfZones; ++i) {
-                    dataAirflowNetworkBalanceManager.nodeReport(i).PZ = AirflowNetworkNodeSimu(i).PZ;
-                    dataAirflowNetworkBalanceManager.nodeReport(i).PZOFF = AirflowNetworkNodeSimu(i).PZ;
-                    dataAirflowNetworkBalanceManager.nodeReport(i).PZON = 0.0;
+                    state.dataAirflowNetworkBalanceManager->nodeReport(i).PZ = AirflowNetworkNodeSimu(i).PZ;
+                    state.dataAirflowNetworkBalanceManager->nodeReport(i).PZOFF = AirflowNetworkNodeSimu(i).PZ;
+                    state.dataAirflowNetworkBalanceManager->nodeReport(i).PZON = 0.0;
                 }
                 for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
-                    dataAirflowNetworkBalanceManager.linkReport1(i).FLOW = AirflowNetworkLinkSimu(i).FLOW;
-                    dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2 = AirflowNetworkLinkSimu(i).FLOW2;
-                    dataAirflowNetworkBalanceManager.linkReport1(i).VolFLOW = AirflowNetworkLinkSimu(i).VolFLOW;
-                    dataAirflowNetworkBalanceManager.linkReport1(i).VolFLOW2 = AirflowNetworkLinkSimu(i).VolFLOW2;
-                    dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF = AirflowNetworkLinkSimu(i).FLOW;
-                    dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF = AirflowNetworkLinkSimu(i).FLOW2;
-                    dataAirflowNetworkBalanceManager.linkReport1(i).VolFLOWOFF = AirflowNetworkLinkSimu(i).VolFLOW;
-                    dataAirflowNetworkBalanceManager.linkReport1(i).VolFLOW2OFF = AirflowNetworkLinkSimu(i).VolFLOW2;
-                    dataAirflowNetworkBalanceManager.linkReport1(i).DP = AirflowNetworkLinkSimu(i).DP;
-                    dataAirflowNetworkBalanceManager.linkReport1(i).DPOFF = AirflowNetworkLinkSimu(i).DP;
-                    dataAirflowNetworkBalanceManager.linkReport1(i).DPON = 0.0;
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW = AirflowNetworkLinkSimu(i).FLOW;
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2 = AirflowNetworkLinkSimu(i).FLOW2;
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).VolFLOW = AirflowNetworkLinkSimu(i).VolFLOW;
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).VolFLOW2 = AirflowNetworkLinkSimu(i).VolFLOW2;
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF = AirflowNetworkLinkSimu(i).FLOW;
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF = AirflowNetworkLinkSimu(i).FLOW2;
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).VolFLOWOFF = AirflowNetworkLinkSimu(i).VolFLOW;
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).VolFLOW2OFF = AirflowNetworkLinkSimu(i).VolFLOW2;
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).DP = AirflowNetworkLinkSimu(i).DP;
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).DPOFF = AirflowNetworkLinkSimu(i).DP;
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).DPON = 0.0;
                 }
             }
         }
@@ -8772,10 +8813,10 @@ namespace AirflowNetworkBalanceManager {
             }
             for (i = AirflowNetworkNumOfSurfaces + 1; i <= AirflowNetworkNumOfLinks; ++i) {
                 AirflowNetworkLinkSimu(i).DP = 0.0;
-                dataAirflowNetworkBalanceManager.linkReport(i).FLOW = 0.0;
-                dataAirflowNetworkBalanceManager.linkReport(i).FLOW2 = 0.0;
-                dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW = 0.0;
-                dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW2 = 0.0;
+                state.dataAirflowNetworkBalanceManager->linkReport(i).FLOW = 0.0;
+                state.dataAirflowNetworkBalanceManager->linkReport(i).FLOW2 = 0.0;
+                state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW = 0.0;
+                state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW2 = 0.0;
             }
         }
 
@@ -8791,28 +8832,28 @@ namespace AirflowNetworkBalanceManager {
                 if (ZN1 > 0 && ZN2 == 0) {
                     Tamb = Zone(ZN1).OutDryBulbTemp;
                     CpAir = PsyCpAirFnW(OutHumRat);
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN1).MultiZoneSen += AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (Tamb - ANZT(ZN1));
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN1).MultiZoneLat += AirflowNetworkLinkSimu(i).FLOW2 * (OutHumRat - ANZW(ZN1));
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).MultiZoneSen += AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (Tamb - ANZT(ZN1));
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).MultiZoneLat += AirflowNetworkLinkSimu(i).FLOW2 * (OutHumRat - ANZW(ZN1));
                 }
                 if (ZN1 == 0 && ZN2 > 0) {
                     Tamb = Zone(ZN2).OutDryBulbTemp;
                     CpAir = PsyCpAirFnW(OutHumRat);
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN2).MultiZoneSen += AirflowNetworkLinkSimu(i).FLOW * CpAir * (Tamb - ANZT(ZN2));
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN2).MultiZoneLat += AirflowNetworkLinkSimu(i).FLOW * (OutHumRat - ANZW(ZN2));
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).MultiZoneSen += AirflowNetworkLinkSimu(i).FLOW * CpAir * (Tamb - ANZT(ZN2));
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).MultiZoneLat += AirflowNetworkLinkSimu(i).FLOW * (OutHumRat - ANZW(ZN2));
                 }
 
                 if (ZN1 > 0 && ZN2 > 0) {
                     if (AirflowNetworkLinkSimu(i).FLOW > 0) { // Flow from ZN1 to ZN2
                         CpAir = PsyCpAirFnW(ANZW(ZN1));
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN2).MultiZoneSen += AirflowNetworkLinkSimu(i).FLOW * CpAir * (ANZT(ZN1) - ANZT(ZN2));
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN2).MultiZoneLat += AirflowNetworkLinkSimu(i).FLOW * (ANZW(ZN1) - ANZW(ZN2));
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).MultiZoneSen += AirflowNetworkLinkSimu(i).FLOW * CpAir * (ANZT(ZN1) - ANZT(ZN2));
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).MultiZoneLat += AirflowNetworkLinkSimu(i).FLOW * (ANZW(ZN1) - ANZW(ZN2));
                         CpAir = PsyCpAirFnW(ANZW(ZN2));
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN1).MultiZoneSen += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * (ANZT(ZN2) - ANZT(ZN1));
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN1).MultiZoneLat += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * (ANZW(ZN2) - ANZW(ZN1));
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).MultiZoneSen += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * (ANZT(ZN2) - ANZT(ZN1));
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).MultiZoneLat += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * (ANZW(ZN2) - ANZW(ZN1));
                     } else {
                         CpAir = PsyCpAirFnW(ANZW(ZN2));
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN1).MultiZoneSen += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * (ANZT(ZN2) - ANZT(ZN1));
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN1).MultiZoneLat += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * (ANZW(ZN2) - ANZW(ZN1));
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).MultiZoneSen += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * (ANZT(ZN2) - ANZT(ZN1));
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).MultiZoneLat += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * (ANZW(ZN2) - ANZW(ZN1));
                     }
                 }
             }
@@ -8822,45 +8863,45 @@ namespace AirflowNetworkBalanceManager {
         int FanNum;
         Real64 MaxPartLoadRatio = 0.0;
         Real64 OnOffFanRunTimeFraction = 0.0;
-        dataAirflowNetworkBalanceManager.MaxOnOffFanRunTimeFraction = 0.0;
+        state.dataAirflowNetworkBalanceManager->MaxOnOffFanRunTimeFraction = 0.0;
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             MaxPartLoadRatio = max(MaxPartLoadRatio, state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio);
-            dataAirflowNetworkBalanceManager.MaxOnOffFanRunTimeFraction = max(dataAirflowNetworkBalanceManager.MaxOnOffFanRunTimeFraction, dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum));
+            state.dataAirflowNetworkBalanceManager->MaxOnOffFanRunTimeFraction = max(state.dataAirflowNetworkBalanceManager->MaxOnOffFanRunTimeFraction, state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum));
         }
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            for (FanNum = 1; FanNum <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; ++FanNum) {
+            for (FanNum = 1; FanNum <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; ++FanNum) {
                 if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
             }
             PartLoadRatio = 1.0;
-            dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum) = 1.0;
+            state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio(AirLoopNum) = 1.0;
             OnOffFanRunTimeFraction = 1.0;
-            dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum) = 1.0;
+            state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum) = 1.0;
             // Calculate the part load ratio, can't be greater than 1 for a simple ONOFF fan
             if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff &&
                 Node(DisSysCompCVFData(FanNum).InletNode).MassFlowRate > VerySmallMassFlow &&
                 state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
                 // Hard code here
                 PartLoadRatio = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
-                dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum) = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
+                state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio(AirLoopNum) = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
                 OnOffFanRunTimeFraction = max(state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF,
                                               state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF,
                                               state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF);
-                dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum) = max(state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF,
+                state.dataAirflowNetworkBalanceManager->LoopOnOffFanRunTimeFraction(AirLoopNum) = max(state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF,
                                                               state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF,
                                                               state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF);
             }
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
 
-            if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum) < 1.0) {
-                for (std::size_t i = 0; i < dataAirflowNetworkBalanceManager.linkReport.size(); ++i) {
-                    auto &r(dataAirflowNetworkBalanceManager.linkReport[i]);
+            if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio(AirLoopNum) < 1.0) {
+                for (std::size_t i = 0; i < state.dataAirflowNetworkBalanceManager->linkReport.size(); ++i) {
+                    auto &r(state.dataAirflowNetworkBalanceManager->linkReport[i]);
                     auto &s(AirflowNetworkLinkSimu[i]);
                     auto &t(AirflowNetworkLinkageData[i]);
                     if (t.AirLoopNum == AirLoopNum) {
-                        r.FLOW = s.FLOW * dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum);
-                        r.FLOW2 = s.FLOW2 * dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum);
-                        r.VolFLOW = s.VolFLOW * dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum);
-                        r.VolFLOW2 = s.VolFLOW2 * dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum);
+                        r.FLOW = s.FLOW * state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio(AirLoopNum);
+                        r.FLOW2 = s.FLOW2 * state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio(AirLoopNum);
+                        r.VolFLOW = s.VolFLOW * state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio(AirLoopNum);
+                        r.VolFLOW2 = s.VolFLOW2 * state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio(AirLoopNum);
                     }
                     if (t.AirLoopNum == 0) {
                         r.FLOW = s.FLOW * MaxPartLoadRatio;
@@ -8873,9 +8914,9 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // One time warning
-        if (dataAirflowNetworkBalanceManager.UpdateAirflowNetworkMyOneTimeFlag) {
+        if (state.dataAirflowNetworkBalanceManager->UpdateAirflowNetworkMyOneTimeFlag) {
             for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-                for (FanNum = 1; FanNum <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; ++FanNum) {
+                for (FanNum = 1; FanNum <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; ++FanNum) {
                     if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
                 }
                 if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff &&
@@ -8892,14 +8933,14 @@ namespace AirflowNetworkBalanceManager {
                             "The mass flow rate during HVAC operation = " + RoundSigDigits(state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate, 2) +
                             " The mass flow rate during no HVAC operation = " +
                             RoundSigDigits(state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate, 2));
-                        dataAirflowNetworkBalanceManager.UpdateAirflowNetworkMyOneTimeFlag = false;
+                        state.dataAirflowNetworkBalanceManager->UpdateAirflowNetworkMyOneTimeFlag = false;
                     }
                 }
             }
         }
 
         // Check mass flow differences in the zone inlet zones and splitter nodes between node and AFN links
-        if (dataAirflowNetworkBalanceManager.UpdateAirflowNetworkMyOneTimeFlag1) {
+        if (state.dataAirflowNetworkBalanceManager->UpdateAirflowNetworkMyOneTimeFlag1) {
             if ((!VAVSystem) && DisplayExtraWarnings) {
                 WriteFlag = false;
                 for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
@@ -8928,12 +8969,12 @@ namespace AirflowNetworkBalanceManager {
                         }
                     }
                 }
-                dataAirflowNetworkBalanceManager.UpdateAirflowNetworkMyOneTimeFlag1 = false;
+                state.dataAirflowNetworkBalanceManager->UpdateAirflowNetworkMyOneTimeFlag1 = false;
                 if (WriteFlag) {
                     ShowWarningError("Please adjust the rate of Maximum Air Flow Rate field in the terminal objects or duct pressure resistance.");
                 }
             } else {
-                dataAirflowNetworkBalanceManager.UpdateAirflowNetworkMyOneTimeFlag1 = false;
+                state.dataAirflowNetworkBalanceManager->UpdateAirflowNetworkMyOneTimeFlag1 = false;
             }
         }
 
@@ -8947,22 +8988,22 @@ namespace AirflowNetworkBalanceManager {
 
                 j = AirflowNetworkNodeData(Node1).EPlusNodeNum;
                 if (j > 0 && AirflowNetworkNodeData(Node1).EPlusZoneNum == 0) {
-                    Node(j).MassFlowRate = AirflowNetworkLinkSimu(i).FLOW * dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirflowNetworkNodeData(Node1).AirLoopNum);
-                    if (!dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Node(j).MassFlowRate = 0.0;
+                    Node(j).MassFlowRate = AirflowNetworkLinkSimu(i).FLOW * state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio(AirflowNetworkNodeData(Node1).AirLoopNum);
+                    if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Node(j).MassFlowRate = 0.0;
                     if (!(AirflowNetworkNodeData(Node1).EPlusTypeNum == EPlusTypeNum_DIN ||
                           AirflowNetworkNodeData(Node1).EPlusTypeNum == EPlusTypeNum_DOU)) {
-                        Node(j).MassFlowRateMaxAvail = AirflowNetworkLinkSimu(i).FLOW * dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirflowNetworkNodeData(Node1).AirLoopNum);
+                        Node(j).MassFlowRateMaxAvail = AirflowNetworkLinkSimu(i).FLOW * state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio(AirflowNetworkNodeData(Node1).AirLoopNum);
                         Node(j).MassFlowRateMax = AirflowNetworkLinkSimu(i).FLOW;
                     }
                 }
 
                 j = AirflowNetworkNodeData(Node2).EPlusNodeNum;
                 if (j > 0) {
-                    Node(j).MassFlowRate = AirflowNetworkLinkSimu(i).FLOW * dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirflowNetworkNodeData(Node2).AirLoopNum);
-                    if (!dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Node(j).MassFlowRate = 0.0;
+                    Node(j).MassFlowRate = AirflowNetworkLinkSimu(i).FLOW * state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio(AirflowNetworkNodeData(Node2).AirLoopNum);
+                    if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Node(j).MassFlowRate = 0.0;
                     if (!(AirflowNetworkNodeData(Node2).EPlusTypeNum == EPlusTypeNum_DIN ||
                           AirflowNetworkNodeData(Node2).EPlusTypeNum == EPlusTypeNum_DOU)) {
-                        Node(j).MassFlowRateMaxAvail = AirflowNetworkLinkSimu(i).FLOW * dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirflowNetworkNodeData(Node2).AirLoopNum);
+                        Node(j).MassFlowRateMaxAvail = AirflowNetworkLinkSimu(i).FLOW * state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio(AirflowNetworkNodeData(Node2).AirLoopNum);
                         Node(j).MassFlowRateMax = AirflowNetworkLinkSimu(i).FLOW;
                     }
                 }
@@ -8997,11 +9038,11 @@ namespace AirflowNetworkBalanceManager {
                 if (AirflowNetworkLinkageData(i).LinkageViewFactorObjectNum != 0) {
                     auto &DuctRadObj(AirflowNetworkLinkageViewFactorData(AirflowNetworkLinkageData(i).LinkageViewFactorObjectNum));
                     Qsen -= DuctRadObj.QRad;
-                    dataAirflowNetworkBalanceManager.exchangeData(AirflowNetworkLinkageData(i).ZoneNum).RadGain -= DuctRadObj.QRad;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(AirflowNetworkLinkageData(i).ZoneNum).RadGain -= DuctRadObj.QRad;
                 }
                 // When the Airloop is shut off, no duct sensible losses
-                if (!dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Qsen = 0.0;
-                dataAirflowNetworkBalanceManager.exchangeData(AirflowNetworkLinkageData(i).ZoneNum).CondSen -= Qsen;
+                if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Qsen = 0.0;
+                state.dataAirflowNetworkBalanceManager->exchangeData(AirflowNetworkLinkageData(i).ZoneNum).CondSen -= Qsen;
             }
             // Calculate sensible leakage losses
             if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_PLR ||
@@ -9011,15 +9052,15 @@ namespace AirflowNetworkBalanceManager {
                     (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     ZN2 = AirflowNetworkNodeData(Node2).EPlusZoneNum;
                     Qsen = AirflowNetworkLinkSimu(i).FLOW * CpAir * (AirflowNetworkNodeSimu(Node1).TZ - AirflowNetworkNodeSimu(Node2).TZ);
-                    if (!dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Qsen = 0.0;
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN2).LeakSen += Qsen;
+                    if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Qsen = 0.0;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).LeakSen += Qsen;
                 }
                 if ((AirflowNetworkNodeData(Node1).EPlusZoneNum > 0) && (AirflowNetworkNodeData(Node2).EPlusNodeNum == 0) &&
                     (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     ZN1 = AirflowNetworkNodeData(Node1).EPlusZoneNum;
                     Qsen = AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (AirflowNetworkNodeSimu(Node2).TZ - AirflowNetworkNodeSimu(Node1).TZ);
-                    if (!dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Qsen = 0.0;
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN1).LeakSen += Qsen;
+                    if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Qsen = 0.0;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).LeakSen += Qsen;
                 }
             }
         }
@@ -9032,8 +9073,8 @@ namespace AirflowNetworkBalanceManager {
             if (AirflowNetworkLinkageData(i).ZoneNum > 0 &&
                 AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_DWC) {
                 Qlat = AirflowNetworkLinkSimu(i).FLOW * (AirflowNetworkNodeSimu(Node2).WZ - AirflowNetworkNodeSimu(Node1).WZ);
-                if (!dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Qlat = 0.0;
-                dataAirflowNetworkBalanceManager.exchangeData(AirflowNetworkLinkageData(i).ZoneNum).DiffLat -= Qlat;
+                if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Qlat = 0.0;
+                state.dataAirflowNetworkBalanceManager->exchangeData(AirflowNetworkLinkageData(i).ZoneNum).DiffLat -= Qlat;
             }
             // Calculate latent leakage losses
             if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_PLR ||
@@ -9043,14 +9084,14 @@ namespace AirflowNetworkBalanceManager {
                     (AirflowNetworkLinkSimu(i).FLOW > 0.0)) {
                     ZN2 = AirflowNetworkNodeData(Node2).EPlusZoneNum;
                     Qlat = AirflowNetworkLinkSimu(i).FLOW * (AirflowNetworkNodeSimu(Node1).WZ - AirflowNetworkNodeSimu(Node2).WZ);
-                    if (!dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Qlat = 0.0;
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN2).LeakLat += Qlat;
+                    if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Qlat = 0.0;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).LeakLat += Qlat;
                     if (Contaminant.CO2Simulation) {
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN2).TotalCO2 +=
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).TotalCO2 +=
                             AirflowNetworkLinkSimu(i).FLOW * (AirflowNetworkNodeSimu(Node1).CO2Z - AirflowNetworkNodeSimu(Node2).CO2Z);
                     }
                     if (Contaminant.GenericContamSimulation) {
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN2).TotalGC +=
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).TotalGC +=
                             AirflowNetworkLinkSimu(i).FLOW * (AirflowNetworkNodeSimu(Node1).GCZ - AirflowNetworkNodeSimu(Node2).GCZ);
                     }
                 }
@@ -9058,14 +9099,14 @@ namespace AirflowNetworkBalanceManager {
                     (AirflowNetworkLinkSimu(i).FLOW2 > 0.0)) {
                     ZN1 = AirflowNetworkNodeData(Node1).EPlusZoneNum;
                     Qlat = AirflowNetworkLinkSimu(i).FLOW2 * (AirflowNetworkNodeSimu(Node2).WZ - AirflowNetworkNodeSimu(Node1).WZ);
-                    if (!dataAirflowNetworkBalanceManager.LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Qlat = 0.0;
-                    dataAirflowNetworkBalanceManager.exchangeData(ZN1).LeakLat += Qlat;
+                    if (!state.dataAirflowNetworkBalanceManager->LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum)) Qlat = 0.0;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).LeakLat += Qlat;
                     if (Contaminant.CO2Simulation) {
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN1).TotalCO2 +=
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).TotalCO2 +=
                             AirflowNetworkLinkSimu(i).FLOW2 * (AirflowNetworkNodeSimu(Node2).CO2Z - AirflowNetworkNodeSimu(Node1).CO2Z);
                     }
                     if (Contaminant.GenericContamSimulation) {
-                        dataAirflowNetworkBalanceManager.exchangeData(ZN1).TotalGC +=
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).TotalGC +=
                             AirflowNetworkLinkSimu(i).FLOW2 * (AirflowNetworkNodeSimu(Node2).GCZ - AirflowNetworkNodeSimu(Node1).GCZ);
                     }
                 }
@@ -9074,61 +9115,61 @@ namespace AirflowNetworkBalanceManager {
 
         // Sum all the loads
         for (i = 1; i <= NumOfZones; ++i) {
-            dataAirflowNetworkBalanceManager.exchangeData(i).TotalSen =
-                dataAirflowNetworkBalanceManager.exchangeData(i).LeakSen + dataAirflowNetworkBalanceManager.exchangeData(i).CondSen + dataAirflowNetworkBalanceManager.exchangeData(i).RadGain;
-            dataAirflowNetworkBalanceManager.exchangeData(i).TotalLat = dataAirflowNetworkBalanceManager.exchangeData(i).LeakLat + dataAirflowNetworkBalanceManager.exchangeData(i).DiffLat;
+            state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalSen =
+                state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakSen + state.dataAirflowNetworkBalanceManager->exchangeData(i).CondSen + state.dataAirflowNetworkBalanceManager->exchangeData(i).RadGain;
+            state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalLat = state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakLat + state.dataAirflowNetworkBalanceManager->exchangeData(i).DiffLat;
         }
 
         // Simple ONOFF fan
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            for (FanNum = 1; FanNum <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; ++FanNum) {
+            for (FanNum = 1; FanNum <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; ++FanNum) {
                 if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
             }
             if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && OnOffFanRunTimeFraction < 1.0) {
                 for (i = 1; i <= NumOfZones; ++i) {
-                    dataAirflowNetworkBalanceManager.exchangeData(i).MultiZoneSen *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).MultiZoneLat *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).LeakSen *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).LeakLat *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).CondSen *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).DiffLat *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).RadGain *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).TotalSen *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).TotalLat *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).SumMCp *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).SumMCpT *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).SumMHr *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).SumMHrW *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).SumMMCp *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).SumMMCpT *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).SumMMHr *= OnOffFanRunTimeFraction;
-                    dataAirflowNetworkBalanceManager.exchangeData(i).SumMMHrW *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).MultiZoneSen *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).MultiZoneLat *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakSen *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).LeakLat *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).CondSen *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).DiffLat *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).RadGain *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalSen *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).TotalLat *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCpT *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMHr *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMHrW *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCpT *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMHr *= OnOffFanRunTimeFraction;
+                    state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMHrW *= OnOffFanRunTimeFraction;
                     if (Contaminant.CO2Simulation) {
-                        dataAirflowNetworkBalanceManager.exchangeData(i).SumMHrCO *= OnOffFanRunTimeFraction;
-                        dataAirflowNetworkBalanceManager.exchangeData(i).SumMMHrCO *= OnOffFanRunTimeFraction;
+                        state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMHrCO *= OnOffFanRunTimeFraction;
+                        state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMHrCO *= OnOffFanRunTimeFraction;
                     }
                     if (Contaminant.GenericContamSimulation) {
-                        dataAirflowNetworkBalanceManager.exchangeData(i).SumMHrGC *= OnOffFanRunTimeFraction;
-                        dataAirflowNetworkBalanceManager.exchangeData(i).SumMMHrGC *= OnOffFanRunTimeFraction;
+                        state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMHrGC *= OnOffFanRunTimeFraction;
+                        state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMHrGC *= OnOffFanRunTimeFraction;
                     }
                 }
                 if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
                     for (i = 1; i <= NumOfZones; ++i) {
-                        dataAirflowNetworkBalanceManager.exchangeData(i).SumMCp += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMCp * (1.0 - OnOffFanRunTimeFraction);
-                        dataAirflowNetworkBalanceManager.exchangeData(i).SumMCpT += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMCpT * (1.0 - OnOffFanRunTimeFraction);
-                        dataAirflowNetworkBalanceManager.exchangeData(i).SumMHr += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMHr * (1.0 - OnOffFanRunTimeFraction);
-                        dataAirflowNetworkBalanceManager.exchangeData(i).SumMHrW += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMHrW * (1.0 - OnOffFanRunTimeFraction);
-                        dataAirflowNetworkBalanceManager.exchangeData(i).SumMMCp += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMMCp * (1.0 - OnOffFanRunTimeFraction);
-                        dataAirflowNetworkBalanceManager.exchangeData(i).SumMMCpT += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMMCpT * (1.0 - OnOffFanRunTimeFraction);
-                        dataAirflowNetworkBalanceManager.exchangeData(i).SumMMHr += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMMHr * (1.0 - OnOffFanRunTimeFraction);
-                        dataAirflowNetworkBalanceManager.exchangeData(i).SumMMHrW += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMMHrW * (1.0 - OnOffFanRunTimeFraction);
+                        state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp += state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMCp * (1.0 - OnOffFanRunTimeFraction);
+                        state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCpT += state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMCpT * (1.0 - OnOffFanRunTimeFraction);
+                        state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMHr += state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMHr * (1.0 - OnOffFanRunTimeFraction);
+                        state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMHrW += state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMHrW * (1.0 - OnOffFanRunTimeFraction);
+                        state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp += state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMMCp * (1.0 - OnOffFanRunTimeFraction);
+                        state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCpT += state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMMCpT * (1.0 - OnOffFanRunTimeFraction);
+                        state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMHr += state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMMHr * (1.0 - OnOffFanRunTimeFraction);
+                        state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMHrW += state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMMHrW * (1.0 - OnOffFanRunTimeFraction);
                         if (Contaminant.CO2Simulation) {
-                            dataAirflowNetworkBalanceManager.exchangeData(i).SumMHrCO += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMHrCO * (1.0 - OnOffFanRunTimeFraction);
-                            dataAirflowNetworkBalanceManager.exchangeData(i).SumMMHrCO += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMMHrCO * (1.0 - OnOffFanRunTimeFraction);
+                            state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMHrCO += state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMHrCO * (1.0 - OnOffFanRunTimeFraction);
+                            state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMHrCO += state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMMHrCO * (1.0 - OnOffFanRunTimeFraction);
                         }
                         if (Contaminant.GenericContamSimulation) {
-                            dataAirflowNetworkBalanceManager.exchangeData(i).SumMHrGC += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMHrGC * (1.0 - OnOffFanRunTimeFraction);
-                            dataAirflowNetworkBalanceManager.exchangeData(i).SumMMHrGC += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMMHrGC * (1.0 - OnOffFanRunTimeFraction);
+                            state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMHrGC += state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMHrGC * (1.0 - OnOffFanRunTimeFraction);
+                            state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMHrGC += state.dataAirflowNetworkBalanceManager->multiExchangeData(i).SumMMHrGC * (1.0 - OnOffFanRunTimeFraction);
                         }
                     }
                 }
@@ -9137,9 +9178,9 @@ namespace AirflowNetworkBalanceManager {
             if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff) {
                 for (i = 1; i <= AirflowNetworkNumOfZones; ++i) {
                     if (AirflowNetworkNodeData(i).AirLoopNum == AirLoopNum) {
-                        dataAirflowNetworkBalanceManager.nodeReport(i).PZ = AirflowNetworkNodeSimu(i).PZ * dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum) +
-                                                         dataAirflowNetworkBalanceManager.nodeReport(i).PZOFF * (1.0 - dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum));
-                        dataAirflowNetworkBalanceManager.nodeReport(i).PZON = AirflowNetworkNodeSimu(i).PZ;
+                        state.dataAirflowNetworkBalanceManager->nodeReport(i).PZ = AirflowNetworkNodeSimu(i).PZ * state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio(AirLoopNum) +
+                                                         state.dataAirflowNetworkBalanceManager->nodeReport(i).PZOFF * (1.0 - state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio(AirLoopNum));
+                        state.dataAirflowNetworkBalanceManager->nodeReport(i).PZON = AirflowNetworkNodeSimu(i).PZ;
                     }
                 }
                 for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
@@ -9147,22 +9188,22 @@ namespace AirflowNetworkBalanceManager {
                     for (j = 1; j <= AirflowNetworkNumOfZones; ++j) {
                         if (MultizoneZoneData(j).ZoneNum == MultizoneSurfaceData(i).ZonePtr) {
                             if (AirflowNetworkNodeData(j).AirLoopNum == AirLoopNum) {
-                                PartLoadRatio = dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum);
+                                PartLoadRatio = state.dataAirflowNetworkBalanceManager->LoopPartLoadRatio(AirLoopNum);
                                 break;
                             }
                         }
                     }
-                    dataAirflowNetworkBalanceManager.linkReport1(i).FLOW =
-                        AirflowNetworkLinkSimu(i).FLOW * PartLoadRatio + dataAirflowNetworkBalanceManager.linkReport1(i).FLOWOFF * (1.0 - PartLoadRatio);
-                    dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2 =
-                        AirflowNetworkLinkSimu(i).FLOW2 * PartLoadRatio + dataAirflowNetworkBalanceManager.linkReport1(i).FLOW2OFF * (1.0 - PartLoadRatio);
-                    dataAirflowNetworkBalanceManager.linkReport1(i).VolFLOW =
-                        AirflowNetworkLinkSimu(i).VolFLOW * PartLoadRatio + dataAirflowNetworkBalanceManager.linkReport1(i).VolFLOWOFF * (1.0 - PartLoadRatio);
-                    dataAirflowNetworkBalanceManager.linkReport1(i).VolFLOW2 =
-                        AirflowNetworkLinkSimu(i).VolFLOW2 * PartLoadRatio + dataAirflowNetworkBalanceManager.linkReport1(i).VolFLOW2OFF * (1.0 - PartLoadRatio);
-                    dataAirflowNetworkBalanceManager.linkReport1(i).DP =
-                        AirflowNetworkLinkSimu(i).DP * PartLoadRatio + dataAirflowNetworkBalanceManager.linkReport1(i).DPOFF * (1.0 - PartLoadRatio);
-                    dataAirflowNetworkBalanceManager.linkReport1(i).DPON = AirflowNetworkLinkSimu(i).DP;
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW =
+                        AirflowNetworkLinkSimu(i).FLOW * PartLoadRatio + state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOWOFF * (1.0 - PartLoadRatio);
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2 =
+                        AirflowNetworkLinkSimu(i).FLOW2 * PartLoadRatio + state.dataAirflowNetworkBalanceManager->linkReport1(i).FLOW2OFF * (1.0 - PartLoadRatio);
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).VolFLOW =
+                        AirflowNetworkLinkSimu(i).VolFLOW * PartLoadRatio + state.dataAirflowNetworkBalanceManager->linkReport1(i).VolFLOWOFF * (1.0 - PartLoadRatio);
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).VolFLOW2 =
+                        AirflowNetworkLinkSimu(i).VolFLOW2 * PartLoadRatio + state.dataAirflowNetworkBalanceManager->linkReport1(i).VolFLOW2OFF * (1.0 - PartLoadRatio);
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).DP =
+                        AirflowNetworkLinkSimu(i).DP * PartLoadRatio + state.dataAirflowNetworkBalanceManager->linkReport1(i).DPOFF * (1.0 - PartLoadRatio);
+                    state.dataAirflowNetworkBalanceManager->linkReport1(i).DPON = AirflowNetworkLinkSimu(i).DP;
                 }
             }
         }
@@ -9411,7 +9452,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void AssignFanAirLoopNum()
+    void AssignFanAirLoopNum(EnergyPlusData &state)
     {
         // Assign the system Fan AirLoop Number based on the zone inlet node
 
@@ -9419,7 +9460,7 @@ namespace AirflowNetworkBalanceManager {
             for (int j = 1; j <= NumOfZones; j++) {
                 if (!ZoneEquipConfig(j).IsControlled) continue;
                 if ((MultizoneZoneData(i).ZoneNum == j) && (ZoneEquipConfig(j).NumInletNodes > 0)) {
-                    for (int k = 1; k <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; k++) {
+                    for (int k = 1; k <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; k++) {
                         if (DisSysCompCVFData(k).AirLoopNum == 0) {
                             DisSysCompCVFData(k).AirLoopNum = ZoneEquipConfig(j).InletNodeAirLoopNum(1);
                         }
@@ -9491,7 +9532,7 @@ namespace AirflowNetworkBalanceManager {
             NodeFound(MultizoneCompExhaustFanData(i).OutletNode) = true;
         }
         // Validate EPlus Node names and types
-        for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfNodes; ++i) {
+        for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfNodes; ++i) {
             if (UtilityRoutines::SameString(DisSysNodeData(i).EPlusName, "") || UtilityRoutines::SameString(DisSysNodeData(i).EPlusName, "Other"))
                 continue;
             LocalError = false;
@@ -9567,7 +9608,7 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= NumOfNodes; ++i) {
             if (NodeFound(i)) continue;
             // Skip the inlet and outlet nodes of zone dehumidifiers
-            if (GetZoneDehumidifierNodeNumber(state, *state.dataZoneDehumidifier, i)) NodeFound(i) = true;
+            if (GetZoneDehumidifierNodeNumber(state, i)) NodeFound(i) = true;
 
             for (j = 1; j <= NumOfZones; ++j) {
                 if (!ZoneEquipConfig(j).IsControlled) continue;
@@ -9626,51 +9667,51 @@ namespace AirflowNetworkBalanceManager {
 
             if (!NodeFound(i)) {
                 // Check if this node is the OA relief node. For the time being, OA relief node is not used
-                if (GetNumOAMixers() > 1) {
+                if (GetNumOAMixers(state) > 1) {
                     //						ShowSevereError( RoutineName + "Only one OutdoorAir:Mixer is allowed in the
                     // AirflowNetwork model." ); 						ErrorsFound = true;
                     int OAFanNum;
                     int OARelNum;
                     int OAMixerNum;
 
-                    for (OAFanNum = 1; OAFanNum <= dataAirflowNetworkBalanceManager.NumOfOAFans; ++OAFanNum) {
-                        DisSysCompOutdoorAirData(OAFanNum).InletNode = GetOAMixerInletNodeNumber(DisSysCompOutdoorAirData(OAFanNum).OAMixerNum);
+                    for (OAFanNum = 1; OAFanNum <= state.dataAirflowNetworkBalanceManager->NumOfOAFans; ++OAFanNum) {
+                        DisSysCompOutdoorAirData(OAFanNum).InletNode = GetOAMixerInletNodeNumber(state, DisSysCompOutdoorAirData(OAFanNum).OAMixerNum);
                         //							NodeFound( DisSysCompOutdoorAirData( OAFanNum ).InletNode ) = true;
                     }
-                    for (OARelNum = 1; OARelNum <= dataAirflowNetworkBalanceManager.NumOfReliefFans; ++OARelNum) {
-                        DisSysCompReliefAirData(OARelNum).OutletNode = GetOAMixerInletNodeNumber(DisSysCompReliefAirData(OARelNum).OAMixerNum);
+                    for (OARelNum = 1; OARelNum <= state.dataAirflowNetworkBalanceManager->NumOfReliefFans; ++OARelNum) {
+                        DisSysCompReliefAirData(OARelNum).OutletNode = GetOAMixerInletNodeNumber(state, DisSysCompReliefAirData(OARelNum).OAMixerNum);
                         //							NodeFound( DisSysCompOutdoorAirData( OAFanNum ).InletNode ) = true;
                     }
                     // Check NodeFound status
-                    for (OAMixerNum = 1; OAMixerNum <= GetNumOAMixers(); ++OAMixerNum) {
-                        if (i == GetOAMixerReliefNodeNumber(OAMixerNum)) {
+                    for (OAMixerNum = 1; OAMixerNum <= GetNumOAMixers(state); ++OAMixerNum) {
+                        if (i == GetOAMixerReliefNodeNumber(state, OAMixerNum)) {
                             NodeFound(i) = true;
                             break;
-                        } else if (i == GetOAMixerInletNodeNumber(OAMixerNum)) {
+                        } else if (i == GetOAMixerInletNodeNumber(state, OAMixerNum)) {
                             NodeFound(i) = true;
                             break;
                         } else {
-                            if (OAMixerNum == GetNumOAMixers()) {
+                            if (OAMixerNum == GetNumOAMixers(state)) {
                                 ShowSevereError(RoutineName + "'" + NodeID(i) + "' is not defined as an AirflowNetwork:Distribution:Node object.");
                                 ErrorsFound = true;
                             }
                         }
                     }
-                } else if (GetNumOAMixers() == 0) {
+                } else if (GetNumOAMixers(state) == 0) {
                     ShowSevereError(RoutineName + "'" + NodeID(i) + "' is not defined as an AirflowNetwork:Distribution:Node object.");
                     ErrorsFound = true;
                 } else {
                     // TODO: I fail to see how you could enter this block given than NumOAMixers (returned by GetNumOAMixers())
                     // is initialized to zero, and we check above if '> 0' or '== 0'
-                    if (dataAirflowNetworkBalanceManager.NumOfOAFans == 1 && DisSysCompOutdoorAirData(1).InletNode == 0) {
-                        DisSysCompOutdoorAirData(1).InletNode = GetOAMixerInletNodeNumber(1);
+                    if (state.dataAirflowNetworkBalanceManager->NumOfOAFans == 1 && DisSysCompOutdoorAirData(1).InletNode == 0) {
+                        DisSysCompOutdoorAirData(1).InletNode = GetOAMixerInletNodeNumber(state, 1);
                     }
-                    if (dataAirflowNetworkBalanceManager.NumOfReliefFans == 1 && DisSysCompReliefAirData(1).OutletNode == 0) {
-                        DisSysCompReliefAirData(1).OutletNode = GetOAMixerInletNodeNumber(1);
+                    if (state.dataAirflowNetworkBalanceManager->NumOfReliefFans == 1 && DisSysCompReliefAirData(1).OutletNode == 0) {
+                        DisSysCompReliefAirData(1).OutletNode = GetOAMixerInletNodeNumber(state, 1);
                     }
-                    if (i == GetOAMixerReliefNodeNumber(1)) {
+                    if (i == GetOAMixerReliefNodeNumber(state, 1)) {
                         NodeFound(i) = true;
-                    } else if (i == GetOAMixerInletNodeNumber(1)) {
+                    } else if (i == GetOAMixerInletNodeNumber(state, 1)) {
                         NodeFound(i) = true;
                     } else {
                         ShowSevereError(RoutineName + "'" + NodeID(i) + "' is not defined as an AirflowNetwork:Distribution:Node object.");
@@ -9746,12 +9787,12 @@ namespace AirflowNetworkBalanceManager {
         // Validate coil name and type
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Coil";
         MultiSpeedHPIndicator = 0;
-        for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCoils; ++i) {
+        for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCoils; ++i) {
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(DisSysCompCoilData(i).EPlusType));
 
                 if (SELECT_CASE_var == "COIL:COOLING:DX") {
-                    ValidateComponent("Coil:Cooling:DX", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
+                    ValidateComponent(state, "Coil:Cooling:DX", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     if (IsNotOK) {
                         ErrorsFound = true;
                     } else {
@@ -9768,7 +9809,7 @@ namespace AirflowNetworkBalanceManager {
                         // SetDXCoilAirLoopNumber(DisSysCompCoilData(i).name, DisSysCompCoilData(i).AirLoopNum);
                     }
                 } else if (SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED") {
-                    ValidateComponent("Coil:Cooling:DX:SingleSpeed", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
+                    ValidateComponent(state, "Coil:Cooling:DX:SingleSpeed", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     if (IsNotOK) {
                         ErrorsFound = true;
                     } else {
@@ -9776,7 +9817,7 @@ namespace AirflowNetworkBalanceManager {
                     }
 
                 } else if (SELECT_CASE_var == "COIL:HEATING:DX:SINGLESPEED") {
-                    ValidateComponent("Coil:Heating:DX:SingleSpeed", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
+                    ValidateComponent(state, "Coil:Heating:DX:SingleSpeed", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     if (IsNotOK) {
                         ErrorsFound = true;
                     } else {
@@ -9784,7 +9825,7 @@ namespace AirflowNetworkBalanceManager {
                     }
 
                 } else if (SELECT_CASE_var == "COIL:HEATING:FUEL") {
-                    ValidateComponent("Coil:Heating:Fuel", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
+                    ValidateComponent(state, "Coil:Heating:Fuel", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     if (IsNotOK) {
                         ErrorsFound = true;
                     } else {
@@ -9792,7 +9833,7 @@ namespace AirflowNetworkBalanceManager {
                     }
 
                 } else if (SELECT_CASE_var == "COIL:HEATING:ELECTRIC") {
-                    ValidateComponent("Coil:Heating:Electric", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
+                    ValidateComponent(state, "Coil:Heating:Electric", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     if (IsNotOK) {
                         ErrorsFound = true;
                     } else {
@@ -9800,25 +9841,25 @@ namespace AirflowNetworkBalanceManager {
                     }
 
                 } else if (SELECT_CASE_var == "COIL:COOLING:WATER") {
-                    ValidateComponent("Coil:Cooling:Water", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
+                    ValidateComponent(state, "Coil:Cooling:Water", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     if (IsNotOK) {
                         ErrorsFound = true;
                     }
 
                 } else if (SELECT_CASE_var == "COIL:HEATING:WATER") {
-                    ValidateComponent("Coil:Heating:Water", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
+                    ValidateComponent(state, "Coil:Heating:Water", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     if (IsNotOK) {
                         ErrorsFound = true;
                     }
 
                 } else if (SELECT_CASE_var == "COIL:COOLING:WATER:DETAILEDGEOMETRY") {
-                    ValidateComponent("Coil:Cooling:Water:DetailedGeometry", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
+                    ValidateComponent(state, "Coil:Cooling:Water:DetailedGeometry", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     if (IsNotOK) {
                         ErrorsFound = true;
                     }
 
                 } else if (SELECT_CASE_var == "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") {
-                    ValidateComponent(
+                    ValidateComponent(state,
                         "Coil:Cooling:DX:TwoStageWithHumidityControlMode", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     if (IsNotOK) {
                         ErrorsFound = true;
@@ -9827,7 +9868,7 @@ namespace AirflowNetworkBalanceManager {
                     }
 
                 } else if (SELECT_CASE_var == "COIL:COOLING:DX:MULTISPEED") {
-                    ValidateComponent("Coil:Cooling:DX:MultiSpeed", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
+                    ValidateComponent(state, "Coil:Cooling:DX:MultiSpeed", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     ++MultiSpeedHPIndicator;
                     if (IsNotOK) {
                         ErrorsFound = true;
@@ -9836,7 +9877,7 @@ namespace AirflowNetworkBalanceManager {
                     }
 
                 } else if (SELECT_CASE_var == "COIL:HEATING:DX:MULTISPEED") {
-                    ValidateComponent("Coil:Heating:DX:MultiSpeed", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
+                    ValidateComponent(state, "Coil:Heating:DX:MultiSpeed", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     ++MultiSpeedHPIndicator;
                     if (IsNotOK) {
                         ErrorsFound = true;
@@ -9845,13 +9886,13 @@ namespace AirflowNetworkBalanceManager {
                     }
 
                 } else if (SELECT_CASE_var == "COIL:HEATING:DESUPERHEATER") {
-                    ValidateComponent("Coil:Heating:Desuperheater", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
+                    ValidateComponent(state, "Coil:Heating:Desuperheater", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     if (IsNotOK) {
                         ErrorsFound = true;
                     }
 
                 } else if (SELECT_CASE_var == "COIL:COOLING:DX:TWOSPEED") {
-                    ValidateComponent("Coil:Cooling:DX:TwoSpeed", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
+                    ValidateComponent(state, "Coil:Cooling:DX:TwoSpeed", DisSysCompCoilData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     if (IsNotOK) {
                         ErrorsFound = true;
                     } else {
@@ -9866,7 +9907,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Validate terminal unit name and type
-        for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfTermUnits; ++i) {
+        for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfTermUnits; ++i) {
             if (UtilityRoutines::SameString(DisSysCompTermUnitData(i).EPlusType, "AirTerminal:SingleDuct:ConstantVolume:Reheat") ||
                 UtilityRoutines::SameString(DisSysCompTermUnitData(i).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat")) {
                 LocalError = false;
@@ -9883,7 +9924,7 @@ namespace AirflowNetworkBalanceManager {
                                               DisSysCompTermUnitData(i).DamperOutletNode);
                 if (LocalError) ErrorsFound = true;
                 if (VAVSystem) {
-                    for (j = 1; j <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; j++) {
+                    for (j = 1; j <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; j++) {
                         if (DisSysCompCVFData(j).FanTypeNum == FanType_SimpleVAV) {
                             if (DisSysCompCVFData(j).AirLoopNum == DisSysCompTermUnitData(i).AirLoopNum &&
                                 !UtilityRoutines::SameString(DisSysCompTermUnitData(i).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat")) {
@@ -9905,25 +9946,25 @@ namespace AirflowNetworkBalanceManager {
 
         // Validate heat exchanger name and type
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:HeatExchanger";
-        for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfHXs; ++i) {
+        for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfHXs; ++i) {
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(DisSysCompHXData(i).EPlusType));
 
                 if (SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:FLATPLATE") {
-                    ValidateComponent("HeatExchanger:AirToAir:FlatPlate", DisSysCompHXData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
+                    ValidateComponent(state, "HeatExchanger:AirToAir:FlatPlate", DisSysCompHXData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     if (IsNotOK) {
                         ErrorsFound = true;
                     }
 
                 } else if (SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT") {
-                    ValidateComponent(
+                    ValidateComponent(state,
                         "HeatExchanger:AirToAir:SensibleAndLatent", DisSysCompHXData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     if (IsNotOK) {
                         ErrorsFound = true;
                     }
 
                 } else if (SELECT_CASE_var == "HEATEXCHANGER:DESICCANT:BALANCEDFLOW") {
-                    ValidateComponent("HeatExchanger:Desiccant:BalancedFlow", DisSysCompHXData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
+                    ValidateComponent(state, "HeatExchanger:Desiccant:BalancedFlow", DisSysCompHXData(i).name, IsNotOK, RoutineName + CurrentModuleObject);
                     if (IsNotOK) {
                         ErrorsFound = true;
                     }
@@ -10052,29 +10093,29 @@ namespace AirflowNetworkBalanceManager {
         for (i = NumOfNodesMultiZone + 1; i <= AirflowNetworkNumOfNodes; ++i) {
             if (AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_SPL) {
                 LocalError = false;
-                j = GetSplitterOutletNumber("", 1, LocalError);
-                dataAirflowNetworkBalanceManager.SplitterNodeNumbers.allocate(j + 2);
-                dataAirflowNetworkBalanceManager.SplitterNodeNumbers = GetSplitterNodeNumbers("", 1, LocalError);
+                j = GetSplitterOutletNumber(state, "", 1, LocalError);
+                state.dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(j + 2);
+                state.dataAirflowNetworkBalanceManager->SplitterNodeNumbers = GetSplitterNodeNumbers(state, "", 1, LocalError);
                 if (LocalError) ErrorsFound = true;
             }
         }
 
         // Assigning inlet and outlet nodes for a splitter
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
-            if (AirflowNetworkNodeData(i).EPlusNodeNum == dataAirflowNetworkBalanceManager.SplitterNodeNumbers(1)) {
+            if (AirflowNetworkNodeData(i).EPlusNodeNum == state.dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1)) {
                 if (AirflowNetworkNodeData(i).EPlusTypeNum == 0) AirflowNetworkNodeData(i).EPlusTypeNum = EPlusTypeNum_SPI;
             }
-            for (j = 1; j <= dataAirflowNetworkBalanceManager.SplitterNodeNumbers(2); ++j) {
-                if (AirflowNetworkNodeData(i).EPlusNodeNum == dataAirflowNetworkBalanceManager.SplitterNodeNumbers(j + 2)) {
+            for (j = 1; j <= state.dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2); ++j) {
+                if (AirflowNetworkNodeData(i).EPlusNodeNum == state.dataAirflowNetworkBalanceManager->SplitterNodeNumbers(j + 2)) {
                     if (AirflowNetworkNodeData(i).EPlusTypeNum == 0) AirflowNetworkNodeData(i).EPlusTypeNum = EPlusTypeNum_SPO;
                 }
             }
         }
 
         // Add additional output variables
-        if (dataAirflowNetworkBalanceManager.DisSysNumOfCVFs > 1) {
+        if (state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs > 1) {
             bool OnOffFanFlag = false;
-            for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; i++) {
+            for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
                 if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff && !DisSysCompCVFData(i).FanModelFlag) {
                     OnOffFanFlag = true;
                     break;
@@ -10092,10 +10133,10 @@ namespace AirflowNetworkBalanceManager {
             if (OnOffFanFlag) {
                 for (j = 1; j <= AirflowNetworkNumOfZones; ++j) {
                     if (!ZoneEquipConfig(AirflowNetworkNodeData(j).EPlusZoneNum).IsControlled) continue;
-                    for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; i++) {
+                    for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
                         if (DisSysCompCVFData(i).AirLoopNum == AirflowNetworkNodeData(j).AirLoopNum &&
                             DisSysCompCVFData(i).FanTypeNum != FanType_SimpleOnOff) {
-                            SetupOutputVariable("AFN Node Total Pressure",
+                            SetupOutputVariable(state, "AFN Node Total Pressure",
                                                 OutputProcessor::Unit::Pa,
                                                 AirflowNetworkNodeSimu(j).PZ,
                                                 "System",
@@ -10106,34 +10147,34 @@ namespace AirflowNetworkBalanceManager {
                 }
                 for (i = 1; i <= NumOfLinksMultiZone; ++i) {
                     if (!ZoneEquipConfig(AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).EPlusZoneNum).IsControlled) continue;
-                    for (j = 1; j <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; j++) {
+                    for (j = 1; j <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; j++) {
                         if (DisSysCompCVFData(j).AirLoopNum == AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).AirLoopNum &&
                             DisSysCompCVFData(j).FanTypeNum != FanType_SimpleOnOff) {
-                            SetupOutputVariable("AFN Linkage Node 1 to Node 2 Mass Flow Rate",
+                            SetupOutputVariable(state, "AFN Linkage Node 1 to Node 2 Mass Flow Rate",
                                                 OutputProcessor::Unit::kg_s,
-                                                dataAirflowNetworkBalanceManager.linkReport(i).FLOW,
+                                                state.dataAirflowNetworkBalanceManager->linkReport(i).FLOW,
                                                 "System",
                                                 "Average",
                                                 AirflowNetworkLinkageData(i).Name);
-                            SetupOutputVariable("AFN Linkage Node 2 to Node 1 Mass Flow Rate",
+                            SetupOutputVariable(state, "AFN Linkage Node 2 to Node 1 Mass Flow Rate",
                                                 OutputProcessor::Unit::kg_s,
-                                                dataAirflowNetworkBalanceManager.linkReport(i).FLOW2,
+                                                state.dataAirflowNetworkBalanceManager->linkReport(i).FLOW2,
                                                 "System",
                                                 "Average",
                                                 AirflowNetworkLinkageData(i).Name);
-                            SetupOutputVariable("AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+                            SetupOutputVariable(state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
                                                 OutputProcessor::Unit::m3_s,
-                                                dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW,
+                                                state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW,
                                                 "System",
                                                 "Average",
                                                 AirflowNetworkLinkageData(i).Name);
-                            SetupOutputVariable("AFN Linkage Node 2 to Node 1 Volume Flow Rate",
+                            SetupOutputVariable(state, "AFN Linkage Node 2 to Node 1 Volume Flow Rate",
                                                 OutputProcessor::Unit::m3_s,
-                                                dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW2,
+                                                state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW2,
                                                 "System",
                                                 "Average",
                                                 AirflowNetworkLinkageData(i).Name);
-                            SetupOutputVariable("AFN Linkage Node 1 to Node 2 Pressure Difference",
+                            SetupOutputVariable(state, "AFN Linkage Node 1 to Node 2 Pressure Difference",
                                                 OutputProcessor::Unit::Pa,
                                                 AirflowNetworkLinkSimu(i).DP,
                                                 "System",
@@ -10145,12 +10186,12 @@ namespace AirflowNetworkBalanceManager {
             }
         }
         bool FanModelConstFlag = false;
-        for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; i++) {
+        for (i = 1; i <= state.dataAirflowNetworkBalanceManager->DisSysNumOfCVFs; i++) {
             if (DisSysCompCVFData(i).FanModelFlag) {
                 int fanIndex = HVACFan::getFanObjectVectorIndex(DisSysCompCVFData(i).name);
                 if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff && HVACFan::fanObjs[fanIndex]->AirPathFlag) {
                     DisSysCompCVFData(i).FanTypeNum = FanType_SimpleConstVolume;
-                    dataAirflowNetworkBalanceManager.SupplyFanType = FanType_SimpleConstVolume;
+                    state.dataAirflowNetworkBalanceManager->SupplyFanType = FanType_SimpleConstVolume;
                     FanModelConstFlag = true;
                     break;
                 }
@@ -10158,32 +10199,32 @@ namespace AirflowNetworkBalanceManager {
         }
         if (FanModelConstFlag) {
             for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
-                if (dataAirflowNetworkBalanceManager.SupplyFanType == FanType_SimpleConstVolume) {
-                    SetupOutputVariable("AFN Linkage Node 1 to Node 2 Mass Flow Rate",
+                if (state.dataAirflowNetworkBalanceManager->SupplyFanType == FanType_SimpleConstVolume) {
+                    SetupOutputVariable(state, "AFN Linkage Node 1 to Node 2 Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
-                                        dataAirflowNetworkBalanceManager.linkReport(i).FLOW,
+                                        state.dataAirflowNetworkBalanceManager->linkReport(i).FLOW,
                                         "System",
                                         "Average",
                                         AirflowNetworkLinkageData(i).Name);
-                    SetupOutputVariable("AFN Linkage Node 2 to Node 1 Mass Flow Rate",
+                    SetupOutputVariable(state, "AFN Linkage Node 2 to Node 1 Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
-                                        dataAirflowNetworkBalanceManager.linkReport(i).FLOW2,
+                                        state.dataAirflowNetworkBalanceManager->linkReport(i).FLOW2,
                                         "System",
                                         "Average",
                                         AirflowNetworkLinkageData(i).Name);
-                    SetupOutputVariable("AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+                    SetupOutputVariable(state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW,
+                                        state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW,
                                         "System",
                                         "Average",
                                         AirflowNetworkLinkageData(i).Name);
-                    SetupOutputVariable("AFN Linkage Node 2 to Node 1 Volume Flow Rate",
+                    SetupOutputVariable(state, "AFN Linkage Node 2 to Node 1 Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        dataAirflowNetworkBalanceManager.linkReport(i).VolFLOW2,
+                                        state.dataAirflowNetworkBalanceManager->linkReport(i).VolFLOW2,
                                         "System",
                                         "Average",
                                         AirflowNetworkLinkageData(i).Name);
-                    SetupOutputVariable("AFN Linkage Node 1 to Node 2 Pressure Difference",
+                    SetupOutputVariable(state, "AFN Linkage Node 1 to Node 2 Pressure Difference",
                                         OutputProcessor::Unit::Pa,
                                         AirflowNetworkLinkSimu(i).DP,
                                         "System",
@@ -10194,7 +10235,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Add AirLoopNum to pressure control object
-        for (i = 1; i <= dataAirflowNetworkBalanceManager.NumOfPressureControllers; ++i) {
+        for (i = 1; i <= state.dataAirflowNetworkBalanceManager->NumOfPressureControllers; ++i) {
             for (j = 1; j <= NumOfZones; ++j) {
                 if (PressureControllerData(i).ZoneNum == j) {
                     for (k = 1; k <= ZoneEquipConfig(j).NumInletNodes; ++k) {
@@ -10202,7 +10243,7 @@ namespace AirflowNetworkBalanceManager {
                             PressureControllerData(i).AirLoopNum = ZoneEquipConfig(j).InletNodeAirLoopNum(k);
                             if (PressureControllerData(i).ControlTypeSet == PressureCtrlRelief) {
                                 PressureControllerData(i).OANodeNum = PrimaryAirSystem(PressureControllerData(i).AirLoopNum).OAMixOAInNodeNum;
-                                for (n = 1; n <= dataAirflowNetworkBalanceManager.NumOfReliefFans; ++n) {
+                                for (n = 1; n <= state.dataAirflowNetworkBalanceManager->NumOfReliefFans; ++n) {
                                     if (DisSysCompReliefAirData(n).OutletNode == PressureControllerData(i).OANodeNum) {
                                         DisSysCompReliefAirData(n).PressCtrlNum = i;
                                     }
@@ -10286,7 +10327,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void ValidateExhaustFanInput()
+    void ValidateExhaustFanInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10315,18 +10356,18 @@ namespace AirflowNetworkBalanceManager {
         std::string CurrentModuleObject;
 
         // Validate supply and return connections
-        if (dataAirflowNetworkBalanceManager.ValidateExhaustFanInputOneTimeFlag) {
+        if (state.dataAirflowNetworkBalanceManager->ValidateExhaustFanInputOneTimeFlag) {
             CurrentModuleObject = "AirflowNetwork:MultiZone:Component:ZoneExhaustFan";
             if (std::any_of(
                     ZoneEquipConfig.begin(), ZoneEquipConfig.end(), [](DataZoneEquipment::EquipConfiguration const &e) { return e.IsControlled; })) {
                 AirflowNetworkZoneExhaustFan.dimension(NumOfZones, false);
             }
             // Ensure the number of exhaust fan defined in the AirflowNetwork model matches the number of Zone Exhaust Fan objects
-            if (dataAirflowNetworkBalanceManager.NumOfExhaustFans != AirflowNetworkNumOfExhFan) {
+            if (state.dataAirflowNetworkBalanceManager->NumOfExhaustFans != AirflowNetworkNumOfExhFan) {
                 ShowSevereError(RoutineName + "The number of " + CurrentModuleObject +
                                 " is not equal to the number of Fan:ZoneExhaust fans defined in ZoneHVAC:EquipmentConnections");
                 ShowContinueError("The number of " + CurrentModuleObject + " is " + RoundSigDigits(AirflowNetworkNumOfExhFan));
-                ShowContinueError("The number of Zone exhaust fans defined in ZoneHVAC:EquipmentConnections is " + RoundSigDigits(dataAirflowNetworkBalanceManager.NumOfExhaustFans));
+                ShowContinueError("The number of Zone exhaust fans defined in ZoneHVAC:EquipmentConnections is " + RoundSigDigits(state.dataAirflowNetworkBalanceManager->NumOfExhaustFans));
                 ErrorsFound = true;
             }
 
@@ -10400,14 +10441,14 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
 
-            dataAirflowNetworkBalanceManager.ValidateExhaustFanInputOneTimeFlag = false;
+            state.dataAirflowNetworkBalanceManager->ValidateExhaustFanInputOneTimeFlag = false;
             if (ErrorsFound) {
                 ShowFatalError(RoutineName + "Program terminates for preceding reason(s).");
             }
         } // End if OneTimeFlag
     }
 
-    void HybridVentilationControl()
+    void HybridVentilationControl(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10457,7 +10498,7 @@ namespace AirflowNetworkBalanceManager {
 
         for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
             AirLoopNum = HybridVentSysAvailAirLoopNum(SysAvailNum);
-            dataAirflowNetworkBalanceManager.VentilationCtrl = HybridVentSysAvailVentCtrl(SysAvailNum);
+            state.dataAirflowNetworkBalanceManager->VentilationCtrl = HybridVentSysAvailVentCtrl(SysAvailNum);
             if (HybridVentSysAvailANCtrlStatus(SysAvailNum) > 0) {
                 ControlType = GetCurrentScheduleValue(HybridVentSysAvailANCtrlStatus(SysAvailNum));
             }
@@ -10482,7 +10523,7 @@ namespace AirflowNetworkBalanceManager {
                     for (ANSurfaceNum = 1; ANSurfaceNum <= AirflowNetworkNumOfSurfaces; ++ANSurfaceNum) {
                         SurfNum = MultizoneSurfaceData(ANSurfaceNum).SurfNum;
                         if (Surface(SurfNum).Zone == ActualZoneNum) {
-                            if (dataAirflowNetworkBalanceManager.VentilationCtrl == HybridVentCtrl_Close) {
+                            if (state.dataAirflowNetworkBalanceManager->VentilationCtrl == HybridVentCtrl_Close) {
                                 MultizoneSurfaceData(ANSurfaceNum).HybridVentClose = true;
                             } else {
                                 if (HybridVentSysAvailWindModifier(SysAvailNum) >= 0) {
@@ -10505,7 +10546,7 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
             }
-            if (ControlType == GlobalCtrlType && !Found && !WarmupFlag && dataAirflowNetworkBalanceManager.VentilationCtrl != HybridVentCtrl_Close) {
+            if (ControlType == GlobalCtrlType && !Found && !WarmupFlag && state.dataAirflowNetworkBalanceManager->VentilationCtrl != HybridVentCtrl_Close) {
                 ++HybridGlobalErrCount;
                 if (HybridGlobalErrCount < 2) {
                     ShowWarningError(RoutineName +
@@ -10526,7 +10567,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void CalcSingleSidedCps(std::vector<std::vector<Real64>> &valsByFacade, int numWindDir)
+    void CalcSingleSidedCps(EnergyPlusData &state, std::vector<std::vector<Real64>> &valsByFacade, int numWindDir)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Sam Brunswick
@@ -10658,13 +10699,13 @@ namespace AirflowNetworkBalanceManager {
         }
         if (AFNNumOfExtOpenings == 0) return;
         // Recount the number of single sided zones
-        dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSingleSideZones = 0;
+        state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSingleSideZones = 0;
         for (AFNZnNum = 1; AFNZnNum <= AirflowNetworkNumOfZones; ++AFNZnNum) {
             if (MultizoneZoneData(AFNZnNum).SingleSidedCpType == "ADVANCED") {
-                ++dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSingleSideZones;
+                ++state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSingleSideZones;
             }
         }
-        if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSingleSideZones == 0) return; // Bail if no zones call for the advanced single sided model.
+        if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSingleSideZones == 0) return; // Bail if no zones call for the advanced single sided model.
         // Recount the number of detailed and simple exterior openings in zones with "ADVANCED" single sided wind pressure coefficients
         AFNNumOfExtOpenings = 0;
         for (SrfNum = 1; SrfNum <= AirflowNetworkNumOfSurfaces; ++SrfNum) {
@@ -10690,7 +10731,7 @@ namespace AirflowNetworkBalanceManager {
         ExtOpenNum = 1;
         for (SrfNum = 1; SrfNum <= AirflowNetworkNumOfSurfaces; ++SrfNum) {
             if (Surface(MultizoneSurfaceData(SrfNum).SurfNum).ExtBoundCond == ExternalEnvironment) {
-                if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfDetOpenings > 0) {
+                if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfDetOpenings > 0) {
                     DetOpenNum = UtilityRoutines::FindItemInList(MultizoneSurfaceData(SrfNum).OpeningName, MultizoneCompDetOpeningData,
                         &AirflowNetwork::DetailedOpening::name);
                     MZDZoneNum = UtilityRoutines::FindItemInList(
@@ -10719,7 +10760,7 @@ namespace AirflowNetworkBalanceManager {
                             ++ExtOpenNum;
                         }
                     }
-                } else if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSimOpenings > 0) {
+                } else if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSimOpenings > 0) {
                     SimOpenNum = UtilityRoutines::FindItemInList(MultizoneSurfaceData(SrfNum).OpeningName, MultizoneCompSimpleOpeningData,
                         &AirflowNetwork::SimpleOpening::name);
                     if (SimOpenNum > 0) {
@@ -10793,15 +10834,15 @@ namespace AirflowNetworkBalanceManager {
                 for (windDirNum = 1; windDirNum <= numWindDir; ++windDirNum) {
                     WindDir = (windDirNum - 1) * 10.0;
                     Real64 WindAng = (windDirNum - 1) * 10.0;
-                    dataAirflowNetworkBalanceManager.IncAng = std::abs(WindAng - ZoneAng(ZnNum));
-                    if (std::abs(dataAirflowNetworkBalanceManager.IncAng) > 180.0) dataAirflowNetworkBalanceManager.IncAng -= 360.0;
+                    state.dataAirflowNetworkBalanceManager->IncAng = std::abs(WindAng - ZoneAng(ZnNum));
+                    if (std::abs(state.dataAirflowNetworkBalanceManager->IncAng) > 180.0) state.dataAirflowNetworkBalanceManager->IncAng -= 360.0;
                     if (UtilityRoutines::SameString(AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation")) {
-                        if (std::abs(dataAirflowNetworkBalanceManager.IncAng) <= 67.5) {
-                            PiFormula(windDirNum) = 0.44 * sign(std::sin(2.67 * std::abs(dataAirflowNetworkBalanceManager.IncAng) * Pi / 180.0), dataAirflowNetworkBalanceManager.IncAng);
-                        } else if (std::abs(dataAirflowNetworkBalanceManager.IncAng) <= 180.0) {
-                            PiFormula(windDirNum) = -0.69 * sign(std::sin((288 - 1.6 * std::abs(dataAirflowNetworkBalanceManager.IncAng)) * Pi / 180.0), dataAirflowNetworkBalanceManager.IncAng);
+                        if (std::abs(state.dataAirflowNetworkBalanceManager->IncAng) <= 67.5) {
+                            PiFormula(windDirNum) = 0.44 * sign(std::sin(2.67 * std::abs(state.dataAirflowNetworkBalanceManager->IncAng) * Pi / 180.0), state.dataAirflowNetworkBalanceManager->IncAng);
+                        } else if (std::abs(state.dataAirflowNetworkBalanceManager->IncAng) <= 180.0) {
+                            PiFormula(windDirNum) = -0.69 * sign(std::sin((288 - 1.6 * std::abs(state.dataAirflowNetworkBalanceManager->IncAng)) * Pi / 180.0), state.dataAirflowNetworkBalanceManager->IncAng);
                         }
-                        SigmaFormula(windDirNum) = 0.423 - 0.00163 * std::abs(dataAirflowNetworkBalanceManager.IncAng);
+                        SigmaFormula(windDirNum) = 0.423 - 0.00163 * std::abs(state.dataAirflowNetworkBalanceManager->IncAng);
                         DeltaCp(ZnNum).WindDir(windDirNum) =
                             (0.02 + (0.346 * std::abs(PiFormula(windDirNum)) + 0.084 * SigmaFormula(windDirNum)) * Sprime(ZnNum));
                     }
@@ -10867,7 +10908,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    Real64 GetZoneInfilAirChangeRate(int const ZoneNum) // hybrid ventilation system controlled zone number
+    Real64 GetZoneInfilAirChangeRate(EnergyPlusData &state, int const ZoneNum) // hybrid ventilation system controlled zone number
     {
 
         // SUBROUTINE INFORMATION:
@@ -10892,7 +10933,7 @@ namespace AirflowNetworkBalanceManager {
 
         CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
         RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
-        InfilVolume = (dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMCp / CpAir / RhoAir) * TimeStepSys * SecInHour;
+        InfilVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp / CpAir / RhoAir) * TimeStepSys * SecInHour;
         ACH = InfilVolume / (TimeStepSys * Zone(ZoneNum).Volume);
 
         return ACH;
@@ -11143,7 +11184,7 @@ namespace AirflowNetworkBalanceManager {
                             if (SupplyAirPath(SupAirPath).OutletNode(SupAirPathOutNodeNum) == NodeNumber) {
                                 return AirLoopNum;
                             }
-                            for (TUNum = 1; TUNum <= dataAirflowNetworkBalanceManager.DisSysNumOfTermUnits; ++TUNum) {
+                            for (TUNum = 1; TUNum <= state.dataAirflowNetworkBalanceManager->DisSysNumOfTermUnits; ++TUNum) {
                                 if (UtilityRoutines::SameString(DisSysCompTermUnitData(TUNum).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat")) {
                                     LocalError = false;
                                     GetHVACSingleDuctSysIndex(state,

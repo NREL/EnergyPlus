@@ -55,8 +55,8 @@
 
 namespace EnergyPlus {
 
-    // forward declarations
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace AirLoopHVACDOAS {
 
@@ -209,22 +209,20 @@ namespace AirLoopHVACDOAS {
         bool GetInputOnceFlag = true;
         bool getAirLoopMixerInputOnceFlag = true;
         bool getAirLoopSplitterInputOnceFlag = true;
-
         int numAirLoopDOAS = 0;
-
         std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
         std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
         std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
 
         void clear_state() override
         {
-            GetInputOnceFlag = true;
-            getAirLoopMixerInputOnceFlag = true;
-            getAirLoopSplitterInputOnceFlag = true;
-            numAirLoopDOAS = 0;
-            airloopDOAS.clear();
-            airloopMixer.clear();
-            airloopSplitter.clear();
+            this->GetInputOnceFlag = true;
+            this->getAirLoopMixerInputOnceFlag = true;
+            this->getAirLoopSplitterInputOnceFlag = true;
+            this->numAirLoopDOAS = 0;
+            this->airloopDOAS.clear();
+            this->airloopMixer.clear();
+            this->airloopSplitter.clear();
         }
     };
 

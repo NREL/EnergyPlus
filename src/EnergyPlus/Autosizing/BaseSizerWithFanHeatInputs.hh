@@ -55,7 +55,8 @@
 
 namespace EnergyPlus {
 
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 struct BaseSizerWithFanHeatInputs : BaseSizer {
 
@@ -88,7 +89,7 @@ struct BaseSizerWithFanHeatInputs : BaseSizer {
                             std::string const &_callingRoutine) override;
 
     void setDataDesAccountForFanHeat(bool flag);
-    
+
     void clearState() {
         BaseSizer::clearState();
         deltaP = 0.0;

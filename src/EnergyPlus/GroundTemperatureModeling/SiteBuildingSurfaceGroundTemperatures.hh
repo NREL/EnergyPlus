@@ -60,8 +60,9 @@
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 // Derived class for Site:GroundTemperature:BuildingSurface
 class SiteBuildingSurfaceGroundTemps : public BaseGroundTempsModel
@@ -76,7 +77,7 @@ public:
     }
 
     static std::shared_ptr<SiteBuildingSurfaceGroundTemps>
-    BuildingSurfaceGTMFactory(IOFiles &ioFiles, int objectType, std::string objectName);
+    BuildingSurfaceGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
 
     Real64 getGroundTemp(EnergyPlusData &state) override;
 

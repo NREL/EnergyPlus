@@ -59,9 +59,9 @@
 #include <EnergyPlus/DataSurfaces.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
-    struct EnergyPlusData;
-    struct ZoneTempPredictorCorrectorData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HeatBalanceKivaManager {
 
@@ -109,7 +109,7 @@ namespace HeatBalanceKivaManager {
         int zoneControlNum;
         Real64 zoneAssumedTemperature;
         void initGround(EnergyPlusData &state, const KivaWeatherData &kivaWeather);
-        void setInitialBoundaryConditions(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
+        void setInitialBoundaryConditions(EnergyPlusData &state, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
         void setBoundaryConditions();
         void plotDomain();
         Real64 floorWeight;
@@ -129,8 +129,8 @@ namespace HeatBalanceKivaManager {
     public:
         KivaManager();
         virtual ~KivaManager();
-        void readWeatherData(EnergyPlusData &state, IOFiles &ioFiles);
-        bool setupKivaInstances(EnergyPlusData &state, IOFiles &ioFiles);
+        void readWeatherData(EnergyPlusData &state);
+        bool setupKivaInstances(EnergyPlusData &state);
         void initKivaInstances(EnergyPlusData &state);
         void calcKivaInstances();
         void defineDefaultFoundation();

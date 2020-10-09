@@ -57,8 +57,9 @@
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace IceThermalStorage {
 
@@ -162,7 +163,7 @@ namespace IceThermalStorage {
 
         void CalcIceStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
 
-        void CalcIceStorageDischarge(Real64 myLoad, bool RunFlag, Real64 MaxCap);
+        void CalcIceStorageDischarge(EnergyPlusData &state, Real64 myLoad, bool RunFlag, Real64 MaxCap);
 
         void CalcQiceDischageMax(Real64 &QiceMin);
 
@@ -178,7 +179,7 @@ namespace IceThermalStorage {
 
         void RecordOutput(Real64 myLoad, bool RunFlag);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
     };
 
     struct DetailedIceStorageData : PlantComponent
@@ -263,7 +264,7 @@ namespace IceThermalStorage {
 
         void ReportDetailedIceStorage();
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
     };
 
     // Object Data

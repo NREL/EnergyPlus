@@ -56,11 +56,12 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #define EP_cache_GlycolSpecificHeat
@@ -230,7 +231,7 @@ namespace FluidProperties {
 #endif
     }
 
-    void GetFluidPropertiesData()
+    void GetFluidPropertiesData(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -610,7 +611,8 @@ namespace FluidProperties {
         // so that the main derived types can be allocated
         FluidNum = 0;
         for (Loop = 1; Loop <= NumOfOptionalInput; ++Loop) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           Alphas,
                                           NumAlphas,
@@ -716,7 +718,8 @@ namespace FluidProperties {
 
         for (Loop = 1; Loop <= NumOfFluidTempArrays; ++Loop) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           Alphas,
                                           NumAlphas,
@@ -763,7 +766,8 @@ namespace FluidProperties {
             TempsName = "";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -835,7 +839,8 @@ namespace FluidProperties {
             TempsName = "";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -905,7 +910,8 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Saturated";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -979,7 +985,8 @@ namespace FluidProperties {
             TempsName = "";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -1049,7 +1056,8 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Saturated";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -1123,7 +1131,8 @@ namespace FluidProperties {
             TempsName = "";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -1193,7 +1202,8 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Saturated";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -1291,7 +1301,8 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Saturated";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -1351,7 +1362,8 @@ namespace FluidProperties {
             FirstSHMatch = true;
             NumOfPressPts = 0;
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -1411,7 +1423,8 @@ namespace FluidProperties {
             NumOfPressPts = 0;
             PressurePtr.allocate(NumOfSHFluidPropArrays);
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -1453,7 +1466,8 @@ namespace FluidProperties {
             }
 
             for (InData = 1; InData <= NumOfPressPts; ++InData) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               PressurePtr(InData).InPtr,
                                               Alphas,
                                               NumAlphas,
@@ -1497,7 +1511,8 @@ namespace FluidProperties {
             NumOfPressPts = 0;
             PressurePtr.allocate(NumOfSHFluidPropArrays);
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -1538,7 +1553,8 @@ namespace FluidProperties {
             }
 
             for (InData = 1; InData <= NumOfPressPts; ++InData) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               PressurePtr(InData).InPtr,
                                               Alphas,
                                               NumAlphas,
@@ -1575,7 +1591,8 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Superheated";
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -1630,7 +1647,8 @@ namespace FluidProperties {
             NumOfConcPts = 0;
             GlyRawData(Loop).CpDataPresent = false;
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for specific heat are consistant
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -1683,7 +1701,8 @@ namespace FluidProperties {
                 CurrentModuleObject = "FluidProperties:Concentration";
                 NumOfConcPts = 0;
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
-                    inputProcessor->getObjectItem(CurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  CurrentModuleObject,
                                                   InData,
                                                   Alphas,
                                                   NumAlphas,
@@ -1730,7 +1749,8 @@ namespace FluidProperties {
             GlyRawData(Loop).RhoDataPresent = false;
             CurrentModuleObject = "FluidProperties:Concentration";
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for density are consistant
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -1783,7 +1803,8 @@ namespace FluidProperties {
                 NumOfConcPts = 0;
                 CurrentModuleObject = "FluidProperties:Concentration";
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
-                    inputProcessor->getObjectItem(CurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  CurrentModuleObject,
                                                   InData,
                                                   Alphas,
                                                   NumAlphas,
@@ -1830,7 +1851,8 @@ namespace FluidProperties {
             GlyRawData(Loop).CondDataPresent = false;
             CurrentModuleObject = "FluidProperties:Concentration";
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for conductivity are consistant
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -1883,7 +1905,8 @@ namespace FluidProperties {
                 NumOfConcPts = 0;
                 CurrentModuleObject = "FluidProperties:Concentration";
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
-                    inputProcessor->getObjectItem(CurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  CurrentModuleObject,
                                                   InData,
                                                   Alphas,
                                                   NumAlphas,
@@ -1930,7 +1953,8 @@ namespace FluidProperties {
             GlyRawData(Loop).ViscDataPresent = false;
             CurrentModuleObject = "FluidProperties:Concentration";
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for viscosity are consistant
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               InData,
                                               Alphas,
                                               NumAlphas,
@@ -1983,7 +2007,8 @@ namespace FluidProperties {
                 NumOfConcPts = 0;
                 CurrentModuleObject = "FluidProperties:Concentration";
                 for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) {
-                    inputProcessor->getObjectItem(CurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  CurrentModuleObject,
                                                   InData,
                                                   Alphas,
                                                   NumAlphas,
@@ -2094,7 +2119,8 @@ namespace FluidProperties {
         NumOfGlyConcs = 1; // Water is always available, everything else must be specified
 
         for (Loop = 1; Loop <= NumOfOptionalInput; ++Loop) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Loop,
                                           Alphas,
                                           NumAlphas,
@@ -2354,8 +2380,8 @@ namespace FluidProperties {
         if (inputProcessor->getNumSectionsFound("INCREASEGLYCOLERRORLIMIT") > 0) GlycolErrorLimitTest += 10;
         if (inputProcessor->getNumSectionsFound("INCREASEREFRIGERANTERRORLIMIT") > 0) RefrigerantErrorLimitTest += 10;
 
-        if (DebugReportGlycols) ReportAndTestGlycols(IOFiles::getSingleton());
-        if (DebugReportRefrigerants) ReportAndTestRefrigerants(IOFiles::getSingleton());
+        if (DebugReportGlycols) ReportAndTestGlycols(state);
+        if (DebugReportRefrigerants) ReportAndTestRefrigerants(state);
     }
 
     // Use Array initializers to mimic the complex initialization of the original
@@ -5308,7 +5334,7 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    void ReportAndTestGlycols(IOFiles &ioFiles)
+    void ReportAndTestGlycols(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5359,226 +5385,226 @@ namespace FluidProperties {
             GlycolIndex = 0; // used in routine calls -- value is returned when first 0
             // Lay out the basic values:
             if (GlycolData(GlycolNum).GlycolName != "") {
-                print(ioFiles.debug, "Glycol={}, Mixture fluid={}\n", GlycolData(GlycolNum).Name, GlycolData(GlycolNum).GlycolName);
+                print(state.files.debug, "Glycol={}, Mixture fluid={}\n", GlycolData(GlycolNum).Name, GlycolData(GlycolNum).GlycolName);
             } else {
-                print(ioFiles.debug, "Glycol={}\n", GlycolData(GlycolNum).Name);
+                print(state.files.debug, "Glycol={}\n", GlycolData(GlycolNum).Name);
             }
-            print(ioFiles.debug, "Concentration:,{:.2R}\n", GlycolData(GlycolNum).Concentration);
+            print(state.files.debug, "Concentration:,{:.2R}\n", GlycolData(GlycolNum).Concentration);
             if (GlycolData(GlycolNum).CpDataPresent) {
-                print(ioFiles.debug,
+                print(state.files.debug,
                       "Specific Heat Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       GlycolData(GlycolNum).CpLowTempValue,
                       GlycolData(GlycolNum).CpLowTempIndex,
                       GlycolData(GlycolNum).CpHighTempValue,
                       GlycolData(GlycolNum).CpHighTempIndex);
-                print(ioFiles.debug, "{}", "Temperatures:");
+                print(state.files.debug, "{}", "Temperatures:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(Loop));
                 }
-                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts));
-                print(ioFiles.debug, "{}", "Specific Heat:");
+                print(state.files.debug, ",{}\n", GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts));
+                print(state.files.debug, "{}", "Specific Heat:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CpValues(Loop));
+                    print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).CpValues(Loop));
                 }
-                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).CpValues(GlycolData(GlycolNum).NumCpTempPts));
+                print(state.files.debug, ",{}\n", GlycolData(GlycolNum).CpValues(GlycolData(GlycolNum).NumCpTempPts));
             }
             if (GlycolData(GlycolNum).RhoDataPresent) {
-                print(ioFiles.debug,
+                print(state.files.debug,
                       "Density Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       GlycolData(GlycolNum).RhoLowTempValue,
                       GlycolData(GlycolNum).RhoLowTempIndex,
                       GlycolData(GlycolNum).RhoHighTempValue,
                       GlycolData(GlycolNum).RhoHighTempIndex);
-                print(ioFiles.debug, "{}", "Temperatures:");
+                print(state.files.debug, "{}", "Temperatures:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumRhoTempPts - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).RhoTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).RhoTemps(Loop));
                 }
-                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts));
-                print(ioFiles.debug, "{}", "Density:");
+                print(state.files.debug, ",{}\n", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts));
+                print(state.files.debug, "{}", "Density:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumRhoTempPts - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).RhoValues(Loop));
+                    print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).RhoValues(Loop));
                 }
-                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts));
+                print(state.files.debug, ",{}\n", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts));
             }
             if (GlycolData(GlycolNum).CondDataPresent) {
-                print(ioFiles.debug,
+                print(state.files.debug,
                       "Conductivity Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       GlycolData(GlycolNum).CondLowTempValue,
                       GlycolData(GlycolNum).CondLowTempIndex,
                       GlycolData(GlycolNum).CondHighTempValue,
                       GlycolData(GlycolNum).CondHighTempIndex);
-                print(ioFiles.debug, "{}", "Temperatures:");
+                print(state.files.debug, "{}", "Temperatures:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CondTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).CondTemps(Loop));
                 }
-                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts));
-                print(ioFiles.debug, "{}", "Conductivity:");
+                print(state.files.debug, ",{}\n", GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts));
+                print(state.files.debug, "{}", "Conductivity:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CondValues(Loop));
+                    print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).CondValues(Loop));
                 }
-                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).CondValues(GlycolData(GlycolNum).NumCondTempPts));
+                print(state.files.debug, ",{}\n", GlycolData(GlycolNum).CondValues(GlycolData(GlycolNum).NumCondTempPts));
             }
             if (GlycolData(GlycolNum).ViscDataPresent) {
-                print(ioFiles.debug,
+                print(state.files.debug,
                       "Viscosity Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       GlycolData(GlycolNum).ViscLowTempValue,
                       GlycolData(GlycolNum).ViscLowTempIndex,
                       GlycolData(GlycolNum).ViscHighTempValue,
                       GlycolData(GlycolNum).ViscHighTempIndex);
-                print(ioFiles.debug, "{}", "Temperatures:");
+                print(state.files.debug, "{}", "Temperatures:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).ViscTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).ViscTemps(Loop));
                 }
-                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts));
-                print(ioFiles.debug, "{}", "Viscosity:");
+                print(state.files.debug, ",{}\n", GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts));
+                print(state.files.debug, "{}", "Viscosity:");
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).ViscValues(Loop));
+                    print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).ViscValues(Loop));
                 }
-                print(ioFiles.debug, ",{}\n", GlycolData(GlycolNum).ViscValues(GlycolData(GlycolNum).NumViscTempPts));
+                print(state.files.debug, ",{}\n", GlycolData(GlycolNum).ViscValues(GlycolData(GlycolNum).NumViscTempPts));
             }
             // ============================================
             // Glycol Results, using out of bounds to out of bounds values in calling
             // ============================================
 
             // ========= Specific Heat from Temperatures
-            print(ioFiles.debug, "Glycol={} **** Results ****\n", GlycolData(GlycolNum).Name);
+            print(state.files.debug, "Glycol={} **** Results ****\n", GlycolData(GlycolNum).Name);
             if (GlycolData(GlycolNum).CpDataPresent) {
-                print(ioFiles.debug, "Specific Heat Results at Temperatures:");
-                print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(1) - incr);
+                print(state.files.debug, "Specific Heat Results at Temperatures:");
+                print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(1) - incr);
 
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(Loop));
                     Temperature =
                         GlycolData(GlycolNum).CpTemps(Loop) + (GlycolData(GlycolNum).CpTemps(Loop + 1) - GlycolData(GlycolNum).CpTemps(Loop)) / 2.0;
-                    print(ioFiles.debug, ",{:.2R}", Temperature);
+                    print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts));
-                print(ioFiles.debug, ",{:.2R}\n", GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts) + incr);
-                print(ioFiles.debug, "Specific Heat:");
+                print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts));
+                print(state.files.debug, ",{:.2R}\n", GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts) + incr);
+                print(state.files.debug, "Specific Heat:");
                 Temperature = GlycolData(GlycolNum).CpTemps(1) - incr;
-                ReturnValue = GetSpecificHeatGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                ReturnValue = GetSpecificHeatGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                print(state.files.debug, ",{:.2R}", ReturnValue);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
                     Temperature = GlycolData(GlycolNum).CpTemps(Loop);
-                    ReturnValue = GetSpecificHeatGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                    ReturnValue = GetSpecificHeatGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                    print(state.files.debug, ",{:.2R}", ReturnValue);
                     Temperature =
                         GlycolData(GlycolNum).CpTemps(Loop) + (GlycolData(GlycolNum).CpTemps(Loop + 1) - GlycolData(GlycolNum).CpTemps(Loop)) / 2.0;
-                    ReturnValue = GetSpecificHeatGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                    ReturnValue = GetSpecificHeatGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                    print(state.files.debug, ",{:.2R}", ReturnValue);
                 }
                 Temperature = GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts);
-                ReturnValue = GetSpecificHeatGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                ReturnValue = GetSpecificHeatGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                print(state.files.debug, ",{:.2R}", ReturnValue);
                 Temperature = GlycolData(GlycolNum).CpTemps(GlycolData(GlycolNum).NumCpTempPts) + incr;
-                ReturnValue = GetSpecificHeatGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(ioFiles.debug, ",{:.2R}\n", ReturnValue);
+                ReturnValue = GetSpecificHeatGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                print(state.files.debug, ",{:.2R}\n", ReturnValue);
             }
 
             // ========= Density from Temperatures
             if (GlycolData(GlycolNum).RhoDataPresent) {
-                print(ioFiles.debug, "Density Results at Temperatures:");
-                print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).RhoTemps(1) - incr);
+                print(state.files.debug, "Density Results at Temperatures:");
+                print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).RhoTemps(1) - incr);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumRhoTempPts - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).RhoTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).RhoTemps(Loop));
                     Temperature = GlycolData(GlycolNum).RhoTemps(Loop) +
                                   (GlycolData(GlycolNum).RhoTemps(Loop + 1) - GlycolData(GlycolNum).RhoTemps(Loop)) / 2.0;
-                    print(ioFiles.debug, ",{:.2R}", Temperature);
+                    print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(ioFiles.debug, ",{}", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts));
-                print(ioFiles.debug, ",{:.2R}\n", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts) + incr);
-                print(ioFiles.debug, "Density:");
+                print(state.files.debug, ",{}", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts));
+                print(state.files.debug, ",{:.2R}\n", GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts) + incr);
+                print(state.files.debug, "Density:");
                 Temperature = GlycolData(GlycolNum).RhoTemps(1) - incr;
-                ReturnValue = GetDensityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(ioFiles.debug, ",{:.3R}", ReturnValue);
+                ReturnValue = GetDensityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                print(state.files.debug, ",{:.3R}", ReturnValue);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumRhoTempPts - 1; ++Loop) {
                     Temperature = GlycolData(GlycolNum).RhoTemps(Loop);
-                    ReturnValue = GetDensityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.3R}", ReturnValue);
+                    ReturnValue = GetDensityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                    print(state.files.debug, ",{:.3R}", ReturnValue);
                     Temperature = GlycolData(GlycolNum).RhoTemps(Loop) +
                                   (GlycolData(GlycolNum).RhoTemps(Loop + 1) - GlycolData(GlycolNum).RhoTemps(Loop)) / 2.0;
-                    ReturnValue = GetDensityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.3R}", ReturnValue);
+                    ReturnValue = GetDensityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                    print(state.files.debug, ",{:.3R}", ReturnValue);
                 }
                 Temperature = GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts);
-                ReturnValue = GetDensityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(ioFiles.debug, ",{:.3R}", ReturnValue);
+                ReturnValue = GetDensityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                print(state.files.debug, ",{:.3R}", ReturnValue);
                 Temperature = GlycolData(GlycolNum).RhoTemps(GlycolData(GlycolNum).NumRhoTempPts) + incr;
-                ReturnValue = GetDensityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(ioFiles.debug, ",{:.3R}\n", ReturnValue);
+                ReturnValue = GetDensityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                print(state.files.debug, ",{:.3R}\n", ReturnValue);
             }
 
             // ========= Conductivity from Temperatures
             if (GlycolData(GlycolNum).CondDataPresent) {
-                print(ioFiles.debug, "Conductivity Results at Temperatures:");
-                print(ioFiles.debug, ",{:.2R}",GlycolData(GlycolNum).CondTemps(1) - incr);
+                print(state.files.debug, "Conductivity Results at Temperatures:");
+                print(state.files.debug, ",{:.2R}",GlycolData(GlycolNum).CondTemps(1) - incr);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CondTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).CondTemps(Loop));
                     Temperature = GlycolData(GlycolNum).CondTemps(Loop) +
                                   (GlycolData(GlycolNum).CondTemps(Loop + 1) - GlycolData(GlycolNum).CondTemps(Loop)) / 2.0;
-                    print(ioFiles.debug, ",{:.2R}", Temperature);
+                    print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts));
-                print(ioFiles.debug, ",{:.2R}\n" , GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts) + incr);
-                print(ioFiles.debug, "Conductivity:");
+                print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts));
+                print(state.files.debug, ",{:.2R}\n" , GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts) + incr);
+                print(state.files.debug, "Conductivity:");
                 Temperature = GlycolData(GlycolNum).CondTemps(1) - incr;
-                ReturnValue = GetConductivityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(ioFiles.debug, ",{:.3R}", ReturnValue);
+                ReturnValue = GetConductivityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                print(state.files.debug, ",{:.3R}", ReturnValue);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
                     Temperature = GlycolData(GlycolNum).CondTemps(Loop);
-                    ReturnValue = GetConductivityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.3R}", ReturnValue);
+                    ReturnValue = GetConductivityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                    print(state.files.debug, ",{:.3R}", ReturnValue);
                     Temperature = GlycolData(GlycolNum).CondTemps(Loop) +
                                   (GlycolData(GlycolNum).CondTemps(Loop + 1) - GlycolData(GlycolNum).CondTemps(Loop)) / 2.0;
-                    ReturnValue = GetConductivityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.3R}", ReturnValue);
+                    ReturnValue = GetConductivityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                    print(state.files.debug, ",{:.3R}", ReturnValue);
                 }
                 Temperature = GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts);
-                ReturnValue = GetConductivityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(ioFiles.debug, ",{:.3R}", ReturnValue);
+                ReturnValue = GetConductivityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                print(state.files.debug, ",{:.3R}", ReturnValue);
                 Temperature = GlycolData(GlycolNum).CondTemps(GlycolData(GlycolNum).NumCondTempPts) + incr;
-                ReturnValue = GetConductivityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(ioFiles.debug, ",{:.3R}\n", ReturnValue);
+                ReturnValue = GetConductivityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                print(state.files.debug, ",{:.3R}\n", ReturnValue);
             }
 
             // ========= Viscosity from Temperatures
             if (GlycolData(GlycolNum).ViscDataPresent) {
-                print(ioFiles.debug, "Viscosity Results at Temperatures:");
-                print(ioFiles.debug, ",{:.2R}",GlycolData(GlycolNum).ViscTemps(1) - incr);
+                print(state.files.debug, "Viscosity Results at Temperatures:");
+                print(state.files.debug, ",{:.2R}",GlycolData(GlycolNum).ViscTemps(1) - incr);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).ViscTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).ViscTemps(Loop));
                     Temperature = GlycolData(GlycolNum).ViscTemps(Loop) +
                                   (GlycolData(GlycolNum).ViscTemps(Loop + 1) - GlycolData(GlycolNum).ViscTemps(Loop)) / 2.0;
-                    print(ioFiles.debug, ",{:.2R}", Temperature);
+                    print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(ioFiles.debug, ",{:.2R}", GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts));
-                print(ioFiles.debug, ",{:.2R}\n", GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts) + incr);
-                print(ioFiles.debug, "Viscosity:");
+                print(state.files.debug, ",{:.2R}", GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts));
+                print(state.files.debug, ",{:.2R}\n", GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts) + incr);
+                print(state.files.debug, "Viscosity:");
                 Temperature = GlycolData(GlycolNum).ViscTemps(1) - incr;
-                ReturnValue = GetViscosityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(ioFiles.debug, ",{:.4R}", ReturnValue);
+                ReturnValue = GetViscosityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                print(state.files.debug, ",{:.4R}", ReturnValue);
                 for (Loop = 1; Loop <= GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
                     Temperature = GlycolData(GlycolNum).ViscTemps(Loop);
-                    ReturnValue = GetViscosityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.4R}", ReturnValue);
+                    ReturnValue = GetViscosityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                    print(state.files.debug, ",{:.4R}", ReturnValue);
                     Temperature = GlycolData(GlycolNum).ViscTemps(Loop) +
                                   (GlycolData(GlycolNum).ViscTemps(Loop + 1) - GlycolData(GlycolNum).ViscTemps(Loop)) / 2.0;
-                    ReturnValue = GetViscosityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.4R}", ReturnValue);
+                    ReturnValue = GetViscosityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                    print(state.files.debug, ",{:.4R}", ReturnValue);
                 }
                 Temperature = GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts);
-                ReturnValue = GetViscosityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(ioFiles.debug, ",{:.4R}", ReturnValue);
+                ReturnValue = GetViscosityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                print(state.files.debug, ",{:.4R}", ReturnValue);
                 Temperature = GlycolData(GlycolNum).ViscTemps(GlycolData(GlycolNum).NumViscTempPts) + incr;
-                ReturnValue = GetViscosityGlycol(GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
-                print(ioFiles.debug, ",{:.4R}\n", ReturnValue);
+                ReturnValue = GetViscosityGlycol(state, GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                print(state.files.debug, ",{:.4R}\n", ReturnValue);
             }
         }
     }
 
     //*****************************************************************************
 
-    void ReportAndTestRefrigerants(IOFiles &ioFiles)
+    void ReportAndTestRefrigerants(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5632,175 +5658,175 @@ namespace FluidProperties {
             RefrigIndex = 0; // used in routine calls -- value is returned when first 0
             // Lay out the basic values:
             if (!RefrigData(RefrigNum).Name.empty()) {
-                print(ioFiles.debug, "Refrigerant={}", RefrigData(RefrigNum).Name);
+                print(state.files.debug, "Refrigerant={}", RefrigData(RefrigNum).Name);
             }
             if (RefrigData(RefrigNum).NumPsPoints > 0) {
-                print(ioFiles.debug,
+                print(state.files.debug,
                       "Saturation Pressures Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       RefrigData(RefrigNum).PsLowTempValue,
                       RefrigData(RefrigNum).PsLowTempIndex,
                       RefrigData(RefrigNum).PsHighTempValue,
                       RefrigData(RefrigNum).PsHighTempIndex);
-                print(ioFiles.debug, "Temperatures:");
+                print(state.files.debug, "Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumPsPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(Loop));
                 }
-                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints));
-                print(ioFiles.debug, "Saturation Pressure:");
+                print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints));
+                print(state.files.debug, "Saturation Pressure:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumPsPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).PsValues(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).PsValues(Loop));
                 }
-                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).PsValues(RefrigData(RefrigNum).NumPsPoints));
+                print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).PsValues(RefrigData(RefrigNum).NumPsPoints));
             }
             if (RefrigData(RefrigNum).NumHPoints > 0) {
-                print(ioFiles.debug,
+                print(state.files.debug,
                       "Enthalpy Saturated Fluid Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       RefrigData(RefrigNum).HfLowTempValue,
                       RefrigData(RefrigNum).HfLowTempIndex,
                       RefrigData(RefrigNum).HfHighTempValue,
                       RefrigData(RefrigNum).HfHighTempIndex);
-                print(ioFiles.debug, "Temperatures:");
+                print(state.files.debug, "Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(Loop));
                 }
-                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints));
-                print(ioFiles.debug, "Enthalpy Saturated Fluid:");
+                print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints));
+                print(state.files.debug, "Enthalpy Saturated Fluid:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HfValues(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).HfValues(Loop));
                 }
-                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).HfValues(RefrigData(RefrigNum).NumHPoints));
-                print(ioFiles.debug,
+                print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).HfValues(RefrigData(RefrigNum).NumHPoints));
+                print(state.files.debug,
                       "Enthalpy Saturated Fluid/Gas Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       RefrigData(RefrigNum).HfgLowTempValue,
                       RefrigData(RefrigNum).HfgLowTempIndex,
                       RefrigData(RefrigNum).HfgHighTempValue,
                       RefrigData(RefrigNum).HfgHighTempIndex);
 
-                print(ioFiles.debug, "Temperatures:");
+                print(state.files.debug, "Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(Loop));
                 }
-                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints));
-                print(ioFiles.debug, "Enthalpy Saturated Fluid/Gas:");
+                print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints));
+                print(state.files.debug, "Enthalpy Saturated Fluid/Gas:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HfgValues(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).HfgValues(Loop));
                 }
-                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).HfgValues(RefrigData(RefrigNum).NumHPoints));
+                print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).HfgValues(RefrigData(RefrigNum).NumHPoints));
             }
             if (RefrigData(RefrigNum).NumCpPoints > 0) {
-                print(ioFiles.debug,
+                print(state.files.debug,
                       "Specific Heat Saturated Fluid Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       RefrigData(RefrigNum).CpfLowTempValue,
                       RefrigData(RefrigNum).CpfLowTempIndex,
                       RefrigData(RefrigNum).CpfHighTempValue,
                       RefrigData(RefrigNum).CpfHighTempIndex);
-                print(ioFiles.debug, "Temperatures:");
+                print(state.files.debug, "Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(Loop));
                 }
-                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints));
-                print(ioFiles.debug, "Specific Heat Saturated Fluid:");
+                print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints));
+                print(state.files.debug, "Specific Heat Saturated Fluid:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpfValues(Loop));
+                    print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpfValues(Loop));
                 }
-                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpfValues(RefrigData(RefrigNum).NumCpPoints));
-                print(ioFiles.debug,
+                print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).CpfValues(RefrigData(RefrigNum).NumCpPoints));
+                print(state.files.debug,
                       "Specific Heat Saturated Fluid/Gas Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       RefrigData(RefrigNum).CpfgLowTempValue,
                       RefrigData(RefrigNum).CpfgLowTempIndex,
                       RefrigData(RefrigNum).CpfgHighTempValue,
                       RefrigData(RefrigNum).CpfgHighTempIndex);
-                print(ioFiles.debug, "Temperatures:");
+                print(state.files.debug, "Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(Loop));
                 }
-                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints));
-                print(ioFiles.debug, "Specific Heat Saturated Fluid/Gas:");
+                print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints));
+                print(state.files.debug, "Specific Heat Saturated Fluid/Gas:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpfgValues(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).CpfgValues(Loop));
                 }
-                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpfgValues(RefrigData(RefrigNum).NumCpPoints));
+                print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpfgValues(RefrigData(RefrigNum).NumCpPoints));
             }
             if (RefrigData(RefrigNum).NumRhoPoints > 0) {
-                print(ioFiles.debug,
+                print(state.files.debug,
                       "Density Saturated Fluid Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                       RefrigData(RefrigNum).RhofLowTempValue,
                       RefrigData(RefrigNum).RhofLowTempIndex,
                       RefrigData(RefrigNum).RhofHighTempValue,
                       RefrigData(RefrigNum).RhofHighTempIndex);
-                print(ioFiles.debug, "Temperatures:");
+                print(state.files.debug, "Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(Loop));
                 }
-                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints));
-                print(ioFiles.debug, "Density Saturated Fluid:");
+                print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints));
+                print(state.files.debug, "Density Saturated Fluid:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhofValues(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).RhofValues(Loop));
                 }
-                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhofValues(RefrigData(RefrigNum).NumRhoPoints));
-                print(ioFiles.debug, "Density Saturated Fluid/Gas Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
+                print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).RhofValues(RefrigData(RefrigNum).NumRhoPoints));
+                print(state.files.debug, "Density Saturated Fluid/Gas Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
                                                          RefrigData(RefrigNum).RhofgLowTempValue,
                                                          RefrigData(RefrigNum).RhofgLowTempIndex,
                                                          RefrigData(RefrigNum).RhofgHighTempValue,
                                                          RefrigData(RefrigNum).RhofgHighTempIndex);
-                print(ioFiles.debug, "Temperatures:");
+                print(state.files.debug, "Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(Loop));
                 }
-                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints));
-                print(ioFiles.debug, "Density Saturated Fluid/Gas:");
+                print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints));
+                print(state.files.debug, "Density Saturated Fluid/Gas:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhofgValues(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).RhofgValues(Loop));
                 }
-                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).RhofgValues(RefrigData(RefrigNum).NumRhoPoints));
+                print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).RhofgValues(RefrigData(RefrigNum).NumRhoPoints));
             }
 
             if (RefrigData(RefrigNum).NumSuperTempPts > 0 && RefrigData(RefrigNum).NumSuperPressPts > 0) {
-                print(ioFiles.debug,
+                print(state.files.debug,
                       "Superheated Gas Fluid Data points:,NumTemperaturePoints=,{},NumPressurePoints=,{}\n",
                       RefrigData(RefrigNum).NumSuperTempPts,
                       RefrigData(RefrigNum).NumSuperPressPts);
-                print(ioFiles.debug, "Superheated Temperatures:");
+                print(state.files.debug, "Superheated Temperatures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumSuperTempPts - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.3R}", RefrigData(RefrigNum).SHTemps(Loop));
+                    print(state.files.debug, ",{:.3R}", RefrigData(RefrigNum).SHTemps(Loop));
                 }
-                print(ioFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).SHTemps(RefrigData(RefrigNum).NumSuperTempPts));
-                print(ioFiles.debug, "Superheated Pressures:");
+                print(state.files.debug, ",{:.3R}\n", RefrigData(RefrigNum).SHTemps(RefrigData(RefrigNum).NumSuperTempPts));
+                print(state.files.debug, "Superheated Pressures:");
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumSuperPressPts - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.3R}", RefrigData(RefrigNum).SHPress(Loop));
+                    print(state.files.debug, ",{:.3R}", RefrigData(RefrigNum).SHPress(Loop));
                 }
-                print(ioFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).SHPress(RefrigData(RefrigNum).NumSuperPressPts));
+                print(state.files.debug, ",{:.3R}\n", RefrigData(RefrigNum).SHPress(RefrigData(RefrigNum).NumSuperPressPts));
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumSuperPressPts; ++Loop) {
-                    print(ioFiles.debug, "Superheated Pressure:#{}={:.2R}\n", Loop, RefrigData(RefrigNum).SHPress(Loop));
-                    print(ioFiles.debug, "Enthalpy Superheated Gas:");
+                    print(state.files.debug, "Superheated Pressure:#{}={:.2R}\n", Loop, RefrigData(RefrigNum).SHPress(Loop));
+                    print(state.files.debug, "Enthalpy Superheated Gas:");
                     for (Loop1 = 1; Loop1 <= RefrigData(RefrigNum).NumSuperTempPts - 1; ++Loop1) {
-                        print(ioFiles.debug, ",{:.3R}", RefrigData(RefrigNum).HshValues(Loop, Loop1));
+                        print(state.files.debug, ",{:.3R}", RefrigData(RefrigNum).HshValues(Loop, Loop1));
                     }
-                    print(ioFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).HshValues(Loop, RefrigData(RefrigNum).NumSuperTempPts));
+                    print(state.files.debug, ",{:.3R}\n", RefrigData(RefrigNum).HshValues(Loop, RefrigData(RefrigNum).NumSuperTempPts));
                 }
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumSuperPressPts; ++Loop) {
-                    print(ioFiles.debug, "Superheated Pressure:#{}={:.2R}\n", RoundSigDigits(Loop), RefrigData(RefrigNum).SHPress(Loop));
-                    print(ioFiles.debug, "Density Superheated Gas:");
+                    print(state.files.debug, "Superheated Pressure:#{}={:.2R}\n", RoundSigDigits(Loop), RefrigData(RefrigNum).SHPress(Loop));
+                    print(state.files.debug, "Density Superheated Gas:");
                     for (Loop1 = 1; Loop1 <= RefrigData(RefrigNum).NumSuperTempPts - 1; ++Loop1) {
-                        print(ioFiles.debug, ",{:.3R}", RefrigData(RefrigNum).RhoshValues(Loop, Loop1));
+                        print(state.files.debug, ",{:.3R}", RefrigData(RefrigNum).RhoshValues(Loop, Loop1));
                     }
-                    print(ioFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).RhoshValues(Loop, RefrigData(RefrigNum).NumSuperTempPts));
+                    print(state.files.debug, ",{:.3R}\n", RefrigData(RefrigNum).RhoshValues(Loop, RefrigData(RefrigNum).NumSuperTempPts));
                 }
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumSuperTempPts; ++Loop) {
-                    print(ioFiles.debug, "Superheated Temperature:#{}={:.2R}\n", Loop, RefrigData(RefrigNum).SHTemps(Loop));
-                    print(ioFiles.debug, "Enthalpy Superheated Gas:");
+                    print(state.files.debug, "Superheated Temperature:#{}={:.2R}\n", Loop, RefrigData(RefrigNum).SHTemps(Loop));
+                    print(state.files.debug, "Enthalpy Superheated Gas:");
                     for (Loop1 = 1; Loop1 <= RefrigData(RefrigNum).NumSuperPressPts - 1; ++Loop1) {
-                        print(ioFiles.debug, ",{:.3R}", RefrigData(RefrigNum).HshValues(Loop1, Loop));
+                        print(state.files.debug, ",{:.3R}", RefrigData(RefrigNum).HshValues(Loop1, Loop));
                     }
-                    print(ioFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).HshValues(RefrigData(RefrigNum).NumSuperPressPts, Loop));
+                    print(state.files.debug, ",{:.3R}\n", RefrigData(RefrigNum).HshValues(RefrigData(RefrigNum).NumSuperPressPts, Loop));
                 }
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumSuperTempPts; ++Loop) {
-                    print(ioFiles.debug, "Superheated Temperature:#{}={:.2R}\n", Loop, RefrigData(RefrigNum).SHTemps(Loop));
-                    print(ioFiles.debug, "Density Superheated Gas:");
+                    print(state.files.debug, "Superheated Temperature:#{}={:.2R}\n", Loop, RefrigData(RefrigNum).SHTemps(Loop));
+                    print(state.files.debug, "Density Superheated Gas:");
                     for (Loop1 = 1; Loop1 <= RefrigData(RefrigNum).NumSuperPressPts - 1; ++Loop1) {
-                        print(ioFiles.debug, ",{:.3R}", RefrigData(RefrigNum).RhoshValues(Loop1, Loop));
+                        print(state.files.debug, ",{:.3R}", RefrigData(RefrigNum).RhoshValues(Loop1, Loop));
                     }
-                    print(ioFiles.debug, ",{:.3R}\n", RefrigData(RefrigNum).RhoshValues(RefrigData(RefrigNum).NumSuperPressPts, Loop));
+                    print(state.files.debug, ",{:.3R}\n", RefrigData(RefrigNum).RhoshValues(RefrigData(RefrigNum).NumSuperPressPts, Loop));
                 }
             }
 
@@ -5809,143 +5835,144 @@ namespace FluidProperties {
             // ============================================
 
             // ========= Pressure from Temperatures
-            print(ioFiles.debug, "Refrigerant={} **** Results ****\n", RefrigData(RefrigNum).Name);
+            print(state.files.debug, "Refrigerant={} **** Results ****\n", RefrigData(RefrigNum).Name);
             if (RefrigData(RefrigNum).NumPsPoints > 0) {
-                print(ioFiles.debug, "Pressure Results at Temperatures:");
-                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(1) - incr);
+                print(state.files.debug, "Pressure Results at Temperatures:");
+                print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(1) - incr);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumPsPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(Loop));
                     Temperature =
                         RefrigData(RefrigNum).PsTemps(Loop) + (RefrigData(RefrigNum).PsTemps(Loop + 1) - RefrigData(RefrigNum).PsTemps(Loop)) / 2.0;
-                    print(ioFiles.debug, ",{:.2R}", Temperature);
+                    print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints));
-                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints) + incr);
-                print(ioFiles.debug, "Saturated Pressures:");
+                print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints));
+                print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints) + incr);
+                print(state.files.debug, "Saturated Pressures:");
                 Temperature = RefrigData(RefrigNum).PsTemps(1) - incr;
-                ReturnValue = GetSatPressureRefrig(RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
-                print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                ReturnValue = GetSatPressureRefrig(state, RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
+                print(state.files.debug, ",{:.2R}", ReturnValue);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumPsPoints - 1; ++Loop) {
                     Temperature = RefrigData(RefrigNum).PsTemps(Loop);
-                    ReturnValue = GetSatPressureRefrig(RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                    ReturnValue = GetSatPressureRefrig(state, RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
+                    print(state.files.debug, ",{:.2R}", ReturnValue);
                     Temperature =
                         RefrigData(RefrigNum).PsTemps(Loop) + (RefrigData(RefrigNum).PsTemps(Loop + 1) - RefrigData(RefrigNum).PsTemps(Loop)) / 2.0;
-                    ReturnValue = GetSatPressureRefrig(RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                    ReturnValue = GetSatPressureRefrig(state, RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
+                    print(state.files.debug, ",{:.2R}", ReturnValue);
                 }
                 Temperature = RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints);
-                ReturnValue = GetSatPressureRefrig(RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
-                print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                ReturnValue = GetSatPressureRefrig(state, RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
+                print(state.files.debug, ",{:.2R}", ReturnValue);
                 Temperature = RefrigData(RefrigNum).PsTemps(RefrigData(RefrigNum).NumPsPoints) + incr;
-                ReturnValue = GetSatPressureRefrig(RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
-                print(ioFiles.debug, ",{:.2R}\n", ReturnValue);
+                ReturnValue = GetSatPressureRefrig(state, RefrigData(RefrigNum).Name, Temperature, RefrigIndex, RoutineName);
+                print(state.files.debug, ",{:.2R}\n", ReturnValue);
             }
 
             // ========= Enthalpy from Temperatures
             if (RefrigData(RefrigNum).NumHPoints > 0) {
-                print(ioFiles.debug, "Enthalpy Results at Temperatures:");
-                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(1) - incr);
+                print(state.files.debug, "Enthalpy Results at Temperatures:");
+                print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(1) - incr);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(Loop));
                     Temperature =
                         RefrigData(RefrigNum).HTemps(Loop) + (RefrigData(RefrigNum).HTemps(Loop + 1) - RefrigData(RefrigNum).HTemps(Loop)) / 2.0;
-                    print(ioFiles.debug, ",{:.2R}", Temperature);
+                    print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints));
-                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints) + incr);
-                print(ioFiles.debug, "Saturated Enthalpy:");
+                print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints));
+                print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints) + incr);
+                print(state.files.debug, "Saturated Enthalpy:");
                 Temperature = RefrigData(RefrigNum).HTemps(1) - incr;
-                ReturnValue = GetSatEnthalpyRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                ReturnValue = GetSatEnthalpyRefrig(state, RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                print(state.files.debug, ",{:.2R}", ReturnValue);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumHPoints - 1; ++Loop) {
                     Temperature = RefrigData(RefrigNum).HTemps(Loop);
-                    ReturnValue = GetSatEnthalpyRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                    ReturnValue = GetSatEnthalpyRefrig(state, RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                    print(state.files.debug, ",{:.2R}", ReturnValue);
                     Temperature =
                         RefrigData(RefrigNum).HTemps(Loop) + (RefrigData(RefrigNum).HTemps(Loop + 1) - RefrigData(RefrigNum).HTemps(Loop)) / 2.0;
-                    ReturnValue = GetSatEnthalpyRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                    ReturnValue = GetSatEnthalpyRefrig(state, RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                    print(state.files.debug, ",{:.2R}", ReturnValue);
                 }
                 Temperature = RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints);
-                ReturnValue = GetSatEnthalpyRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                ReturnValue = GetSatEnthalpyRefrig(state, RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                print(state.files.debug, ",{:.2R}", ReturnValue);
                 Temperature = RefrigData(RefrigNum).HTemps(RefrigData(RefrigNum).NumHPoints) + incr;
-                ReturnValue = GetSatEnthalpyRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(ioFiles.debug, ",{:.2R}\n", ReturnValue);
+                ReturnValue = GetSatEnthalpyRefrig(state, RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                print(state.files.debug, ",{:.2R}\n", ReturnValue);
             }
 
             // ========= Specific Heat from Temperatures
             if (RefrigData(RefrigNum).NumCpPoints > 0) {
-                print(ioFiles.debug, "Specific Heat Results at Temperatures:");
-                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(1) - incr);
+                print(state.files.debug, "Specific Heat Results at Temperatures:");
+                print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(1) - incr);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).CpTemps(Loop));
                     Temperature =
                         RefrigData(RefrigNum).CpTemps(Loop) + (RefrigData(RefrigNum).CpTemps(Loop + 1) - RefrigData(RefrigNum).CpTemps(Loop)) / 2.0;
-                    print(ioFiles.debug, ",{:.2R}", Temperature);
+                    print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(ioFiles.debug,  ",{:.2R}", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints));
-                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints) + incr);
-                print(ioFiles.debug, "Saturated Specific Heat:");
+                print(state.files.debug,  ",{:.2R}", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints));
+                print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints) + incr);
+                print(state.files.debug, "Saturated Specific Heat:");
                 Temperature = RefrigData(RefrigNum).CpTemps(1) - incr;
-                ReturnValue = GetSatSpecificHeatRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                ReturnValue = GetSatSpecificHeatRefrig(state, RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                print(state.files.debug, ",{:.2R}", ReturnValue);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumCpPoints - 1; ++Loop) {
                     Temperature = RefrigData(RefrigNum).CpTemps(Loop);
-                    ReturnValue = GetSatSpecificHeatRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                    ReturnValue = GetSatSpecificHeatRefrig(state, RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                    print(state.files.debug, ",{:.2R}", ReturnValue);
                     Temperature =
                         RefrigData(RefrigNum).CpTemps(Loop) + (RefrigData(RefrigNum).CpTemps(Loop + 1) - RefrigData(RefrigNum).CpTemps(Loop)) / 2.0;
-                    ReturnValue = GetSatSpecificHeatRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                    ReturnValue = GetSatSpecificHeatRefrig(state, RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                    print(state.files.debug, ",{:.2R}", ReturnValue);
                 }
                 Temperature = RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints);
-                ReturnValue = GetSatSpecificHeatRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                ReturnValue = GetSatSpecificHeatRefrig(state, RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                print(state.files.debug, ",{:.2R}", ReturnValue);
                 Temperature = RefrigData(RefrigNum).CpTemps(RefrigData(RefrigNum).NumCpPoints) + incr;
-                ReturnValue = GetSatSpecificHeatRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(ioFiles.debug, ",{:.2R}\n", ReturnValue);
+                ReturnValue = GetSatSpecificHeatRefrig(state, RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                print(state.files.debug, ",{:.2R}\n", ReturnValue);
             }
 
             // ========= Density from Temperatures
             if (RefrigData(RefrigNum).NumRhoPoints > 0) {
-                print(ioFiles.debug, "Density Results at Temperatures:");
-                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(1) - incr);
+                print(state.files.debug, "Density Results at Temperatures:");
+                print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(1) - incr);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
-                    print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(Loop));
+                    print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(Loop));
                     Temperature = RefrigData(RefrigNum).RhoTemps(Loop) +
                                   (RefrigData(RefrigNum).RhoTemps(Loop + 1) - RefrigData(RefrigNum).RhoTemps(Loop)) / 2.0;
-                    print(ioFiles.debug, ",{:.2R}", Temperature);
+                    print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(ioFiles.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints));
-                print(ioFiles.debug, ",{:.2R}\n", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints) + incr);
-                print(ioFiles.debug, "Saturated Density:");
+                print(state.files.debug, ",{:.2R}", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints));
+                print(state.files.debug, ",{:.2R}\n", RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints) + incr);
+                print(state.files.debug, "Saturated Density:");
                 Temperature = RefrigData(RefrigNum).RhoTemps(1) - incr;
-                ReturnValue = GetSatDensityRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                ReturnValue = GetSatDensityRefrig(state, RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                print(state.files.debug, ",{:.2R}", ReturnValue);
                 for (Loop = 1; Loop <= RefrigData(RefrigNum).NumRhoPoints - 1; ++Loop) {
                     Temperature = RefrigData(RefrigNum).RhoTemps(Loop);
-                    ReturnValue = GetSatDensityRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                    ReturnValue = GetSatDensityRefrig(state, RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                    print(state.files.debug, ",{:.2R}", ReturnValue);
                     Temperature = RefrigData(RefrigNum).RhoTemps(Loop) +
                                   (RefrigData(RefrigNum).RhoTemps(Loop + 1) - RefrigData(RefrigNum).RhoTemps(Loop)) / 2.0;
-                    ReturnValue = GetSatDensityRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                    print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                    ReturnValue = GetSatDensityRefrig(state, RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                    print(state.files.debug, ",{:.2R}", ReturnValue);
                 }
                 Temperature = RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints);
-                ReturnValue = GetSatDensityRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(ioFiles.debug, ",{:.2R}", ReturnValue);
+                ReturnValue = GetSatDensityRefrig(state, RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                print(state.files.debug, ",{:.2R}", ReturnValue);
                 Temperature = RefrigData(RefrigNum).RhoTemps(RefrigData(RefrigNum).NumRhoPoints) + incr;
-                ReturnValue = GetSatDensityRefrig(RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
-                print(ioFiles.debug, ",{:.2R}\n", ReturnValue);
+                ReturnValue = GetSatDensityRefrig(state, RefrigData(RefrigNum).Name, Temperature, Quality, RefrigIndex, RoutineName);
+                print(state.files.debug, ",{:.2R}\n", ReturnValue);
             }
         }
     }
 
     //*****************************************************************************
 
-    Real64 GetSatPressureRefrig(std::string const &Refrigerant, // carries in substance name
+    Real64 GetSatPressureRefrig(EnergyPlusData &state,
+                                std::string const &Refrigerant, // carries in substance name
                                 Real64 const Temperature,       // actual temperature given as input
                                 int &RefrigIndex,               // Index to Refrigerant Properties
                                 std::string const &CalledFrom   // routine this function was called from (error messages)
@@ -5996,13 +6023,13 @@ namespace FluidProperties {
 
         // FLOW:
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
         RefrigNum = 0;
         if (NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatPressureRefrig", "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatPressureRefrig", "properties", CalledFrom);
         }
 
         ErrorFlag = false;
@@ -6011,9 +6038,9 @@ namespace FluidProperties {
             RefrigNum = RefrigIndex;
         } else {
             // Find which refrigerant (index) is being requested
-            RefrigNum = FindRefrigerant(Refrigerant);
+            RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatPressureRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatPressureRefrig", "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -6066,7 +6093,8 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    Real64 GetSatTemperatureRefrig(std::string const &Refrigerant, // carries in substance name
+    Real64 GetSatTemperatureRefrig(EnergyPlusData &state,
+                                   std::string const &Refrigerant, // carries in substance name
                                    Real64 const Pressure,          // actual temperature given as input
                                    int &RefrigIndex,               // Index to Refrigerant Properties
                                    std::string const &CalledFrom   // routine this function was called from (error messages)
@@ -6117,13 +6145,13 @@ namespace FluidProperties {
 
         // FLOW:
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
         RefrigNum = 0;
         if (NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatTemperatureRefrig", "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatTemperatureRefrig", "properties", CalledFrom);
         }
 
         ErrorFlag = false;
@@ -6132,9 +6160,9 @@ namespace FluidProperties {
             RefrigNum = RefrigIndex;
         } else {
             // Find which refrigerant (index) is being requested
-            RefrigNum = FindRefrigerant(Refrigerant);
+            RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatTemperatureRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatTemperatureRefrig", "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -6186,7 +6214,8 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    Real64 GetSatEnthalpyRefrig(std::string const &Refrigerant, // carries in substance name
+    Real64 GetSatEnthalpyRefrig(EnergyPlusData &state,
+                                std::string const &Refrigerant, // carries in substance name
                                 Real64 const Temperature,       // actual temperature given as input
                                 Real64 const Quality,           // actual quality given as input
                                 int &RefrigIndex,               // Index to Refrigerant Properties
@@ -6234,13 +6263,13 @@ namespace FluidProperties {
 
         // FLOW:
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
         RefrigNum = 0;
         if (NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
@@ -6253,9 +6282,9 @@ namespace FluidProperties {
             RefrigNum = RefrigIndex;
         } else {
             // Find which refrigerant (index) is being requested
-            RefrigNum = FindRefrigerant(Refrigerant);
+            RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -6268,7 +6297,8 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    Real64 GetSatDensityRefrig(std::string const &Refrigerant, // carries in substance name
+    Real64 GetSatDensityRefrig(EnergyPlusData &state,
+                               std::string const &Refrigerant, // carries in substance name
                                Real64 const Temperature,       // actual temperature given as input
                                Real64 const Quality,           // actual quality given as input
                                int &RefrigIndex,               // Index to Refrigerant Properties
@@ -6326,13 +6356,13 @@ namespace FluidProperties {
 
         // FLOW:
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
         RefrigNum = 0;
         if (NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatDensityRefrig", "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatDensityRefrig", "properties", CalledFrom);
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
@@ -6347,9 +6377,9 @@ namespace FluidProperties {
             RefrigNum = RefrigIndex;
         } else {
             // Find which refrigerant (index) is being requested
-            RefrigNum = FindRefrigerant(Refrigerant);
+            RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatDensityRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatDensityRefrig", "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -6423,7 +6453,8 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    Real64 GetSatSpecificHeatRefrig(std::string const &Refrigerant, // carries in substance name
+    Real64 GetSatSpecificHeatRefrig(EnergyPlusData &state,
+                                    std::string const &Refrigerant, // carries in substance name
                                     Real64 const Temperature,       // actual temperature given as input
                                     Real64 const Quality,           // actual quality given as input
                                     int &RefrigIndex,               // Index to Refrigerant Properties
@@ -6472,13 +6503,13 @@ namespace FluidProperties {
 
         // FLOW:
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
         RefrigNum = 0;
         if (NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatSpecificHeatRefrig", "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatSpecificHeatRefrig", "properties", CalledFrom);
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
@@ -6493,9 +6524,9 @@ namespace FluidProperties {
             RefrigNum = RefrigIndex;
         } else {
             // Find which refrigerant (index) is being requested
-            RefrigNum = FindRefrigerant(Refrigerant);
+            RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatSpecificHeatRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSatSpecificHeatRefrig", "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -6510,7 +6541,8 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    Real64 GetSupHeatEnthalpyRefrig(std::string const &Refrigerant, // carries in substance name
+    Real64 GetSupHeatEnthalpyRefrig(EnergyPlusData &state,
+                                    std::string const &Refrigerant, // carries in substance name
                                     Real64 const Temperature,       // actual temperature given as input
                                     Real64 const Pressure,          // actual pressure given as input
                                     int &RefrigIndex,               // Index to Refrigerant Properties
@@ -6588,13 +6620,13 @@ namespace FluidProperties {
 
         // see if data is there
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
         RefrigNum = 0;
         if (NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineNameNoColon, "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineNameNoColon, "properties", CalledFrom);
         }
 
         ErrCount = 0;
@@ -6608,9 +6640,9 @@ namespace FluidProperties {
             RefrigNum = RefrigIndex;
         } else {
             // Find which refrigerant (index) is being requested
-            RefrigNum = FindRefrigerant(Refrigerant);
+            RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineNameNoColon, "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineNameNoColon, "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -6664,16 +6696,16 @@ namespace FluidProperties {
         // to give reasonable interpolation near saturation reset any point with zero value
         // in table to saturation value
         if (LoTempLoEnthalpy <= 0.0) {
-            LoTempLoEnthalpy = GetSatEnthalpyRefrig(Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon);
+            LoTempLoEnthalpy = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon);
         }
         if (LoTempHiEnthalpy <= 0.0) {
-            LoTempHiEnthalpy = GetSatEnthalpyRefrig(Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon);
+            LoTempHiEnthalpy = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon);
         }
         if (HiTempLoEnthalpy <= 0.0) {
-            HiTempLoEnthalpy = GetSatEnthalpyRefrig(Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon);
+            HiTempLoEnthalpy = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon);
         }
         if (HiTempHiEnthalpy <= 0.0) {
-            HiTempHiEnthalpy = GetSatEnthalpyRefrig(Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon);
+            HiTempHiEnthalpy = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon);
         }
 
         // interpolate w.r.t. pressure
@@ -6690,7 +6722,7 @@ namespace FluidProperties {
             (refrig.HshValues(LoPressIndex, HiTempIndex) <= 0.0) && (refrig.HshValues(HiPressIndex, HiTempIndex) <= 0.0)) {
             ++SatErrCount;
             // set return value
-            ReturnValue = GetSatEnthalpyRefrig(Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoSpace + CalledFrom);
+            ReturnValue = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoSpace + CalledFrom);
             // send warning
             if (!WarmupFlag) {
                 RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrCount += SatErrCount;
@@ -6764,7 +6796,8 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    Real64 GetSupHeatPressureRefrig(std::string const &Refrigerant, // carries in substance name
+    Real64 GetSupHeatPressureRefrig(EnergyPlusData &state,
+                                    std::string const &Refrigerant, // carries in substance name
                                     Real64 const Temperature,       // actual temperature given as input
                                     Real64 const Enthalpy,          // actual enthalpy given as input
                                     int &RefrigIndex,               // Index to Refrigerant Properties
@@ -6853,13 +6886,13 @@ namespace FluidProperties {
         // FLOW:
 
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
         RefrigNum = 0;
         if (NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
         }
 
         ErrCount = 0;
@@ -6873,9 +6906,9 @@ namespace FluidProperties {
             RefrigNum = RefrigIndex;
         } else {
             // Find which refrigerant (index) is being requested
-            RefrigNum = FindRefrigerant(Refrigerant);
+            RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -6944,7 +6977,7 @@ namespace FluidProperties {
         EnthalpyMax = max(refrig.HshValues(TempStart, LoTempIndex), refrig.HshValues(TempStart, HiTempIndex));
         EnthalpyMin = min(refrig.HshValues(TempFinish, LoTempIndex), refrig.HshValues(TempFinish, HiTempIndex));
         // get saturated enthalpy for checking
-        SatEnthalpy = GetSatEnthalpyRefrig(Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoSpace + CalledFrom);
+        SatEnthalpy = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoSpace + CalledFrom);
 
         // make some checks on the data before interpolating
         if (Enthalpy < SatEnthalpy) {
@@ -6952,7 +6985,7 @@ namespace FluidProperties {
             ++CurSatErrCount;
             ++ErrCount;
             // return sat pressure at this temperature
-            ReturnValue = GetSatPressureRefrig(Refrigerant, Temperature, RefrigNum, RoutineNameNoSpace + CalledFrom);
+            ReturnValue = GetSatPressureRefrig(state, Refrigerant, Temperature, RefrigNum, RoutineNameNoSpace + CalledFrom);
 
         } else if (EnthalpyMax < Enthalpy || EnthalpyMin > Enthalpy) {
             // out of range error
@@ -7066,7 +7099,8 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    Real64 GetSupHeatTempRefrig(std::string const &Refrigerant, // carries in substance name
+    Real64 GetSupHeatTempRefrig(EnergyPlusData &state,
+                                std::string const &Refrigerant, // carries in substance name
                                 Real64 const Pressure,          // actual pressure given as input
                                 Real64 const Enthalpy,          // actual enthalpy given as input
                                 Real64 TempLow,                 // lower bound of temperature in the iteration
@@ -7107,13 +7141,13 @@ namespace FluidProperties {
         Real64 Temp;         // Temperature of the superheated refrigerant at the given enthalpy and pressure
 
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
         RefrigNum = 0;
         if (NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
         }
 
         // Find which refrigerant (index) is being requested and then determine
@@ -7122,9 +7156,9 @@ namespace FluidProperties {
             RefrigNum = RefrigIndex;
         } else {
             // Find which refrigerant (index) is being requested
-            RefrigNum = FindRefrigerant(Refrigerant);
+            RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatPressureRefrig", "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -7132,7 +7166,7 @@ namespace FluidProperties {
 
         // check temperature data range and attempt to cap if necessary
         RefTHigh = refrig.PsHighTempValue;
-        RefTSat = GetSatTemperatureRefrig(Refrigerant, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom);
+        RefTSat = GetSatTemperatureRefrig(state, Refrigerant, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom);
 
         if (TempLow < RefTSat) {
             ShowWarningMessage(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
@@ -7158,8 +7192,8 @@ namespace FluidProperties {
         }
 
         // check enthalpy data range and attempt to cap if necessary
-        EnthalpyLow = GetSupHeatEnthalpyRefrig(Refrigerant, TempLow, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom);
-        EnthalpyHigh = GetSupHeatEnthalpyRefrig(Refrigerant, TempUp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom);
+        EnthalpyLow = GetSupHeatEnthalpyRefrig(state, Refrigerant, TempLow, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom);
+        EnthalpyHigh = GetSupHeatEnthalpyRefrig(state, Refrigerant, TempUp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom);
         if (Enthalpy <= EnthalpyLow) {
             ReturnValue = TempLow;
             return ReturnValue;
@@ -7180,14 +7214,15 @@ namespace FluidProperties {
             Par(2) = Enthalpy;
             Par(3) = Pressure;
 
-            SolveRoot(ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par);
+            TempSolveRoot::SolveRoot(state, ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par);
             ReturnValue = Temp;
         }
 
         return ReturnValue;
     }
 
-    Real64 GetSupHeatTempRefrigResidual(Real64 const Temp, // temperature of the refrigerant
+    Real64 GetSupHeatTempRefrigResidual(EnergyPlusData &state,
+                                        Real64 const Temp, // temperature of the refrigerant
                                         Array1D<Real64> const &Par)
     {
         // FUNCTION INFORMATION:
@@ -7241,7 +7276,7 @@ namespace FluidProperties {
         Refrigerant = RefrigErrorTracking(RefrigNum).Name;
         if (std::abs(Enthalpy_Req) < 100.0) Enthalpy_Req = sign(100.0, Enthalpy_Req);
 
-        Enthalpy_Act = GetSupHeatEnthalpyRefrig(Refrigerant, Temp, Pressure, RefrigNum, RoutineNameNoSpace);
+        Enthalpy_Act = GetSupHeatEnthalpyRefrig(state, Refrigerant, Temp, Pressure, RefrigNum, RoutineNameNoSpace);
 
         TempResidual = (Enthalpy_Act - Enthalpy_Req) / Enthalpy_Req;
 
@@ -7250,7 +7285,8 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    Real64 GetSupHeatDensityRefrig(std::string const &Refrigerant, // carries in substance name
+    Real64 GetSupHeatDensityRefrig(EnergyPlusData &state,
+                                   std::string const &Refrigerant, // carries in substance name
                                    Real64 const Temperature,       // actual temperature given as input
                                    Real64 const Pressure,          // actual pressure given as input
                                    int &RefrigIndex,               // Index to Refrigerant Properties
@@ -7325,13 +7361,13 @@ namespace FluidProperties {
 
         // see if data is there
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
         RefrigNum = 0;
         if (NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
+            ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
         }
 
         ErrCount = 0; // initialize for this call
@@ -7345,9 +7381,9 @@ namespace FluidProperties {
             RefrigNum = RefrigIndex;
         } else {
             // Find which refrigerant (index) is being requested
-            RefrigNum = FindRefrigerant(Refrigerant);
+            RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
+                ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineName, "properties", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -7405,7 +7441,7 @@ namespace FluidProperties {
         int n_zero(0);
         Real64 saturated_density(0.0);
         if (min(LoTempLoDensity, LoTempHiDensity, HiTempLoDensity, HiTempHiDensity) <= 0.0) {
-            saturated_density = GetSatDensityRefrig(Refrigerant, Temperature, 1.0, RefrigNum, RoutineName);
+            saturated_density = GetSatDensityRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, RoutineName);
             if (LoTempLoDensity <= 0.0) {
                 LoTempLoDensity = saturated_density;
                 ++n_zero;
@@ -7506,13 +7542,15 @@ namespace FluidProperties {
 
     //*****************************************************************************
 #ifdef EP_cache_GlycolSpecificHeat
-    Real64 GetSpecificHeatGlycol_raw(std::string const &Glycol,    // carries in substance name
+    Real64 GetSpecificHeatGlycol_raw(EnergyPlusData &state,
+                                     std::string const &Glycol,    // carries in substance name
                                      Real64 const Temperature,     // actual temperature given as input
                                      int &GlycolIndex,             // Index to Glycol Properties
                                      std::string const &CalledFrom // routine this function was called from (error messages)
     )
 #else
-    Real64 GetSpecificHeatGlycol(std::string const &Glycol,    // carries in substance name
+    Real64 GetSpecificHeatGlycol(EnergyPlusData &state,
+                                 std::string const &Glycol,    // carries in substance name
                                  Real64 const Temperature,     // actual temperature given as input
                                  int &GlycolIndex,             // Index to Glycol Properties
                                  std::string const &CalledFrom // routine this function was called from (error messages)
@@ -7563,21 +7601,21 @@ namespace FluidProperties {
 
         // Get the input if we haven't already
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
         // If no glycols, no fluid properties can be evaluated
         int GlycolNum(0);
-        if (NumOfGlycols == 0) ReportFatalGlycolErrors(NumOfGlycols, GlycolNum, true, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
+        if (NumOfGlycols == 0) ReportFatalGlycolErrors(state, NumOfGlycols, GlycolNum, true, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
 
         // If glycol index has not yet been found for this fluid, find its value now
         if (GlycolIndex > 0) {
             GlycolNum = GlycolIndex;
         } else { // Find which glycol (index) is being requested
-            GlycolNum = FindGlycol(Glycol);
+            GlycolNum = FindGlycol(state, Glycol);
             if (GlycolNum == 0) {
-                ReportFatalGlycolErrors(NumOfGlycols, GlycolNum, true, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
+                ReportFatalGlycolErrors(state, NumOfGlycols, GlycolNum, true, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
             }
             GlycolIndex = GlycolNum;
         }
@@ -7585,7 +7623,7 @@ namespace FluidProperties {
 
         // If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
         if (!glycol_data.CpDataPresent) {
-            ReportFatalGlycolErrors(NumOfGlycols, GlycolNum, glycol_data.CpDataPresent, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
+            ReportFatalGlycolErrors(state, NumOfGlycols, GlycolNum, glycol_data.CpDataPresent, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
         }
 
         // Now determine the value of specific heat using interpolation
@@ -7652,7 +7690,8 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    Real64 GetDensityGlycol(std::string const &Glycol,    // carries in substance name
+    Real64 GetDensityGlycol(EnergyPlusData &state,
+                            std::string const &Glycol,    // carries in substance name
                             Real64 const Temperature,     // actual temperature given as input
                             int &GlycolIndex,             // Index to Glycol Properties
                             std::string const &CalledFrom // routine this function was called from (error messages)
@@ -7711,28 +7750,28 @@ namespace FluidProperties {
 
         // Get the input if we haven't already
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
         // If no glycols, no fluid properties can be evaluated
         GlycolNum = 0;
-        if (NumOfGlycols == 0) ReportFatalGlycolErrors(NumOfGlycols, GlycolNum, true, Glycol, "GetDensityGlycol", "density", CalledFrom);
+        if (NumOfGlycols == 0) ReportFatalGlycolErrors(state, NumOfGlycols, GlycolNum, true, Glycol, "GetDensityGlycol", "density", CalledFrom);
 
         // If glycol index has not yet been found for this fluid, find its value now
         if (GlycolIndex > 0) {
             GlycolNum = GlycolIndex;
         } else { // Find which refrigerant (index) is being requested
-            GlycolNum = FindGlycol(Glycol);
+            GlycolNum = FindGlycol(state, Glycol);
             if (GlycolNum == 0) {
-                ReportFatalGlycolErrors(NumOfGlycols, GlycolNum, true, Glycol, "GetDensityGlycol", "density", CalledFrom);
+                ReportFatalGlycolErrors(state, NumOfGlycols, GlycolNum, true, Glycol, "GetDensityGlycol", "density", CalledFrom);
             }
             GlycolIndex = GlycolNum;
         }
 
         // If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
         if (!GlycolData(GlycolIndex).RhoDataPresent) {
-            ReportFatalGlycolErrors(
+            ReportFatalGlycolErrors(state,
                 NumOfGlycols, GlycolNum, GlycolData(GlycolIndex).RhoDataPresent, Glycol, "GetDensityGlycol", "density", CalledFrom);
         }
 
@@ -7814,7 +7853,8 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    Real64 GetConductivityGlycol(std::string const &Glycol,    // carries in substance name
+    Real64 GetConductivityGlycol(EnergyPlusData &state,
+                                 std::string const &Glycol,    // carries in substance name
                                  Real64 const Temperature,     // actual temperature given as input
                                  int &GlycolIndex,             // Index to Glycol Properties
                                  std::string const &CalledFrom // routine this function was called from (error messages)
@@ -7873,28 +7913,28 @@ namespace FluidProperties {
 
         // Get the input if we haven't already
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
         // If no glycols, no fluid properties can be evaluated
         GlycolNum = 0;
-        if (NumOfGlycols == 0) ReportFatalGlycolErrors(NumOfGlycols, GlycolNum, true, Glycol, "GetConductivityGlycol", "conductivity", CalledFrom);
+        if (NumOfGlycols == 0) ReportFatalGlycolErrors(state, NumOfGlycols, GlycolNum, true, Glycol, "GetConductivityGlycol", "conductivity", CalledFrom);
 
         // If glycol index has not yet been found for this fluid, find its value now
         if (GlycolIndex > 0) {
             GlycolNum = GlycolIndex;
         } else { // Find which refrigerant (index) is being requested
-            GlycolNum = FindGlycol(Glycol);
+            GlycolNum = FindGlycol(state, Glycol);
             if (GlycolNum == 0) {
-                ReportFatalGlycolErrors(NumOfGlycols, GlycolNum, true, Glycol, "GetConductivityGlycol", "conductivity", CalledFrom);
+                ReportFatalGlycolErrors(state, NumOfGlycols, GlycolNum, true, Glycol, "GetConductivityGlycol", "conductivity", CalledFrom);
             }
             GlycolIndex = GlycolNum;
         }
 
         // If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
         if (!GlycolData(GlycolIndex).CondDataPresent) {
-            ReportFatalGlycolErrors(
+            ReportFatalGlycolErrors(state,
                 NumOfGlycols, GlycolNum, GlycolData(GlycolIndex).CondDataPresent, Glycol, "GetConductivityGlycol", "conductivity", CalledFrom);
         }
 
@@ -7977,7 +8017,8 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    Real64 GetViscosityGlycol(std::string const &Glycol,    // carries in substance name
+    Real64 GetViscosityGlycol(EnergyPlusData &state,
+                              std::string const &Glycol,    // carries in substance name
                               Real64 const Temperature,     // actual temperature given as input
                               int &GlycolIndex,             // Index to Glycol Properties
                               std::string const &CalledFrom // routine this function was called from (error messages)
@@ -8036,28 +8077,28 @@ namespace FluidProperties {
 
         // Get the input if we haven't already
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
         // If no glycols, no fluid properties can be evaluated
         GlycolNum = 0;
-        if (NumOfGlycols == 0) ReportFatalGlycolErrors(NumOfGlycols, GlycolNum, true, Glycol, "GetViscosityGlycol", "viscosity", CalledFrom);
+        if (NumOfGlycols == 0) ReportFatalGlycolErrors(state, NumOfGlycols, GlycolNum, true, Glycol, "GetViscosityGlycol", "viscosity", CalledFrom);
 
         // If glycol index has not yet been found for this fluid, find its value now
         if (GlycolIndex > 0) {
             GlycolNum = GlycolIndex;
         } else { // Find which refrigerant (index) is being requested
-            GlycolNum = FindGlycol(Glycol);
+            GlycolNum = FindGlycol(state, Glycol);
             if (GlycolNum == 0) {
-                ReportFatalGlycolErrors(NumOfGlycols, GlycolNum, true, Glycol, "GetViscosityGlycol", "viscosity", CalledFrom);
+                ReportFatalGlycolErrors(state, NumOfGlycols, GlycolNum, true, Glycol, "GetViscosityGlycol", "viscosity", CalledFrom);
             }
             GlycolIndex = GlycolNum;
         }
 
         // If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
         if (!GlycolData(GlycolIndex).ViscDataPresent) {
-            ReportFatalGlycolErrors(
+            ReportFatalGlycolErrors(state,
                 NumOfGlycols, GlycolNum, GlycolData(GlycolIndex).ViscDataPresent, Glycol, "GetViscosityGlycol", "viscosity", CalledFrom);
         }
 
@@ -8147,7 +8188,8 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    Real64 GetQualityRefrig(std::string const &Refrigerant, // carries in substance name
+    Real64 GetQualityRefrig(EnergyPlusData &state,
+                            std::string const &Refrigerant, // carries in substance name
                             Real64 const Temperature,       // actual temperature given as input
                             Real64 const Enthalpy,          // actual enthalpy given as input
                             int &RefrigIndex,               // Index to Refrigerant Properties
@@ -8200,13 +8242,13 @@ namespace FluidProperties {
 
         // FLOW:
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
         RefrigNum = 0;
         if (NumOfRefrigerants == 0) {
-            ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetQualityRefrig", "enthalpy", CalledFrom);
+            ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetQualityRefrig", "enthalpy", CalledFrom);
         }
 
         // Find which refrigerant (index) is being requested and then determine
@@ -8215,9 +8257,9 @@ namespace FluidProperties {
             RefrigNum = RefrigIndex;
         } else {
             // Find which refrigerant (index) is being requested
-            RefrigNum = FindRefrigerant(Refrigerant);
+            RefrigNum = FindRefrigerant(state, Refrigerant);
             if (RefrigNum == 0) {
-                ReportFatalRefrigerantErrors(NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetQualityRefrig", "enthalpy", CalledFrom);
+                ReportFatalRefrigerantErrors(state, NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetQualityRefrig", "enthalpy", CalledFrom);
             }
             RefrigIndex = RefrigNum;
         }
@@ -8278,7 +8320,7 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    int FindRefrigerant(std::string const &Refrigerant) // carries in substance name
+    int FindRefrigerant(EnergyPlusData &state, std::string const &Refrigerant) // carries in substance name
     {
 
         // FUNCTION INFORMATION:
@@ -8306,7 +8348,7 @@ namespace FluidProperties {
         // FLOW:
         // Make sure we have already read in the input
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
@@ -8325,7 +8367,7 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    int FindGlycol(std::string const &Glycol) // carries in substance name
+    int FindGlycol(EnergyPlusData &state, std::string const &Glycol) // carries in substance name
     {
 
         // FUNCTION INFORMATION:
@@ -8353,7 +8395,7 @@ namespace FluidProperties {
         // FLOW:
         // Make sure we have already read in the input
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
@@ -8644,7 +8686,7 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    int CheckFluidPropertyName(std::string const &NameToCheck) // Name from input(?) to be checked against valid FluidPropertyNames
+    int CheckFluidPropertyName(EnergyPlusData &state, std::string const &NameToCheck) // Name from input(?) to be checked against valid FluidPropertyNames
     {
 
         // FUNCTION INFORMATION:
@@ -8663,7 +8705,7 @@ namespace FluidProperties {
         int Found;
 
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
@@ -8767,7 +8809,8 @@ namespace FluidProperties {
         }
     }
 
-    void ReportFatalGlycolErrors(int const NumGlycols,           // Number of Glycols in input/data
+    void ReportFatalGlycolErrors(EnergyPlusData &state,
+                                 int const NumGlycols,           // Number of Glycols in input/data
                                  int const GlycolNum,            // Glycol Index
                                  bool const DataPresent,         // data is present for this fluid.
                                  std::string const &GlycolName,  // Name being reported
@@ -8811,7 +8854,7 @@ namespace FluidProperties {
         int RefrigNo;
 
         // check and see if it might be a refrigerant
-        RefrigNo = FindRefrigerant(GlycolName);
+        RefrigNo = FindRefrigerant(state, GlycolName);
 
         if (NumGlycols == 0) {
             ShowSevereError(RoutineName + ": no glycols found -- cannot evaluate fluid " + Property + " for \"" + GlycolName +
@@ -8827,7 +8870,8 @@ namespace FluidProperties {
         ShowFatalError("Program terminates due to preceding condition.");
     }
 
-    void ReportFatalRefrigerantErrors(int const NumRefrigerants,          // Number of Refrigerants in input/data
+    void ReportFatalRefrigerantErrors(EnergyPlusData &state,
+                                      int const NumRefrigerants,          // Number of Refrigerants in input/data
                                       int const RefrigerantNum,           // Refrigerant Index
                                       bool const DataPresent,             // data is present for this fluid.
                                       std::string const &RefrigerantName, // Name being reported
@@ -8871,7 +8915,7 @@ namespace FluidProperties {
         int GlycolNo;
 
         // check and see if it might be a refrigerant
-        GlycolNo = FindGlycol(RefrigerantName);
+        GlycolNo = FindGlycol(state, RefrigerantName);
 
         if (NumRefrigerants == 0) {
             ShowSevereError(RoutineName + ": no refrigerants found -- cannot evaluate fluid " + Property + " for \"" + RefrigerantName +
@@ -8888,7 +8932,7 @@ namespace FluidProperties {
         ShowFatalError("Program terminates due to preceding condition.");
     }
 
-    void GetFluidDensityTemperatureLimits(int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit)
+    void GetFluidDensityTemperatureLimits(EnergyPlusData &state, int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8925,7 +8969,7 @@ namespace FluidProperties {
         // na
         // Get the input if we haven't already
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
@@ -8935,7 +8979,7 @@ namespace FluidProperties {
         }
     }
 
-    void GetFluidSpecificHeatTemperatureLimits(int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit)
+    void GetFluidSpecificHeatTemperatureLimits(EnergyPlusData &state, int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8972,7 +9016,7 @@ namespace FluidProperties {
         // na
         // Get the input if we haven't already
         if (GetInput) {
-            GetFluidPropertiesData();
+            GetFluidPropertiesData(state);
             GetInput = false;
         }
 
@@ -8990,17 +9034,17 @@ namespace FluidProperties {
             EnergyPlus::ShowFatalError("Can only do water right now");
         }
     }
-    Real64 GlycolAPI::specificHeat(Real64 temperature) {
-        return FluidProperties::GetSpecificHeatGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    Real64 GlycolAPI::specificHeat(EnergyPlusData &state, Real64 temperature) {
+        return FluidProperties::GetSpecificHeatGlycol(state, this->glycolName, temperature, this->glycolIndex, this->cf);
     }
-    Real64 GlycolAPI::density(Real64 temperature) {
-        return FluidProperties::GetDensityGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    Real64 GlycolAPI::density(EnergyPlusData &state, Real64 temperature) {
+        return FluidProperties::GetDensityGlycol(state, this->glycolName, temperature, this->glycolIndex, this->cf);
     }
-    Real64 GlycolAPI::conductivity(Real64 temperature) {
-        return FluidProperties::GetConductivityGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    Real64 GlycolAPI::conductivity(EnergyPlusData &state, Real64 temperature) {
+        return FluidProperties::GetConductivityGlycol(state, this->glycolName, temperature, this->glycolIndex, this->cf);
     }
-    Real64 GlycolAPI::viscosity(Real64 temperature) {
-        return FluidProperties::GetViscosityGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    Real64 GlycolAPI::viscosity(EnergyPlusData &state, Real64 temperature) {
+        return FluidProperties::GetViscosityGlycol(state, this->glycolName, temperature, this->glycolIndex, this->cf);
     }
 
     RefrigerantAPI::RefrigerantAPI(std::string const &refrigName) {
@@ -9011,29 +9055,29 @@ namespace FluidProperties {
             EnergyPlus::ShowFatalError("Can only do steam right now");
         }
     }
-    Real64 RefrigerantAPI::saturationPressure(Real64 temperature) {
-        return FluidProperties::GetSatPressureRefrig(this->rName, temperature, this->rIndex, this->cf);
+    Real64 RefrigerantAPI::saturationPressure(EnergyPlusData &state, Real64 temperature) {
+        return FluidProperties::GetSatPressureRefrig(state, this->rName, temperature, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::saturationTemperature(Real64 pressure) {
-        return FluidProperties::GetSatTemperatureRefrig(this->rName, pressure, this->rIndex, this->cf);
+    Real64 RefrigerantAPI::saturationTemperature(EnergyPlusData &state, Real64 pressure) {
+        return FluidProperties::GetSatTemperatureRefrig(state, this->rName, pressure, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::saturatedEnthalpy(Real64 temperature, Real64 quality) {
-        return FluidProperties::GetSatEnthalpyRefrig(this->rName, temperature, quality, this->rIndex, this->cf);
+    Real64 RefrigerantAPI::saturatedEnthalpy(EnergyPlusData &state, Real64 temperature, Real64 quality) {
+        return FluidProperties::GetSatEnthalpyRefrig(state, this->rName, temperature, quality, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::saturatedDensity(Real64 temperature, Real64 quality) {
-        return FluidProperties::GetSatDensityRefrig(this->rName, temperature, quality, this->rIndex, this->cf);
+    Real64 RefrigerantAPI::saturatedDensity(EnergyPlusData &state, Real64 temperature, Real64 quality) {
+        return FluidProperties::GetSatDensityRefrig(state, this->rName, temperature, quality, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::saturatedSpecificHeat(Real64 temperature, Real64 quality) {
-        return FluidProperties::GetSatSpecificHeatRefrig(this->rName, temperature, quality, this->rIndex, this->cf);
+    Real64 RefrigerantAPI::saturatedSpecificHeat(EnergyPlusData &state, Real64 temperature, Real64 quality) {
+        return FluidProperties::GetSatSpecificHeatRefrig(state, this->rName, temperature, quality, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::superHeatedEnthalpy(Real64 temperature, Real64 pressure) {
-        return FluidProperties::GetSupHeatEnthalpyRefrig(this->rName, temperature, pressure, this->rIndex, this->cf);
+    Real64 RefrigerantAPI::superHeatedEnthalpy(EnergyPlusData &state, Real64 temperature, Real64 pressure) {
+        return FluidProperties::GetSupHeatEnthalpyRefrig(state, this->rName, temperature, pressure, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::superHeatedPressure(Real64 temperature, Real64 enthalpy) {
-        return FluidProperties::GetSupHeatPressureRefrig(this->rName, temperature, enthalpy, this->rIndex, this->cf);
+    Real64 RefrigerantAPI::superHeatedPressure(EnergyPlusData &state, Real64 temperature, Real64 enthalpy) {
+        return FluidProperties::GetSupHeatPressureRefrig(state, this->rName, temperature, enthalpy, this->rIndex, this->cf);
     }
-    Real64 RefrigerantAPI::superHeatedDensity(Real64 temperature, Real64 pressure) {
-        return FluidProperties::GetSupHeatDensityRefrig(this->rName, temperature, pressure, this->rIndex, this->cf);
+    Real64 RefrigerantAPI::superHeatedDensity(EnergyPlusData &state, Real64 temperature, Real64 pressure) {
+        return FluidProperties::GetSupHeatDensityRefrig(state, this->rName, temperature, pressure, this->rIndex, this->cf);
     }
 
 } // namespace FluidProperties

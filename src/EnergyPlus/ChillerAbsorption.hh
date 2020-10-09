@@ -199,7 +199,7 @@ namespace ChillerAbsorption {
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getDesignTemperatures(Real64 &tempDesCondIn, Real64 &TempDesEvapOut) override;
 
@@ -207,11 +207,11 @@ namespace ChillerAbsorption {
 
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
-        void sizeChiller();
+        void sizeChiller(EnergyPlusData &state);
 
-        void calculate(Real64 &MyLoad, bool RunFlag);
+        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
         void updateRecords(Real64 MyLoad, bool RunFlag);
     };
@@ -224,11 +224,12 @@ namespace ChillerAbsorption {
         int numAbsorbers = 0;
         bool getInput = true;
         Array1D<ChillerAbsorption::BLASTAbsorberSpecs> absorptionChillers;
+
         void clear_state() override
         {
-            numAbsorbers = 0;
-            getInput = true;
-            absorptionChillers.deallocate();
+            this->numAbsorbers = 0;
+            this->getInput = true;
+            this->absorptionChillers.deallocate();
         }
     };
 

@@ -218,7 +218,7 @@ namespace ChillerIndirectAbsorption {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &sizFac) override;
 
@@ -226,7 +226,7 @@ namespace ChillerIndirectAbsorption {
 
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
         void sizeChiller(EnergyPlusData &state);
 
@@ -243,11 +243,12 @@ namespace ChillerIndirectAbsorption {
         int NumIndirectAbsorbers = 0;
         bool GetInput = true;
         Array1D<ChillerIndirectAbsorption::IndirectAbsorberSpecs> IndirectAbsorber;
+
         void clear_state() override
         {
-            NumIndirectAbsorbers = 0;
-            GetInput = true;
-            IndirectAbsorber.deallocate();
+            this->NumIndirectAbsorbers = 0;
+            this->GetInput = true;
+            this->IndirectAbsorber.deallocate();
         }
     };
 

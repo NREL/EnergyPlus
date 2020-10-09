@@ -54,10 +54,8 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DemandManager.hh>
-#include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -90,7 +88,6 @@ namespace DemandManager {
     // completed.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SecInHour;
@@ -191,7 +188,7 @@ namespace DemandManager {
         // FLOW:
         if (GetInput && !DoingSizing) {
             GetDemandManagerInput(state);
-            GetDemandManagerListInput();
+            GetDemandManagerListInput(state);
             GetInput = false;
         }
 
@@ -390,7 +387,7 @@ namespace DemandManager {
         }
     }
 
-    void GetDemandManagerListInput()
+    void GetDemandManagerListInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -437,7 +434,8 @@ namespace DemandManager {
 
             for (ListNum = 1; ListNum <= NumDemandManagerList; ++ListNum) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               ListNum,
                                               AlphArray,
                                               NumAlphas,
@@ -477,7 +475,7 @@ namespace DemandManager {
                 // Further checking for conflicting DEMAND MANAGER LISTs
 
                 if (!lAlphaFieldBlanks(3)) {
-                    DemandManagerList(ListNum).LimitSchedule = GetScheduleIndex(AlphArray(3));
+                    DemandManagerList(ListNum).LimitSchedule = GetScheduleIndex(state, AlphArray(3));
 
                     if (DemandManagerList(ListNum).LimitSchedule == 0) {
                         ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + AlphArray(3) +
@@ -489,7 +487,7 @@ namespace DemandManager {
                 DemandManagerList(ListNum).SafetyFraction = NumArray(1);
 
                 if (!lAlphaFieldBlanks(4)) {
-                    DemandManagerList(ListNum).BillingSchedule = GetScheduleIndex(AlphArray(4));
+                    DemandManagerList(ListNum).BillingSchedule = GetScheduleIndex(state, AlphArray(4));
 
                     if (DemandManagerList(ListNum).BillingSchedule == 0) {
                         ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + "=\"" + AlphArray(4) +
@@ -499,7 +497,7 @@ namespace DemandManager {
                 }
 
                 if (!lAlphaFieldBlanks(5)) {
-                    DemandManagerList(ListNum).PeakSchedule = GetScheduleIndex(AlphArray(5));
+                    DemandManagerList(ListNum).PeakSchedule = GetScheduleIndex(state, AlphArray(5));
 
                     if (DemandManagerList(ListNum).PeakSchedule == 0) {
                         ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + "=\"" + AlphArray(5) +
@@ -569,49 +567,49 @@ namespace DemandManager {
                 }
 
                 // Setup report variables
-                SetupOutputVariable("Demand Manager Meter Demand Power",
+                SetupOutputVariable(state, "Demand Manager Meter Demand Power",
                                     OutputProcessor::Unit::W,
                                     DemandManagerList(ListNum).MeterDemand,
                                     "Zone",
                                     "Average",
                                     DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable("Demand Manager Average Demand Power",
+                SetupOutputVariable(state, "Demand Manager Average Demand Power",
                                     OutputProcessor::Unit::W,
                                     DemandManagerList(ListNum).AverageDemand,
                                     "Zone",
                                     "Average",
                                     DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable("Demand Manager Peak Demand Power",
+                SetupOutputVariable(state, "Demand Manager Peak Demand Power",
                                     OutputProcessor::Unit::W,
                                     DemandManagerList(ListNum).PeakDemand,
                                     "Zone",
                                     "Average",
                                     DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable("Demand Manager Scheduled Limit Power",
+                SetupOutputVariable(state, "Demand Manager Scheduled Limit Power",
                                     OutputProcessor::Unit::W,
                                     DemandManagerList(ListNum).ScheduledLimit,
                                     "Zone",
                                     "Average",
                                     DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable("Demand Manager Demand Limit Power",
+                SetupOutputVariable(state, "Demand Manager Demand Limit Power",
                                     OutputProcessor::Unit::W,
                                     DemandManagerList(ListNum).DemandLimit,
                                     "Zone",
                                     "Average",
                                     DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable("Demand Manager Over Limit Power",
+                SetupOutputVariable(state, "Demand Manager Over Limit Power",
                                     OutputProcessor::Unit::W,
                                     DemandManagerList(ListNum).OverLimit,
                                     "Zone",
                                     "Average",
                                     DemandManagerList(ListNum).Name);
 
-                SetupOutputVariable("Demand Manager Over Limit Time",
+                SetupOutputVariable(state, "Demand Manager Over Limit Time",
                                     OutputProcessor::Unit::hr,
                                     DemandManagerList(ListNum).OverLimitDuration,
                                     "Zone",
@@ -628,17 +626,17 @@ namespace DemandManager {
             NumArray.deallocate();
 
             // Iteration diagnostic reporting for all DEMAND MANAGER LISTs
-            SetupOutputVariable("Demand Manager Exterior Energy Iteration Count",
+            SetupOutputVariable(state, "Demand Manager Exterior Energy Iteration Count",
                                 OutputProcessor::Unit::None,
                                 DemandManagerExtIterations,
                                 "Zone",
                                 "Sum",
                                 "ManageDemand");
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Demand Manager Heat Balance Iteration Count", OutputProcessor::Unit::None, DemandManagerHBIterations, "Zone", "Sum", "ManageDemand");
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Demand Manager HVAC Iteration Count", OutputProcessor::Unit::None, DemandManagerHVACIterations, "Zone", "Sum", "ManageDemand");
         }
     }
@@ -751,7 +749,8 @@ namespace DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               MgrNum - StartIndex + 1,
                                               AlphArray,
                                               NumAlphas,
@@ -768,7 +767,7 @@ namespace DemandManager {
                 DemandMgr(MgrNum).Type = ManagerTypeExtLights;
 
                 if (!lAlphaFieldBlanks(2)) {
-                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(AlphArray(2));
+                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
 
                     if (DemandMgr(MgrNum).AvailSchedule == 0) {
                         ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
@@ -837,7 +836,7 @@ namespace DemandManager {
                     DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
 
                     for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.exteriorEnergyUse.ExteriorLights);
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataExteriorEnergyUse->ExteriorLights);
 
                         if (LoadPtr > 0) {
                             DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
@@ -864,7 +863,8 @@ namespace DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               MgrNum - StartIndex + 1,
                                               AlphArray,
                                               NumAlphas,
@@ -881,7 +881,7 @@ namespace DemandManager {
                 DemandMgr(MgrNum).Type = ManagerTypeLights;
 
                 if (!lAlphaFieldBlanks(2)) {
-                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(AlphArray(2));
+                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
 
                     if (DemandMgr(MgrNum).AvailSchedule == 0) {
                         ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
@@ -998,7 +998,8 @@ namespace DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               MgrNum - StartIndex + 1,
                                               AlphArray,
                                               NumAlphas,
@@ -1015,7 +1016,7 @@ namespace DemandManager {
                 DemandMgr(MgrNum).Type = ManagerTypeElecEquip;
 
                 if (!lAlphaFieldBlanks(2)) {
-                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(AlphArray(2));
+                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
 
                     if (DemandMgr(MgrNum).AvailSchedule == 0) {
                         ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
@@ -1132,7 +1133,8 @@ namespace DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               MgrNum - StartIndex + 1,
                                               AlphArray,
                                               NumAlphas,
@@ -1150,7 +1152,7 @@ namespace DemandManager {
                 DemandMgr(MgrNum).Type = ManagerTypeThermostats;
 
                 if (!lAlphaFieldBlanks(2)) {
-                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(AlphArray(2));
+                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
 
                     if (DemandMgr(MgrNum).AvailSchedule == 0) {
                         ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
@@ -1274,7 +1276,8 @@ namespace DemandManager {
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               MgrNum - StartIndex + 1,
                                               AlphArray,
                                               NumAlphas,
@@ -1292,7 +1295,7 @@ namespace DemandManager {
                 DemandMgr(MgrNum).Type = ManagerTypeVentilation;
 
                 if (!lAlphaFieldBlanks(2)) {
-                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(AlphArray(2));
+                    DemandMgr(MgrNum).AvailSchedule = GetScheduleIndex(state, AlphArray(2));
 
                     if (DemandMgr(MgrNum).AvailSchedule == 0) {
                         ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphArray(2) +
@@ -1806,14 +1809,14 @@ namespace DemandManager {
             auto const SELECT_CASE_var(DemandMgr(MgrNum).Type);
 
             if (SELECT_CASE_var == ManagerTypeExtLights) {
-                LowestPower = state.exteriorEnergyUse.ExteriorLights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
+                LowestPower = state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
                 if (Action == CheckCanReduce) {
-                    if (state.exteriorEnergyUse.ExteriorLights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
+                    if (state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
                 } else if (Action == SetLimit) {
-                    state.exteriorEnergyUse.ExteriorLights(LoadPtr).ManageDemand = true;
-                    state.exteriorEnergyUse.ExteriorLights(LoadPtr).DemandLimit = LowestPower;
+                    state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).ManageDemand = true;
+                    state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).DemandLimit = LowestPower;
                 } else if (Action == ClearLimit) {
-                    state.exteriorEnergyUse.ExteriorLights(LoadPtr).ManageDemand = false;
+                    state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).ManageDemand = false;
                 }
 
             } else if (SELECT_CASE_var == ManagerTypeLights) {
@@ -1926,7 +1929,7 @@ namespace DemandManager {
 
         if (GetInput) {
             GetDemandManagerInput(state);
-            GetDemandManagerListInput();
+            GetDemandManagerListInput(state);
             GetInput = false;
         }
     }
