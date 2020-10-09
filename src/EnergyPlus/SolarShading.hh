@@ -69,10 +69,8 @@
 
 namespace EnergyPlus {
 
-    // Forward Declarations
-    struct EnergyPlusData;
-    struct WindowComplexManagerData;
-    struct WindowEquivalentLayerData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace SolarShading {
 
@@ -297,7 +295,8 @@ namespace SolarShading {
                                  int const NS3  // Location to place results of overlap
     );
 
-    void CalcPerSolarBeam(WindowComplexManagerData &dataWindowComplexManager, Real64 const AvgEqOfTime,       // Average value of Equation of Time for period
+    void CalcPerSolarBeam(EnergyPlusData &state,
+                          Real64 const AvgEqOfTime,       // Average value of Equation of Time for period
                           Real64 const AvgSinSolarDeclin, // Average value of Sine of Solar Declination for period
                           Real64 const AvgCosSolarDeclin  // Average value of Cosine of Solar Declination for period
     );
@@ -338,13 +337,13 @@ namespace SolarShading {
                                    int const TS     // Time step Index
     );
 
-    void CalcInteriorSolarDistribution(WindowEquivalentLayerData &dataWindowEquivalentLayer);
+    void CalcInteriorSolarDistribution(EnergyPlusData &state);
 
     void CalcAborbedOnExteriorOpaqueSurfaces();
 
-    void CalcInteriorSolarDistributionWCE(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager);
+    void CalcInteriorSolarDistributionWCE(EnergyPlusData &state);
 
-    void CalcInteriorSolarDistributionWCESimple(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager);
+    void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state);
 
     int WindowScheduledSolarAbs(int const SurfNum, // Surface number
                                 int const ConstNum // Construction number
@@ -354,7 +353,7 @@ namespace SolarShading {
                                  int const ConstNum // Construction number
     );
 
-    void PerformSolarCalculations(WindowComplexManagerData &dataWindowComplexManager, IOFiles &ioFiles);
+    void PerformSolarCalculations(EnergyPlusData &state, IOFiles &ioFiles);
 
     void SHDRVL(int const HTSS,  // Heat transfer surface number of the subsurface
                 int const SBSNR, // Subsurface number
@@ -380,7 +379,9 @@ namespace SolarShading {
               Real64 const CosSolarDeclin  // Cosine of the Solar declination (current day)
     );
 
-    void WindowShadingManager(WindowEquivalentLayerData &dataWindowEquivalentLayer);
+    void WindowShadingManager(EnergyPlusData &state);
+
+    int selectActiveWindowShadingControlIndex(int curSurface);
 
     void WindowGapAirflowControl();
 
@@ -401,7 +402,7 @@ namespace SolarShading {
 
     void ComputeWinShadeAbsorpFactors();
 
-    void CalcWinTransDifSolInitialDistribution(WindowEquivalentLayerData &dataWindowEquivalentLayer);
+    void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state);
 
     void CalcInteriorWinTransDifSolInitialDistribution(
         int const IntWinEnclosureNum,     // Interior Window Enclosure index number
@@ -414,7 +415,7 @@ namespace SolarShading {
                                   int const ISurf                    // Surface number of the complex fenestration
     );
 
-    void TimestepInitComplexFenestration(WindowComplexManagerData &dataWindowComplexManager);
+    void TimestepInitComplexFenestration(EnergyPlusData &state);
 
 } // namespace SolarShading
 

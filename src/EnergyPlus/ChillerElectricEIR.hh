@@ -62,8 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
-struct ChillerElectricEIRData;
 
 namespace ChillerElectricEIR {
 
@@ -227,7 +225,7 @@ namespace ChillerElectricEIR {
         {
         }
 
-        static PlantComponent *factory(ChillerElectricEIRData &state, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void setupOutputVars();
 
@@ -241,11 +239,11 @@ namespace ChillerElectricEIR {
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad);
+        void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
         void size(EnergyPlusData &state);
 
-        void calculate(Real64 &MyLoad, bool RunFlag);
+        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
         void calcHeatRecovery(Real64 &QCond,        // Current condenser load [W]
                               Real64 CondMassFlow,  // Current condenser mass flow [kg/s]
@@ -256,7 +254,7 @@ namespace ChillerElectricEIR {
         void update(Real64 MyLoad, bool RunFlag);
     };
 
-    void GetElectricEIRChillerInput(ChillerElectricEIRData &chillers);
+    void GetElectricEIRChillerInput(EnergyPlusData &state);
 
 } // namespace ChillerElectricEIR
 
@@ -264,11 +262,12 @@ namespace ChillerElectricEIR {
         int NumElectricEIRChillers = 0;
         bool getInputFlag = true;
         Array1D<ChillerElectricEIR::ElectricEIRChillerSpecs> ElectricEIRChiller;
+
         void clear_state() override
         {
-            NumElectricEIRChillers = 0;
-            getInputFlag = true;
-            ElectricEIRChiller.deallocate();
+            this->NumElectricEIRChillers = 0;
+            this->getInputFlag = true;
+            this->ElectricEIRChiller.deallocate();
         }
     };
 

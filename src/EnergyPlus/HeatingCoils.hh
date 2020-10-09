@@ -57,8 +57,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HeatingCoils {
 
@@ -236,7 +237,8 @@ namespace HeatingCoils {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void CalcElectricHeatingCoil(int const CoilNum, // index to heating coil
+    void CalcElectricHeatingCoil(EnergyPlusData &state,
+                                 int const CoilNum, // index to heating coil
                                  Real64 &QCoilReq,
                                  Real64 &QCoilActual,       // coil load actually delivered (W)
                                  int const FanOpMode,       // fan operating mode
@@ -250,14 +252,16 @@ namespace HeatingCoils {
                                            int const FanOpMode      // Fan operation mode
     );
 
-    void CalcFuelHeatingCoil(int const CoilNum, // index to heating coil
+    void CalcFuelHeatingCoil(EnergyPlusData &state,
+                             int const CoilNum, // index to heating coil
                              Real64 const QCoilReq,
                              Real64 &QCoilActual,       // coil load actually delivered (W)
                              int const FanOpMode,       // fan operating mode
                              Real64 const PartLoadRatio // part-load ratio of heating coil
     );
 
-    void CalcMultiStageGasHeatingCoil(int &CoilNum,            // the number of the Gas heating coil to be simulated
+    void CalcMultiStageGasHeatingCoil(EnergyPlusData &state,
+                                      int &CoilNum,            // the number of the Gas heating coil to be simulated
                                       Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
                                       Real64 const CycRatio,   // cycling part load ratio
                                       int const StageNum,      // Speed number

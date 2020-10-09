@@ -61,7 +61,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace PlantHeatExchangerFluidToFluid {
 
@@ -162,7 +161,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
         void setupOutputVars();
 
-        void initialize(BranchInputManagerData &dataBranchInputManager);
+        void initialize(EnergyPlusData &state);
 
         void size();
 

@@ -56,12 +56,10 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward Declarations
-    struct EnergyPlusData;
-    struct WindowComplexManagerData;
-    struct WindowEquivalentLayerData;
-    struct WindowManagerData;
-    class IOFiles;
+
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
 namespace HeatBalanceManager {
 
@@ -163,7 +161,7 @@ namespace HeatBalanceManager {
 
     void GetSiteAtmosphereData(EnergyPlus::IOFiles &ioFiles, bool &ErrorsFound);
 
-    void GetMaterialData(WindowEquivalentLayerData &dataWindowEquivalentLayer, IOFiles &ioFiles, bool &ErrorsFound); // set to true if errors found in input
+    void GetMaterialData(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound); // set to true if errors found in input
 
     void GetWindowGlassSpectralData(bool &ErrorsFound); // set to true if errors found in input
 
@@ -199,7 +197,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
+    void InitHeatBalance(EnergyPlusData &state, IOFiles &ioFiles);
 
     void AllocateHeatBalArrays();
 
@@ -214,7 +212,7 @@ namespace HeatBalanceManager {
     void CheckWarmupConvergence();
 
     void ReportWarmupConvergence(IOFiles &ioFiles);
-    
+
     void UpdateWindowFaceTempsNonBSDFWin();
 
     //        End of Record Keeping subroutines for the HB Module

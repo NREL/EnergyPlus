@@ -201,7 +201,7 @@ namespace RoomAirModelAirflowNetwork {
             thisRAFN.CalcRoomAirModelAirflowNetwork(ThisRoomAirNode);
         }
 
-        thisRAFN.UpdateRoomAirModelAirflowNetwork(state.dataZoneDehumidifier);
+        thisRAFN.UpdateRoomAirModelAirflowNetwork(state);
 
     } // SimRoomAirModelAirflowNetwork
 
@@ -574,7 +574,7 @@ namespace RoomAirModelAirflowNetwork {
         }
 
         // reuse code in ZoneTempPredictorCorrector for sensible components.
-        CalcNodeSums(state.dataZonePlenum, RoomAirNode);
+        CalcNodeSums(state, RoomAirNode);
 
         SumNonAirSystemResponseForNode(state, RoomAirNode);
 
@@ -756,7 +756,7 @@ namespace RoomAirModelAirflowNetwork {
 
     } // CalcRoomAirModelAirflowNetwork
 
-    void RAFNData::UpdateRoomAirModelAirflowNetwork(ZoneDehumidifierData &dataZoneDehumidifier)
+    void RAFNData::UpdateRoomAirModelAirflowNetwork(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -797,7 +797,7 @@ namespace RoomAirModelAirflowNetwork {
 
         if (!ThisRAFNZone.IsUsed) return;
 
-        if (!ZoneSizingCalc) SumSystemDepResponseForNode(dataZoneDehumidifier);
+        if (!ZoneSizingCalc) SumSystemDepResponseForNode(state);
 
         AirNodeNum = RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID;
 
@@ -829,7 +829,7 @@ namespace RoomAirModelAirflowNetwork {
         }
     } // UpdateRoomAirModelAirflowNetwork
 
-    void RAFNData::CalcNodeSums(ZonePlenumData &dataZonePlenum, int const RoomAirNodeNum)
+    void RAFNData::CalcNodeSums(EnergyPlusData &state, int const RoomAirNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -869,7 +869,6 @@ namespace RoomAirModelAirflowNetwork {
         using DataLoopNode::Node;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_Window;
-        using DataSurfaces::SurfaceWindow;
         using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumInternalConvectionGainsByIndices;
         //using InternalHeatGains::SumInternalConvectionGainsByTypes;
@@ -966,14 +965,14 @@ namespace RoomAirModelAirflowNetwork {
 
         // Check to see if this is a plenum zone
         ZoneRetPlenumAirFlag = false;
-        for (ZoneRetPlenumNum = 1; ZoneRetPlenumNum <= dataZonePlenum.NumZoneReturnPlenums; ++ZoneRetPlenumNum) {
-            if (dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).ActualZoneNum != ZoneNum) continue;
+        for (ZoneRetPlenumNum = 1; ZoneRetPlenumNum <= state.dataZonePlenum->NumZoneReturnPlenums; ++ZoneRetPlenumNum) {
+            if (state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ActualZoneNum != ZoneNum) continue;
             ZoneRetPlenumAirFlag = true;
             break;
         } // ZoneRetPlenumNum
         ZoneSupPlenumAirFlag = false;
-        for (ZoneSupPlenumNum = 1; ZoneSupPlenumNum <= dataZonePlenum.NumZoneSupplyPlenums; ++ZoneSupPlenumNum) {
-            if (dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).ActualZoneNum != ZoneNum) continue;
+        for (ZoneSupPlenumNum = 1; ZoneSupPlenumNum <= state.dataZonePlenum->NumZoneSupplyPlenums; ++ZoneSupPlenumNum) {
+            if (state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).ActualZoneNum != ZoneNum) continue;
             ZoneSupPlenumAirFlag = true;
             break;
         } // ZoneSupPlenumNum
@@ -1000,17 +999,17 @@ namespace RoomAirModelAirflowNetwork {
                 } // EquipLoop
             }     // NodeNum
         } else if (ZoneRetPlenumAirFlag) {
-            for (NodeNum = 1; NodeNum <= dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
+            for (NodeNum = 1; NodeNum <= state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).NumInletNodes; ++NodeNum) {
                 // Get node conditions
-                NodeTemp = Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
-                MassFlowRate = Node(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
+                NodeTemp = Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
+                MassFlowRate = Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
                 CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             } // NodeNum
             // add in the leaks
-            for (ADUListIndex = 1; ADUListIndex <= dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
-                ADUNum = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
+            for (ADUListIndex = 1; ADUListIndex <= state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
+                ADUNum = state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
                 if (AirDistUnit(ADUNum).UpStreamLeak) {
                     ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
                     NodeTemp = Node(ADUInNode).Temp;
@@ -1030,8 +1029,8 @@ namespace RoomAirModelAirflowNetwork {
             } // ADUListIndex
         } else if (ZoneSupPlenumAirFlag) {
             // Get node conditions
-            NodeTemp = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
-            MassFlowRate = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
+            NodeTemp = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
+            MassFlowRate = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
             CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
             SumSysMCp += MassFlowRate * CpAir;
             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -1072,49 +1071,49 @@ namespace RoomAirModelAirflowNetwork {
             if (Surface(SurfNum).Class == SurfaceClass_Window) {
 
                 // Add to the convective internal gains
-                if (SurfaceWindow(SurfNum).ShadingFlag == IntShadeOn || SurfaceWindow(SurfNum).ShadingFlag == IntBlindOn) {
+                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The shade area covers the area of the glazing plus the area of the dividers.
-                    Area += SurfaceWindow(SurfNum).DividerArea;
-                    SumIntGain += SurfaceWindow(SurfNum).DividerHeatGain;
+                    Area += SurfWinDividerArea(SurfNum);
+                    SumIntGain += SurfWinDividerHeatGain(SurfNum);
                 }
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
-                if (SurfaceWindow(SurfNum).ShadingFlag == IntShadeOn || SurfaceWindow(SurfNum).ShadingFlag == IntBlindOn)
-                    SumIntGain += SurfaceWindow(SurfNum).ConvHeatFlowNatural;
+                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn)
+                    SumIntGain += SurfWinConvHeatFlowNatural(SurfNum);
 
                 // Convective heat gain from airflow window
-                if (SurfaceWindow(SurfNum).AirflowThisTS > 0.0) {
-                    SumIntGain += SurfaceWindow(SurfNum).ConvHeatGainToZoneAir;
+                if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
+                    SumIntGain += SurfWinConvHeatGainToZoneAir(SurfNum);
                     if (Zone(ZoneNum).NoHeatToReturnAir) {
-                        SumIntGain += SurfaceWindow(SurfNum).RetHeatGainToZoneAir;
-                        WinHeatGain(SurfNum) += SurfaceWindow(SurfNum).RetHeatGainToZoneAir;
-                        WinHeatTransfer(SurfNum) += SurfaceWindow(SurfNum).RetHeatGainToZoneAir;
-                        if (WinHeatGain(SurfNum) >= 0.0) {
-                            WinHeatGainRep(SurfNum) = WinHeatGain(SurfNum);
-                            WinHeatGainRepEnergy(SurfNum) = WinHeatGainRep(SurfNum) * TimeStepZone * SecInHour;
+                        SumIntGain += SurfWinRetHeatGainToZoneAir(SurfNum);
+                        SurfWinHeatGain(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
+                        SurfWinHeatTransfer(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
+                        if (SurfWinHeatGain(SurfNum) >= 0.0) {
+                            SurfWinHeatGainRep(SurfNum) = SurfWinHeatGain(SurfNum);
+                            SurfWinHeatGainRepEnergy(SurfNum) = SurfWinHeatGainRep(SurfNum) * TimeStepZone * SecInHour;
                         } else {
-                            WinHeatLossRep(SurfNum) = -WinHeatGain(SurfNum);
-                            WinHeatLossRepEnergy(SurfNum) = WinHeatLossRep(SurfNum) * TimeStepZone * SecInHour;
+                            SurfWinHeatLossRep(SurfNum) = - SurfWinHeatGain(SurfNum);
+                            SurfWinHeatLossRepEnergy(SurfNum) = SurfWinHeatLossRep(SurfNum) * TimeStepZone * SecInHour;
                         }
-                        WinHeatTransfer(SurfNum) = WinHeatGain(SurfNum);
-                        WinHeatTransferRepEnergy(SurfNum) = WinHeatGain(SurfNum) * TimeStepZone * SecInHour;
+                        SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
+                        SurfWinHeatTransferRepEnergy(SurfNum) = SurfWinHeatGain(SurfNum) * TimeStepZone * SecInHour;
                     }
                 }
 
                 // Add to the surface convection sums
-                if (SurfaceWindow(SurfNum).FrameArea > 0.0) {
+                if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfaceWindow(SurfNum).FrameArea * (1.0 + SurfaceWindow(SurfNum).ProjCorrFrIn) *
-                                  SurfaceWindow(SurfNum).FrameTempSurfIn;
-                    HA += HConvIn(SurfNum) * SurfaceWindow(SurfNum).FrameArea * (1.0 + SurfaceWindow(SurfNum).ProjCorrFrIn);
+                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
+                                  SurfWinFrameTempSurfIn(SurfNum);
+                    HA += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum));
                 }
 
-                if (SurfaceWindow(SurfNum).DividerArea > 0.0 && SurfaceWindow(SurfNum).ShadingFlag != IntShadeOn &&
-                    SurfaceWindow(SurfNum).ShadingFlag != IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
+                    SurfWinShadingFlag(SurfNum) != IntBlindOn) {
                     // Window divider contribution(only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += HConvIn(SurfNum) * SurfaceWindow(SurfNum).DividerArea * (1.0 + 2.0 * SurfaceWindow(SurfNum).ProjCorrDivIn) *
-                                  SurfaceWindow(SurfNum).DividerTempSurfIn;
-                    HA += HConvIn(SurfNum) * SurfaceWindow(SurfNum).DividerArea * (1.0 + 2.0 * SurfaceWindow(SurfNum).ProjCorrDivIn);
+                    SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
+                                  SurfWinDividerTempSurfIn(SurfNum);
+                    HA += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum));
                 }
 
             } // End of check if window
@@ -1381,7 +1380,7 @@ namespace RoomAirModelAirflowNetwork {
 
     //*****************************************************************************************
 
-    void RAFNData::SumSystemDepResponseForNode(ZoneDehumidifierData &dataZoneDehumidifier)
+    void RAFNData::SumSystemDepResponseForNode(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B.Griffith
@@ -1422,7 +1421,7 @@ namespace RoomAirModelAirflowNetwork {
             for (I = 1; I <= ThisRAFNZone.Node(RoomAirNode).NumHVACs; ++I) {
                 if (ThisRAFNZone.Node(RoomAirNode).HVAC(I).TypeOfNum == ZoneEquipTypeOf_DehumidifierDX) {
                     if (SysOutputProvided == 0.0)
-                        SimZoneDehumidifier(dataZoneDehumidifier, ThisRAFNZone.Node(RoomAirNode).HVAC(I).Name,
+                        SimZoneDehumidifier(state, ThisRAFNZone.Node(RoomAirNode).HVAC(I).Name,
                                             ZoneNum,
                                             false,
                                             SysOutputProvided,

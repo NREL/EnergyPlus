@@ -62,8 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct ChillerAbsorberData;
-struct BranchInputManagerData;
 
 namespace ChillerAbsorption {
 
@@ -195,7 +193,7 @@ namespace ChillerAbsorption {
         {
         }
 
-        static PlantComponent *factory(ChillerAbsorberData &boilers, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -207,7 +205,7 @@ namespace ChillerAbsorption {
 
         void getSizingFactor(Real64 &sizFac) override;
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad);
+        void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
         void setupOutputVars();
 
@@ -218,7 +216,7 @@ namespace ChillerAbsorption {
         void updateRecords(Real64 MyLoad, bool RunFlag);
     };
 
-    void GetBLASTAbsorberInput(ChillerAbsorberData &chillers);
+    void GetBLASTAbsorberInput(EnergyPlusData &state);
 
 } // namespace ChillerAbsorption
 
@@ -226,11 +224,12 @@ namespace ChillerAbsorption {
         int numAbsorbers = 0;
         bool getInput = true;
         Array1D<ChillerAbsorption::BLASTAbsorberSpecs> absorptionChillers;
+
         void clear_state() override
         {
-            numAbsorbers = 0;
-            getInput = true;
-            absorptionChillers.deallocate();
+            this->numAbsorbers = 0;
+            this->getInput = true;
+            this->absorptionChillers.deallocate();
         }
     };
 

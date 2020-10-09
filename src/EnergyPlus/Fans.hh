@@ -60,14 +60,13 @@
 
 namespace EnergyPlus {
 
-    struct EnergyPlusData;
-    struct FansData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace Fans {
 
     // Using/Aliasing
     using DataHVACGlobals::MinFrac;
-    using DataHVACGlobals::SystemAirflowSizing;
 
     struct FanEquipConditions
     {
@@ -275,17 +274,17 @@ namespace Fans {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void SimSimpleFan(FansData &fans, int const FanNum);
+    void SimSimpleFan(EnergyPlusData &state, int const FanNum);
 
-    void SimVariableVolumeFan(FansData &fans, int const FanNum, Optional<Real64 const> PressureRise = _);
+    void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> PressureRise = _);
 
-    void SimOnOffFan(FansData &fans, int const FanNum, Optional<Real64 const> SpeedRatio = _);
+    void SimOnOffFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> SpeedRatio = _);
 
-    void SimZoneExhaustFan(FansData &fans, int const FanNum);
+    void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum);
 
     // cpw22Aug2010 Added Component Model fan algorithm
 
-    void SimComponentModelFan(FansData &fans, int const FanNum);
+    void SimComponentModelFan(EnergyPlusData &state, int const FanNum);
 
     // End Algorithm Section of the Module
     // *****************************************************************************
@@ -301,7 +300,7 @@ namespace Fans {
     // Beginning of Reporting subroutines for the Fan Module
     // *****************************************************************************
 
-    void ReportFan(int const FanNum);
+    void ReportFan(EnergyPlusData &state, int const FanNum);
 
     //        End of Reporting subroutines for the Fan Module
     // *****************************************************************************
@@ -371,7 +370,8 @@ namespace Fans {
                     Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     );
 
-    Real64 CalFaultyFanAirFlowReduction(std::string const &FanName,          // Name of the Fan
+    Real64 CalFaultyFanAirFlowReduction(EnergyPlusData &state,
+                                        std::string const &FanName,          // Name of the Fan
                                         Real64 const FanDesignAirFlowRate,   // Fan Design Volume Flow Rate [m3/s]
                                         Real64 const FanDesignDeltaPress,    // Fan Design Delta Pressure [Pa]
                                         Real64 const FanFaultyDeltaPressInc, // Increase of Fan Delta Pressure in the Faulty Case [Pa]
@@ -383,6 +383,16 @@ namespace Fans {
     );
 
     void SetFanAirLoopNumber(int const FanIndex, int const AirLoopNum);
+
+    void FanInputsForDesHeatGain(EnergyPlusData &state,
+                                 int const &fanIndex,
+                                 Real64 &deltaP,
+                                 Real64 &motEff,
+                                 Real64 &totEff,
+                                 Real64 &motInAirFrac,
+                                 Real64 &fanShaftPow,
+                                 Real64 &motInPower,
+                                 bool &fanCompModel);
 
     // Clears the global data in Fans.
     // Needed for unit tests, should not be normally called.

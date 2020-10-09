@@ -1118,7 +1118,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     ScheduleInputProcessed = true;
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetConstructData(state.files, ErrorsFound);
@@ -1142,7 +1142,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     EXPECT_EQ(LowTempRadiantSystem::HydronicSystem, RadSysTypes(RadSysNum).SystemType);
 
     ErrorsFound = false;
-    PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+    PlantUtilities::ScanPlantLoopsForObject(state,
                                             HydrRadSys(RadSysNum).Name,
                                             TypeOf_LowTempRadiant_VarFlow,
                                             HydrRadSys(RadSysNum).HWLoopNum,
@@ -1158,7 +1158,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+    PlantUtilities::ScanPlantLoopsForObject(state,
                                             HydrRadSys(RadSysNum).Name,
                                             TypeOf_LowTempRadiant_VarFlow,
                                             HydrRadSys(RadSysNum).CWLoopNum,
@@ -2155,7 +2155,7 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     actualResult = 0.0; // reset
     actualResult = CFloRadSys(1).setRadiantSystemControlTemperature();
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
-    
+
 }
 
 TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionTest)
@@ -2193,23 +2193,7 @@ TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionTest)
     functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
     EXPECT_NEAR(expectedResult, functionResult, 0.001);
 
-    // Test 3a: Temperature Difference is not zero and positive, throttling range is non-zero but less than temperature difference
-    offTemperature = 16.0;
-    controlTemperature = 15.0;
-    throttlingRange = 0.5;
-    expectedResult = 2.0;
-    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
-    EXPECT_NEAR(expectedResult, functionResult, 0.001);
-
-    // Test 3b: Temperature Difference is not zero and negative, throttling range is non-zero but less than temperature difference
-    offTemperature = 16.0;
-    controlTemperature = 15.0;
-    throttlingRange = 0.5;
-    expectedResult = 2.0;
-    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
-    EXPECT_NEAR(expectedResult, functionResult, 0.001);
-
-    // Test 4a: Temperature Difference is not zero and positive, throttling range is non-zero but greater than temperature difference
+    // Test 3a: Temperature Difference is not zero and positive, throttling range is non-zero but greater than temperature difference
     offTemperature = 16.0;
     controlTemperature = 15.0;
     throttlingRange = 2.0;
@@ -2217,12 +2201,54 @@ TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionTest)
     functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
     EXPECT_NEAR(expectedResult, functionResult, 0.001);
 
-    // Test 4b: Temperature Difference is not zero and negative, throttling range is non-zero but greater than temperature difference
+    // Test 3b: Temperature Difference is not zero and negative, throttling range is non-zero but greater than temperature difference
     offTemperature = 14.0;
     controlTemperature = 15.0;
     throttlingRange = 2.0;
     expectedResult = 0.5;
     functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+}
+
+TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionMaxLimitTest)
+{
+    Real64 offTemperature;
+    Real64 controlTemperature;
+    Real64 throttlingRange;
+    Real64 functionResult;
+    Real64 expectedResult;
+
+    HydrRadSys.allocate(1);
+    auto &thisRadSys (HydrRadSys(1));
+    ElecRadSys.allocate(1);
+    auto &thisElecRadSys (ElecRadSys(1));
+    
+    // Test A: Hydronic variable flow system, temperature Difference is not zero and positive,
+    //         throttling range is non-zero but less than temperature difference, limit to 1.0 max
+    offTemperature = 22.0;
+    controlTemperature = 21.0;
+    throttlingRange = 0.5;
+    expectedResult = 1.0;   // delta T/throttlingRange = 2.0 but this needs to be limited to 1.0
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+    // Test B: Hydronic variable flow system, temperature Difference is not zero and negative,
+    //         throttling range is non-zero but less than temperature difference, limit to 1.0 max
+    offTemperature = 24.0;
+    controlTemperature = 25.0;
+    throttlingRange = 0.5;
+    expectedResult = 1.0;   // delta T/throttlingRange = 2.0 but this needs to be limited to 1.0
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+    
+    // Test C: Electric system, temperature Difference is not zero and positive, throttling range
+    //         is non-zero but less than temperature difference, limit to 1.0 max
+    offTemperature = 23.0;
+    controlTemperature = 20.0;
+    throttlingRange = 1.0;
+    expectedResult = 1.0;   // delta T/throttlingRange = 3.0 but this needs to be limited to 1.0
+    functionResult = thisElecRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
     EXPECT_NEAR(expectedResult, functionResult, 0.001);
 
 }
@@ -2389,17 +2415,17 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     // because calculateCurrentDailyAverageODB is called by calculateRunningMeanAverageTemperature
     Real64 expectedResult;
     Real64 acceptibleError = 0.001;
-    
+
     CFloRadSys.allocate(1);
     auto &thisCFloSys (CFloRadSys(1));
-    
+
     NumOfTimeStepInHour = 1;
-    WeatherManager::TodayOutDryBulbTemp.allocate(NumOfTimeStepInHour, DataGlobals::HoursInDay);
-    WeatherManager::TodayOutDryBulbTemp = 0.0;
+    state.dataWeatherManager->TodayOutDryBulbTemp.allocate(NumOfTimeStepInHour, DataGlobals::HoursInDay);
+    state.dataWeatherManager->TodayOutDryBulbTemp = 0.0;
     for (int hourNumber = 1; hourNumber <= DataGlobals::HoursInDay; ++hourNumber) {
-        WeatherManager::TodayOutDryBulbTemp(NumOfTimeStepInHour,hourNumber) = double(hourNumber);
+        state.dataWeatherManager->TodayOutDryBulbTemp(NumOfTimeStepInHour,hourNumber) = double(hourNumber);
     }
-    
+
     // Test 1: First day of the simulation and it's in warmup-->everything set to the same temperature
     DataGlobals::DayOfSim = 1;
     DataGlobals::WarmupFlag = true;
@@ -2410,7 +2436,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = -9999.9;
     thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
     expectedResult = 12.5;
-    thisCFloSys.calculateRunningMeanAverageTemperature();
+    thisCFloSys.calculateRunningMeanAverageTemperature(state);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
@@ -2426,7 +2452,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = -9999.9;
     thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
     expectedResult = -9999.9;
-    thisCFloSys.calculateRunningMeanAverageTemperature();
+    thisCFloSys.calculateRunningMeanAverageTemperature(state);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
@@ -2442,7 +2468,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = 12.345;
     thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
     expectedResult = 12.345;
-    thisCFloSys.calculateRunningMeanAverageTemperature();
+    thisCFloSys.calculateRunningMeanAverageTemperature(state);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
@@ -2457,7 +2483,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature = 14.5;
     thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = 5.0;
     thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
-    thisCFloSys.calculateRunningMeanAverageTemperature();
+    thisCFloSys.calculateRunningMeanAverageTemperature(state);
     expectedResult = 12.5;  // Average of TodayOutDryBulbTemp(firstTimeStepIndex,hourNumber)
     EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
     expectedResult = 15.0;  // Should transfer what was todayAverageOutdoorDryBulbTemperature (see above)
@@ -2479,7 +2505,7 @@ TEST_F(LowTempRadiantSystemTest, updateOperatingModeHistoryTest)
     DataGlobals::HourOfDay = 4;
     DataGlobals::TimeStep = 5;
     auto &thisRadSys (HydrRadSys(1));
-    
+
     // Test 1: Operating Mode different, beginning of day-->lastOperatingMode should switch, last parameters should get set appropriately
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::HeatingMode;
     thisRadSys.OperatingMode = LowTempRadiantSystem::CoolingMode;
@@ -2572,14 +2598,14 @@ TEST_F(LowTempRadiantSystemTest, setOperatingModeBasedOnChangeoverDelayTest)
     thisRadSys.setOperatingModeBasedOnChangeoverDelay();
     expectedResult = LowTempRadiantSystem::HeatingMode;
     EXPECT_EQ(thisRadSys.OperatingMode, expectedResult);
-    
+
     // Test 2: lastOperatingMode is not NotOperating, OperatingMode is NotOperating-->don't do anything to OperatingMode
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::HeatingMode;
     thisRadSys.OperatingMode = LowTempRadiantSystem::NotOperating;
     thisRadSys.setOperatingModeBasedOnChangeoverDelay();
     expectedResult = LowTempRadiantSystem::NotOperating;
     EXPECT_EQ(thisRadSys.OperatingMode, expectedResult);
-    
+
     // Test 3: lastOperatingMode and OperatingMode are both the same (and not NotOperating)-->don't do anything to OperatingMode
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::HeatingMode;
     thisRadSys.OperatingMode = LowTempRadiantSystem::HeatingMode;

@@ -62,8 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
-struct ChillerExhaustAbsorptionData;
 
 namespace ChillerExhaustAbsorption {
 
@@ -216,7 +214,7 @@ namespace ChillerExhaustAbsorption {
         {
         }
 
-        static PlantComponent *factory(ChillerExhaustAbsorptionData &chillers, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -228,32 +226,33 @@ namespace ChillerExhaustAbsorption {
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 
-        void initialize(BranchInputManagerData &dataBranchInputManager);
+        void initialize(EnergyPlusData &state);
 
         void setupOutputVariables();
 
         void size();
 
-        void calcChiller(Real64 &MyLoad);
+        void calcChiller(EnergyPlusData &state, Real64 &MyLoad);
 
-        void calcHeater(Real64 &MyLoad, bool RunFlag);
+        void calcHeater(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
         void updateCoolRecords(Real64 MyLoad, bool RunFlag);
 
         void updateHeatRecords(Real64 MyLoad, bool RunFlag);
     };
 
-    void GetExhaustAbsorberInput(ChillerExhaustAbsorptionData &chillers);
+    void GetExhaustAbsorberInput(EnergyPlusData &state);
 
 } // namespace ChillerExhaustAbsorption
 
     struct ChillerExhaustAbsorptionData : BaseGlobalStruct {
         bool Sim_GetInput = true;
         Array1D<ChillerExhaustAbsorption::ExhaustAbsorberSpecs> ExhaustAbsorber;
+
         void clear_state() override
         {
-            Sim_GetInput = true;
-            ExhaustAbsorber.deallocate();
+            this->Sim_GetInput = true;
+            this->ExhaustAbsorber.deallocate();
         }
     };
 

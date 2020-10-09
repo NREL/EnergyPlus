@@ -66,8 +66,8 @@
 
 namespace EnergyPlus {
 
-    // Forward Declarations
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DataHeatBalance {
 
@@ -501,9 +501,10 @@ namespace DataHeatBalance {
     extern Array1D<Real64> QRadSWOutIncSkyDiffReflObs; // Exterior diffuse solar incident from sky diffuse
     // reflection from obstructions (W/m2)
     extern Array1D<Real64> CosIncidenceAngle; // Cosine of beam solar incidence angle (for reporting)
-    extern Array1D_int BSDFBeamDirectionRep;  // BSDF beam direction number for given complex fenestration state (for reporting) []
-    extern Array1D<Real64> BSDFBeamThetaRep;  // BSDF beam Theta angle (for reporting) [rad]
-    extern Array1D<Real64> BSDFBeamPhiRep;    // BSDF beam Phi angle (for reporting) [rad]
+
+    extern Array1D_int SurfWinBSDFBeamDirectionRep;  // BSDF beam direction number for given complex fenestration state (for reporting) []
+    extern Array1D<Real64> SurfWinBSDFBeamThetaRep;  // BSDF beam Theta angle (for reporting) [rad]
+    extern Array1D<Real64> SurfWinBSDFBeamPhiRep;    // BSDF beam Phi angle (for reporting) [rad]
 
     extern Array1D<Real64> QRadSWwinAbsTot;   // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
     extern Array2D<Real64> QRadSWwinAbsLayer; // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
@@ -1873,8 +1874,8 @@ namespace DataHeatBalance {
         Real64 SimpVentVolMin;   // a large number since finding minimum volume
         // for Sensible Heat Gas Component Report
         // annual
-        Real64 SHGSAnHvacHt;    // hvac air heating
-        Real64 SHGSAnHvacCl;    // hvac air cooling
+        Real64 SHGSAnZoneEqHt;    // Zone Eq heating
+        Real64 SHGSAnZoneEqCl;    // Zone Eq cooling
         Real64 SHGSAnHvacATUHt; // heating by Air Terminal Unit [J]
         Real64 SHGSAnHvacATUCl; // cooling by Air Terminal Unit [J]
         Real64 SHGSAnSurfHt;    // heated surface heating
@@ -1946,7 +1947,7 @@ namespace DataHeatBalance {
         ZonePreDefRepType()
             : isOccupied(false), NumOccAccum(0.0), NumOccAccumTime(0.0), TotTimeOcc(0.0), MechVentVolTotal(0.0), MechVentVolMin(9.9e9),
               InfilVolTotal(0.0), InfilVolMin(9.9e9), AFNInfilVolTotal(0.0), AFNInfilVolMin(9.9e9), SimpVentVolTotal(0.0), SimpVentVolMin(9.9e9),
-              SHGSAnHvacHt(0.0), SHGSAnHvacCl(0.0), SHGSAnHvacATUHt(0.0), SHGSAnHvacATUCl(0.0), SHGSAnSurfHt(0.0), SHGSAnSurfCl(0.0),
+              SHGSAnZoneEqHt(0.0), SHGSAnZoneEqCl(0.0), SHGSAnHvacATUHt(0.0), SHGSAnHvacATUCl(0.0), SHGSAnSurfHt(0.0), SHGSAnSurfCl(0.0),
               SHGSAnPeoplAdd(0.0), SHGSAnLiteAdd(0.0), SHGSAnEquipAdd(0.0), SHGSAnWindAdd(0.0), SHGSAnIzaAdd(0.0), SHGSAnInfilAdd(0.0),
               SHGSAnOtherAdd(0.0), SHGSAnEquipRem(0.0), SHGSAnWindRem(0.0), SHGSAnIzaRem(0.0), SHGSAnInfilRem(0.0), SHGSAnOtherRem(0.0),
               clPtTimeStamp(0), clPeak(0.0), SHGSClHvacHt(0.0), SHGSClHvacCl(0.0), SHGSClHvacATUHt(0.0), SHGSClHvacATUCl(0.0), SHGSClSurfHt(0.0),

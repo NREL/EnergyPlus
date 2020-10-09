@@ -56,9 +56,10 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    class IOFiles;
+
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
 struct CoilCoolingDXCurveFitPerformanceInputSpecification
 {
@@ -80,8 +81,9 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
 struct CoilCoolingDXCurveFitPerformance
 {
     std::string object_name = "Coil:Cooling:DX:CurveFit:Performance";
-    void instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data);
-    void simulate(const DataLoopNode::NodeData &inletNode,
+    void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data);
+    void simulate(EnergyPlusData &state,
+                  const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
                   int useAlternateMode,
                   Real64 &PLR,
@@ -92,7 +94,8 @@ struct CoilCoolingDXCurveFitPerformance
                   DataLoopNode::NodeData &condOutletNode,
                   Real64 LoadSHR = 0.0);
 
-    void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
+    void calculate(EnergyPlusData &state,
+                   CoilCoolingDXCurveFitOperatingMode &currentMode,
                    const DataLoopNode::NodeData &inletNode,
                    DataLoopNode::NodeData &outletNode,
                    Real64 &PLR,
@@ -106,7 +109,7 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 calcIEERResidual(EnergyPlusData &state, Real64 const SupplyAirMassFlowRate, std::vector<Real64> const &Par);
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
     CoilCoolingDXCurveFitPerformance() = default;
-    explicit CoilCoolingDXCurveFitPerformance(const std::string &name);
+    explicit CoilCoolingDXCurveFitPerformance(EnergyPlusData &state, const std::string &name);
     void size(EnergyPlusData &state);
     void setOperMode(CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode);
 

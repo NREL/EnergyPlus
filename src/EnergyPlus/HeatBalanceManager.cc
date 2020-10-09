@@ -170,7 +170,6 @@ namespace HeatBalanceManager {
     using DataSurfaces::FrameDividerProperties;
     using DataSurfaces::ShadingTransmittanceVaries;
     using DataSurfaces::StormWindow;
-    using DataSurfaces::SurfaceWindow;
     using DataSurfaces::Suspended;
     using DataSurfaces::TotStormWin;
     using DataSurfaces::TotSurfaces;
@@ -370,7 +369,7 @@ namespace HeatBalanceManager {
                   ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files); // Initialize all heat balance related parameters
+        InitHeatBalance(state, state.files); // Initialize all heat balance related parameters
         ManageEMS(state, DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
@@ -400,7 +399,7 @@ namespace HeatBalanceManager {
             CheckWarmupConvergence();
             if (!WarmupFlag) {
                 DayOfSim = 0; // Reset DayOfSim if Warmup converged
-                state.dataGlobals.DayOfSimChr = "0";
+                state.dataGlobal->DayOfSimChr = "0";
 
                 ManageEMS(state, emsCallFromBeginNewEvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const()); // calling point
             }
@@ -462,7 +461,7 @@ namespace HeatBalanceManager {
 
         GetWindowGlassSpectralData(ErrorsFound);
 
-        GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound); // Read materials from input file/transfer from legacy data structure
+        GetMaterialData(state, state.files, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
         GetFrameAndDividerData(ErrorsFound);
 
@@ -1220,7 +1219,7 @@ namespace HeatBalanceManager {
             AlphaName(3) = "NO";
         }
 
-        WindowManager::initWindowModel(state.dataWindowManager);
+        WindowManager::initWindowModel(state);
 
         static constexpr auto Format_728(
             "! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");
@@ -1466,7 +1465,7 @@ namespace HeatBalanceManager {
         print(ioFiles.eio, Format_720, SiteWindExp, SiteWindBLHeight, SiteTempGradient);
     }
 
-    void GetMaterialData(WindowEquivalentLayerData &dataWindowEquivalentLayer, IOFiles &ioFiles, bool &ErrorsFound) // set to true if errors found in input
+    void GetMaterialData(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -2080,20 +2079,20 @@ namespace HeatBalanceManager {
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", blank field.");
                     ShowContinueError(" Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type.");
                 } else {
-                    dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr = CurveManager::GetCurveIndex(MaterialNames(5));
+                    dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr = CurveManager::GetCurveIndex(state, MaterialNames(5));
                     if (dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr == 0) {
                         ErrorsFound = true;
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(5) + " requires a valid table object name, entered input=" + MaterialNames(5));
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state, dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr, // Curve index
                                                                     {2},                                         // Valid dimensions
                                                                     RoutineName,                                 // Routine name
                                                                     CurrentModuleObject,                         // Object Type
                                                                     dataMaterial.Material(MaterNum).Name,                     // Object Name
                                                                     cAlphaFieldNames(5));                        // Field Name
 
-                        GetCurveMinMaxValues(dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        GetCurveMinMaxValues(state, dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
@@ -2129,20 +2128,20 @@ namespace HeatBalanceManager {
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", blank field.");
                     ShowContinueError(" Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type.");
                 } else {
-                    dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr = CurveManager::GetCurveIndex(MaterialNames(6));
+                    dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr = CurveManager::GetCurveIndex(state, MaterialNames(6));
                     if (dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr == 0) {
                         ErrorsFound = true;
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(6) + " requires a valid table object name, entered input=" + MaterialNames(6));
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state, dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr, // Curve index
                                                                     {2},                                          // Valid dimensions
                                                                     RoutineName,                                  // Routine name
                                                                     CurrentModuleObject,                          // Object Type
                                                                     dataMaterial.Material(MaterNum).Name,                      // Object Name
                                                                     cAlphaFieldNames(6));                         // Field Name
 
-                        GetCurveMinMaxValues(dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        GetCurveMinMaxValues(state, dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
@@ -2178,20 +2177,20 @@ namespace HeatBalanceManager {
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", blank field.");
                     ShowContinueError(" Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type.");
                 } else {
-                    dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr = CurveManager::GetCurveIndex(MaterialNames(7));
+                    dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr = CurveManager::GetCurveIndex(state, MaterialNames(7));
                     if (dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr == 0) {
                         ErrorsFound = true;
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(7) + " requires a valid table object name, entered input=" + MaterialNames(7));
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state, dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr, // Curve index
                                                                     {2},                                          // Valid dimensions
                                                                     RoutineName,                                  // Routine name
                                                                     CurrentModuleObject,                          // Object Type
                                                                     dataMaterial.Material(MaterNum).Name,                      // Object Name
                                                                     cAlphaFieldNames(7));                         // Field Name
 
-                        GetCurveMinMaxValues(dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        GetCurveMinMaxValues(state, dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
@@ -3565,11 +3564,11 @@ namespace HeatBalanceManager {
             //  they are used with window shading controls that adjust slat angles like MaximizeSolar or BlockBeamSolar
             if (!lAlphaFieldBlanks(3)) {
                 if (UtilityRoutines::SameString(MaterialNames(3), "FixedSlatAngle")) {
-                    dataMaterial.Material(MaterNum).SlatAngleType = dataWindowEquivalentLayer.lscNONE;
+                    dataMaterial.Material(MaterNum).SlatAngleType = state.dataWindowEquivalentLayer->lscNONE;
                 } else if (UtilityRoutines::SameString(MaterialNames(3), "MaximizeSolar")) {
-                    dataMaterial.Material(MaterNum).SlatAngleType = dataWindowEquivalentLayer.lscVBPROF;
+                    dataMaterial.Material(MaterNum).SlatAngleType = state.dataWindowEquivalentLayer->lscVBPROF;
                 } else if (UtilityRoutines::SameString(MaterialNames(3), "BlockBeamSolar")) {
-                    dataMaterial.Material(MaterNum).SlatAngleType = dataWindowEquivalentLayer.lscVBNOBM;
+                    dataMaterial.Material(MaterNum).SlatAngleType = state.dataWindowEquivalentLayer->lscVBNOBM;
                 } else {
                     dataMaterial.Material(MaterNum).SlatAngleType = 0;
                 }
@@ -5156,7 +5155,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, IOFiles &ioFiles)
+    void InitHeatBalance(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5200,9 +5199,9 @@ namespace HeatBalanceManager {
             }
 
             DisplayString("Initializing Window Optical Properties");
-            InitEquivalentLayerWindowCalculations(dataWindowEquivalentLayer); // Initialize the EQL window optical properties
+            InitEquivalentLayerWindowCalculations(state); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
-            InitWindowOpticalCalculations(dataWindowComplexManager, dataWindowManager, ioFiles);
+            InitWindowOpticalCalculations(state, ioFiles);
             InitDaylightingDevices(ioFiles); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(ioFiles); // Initialize the shadowing calculations
@@ -5231,9 +5230,9 @@ namespace HeatBalanceManager {
             MaxLoadZoneRpt = 0.0;
             CountWarmupDayPoints = 0;
 
-            for (auto &e : SurfaceWindow) {
-                e.ThetaFace = 296.15;
-                e.EffInsSurfTemp = 23.0;
+            for (SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
+                DataSurfaces::SurfaceWindow(SurfNum).ThetaFace = 296.15;
+                DataSurfaces::SurfWinEffInsSurfTemp(SurfNum) = 23.0;
             }
         }
 
@@ -5250,7 +5249,7 @@ namespace HeatBalanceManager {
                 StormWinChangeThisDay = false;
                 for (StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum) {
                     SurfNum = StormWindow(StormWinNum).BaseWindowNum;
-                    SurfaceWindow(SurfNum).StormWinFlagPrevDay = SurfaceWindow(SurfNum).StormWinFlag;
+                    DataSurfaces::SurfWinStormWinFlagPrevDay(SurfNum) = DataSurfaces::SurfWinStormWinFlag(SurfNum);
                 }
                 ChangeSet = true;
             }
@@ -5270,12 +5269,12 @@ namespace HeatBalanceManager {
                 }
             }
             if (!DetailedSolarTimestepIntegration) {
-                PerformSolarCalculations(dataWindowComplexManager, ioFiles);
+                PerformSolarCalculations(state, ioFiles);
             }
         }
 
         if (DetailedSolarTimestepIntegration) { // always redo solar calcs
-            PerformSolarCalculations(dataWindowComplexManager, ioFiles);
+            PerformSolarCalculations(state, ioFiles);
         }
 
         if (BeginDayFlag && !WarmupFlag && KindOfSim == ksRunPeriodWeather && ReportExtShadingSunlitFrac) {
@@ -5926,11 +5925,11 @@ namespace HeatBalanceManager {
             CalcMoreNodeInfo();
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
-                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
+                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
             }
 
             UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
-            UpdateUtilityBills(state.dataCostEstimateManager);
+            UpdateUtilityBills(state);
         } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
             if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                 PrintEnvrnStampWarmup = true;
@@ -5969,13 +5968,13 @@ namespace HeatBalanceManager {
             CalcMoreNodeInfo();
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
-                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
+                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
             }
 
         } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
-                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
+                if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
             }
         }
         // There is no hourly reporting in the heat balance.
@@ -7066,6 +7065,8 @@ namespace HeatBalanceManager {
         // REFERENCES:na
         // Using/Aliasing
         using General::BetweenDates;
+        using DataSurfaces::SurfWinStormWinFlag;
+        using DataSurfaces::SurfWinStormWinFlagPrevDay;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:na
@@ -7087,7 +7088,7 @@ namespace HeatBalanceManager {
 
         for (StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum) {
             SurfNum = StormWindow(StormWinNum).BaseWindowNum;
-            SurfaceWindow(SurfNum).StormWinFlagPrevDay = SurfaceWindow(SurfNum).StormWinFlag;
+            SurfWinStormWinFlagPrevDay(SurfNum) = SurfWinStormWinFlag(SurfNum);
             DateOff = StormWindow(StormWinNum).DateOff - 1;
             // Note: Dateon = Dateoff is not allowed and will have produced an error in getinput.
             if (DateOff == 0) DateOff = 366;
@@ -7096,9 +7097,9 @@ namespace HeatBalanceManager {
             } else {
                 StormWinFlag = 0;
             }
-            SurfaceWindow(SurfNum).StormWinFlag = StormWinFlag;
-            if (BeginSimFlag) SurfaceWindow(SurfNum).StormWinFlagPrevDay = StormWinFlag;
-            if (SurfaceWindow(SurfNum).StormWinFlag != SurfaceWindow(SurfNum).StormWinFlagPrevDay) StormWinChangeThisDay = true;
+            SurfWinStormWinFlag(SurfNum) = StormWinFlag;
+            if (BeginSimFlag) SurfWinStormWinFlagPrevDay(SurfNum) = StormWinFlag;
+            if (SurfWinStormWinFlag(SurfNum) != SurfWinStormWinFlagPrevDay(SurfNum)) StormWinChangeThisDay = true;
         }
     }
 

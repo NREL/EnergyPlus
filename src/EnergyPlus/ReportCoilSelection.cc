@@ -47,7 +47,6 @@
 
 // C++ Headers
 #include <string>
-#include <vector>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BoilerSteam.hh>
@@ -438,7 +437,7 @@ void ReportCoilSelection::setCoilFinalSizes(std::string const &coilName,    // u
     }
 }
 
-void ReportCoilSelection::doAirLoopSetup(int const coilVecIndex)
+void ReportCoilSelection::doAirLoopSetup(EnergyPlusData &state, int const coilVecIndex)
 {
     // this routine sets up some things for central air systems, needs to follow setting of an airloop num
     auto &c(coilSelectionDataObjs[coilVecIndex]);
@@ -454,21 +453,21 @@ void ReportCoilSelection::doAirLoopSetup(int const coilVecIndex)
         }
         // fill list of zones connected to this air loop
         // this could be reworked to use different structure which is available now since std 62.1 changes
-        if (allocated(DataAirLoop::AirToZoneNodeInfo)) {
-            if (DataAirLoop::AirToZoneNodeInfo(c->airloopNum).NumZonesCooled > 0) {
-                int zoneCount = DataAirLoop::AirToZoneNodeInfo(c->airloopNum).NumZonesCooled;
+        if (allocated(state.dataAirLoop->AirToZoneNodeInfo)) {
+            if (state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).NumZonesCooled > 0) {
+                int zoneCount = state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).NumZonesCooled;
                 c->zoneNum.resize(zoneCount);
                 c->zoneName.resize(zoneCount);
-                for (int loopZone = 1; loopZone <= DataAirLoop::AirToZoneNodeInfo(c->airloopNum).NumZonesCooled; ++loopZone) {
-                    c->zoneNum[loopZone - 1] = DataAirLoop::AirToZoneNodeInfo(c->airloopNum).CoolCtrlZoneNums(loopZone);
+                for (int loopZone = 1; loopZone <= state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).NumZonesCooled; ++loopZone) {
+                    c->zoneNum[loopZone - 1] = state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).CoolCtrlZoneNums(loopZone);
                     c->zoneName[loopZone - 1] = DataHeatBalance::Zone(c->zoneNum[loopZone - 1]).Name;
                 }
             }
 
-            if (DataAirLoop::AirToZoneNodeInfo(c->airloopNum).NumZonesHeated > 0) {
-                int zoneCount = DataAirLoop::AirToZoneNodeInfo(c->airloopNum).NumZonesHeated;
+            if (state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).NumZonesHeated > 0) {
+                int zoneCount = state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).NumZonesHeated;
                 for (int loopZone = 1; loopZone <= zoneCount; ++loopZone) {
-                    int zoneIndex = DataAirLoop::AirToZoneNodeInfo(c->airloopNum).HeatCtrlZoneNums(loopZone);
+                    int zoneIndex = state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).HeatCtrlZoneNums(loopZone);
                     // see if this zone is new or already in list
                     bool found = false;
                     for (auto &z : c->zoneNum) {
@@ -815,12 +814,12 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
                     c->cpFluid * c->rhoFluid * DataSizing::PlantSizData(c->pltSizNum).DeltaT * DataSizing::PlantSizData(c->pltSizNum).DesVolFlowRate;
             } else {
                 // find boiler on this plant loop and get capacity from it
-                if (allocated(state.dataSteamBoilers.Boiler)) {
-                    for (int boilerIndex = 1; boilerIndex <= state.dataSteamBoilers.numBoilers; ++boilerIndex) {
-                        if (state.dataSteamBoilers.Boiler(boilerIndex).LoopNum == c->waterLoopNum) { // steam boiler on this loop
-                            c->plantDesSupTemp = state.dataSteamBoilers.Boiler(boilerIndex).TempUpLimitBoilerOut;
-                            c->plantDesRetTemp = state.dataSteamBoilers.Boiler(boilerIndex).TempUpLimitBoilerOut - c->plantDesDeltaTemp;
-                            c->plantDesCapacity = state.dataSteamBoilers.Boiler(boilerIndex).NomCap;
+                if (allocated(state.dataBoilerSteam->Boiler)) {
+                    for (int boilerIndex = 1; boilerIndex <= state.dataBoilerSteam->numBoilers; ++boilerIndex) {
+                        if (state.dataBoilerSteam->Boiler(boilerIndex).LoopNum == c->waterLoopNum) { // steam boiler on this loop
+                            c->plantDesSupTemp = state.dataBoilerSteam->Boiler(boilerIndex).TempUpLimitBoilerOut;
+                            c->plantDesRetTemp = state.dataBoilerSteam->Boiler(boilerIndex).TempUpLimitBoilerOut - c->plantDesDeltaTemp;
+                            c->plantDesCapacity = state.dataBoilerSteam->Boiler(boilerIndex).NomCap;
                         }
                     }
                 }
@@ -1047,7 +1046,8 @@ void ReportCoilSelection::setCoilWaterFlowPltSizNum(std::string const &coilName,
     }
 }
 
-void ReportCoilSelection::setCoilEntAirTemp(std::string const &coilName,    // user-defined name of the coil
+void ReportCoilSelection::setCoilEntAirTemp(EnergyPlusData &state,
+                                            std::string const &coilName,    // user-defined name of the coil
                                             std::string const &coilType,    // idf input object class name of coil
                                             Real64 const entAirDryBulbTemp, // degree C air entering coil
                                             int const curSysNum,            // airloop system number index, if non zero
@@ -1058,7 +1058,7 @@ void ReportCoilSelection::setCoilEntAirTemp(std::string const &coilName,    // u
     auto &c(coilSelectionDataObjs[index]);
     c->coilDesEntTemp = entAirDryBulbTemp;
     c->airloopNum = curSysNum;
-    doAirLoopSetup(index);
+    doAirLoopSetup(state, index);
     c->zoneEqNum = curZoneEqNum;
 }
 
@@ -1123,6 +1123,7 @@ void ReportCoilSelection::setCoilLvgAirHumRat(std::string const &coilName, // us
 }
 
 void ReportCoilSelection::setCoilCoolingCapacity(
+    EnergyPlusData &state,
     std::string const &coilName,       // user-defined name of the coil
     std::string const &coilType,       // idf input object class name of coil
     Real64 const TotalCoolingCap,      // {W} coil cooling capacity, sizing result
@@ -1147,7 +1148,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
 
     c->fanHeatGainIdealPeak = fanCoolLoad;
     c->airloopNum = curSysNum;
-    doAirLoopSetup(index);
+    doAirLoopSetup(state, index);
     c->zoneEqNum = curZoneEqNum;
     //	if ( c->zoneEqNum > 0 ) doZoneEqSetup( index );
     c->oASysNum = curOASysNum;
@@ -1157,27 +1158,27 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         // crash
         if (DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD > 0 &&
             DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD <= DataEnvironment::TotDesDays) {
-            c->desDayNameAtSensPeak = WeatherManager::DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD).Title;
+            c->desDayNameAtSensPeak = state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD).Title;
             c->coilSensePeakHrMin =
-                General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD).Month) + "/" +
-                General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD).DayOfMonth) + " " +
+                General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD).Month) + "/" +
+                General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD).DayOfMonth) + " " +
                 getTimeText(DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD));
         }
         if (DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD > 0 &&
             DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD <= DataEnvironment::TotDesDays) {
-            c->desDayNameAtTotalPeak = WeatherManager::DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD).Title;
+            c->desDayNameAtTotalPeak = state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD).Title;
             c->coilTotalPeakHrMin =
-                General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD).Month) + "/" +
-                General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD).DayOfMonth) + " " +
+                General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD).Month) + "/" +
+                General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD).DayOfMonth) + " " +
                 getTimeText(DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtTotCoolPk(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD));
         }
 
         if (DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD > 0 &&
             DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD <= DataEnvironment::TotDesDays) {
-            c->desDayNameAtAirFlowPeak = WeatherManager::DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).Title;
+            c->desDayNameAtAirFlowPeak = state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).Title;
             c->airPeakHrMin =
-                General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).Month) + "/" +
-                General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).DayOfMonth) + " " +
+                General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).Month) + "/" +
+                General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).DayOfMonth) + " " +
                 getTimeText(DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtCoolFlowPk(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD));
         }
 
@@ -1321,11 +1322,11 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         if (DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum > 0 &&
             DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
             c->coilSensePeakHrMin =
-                General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum).Month) + "/" +
-                General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum).DayOfMonth) + " " +
+                General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum).Month) + "/" +
+                General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum).DayOfMonth) + " " +
                 getTimeText(DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtCoolMax);
-            c->airPeakHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum).Month) + "/" +
-                              General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum).DayOfMonth) +
+            c->airPeakHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum).Month) + "/" +
+                              General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum).DayOfMonth) +
                               " " + getTimeText(DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtCoolMax);
         }
 
@@ -1395,6 +1396,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
 }
 
 void ReportCoilSelection::setCoilHeatingCapacity(
+    EnergyPlusData &state,
     std::string const &coilName,       // user-defined name of the coil
     std::string const &coilType,       // idf input object class name of coil
     Real64 const totalHeatingCap,      // {W} coil Heating capacity
@@ -1418,7 +1420,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
 
     c->fanHeatGainIdealPeak = fanHeatGain;
     c->airloopNum = curSysNum;
-    doAirLoopSetup(index);
+    doAirLoopSetup(state, index);
     c->zoneEqNum = curZoneEqNum;
     //	if ( c->zoneEqNum > 0 ) doZoneEqSetup( index );
     if (curSysNum > 0 && c->zoneEqNum == 0 && allocated(DataSizing::FinalSysSizing)) {
@@ -1491,13 +1493,13 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         }
 
         if (DataSizing::FinalSysSizing(curSysNum).HeatDDNum > 0 && DataSizing::FinalSysSizing(curSysNum).HeatDDNum <= DataEnvironment::TotDesDays) {
-            c->coilSensePeakHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::FinalSysSizing(curSysNum).HeatDDNum).Month) + "/" +
-                                    General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::FinalSysSizing(curSysNum).HeatDDNum).DayOfMonth) +
+            c->coilSensePeakHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalSysSizing(curSysNum).HeatDDNum).Month) + "/" +
+                                    General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalSysSizing(curSysNum).HeatDDNum).DayOfMonth) +
                                     " " + getTimeText(DataSizing::FinalSysSizing(curSysNum).SysHeatCoilTimeStepPk);
-            c->airPeakHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::FinalSysSizing(curSysNum).HeatDDNum).Month) + "/" +
-                              General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::FinalSysSizing(curSysNum).HeatDDNum).DayOfMonth) + " " +
+            c->airPeakHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalSysSizing(curSysNum).HeatDDNum).Month) + "/" +
+                              General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalSysSizing(curSysNum).HeatDDNum).DayOfMonth) + " " +
                               getTimeText(DataSizing::FinalSysSizing(curSysNum).SysHeatAirTimeStepPk);
-            c->desDayNameAtAirFlowPeak = WeatherManager::DesDayInput(DataSizing::FinalSysSizing(curSysNum).HeatDDNum).Title;
+            c->desDayNameAtAirFlowPeak = state.dataWeatherManager->DesDayInput(DataSizing::FinalSysSizing(curSysNum).HeatDDNum).Title;
         }
 
         // now set Coil Ent And Lvg Conditions
@@ -1547,11 +1549,11 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         if (DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum > 0 &&
             DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
             c->coilSensePeakHrMin =
-                General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum).Month) + "/" +
-                General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum).DayOfMonth) + " " +
+                General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum).Month) + "/" +
+                General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum).DayOfMonth) + " " +
                 getTimeText(DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtHeatMax);
-            c->airPeakHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum).Month) + "/" +
-                              General::TrimSigDigits(WeatherManager::DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum).DayOfMonth) +
+            c->airPeakHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum).Month) + "/" +
+                              General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum).DayOfMonth) +
                               " " + getTimeText(DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtHeatMax);
         }
         c->desDayNameAtAirFlowPeak = DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesDay;
@@ -1772,7 +1774,8 @@ void ReportCoilSelection::setCoilWaterHeaterCapacityPltSizNum(std::string const 
     c->waterLoopNum = dataWaterLoopNum;
 }
 
-void ReportCoilSelection::setCoilUA(std::string const &coilName,            // user-defined name of the coil
+void ReportCoilSelection::setCoilUA(EnergyPlusData &state,
+                                    std::string const &coilName,            // user-defined name of the coil
                                     std::string const &coilType,            // idf input object class name of coil
                                     Real64 const UAvalue,                   // [W/k] UA value for coil,
                                     Real64 const dataCapacityUsedForSizing, // [W] sizing global
@@ -1787,7 +1790,7 @@ void ReportCoilSelection::setCoilUA(std::string const &coilName,            // u
     c->coilTotCapAtPeak = dataCapacityUsedForSizing;
     c->capIsAutosized = isAutoSize;
     c->airloopNum = curSysNum;
-    doAirLoopSetup(index);
+    doAirLoopSetup(state, index);
     c->zoneEqNum = curZoneEqNum;
 }
 

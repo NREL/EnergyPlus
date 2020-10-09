@@ -52,7 +52,6 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -1071,11 +1070,11 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
@@ -1097,7 +1096,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
         DataGlobals::DayOfSim = 0;
-        state.dataGlobals.DayOfSimChr = "0";
+        state.dataGlobal->DayOfSimChr = "0";
 
         while ((DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 
@@ -2162,11 +2161,11 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
@@ -2188,7 +2187,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
         DataGlobals::DayOfSim = 0;
-        state.dataGlobals.DayOfSimChr = "0";
+        state.dataGlobal->DayOfSimChr = "0";
 
         while ((DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 
@@ -2469,14 +2468,14 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     DataLoopNode::Node(3).TempSetPoint = 11.0;
 
     // now call the init routine
-    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize(state.dataBranchInputManager);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize(state);
 
     // check value in FreeCoolCntrlMinCntrlTemp
     EXPECT_NEAR(DataPlant::PlantLoop(1).LoopSide(2).Branch(2).Comp(1).FreeCoolCntrlMinCntrlTemp, 11.0, 0.001);
 
     // change the tolerance and check the result, issue 5626 fix subtracts tolerance
     PlantHeatExchangerFluidToFluid::FluidHX(1).TempControlTol = 1.5;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize(state.dataBranchInputManager);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize(state);
 }
 
 } // namespace EnergyPlus

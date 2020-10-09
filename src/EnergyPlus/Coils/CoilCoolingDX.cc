@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -77,18 +78,14 @@ using namespace DataIPShortCuts;
 
 namespace EnergyPlus {
 
-    int const coilNormalMode = 0;       // Normal operation mode
-    int const coilEnhancedMode = 1;     // Enhanced operation mode
-    int const coilSubcoolReheatMode = 2; // SubcoolReheat operation mode
-
     std::vector<CoilCoolingDX> coilCoolingDXs;
     bool coilCoolingDXGetInputFlag = true;
     std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
 }
 
-int CoilCoolingDX::factory(std::string const & coilName) {
+int CoilCoolingDX::factory(EnergyPlusData &state, std::string const & coilName) {
     if (coilCoolingDXGetInputFlag) {
-        CoilCoolingDX::getInput();
+        CoilCoolingDX::getInput(state);
         coilCoolingDXGetInputFlag = false;
     }
     int handle = -1;
@@ -107,7 +104,7 @@ void CoilCoolingDX::clear_state() {
     coilCoolingDXGetInputFlag = true;
 }
 
-void CoilCoolingDX::getInput() {
+void CoilCoolingDX::getInput(EnergyPlusData &state) {
     int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(coilCoolingDXObjectName);
     if (numCoolingCoilDXs <= 0) {
         ShowFatalError(R"(No "Coil:Cooling:DX" objects in input file)");
@@ -129,23 +126,23 @@ void CoilCoolingDX::getInput() {
         input_specs.condensate_collection_water_storage_tank_name = cAlphaArgs(9);
         input_specs.evaporative_condenser_supply_water_storage_tank_name = cAlphaArgs(10);
         CoilCoolingDX thisCoil;
-        thisCoil.instantiateFromInputSpec(input_specs);
+        thisCoil.instantiateFromInputSpec(state, input_specs);
         coilCoolingDXs.push_back(thisCoil);
     }
 }
 
-void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecification& input_data)
+void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXInputSpecification& input_data)
 {
     static const std::string routineName("CoilCoolingDX::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
     bool errorsFound = false;
     this->name = input_data.name;
-    this->performance = CoilCoolingDXCurveFitPerformance(input_data.performance_object_name);
+    this->performance = CoilCoolingDXCurveFitPerformance(state, input_data.performance_object_name);
 
     if (!this->performance.original_input_specs.base_operating_mode_name.empty() &&
-        !this->performance.original_input_specs.alternate_operating_mode_name.empty() && 
+        !this->performance.original_input_specs.alternate_operating_mode_name.empty() &&
         !this->performance.original_input_specs.alternate_operating_mode2_name.empty()) {
-        this->CoolingCoilType = DataHVACGlobals::CoilDX_SubcoolReheat;
+        this->SubcoolReheatFlag = true;
     }
 
     // other construction below
@@ -193,7 +190,7 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
                                                                         DataLoopNode::ObjectIsNotParent);
 
     if (!input_data.condensate_collection_water_storage_tank_name.empty()) {
-        WaterManager::SetupTankSupplyComponent(this->name,
+        WaterManager::SetupTankSupplyComponent(state, this->name,
                                                coilCoolingDXObjectName,
                                  input_data.condensate_collection_water_storage_tank_name,
                                  errorsFound,
@@ -202,7 +199,7 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
     }
 
     if (!input_data.evaporative_condenser_supply_water_storage_tank_name.empty()) {
-        WaterManager::SetupTankDemandComponent(this->name,
+        WaterManager::SetupTankDemandComponent(state, this->name,
                                                coilCoolingDXObjectName,
                                  input_data.evaporative_condenser_supply_water_storage_tank_name,
                                  errorsFound,
@@ -276,9 +273,9 @@ void CoilCoolingDX::oneTimeInit() {
                         this->name,
                         _,
                         "Electricity",
-                        "DHW",
+                        "Cooling",
                         _,
-                        "Plant");
+                        "System");
    // Ported from variable speed coil
     SetupOutputVariable("Cooling Coil Air Mass Flow Rate",
         OutputProcessor::Unit::kg_s,
@@ -384,18 +381,18 @@ void CoilCoolingDX::oneTimeInit() {
                             _,
                             "System");
     }
-    if (this->CoolingCoilType == DataHVACGlobals::CoilDX_SubcoolReheat) {
+    if (this->SubcoolReheatFlag) {
         SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode",
                             OutputProcessor::Unit::None,
                             this->performance.OperatingMode,
                             "System",
                             "Average",
                             this->name);
-        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode Ratio", 
-                            OutputProcessor::Unit::None, 
-                            this->performance.ModeRatio, 
-                            "System", 
-                            "Average", 
+        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode Ratio",
+                            OutputProcessor::Unit::None,
+                            this->performance.ModeRatio,
+                            "System",
+                            "Average",
                             this->name);
         SetupOutputVariable("SubcoolReheat Cooling Coil Recovered Heat Energy Rate",
                             OutputProcessor::Unit::W,
@@ -459,7 +456,7 @@ void CoilCoolingDX::size(EnergyPlusData &state) {
     this->performance.size(state);
 }
 
-void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR)
+void CoilCoolingDX::simulate(EnergyPlusData &state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR)
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit();
@@ -477,7 +474,7 @@ void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Rea
     // TODO: check the minOATcompressor and reset data/pass through data as needed
     this->performance.OperatingMode = 0;
     this->performance.ModeRatio = 0.0;
-    this->performance.simulate(
+    this->performance.simulate(state,
         evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, LoadSHR);
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
@@ -522,7 +519,7 @@ void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Rea
             Real64 condAirMassFlow = condInletNode.MassFlowRate; // TODO: How is this getting a value?
             Real64 waterDensity = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
             this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
-            if (useAlternateMode == coilNormalMode) {
+            if (useAlternateMode == DataHVACGlobals::coilNormalMode) {
                 this->evapCondPumpElecPower = this->performance.normalMode.getCurrentEvapCondPumpPower(speedNum);
             }
             DataWater::WaterStorage(this->evaporativeCondSupplyTankIndex).VdotRequestDemand(this->evaporativeCondSupplyTankARRID) =
@@ -539,13 +536,16 @@ void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Rea
     this->outletAirDryBulbTemp = evapOutletNode.Temp;
     this->outletAirHumRat = evapOutletNode.HumRat;
 
-    this->totalCoolingEnergyRate = evapOutletNode.MassFlowRate * (evapInletNode.Enthalpy - evapOutletNode.Enthalpy);
+    CalcComponentSensibleLatentOutput(evapOutletNode.MassFlowRate,
+                                      evapInletNode.Temp,
+                                      evapInletNode.HumRat,
+                                      evapOutletNode.Temp,
+                                      evapOutletNode.HumRat,
+                                      this->sensCoolingEnergyRate,
+                                      this->latCoolingEnergyRate,
+                                      this->totalCoolingEnergyRate);
     this->totalCoolingEnergy = this->totalCoolingEnergyRate * reportingConstant;
-    Real64 minAirHumRat = min(evapInletNode.HumRat, evapOutletNode.HumRat);
-    this->sensCoolingEnergyRate = evapOutletNode.MassFlowRate * (Psychrometrics::PsyHFnTdbW(evapInletNode.Temp, minAirHumRat) -
-                                                                 Psychrometrics::PsyHFnTdbW(evapOutletNode.Temp, minAirHumRat));
     this->sensCoolingEnergy = this->sensCoolingEnergyRate * reportingConstant;
-    this->latCoolingEnergyRate = this->totalCoolingEnergyRate - this->sensCoolingEnergyRate;
     this->latCoolingEnergy = this->latCoolingEnergyRate * reportingConstant;
 
     this->evapCondPumpElecConsumption = this->evapCondPumpElecPower * reportingConstant;
@@ -560,7 +560,7 @@ void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Rea
     this->speedNumReport = speedNum;
     this->speedRatioReport = speedRatio;
 
-    if (useAlternateMode == coilSubcoolReheatMode) {
+    if (useAlternateMode == DataHVACGlobals::coilSubcoolReheatMode) {
         this->recoveredHeatEnergyRate = this->performance.recoveredEnergyRate;
         this->recoveredHeatEnergy = this->recoveredHeatEnergyRate * reportingConstant;
     }
@@ -568,10 +568,10 @@ void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Rea
     // Fishy global things that need to be set here, try to set the AFN stuff now
     // This appears to be the only location where airLoopNum gets used
     //DataAirLoop::LoopDXCoilRTF = max(this->coolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
-    DataAirLoop::LoopDXCoilRTF = this->coolingCoilRuntimeFraction;
+    state.dataAirLoop->LoopDXCoilRTF = this->coolingCoilRuntimeFraction;
     DataHVACGlobals::DXElecCoolingPower = this->elecCoolingPower;
     if (this->airLoopNum > 0) {
-        DataAirLoop::AirLoopAFNInfo(this->airLoopNum).AFNLoopDXCoilRTF = this->coolingCoilRuntimeFraction;
+        state.dataAirLoop->AirLoopAFNInfo(this->airLoopNum).AFNLoopDXCoilRTF = this->coolingCoilRuntimeFraction;
         // The original calculation is below, but no heating yet
         //        max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
     }

@@ -61,8 +61,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HVACFan {
 
@@ -85,7 +86,7 @@ namespace HVACFan {
         // Copy Constructor
         FanSystem(FanSystem const &) = default;
 
-        void simulate(EnergyPlusData &state, 
+        void simulate(EnergyPlusData &state,
             //		bool const firstHVACIteration,
             Optional<Real64 const> flowFraction = _,     // Flow fraction in operating mode 1
             Optional_bool_const zoneCompTurnFansOn = _,  // Turn fans ON signal from ZoneHVAC component
@@ -107,6 +108,9 @@ namespace HVACFan {
         Real64 getFanDesignTemperatureRise() const;
 
         Real64 getFanDesignHeatGain(EnergyPlusData &state, Real64 const FanVolFlow);
+
+        void
+        FanInputsForDesignHeatGain(EnergyPlusData &state, Real64 &deltaP, Real64 &motEff, Real64 &totEff, Real64 &motInAirFrac);
 
         // void
         // fanIsSecondaryDriver();
@@ -148,7 +152,8 @@ namespace HVACFan {
 
         void set_size(EnergyPlusData &state);
 
-        void calcSimpleSystemFan(Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
+        void calcSimpleSystemFan(EnergyPlusData &state,
+                                 Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
                                  Optional<Real64 const> pressureRise, // Pressure difference to use for DeltaPress
                                  Optional<Real64 const> flowRatio1,   // Flow ratio in operating mode 1
                                  Optional<Real64 const> runTimeFrac1, // Run time fraction in operating mode 1
@@ -157,7 +162,7 @@ namespace HVACFan {
                                  Optional<Real64 const> pressureRise2 // Pressure difference to use for operating mode 2
         );
 
-        void update() const;
+        void update(EnergyPlusData &state) const;
 
         void report();
 

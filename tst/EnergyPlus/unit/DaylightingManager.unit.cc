@@ -811,7 +811,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(state, state.files, foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(state.files, foundErrors); // read construction data
@@ -831,7 +831,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, foundErrors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, state.files, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()
@@ -1324,7 +1324,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(state, state.files, foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(state.files, foundErrors); // read construction data
@@ -1379,26 +1379,26 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
 
     // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
-    SurfaceWindow(IWin).WindowModelType = Window5DetailedModel;
-    SurfaceWindow(IWin).ShadingFlag = DataSurfaces::NoShade;
+    SurfWinWindowModelType(IWin) = Window5DetailedModel;
+    SurfWinShadingFlag(IWin) = DataSurfaces::NoShade;
     DaylightingManager::DayltgInteriorIllum(ZoneNum);
     EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
 
-    SurfaceWindow(IWin).ShadingFlag = DataSurfaces::ExtBlindOn;
+    SurfWinShadingFlag(IWin) = DataSurfaces::ExtBlindOn;
     DaylightingManager::DayltgInteriorIllum(ZoneNum);
     EXPECT_NEAR(DaylightingManager::DaylIllum(1), 50.0, 0.001);
     EXPECT_NEAR(DaylightingManager::DaylIllum(2), 5.0, 0.001);
 
     // BSDF model - expect 100 for unshaded and 100 for shaded (10 for RefPt2
     // BSDF does shading differently, it's integrated in the base state
-    SurfaceWindow(IWin).WindowModelType = WindowBSDFModel;
-    SurfaceWindow(IWin).ShadingFlag = DataSurfaces::NoShade;
+    SurfWinWindowModelType(IWin) = WindowBSDFModel;
+    SurfWinShadingFlag(IWin) = DataSurfaces::NoShade;
     DaylightingManager::DayltgInteriorIllum(ZoneNum);
     EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
 
-    SurfaceWindow(IWin).ShadingFlag = DataSurfaces::ExtBlindOn;
+    SurfWinShadingFlag(IWin) = DataSurfaces::ExtBlindOn;
     DaylightingManager::DayltgInteriorIllum(ZoneNum);
     EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
@@ -2085,7 +2085,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(state, state.files, foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(state.files, foundErrors); // read construction data
@@ -2105,7 +2105,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, foundErrors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, state.files, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()
@@ -2830,7 +2830,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(state, state.files, foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(state.files, foundErrors); // read construction data
@@ -2850,7 +2850,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, foundErrors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, state.files, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()

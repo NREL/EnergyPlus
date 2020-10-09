@@ -752,6 +752,7 @@ namespace NodeInputManager {
                 NodeID.redimension({0, NumOfNodes});
                 NodeRef.redimension(NumOfNodes);
                 MarkedNode.redimension(NumOfNodes);
+                NodeSetpointCheck.redimension(NumOfNodes);
                 // Set new item in Node
                 Node(NumOfNodes).FluidType = NodeFluidType;
                 NodeRef(NumOfNodes) = 0;
@@ -767,6 +768,7 @@ namespace NodeInputManager {
             NodeID.allocate({0, 1});
             NodeRef.allocate(1);
             MarkedNode.allocate(1);
+            NodeSetpointCheck.allocate(1);
 
             NumOfUniqueNodeNames = 1;
             NodeID(0) = "Undefined";

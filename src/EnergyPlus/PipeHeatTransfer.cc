@@ -58,6 +58,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -69,7 +70,6 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -203,7 +203,7 @@ namespace PipeHeatTransfer {
                               Real64 &EP_UNUSED(CurLoad),
                               bool const EP_UNUSED(RunFlag))
     {
-        this->InitPipesHeatTransfer(state.dataBranchInputManager, FirstHVACIteration);
+        this->InitPipesHeatTransfer(state, FirstHVACIteration);
         // make the calculations
         for (int InnerTimeStepCtr = 1; InnerTimeStepCtr <= nsvNumInnerTimeSteps; ++InnerTimeStepCtr) {
             {
@@ -824,7 +824,7 @@ namespace PipeHeatTransfer {
 
     //==============================================================================
 
-    void PipeHTData::InitPipesHeatTransfer(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // component number
+    void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHVACIteration // component number
     )
     {
 
@@ -889,7 +889,7 @@ namespace PipeHeatTransfer {
         // get some data only once
         if (this->OneTimeInit) {
             errFlag = false;
-            ScanPlantLoopsForObject(dataBranchInputManager,
+            ScanPlantLoopsForObject(state,
                 this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("InitPipesHeatTransfer: Program terminated due to previous condition(s).");
@@ -908,7 +908,7 @@ namespace PipeHeatTransfer {
                         for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex) {
                             for (WidthIndex = 1; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
                                 CurrentDepth = (DepthIndex - 1) * this->dSregular;
-                                this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex) = this->TBND(CurrentDepth, CurSimDay);
+                                this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex) = this->TBND(state, CurrentDepth, CurSimDay);
                             }
                         }
                     }
@@ -953,13 +953,13 @@ namespace PipeHeatTransfer {
                         for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex) {
                             // Farfield boundary
                             CurrentDepth = (DepthIndex - 1) * this->dSregular;
-                            CurTemp = this->TBND(CurrentDepth, CurSimDay);
+                            CurTemp = this->TBND(state, CurrentDepth, CurSimDay);
                             this->T(1, DepthIndex, LengthIndex, TimeIndex) = CurTemp;
                         }
                         for (WidthIndex = 1; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
                             // Bottom side of boundary
                             CurrentDepth = this->DomainDepth;
-                            CurTemp = this->TBND(CurrentDepth, CurSimDay);
+                            CurTemp = this->TBND(state, CurrentDepth, CurSimDay);
                             this->T(WidthIndex, this->NumDepthNodes, LengthIndex, TimeIndex) = CurTemp;
                         }
                     }
@@ -1911,7 +1911,7 @@ namespace PipeHeatTransfer {
 
     //==============================================================================
 
-    Real64 PipeHTData::TBND(Real64 const z,       // Current Depth
+    Real64 PipeHTData::TBND(EnergyPlusData &state, Real64 const z,       // Current Depth
                             Real64 const DayOfSim // Current Simulation Day
     )
     {
@@ -1934,7 +1934,7 @@ namespace PipeHeatTransfer {
         Real64 curSimTime = DayOfSim * SecsInDay;
         Real64 TBND;
 
-        TBND = this->groundTempModel->getGroundTempAtTimeInSeconds(z, curSimTime);
+        TBND = this->groundTempModel->getGroundTempAtTimeInSeconds(state, z, curSimTime);
 
         return TBND;
     }

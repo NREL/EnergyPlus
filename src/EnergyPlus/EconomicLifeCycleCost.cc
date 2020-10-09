@@ -56,6 +56,7 @@
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/EconomicTariff.hh>
@@ -294,7 +295,7 @@ namespace EconomicLifeCycleCost {
         }
     }
 
-    void ComputeLifeCycleCostAndReport(CostEstimateManagerData &dataCostEstimateManager)
+    void ComputeLifeCycleCostAndReport(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -329,11 +330,11 @@ namespace EconomicLifeCycleCost {
 
         if (LCCparamPresent) {
             DisplayString("Computing Life Cycle Costs and Reporting");
-            ExpressAsCashFlows(dataCostEstimateManager);
+            ExpressAsCashFlows(state);
             ComputePresentValue();
             ComputeEscalatedEnergyCosts();
             ComputeTaxAndDepreciation();
-            WriteTabularLifeCycleCostReport(dataCostEstimateManager);
+            WriteTabularLifeCycleCostReport(state);
         }
     }
 
@@ -1204,7 +1205,7 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ExpressAsCashFlows(CostEstimateManagerData &dataCostEstimateManager)
+    void ExpressAsCashFlows(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -1267,12 +1268,12 @@ namespace EconomicLifeCycleCost {
         ExpressAsCashFlows_serviceMonths1900 = (serviceDateYear - 1900) * 12 + serviceDateMonth;
         monthsBaseToService = ExpressAsCashFlows_serviceMonths1900 - ExpressAsCashFlows_baseMonths1900;
         // if ComponentCost:LineItem exist, the grand total of all costs are another non-recurring cost
-        if (dataCostEstimateManager.CurntBldg.GrandTotal > 0.0) { // from DataCostEstimate and computed in WriteCompCostTable within OutputReportTabular
+        if (state.dataCostEstimateManager->CurntBldg.GrandTotal > 0.0) { // from DataCostEstimate and computed in WriteCompCostTable within OutputReportTabular
             ++numNonrecurringCost;
             NonrecurringCost(numNonrecurringCost).name = "Total of ComponentCost:*";
             NonrecurringCost(numNonrecurringCost).lineItem = "";
             NonrecurringCost(numNonrecurringCost).category = costCatConstruction;
-            NonrecurringCost(numNonrecurringCost).cost = dataCostEstimateManager.CurntBldg.GrandTotal;
+            NonrecurringCost(numNonrecurringCost).cost = state.dataCostEstimateManager->CurntBldg.GrandTotal;
             NonrecurringCost(numNonrecurringCost).startOfCosts = startBasePeriod;
             NonrecurringCost(numNonrecurringCost).yearsFromStart = 0;
             NonrecurringCost(numNonrecurringCost).monthsFromStart = 0;
@@ -2018,7 +2019,7 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularLifeCycleCostReport(CostEstimateManagerData &dataCostEstimateManager)
+    void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -2156,7 +2157,7 @@ namespace EconomicLifeCycleCost {
             }
             columnWidth = 14; // array assignment - same for all columns
             WriteSubtitle("Life-Cycle Cost Parameters");
-            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters");
@@ -2195,7 +2196,7 @@ namespace EconomicLifeCycleCost {
                 }
             }
             WriteSubtitle("Use Price Escalation");
-            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation");
@@ -2232,7 +2233,7 @@ namespace EconomicLifeCycleCost {
                     }
                 }
                 WriteSubtitle("Use Adjustment");
-                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment");
@@ -2273,7 +2274,7 @@ namespace EconomicLifeCycleCost {
                 }
             }
             WriteSubtitle("Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
-            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
                                                        rowHead,
@@ -2317,7 +2318,7 @@ namespace EconomicLifeCycleCost {
                 tableBody(jObj, iYear) = RealToStr(CashFlow(costCatTotEnergy).yrAmount(iYear) + CashFlow(costCatWater).yrAmount(iYear), 2);
             }
             WriteSubtitle("Energy and Water Cost Cash Flows (Without Escalation)");
-            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
                                                        rowHead,
@@ -2367,7 +2368,7 @@ namespace EconomicLifeCycleCost {
                 tableBody(jObj, iYear) = RealToStr(EscalatedTotEnergy(iYear) + CashFlow(costCatWater).yrAmount(iYear), 2);
             }
             WriteSubtitle("Energy and Water Cost Cash Flows (With Escalation)");
-            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
                                                        rowHead,
@@ -2408,7 +2409,7 @@ namespace EconomicLifeCycleCost {
                 tableBody(4, iYear) = RealToStr(CashFlow(costCatTotCaptl).yrAmount(iYear), 2);
             }
             WriteSubtitle("Capital Cash Flow by Category (Without Escalation)");
-            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
                                                        rowHead,
@@ -2461,7 +2462,7 @@ namespace EconomicLifeCycleCost {
                 tableBody(10, iYear) = RealToStr(CashFlow(costCatTotOper).yrAmount(iYear), 2);
             }
             WriteSubtitle("Operating Cash Flow by Category (Without Escalation)");
-            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
                                                        rowHead,
@@ -2516,7 +2517,7 @@ namespace EconomicLifeCycleCost {
                 tableBody(10, iYear) = RealToStr(yearly_total_cost, 2);
             }
             WriteSubtitle("Operating Cash Flow by Category (With Escalation)");
-            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
                                                        rowHead,
@@ -2573,7 +2574,7 @@ namespace EconomicLifeCycleCost {
                     }
                 }
                 WriteSubtitle("DEBUG ONLY - Monthly Cash Flows");
-                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
@@ -2606,7 +2607,7 @@ namespace EconomicLifeCycleCost {
                 }
             }
             WriteSubtitle("Monthly Total Cash Flow (Without Escalation)");
-            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)");
@@ -2694,7 +2695,7 @@ namespace EconomicLifeCycleCost {
             }
             tableBody(4, numRows + 1) = RealToStr(totalPV, 2);
             WriteSubtitle("Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
-            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
                                                        rowHead,
@@ -2759,7 +2760,7 @@ namespace EconomicLifeCycleCost {
             tableBody(1, 16) = RealToStr(CashFlow(costCatTotGrand).presentValue, 2);
 
             WriteSubtitle("Present Value by Category");
-            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category");
@@ -2799,7 +2800,7 @@ namespace EconomicLifeCycleCost {
             tableBody(3, lengthStudyYears + 1) = RealToStr(totalPV, 2);
 
             WriteSubtitle("Present Value by Year");
-            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year");
@@ -2841,7 +2842,7 @@ namespace EconomicLifeCycleCost {
                 tableBody(5, lengthStudyYears + 1) = RealToStr(totalPV, 2);
 
                 WriteSubtitle("After Tax Estimate");
-                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate");

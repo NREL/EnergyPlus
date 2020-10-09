@@ -63,9 +63,9 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    class IOFiles;
-    struct EnergyPlusData;
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
 namespace AirflowNetworkBalanceManager {
 
@@ -109,9 +109,9 @@ namespace AirflowNetworkBalanceManager {
 
     void GetAirflowNetworkInput(EnergyPlusData &state);
 
-    void AllocateAndInitData();
+    void AllocateAndInitData(EnergyPlusData &state);
 
-    void CalcAirflowNetworkAirBalance();
+    void CalcAirflowNetworkAirBalance(EnergyPlusData &state);
 
     Real64 CalcDuctInsideConvResist(Real64 Tair, // Average air temperature
                                     Real64 mdot, // Mass flow rate
@@ -119,7 +119,8 @@ namespace AirflowNetworkBalanceManager {
                                     Real64 hIn   // User defined convection coefficient
     );
 
-    Real64 CalcDuctOutsideConvResist(Real64 Ts,      // Surface temperature
+    Real64 CalcDuctOutsideConvResist(EnergyPlusData &state,
+                                     Real64 Ts,      // Surface temperature
                                      Real64 Tamb,    // Free air temperature
                                      Real64 Wamb,    // Free air humidity ratio
                                      Real64 Pamb,    // Free air barometric pressure
@@ -128,7 +129,8 @@ namespace AirflowNetworkBalanceManager {
                                      Real64 hOut     // User defined convection coefficient
     );
 
-    Real64 CalcWindPressure(int curve,           // Curve index, change this to pointer after curve refactor
+    Real64 CalcWindPressure(EnergyPlusData &state,
+                            int curve,           // Curve index, change this to pointer after curve refactor
                             bool symmetricCurve, // True if the curve is symmetric (0 to 180)
                             bool relativeAngle,  // True if the Cp curve angle is measured relative to the surface
                             Real64 azimuth,      // Azimuthal angle of surface
@@ -138,41 +140,42 @@ namespace AirflowNetworkBalanceManager {
                             Real64 humRat        // Air node humidity ratio
     );
 
-    void CalcAirflowNetworkHeatBalance();
+    void CalcAirflowNetworkHeatBalance(EnergyPlusData &state);
 
-    void CalcAirflowNetworkMoisBalance();
+    void CalcAirflowNetworkMoisBalance(EnergyPlusData &state);
 
-    void CalcAirflowNetworkCO2Balance();
+    void CalcAirflowNetworkCO2Balance(EnergyPlusData &state);
 
-    void CalcAirflowNetworkGCBalance();
+    void CalcAirflowNetworkGCBalance(EnergyPlusData &state);
 
-    void MRXINV(int NORDER);
+    void MRXINV(EnergyPlusData &state, int NORDER);
 
-    void ReportAirflowNetwork();
+    void ReportAirflowNetwork(EnergyPlusData &state);
 
-    void UpdateAirflowNetwork(Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
+    void UpdateAirflowNetwork(EnergyPlusData &state, Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
 
     void AirflowNetworkVentingControl(int i,       // AirflowNetwork surface number
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
     );
 
-    void AssignFanAirLoopNum();
+    void AssignFanAirLoopNum(EnergyPlusData &state);
 
     void ValidateDistributionSystem(EnergyPlusData &state);
 
     void ValidateFanFlowRate(); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
 
-    void ValidateExhaustFanInput();
+    void ValidateExhaustFanInput(EnergyPlusData &state);
 
-    void HybridVentilationControl();
+    void HybridVentilationControl(EnergyPlusData &state);
 
-    void CalcSingleSidedCps(std::vector<std::vector<Real64>> &valsByFacade, int numWindDirs = 36);
+    void CalcSingleSidedCps(EnergyPlusData &state, std::vector<std::vector<Real64>> &valsByFacade, int numWindDirs = 36);
 
-    Real64 GetZoneInfilAirChangeRate(int ZoneNum); // hybrid ventilation system controlled zone number
+    Real64 GetZoneInfilAirChangeRate(EnergyPlusData &state, int ZoneNum); // hybrid ventilation system controlled zone number
 
     int GetAirLoopNumber(EnergyPlusData &state, int NodeNumber); // Get air loop number for each distribution node and linkage
 
-    Real64 AFNPressureResidual(Real64 ExFanMassFlowRate,
+    Real64 AFNPressureResidual(EnergyPlusData &state,
+                               Real64 ExFanMassFlowRate,
                                Array1D<Real64> const &Par); // Residual function using Regula Falsi
 
     // derived class or struct
@@ -202,7 +205,8 @@ namespace AirflowNetworkBalanceManager {
         {
         }
 
-        void calc(int ZoneNum,
+        void calc(EnergyPlusData &state,
+                  int ZoneNum,
                   Real64 TimeOpenDuration,
                   Real64 TimeCloseDuration,
                   int &OpeningStatus,
@@ -219,12 +223,12 @@ namespace AirflowNetworkBalanceManager {
 
     struct AirflowNetworkBalanceManagerData : BaseGlobalStruct {
 
-        void initialize();
-        void calculateWindPressureCoeffs();
+        void initialize(EnergyPlusData &state);
+        void calculateWindPressureCoeffs(EnergyPlusData &state);
 
         Array1D<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
         Array1D_int SplitterNodeNumbers;
-        int AirflowNetworkNumOfExtSurfaces;
+        int AirflowNetworkNumOfExtSurfaces = 0;
         // Inverse matrix
         Array1D<Real64> MA;
         Array1D<Real64> MV;
@@ -295,79 +299,76 @@ namespace AirflowNetworkBalanceManager {
         Array1D<AirflowNetwork::AirflowNetworkNodeReportData> nodeReport;
         Array1D<AirflowNetwork::AirflowNetworkLinkReportData> linkReport1;
 
-        void clear_state() override {
-            OccupantVentilationControl.deallocate();
-            SplitterNodeNumbers.deallocate();
-            AirflowNetworkNumOfExtSurfaces = 0;
-            MA.deallocate();
-            MV.deallocate();
-            IVEC.deallocate();
-            VentilationCtrl = 0;
-            NumOfExhaustFans = 0;
-            NumAirflowNetwork = 0;
-            AirflowNetworkNumOfDetOpenings = 0;
-            AirflowNetworkNumOfSimOpenings = 0;
-            AirflowNetworkNumOfHorOpenings = 0;
-            AirflowNetworkNumOfSurCracks = 0;
-            AirflowNetworkNumOfSurELA = 0;
-            AirflowNetworkNumOfExtNode = 0;
-            AirflowNetworkNumOfOutAirNode = 0;
-            AirflowNetworkNumOfSingleSideZones = 0;
-            DisSysNumOfNodes = 0;
-            DisSysNumOfLeaks = 0;
-            DisSysNumOfELRs = 0;
-            DisSysNumOfDucts = 0;
-            DisSysNumOfDuctViewFactors = 0;
-            DisSysNumOfDampers = 0;
-            DisSysNumOfCVFs = 0;
-            DisSysNumOfDetFans = 0;
-            DisSysNumOfCoils = 0;
-            DisSysNumOfHXs = 0;
-            DisSysNumOfCPDs = 0;
-            DisSysNumOfTermUnits = 0;
-            DisSysNumOfLinks = 0;
-            NumOfExtNodes = 0;
-            IncAng = 0.0;
-            SupplyFanType = 0;
-            MaxOnOffFanRunTimeFraction = 0.0;
-            CurrentEndTimeLast = 0.0;
-            TimeStepSysLast = 0.0;
-            AirflowNetworkNumOfOccuVentCtrls = 0;
-            IntraZoneNumOfNodes = 0;
-            IntraZoneNumOfLinks = 0;
-            IntraZoneNumOfZones = 0;
-            NumOfPressureControllers = 0;
-            NumOfOAFans = 0;
-            NumOfReliefFans = 0;
-            AirflowNetworkGetInputFlag = true;
-            AssignFanAirLoopNumFlag = true;
-            ValidateDistributionSystemFlag = true;
-            FacadeAng = Array1D<Real64>(5);
-            AirflowNetworkZnRpt.deallocate();
-            LoopPartLoadRatio.deallocate();
-            LoopOnOffFanRunTimeFraction.deallocate();
-            LoopOnOffFlag.deallocate();
-            UniqueAirflowNetworkSurfaceName.clear();
-
-            ValidateExhaustFanInputOneTimeFlag = true;
-            initializeOneTimeFlag = true;
-            initializeMyEnvrnFlag = true;
-            CalcAirflowNetworkAirBalanceOneTimeFlag = true;
-            CalcAirflowNetworkAirBalanceErrorsFound = false;
-            UpdateAirflowNetworkMyOneTimeFlag = true;
-            UpdateAirflowNetworkMyOneTimeFlag1 = true;
-
-            exchangeData.deallocate();
-            multiExchangeData.deallocate();
-            linkReport.deallocate();
-            nodeReport.deallocate();
-            linkReport1.deallocate();
+        void clear_state() override
+        {
+            this->OccupantVentilationControl.deallocate();
+            this->SplitterNodeNumbers.deallocate();
+            this->AirflowNetworkNumOfExtSurfaces = 0;
+            this->MA.deallocate();
+            this->MV.deallocate();
+            this->IVEC.deallocate();
+            this->VentilationCtrl = 0;
+            this->NumOfExhaustFans = 0;
+            this->NumAirflowNetwork = 0;
+            this->AirflowNetworkNumOfDetOpenings = 0;
+            this->AirflowNetworkNumOfSimOpenings = 0;
+            this->AirflowNetworkNumOfHorOpenings = 0;
+            this->AirflowNetworkNumOfSurCracks = 0;
+            this->AirflowNetworkNumOfSurELA = 0;
+            this->AirflowNetworkNumOfExtNode = 0;
+            this->AirflowNetworkNumOfOutAirNode = 0;
+            this->AirflowNetworkNumOfSingleSideZones = 0;
+            this->DisSysNumOfNodes = 0;
+            this->DisSysNumOfLeaks = 0;
+            this->DisSysNumOfELRs = 0;
+            this->DisSysNumOfDucts = 0;
+            this->DisSysNumOfDuctViewFactors = 0;
+            this->DisSysNumOfDampers = 0;
+            this->DisSysNumOfCVFs = 0;
+            this->DisSysNumOfDetFans = 0;
+            this->DisSysNumOfCoils = 0;
+            this->DisSysNumOfHXs = 0;
+            this->DisSysNumOfCPDs = 0;
+            this->DisSysNumOfTermUnits = 0;
+            this->DisSysNumOfLinks = 0;
+            this->NumOfExtNodes = 0;
+            this->IncAng = 0.0;
+            this->SupplyFanType = 0;
+            this->MaxOnOffFanRunTimeFraction = 0.0;
+            this->CurrentEndTimeLast = 0.0;
+            this->TimeStepSysLast = 0.0;
+            this->AirflowNetworkNumOfOccuVentCtrls = 0;
+            this->IntraZoneNumOfNodes = 0;
+            this->IntraZoneNumOfLinks = 0;
+            this->IntraZoneNumOfZones = 0;
+            this->NumOfPressureControllers = 0;
+            this->NumOfOAFans = 0;
+            this->NumOfReliefFans = 0;
+            this->AirflowNetworkGetInputFlag = true;
+            this->AssignFanAirLoopNumFlag = true;
+            this->ValidateDistributionSystemFlag = true;
+            this->FacadeAng = Array1D<Real64>(5);
+            this->AirflowNetworkZnRpt.deallocate();
+            this->LoopPartLoadRatio.deallocate();
+            this->LoopOnOffFanRunTimeFraction.deallocate();
+            this->LoopOnOffFlag.deallocate();
+            this->UniqueAirflowNetworkSurfaceName.clear();
+            this->ValidateExhaustFanInputOneTimeFlag = true;
+            this->initializeOneTimeFlag = true;
+            this->initializeMyEnvrnFlag = true;
+            this->CalcAirflowNetworkAirBalanceOneTimeFlag = true;
+            this->CalcAirflowNetworkAirBalanceErrorsFound = false;
+            this->UpdateAirflowNetworkMyOneTimeFlag = true;
+            this->UpdateAirflowNetworkMyOneTimeFlag1 = true;
+            this->exchangeData.deallocate();
+            this->multiExchangeData.deallocate();
+            this->linkReport.deallocate();
+            this->nodeReport.deallocate();
+            this->linkReport1.deallocate();
 
             solver.clear();
         }
     };
-
-    extern AirflowNetworkBalanceManagerData dataAirflowNetworkBalanceManager;
 
 } // namespace EnergyPlus
 

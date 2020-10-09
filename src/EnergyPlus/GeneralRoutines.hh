@@ -57,16 +57,12 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    class IOFiles;
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct ZonePlenumData;
-    class OutputFiles;
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
-    void GeneralRoutines_clear_state();
+void GeneralRoutines_clear_state();
 
 void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,               // the component Name
                        std::string const &CompType,               // Type of component
@@ -118,7 +114,7 @@ void ValidateComponent(std::string const &CompType,    // Component Type (e.g. C
                        std::string const &CallString   // Context of this pair -- for error message
 );
 
-void CalcPassiveExteriorBaffleGap(ConvectionCoefficientsData &dataConvectionCoefficients,
+void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   IOFiles &ioFiles,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,        // Area available for venting the gap [m2]
@@ -162,6 +158,33 @@ void TestAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFoun
 void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound);
 
 void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound, Array2S_int ValRetAPaths);
+
+void CalcComponentSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
+                                       Real64 const TDB2,      // dry-bulb temperature at state 2 {C}
+                                       Real64 const W2,        // humidity ratio at state 2
+                                       Real64 const TDB1,      // dry-bulb temperature at  at state 1 {C}
+                                       Real64 const W1,        // humidity ratio at state 1
+                                       Real64 &SensibleOutput, // sensible output rate (state 2 -> State 1), {W}
+                                       Real64 &LatentOutput,   // latent output rate (state 2 -> State 1), {W}
+                                       Real64 &TotalOutput     // total = sensible + latent putput rate (state 2 -> State 1), {W}
+);
+
+void CalcZoneSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
+                                  Real64 const TDBEquip,  // dry-bulb temperature at equipment outlet {C}
+                                  Real64 const WEquip,    // humidity ratio at equipment outlet
+                                  Real64 const TDBZone,   // dry-bulb temperature at zone air node {C}
+                                  Real64 const WZone,     // humidity ratio at zone air node
+                                  Real64 &SensibleOutput, // sensible output rate (state 2 -> State 1), {W}
+                                  Real64 &LatentOutput,   // latent output rate (state 2 -> State 1), {W}
+                                  Real64 &TotalOutput     // total = sensible + latent putput rate (state 2 -> State 1), {W}
+);
+
+void CalcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
+                            Real64 const TDBEquip, // dry-bulb temperature at equipment outlet {C}
+                            Real64 const TDBZone,  // dry-bulb temperature at zone air node {C}
+                            Real64 const WZone,    // humidity ratio at zone air node
+                            Real64 &SensibleOutput // sensible output rate (state 2 -> State 1), {W}
+);
 
 } // namespace EnergyPlus
 

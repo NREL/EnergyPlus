@@ -61,7 +61,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace UserDefinedComponents {
 
@@ -197,7 +196,7 @@ namespace UserDefinedComponents {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
@@ -205,7 +204,7 @@ namespace UserDefinedComponents {
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, int LoopNum, Real64 MyLoad);
+        void initialize(EnergyPlusData &state, int LoopNum, Real64 MyLoad);
 
         void report(int LoopNum);
     };
@@ -231,7 +230,7 @@ namespace UserDefinedComponents {
         {
         }
 
-        void initialize(BranchInputManagerData &dataBranchInputManager);
+        void initialize(EnergyPlusData &state);
 
         void report();
     };
@@ -263,7 +262,7 @@ namespace UserDefinedComponents {
         {
         }
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, int ZoneNum);
+        void initialize(EnergyPlusData &state, int ZoneNum);
 
         void report();
     };
@@ -297,7 +296,7 @@ namespace UserDefinedComponents {
         {
         }
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, int ZoneNum);
+        void initialize(EnergyPlusData &state, int ZoneNum);
 
         void report();
     };
@@ -328,17 +327,17 @@ namespace UserDefinedComponents {
     void SimAirTerminalUserDefined(EnergyPlusData &state,
                                    std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
 
-    void GetUserDefinedPlantComponents();
+    void GetUserDefinedPlantComponents(EnergyPlusData &state);
 
-    void GetUserDefinedComponents();
+    void GetUserDefinedComponents(EnergyPlusData &state);
 
-    void GetUserDefinedCoilIndex(std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject);
-
-    void
-    GetUserDefinedCoilAirInletNode(std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void GetUserDefinedCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
     void
-    GetUserDefinedCoilAirOutletNode(std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    GetUserDefinedCoilAirInletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+
+    void
+    GetUserDefinedCoilAirOutletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
 } // namespace UserDefinedComponents
 

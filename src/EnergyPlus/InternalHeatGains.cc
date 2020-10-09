@@ -187,7 +187,7 @@ namespace InternalHeatGains {
         if (ZoneSizingCalc) GatherComponentLoadsIntGain();
     }
 
-    void GetInternalHeatGainsInput(EnergyPlus::EnergyPlusData &state)
+    void GetInternalHeatGainsInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1532,7 +1532,7 @@ namespace InternalHeatGains {
 
                     if (AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator(
-                            "Lights", Lights(Loop).Name, "Electric Power Level", "[W]", Lights(Loop).EMSLightsOn, Lights(Loop).EMSLightingPower);
+                            "Lights", Lights(Loop).Name, "Electricity Rate", "[W]", Lights(Loop).EMSLightsOn, Lights(Loop).EMSLightingPower);
                         SetupEMSInternalVariable("Lighting Power Design Level", Lights(Loop).Name, "[W]", Lights(Loop).DesignLevel);
                     } // EMS
                     // setup internal gains
@@ -1956,7 +1956,7 @@ namespace InternalHeatGains {
                     if (AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator("ElectricEquipment",
                                          ZoneElectric(Loop).Name,
-                                         "Electric Power Level",
+                                         "Electricity Rate",
                                          "[W]",
                                          ZoneElectric(Loop).EMSZoneEquipOverrideOn,
                                          ZoneElectric(Loop).EMSEquipPower);
@@ -2352,7 +2352,7 @@ namespace InternalHeatGains {
                     if (AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator("GasEquipment",
                                          ZoneGas(Loop).Name,
-                                         "Gas Power Level",
+                                         "NaturalGas Rate",
                                          "[W]",
                                          ZoneGas(Loop).EMSZoneEquipOverrideOn,
                                          ZoneGas(Loop).EMSEquipPower);
@@ -3747,21 +3747,21 @@ namespace InternalHeatGains {
                 bool hasReturnApproachTemp = !lNumericFieldBlanks(11);
 
                 // Performance curves
-                ZoneITEq(Loop).CPUPowerFLTCurve = GetCurveIndex(AlphaName(7));
+                ZoneITEq(Loop).CPUPowerFLTCurve = GetCurveIndex(state, AlphaName(7));
                 if (ZoneITEq(Loop).CPUPowerFLTCurve == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
                     ShowContinueError("Invalid " + cAlphaFieldNames(7) + '=' + AlphaName(7));
                     ErrorsFound = true;
                 }
 
-                ZoneITEq(Loop).AirFlowFLTCurve = GetCurveIndex(AlphaName(8));
+                ZoneITEq(Loop).AirFlowFLTCurve = GetCurveIndex(state, AlphaName(8));
                 if (ZoneITEq(Loop).AirFlowFLTCurve == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
                     ShowContinueError("Invalid " + cAlphaFieldNames(8) + '=' + AlphaName(8));
                     ErrorsFound = true;
                 }
 
-                ZoneITEq(Loop).FanPowerFFCurve = GetCurveIndex(AlphaName(9));
+                ZoneITEq(Loop).FanPowerFFCurve = GetCurveIndex(state, AlphaName(9));
                 if (ZoneITEq(Loop).FanPowerFFCurve == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
                     ShowContinueError("Invalid " + cAlphaFieldNames(9) + '=' + AlphaName(9));
@@ -3770,7 +3770,7 @@ namespace InternalHeatGains {
 
                 if (!lAlphaFieldBlanks(15)) {
                     // If this field isn't blank, it must point to a valid curve
-                    ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(AlphaName(15));
+                    ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(state, AlphaName(15));
                     if (ZoneITEq(Loop).RecircFLTCurve == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
                         ShowContinueError("Invalid " + cAlphaFieldNames(15) + '=' + AlphaName(15));
@@ -3783,7 +3783,7 @@ namespace InternalHeatGains {
 
                 if (!lAlphaFieldBlanks(16)) {
                     // If this field isn't blank, it must point to a valid curve
-                    ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(AlphaName(16));
+                    ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(state, AlphaName(16));
                     if (ZoneITEq(Loop).UPSEfficFPLRCurve == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
                         ShowContinueError("Invalid " + cAlphaFieldNames(16) + '=' + AlphaName(16));
@@ -5180,9 +5180,7 @@ namespace InternalHeatGains {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ActivityLevel_WperPerson; // Units on Activity Level (Schedule)
         Real64 NumberOccupants;          // Number of occupants
-        int SurfNum;                     // DO loop counter for surfaces
         int Loop;
-        int NZ;
         Real64 Q;                  // , QR
         Real64 TotalPeopleGain;    // Total heat gain from people (intermediate calculational variable)
         Real64 SensiblePeopleGain; // Sensible heat gain from people (intermediate calculational variable)
@@ -5264,7 +5262,7 @@ namespace InternalHeatGains {
         //       at 30F were assumed in order to give reasonable values beyond
         //       The reported temperature range.
         for (Loop = 1; Loop <= TotPeople; ++Loop) {
-            NZ = People(Loop).ZonePtr;
+            int NZ = People(Loop).ZonePtr;
             NumberOccupants = People(Loop).NumberOfPeople * GetCurrentScheduleValue(People(Loop).NumberOfPeoplePtr);
             if (People(Loop).EMSPeopleOn) NumberOccupants = People(Loop).EMSNumberOfPeople;
 
@@ -5319,7 +5317,7 @@ namespace InternalHeatGains {
         }
 
         for (Loop = 1; Loop <= TotLights; ++Loop) {
-            NZ = Lights(Loop).ZonePtr;
+            int NZ = Lights(Loop).ZonePtr;
             Q = Lights(Loop).DesignLevel * GetCurrentScheduleValue(Lights(Loop).SchedPtr);
 
             if (ZoneDaylight(NZ).DaylightMethod == SplitFluxDaylighting || ZoneDaylight(NZ).DaylightMethod == DElightDaylighting) {
@@ -5344,7 +5342,7 @@ namespace InternalHeatGains {
                     int retNum = Lights(Loop).ZoneReturnNum;
                     int ReturnZonePlenumCondNum = ZoneEquipConfig(NZ).ReturnNodePlenumNum(retNum);
                     if (ReturnZonePlenumCondNum > 0) {
-                        ReturnPlenumTemp = state.dataZonePlenum.ZoneRetPlenCond(ReturnZonePlenumCondNum).ZoneTemp;
+                        ReturnPlenumTemp = state.dataZonePlenum->ZoneRetPlenCond(ReturnZonePlenumCondNum).ZoneTemp;
                         FractionReturnAir =
                             Lights(Loop).FractionReturnAirPlenTempCoeff1 - Lights(Loop).FractionReturnAirPlenTempCoeff2 * ReturnPlenumTemp;
                         FractionReturnAir = max(0.0, min(1.0, FractionReturnAir));
@@ -5393,7 +5391,7 @@ namespace InternalHeatGains {
             ZoneElectric(Loop).LostRate = Q * ZoneElectric(Loop).FractionLost;
             ZoneElectric(Loop).TotGainRate = Q - ZoneElectric(Loop).LostRate;
 
-            NZ = ZoneElectric(Loop).ZonePtr;
+            int NZ = ZoneElectric(Loop).ZonePtr;
             ZnRpt(NZ).ElecPower += ZoneElectric(Loop).Power;
             ZoneIntGain(NZ).QEERAD += ZoneElectric(Loop).RadGainRate;
             ZoneIntGain(NZ).QEECON += ZoneElectric(Loop).ConGainRate;
@@ -5415,7 +5413,7 @@ namespace InternalHeatGains {
             ZoneGas(Loop).TotGainRate = Q - ZoneGas(Loop).LostRate;
             ZoneGas(Loop).CO2GainRate = Q * ZoneGas(Loop).CO2RateFactor;
 
-            NZ = ZoneGas(Loop).ZonePtr;
+            int NZ = ZoneGas(Loop).ZonePtr;
             ZnRpt(NZ).GasPower += ZoneGas(Loop).Power;
             ZoneIntGain(NZ).QGERAD += ZoneGas(Loop).RadGainRate;
             ZoneIntGain(NZ).QGECON += ZoneGas(Loop).ConGainRate;
@@ -5436,7 +5434,7 @@ namespace InternalHeatGains {
             ZoneOtherEq(Loop).LostRate = Q * ZoneOtherEq(Loop).FractionLost;
             ZoneOtherEq(Loop).TotGainRate = Q - ZoneOtherEq(Loop).LostRate;
 
-            NZ = ZoneOtherEq(Loop).ZonePtr;
+            int NZ = ZoneOtherEq(Loop).ZonePtr;
             ZoneIntGain(NZ).QOERAD += ZoneOtherEq(Loop).RadGainRate;
             ZoneIntGain(NZ).QOECON += ZoneOtherEq(Loop).ConGainRate;
             ZoneIntGain(NZ).QOELAT += ZoneOtherEq(Loop).LatGainRate;
@@ -5456,7 +5454,7 @@ namespace InternalHeatGains {
             ZoneHWEq(Loop).LostRate = Q * ZoneHWEq(Loop).FractionLost;
             ZoneHWEq(Loop).TotGainRate = Q - ZoneHWEq(Loop).LostRate;
 
-            NZ = ZoneHWEq(Loop).ZonePtr;
+            int NZ = ZoneHWEq(Loop).ZonePtr;
             ZnRpt(NZ).HWPower += ZoneHWEq(Loop).Power;
             ZoneIntGain(NZ).QHWRAD += ZoneHWEq(Loop).RadGainRate;
             ZoneIntGain(NZ).QHWCON += ZoneHWEq(Loop).ConGainRate;
@@ -5477,7 +5475,7 @@ namespace InternalHeatGains {
             ZoneSteamEq(Loop).LostRate = Q * ZoneSteamEq(Loop).FractionLost;
             ZoneSteamEq(Loop).TotGainRate = Q - ZoneSteamEq(Loop).LostRate;
 
-            NZ = ZoneSteamEq(Loop).ZonePtr;
+            int NZ = ZoneSteamEq(Loop).ZonePtr;
             ZnRpt(NZ).SteamPower += ZoneSteamEq(Loop).Power;
             ZoneIntGain(NZ).QSERAD += ZoneSteamEq(Loop).RadGainRate;
             ZoneIntGain(NZ).QSECON += ZoneSteamEq(Loop).ConGainRate;
@@ -5486,7 +5484,7 @@ namespace InternalHeatGains {
         }
 
         for (Loop = 1; Loop <= TotBBHeat; ++Loop) {
-            NZ = ZoneBBHeat(Loop).ZonePtr;
+            int NZ = ZoneBBHeat(Loop).ZonePtr;
             if (Zone(NZ).OutDryBulbTemp >= ZoneBBHeat(Loop).HighTemperature) {
                 Q = 0.0;
             } else if (Zone(NZ).OutDryBulbTemp > ZoneBBHeat(Loop).LowTemperature) {
@@ -5514,16 +5512,16 @@ namespace InternalHeatGains {
         }
 
         for (Loop = 1; Loop <= TotCO2Gen; ++Loop) {
-            NZ = ZoneCO2Gen(Loop).ZonePtr;
+            int NZ = ZoneCO2Gen(Loop).ZonePtr;
             ZoneCO2Gen(Loop).CO2GainRate = ZoneCO2Gen(Loop).CO2DesignRate * GetCurrentScheduleValue(ZoneCO2Gen(Loop).SchedPtr);
             ZnRpt(NZ).CO2Rate += ZoneCO2Gen(Loop).CO2GainRate;
         }
 
-        if (NumZoneITEqStatements > 0) CalcZoneITEq();
+        if (NumZoneITEqStatements > 0) CalcZoneITEq(state);
 
         CalcWaterThermalTankZoneGains(state);
         PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
-        CalcWaterUseZoneGains(state.dataWaterUse);
+        CalcWaterUseZoneGains(state);
         FigureFuelCellZoneGains();
         FigureMicroCHPZoneGains();
         initializeElectricPowerServiceZoneGains();
@@ -5533,7 +5531,7 @@ namespace InternalHeatGains {
         // store pointer values to hold generic internal gain values constant for entire timestep
         UpdateInternalGainValues();
 
-        for (NZ = 1; NZ <= NumOfZones; ++NZ) {
+        for (int NZ = 1; NZ <= NumOfZones; ++NZ) {
 
             SumAllInternalLatentGains(NZ, ZoneLatentGain(NZ));
             // Added for hybrid model
@@ -5559,24 +5557,30 @@ namespace InternalHeatGains {
         if (CompLoadReportIsReq) {
             AllocateLoadComponentArrays();
         }
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            int const NZ = Surface(SurfNum).Zone;
-            if (!Surface(SurfNum).HeatTransSurf || NZ == 0) continue; // Skip non-heat transfer surfaces
-            int const radEnclosureNum = Zone(Surface(SurfNum).Zone).RadiantEnclosureNum;
-            if (!doLoadComponentPulseNow) {
-                QRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
-            } else {
-                curQL = QL(radEnclosureNum);
-                // for the loads component report during the special sizing run increase the radiant portion
-                // a small amount to create a "pulse" of heat that is used for the delayed loads
-                adjQL = curQL + DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
-                // ITABSF is the Inside Thermal Absorptance
-                // TMULT is a multiplier for each zone
-                // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
-                QRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
-                // store the magnitude and time of the pulse
-                radiantPulseTimestep(CurOverallSimDay, NZ) = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
-                radiantPulseReceived(CurOverallSimDay, SurfNum) = (adjQL - curQL) * TMULT(radEnclosureNum) * ITABSF(SurfNum) * Surface(SurfNum).Area;
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {// Loop through all surfaces...
+            int const firstSurf = Zone(zoneNum).SurfaceFirst;
+            int const lastSurf = Zone(zoneNum).SurfaceLast;
+            if (firstSurf <= 0) continue;
+            for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+                if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+                int const radEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
+                if (!doLoadComponentPulseNow) {
+                    QRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
+                } else {
+                    curQL = QL(radEnclosureNum);
+                    // for the loads component report during the special sizing run increase the radiant portion
+                    // a small amount to create a "pulse" of heat that is used for the delayed loads
+                    adjQL = curQL +
+                            DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
+                    // ITABSF is the Inside Thermal Absorptance
+                    // TMULT is a multiplier for each zone
+                    // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
+                    QRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
+                    // store the magnitude and time of the pulse
+                    radiantPulseTimestep(CurOverallSimDay, zoneNum) = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                    radiantPulseReceived(CurOverallSimDay, SurfNum) =
+                            (adjQL - curQL) * TMULT(radEnclosureNum) * ITABSF(SurfNum) * Surface(SurfNum).Area;
+                }
             }
         }
     }
@@ -5607,7 +5611,7 @@ namespace InternalHeatGains {
         }
     }
 
-    void CalcZoneITEq()
+    void CalcZoneITEq(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5774,7 +5778,7 @@ namespace InternalHeatGains {
                     TSupply = Node(SupplyNodeNum).Temp;
                     WSupply = Node(SupplyNodeNum).HumRat;
                     if (ZoneITEq(Loop).RecircFLTCurve != 0) {
-                        RecircFrac = ZoneITEq(Loop).DesignRecircFrac * CurveValue(ZoneITEq(Loop).RecircFLTCurve, CPULoadSchedFrac, TSupply);
+                        RecircFrac = ZoneITEq(Loop).DesignRecircFrac * CurveValue(state, ZoneITEq(Loop).RecircFLTCurve, CPULoadSchedFrac, TSupply);
                     } else {
                         RecircFrac = ZoneITEq(Loop).DesignRecircFrac;
                     }
@@ -5815,20 +5819,20 @@ namespace InternalHeatGains {
             }
 
             CPUPower =
-                max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
+                max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(state, ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
             ZoneITEq(Loop).CPUPowerAtDesign =
-                max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
+                max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(state, ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
 
-            AirVolFlowFrac = max(CurveValue(ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
+            AirVolFlowFrac = max(CurveValue(state, ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
             AirVolFlowRate = ZoneITEq(Loop).DesignAirVolFlowRate * OperSchedFrac * AirVolFlowFrac;
             if (AirVolFlowRate < SmallAirVolFlow) {
                 AirVolFlowRate = 0.0;
             }
-            AirVolFlowFracDesignT = max(CurveValue(ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
+            AirVolFlowFracDesignT = max(CurveValue(state, ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
 
-            FanPower = max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFrac), 0.0);
+            FanPower = max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveValue(state, ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFrac), 0.0);
             ZoneITEq(Loop).FanPowerAtDesign =
-                max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFracDesignT), 0.0);
+                max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveValue(state, ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFracDesignT), 0.0);
 
             // Calculate UPS net power input (power in less power to ITEquip) and UPS heat gain to zone
             if (ZoneITEq(Loop).DesignTotalPower > 0.0) {
@@ -5838,7 +5842,7 @@ namespace InternalHeatGains {
             }
             if (ZoneITEq(Loop).UPSEfficFPLRCurve != 0) {
                 UPSPower = (CPUPower + FanPower) *
-                           max((1.0 - ZoneITEq(Loop).DesignUPSEfficiency * CurveValue(ZoneITEq(Loop).UPSEfficFPLRCurve, UPSPartLoadRatio)), 0.0);
+                           max((1.0 - ZoneITEq(Loop).DesignUPSEfficiency * CurveValue(state, ZoneITEq(Loop).UPSEfficFPLRCurve, UPSPartLoadRatio)), 0.0);
             } else {
                 UPSPower = (CPUPower + FanPower) * max((1.0 - ZoneITEq(Loop).DesignUPSEfficiency), 0.0);
             }

@@ -59,7 +59,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace PoweredInductionUnits {
 
@@ -168,7 +167,7 @@ namespace PoweredInductionUnits {
         {
         }
 
-        void CalcOutdoorAirVolumeFlowRate();
+        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
     };
 
     // Object Data
@@ -187,12 +186,12 @@ namespace PoweredInductionUnits {
 
     void GetPIUs(EnergyPlusData &state);
 
-    void InitPIU(BranchInputManagerData &dataBranchInputManager,
+    void InitPIU(EnergyPlusData &state,
                  int const PIUNum,             // number of the current fan coil unit being simulated
                  bool const FirstHVACIteration // TRUE if first zone equip this HVAC step
     );
 
-    void SizePIU(int const PIUNum);
+    void SizePIU(EnergyPlusData &state, int const PIUNum);
 
     void CalcSeriesPIU(EnergyPlusData &state, int const PIUNum,             // number of the current PIU being simulated
                        int const ZoneNum,            // number of zone being served
@@ -206,7 +205,7 @@ namespace PoweredInductionUnits {
                          bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void ReportPIU(int const PIUNum); // number of the current fan coil unit being simulated
+    void ReportPIU(EnergyPlusData &state, int const PIUNum); // number of the current fan coil unit being simulated
 
     // ===================== Utilities =====================================
 

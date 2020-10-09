@@ -78,7 +78,7 @@ namespace DisplacementVentMgr {
 
     void clear_state();
 
-    void ManageUCSDDVModel(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum); // index number for the specified zone
+    void ManageUCSDDVModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
     //**************************************************************************************************
 
@@ -86,7 +86,7 @@ namespace DisplacementVentMgr {
 
     //**************************************************************************************************
 
-    void HcUCSDDV(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum, Real64 const FractionHeight);
+    void HcUCSDDV(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight);
 
     //**************************************************************************************************
 
@@ -100,7 +100,7 @@ namespace DisplacementVentMgr {
                                                Real64 zoneMultiplier,
                                                Real64 airCap);
 
-    void CalcUCSDDV(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum); // Which Zonenum
+    void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum); // Which Zonenum
 
 } // namespace DisplacementVentMgr
 

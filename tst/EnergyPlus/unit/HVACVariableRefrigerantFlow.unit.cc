@@ -195,22 +195,22 @@ protected:
         DataSizing::NumSysSizInput = 1;
         DataSizing::SysSizInput.allocate(1);
         DataSizing::SysSizInput(1).AirLoopNum = 1;
-        CurveManager::NumCurves = 10;
-        CurveManager::PerfCurve.allocate(10);
-        CurveManager::PerfCurve(1).InterpolationType = EvaluateCurveToLimits;
-        CurveManager::PerfCurve(1).CurveType = CurveManager::Linear;
-        CurveManager::PerfCurve(1).Coeff1 = 1.0;
-        CurveManager::PerfCurve(1).CurveMax = 1.0;
-        CurveManager::PerfCurve(2).InterpolationType = EvaluateCurveToLimits;
-        CurveManager::PerfCurve(2).CurveType = CurveManager::Linear;
-        CurveManager::PerfCurve(2).Coeff1 = 1.0;
-        CurveManager::PerfCurve(2).CurveMax = 1.0;
+        state.dataCurveManager->NumCurves = 10;
+        state.dataCurveManager->PerfCurve.allocate(10);
+        state.dataCurveManager->PerfCurve(1).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+        state.dataCurveManager->PerfCurve(1).CurveType = CurveTypeEnum::Linear;
+        state.dataCurveManager->PerfCurve(1).Coeff1 = 1.0;
+        state.dataCurveManager->PerfCurve(1).CurveMax = 1.0;
+        state.dataCurveManager->PerfCurve(2).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+        state.dataCurveManager->PerfCurve(2).CurveType = CurveTypeEnum::Linear;
+        state.dataCurveManager->PerfCurve(2).Coeff1 = 1.0;
+        state.dataCurveManager->PerfCurve(2).CurveMax = 1.0;
 
         int NumAirLoops = DataHVACGlobals::NumPrimaryAirSys = 1; // allocate to 1 air loop and adjust/resize as needed
         DataAirSystems::PrimaryAirSystem.allocate(NumAirLoops);
         int thisAirLoop = 1;
         DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch.allocate(1);
-        DataAirLoop::AirLoopControlInfo.allocate(1);
+        state.dataAirLoop->AirLoopControlInfo.allocate(1);
 
         ZoneSysEnergyDemand.allocate(numZones);
 
@@ -555,7 +555,7 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToCoolSP = 0.0;
     ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToHeatSP = 0.0;
 
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
 
     Node(VRF(curSysNum).CondenserNodeNum).Temp = 35.0;
 
@@ -2254,7 +2254,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
     // Read in IDF
     ProcessScheduleInput(state.files);                    // read schedules
-    CurveManager::GetCurveInput();             // read curves
+    CurveManager::GetCurveInput(state);             // read curves
     FluidProperties::GetFluidPropertiesData(); // read refrigerant properties
 
     // set up ZoneEquipConfig data
@@ -2330,7 +2330,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         DataEnvironment::OutDryBulbTemp = 10.35;
 
         // Run
-        VRF(VRFCond).VRFHR_OU_HR_Mode(h_IU_evap_in,
+        VRF(VRFCond).VRFHR_OU_HR_Mode(state,
+                                      h_IU_evap_in,
                                       h_comp_out,
                                       Q_c_TU_PL,
                                       Q_h_TU_PL,
@@ -2397,7 +2398,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Real64 CompSpdActual;               // Actual compressor running speed [rps]
 
     // Run
-    VRF(VRFCond).VRFOU_CompSpd(Q_req, FlagEvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
+    VRF(VRFCond).VRFOU_CompSpd(state, Q_req, FlagEvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
     // Test
     EXPECT_NEAR(1295, CompSpdActual, 5);
@@ -2415,7 +2416,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Real64 CompSpdActual;               // Actual compressor running speed [rps]
 
     // Run
-    VRF(VRFCond).VRFOU_CompSpd(Q_req, FlagCondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
+    VRF(VRFCond).VRFOU_CompSpd(state, Q_req, FlagCondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
     // Test
     EXPECT_NEAR(950, CompSpdActual, 5);
@@ -2437,7 +2438,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Real64 Ncomp;                       // Compressor power [W]
 
     // Run
-    VRF(VRFCond).VRFOU_CompCap(CompSpdActual, T_suction, T_discharge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp);
+    VRF(VRFCond).VRFOU_CompCap(state, CompSpdActual, T_suction, T_discharge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp);
 
     // Test
     EXPECT_NEAR(6990, Q_c_tot, 10);
@@ -2465,7 +2466,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Real64 CompSpdActual;               // Actual compressor running speed [rps]
 
     // Run
-    VRF(VRFCond).VRFOU_CalcCompH(
+    VRF(VRFCond).VRFOU_CalcCompH(state,
         TU_load, T_suction, T_discharge, Pipe_h_out_ave, IUMaxCondTemp, MinOutdoorUnitTe, Tfs, Pipe_Q, OUEvapHeatExtract, CompSpdActual, Ncomp);
 
     // Test
@@ -2732,8 +2733,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     Array1D<Real64> Par;
 
     // Allocate
-    NumCurves = 1; // CurveManager::NumCurves
-    PerfCurve.allocate(NumCurves);
+    state.dataCurveManager->NumCurves = 1; // CurveManager::NumCurves
+    state.dataCurveManager->PerfCurve.allocate(state.dataCurveManager->NumCurves);
 
     NumPar = 3;
     Par.allocate(NumPar);
@@ -2744,26 +2745,26 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     Par(3) = CurveNum;
 
     // Inputs: parameters
-    PerfCurve(CurveNum).CurveType = CurveManager::BiQuadratic;
-    PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
-    PerfCurve(CurveNum).Coeff1 = 724.71125;  // Coefficient1 Constant
-    PerfCurve(CurveNum).Coeff2 = -21.867868; // Coefficient2 x
-    PerfCurve(CurveNum).Coeff3 = 0.52480042; // Coefficient3 x**2
-    PerfCurve(CurveNum).Coeff4 = -17.043566; // Coefficient4 y
-    PerfCurve(CurveNum).Coeff5 = -.40346383; // Coefficient5 y**2
-    PerfCurve(CurveNum).Coeff6 = 0.29573589; // Coefficient6 x*y
-    PerfCurve(CurveNum).Var1Min = 15;        // Minimum Value of x
-    PerfCurve(CurveNum).Var1Max = 65;        // Maximum Value of x
-    PerfCurve(CurveNum).Var2Min = -30;       // Minimum Value of y
-    PerfCurve(CurveNum).Var2Max = 15;        // Maximum Value of y
+    state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
+    state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = 724.71125;  // Coefficient1 Constant
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = -21.867868; // Coefficient2 x
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.52480042; // Coefficient3 x**2
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = -17.043566; // Coefficient4 y
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = -.40346383; // Coefficient5 y**2
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.29573589; // Coefficient6 x*y
+    state.dataCurveManager->PerfCurve(CurveNum).Var1Min = 15;        // Minimum Value of x
+    state.dataCurveManager->PerfCurve(CurveNum).Var1Max = 65;        // Maximum Value of x
+    state.dataCurveManager->PerfCurve(CurveNum).Var2Min = -30;       // Minimum Value of y
+    state.dataCurveManager->PerfCurve(CurveNum).Var2Max = 15;        // Maximum Value of y
 
     // Run and Check
-    double CompResidual = HVACVariableRefrigerantFlow::CompResidual_FluidTCtrl(Te, Par);
+    double CompResidual = HVACVariableRefrigerantFlow::CompResidual_FluidTCtrl(state, Te, Par);
     EXPECT_NEAR(1.652, CompResidual, 0.005);
 
     // Clean up
-    PerfCurve.deallocate();
+    state.dataCurveManager->PerfCurve.deallocate();
     Par.deallocate();
 }
 
@@ -3719,7 +3720,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     ZoneSysEnergyDemand.allocate(1);
 
     ProcessScheduleInput(state.files);   // read schedules
-    GetCurveInput();          // read curves
+    GetCurveInput(state);          // read curves
     GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
@@ -3736,7 +3737,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0; // set load = 0
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0;
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
 
     FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
     FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
@@ -3757,7 +3758,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     int OAUnitNum = 0;
     Real64 OAUCoilOutTemp = 0.0;
     bool ZoneEquipment = true;
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
 
     SimulateVRF(state,
                 VRFTU(VRFTUNum).Name,
@@ -3824,13 +3825,13 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     Real64 InputPowerMultiplier = 0.90 - 36.45 * OutdoorCoildw;
     // setup curve results
     Real64 InletAirDryBulbC = DXCoils::DXCoilHeatInletAirDBTemp(DXHeatingCoilIndex); // load weighted average but only 1 coil here
-    Real64 OATatHeatCapBoundary = CurveValue(VRF(VRFCond).HeatBoundaryCurvePtr, InletAirDryBulbC);
-    Real64 OATatHeatEIRBoundary = CurveValue(VRF(VRFCond).EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
-    Real64 TotHeatCapTempModFacLo = CurveValue(VRF(VRFCond).HeatCapFT, InletAirDryBulbC, outWB);
-    Real64 TotHeatEIRTempModFacLo = CurveValue(VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, outWB);
-    Real64 TotHeatCapTempModFacHi = CurveValue(VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, outWB);
-    Real64 TotHeatEIRTempModFacHi = CurveValue(VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, outWB);
-    Real64 EIRFPLRModFac = CurveValue(VRF(VRFCond).HeatEIRFPLR1, max(VRF(VRFCond).MinPLR, VRF(VRFCond).VRFCondPLR));
+    Real64 OATatHeatCapBoundary = CurveValue(state, VRF(VRFCond).HeatBoundaryCurvePtr, InletAirDryBulbC);
+    Real64 OATatHeatEIRBoundary = CurveValue(state, VRF(VRFCond).EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
+    Real64 TotHeatCapTempModFacLo = CurveValue(state, VRF(VRFCond).HeatCapFT, InletAirDryBulbC, outWB);
+    Real64 TotHeatEIRTempModFacLo = CurveValue(state, VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, outWB);
+    Real64 TotHeatCapTempModFacHi = CurveValue(state, VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, outWB);
+    Real64 TotHeatEIRTempModFacHi = CurveValue(state, VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, outWB);
+    Real64 EIRFPLRModFac = CurveValue(state, VRF(VRFCond).HeatEIRFPLR1, max(VRF(VRFCond).MinPLR, VRF(VRFCond).VRFCondPLR));
     Real64 TotalCondHeatingCapacityLo =
         VRF(VRFCond).HeatingCapacity * HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacLo * HeatingCapacityMultiplier;
     Real64 ElecHeatingPowerLo =
@@ -3895,13 +3896,13 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     outWB = Node(VRF(VRFCond).CondenserNodeNum).OutAirWetBulb;                // no defrost adjustment to OA WB
     InletAirDryBulbC = DXCoils::DXCoilHeatInletAirDBTemp(DXHeatingCoilIndex); // load weighted average but only 1 coil here
-    OATatHeatCapBoundary = CurveValue(VRF(VRFCond).HeatBoundaryCurvePtr, InletAirDryBulbC);
-    OATatHeatEIRBoundary = CurveValue(VRF(VRFCond).EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
-    TotHeatCapTempModFacLo = CurveValue(VRF(VRFCond).HeatCapFT, InletAirDryBulbC, outWB);
-    TotHeatEIRTempModFacLo = CurveValue(VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, outWB);
-    TotHeatCapTempModFacHi = CurveValue(VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, outWB);
-    TotHeatEIRTempModFacHi = CurveValue(VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, outWB);
-    EIRFPLRModFac = CurveValue(VRF(VRFCond).HeatEIRFPLR1, max(VRF(VRFCond).MinPLR, VRF(VRFCond).VRFCondPLR)); // EIRFPLR1 is used when PLR <= 1
+    OATatHeatCapBoundary = CurveValue(state, VRF(VRFCond).HeatBoundaryCurvePtr, InletAirDryBulbC);
+    OATatHeatEIRBoundary = CurveValue(state, VRF(VRFCond).EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
+    TotHeatCapTempModFacLo = CurveValue(state, VRF(VRFCond).HeatCapFT, InletAirDryBulbC, outWB);
+    TotHeatEIRTempModFacLo = CurveValue(state, VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, outWB);
+    TotHeatCapTempModFacHi = CurveValue(state, VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, outWB);
+    TotHeatEIRTempModFacHi = CurveValue(state, VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, outWB);
+    EIRFPLRModFac = CurveValue(state, VRF(VRFCond).HeatEIRFPLR1, max(VRF(VRFCond).MinPLR, VRF(VRFCond).VRFCondPLR)); // EIRFPLR1 is used when PLR <= 1
     TotalCondHeatingCapacityLo = VRF(VRFCond).HeatingCapacity * HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacLo * HeatingCapacityMultiplier;
     ElecHeatingPowerLo = VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacLo * TotHeatEIRTempModFacLo * EIRFPLRModFac * InputPowerMultiplier;
     TotalCondHeatingCapacityHi = VRF(VRFCond).HeatingCapacity * HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacHi * HeatingCapacityMultiplier;
@@ -3985,12 +3986,12 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     // test that correct performance curve is used (i.e., lo or hi performance curves based on OAT)
     int DXCoolingCoilIndex = 1;
     Real64 InletAirWetBulbC = DXCoils::DXCoilCoolInletAirWBTemp(DXCoolingCoilIndex); // load weighted average but only 1 coil here
-    Real64 OATatCoolCapBoundary = CurveValue(VRF(VRFCond).CoolBoundaryCurvePtr, InletAirWetBulbC);
-    Real64 OATatCoolEIRBoundary = CurveValue(VRF(VRFCond).EIRCoolBoundaryCurvePtr, InletAirWetBulbC);
-    Real64 TotCoolCapTempModFacLo = CurveValue(VRF(VRFCond).CoolCapFT, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
-    Real64 TotCoolEIRTempModFacLo = CurveValue(VRF(VRFCond).CoolEIRFT, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
-    Real64 TotCoolCapTempModFacHi = CurveValue(VRF(VRFCond).CoolCapFTHi, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
-    Real64 TotCoolEIRTempModFacHi = CurveValue(VRF(VRFCond).CoolEIRFTHi, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 OATatCoolCapBoundary = CurveValue(state, VRF(VRFCond).CoolBoundaryCurvePtr, InletAirWetBulbC);
+    Real64 OATatCoolEIRBoundary = CurveValue(state, VRF(VRFCond).EIRCoolBoundaryCurvePtr, InletAirWetBulbC);
+    Real64 TotCoolCapTempModFacLo = CurveValue(state, VRF(VRFCond).CoolCapFT, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotCoolEIRTempModFacLo = CurveValue(state, VRF(VRFCond).CoolEIRFT, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotCoolCapTempModFacHi = CurveValue(state, VRF(VRFCond).CoolCapFTHi, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotCoolEIRTempModFacHi = CurveValue(state, VRF(VRFCond).CoolEIRFTHi, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
     Real64 TotalCondCoolingCapacityLo = VRF(VRFCond).CoolingCapacity * CoolCombinationRatio(VRFCond) * TotCoolCapTempModFacLo;
     Real64 ElecCoolingPowerLo = VRF(VRFCond).RatedCoolingPower * TotCoolCapTempModFacLo * TotCoolEIRTempModFacLo;
     Real64 TotalCondCoolingCapacityHi = VRF(VRFCond).CoolingCapacity * CoolCombinationRatio(VRFCond) * TotCoolCapTempModFacHi;
@@ -4708,7 +4709,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     ZoneSysEnergyDemand.allocate(1);
 
     ProcessScheduleInput(state.files);   // read schedules
-    GetCurveInput();          // read curves
+    GetCurveInput(state);          // read curves
     GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
@@ -4721,7 +4722,8 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     EXPECT_EQ(0, VRFTU(VRFTUNum).IndexToTUInTUList);
 
     // Additional tests for fuel type input
-    EXPECT_EQ(VRF(VRFTUNum).FuelType, FuelTypeElectricity);
+    EXPECT_EQ(VRF(VRFTUNum).FuelType, "Electricity");
+    EXPECT_EQ(VRF(VRFTUNum).FuelTypeNum, DataGlobalConstants::iRT_Electricity);
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
@@ -5563,20 +5565,20 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DummyArray = 0.0;
     ScheduleManager::GetScheduleValuesForDay(1, DummyArray, 58, 3);
 
-    CurveManager::GetCurveInput();                // read curves
+    CurveManager::GetCurveInput(state);                // read curves
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData(state); // read equipment list and connections
 
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
+    BranchInputManager::ManageBranchInput(state);
     // Get plant loop data
     PlantManager::GetPlantLoopData(state);
     PlantManager::GetPlantInput(state);
 
     HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(state, VRFTUNum); // trigger GetVRFInput by calling a mining function
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
 
     Schedule(VRF(VRFCond).SchedPtr).CurrentValue = 1.0;             // enable the VRF condenser
     Schedule(VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
@@ -6435,12 +6437,12 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     DataGlobals::MinutesPerTimeStep = 60;
     DataSizing::ZoneEqSizing.allocate(1);
 
-    CurveManager::GetCurveInput();                // read curves
+    CurveManager::GetCurveInput(state);                // read curves
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData(state); // read equipment list and connections
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
     HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(state, VRFTUNum); // trigger GetVRFInput by calling a mining function
     OutsideAirNode = VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum;       // outside air air inlet node num
@@ -6498,7 +6500,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput();
+    CurveManager::GetCurveInput(state);
 
     int VRFCond = 1;
     VRF.allocate(1);
@@ -6584,7 +6586,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     TerminalUnitList(1).TotalHeatLoad(4) = 0.0;
     TerminalUnitList(1).TotalHeatLoad(5) = 0.0;
 
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
 
     EXPECT_DOUBLE_EQ(VRF(VRFCond).ElecCoolingPower, 0.0);
     EXPECT_DOUBLE_EQ(VRF(VRFCond).ElecHeatingPower, 0.0);
@@ -6618,7 +6620,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     TerminalUnitList(1).TotalCoolLoad(4) = 1000.0;
     TerminalUnitList(1).TotalCoolLoad(5) = 1000.0;
 
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     EXPECT_FALSE(VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
     EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 5000.0);
@@ -6649,7 +6651,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     TerminalUnitList(1).TotalHeatLoad(4) = 1000.0;
     TerminalUnitList(1).TotalHeatLoad(5) = 1000.0;
 
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     EXPECT_FALSE(VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
     EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
@@ -6692,7 +6694,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     // set heat recovery time constant to non-zero value (means mode change will degrade performance)
     VRF(VRFCond).HRHeatCapTC = 0.25; // 15 min exponential rise
     // last operating mode was heating
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     EXPECT_TRUE(VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
     EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
@@ -6721,7 +6723,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 0.75 - CalcVRFCondenser saves last time stamp for use in exponential curve, increment by
                                                            // 1 time step to get same answer
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     EXPECT_TRUE(VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
     EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
@@ -6744,7 +6746,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     LastModeCooling(VRFCond) = false;
     LastModeHeating(VRFCond) = true;
 
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
 
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
 
@@ -6754,7 +6756,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 
     // simulate again and see that power has exponential changed from previous time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.25
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.95021, 0.00001); // will exponentially rise towards 1.0
     EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
@@ -6762,7 +6764,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 
     // simulate again and see that power has exponential changed from previous time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.5
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.98168, 0.00001); // will exponentially rise towards 1.0
     EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
@@ -6770,7 +6772,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 
     // simulate again and see that power has exponential changed from previous time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.75
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 1.0, 0.00001); // will exponentially rise towards 1.0
     EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
@@ -8044,31 +8046,31 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
 
     int CoilNum(1);
     DataLoopNode::Node.allocate(4);
-    WaterCoils::NumWaterCoils = 1;
-    WaterCoils::WaterCoil.allocate(WaterCoils::NumWaterCoils);
-    WaterCoils::WaterCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
-    WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num = WaterCoils::WaterCoil_SimpleHeating;
-    WaterCoils::WaterCoil(CoilNum).WaterCoilModel = WaterCoils::CoilType_Heating;
-    WaterCoils::WaterCoil(CoilNum).WaterCoilType = WaterCoils::CoilType_Heating;
-    WaterCoils::WaterCoil(CoilNum).WaterCoilTypeA = "Heating";
-    WaterCoils::WaterCoil(CoilNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
-    WaterCoils::WaterCoil(CoilNum).WaterLoopNum = 1;
+    state.dataWaterCoils->NumWaterCoils = 1;
+    state.dataWaterCoils->WaterCoil.allocate(state.dataWaterCoils->NumWaterCoils);
+    state.dataWaterCoils->WaterCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
+    state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state.dataWaterCoils->WaterCoil_SimpleHeating;
+    state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state.dataWaterCoils->CoilType_Heating;
+    state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state.dataWaterCoils->CoilType_Heating;
+    state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Heating";
+    state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
 
-    // WaterCoils::WaterCoil(CoilNum).FuelType_Num = DataGlobalConstants::iRT_Natural_Gas;
-    WaterCoils::WaterCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
-    WaterCoils::WaterCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
-    WaterCoils::WaterCoil(CoilNum).WaterInletNodeNum = thisVRFTU.SuppHeatCoilFluidInletNode;
-    WaterCoils::WaterCoil(CoilNum).WaterOutletNodeNum = thisVRFTU.SuppHeatCoilFluidOutletNode;
+    // state.dataWaterCoils->WaterCoil(CoilNum).FuelType_Num = DataGlobalConstants::iRT_Natural_Gas;
+    state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
+    state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
+    state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = thisVRFTU.SuppHeatCoilFluidInletNode;
+    state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = thisVRFTU.SuppHeatCoilFluidOutletNode;
 
-    WaterCoils::WaterCoil(CoilNum).UACoil = 1000;
-    WaterCoils::WaterCoil(CoilNum).MaxWaterVolFlowRate = 0.001;
+    state.dataWaterCoils->WaterCoil(CoilNum).UACoil = 1000;
+    state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = 0.001;
 
-    WaterCoils::GetWaterCoilsInputFlag = false;
+    state.dataWaterCoils->GetWaterCoilsInputFlag = false;
 
-    WaterCoils::WaterCoil(CoilNum).WaterLoopNum = 1;
-    WaterCoils::WaterCoil(CoilNum).WaterLoopSide = 1;
-    WaterCoils::WaterCoil(CoilNum).WaterLoopBranchNum = 1;
-    WaterCoils::WaterCoil(CoilNum).WaterLoopCompNum = 1;
+    state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
+    state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopSide = 1;
+    state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopBranchNum = 1;
+    state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopCompNum = 1;
 
     NumPltSizInput = 1;
     PlantSizData.allocate(NumPltSizInput);
@@ -8093,30 +8095,30 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     PlantLoop(1).Name = "HotWaterLoop";
     PlantLoop(1).FluidName = "WATER";
     PlantLoop(1).FluidIndex = 1;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = WaterCoils::WaterCoil(CoilNum).Name;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = WaterCoils::WaterCoil_SimpleHeating;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = WaterCoils::WaterCoil(1).WaterInletNodeNum;
-    WaterCoils::CheckEquipName.dimension(WaterCoils::NumWaterCoils, true);
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataWaterCoils->WaterCoil(CoilNum).Name;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state.dataWaterCoils->WaterCoil_SimpleHeating;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    state.dataWaterCoils->CheckEquipName.dimension(state.dataWaterCoils->NumWaterCoils, true);
 
-    WaterCoils::MyUAAndFlowCalcFlag.allocate(CoilNum);
-    WaterCoils::MyUAAndFlowCalcFlag(CoilNum) = true;
-    WaterCoils::MySizeFlag.allocate(CoilNum);
-    WaterCoils::MySizeFlag(CoilNum) = true;
+    state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(CoilNum);
+    state.dataWaterCoils->MyUAAndFlowCalcFlag(CoilNum) = true;
+    state.dataWaterCoils->MySizeFlag.allocate(CoilNum);
+    state.dataWaterCoils->MySizeFlag(CoilNum) = true;
 
     DataGlobals::DoingSizing = true;
     SysSizingCalc = true;
     DataEnvironment::OutDryBulbTemp = 5.0;
     // init coil inlet condition
-    DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
-    DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
-    DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
-    DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).AirInletNodeNum).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).AirInletNodeNum).Temp,
-                                   DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).AirInletNodeNum).HumRat);
+    DataLoopNode::Node(state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
+    DataLoopNode::Node(state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
+    DataLoopNode::Node(state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
+    DataLoopNode::Node(state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).Temp,
+                                   DataLoopNode::Node(state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).HumRat);
 
-    DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).WaterInletNodeNum).MassFlowRate = thisVRFTU.SuppHeatCoilFluidMaxFlow;
-    DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).WaterInletNodeNum).MassFlowRateMax = thisVRFTU.SuppHeatCoilFluidMaxFlow;
-    DataLoopNode::Node(WaterCoils::WaterCoil(CoilNum).WaterInletNodeNum).Temp = 60.0;
+    DataLoopNode::Node(state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum).MassFlowRate = thisVRFTU.SuppHeatCoilFluidMaxFlow;
+    DataLoopNode::Node(state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum).MassFlowRateMax = thisVRFTU.SuppHeatCoilFluidMaxFlow;
+    DataLoopNode::Node(state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum).Temp = 60.0;
 
     bool FirstHVACIteration(false);
     Real64 SuppHeatCoilLoad = 10000.0;
@@ -8128,13 +8130,13 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     thisVRFTU.CalcVRFSuppHeatingCoil(state, VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
     // check the coil load delivered
     EXPECT_NEAR(10000.0, SuppHeatCoilLoad, 5.0);
-    EXPECT_NEAR(10000.0, WaterCoils::WaterCoil(CoilNum).TotWaterHeatingCoilRate, 5.0);
+    EXPECT_NEAR(10000.0, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate, 5.0);
     // test larger heating load
     SuppHeatCoilLoad = 12000.0;
     thisVRFTU.CalcVRFSuppHeatingCoil(state, VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
     // delivered heating capacity
     EXPECT_NEAR(12000.0, SuppHeatCoilLoad, 5.0);
-    EXPECT_NEAR(12000.0, WaterCoils::WaterCoil(CoilNum).TotWaterHeatingCoilRate, 5.0);
+    EXPECT_NEAR(12000.0, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate, 5.0);
 }
 
 TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
@@ -10562,7 +10564,7 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -7000.0;
     ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -7000.0;
     ZoneEqSizing.allocate(1);
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
     InitVRF(state, VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
     EXPECT_EQ(QZnReq, -5000.0);
     SimVRF(state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
@@ -11145,7 +11147,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
     ZoneSizingRunDone = true;
     ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
@@ -11156,7 +11158,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
 
     ZoneSysEnergyDemand.allocate(1);
     ProcessScheduleInput(state.files);
-    GetCurveInput();
+    GetCurveInput(state);
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
@@ -11229,7 +11231,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     // check model inputs
     ASSERT_EQ(1, NumVRFCond);
     ASSERT_EQ(1, NumVRFTU);
-    ASSERT_EQ(1, state.fans.NumFans);
+    ASSERT_EQ(1, state.dataFans->NumFans);
     ASSERT_EQ(2, NumDXCoils);
     ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);
     ASSERT_EQ("TU1 VRF DX HEATING COIL", thisDXHeatingCoil.Name);
@@ -11238,9 +11240,9 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     EXPECT_EQ(0.0, thisVRFTU.CoolOutAirMassFlow);
     EXPECT_EQ(0.0, thisVRFTU.HeatOutAirMassFlow);
     EXPECT_EQ(0.0, thisVRFTU.NoCoolHeatOutAirMassFlow);
-    EXPECT_NEAR(5367.7224, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
-    EXPECT_NEAR(4999.6842, thisVRFTU.TotalCoolingRate, 0.0001);
-    EXPECT_NEAR(368.0382, thisFan.FanPower, 0.0001);
+    EXPECT_NEAR(5367.7328, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
+    EXPECT_NEAR(4999.6942, thisVRFTU.TotalCoolingRate, 0.0001);
+    EXPECT_NEAR(368.0386, thisFan.FanPower, 0.0001);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
 }
 
@@ -12876,7 +12878,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
     ZoneSizingRunDone = true;
     ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
@@ -12887,7 +12889,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
 
     ZoneSysEnergyDemand.allocate(1);
     ProcessScheduleInput(state.files);
-    GetCurveInput();
+    GetCurveInput(state);
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
@@ -12962,7 +12964,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     // check model inputs
     ASSERT_EQ(1, NumVRFCond);
     ASSERT_EQ(1, NumVRFTU);
-    ASSERT_EQ(1, state.fans.NumFans);
+    ASSERT_EQ(1, state.dataFans->NumFans);
     ASSERT_EQ(2, NumDXCoils);
     ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);
     ASSERT_EQ("TU1 VRF DX HEATING COIL", thisDXHeatingCoil.Name);
@@ -13042,7 +13044,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput();
+    CurveManager::GetCurveInput(state);
 
     int VRFCond = 1;
     VRF.allocate(1);
@@ -13122,7 +13124,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     TerminalUnitList(1).HRCoolRequest = false;
     TerminalUnitList(1).TotalHeatLoad = 0.0;
     TerminalUnitList(1).HRHeatRequest = false;
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
 
     // increment time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 0.5
@@ -13159,7 +13161,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     VRF(VRFCond).HRHeatCapTC = 0.25; // 15 min exponential rise
     // VRF(VRFCond).HRHeatEIRTC = 0.0; // (default)
     // last operating mode was heating
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     EXPECT_TRUE(VRF(VRFCond).ModeChange);
     EXPECT_FALSE(VRF(VRFCond).HRModeChange);
     EXPECT_EQ(VRF(VRFCond).OperatingMode, 2); // ModeHeatingOnly
@@ -13629,7 +13631,7 @@ TEST_F(EnergyPlusFixture, VRF_BlowthroughFanPlacement_InputTest)
 
     bool ErrorsFound(false);
     ProcessScheduleInput(state.files);
-    GetCurveInput();
+    GetCurveInput(state);
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
@@ -14218,7 +14220,7 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     Real64 maxEIRfLowPLRXInput(0.0);
     bool ErrorsFound(false);
     ProcessScheduleInput(state.files);
-    GetCurveInput();
+    GetCurveInput(state);
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
@@ -14228,12 +14230,12 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_TRUE(ErrorsFound);
     // set pointer to components
     auto &thisVRF(VRF(1));
-    auto &thisCoolEIRFPLR(PerfCurve(thisVRF.CoolEIRFPLR1));
-    auto &thisHeatEIRFPLR(PerfCurve(thisVRF.HeatEIRFPLR1));
+    auto &thisCoolEIRFPLR(state.dataCurveManager->PerfCurve(thisVRF.CoolEIRFPLR1));
+    auto &thisHeatEIRFPLR(state.dataCurveManager->PerfCurve(thisVRF.HeatEIRFPLR1));
     // check user input VRF Minimum PLR
     EXPECT_EQ(0.15, thisVRF.MinPLR);
     // EIRFPLR curve minimum PLR value specified
-    CurveManager::GetCurveMinMaxValues(thisVRF.CoolEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    CurveManager::GetCurveMinMaxValues(state, thisVRF.CoolEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
     EXPECT_EQ(0.25, thisCoolEIRFPLR.Var1Min);
     EXPECT_EQ(0.25, minEIRfLowPLRXInput); // getinput checks this
     EXPECT_EQ(1.00, thisCoolEIRFPLR.Var1Max);
@@ -14241,12 +14243,14 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_GT(thisCoolEIRFPLR.Var1Min, thisVRF.MinPLR); // expect warning message
     minEIRfLowPLRXInput = 0.0;
     maxEIRfLowPLRXInput = 0.0;
-    CurveManager::GetCurveMinMaxValues(thisVRF.HeatEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    CurveManager::GetCurveMinMaxValues(state, thisVRF.HeatEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
     EXPECT_EQ(0.25, thisHeatEIRFPLR.Var1Min);
     EXPECT_EQ(0.25, minEIRfLowPLRXInput); // getinput checks this
     EXPECT_EQ(1.00, thisHeatEIRFPLR.Var1Max);
     EXPECT_EQ(1.00, maxEIRfLowPLRXInput);               // getinput checks this
     EXPECT_GT(thisHeatEIRFPLR.Var1Min, thisVRF.MinPLR); // expect warning message
+    EXPECT_EQ(thisVRF.FuelType, "Electricity"); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
+    EXPECT_EQ(thisVRF.FuelTypeNum, DataGlobalConstants::iRT_Electricity); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
 }
 
 
@@ -14931,12 +14935,12 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     DataGlobals::MinutesPerTimeStep = 60;
     DataSizing::ZoneEqSizing.allocate(1);
 
-    CurveManager::GetCurveInput();                // read curves
+    CurveManager::GetCurveInput(state);                // read curves
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData(state); // read equipment list and connections
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
     HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(state, VRFTUNum);  // trigger GetVRFInput by calling a mining function
     OutsideAirNode = VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum; // outside air air inlet node num

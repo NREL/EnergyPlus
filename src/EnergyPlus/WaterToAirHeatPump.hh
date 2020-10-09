@@ -52,38 +52,16 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 // Forward declarations
-struct BranchInputManagerData;
+struct EnergyPlusData;
 
 namespace WaterToAirHeatPump {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern int const CompressorType_Reciprocating;
-    extern int const CompressorType_Rotary;
-    extern int const CompressorType_Scroll;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // Output Variables Type definition
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumWatertoAirHPs; // The Number of Water to Air Heat Pumps found in the Input
-    extern Array1D_bool CheckEquipName;
-
-    extern int RefrigIndex;        // Refrigerant index
-    extern int WaterIndex;         // Water index
-    extern bool GetCoilsInputFlag; // Flag set to make sure you get input once
-    // Subroutine Specifications for the Module
-
-    void clear_state();
 
     struct WatertoAirHPEquipConditions
     {
@@ -178,12 +156,9 @@ namespace WaterToAirHeatPump {
         }
     };
 
-    // Object Data
-    extern Array1D<WatertoAirHPEquipConditions> WatertoAirHP;
-
     // Functions
 
-    void SimWatertoAirHP(BranchInputManagerData &dataBranchInputManager,
+    void SimWatertoAirHP(EnergyPlusData &state,
                          std::string const &CompName,   // component name
                          int &CompIndex,                // Index for Component name
                          Real64 const DesignAirflow,    // design air flow rate
@@ -199,18 +174,9 @@ namespace WaterToAirHeatPump {
                          int const CompOp,
                          Real64 const PartLoadRatio);
 
-    // Get Input Section of the Module
-    //******************************************************************************
+    void GetWatertoAirHPInput(EnergyPlusData &state);
 
-    void GetWatertoAirHPInput();
-
-    // End of Get Input subroutines for the HB Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
-
-    void InitWatertoAirHP(BranchInputManagerData &dataBranchInputManager,
+    void InitWatertoAirHP(EnergyPlusData &state,
                           int const HPNum, // index to main heat pump data structure
                           bool const InitFlag,
                           Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -221,13 +187,7 @@ namespace WaterToAirHeatPump {
                           Real64 const DesignAirFlow,
                           Real64 const PartLoadRatio);
 
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
-    void CalcWatertoAirHPCooling(int const HPNum,               // heat pump number
+    void CalcWatertoAirHPCooling(EnergyPlusData &state, int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
                                  Real64 const RuntimeFrac,
@@ -240,7 +200,7 @@ namespace WaterToAirHeatPump {
                                        Array1D<Real64> const &Par    // Function parameters
     );
 
-    void CalcWatertoAirHPHeating(int const HPNum,               // heat pump number
+    void CalcWatertoAirHPHeating(EnergyPlusData &state, int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
                                  Real64 const RuntimeFrac,
@@ -249,21 +209,9 @@ namespace WaterToAirHeatPump {
                                  int const CompOp,
                                  Real64 const PartLoadRatio);
 
-    // End Algorithm Section of the Module
-    // *****************************************************************************
+    void UpdateWatertoAirHP(EnergyPlusData &state, int const HPNum);
 
-    // End Algorithm Section of the Module
-    // *****************************************************************************
-
-    // Beginning of Update subroutines for the WatertoAirHP Module
-    // *****************************************************************************
-
-    void UpdateWatertoAirHP(int const HPNum);
-
-    //        End of Update subroutines for the WatertoAirHP Module
-    // *****************************************************************************
-
-    Real64 CalcEffectiveSHR(int const HPNum,         // Index number for cooling coil
+    Real64 CalcEffectiveSHR(EnergyPlusData &state, int const HPNum,         // Index number for cooling coil
                             Real64 const SHRss,      // Steady-state sensible heat ratio
                             int const CyclingScheme, // fan/compressor cycling scheme indicator
                             Real64 const RTF,        // Compressor run-time fraction
@@ -273,32 +221,70 @@ namespace WaterToAirHeatPump {
                             Real64 const EnteringWB  // Entering air wet-bulb temperature
     );
 
-    Real64 DegradF(std::string &FluidName, // Name of glycol used in source side
+    Real64 DegradF(EnergyPlusData &state, std::string &FluidName, // Name of glycol used in source side
                    Real64 &Temp,           // Temperature of the fluid
                    int &FluidIndex         // Index number for the fluid
     );
 
-    int GetCoilIndex(std::string const &CoilType, // must match coil types in this module
+    int GetCoilIndex(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                      std::string const &CoilName, // must match coil names for the coil type
                      bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
 
 } // namespace WaterToAirHeatPump
+
+    struct WaterToAirHeatPumpData : BaseGlobalStruct {
+
+        int const CompressorType_Reciprocating;
+        int const CompressorType_Rotary;
+        int const CompressorType_Scroll;
+
+        int NumWatertoAirHPs; // The Number of Water to Air Heat Pumps found in the Input
+        Array1D_bool CheckEquipName;
+
+        int RefrigIndex;           // Refrigerant index
+        int WaterIndex;            // Water index
+        bool GetCoilsInputFlag; // Flag set to make sure you get input once
+        bool MyOneTimeFlag;
+        bool firstTime;
+
+        Array1D<WaterToAirHeatPump::WatertoAirHPEquipConditions> WatertoAirHP;
+
+        void clear_state() override
+        {
+            this->NumWatertoAirHPs = 0;
+            this->CheckEquipName.clear();
+            this->RefrigIndex = 0;
+            this->WaterIndex = 0;
+            this->GetCoilsInputFlag = true;
+            this->MyOneTimeFlag = true;
+            this->firstTime = true;
+            this->WatertoAirHP.clear();
+        }
+
+        // Default Constructor
+        WaterToAirHeatPumpData()
+            : CompressorType_Reciprocating(1), CompressorType_Rotary(2), CompressorType_Scroll(3),
+              NumWatertoAirHPs(0), RefrigIndex(0), WaterIndex(0), GetCoilsInputFlag(true),
+              MyOneTimeFlag(true), firstTime(true)
+        {
+        }
+    };
 
 } // namespace EnergyPlus
 

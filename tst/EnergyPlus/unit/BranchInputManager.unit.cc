@@ -102,8 +102,8 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
     int IOStat; // Could be used in the Get Routines, not currently checked
 
     if (NumOfBranches > 0) {
-        state.dataBranchInputManager.Branch.allocate(NumOfBranches);
-        for (auto &e : state.dataBranchInputManager.Branch)
+        state.dataBranchInputManager->Branch.allocate(NumOfBranches);
+        for (auto &e : state.dataBranchInputManager->Branch)
             e.AssignedLoopName.clear();
         inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNumbers);
         NodeNums.dimension(NumParams, 0);
@@ -121,7 +121,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
                                           cAlphaFields, cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(Alphas(1), state.dataBranchInputManager.Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(Alphas(1), state.dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
                 if (IsBlank) {
                     continue;
@@ -131,7 +131,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
             }
             ++BCount;
 
-            GetSingleBranchInput(state.dataBranchInputManager, RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
+            GetSingleBranchInput(state, RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
         }
 
         EXPECT_EQ(NumOfBranches, 1);
@@ -258,8 +258,8 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
     int IOStat; // Could be used in the Get Routines, not currently checked
 
     if (NumOfBranches > 0) {
-        state.dataBranchInputManager.Branch.allocate(NumOfBranches);
-        for (auto &e : state.dataBranchInputManager.Branch)
+        state.dataBranchInputManager->Branch.allocate(NumOfBranches);
+        for (auto &e : state.dataBranchInputManager->Branch)
             e.AssignedLoopName.clear();
         inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNumbers);
         NodeNums.dimension(NumParams, 0);
@@ -277,7 +277,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
                                           cAlphaFields, cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(Alphas(1), state.dataBranchInputManager.Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            UtilityRoutines::VerifyName(Alphas(1), state.dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
                 if (IsBlank) {
                     continue;
@@ -287,7 +287,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
             }
             ++BCount;
 
-            GetSingleBranchInput(state.dataBranchInputManager, RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
+            GetSingleBranchInput(state, RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
         }
 
         EXPECT_EQ(NumOfBranches, 1);
@@ -460,7 +460,7 @@ TEST_F(EnergyPlusFixture, BranchInputManager_GetAirBranchIndex)
     CompType = "AIRLOOPHVAC:OUTDOORAIRSYSTEM";
     CompName = "DOAS OA SYSTEM";
 
-    BranchIndex = GetAirBranchIndex(state.dataBranchInputManager, CompType, CompName);
+    BranchIndex = GetAirBranchIndex(state, CompType, CompName);
 
     EXPECT_EQ(1, BranchIndex);
 
@@ -468,7 +468,7 @@ TEST_F(EnergyPlusFixture, BranchInputManager_GetAirBranchIndex)
     CompType = "PIPE:ADIABATIC";
     CompName = "TOWERWATERSYS DEMAND BYPASS PIPE";
 
-    BranchIndex = GetAirBranchIndex(state.dataBranchInputManager, CompType, CompName);
+    BranchIndex = GetAirBranchIndex(state, CompType, CompName);
 
     EXPECT_EQ(2, BranchIndex);
 
@@ -476,7 +476,7 @@ TEST_F(EnergyPlusFixture, BranchInputManager_GetAirBranchIndex)
     CompType = "PIPE:ADIABATIC";
     CompName = "TOWERWATERSYS DEMAND BYPASS PIPE NOT THERE";
 
-    BranchIndex = GetAirBranchIndex(state.dataBranchInputManager, CompType, CompName);
+    BranchIndex = GetAirBranchIndex(state, CompType, CompName);
 
     EXPECT_EQ(0, BranchIndex);
 }

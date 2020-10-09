@@ -91,40 +91,13 @@ namespace DataHVACGlobals {
     extern int const NumOfSizingTypes; // request sizing for cooling air flow rate
 
     extern int const CoolingAirflowSizing;                              // request sizing for cooling air flow rate
-    extern int const CoolingWaterflowSizing;                            // request sizing for cooling coil water flow rate
-    extern int const HeatingWaterflowSizing;                            // request sizing for heating coil water flow rate
-    extern int const CoolingWaterDesAirInletTempSizing;                 // request sizing for cooling water coil inlet air temp
-    extern int const CoolingWaterDesAirInletHumRatSizing;               // request sizing for cooling water coil inlet air humidity ratio
     extern int const CoolingWaterDesWaterInletTempSizing;               // request sizing for cooling water coil inlet water temp
-    extern int const CoolingWaterDesAirOutletTempSizing;                // request sizing for cooling water coil outlet air temp
-    extern int const CoolingWaterDesAirOutletHumRatSizing;              // request sizing for cooling water coil outlet air humidity ratio
-    extern int const CoolingWaterNumofTubesPerRowSizing;                // request sizing for cooling water coil number of tubes per row
-    extern int const HeatingWaterDesAirInletTempSizing;                 // request sizing for heating water coil inlet air temp
-    extern int const HeatingWaterDesAirInletHumRatSizing;               // request sizing for heating water coil inlet air humidity ratio
-    extern int const HeatingWaterDesCoilLoadUsedForUASizing;            // request sizing for heating water coil capacity used for UA sizing
-    extern int const HeatingWaterDesCoilWaterVolFlowUsedForUASizing;    // request sizing for heating water coil volume flow rate used for UA sizing
     extern int const HeatingAirflowSizing;                              // request sizing for heating air flow rate
-    extern int const HeatingAirflowUASizing;                            // request sizing for heating air flow rate
     extern int const SystemAirflowSizing;                               // request sizing for system air flow rate
     extern int const CoolingCapacitySizing;                             // request sizing for cooling capacity
     extern int const HeatingCapacitySizing;                             // request sizing for heating capacity
-    extern int const WaterHeatingCapacitySizing;                        // request sizing for heating capacity
-    extern int const WaterHeatingCoilUASizing;                          // request sizing for heating coil UA
     extern int const SystemCapacitySizing;                              // request sizing for system capacity
-    extern int const CoolingSHRSizing;                                  // request sizing for cooling SHR
-    extern int const HeatingDefrostSizing;                              // request sizing for heating defrost capacity
-    extern int const MaxHeaterOutletTempSizing;                         // request sizing for heating coil maximum outlet temperature
     extern int const AutoCalculateSizing;                               // identifies an autocalulate input
-    extern int const ZoneCoolingLoadSizing;                             // zone cooling sensible load (zsz file)
-    extern int const ZoneHeatingLoadSizing;                             // zome heating sensible load (zsz file)
-    extern int const MinSATempCoolingSizing;                            // minimum SA temperature in cooling
-    extern int const MaxSATempHeatingSizing;                            // maximum SA temperature in heating
-    extern int const ASHRAEMinSATCoolingSizing;                         // minimum SA temperature in cooling model when using ASHRAE 90.1 SZVAV method
-    extern int const ASHRAEMaxSATHeatingSizing;                         // maximum SA temperature in heating model when using ASHRAE 90.1 SZVAV method
-    extern int const HeatingCoilDesAirInletTempSizing;                  // design inlet air temperature for heating coil
-    extern int const HeatingCoilDesAirOutletTempSizing;                 // design outlet air temperature for heating coil
-    extern int const HeatingCoilDesAirInletHumRatSizing;                // design inlet air humidity ratio for heating coil
-    extern int const DesiccantDehumidifierBFPerfDataFaceVelocitySizing; // identifies desiccant performance data face velocity autosisizing input
 
     // Condenser Type (using same numbering scheme as for chillers)
     extern int const AirCooled;   // Air-cooled condenser
@@ -229,7 +202,12 @@ namespace DataHVACGlobals {
 
     extern int const CoilVRF_FluidTCtrl_Cooling;
     extern int const CoilVRF_FluidTCtrl_Heating;
-    extern int const CoilDX_SubcoolReheat;
+//    extern int const CoilDX_SubcoolReheat;
+    extern int const CoilDX_CurveFit_Speed;
+
+    extern int const coilNormalMode;        // Normal operation mode
+    extern int const coilEnhancedMode;      // Enhanced operation mode
+    extern int const coilSubcoolReheatMode; // SubcoolReheat operation mode
 
     extern Array1D_string const cAllCoilTypes;
     extern Array1D_string const cCoolingCoilTypes;

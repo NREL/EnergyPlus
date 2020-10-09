@@ -53,8 +53,9 @@
 #include <EnergyPlus/DataHVACSystems.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace UnitarySystems {
 
@@ -196,7 +197,6 @@ namespace UnitarySystems {
         int m_SystemHeatControlNodeNum;
         bool m_CoolCoilExists;
         int m_CoolingCoilType_Num;
-        int m_CoolingCoilSubType_Num;
         int m_NumOfSpeedCooling;
         int m_CoolingCoilAvailSchPtr;
         Real64 m_DesignCoolingCapacity;
@@ -481,11 +481,13 @@ namespace UnitarySystems {
 
         static void getUnitarySystemInput(EnergyPlusData &state, std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
-        static Real64 DOE2DXCoilResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 DOE2DXCoilResidual(EnergyPlusData &state,
+                                         Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                          std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 DOE2DXCoilHumRatResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 DOE2DXCoilHumRatResidual(EnergyPlusData &state,
+                                               Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
@@ -569,7 +571,8 @@ namespace UnitarySystems {
                                                    std::vector<Real64> const &Par // par(1) = CoolWatertoAirHP coil number
         );
 
-        static Real64 DXHeatingCoilResidual(Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 DXHeatingCoilResidual(EnergyPlusData &state,
+                                            Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                             std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
@@ -588,7 +591,7 @@ namespace UnitarySystems {
                                        int const ControlMode       // temperature or humidity control mode
         );
 
-        void reportUnitarySystem(int const AirLoopNum);
+        void reportUnitarySystem(EnergyPlusData &state, int const AirLoopNum);
 
         void unitarySystemHeatRecovery();
 

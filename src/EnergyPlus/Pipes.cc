@@ -121,12 +121,12 @@ namespace Pipes {
         LocalPipeUniqueNames.clear();
     }
 
-    PlantComponent *LocalPipeData::factory(PipesData &pipes, int objectType, std::string objectName)
+    PlantComponent *LocalPipeData::factory(EnergyPlusData &state, int objectType, std::string objectName)
     {
         // Process the input data for pipes if it hasn't been done already
-        if (pipes.GetPipeInputFlag) {
-            GetPipeInput(pipes);
-            pipes.GetPipeInputFlag = false;
+        if (state.dataPipes->GetPipeInputFlag) {
+            GetPipeInput(state);
+            state.dataPipes->GetPipeInputFlag = false;
         }
         // Now look for this particular pipe in the list
         for (auto &pipe : LocalPipe) {
@@ -148,7 +148,7 @@ namespace Pipes {
         if (this->OneTimeInit) {
             int FoundOnLoop = 0;
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                 this->Name, this->TypeOf, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, errFlag, _, _, FoundOnLoop, _, _);
             if (FoundOnLoop == 0) {
                 ShowFatalError("SimPipes: Pipe=\"" + this->Name + "\" not found on a Plant Loop."); // LCOV_EXCL_LINE
@@ -176,7 +176,7 @@ namespace Pipes {
         PlantUtilities::SafeCopyPlantNode(this->InletNodeNum, this->OutletNodeNum, this->LoopNum);
     }
 
-    void GetPipeInput(PipesData &pipes)
+    void GetPipeInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -209,9 +209,9 @@ namespace Pipes {
         // GET NUMBER OF ALL EQUIPMENT TYPES
         NumWaterPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic");
         NumSteamPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic:Steam");
-        pipes.NumLocalPipes = NumWaterPipes + NumSteamPipes;
-        LocalPipe.allocate(pipes.NumLocalPipes);
-        LocalPipeUniqueNames.reserve(static_cast<unsigned>(pipes.NumLocalPipes));
+        state.dataPipes->NumLocalPipes = NumWaterPipes + NumSteamPipes;
+        LocalPipe.allocate(state.dataPipes->NumLocalPipes);
+        LocalPipeUniqueNames.reserve(static_cast<unsigned>(state.dataPipes->NumLocalPipes));
 
         cCurrentModuleObject = "Pipe:Adiabatic";
         for (PipeWaterNum = 1; PipeWaterNum <= NumWaterPipes; ++PipeWaterNum) {

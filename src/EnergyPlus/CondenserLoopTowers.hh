@@ -64,8 +64,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
-struct CondenserLoopTowersData;
 
 namespace CondenserLoopTowers {
 
@@ -400,7 +398,7 @@ namespace CondenserLoopTowers {
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        void initialize(BranchInputManagerData &dataBranchInputManager);
+        void initialize(EnergyPlusData &state);
 
         void setupOutputVariables();
 
@@ -426,14 +424,14 @@ namespace CondenserLoopTowers {
 
         void calculateWaterUsage();
 
-        Real64 calculateVariableSpeedApproach(CondenserLoopTowersData &dataCondenserLoopTowers,
+        Real64 calculateVariableSpeedApproach(EnergyPlusData &state,
                                               Real64 PctWaterFlow,  // Water flow ratio of cooling tower
                                               Real64 airFlowRatioLocal, // Air flow ratio of cooling tower
                                               Real64 Twb,           // Inlet air wet-bulb temperature [C]
                                               Real64 Tr             // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
         );
 
-        void checkModelBounds(CondenserLoopTowersData &dataCondenserLoopTowers,
+        void checkModelBounds(EnergyPlusData &state,
                               Real64 Twb,                      // current inlet air wet-bulb temperature (C)
                               Real64 Tr,                       // requested range temperature for current time step (C)
                               Real64 Ta,                       // requested approach temperature for current time step (C)
@@ -467,25 +465,26 @@ namespace CondenserLoopTowers {
                                   Array1D<Real64> const &Par // par(1) = Tower number
         );
 
-        static PlantComponent *factory(CondenserLoopTowersData &dataCondenserLoopTowers, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    void GetTowerInput(CondenserLoopTowersData &dataCondenserLoopTowers);
+    void GetTowerInput(EnergyPlusData &state);
 
 } // namespace CondenserLoopTowers
 
-struct CondenserLoopTowersData : BaseGlobalStruct {
-    int NumSimpleTowers = 0; // Number of similar towers
-    bool GetInput = true;
-    Array1D<CondenserLoopTowers::CoolingTower> towers; // dimension to number of machines
-    std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
+    struct CondenserLoopTowersData : BaseGlobalStruct {
+        int NumSimpleTowers = 0; // Number of similar towers
+        bool GetInput = true;
+        Array1D<CondenserLoopTowers::CoolingTower> towers; // dimension to number of machines
+        std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
 
-    void clear_state() override {
-        NumSimpleTowers = 0;
-        GetInput = true;
-        towers.deallocate();
-        UniqueSimpleTowerNames.clear();
-    }
+        void clear_state() override
+        {
+            this->NumSimpleTowers = 0;
+            this->GetInput = true;
+            this->towers.deallocate();
+            this->UniqueSimpleTowerNames.clear();
+        }
 };
 
 } // namespace EnergyPlus

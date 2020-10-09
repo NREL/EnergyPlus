@@ -56,12 +56,12 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct PlantChillersData;
 
 namespace PlantChillers {
 
@@ -185,7 +185,7 @@ namespace PlantChillers {
 
         void getDesignTemperatures(Real64 &EP_UNUSED(TempDesCondIn), Real64 &EP_UNUSED(TempDesEvapOut)) override;
 
-        virtual void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad) = 0;
+        virtual void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) = 0;
 
         virtual void size() = 0;
     };
@@ -232,15 +232,15 @@ namespace PlantChillers {
         {
         }
 
-        static void getInput(PlantChillersData &chillers);
+        static void getInput(EnergyPlusData &state);
 
         void setupOutputVariables();
 
-        static ElectricChillerSpecs *factory(PlantChillersData &chillers, std::string const &chillerName);
+        static ElectricChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad) override;
+        void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
 
         void size() override;
 
@@ -329,19 +329,20 @@ namespace PlantChillers {
         {
         }
 
-        static EngineDrivenChillerSpecs *factory(PlantChillersData &chillers, std::string const &chillerName);
+        static EngineDrivenChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
 
-        static void getInput(PlantChillersData &chillers);
+        static void getInput(EnergyPlusData &state);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables();
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad) override;
+        void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
 
         void size() override;
 
-        void calculate(Real64 &MyLoad,   // operating load
+        void calculate(EnergyPlusData &state,
+                       Real64 &MyLoad,   // operating load
                        bool RunFlag,     // TRUE when chiller operating
                        int EquipFlowCtrl // Flow control mode for the equipment
         );
@@ -421,15 +422,15 @@ namespace PlantChillers {
         {
         }
 
-        static GTChillerSpecs *factory(PlantChillersData &chillers, std::string const &chillerName);
+        static GTChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
 
-        static void getInput(PlantChillersData &chillers);
+        static void getInput(EnergyPlusData &state);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables();
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad) override;
+        void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
 
         void size() override;
 
@@ -453,15 +454,15 @@ namespace PlantChillers {
         {
         }
 
-        static ConstCOPChillerSpecs *factory(PlantChillersData &chillers, std::string const &chillerName);
+        static ConstCOPChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
 
-        static void getInput(PlantChillersData &chillers);
+        static void getInput(EnergyPlusData &state);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables();
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad) override;
+        void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
 
         void size() override;
 

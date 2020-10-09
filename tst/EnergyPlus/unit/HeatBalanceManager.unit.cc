@@ -167,7 +167,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 
     bool ErrorsFound(false);
 
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(state, state.files, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 }
@@ -204,7 +204,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_
 
     bool ErrorsFound(false);
 
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(state, state.files, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 }
@@ -536,7 +536,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
 
     ZoneEquipInputsFilled = true;
     NumPrimaryAirSys = 1;
-    AirLoopFlow.allocate(1);
+    state.dataAirLoop->AirLoopFlow.allocate(1);
     PrimaryAirSystem.allocate(1);
     PrimaryAirSystem(1).OASysExists = true;
     Node.allocate(8);
@@ -560,13 +560,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     Node(7).MassFlowRate = 0.0; // Zone 2 exhaust node
     Node(8).MassFlowRate = 8.0; // Zone 2 return node
     ZoneEquipConfig(2).ZoneExh = 0.0;
-    AirLoopFlow(1).OAFlow = Node(2).MassFlowRate + Node(6).MassFlowRate;
-    AirLoopFlow(1).MaxOutAir = AirLoopFlow(1).OAFlow;
+    state.dataAirLoop->AirLoopFlow(1).OAFlow = Node(2).MassFlowRate + Node(6).MassFlowRate;
+    state.dataAirLoop->AirLoopFlow(1).MaxOutAir = state.dataAirLoop->AirLoopFlow(1).OAFlow;
     Infiltration(1).MassFlowRate = 0.5;
     Mixing(1).MixingMassFlowRate = 0.1;
 
     // call zone air mass balance
-    CalcZoneMassBalance(false);
+    CalcZoneMassBalance(state, false);
     EXPECT_EQ(Node(4).MassFlowRate, 0.0);         // Zone 1 return node (max(0.0, 1-2)
     EXPECT_EQ(Infiltration(1).MassFlowRate, 1.0); // Zone 1 infiltration flow rate (2 - 1)
     EXPECT_EQ(Mixing(1).MixingMassFlowRate, 0.1); // Zone 1 to Zone 2 mixing flow rate (unchanged)
@@ -577,7 +577,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipConfig.deallocate();
     Node.deallocate();
     PrimaryAirSystem.deallocate();
-    AirLoopFlow.deallocate();
+    state.dataAirLoop->AirLoopFlow.deallocate();
     NumPrimaryAirSys = 0;
 }
 
@@ -712,7 +712,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // check the "Material:RoofVegetation" names
@@ -1214,7 +1214,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -1275,7 +1275,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_DOUBLE_EQ(0.012611481326656135, DataLoopNode::Node(1).HumRat);
     EXPECT_DOUBLE_EQ(57247.660939392081, DataLoopNode::Node(1).Enthalpy);
 
-    InitHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files);
+    InitHeatBalance(state, state.files);
 
     // Test if local value correctly overwritten
     EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
@@ -1293,7 +1293,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataEnvironment::WindSpeed = 1.5;
     DataEnvironment::WindDir = 90.0;
 
-    InitHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files);
+    InitHeatBalance(state, state.files);
 
     // Test if local value correctly overwritten
     EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
@@ -1569,13 +1569,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation(state);
     DataGlobals::DayOfSim = 2; // avoid array bounds problem in RecKeepHeatBalance
-    WeatherManager::Envrn = 1;
+    state.dataWeatherManager->Envrn = 1;
 
     // Test 1 - Set time of day to morning - should use high transmittance window
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 11;
     DataGlobals::CurrentTime = 11.0;
-    WeatherManager::SetCurrentWeather();
+    WeatherManager::SetCurrentWeather(state);
     HeatBalanceManager::ManageHeatBalance(state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
     HeatBalanceManager::ManageHeatBalance(state);
@@ -1583,7 +1583,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
     int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", dataConstruction.Construct);
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win1ConstNum);
-    Real64 transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);
+    Real64 transSol = DataSurfaces::SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_GT(transSol, 0.8);
     Real64 refPtIllum = DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1);
     EXPECT_GT(refPtIllum, 3000.0);
@@ -1592,13 +1592,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 14;
     DataGlobals::CurrentTime = 14.0;
-    WeatherManager::SetCurrentWeather();
+    WeatherManager::SetCurrentWeather(state);
     HeatBalanceManager::ManageHeatBalance(state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
     HeatBalanceManager::ManageHeatBalance(state);
     int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", dataConstruction.Construct);
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win2ConstNum);
-    transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);
+    transSol = DataSurfaces::SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_LT(transSol, 0.2);
     refPtIllum = DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1);
     EXPECT_LT(refPtIllum, 1000.0);
@@ -1766,7 +1766,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsfound);
+    HeatBalanceManager::GetMaterialData(state, state.files, errorsfound);
 
     EXPECT_FALSE(errorsfound);
     EXPECT_NEAR(dataMaterial.Material(1).Resistance,0.158,0.0001);
@@ -1811,7 +1811,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
 
     // call get material data to auto-generate IRTSurface material
     ErrorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHeatBalance::TotMaterials, 1);
     int MaterNum = 1;
@@ -1948,7 +1948,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)
 
     bool ErrorsFound(false); // If errors detected in input
 
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
 
     ASSERT_FALSE(ErrorsFound);
 
@@ -2246,7 +2246,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     SimulationManager::ManageSimulation(state);
- 
+
     int surfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
     EXPECT_EQ(DataSurfaces::Surface(surfNum).Construction, DataSurfaces::Surface(surfNum).EMSConstructionOverrideValue);
     EXPECT_TRUE(DataSurfaces::Surface(surfNum).EMSConstructionOverrideON);

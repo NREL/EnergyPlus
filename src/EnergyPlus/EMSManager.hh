@@ -56,7 +56,9 @@
 #include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 // note there are routines that lie outside of the Module at the end of this file
 
@@ -98,11 +100,11 @@ namespace EMSManager {
                    Optional_int_const ProgramManagerToRun = _ // specific program manager to run
     );
 
-    void InitEMS(IOFiles &ioFiles, int const iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
+    void InitEMS(EnergyPlusData &state, IOFiles &ioFiles, int const iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
 
     void ReportEMS();
 
-    void GetEMSInput(IOFiles &ioFiles);
+    void GetEMSInput(EnergyPlusData &state, IOFiles &ioFiles);
 
     void ProcessEMSInput(bool const reportErrors); // .  If true, then report out errors ,otherwise setup what we can
 
@@ -116,14 +118,21 @@ namespace EMSManager {
 
     void UpdateEMSTrendVariables();
 
-    void CheckIfNodeSetPointManagedByEMS(int const NodeNum, // index of node being checked.
+    std::string controlTypeName(int const SetPointType); // Maps int to the std::string equivalent
+                                                         // (eg iTemperatureSetPoint => "Temperature Setpoint")
+
+    bool CheckIfNodeSetPointManaged(int const NodeNum, // index of node being checked.
+                                    int const SetPointType,
+                                    bool byHandle = false);
+
+    bool CheckIfNodeSetPointManagedByEMS(int const NodeNum, // index of node being checked.
                                          int const SetPointType,
                                          bool &ErrorFlag);
 
     bool CheckIfNodeMoreInfoSensedByEMS(int const nodeNum, // index of node being checked.
                                         std::string const &varName);
 
-    void SetupPrimaryAirSystemAvailMgrAsActuators();
+    void SetupPrimaryAirSystemAvailMgrAsActuators(EnergyPlusData &state);
 
     void SetupWindowShadingControlActuators();
 
@@ -140,6 +149,8 @@ namespace EMSManager {
     void SetupZoneInfoAsInternalDataAvail();
 
     void checkForUnusedActuatorsAtEnd();
+
+    void checkSetpointNodesAtEnd();
 
 } // namespace EMSManager
 

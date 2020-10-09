@@ -59,8 +59,9 @@
 #include <EnergyPlus/WaterToWaterHeatPumps.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace EIRPlantLoopHeatPumps {
 
@@ -142,7 +143,7 @@ namespace EIRPlantLoopHeatPumps {
 
         EIRPlantLoopHeatPump() = default;
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
@@ -151,7 +152,7 @@ namespace EIRPlantLoopHeatPumps {
                                  Real64 &EP_UNUSED(MinLoad),
                                  Real64 &EP_UNUSED(OptLoad)) override;
 
-        void doPhysics(Real64 currentLoad);
+        void doPhysics(EnergyPlusData &state, Real64 currentLoad);
 
         void sizeLoadSide();
 
@@ -167,11 +168,11 @@ namespace EIRPlantLoopHeatPumps {
 
         void resetReportingVariables();
 
-        static PlantComponent *factory(int hp_type_of_num, std::string hp_name);
+        static PlantComponent *factory(EnergyPlusData &state, int hp_type_of_num, std::string hp_name);
 
         static void pairUpCompanionCoils();
 
-        static void processInputForEIRPLHP();
+        static void processInputForEIRPLHP(EnergyPlusData &state);
 
         static void clear_state();
 

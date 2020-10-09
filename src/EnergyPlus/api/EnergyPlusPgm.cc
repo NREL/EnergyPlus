@@ -239,8 +239,14 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 // Enable floating point exceptions
 #ifndef NDEBUG
 #ifdef __unix__
-    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW); // These exceptions are enabled (FE_INEXACT and FE_UNDERFLOW will not throw)
 #endif
+#endif
+
+#ifdef MSVC_DEBUG
+    // the following line enables NaN detection in Visual Studio debug builds. See
+    // https://github.com/NREL/EnergyPlus/wiki/Debugging-Tips
+    int fp_control_state = _controlfp(_EM_INEXACT | _EM_UNDERFLOW, _MCW_EM); // These exceptions are disabled (_EM_INEXACT and _EM_UNDERFLOW will not throw)
 #endif
 
 #ifdef _MSC_VER
@@ -264,7 +270,7 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 
     DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
 
-    DataSystemVariables::processEnvironmentVariables(state.dataGlobals);
+    DataSystemVariables::processEnvironmentVariables(state);
 
 }
 
@@ -390,7 +396,7 @@ int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepat
     // as possible and contain all "simulation" code in other modules and files.
 
     int status = initializeEnergyPlus(state, filepath);
-    if (status) return status;
+    if (status || EnergyPlus::DataGlobals::outputEpJSONConversionOnly) return status;
     try {
         EnergyPlus::SimulationManager::ManageSimulation(state);
     } catch (const EnergyPlus::FatalError &e) {
@@ -428,7 +434,7 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const ch
     EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv );
 
     int status = initializeAsLibrary(state);
-    if (status) return status;
+    if (status || EnergyPlus::DataGlobals::outputEpJSONConversionOnly) return status;
     try {
         EnergyPlus::SimulationManager::ManageSimulation(state);
     } catch (const EnergyPlus::FatalError &e) {

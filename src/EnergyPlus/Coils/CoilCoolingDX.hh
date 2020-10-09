@@ -55,8 +55,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 struct CoilCoolingDXInputSpecification
 {
@@ -75,12 +76,12 @@ struct CoilCoolingDXInputSpecification
 struct CoilCoolingDX
 {
     CoilCoolingDX() = default;
-    static int factory(std::string const &coilName);
-    static void getInput();
+    static int factory(EnergyPlusData &state, std::string const &coilName);
+    static void getInput(EnergyPlusData &state);
     static void clear_state();
-    void instantiateFromInputSpec(const CoilCoolingDXInputSpecification &input_data);
+    void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXInputSpecification &input_data);
     void oneTimeInit();
-    void simulate(int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR = -1.0);
+    void simulate(EnergyPlusData &state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR = -1.0);
     void setData(int fanIndex, int fanType, std::string const &fanName, int airLoopNum);
     void getFixedData(int &evapInletNodeIndex,
                       int &evapOutletNodeIndex,
@@ -120,7 +121,7 @@ struct CoilCoolingDX
     int supplyFanType = 0;
     std::string supplyFanName = "";
     bool doStandardRatingFlag = true;
-    int CoolingCoilType = 0; // Coolig coil type
+    bool SubcoolReheatFlag = false; // Subcool reheat coil control
 
     // report variables
     Real64 totalCoolingEnergyRate = 0.0;
@@ -148,10 +149,6 @@ struct CoilCoolingDX
     Real64 recoveredHeatEnergy = 0.0;
     Real64 recoveredHeatEnergyRate = 0.0;
 };
-
-extern int const coilNormalMode; // Normal operation mode
-extern int const coilEnhancedMode; // Enhanced operation mode
-extern int const coilSubcoolReheatMode; // SubcoolReheat operation mode
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
 extern bool coilCoolingDXGetInputFlag;

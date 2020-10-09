@@ -52,11 +52,10 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    class IOFiles;
-    struct CostEstimateManagerData;
-    struct EnergyPlusData;
-    struct ZoneTempPredictorCorrectorData;
+
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
 namespace SimulationManager {
 
@@ -103,7 +102,7 @@ namespace SimulationManager {
 
     void ReportNodeConnections(IOFiles &ioFiles);
 
-    void ReportLoopConnections(IOFiles &ioFiles);
+    void ReportLoopConnections(EnergyPlusData &state, IOFiles &ioFiles);
 
     void ReportParentChildren(IOFiles &ioFiles);
 
@@ -118,7 +117,8 @@ namespace SimulationManager {
 
 // EXTERNAL SUBROUTINES:
 
-void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the exterior energy use simulation
+void Resimulate(EnergyPlusData &state,
+                bool &ResimExt, // Flag to resimulate the exterior energy use simulation
                 bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
                 bool &ResimHVAC // Flag to resimulate the HVAC simulation
 );

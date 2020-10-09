@@ -52,12 +52,15 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
-    struct EnergyPlusData;
+
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
 namespace SizingManager {
 
@@ -105,9 +108,9 @@ namespace SizingManager {
 
     void ManageSystemSizingAdjustments(EnergyPlusData &state);
 
-    void ManageSystemVentilationAdjustments();
+    void ManageSystemVentilationAdjustments(EnergyPlusData &state);
 
-    void DetermineSystemPopulationDiversity();
+    void DetermineSystemPopulationDiversity(EnergyPlusData &state);
 
     void GetOARequirements();
 
@@ -174,7 +177,7 @@ namespace SizingManager {
 
     std::string TimeIndexToHrMinString(int timeIndex);
 
-    void UpdateFacilitySizing(DataGlobal const &dataGlobals, int const CallIndicator);
+    void UpdateFacilitySizing(EnergyPlusData &state, int const CallIndicator);
 
     void UpdateTermUnitFinalZoneSizing();
 

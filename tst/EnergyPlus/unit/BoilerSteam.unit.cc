@@ -90,8 +90,8 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
     });
 
     ASSERT_TRUE(process_idf(idf_objects, false));
-    GetBoilerInput(state.dataSteamBoilers);
-    auto &thisBoiler = state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers);
+    GetBoilerInput(state);
+    auto &thisBoiler = state.dataBoilerSteam->Boiler(state.dataBoilerSteam->numBoilers);
     EXPECT_EQ(thisBoiler.Name, "STEAM BOILER PLANT BOILER");
     EXPECT_EQ(thisBoiler.FuelType, AssignResourceTypeNum("NATURALGAS"));
     EXPECT_EQ(thisBoiler.BoilerMaxOperPress, 160000);
@@ -158,8 +158,8 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetBoilerInput(state.dataSteamBoilers);
-    auto &thisBoiler = state.dataSteamBoilers.Boiler(state.dataSteamBoilers.numBoilers);
+    GetBoilerInput(state);
+    auto &thisBoiler = state.dataBoilerSteam->Boiler(state.dataBoilerSteam->numBoilers);
 
     DataPlant::PlantLoop(1).Name = "SteamLoop";
     DataPlant::PlantLoop(1).FluidName = "Steam";
@@ -180,7 +180,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     DataPlant::PlantFinalSizesOkayToReport = true;
 
     DataGlobals::BeginEnvrnFlag = true;
-    thisBoiler.initialize(state.dataBranchInputManager);
+    thisBoiler.initialize(state);
     thisBoiler.calculate(MyLoad, RunFlag, DataBranchAirLoopPlant::ControlType_SeriesActive);
 
     // check boiler fuel used and the resultant boiler efficiency

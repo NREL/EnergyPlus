@@ -53,30 +53,30 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -141,19 +141,20 @@ namespace PhotovoltaicThermalCollectors {
 
     void PVTCollectorStruct::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initialize(state.dataBranchInputManager, true);
+        this->initialize(state, true);
         this->size();
     }
 
-    void PVTCollectorStruct::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PVTCollectorStruct::simulate(EnergyPlusData &state,
+                                      const PlantLocation &EP_UNUSED(calledFromLocation),
                                       bool const FirstHVACIteration,
                                       Real64 &EP_UNUSED(CurLoad),
                                       bool const EP_UNUSED(RunFlag))
     {
 
-        this->initialize(state.dataBranchInputManager, FirstHVACIteration);
+        this->initialize(state, FirstHVACIteration);
         this->control();
-        this->calculate(state.dataConvectionCoefficients, state.files);
+        this->calculate(state, state.files);
         this->update();
     }
 
@@ -445,7 +446,7 @@ namespace PhotovoltaicThermalCollectors {
             "Generator PVT Fluid Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.MdotWorkFluid, "System", "Average", this->Name);
     }
 
-    void PVTCollectorStruct::initialize(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration)
+    void PVTCollectorStruct::initialize(EnergyPlusData &state, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -468,8 +469,19 @@ namespace PhotovoltaicThermalCollectors {
         if (this->SetLoopIndexFlag) {
             if (allocated(DataPlant::PlantLoop) && (this->PlantInletNodeNum > 0)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
-                    this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        this->TypeNum,
+                                                        this->WLoopNum,
+                                                        this->WLoopSideNum,
+                                                        this->WLoopBranchNum,
+                                                        this->WLoopCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
                 if (errFlag) {
                     ShowFatalError("InitPVTcollectors: Program terminated for previous conditions.");
                 }
@@ -663,10 +675,10 @@ namespace PhotovoltaicThermalCollectors {
                         }
                     } else { // Hardsized
                         if (DataPlant::PlantFinalSizesOkayToReport && this->DesignVolFlowRate > 0.0) {
-                            ReportSizingManager::ReportSizingOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
-                                                                    this->Name,
-                                                                    "User-Specified Design Flow Rate [m3/s]",
-                                                                    this->DesignVolFlowRate);
+                            BaseSizer::reportSizerOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
+                                                         this->Name,
+                                                         "User-Specified Design Flow Rate [m3/s]",
+                                                         this->DesignVolFlowRate);
                         }
                     }
                 }
@@ -676,26 +688,26 @@ namespace PhotovoltaicThermalCollectors {
             if (this->DesignVolFlowRateWasAutoSized) {
                 this->DesignVolFlowRate = DesignVolFlowRateDes;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name, "Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
-                                                            this->Name,
-                                                            "Initial Design Size Design Flow Rate [m3/s]",
-                                                            DesignVolFlowRateDes);
+                    BaseSizer::reportSizerOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
+                                                 this->Name,
+                                                 "Initial Design Size Design Flow Rate [m3/s]",
+                                                 DesignVolFlowRateDes);
                 }
                 PlantUtilities::RegisterPlantCompDesignFlow(this->PlantInletNodeNum, this->DesignVolFlowRate);
 
             } else { // Hardsized with sizing data
                 if (this->DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0 && DataPlant::PlantFinalSizesOkayToReport) {
                     Real64 DesignVolFlowRateUser = this->DesignVolFlowRate;
-                    ReportSizingManager::ReportSizingOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
-                                                            this->Name,
-                                                            "Design Size Design Flow Rate [m3/s]",
-                                                            DesignVolFlowRateDes,
-                                                            "User-Specified Design Flow Rate [m3/s]",
-                                                            DesignVolFlowRateUser);
+                    BaseSizer::reportSizerOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
+                                                 this->Name,
+                                                 "Design Size Design Flow Rate [m3/s]",
+                                                 DesignVolFlowRateDes,
+                                                 "User-Specified Design Flow Rate [m3/s]",
+                                                 DesignVolFlowRateUser);
                     if (DataGlobals::DisplayExtraWarnings) {
                         if ((std::abs(DesignVolFlowRateDes - DesignVolFlowRateUser) / DesignVolFlowRateUser) >
                             DataSizing::AutoVsHardSizingThreshold) {
@@ -717,10 +729,10 @@ namespace PhotovoltaicThermalCollectors {
                 if (!this->DesignVolFlowRateWasAutoSized && !SizingDesRunThisAirSys) { // Simulation continue
                     HardSizeNoDesRun = true;
                     if (this->DesignVolFlowRate > 0.0) {
-                        ReportSizingManager::ReportSizingOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
-                                                                this->Name,
-                                                                "User-Specified Design Flow Rate [m3/s]",
-                                                                this->DesignVolFlowRate);
+                        BaseSizer::reportSizerOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
+                                                     this->Name,
+                                                     "User-Specified Design Flow Rate [m3/s]",
+                                                     this->DesignVolFlowRate);
                     }
                 } else {
                     CheckSysSizing("SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name);
@@ -748,18 +760,18 @@ namespace PhotovoltaicThermalCollectors {
                 if (!HardSizeNoDesRun) {
                     if (this->DesignVolFlowRateWasAutoSized) {
                         this->DesignVolFlowRate = DesignVolFlowRateDes;
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name, "Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes);
                         this->SizingInit = false;
                     } else {
                         if (this->DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0) {
                             Real64 DesignVolFlowRateUser = this->DesignVolFlowRate;
-                            ReportSizingManager::ReportSizingOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
-                                                                    this->Name,
-                                                                    "Design Size Design Flow Rate [m3/s]",
-                                                                    DesignVolFlowRateDes,
-                                                                    "User-Specified Design Flow Rate [m3/s]",
-                                                                    DesignVolFlowRateUser);
+                            BaseSizer::reportSizerOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
+                                                         this->Name,
+                                                         "Design Size Design Flow Rate [m3/s]",
+                                                         DesignVolFlowRateDes,
+                                                         "User-Specified Design Flow Rate [m3/s]",
+                                                         DesignVolFlowRateUser);
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(DesignVolFlowRateDes - DesignVolFlowRateUser) / DesignVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
@@ -844,7 +856,7 @@ namespace PhotovoltaicThermalCollectors {
         }
     }
 
-    void PVTCollectorStruct::calculate(ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles)
+    void PVTCollectorStruct::calculate(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -947,7 +959,7 @@ namespace PhotovoltaicThermalCollectors {
                 Real64 HcExt(0.0);
                 Real64 HrSky(0.0);
 
-                ConvectionCoefficients::InitExteriorConvectionCoeff(dataConvectionCoefficients,
+                ConvectionCoefficients::InitExteriorConvectionCoeff(state,
                                                                     ioFiles,
                                                                     this->SurfNum,
                                                                     0.0,

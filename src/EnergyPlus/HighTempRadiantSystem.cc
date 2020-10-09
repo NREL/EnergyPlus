@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -73,7 +74,6 @@
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -167,7 +167,6 @@ namespace HighTempRadiantSystem {
     bool MyEnvrnFlag(true);
     bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
 
-
     // Functions
     void clear_state()
     {
@@ -188,7 +187,8 @@ namespace HighTempRadiantSystem {
         ZoneEquipmentListChecked = false;
     }
 
-    void SimHighTempRadiantSystem(EnergyPlusData &state, std::string const &CompName,   // name of the low temperature radiant system
+    void SimHighTempRadiantSystem(EnergyPlusData &state,
+                                  std::string const &CompName,   // name of the low temperature radiant system
                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                   Real64 &LoadMet,               // load met by the radiant system, in Watts
                                   int &CompIndex)
@@ -212,8 +212,8 @@ namespace HighTempRadiantSystem {
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool ErrorsFoundInGet;          // Set to true when there are severe errors during the Get routine
-        int RadSysNum;                  // Radiant system number/index in local derived types
+        bool ErrorsFoundInGet; // Set to true when there are severe errors during the Get routine
+        int RadSysNum;         // Radiant system number/index in local derived types
 
         // FLOW:
         if (GetInputFlag) {
@@ -681,7 +681,8 @@ namespace HighTempRadiantSystem {
         }
     }
 
-    void InitHighTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+    void InitHighTempRadiantSystem(EnergyPlusData &state,
+                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                    int const RadSysNum // Index for the low temperature radiant system under consideration within the derived types
     )
     {
@@ -721,7 +722,7 @@ namespace HighTempRadiantSystem {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNum;                 // Intermediate variable for keeping track of the zone number
+        int ZoneNum; // Intermediate variable for keeping track of the zone number
         int Loop;
 
         // FLOW:
@@ -800,8 +801,6 @@ namespace HighTempRadiantSystem {
         using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
         using General::RoundSigDigits;
-        using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -877,8 +876,11 @@ namespace HighTempRadiantSystem {
                 } else {
                     TempSize = HighTempRadSys(RadSysNum).ScaledHeatingCapacity;
                 }
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                HighTempRadSys(RadSysNum).MaxPowerCapac = TempSize;
+                bool errorsFound = false;
+                HeatingCapacitySizer sizerHeatingCapacity;
+                sizerHeatingCapacity.overrideSizingString(SizingString);
+                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                HighTempRadSys(RadSysNum).MaxPowerCapac = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                 DataScalableCapSizingON = false;
             }
         }
@@ -980,9 +982,10 @@ namespace HighTempRadiantSystem {
         }
     }
 
-    void CalcHighTempRadiantSystemSP(EnergyPlusData &state,
-                                     bool const EP_UNUSED(FirstHVACIteration), // true if this is the first HVAC iteration at this system time step !unused1208
-                                     int const RadSysNum                       // name of the low temperature radiant system
+    void CalcHighTempRadiantSystemSP(
+        EnergyPlusData &state,
+        bool const EP_UNUSED(FirstHVACIteration), // true if this is the first HVAC iteration at this system time step !unused1208
+        int const RadSysNum                       // name of the low temperature radiant system
     )
     {
 
@@ -1062,7 +1065,7 @@ namespace HighTempRadiantSystem {
             DistributeHTRadGains();
 
             // Now "simulate" the system by recalculating the heat balances
-            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.files, ZoneNum);
             HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
             // First determine whether or not the unit should be on
@@ -1105,7 +1108,7 @@ namespace HighTempRadiantSystem {
                     DistributeHTRadGains();
 
                     // Now "simulate" the system by recalculating the heat balances
-                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.files, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                     // Redetermine the current value of the controlling temperature
@@ -1142,7 +1145,8 @@ namespace HighTempRadiantSystem {
         }
     }
 
-    void UpdateHighTempRadiantSystem(EnergyPlusData &state, int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
+    void UpdateHighTempRadiantSystem(EnergyPlusData &state,
+                                     int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
                                      Real64 &LoadMet      // load met by the radiant system, in Watts
     )
     {
@@ -1224,7 +1228,7 @@ namespace HighTempRadiantSystem {
 
                 // Now "simulate" the system by recalculating the heat balances
                 ZoneNum = HighTempRadSys(RadSysNum).ZonePtr;
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.files, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
             }
         }
@@ -1511,22 +1515,22 @@ namespace HighTempRadiantSystem {
             Area = Surface(SurfNum).Area;
 
             if (Surface(SurfNum).Class == SurfaceClass_Window) {
-                if (SurfaceWindow(SurfNum).ShadingFlag == IntShadeOn || SurfaceWindow(SurfNum).ShadingFlag == IntBlindOn) {
+                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += SurfaceWindow(SurfNum).DividerArea;
+                    Area += SurfWinDividerArea(SurfNum);
                 }
 
-                if (SurfaceWindow(SurfNum).FrameArea > 0.0) {
+                if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfaceWindow(SurfNum).FrameArea * (1.0 + SurfaceWindow(SurfNum).ProjCorrFrIn) *
-                                  SurfaceWindow(SurfNum).FrameTempSurfIn;
+                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
+                                  SurfWinFrameTempSurfIn(SurfNum);
                 }
 
-                if (SurfaceWindow(SurfNum).DividerArea > 0.0 && SurfaceWindow(SurfNum).ShadingFlag != IntShadeOn &&
-                    SurfaceWindow(SurfNum).ShadingFlag != IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
+                    SurfWinShadingFlag(SurfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += HConvIn(SurfNum) * SurfaceWindow(SurfNum).DividerArea * (1.0 + 2.0 * SurfaceWindow(SurfNum).ProjCorrDivIn) *
-                                  SurfaceWindow(SurfNum).DividerTempSurfIn;
+                    SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
+                                  SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 

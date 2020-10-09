@@ -55,8 +55,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace SystemReports {
 
@@ -228,7 +229,7 @@ namespace SystemReports {
 
     // Functions
 
-    void InitEnergyReports(IOFiles &ioFiles);
+    void InitEnergyReports(EnergyPlusData &state, IOFiles &ioFiles);
 
     void FindFirstLastPtr(IOFiles &ioFiles, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
 
@@ -323,7 +324,7 @@ namespace SystemReports {
                              int &MatchComp               // Component number of the match
     );
 
-    void ReportAirLoopConnections(IOFiles &ioFiles);
+    void ReportAirLoopConnections(EnergyPlusData &state, IOFiles &ioFiles);
 
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************
