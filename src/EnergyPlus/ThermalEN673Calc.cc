@@ -260,8 +260,6 @@ namespace ThermalEN673Calc {
                        std::string &ErrorMessage)
     {
         // Using
-        using DataGlobals::StefanBoltzmann;
-
         // Argument array dimensioning
         EP_SIZE_CHECK(emis, maxlay2);
         EP_SIZE_CHECK(gap, MaxGap);
@@ -424,7 +422,7 @@ namespace ThermalEN673Calc {
                 }
             }
             for (i = 1; i <= nlayer - 1; ++i) {
-                hr(i) = 4.0 * StefanBoltzmann * std::pow(1.0 / emis(2 * i) + 1.0 / emis(2 * i + 1) - 1.0, -1.0) * pow_3(Tm);
+                hr(i) = 4.0 * DataGlobalConstants::StefanBoltzmann() * std::pow(1.0 / emis(2 * i) + 1.0 / emis(2 * i + 1) - 1.0, -1.0) * pow_3(Tm);
                 hs(i) = hg(i) + hr(i);
                 rs(2 * i + 1) = 1.0 / hs(i); // Thermal resistance of each gap
                 sumRs += rs(2 * i + 1);

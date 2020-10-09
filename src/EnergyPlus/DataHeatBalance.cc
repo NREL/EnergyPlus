@@ -92,7 +92,6 @@ namespace DataHeatBalance {
     // SolarShading, etc. Modules.
 
     // Using/Aliasing
-    using DataGlobals::AutoCalculate;
     using DataSurfaces::MaxSlatAngs;
     using namespace DataVectorTypes;
     using DataBSDFWindow::BSDFLayerAbsorpStruct;

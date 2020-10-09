@@ -500,7 +500,7 @@ namespace EIRPlantLoopHeatPumps {
         if (DataGlobals::BeginEnvrnFlag && this->envrnInit && DataPlant::PlantFirstSizesOkayToFinalize) {
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
-                                                           DataGlobals::InitConvTemp,
+                                                           DataGlobalConstants::InitConvTemp(),
                                                            DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                                                            routineName);
             this->loadSideDesignMassFlowRate = rho * this->loadSideDesignVolFlowRate;
@@ -516,7 +516,7 @@ namespace EIRPlantLoopHeatPumps {
             if (this->waterSource) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidName,
-                                                        DataGlobals::InitConvTemp,
+                                                        DataGlobalConstants::InitConvTemp(),
                                                         DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidIndex,
                                                         routineName);
                 this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
@@ -575,9 +575,9 @@ namespace EIRPlantLoopHeatPumps {
         Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
 
         std::string const typeName = DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum);
-        Real64 loadSideInitTemp = DataGlobals::CWInitConvTemp;
+        Real64 loadSideInitTemp = DataGlobalConstants::CWInitConvTemp();
         if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) {
-            loadSideInitTemp = DataGlobals::HWInitConvTemp;
+            loadSideInitTemp = DataGlobalConstants::HWInitConvTemp();
         }
 
         Real64 const rho = FluidProperties::GetDensityGlycol(state,
@@ -755,9 +755,9 @@ namespace EIRPlantLoopHeatPumps {
         Real64 tmpSourceVolFlow;
 
         std::string const typeName = DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum);
-        Real64 sourceSideInitTemp = DataGlobals::HWInitConvTemp;
+        Real64 sourceSideInitTemp = DataGlobalConstants::HWInitConvTemp();
         if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) {
-            sourceSideInitTemp = DataGlobals::CWInitConvTemp;
+            sourceSideInitTemp = DataGlobalConstants::CWInitConvTemp();
         }
 
         Real64 const rhoSrc = FluidProperties::GetDensityGlycol(state,

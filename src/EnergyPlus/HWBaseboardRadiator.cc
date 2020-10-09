@@ -856,7 +856,7 @@ namespace HWBaseboardRadiator {
 
             rho = GetDensityGlycol(state,
                                    PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                   DataGlobals::HWInitConvTemp,
+                                   DataGlobalConstants::HWInitConvTemp(),
                                    PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                    RoutineName);
 
@@ -1089,12 +1089,12 @@ namespace HWBaseboardRadiator {
                     if (DesCoilLoad >= SmallLoad) {
                         Cp = GetSpecificHeatGlycol(state,
                                                    PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                                   HWInitConvTemp,
+                                                   DataGlobalConstants::HWInitConvTemp(),
                                                    PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                                    RoutineName);
                         rho = GetDensityGlycol(state,
                                                PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                               HWInitConvTemp,
+                                               DataGlobalConstants::HWInitConvTemp(),
                                                PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                                RoutineName);
                         WaterVolFlowRateMaxDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
@@ -1142,7 +1142,7 @@ namespace HWBaseboardRadiator {
                     DesCoilLoad = RatedCapacityDes;
                     rho = GetDensityGlycol(state,
                                            PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                           DataGlobals::HWInitConvTemp,
+                                           DataGlobalConstants::HWInitConvTemp(),
                                            PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                            RoutineNameFull);
                     WaterMassFlowRateStd = HWBaseboard(BaseboardNum).WaterVolFlowRateMax * rho;

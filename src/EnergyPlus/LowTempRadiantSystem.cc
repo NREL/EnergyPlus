@@ -1961,7 +1961,7 @@ namespace LowTempRadiantSystem {
                 if (HydrRadSys(RadSysNum).HotWaterInNode > 0) {
                     rho = GetDensityGlycol(state,
                                            PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidName,
-                                           DataGlobals::HWInitConvTemp,
+                                           DataGlobalConstants::HWInitConvTemp(),
                                            PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                            RoutineName);
                     HydrRadSys(RadSysNum).WaterFlowMaxHeat = rho * HydrRadSys(RadSysNum).WaterVolFlowMaxHeat;
@@ -1977,7 +1977,7 @@ namespace LowTempRadiantSystem {
                 if (HydrRadSys(RadSysNum).ColdWaterInNode > 0) {
                     rho = GetDensityGlycol(state,
                                            PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidName,
-                                           DataGlobals::CWInitConvTemp,
+                                           DataGlobalConstants::CWInitConvTemp(),
                                            PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                            RoutineName);
                     HydrRadSys(RadSysNum).WaterFlowMaxCool = rho * HydrRadSys(RadSysNum).WaterVolFlowMaxCool;
@@ -2002,7 +2002,7 @@ namespace LowTempRadiantSystem {
                 if (CFloRadSys(RadSysNum).HotWaterInNode > 0) {
                     rho = GetDensityGlycol(state,
                                            PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidName,
-                                           DataGlobals::HWInitConvTemp,
+                                           DataGlobalConstants::HWInitConvTemp(),
                                            PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                            RoutineName);
                     CFloRadSys(RadSysNum).HotDesignWaterMassFlowRate = rho * CFloRadSys(RadSysNum).WaterVolFlowMax;
@@ -2018,7 +2018,7 @@ namespace LowTempRadiantSystem {
                 if (CFloRadSys(RadSysNum).ColdWaterInNode > 0) {
                     rho = GetDensityGlycol(state,
                                            PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidName,
-                                           DataGlobals::CWInitConvTemp,
+                                           DataGlobalConstants::CWInitConvTemp(),
                                            PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                            RoutineName);
                     CFloRadSys(RadSysNum).ColdDesignWaterMassFlowRate = rho * CFloRadSys(RadSysNum).WaterVolFlowMax;
@@ -2680,12 +2680,12 @@ namespace LowTempRadiantSystem {
                             if (DesCoilLoad >= SmallLoad) {
                                 rho = GetDensityGlycol(state,
                                                        PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidName,
-                                                       DataGlobals::HWInitConvTemp,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
                                 Cp = GetSpecificHeatGlycol(state,
                                                            PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidName,
-                                                           DataGlobals::HWInitConvTemp,
+                                                           DataGlobalConstants::HWInitConvTemp(),
                                                            PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
                                 WaterVolFlowMaxHeatDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
@@ -2840,12 +2840,12 @@ namespace LowTempRadiantSystem {
                             if (DesCoilLoad >= SmallLoad) {
                                 rho = GetDensityGlycol(state,
                                                        PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidName,
-                                                       DataGlobals::CWInitConvTemp,
+                                                       DataGlobalConstants::CWInitConvTemp(),
                                                        PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                                        RoutineName);
                                 Cp = GetSpecificHeatGlycol(state,
                                                            PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidName,
-                                                           DataGlobals::CWInitConvTemp,
+                                                           DataGlobalConstants::CWInitConvTemp(),
                                                            PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                                            RoutineName);
                                 WaterVolFlowMaxCoolDes = DesCoilLoad / (PlantSizData(PltSizCoolNum).DeltaT * Cp * rho);
@@ -2990,12 +2990,12 @@ namespace LowTempRadiantSystem {
                         if (FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad >= SmallLoad) {
                             rho = GetDensityGlycol(state,
                                                    PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidName,
-                                                   DataGlobals::HWInitConvTemp,
+                                                   DataGlobalConstants::HWInitConvTemp(),
                                                    PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                                    "SizeLowTempRadiantSystem");
                             Cp = GetSpecificHeatGlycol(state,
                                                        PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidName,
-                                                       DataGlobals::HWInitConvTemp,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                                        "SizeLowTempRadiantSystem");
                             WaterVolFlowMaxHeatDes =
@@ -3023,12 +3023,12 @@ namespace LowTempRadiantSystem {
                         if (FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad >= SmallLoad) {
                             rho = GetDensityGlycol(state,
                                                    PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidName,
-                                                   DataGlobals::CWInitConvTemp,
+                                                   DataGlobalConstants::CWInitConvTemp(),
                                                    PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                                    "SizeLowTempRadiantSystem");
                             Cp = GetSpecificHeatGlycol(state,
                                                        PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidName,
-                                                       DataGlobals::CWInitConvTemp,
+                                                       DataGlobalConstants::CWInitConvTemp(),
                                                        PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                                        "SizeLowTempRadiantSystem");
                             WaterVolFlowMaxCoolDes =

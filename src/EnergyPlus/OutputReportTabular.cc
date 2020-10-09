@@ -4826,7 +4826,6 @@ namespace OutputReportTabular {
         // the output variables and data structures shown.
 
         // Using/Aliasing
-        using DataGlobals::convertJtoGJ;
         using DataHeatBalance::BuildingPreDefRep;
 
         using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
@@ -4842,15 +4841,15 @@ namespace OutputReportTabular {
 
         // Only gather zone report at zone time steps
         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
-            BuildingPreDefRep.emiEnvelopConv += SumSurfaceHeatEmission * convertJtoGJ;
+            BuildingPreDefRep.emiEnvelopConv += SumSurfaceHeatEmission * DataGlobalConstants::convertJtoGJ();
             return;
         }
 
         CalcHeatEmissionReport(state);
-        BuildingPreDefRep.emiZoneExfiltration += ZoneTotalExfiltrationHeatLoss * convertJtoGJ;
-        BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss * convertJtoGJ;
-        BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss * convertJtoGJ;
-        BuildingPreDefRep.emiHVACReject += SysTotalHVACRejectHeatLoss * convertJtoGJ;
+        BuildingPreDefRep.emiZoneExfiltration += ZoneTotalExfiltrationHeatLoss * DataGlobalConstants::convertJtoGJ();
+        BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss * DataGlobalConstants::convertJtoGJ();
+        BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss * DataGlobalConstants::convertJtoGJ();
+        BuildingPreDefRep.emiHVACReject += SysTotalHVACRejectHeatLoss * DataGlobalConstants::convertJtoGJ();
 
         BuildingPreDefRep.emiTotHeat = BuildingPreDefRep.emiEnvelopConv + BuildingPreDefRep.emiZoneExfiltration + BuildingPreDefRep.emiZoneExhaust +
                                        BuildingPreDefRep.emiHVACRelief + BuildingPreDefRep.emiHVACReject;
@@ -4866,7 +4865,6 @@ namespace OutputReportTabular {
 
         // Using/Aliasing
         using DataEnvironment::WeatherFileLocationTitle;
-        using DataGlobals::convertJtoGJ;
         using DataHeatBalance::BuildingPreDefRep;
         using DataHeatBalance::NumRefrigCondensers;
         using DataHeatBalance::NumRefrigeratedRacks;
@@ -6441,7 +6439,6 @@ namespace OutputReportTabular {
         int StartOfWeek;
         static Real64 HrsPerWeek(0.0);
         Real64 consumptionTotal;
-        Real64 convertJtoGJ;
         // sensible heat gain report totals
         static Real64 totalZoneEqHt(0.0);
         static Real64 totalZoneEqCl(0.0);
@@ -6462,7 +6459,6 @@ namespace OutputReportTabular {
         static Real64 totalInfilRem(0.0);
         static Real64 totalOtherRem(0.0);
 
-        convertJtoGJ = 1.0 / 1000000000.0;
         StartOfWeek = RunPeriodStartDayOfWeek;
         if (StartOfWeek == 0) StartOfWeek = 2; // if the first day of the week has not been set yet, assume monday
 
@@ -6626,24 +6622,24 @@ namespace OutputReportTabular {
             // annual
             // PreDefTableEntry( pdchSHGSAnHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacHt * convertJtoGJ, 3 );
             // PreDefTableEntry( pdchSHGSAnHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacCl * convertJtoGJ, 3 );
-            PreDefTableEntry(pdchSHGSAnZoneEqHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqHt * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnZoneEqCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqCl * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnHvacATUHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnHvacATUHt * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnHvacATUCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnHvacATUCl * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnSurfHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnSurfHt * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnSurfCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnSurfCl * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnPeoplAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnPeoplAdd * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnLiteAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnLiteAdd * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnEquipAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnEquipAdd * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnWindAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnWindAdd * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnIzaAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnIzaAdd * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnInfilAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnInfilAdd * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnOtherAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnOtherAdd * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnEquipRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnEquipRem * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnWindRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnWindRem * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnIzaRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnIzaRem * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnInfilRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnInfilRem * convertJtoGJ, 3);
-            PreDefTableEntry(pdchSHGSAnOtherRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnOtherRem * convertJtoGJ, 3);
+            PreDefTableEntry(pdchSHGSAnZoneEqHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqHt * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnZoneEqCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqCl * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnHvacATUHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnHvacATUHt * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnHvacATUCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnHvacATUCl * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnSurfHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnSurfHt * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnSurfCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnSurfCl * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnPeoplAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnPeoplAdd * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnLiteAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnLiteAdd * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnEquipAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnEquipAdd * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnWindAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnWindAdd * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnIzaAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnIzaAdd * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnInfilAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnInfilAdd * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnOtherAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnOtherAdd * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnEquipRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnEquipRem * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnWindRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnWindRem * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnIzaRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnIzaRem * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnInfilRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnInfilRem * DataGlobalConstants::convertJtoGJ(), 3);
+            PreDefTableEntry(pdchSHGSAnOtherRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnOtherRem * DataGlobalConstants::convertJtoGJ(), 3);
             // peak cooling
             PreDefTableEntry(pdchSHGSClTimePeak, Zone(iZone).Name, DateToString(ZonePreDefRep(iZone).clPtTimeStamp));
             // PreDefTableEntry( pdchSHGSClHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSClHvacHt );
@@ -6712,24 +6708,24 @@ namespace OutputReportTabular {
         }
         // PreDefTableEntry( pdchSHGSAnHvacHt, "Total Facility", totalHvacHt * convertJtoGJ, 3 );
         // PreDefTableEntry( pdchSHGSAnHvacCl, "Total Facility", totalHvacCl * convertJtoGJ, 3 );
-        PreDefTableEntry(pdchSHGSAnZoneEqHt, "Total Facility", totalZoneEqHt * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnZoneEqCl, "Total Facility", totalZoneEqCl * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnHvacATUHt, "Total Facility", totalHvacATUHt * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnHvacATUCl, "Total Facility", totalHvacATUCl * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnSurfHt, "Total Facility", totalSurfHt * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnSurfCl, "Total Facility", totalSurfCl * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnPeoplAdd, "Total Facility", totalPeoplAdd * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnLiteAdd, "Total Facility", totalLiteAdd * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnEquipAdd, "Total Facility", totalEquipAdd * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnWindAdd, "Total Facility", totalWindAdd * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnIzaAdd, "Total Facility", totalIzaAdd * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnInfilAdd, "Total Facility", totalInfilAdd * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnOtherAdd, "Total Facility", totalOtherAdd * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnEquipRem, "Total Facility", totalEquipRem * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnWindRem, "Total Facility", totalWindRem * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnIzaRem, "Total Facility", totalIzaRem * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnInfilRem, "Total Facility", totalInfilRem * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnOtherRem, "Total Facility", totalOtherRem * convertJtoGJ, 3);
+        PreDefTableEntry(pdchSHGSAnZoneEqHt, "Total Facility", totalZoneEqHt * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnZoneEqCl, "Total Facility", totalZoneEqCl * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnHvacATUHt, "Total Facility", totalHvacATUHt * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnHvacATUCl, "Total Facility", totalHvacATUCl * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnSurfHt, "Total Facility", totalSurfHt * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnSurfCl, "Total Facility", totalSurfCl * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnPeoplAdd, "Total Facility", totalPeoplAdd * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnLiteAdd, "Total Facility", totalLiteAdd * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnEquipAdd, "Total Facility", totalEquipAdd * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnWindAdd, "Total Facility", totalWindAdd * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnIzaAdd, "Total Facility", totalIzaAdd * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnInfilAdd, "Total Facility", totalInfilAdd * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnOtherAdd, "Total Facility", totalOtherAdd * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnEquipRem, "Total Facility", totalEquipRem * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnWindRem, "Total Facility", totalWindRem * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnIzaRem, "Total Facility", totalIzaRem * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnInfilRem, "Total Facility", totalInfilRem * DataGlobalConstants::convertJtoGJ(), 3);
+        PreDefTableEntry(pdchSHGSAnOtherRem, "Total Facility", totalOtherRem * DataGlobalConstants::convertJtoGJ(), 3);
         // building level results for peak cooling
         PreDefTableEntry(pdchSHGSClTimePeak, "Total Facility", DateToString(BuildingPreDefRep.clPtTimeStamp));
         // PreDefTableEntry( pdchSHGSClHvacHt, "Total Facility", BuildingPreDefRep.SHGSClHvacHt );

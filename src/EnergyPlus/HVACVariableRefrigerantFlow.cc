@@ -5231,7 +5231,7 @@ namespace HVACVariableRefrigerantFlow {
                 if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow > 0.0) {
                     rho = GetDensityGlycol(state,
                                            PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
-                                           DataGlobals::HWInitConvTemp,
+                                           DataGlobalConstants::HWInitConvTemp(),
                                            PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
                                            RoutineName);
                     VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * rho;
@@ -5958,7 +5958,8 @@ namespace HVACVariableRefrigerantFlow {
 
             if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
                 rho = GetDensityGlycol(
-                    state, PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, CWInitConvTemp, PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
+                    state, PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, DataGlobalConstants::CWInitConvTemp(),
+                    PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
                 VRF(VRFCond).WaterCondenserDesignMassFlow = VRF(VRFCond).WaterCondVolFlowRate * rho;
 
                 InitComponentNodes(0.0,
@@ -5988,7 +5989,7 @@ namespace HVACVariableRefrigerantFlow {
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             rho = GetDensityGlycol(state,
                                                    PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
-                                                   DataGlobals::HWInitConvTemp,
+                                                   DataGlobalConstants::HWInitConvTemp(),
                                                    PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
                                                    RoutineName);
                             VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = CoilMaxVolFlowRate * rho;
@@ -8181,7 +8182,7 @@ namespace HVACVariableRefrigerantFlow {
                     }
 
                     rho = FluidProperties::GetDensityGlycol(
-                        state, PlantLoop(this->SourceLoopNum).FluidName, CWInitConvTemp, PlantLoop(this->SourceLoopNum).FluidIndex, RoutineName);
+                        state, PlantLoop(this->SourceLoopNum).FluidName, DataGlobalConstants::CWInitConvTemp(), PlantLoop(this->SourceLoopNum).FluidIndex, RoutineName);
                     this->WaterCondenserDesignMassFlow = this->WaterCondVolFlowRate * rho;
                     PlantUtilities::InitComponentNodes(0.0,
                                                        this->WaterCondenserDesignMassFlow,

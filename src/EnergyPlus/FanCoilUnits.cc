@@ -1269,7 +1269,7 @@ namespace FanCoilUnits {
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil_Water) {
                 rho = GetDensityGlycol(state,
                                        PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidName,
-                                       DataGlobals::HWInitConvTemp,
+                                       DataGlobalConstants::HWInitConvTemp(),
                                        PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidIndex,
                                        RoutineName);
                 FanCoil(FanCoilNum).MaxHeatCoilFluidFlow = rho * FanCoil(FanCoilNum).MaxHotWaterVolFlow;
@@ -1278,7 +1278,7 @@ namespace FanCoilUnits {
 
             rho = GetDensityGlycol(state,
                                    PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidName,
-                                   DataGlobals::CWInitConvTemp,
+                                   DataGlobalConstants::CWInitConvTemp(),
                                    PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidIndex,
                                    RoutineName);
             FanCoil(FanCoilNum).MaxCoolCoilFluidFlow = rho * FanCoil(FanCoilNum).MaxColdWaterVolFlow;
@@ -1886,12 +1886,12 @@ namespace FanCoilUnits {
                             if (DesCoilLoad >= SmallLoad) {
                                 rho = GetDensityGlycol(state,
                                                        PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidName,
-                                                       DataGlobals::HWInitConvTemp,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidIndex,
                                                        RoutineNameNoSpace);
                                 Cp = GetSpecificHeatGlycol(state,
                                                            PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidName,
-                                                           DataGlobals::HWInitConvTemp,
+                                                           DataGlobalConstants::HWInitConvTemp(),
                                                            PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidIndex,
                                                            RoutineNameNoSpace);
 

@@ -245,7 +245,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
     DataSurfaces::Surface(winNum).OutDryBulbTemp = T_out;
     DataHeatBalance::TempEffBulkAir(winNum) = T_in;
-    DataSurfaces::SurfWinIRfromParentZone(winNum) = DataGlobals::StefanBoltzmann * std::pow(T_in + DataGlobals::KelvinConv, 4);
+    DataSurfaces::SurfWinIRfromParentZone(winNum) = DataGlobalConstants::StefanBoltzmann() * std::pow(T_in + DataGlobalConstants::KelvinConv(), 4);
     DataHeatBalFanSys::ZoneAirHumRatAvg.dimension(1, 0.01);
     DataHeatBalFanSys::ZoneAirHumRat.dimension(1, 0.01);
     DataHeatBalFanSys::MAT.dimension(1, T_in);
@@ -2824,14 +2824,12 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     Real64 inSurfTemp;
     Real64 outSurfTemp;
-    Real64 const StefanBoltzmann(5.6697E-8);
-    Real64 const KelvinConv(273.15);
     ScheduleManager::Schedule(1).CurrentValue = 25.0; // Srd Srfs Temp
     // Claculate temperature based on supply flow rate
 
     WindowManager::CalcWindowHeatBalance(state, surfNum2, DataHeatBalance::HConvIn(surfNum2), inSurfTemp, outSurfTemp);
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(state.dataWindowManager->thetas(1))), DataHeatBalSurface::QRadLWOutSrdSurfs(surfNum2));
+    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann() * 0.84 * 0.6 * (pow_4(25.0 + DataGlobalConstants::KelvinConv()) - pow_4(state.dataWindowManager->thetas(1))), DataHeatBalSurface::QRadLWOutSrdSurfs(surfNum2));
     EXPECT_NEAR(-24.9342, DataHeatBalSurface::QHeatEmiReport(surfNum2),3);
 }
 TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)

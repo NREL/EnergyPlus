@@ -866,7 +866,7 @@ namespace PoweredInductionUnits {
                 // plant upgrade note? why no separate handling of steam coil? add it ?
                 rho = GetDensityGlycol(state,
                                        PlantLoop(PIU(PIUNum).HWLoopNum).FluidName,
-                                       DataGlobals::HWInitConvTemp,
+                                       DataGlobalConstants::HWInitConvTemp(),
                                        PlantLoop(PIU(PIUNum).HWLoopNum).FluidIndex,
                                        RoutineName);
 
@@ -1339,12 +1339,12 @@ namespace PoweredInductionUnits {
 
                                 rho = GetDensityGlycol(state,
                                                        PlantLoop(PIU(PIUNum).HWLoopNum).FluidName,
-                                                       DataGlobals::HWInitConvTemp,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(PIU(PIUNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
                                 Cp = GetSpecificHeatGlycol(state,
                                                            PlantLoop(PIU(PIUNum).HWLoopNum).FluidName,
-                                                           DataGlobals::HWInitConvTemp,
+                                                           DataGlobalConstants::HWInitConvTemp(),
                                                            PlantLoop(PIU(PIUNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
 

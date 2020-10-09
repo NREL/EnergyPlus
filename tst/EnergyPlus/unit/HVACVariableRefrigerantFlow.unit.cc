@@ -5674,7 +5674,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     EXPECT_DOUBLE_EQ(CondVolFlowRate, VRF(VRFCond).WaterCondVolFlowRate);
 
     rho = GetDensityGlycol(state,
-        PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, InitConvTemp, PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
+        PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, DataGlobalConstants::InitConvTemp(), PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
     EXPECT_DOUBLE_EQ(VRF(VRFCond).WaterCondenserDesignMassFlow, (VRF(VRFCond).WaterCondVolFlowRate * rho));
 
     // set zone load to heating

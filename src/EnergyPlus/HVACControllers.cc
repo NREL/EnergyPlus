@@ -1193,7 +1193,7 @@ namespace HVACControllers {
 
             rho = GetDensityGlycol(state,
                                    PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidName,
-                                   CWInitConvTemp,
+                                   DataGlobalConstants::CWInitConvTemp(),
                                    PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidIndex,
                                    RoutineName);
 

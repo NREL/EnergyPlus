@@ -460,7 +460,7 @@ namespace Boilers {
             // if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                 DataGlobals::HWInitConvTemp,
+                                                                 DataGlobalConstants::HWInitConvTemp(),
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                  RoutineName);
             this->DesMassFlowRate = this->VolFlowRate * rho;
@@ -561,12 +561,12 @@ namespace Boilers {
 
                 Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                      DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                     DataGlobals::HWInitConvTemp,
+                                                                     DataGlobalConstants::HWInitConvTemp(),
                                                                      DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                      RoutineName);
                 Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                          DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                         DataGlobals::HWInitConvTemp,
+                                                                         DataGlobalConstants::HWInitConvTemp(),
                                                                          DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                          RoutineName);
                 tmpNomCap = Cp * rho * this->SizFac * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate;

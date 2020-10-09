@@ -83,7 +83,6 @@ namespace TARCOGArgs {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using DataGlobals::StefanBoltzmann;
     using namespace TARCOGCommon;
     using namespace TARCOGGassesParams;
     using namespace TARCOGOutput;
@@ -692,10 +691,10 @@ namespace TARCOGArgs {
             auto const SELECT_CASE_var(isky);
             if (SELECT_CASE_var == 3) {
                 Gout = outir;
-                trmout = root_4(Gout / StefanBoltzmann);
+                trmout = root_4(Gout / DataGlobalConstants::StefanBoltzmann());
             } else if (SELECT_CASE_var == 2) { // effective clear sky emittance from swinbank (SPC142/ISO15099 equations 131, 132, ...)
                 Rsky = 5.31e-13 * pow_6(tout);
-                esky = Rsky / (StefanBoltzmann * pow_4(tout)); // check esky const, also check what esky to use when tsky input...
+                esky = Rsky / (DataGlobalConstants::StefanBoltzmann() * pow_4(tout)); // check esky const, also check what esky to use when tsky input...
             } else if (SELECT_CASE_var == 1) {
                 esky = pow_4(tsky) / pow_4(tout);
             } else if (SELECT_CASE_var == 0) { // for isky=0 it is assumed that actual values for esky and Tsky are specified
@@ -721,7 +720,7 @@ namespace TARCOGArgs {
                 trmout = tout * root_4(e0);
             }
 
-            Gout = StefanBoltzmann * pow_4(trmout);
+            Gout = DataGlobalConstants::StefanBoltzmann() * pow_4(trmout);
         } // if (isky.ne.3) then
 
         ebsky = Gout;
@@ -739,7 +738,7 @@ namespace TARCOGArgs {
             trmin = tind;
         }
 
-        Gin = StefanBoltzmann * pow_4(trmin);
+        Gin = DataGlobalConstants::StefanBoltzmann() * pow_4(trmin);
         ebroom = Gin;
 
         // calculate ir reflectance:

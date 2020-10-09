@@ -864,7 +864,7 @@ namespace UnitHeater {
 
             if (UnitHeat(UnitHeatNum).HCoilType == WaterHeatingCoil) {
                 rho = GetDensityGlycol(state, PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
-                                       DataGlobals::HWInitConvTemp,
+                                       DataGlobalConstants::HWInitConvTemp(),
                                        PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                        RoutineName);
 
@@ -1224,11 +1224,11 @@ namespace UnitHeater {
 
                             if (DesCoilLoad >= SmallLoad) {
                                 rho = GetDensityGlycol(state, PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
-                                                       DataGlobals::HWInitConvTemp,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
                                 Cp = GetSpecificHeatGlycol(state, PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
-                                                           DataGlobals::HWInitConvTemp,
+                                                           DataGlobalConstants::HWInitConvTemp(),
                                                            PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
                                 MaxVolHotWaterFlowDes = DesCoilLoad / (WaterCoilSizDeltaT * Cp * rho);

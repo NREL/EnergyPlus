@@ -1272,7 +1272,7 @@ namespace Fans {
             //   StdRhoAir=PsyRhoAirFnPbTdbW(StdBaroPress,20,0)
             // From PsychRoutines:
             //   w=MAX(dw,1.0d-5)
-            //   rhoair = pb/(287.d0*(tdb+KelvinConv)*(1.0d0+1.6077687d0*w))
+            //   rhoair = pb/(287.d0*(tdb+DataGlobalConstants::KelvinConv())*(1.0d0+1.6077687d0*w))
             RhoAir = StdRhoAir;
 
             // Adjust max fan volumetric airflow using fan sizing factor
@@ -2321,7 +2321,7 @@ namespace Fans {
         //   StdRhoAir=PsyRhoAirFnPbTdbW(StdBaroPress,20,0)
         // From PsychRoutines:
         //   w=MAX(dw,1.0d-5)
-        //   rhoair = pb/(287.d0*(tdb+KelvinConv)*(1.0d0+1.6077687d0*w))
+        //   rhoair = pb/(287.d0*(tdb+DataGlobalConstants::KelvinConv())*(1.0d0+1.6077687d0*w))
         RhoAir = Fan(FanNum).RhoAirStdInit;
         MassFlow = min(Fan(FanNum).InletAirMassFlowRate, Fan(FanNum).MaxAirMassFlowRate);
 

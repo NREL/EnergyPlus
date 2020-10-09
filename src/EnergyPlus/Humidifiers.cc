@@ -864,7 +864,7 @@ namespace Humidifiers {
             }
 
             if (!HardSizeNoDesRun) {
-                NomCapVolDes = MassFlowDes * (OutletHumRatDes - InletHumRatDes) / RhoH2O(DataGlobals::InitConvTemp);
+                NomCapVolDes = MassFlowDes * (OutletHumRatDes - InletHumRatDes) / RhoH2O(DataGlobalConstants::InitConvTemp());
                 if (NomCapVolDes < 0.0) NomCapVolDes = 0.0; // No humidity demand
 
                 if (IsAutoSize) {
@@ -894,7 +894,7 @@ namespace Humidifiers {
                 }
             }
 
-            NomCap = RhoH2O(DataGlobals::InitConvTemp) * NomCapVol;
+            NomCap = RhoH2O(DataGlobalConstants::InitConvTemp()) * NomCapVol;
             RefrigerantIndex = FindRefrigerant(state, fluidNameSteam);
             WaterIndex = FindGlycol(state, fluidNameWater);
             SteamSatEnthalpy = GetSatEnthalpyRefrig(state, fluidNameSteam, TSteam, 1.0, RefrigerantIndex, CalledFrom);
@@ -1086,7 +1086,7 @@ namespace Humidifiers {
         HumRatSatOut = 0.0;
         HumRatSatApp = 0.0;
         WaterInEnthalpy = 2676125.0; // At 100 C
-        WaterDens = RhoH2O(DataGlobals::InitConvTemp);
+        WaterDens = RhoH2O(DataGlobalConstants::InitConvTemp());
         WaterAddNeededMax = min(WaterAddNeeded, NomCap);
         if (WaterAddNeededMax > 0.0) {
             //   ma*W1 + mw = ma*W2
@@ -1201,7 +1201,7 @@ namespace Humidifiers {
         HumRatSatOut = 0.0;
         HumRatSatApp = 0.0;
         WaterInEnthalpy = 2676125.0; // At 100 C
-        WaterDens = RhoH2O(DataGlobals::InitConvTemp);
+        WaterDens = RhoH2O(DataGlobalConstants::InitConvTemp());
         WaterAddNeededMax = min(WaterAddNeeded, NomCap);
         if (WaterAddNeededMax > 0.0) {
             //   ma*W1 + mw = ma*W2

@@ -1471,7 +1471,7 @@ namespace UnitVentilator {
                 if (UnitVent(UnitVentNum).HCoilType == Heating_WaterCoilType) {
 
                     rho = GetDensityGlycol(state, PlantLoop(UnitVent(UnitVentNum).HWLoopNum).FluidName,
-                                           HWInitConvTemp,
+                                           DataGlobalConstants::HWInitConvTemp(),
                                            PlantLoop(UnitVent(UnitVentNum).HWLoopNum).FluidIndex,
                                            RoutineName);
 
@@ -2227,11 +2227,11 @@ namespace UnitVentilator {
                                     DesHeatingLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 }
                                 rho = GetDensityGlycol(state, PlantLoop(UnitVent(UnitVentNum).HWLoopNum).FluidName,
-                                                       HWInitConvTemp,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(UnitVent(UnitVentNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
                                 Cp = GetSpecificHeatGlycol(state, PlantLoop(UnitVent(UnitVentNum).HWLoopNum).FluidName,
-                                                           HWInitConvTemp,
+                                                           DataGlobalConstants::HWInitConvTemp(),
                                                            PlantLoop(UnitVent(UnitVentNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
                                 MaxVolHotWaterFlowDes = DesHeatingLoad / (WaterCoilSizDeltaT * Cp * rho);

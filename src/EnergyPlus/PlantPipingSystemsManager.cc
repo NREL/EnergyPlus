@@ -2157,7 +2157,7 @@ namespace EnergyPlus {
                 // Once we find ourselves on the plant loop, we can do other things
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
-                                                               DataGlobals::InitConvTemp,
+                                                               DataGlobalConstants::InitConvTemp(),
                                                                DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
                                                                RoutineName);
                 thisCircuit->DesignMassFlowRate = thisCircuit->DesignVolumeFlowRate * rho;

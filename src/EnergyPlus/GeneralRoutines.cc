@@ -1059,7 +1059,6 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     Real64 const nu(15.66e-6);       // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
     Real64 const k(0.0267);          // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
     Real64 const Sigma(5.6697e-08);  // Stefan-Boltzmann constant
-    Real64 const KelvinConv(273.15); // Conversion from Celsius to Kelvin
     static std::string const RoutineName("CalcPassiveExteriorBaffleGap");
     // INTERFACE BLOCK SPECIFICATIONS:
 
@@ -1155,8 +1154,8 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         InitExteriorConvectionCoeff(state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = Surface(SurfPtr).Construction;
         AbsThermSurf = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
-        TsoK = TH(1, 1, SurfPtr) + KelvinConv;
-        TsBaffK = TmpTsBaf + KelvinConv;
+        TsoK = TH(1, 1, SurfPtr) + DataGlobalConstants::KelvinConv();
+        TsBaffK = TmpTsBaf + DataGlobalConstants::KelvinConv();
         if (TsBaffK == TsoK) {        // avoid divide by zero
             HPlenARR(ThisSurf) = 0.0; // no net heat transfer if same temperature
         } else {
@@ -1219,7 +1218,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     //	Isc = sum( QRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
     Isc = sum_product_sub(QRadSWOutIncident, Surface, &SurfaceData::Area, SurfPtrARR) / A; // Autodesk:F2C++ Functions handle array subscript usage
 
-    TmeanK = 0.5 * (TmpTsBaf + Tso) + KelvinConv;
+    TmeanK = 0.5 * (TmpTsBaf + Tso) + DataGlobalConstants::KelvinConv();
 
     Gr = g * pow_3(GapThick) * std::abs(Tso - TmpTsBaf) * pow_2(RhoAir) / (TmeanK * pow_2(nu));
 
@@ -1231,14 +1230,14 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     VdotWind = Cv * (VentArea / 2.0) * Vwind;
 
     if (TaGap > Tamb) {
-        VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (TaGap - Tamb) / (TaGap + KelvinConv));
+        VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (TaGap - Tamb) / (TaGap + DataGlobalConstants::KelvinConv()));
     } else if (TaGap == Tamb) {
         VdotThermal = 0.0;
     } else {
         if ((std::abs(Tilt) < 5.0) || (std::abs(Tilt - 180.0) < 5.0)) {
             VdotThermal = 0.0; // stable bouyancy situation
         } else {
-            VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (Tamb - TaGap) / (Tamb + KelvinConv));
+            VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (Tamb - TaGap) / (Tamb + DataGlobalConstants::KelvinConv()));
         }
     }
 

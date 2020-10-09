@@ -161,8 +161,6 @@ namespace TARCOGOutput {
     {
 
         // Using/Aliasing
-        using DataGlobals::KelvinConv;
-
         // Argument array dimensioning
         EP_SIZE_CHECK(ibc, 2);
         EP_SIZE_CHECK(LayerType, maxlay);
@@ -326,9 +324,9 @@ namespace TARCOGOutput {
         print(InArgumentsFile, Format_1000);
         print(InArgumentsFile, "\n");
         print(InArgumentsFile, Format_1005);
-        print(InArgumentsFile, Format_1010, tout, tout - KelvinConv);
-        print(InArgumentsFile, Format_1015, tind, tind - KelvinConv);
-        print(InArgumentsFile, Format_1020, trmin, trmin - KelvinConv);
+        print(InArgumentsFile, Format_1010, tout, tout - DataGlobalConstants::KelvinConv());
+        print(InArgumentsFile, Format_1015, tind, tind - DataGlobalConstants::KelvinConv());
+        print(InArgumentsFile, Format_1020, trmin, trmin - DataGlobalConstants::KelvinConv());
         print(InArgumentsFile, Format_1030, wso);
         if (iwd == 0) print(InArgumentsFile, Format_1032); // windward
         if (iwd == 1) print(InArgumentsFile, Format_1033); // leeward
@@ -336,7 +334,7 @@ namespace TARCOGOutput {
         print(InArgumentsFile, Format_1040, dir);
         print(InArgumentsFile, Format_1041, outir);
         print(InArgumentsFile, Format_1045, isky);
-        print(InArgumentsFile, Format_1050, tsky, tsky - KelvinConv);
+        print(InArgumentsFile, Format_1050, tsky, tsky - DataGlobalConstants::KelvinConv());
         print(InArgumentsFile, Format_1055, esky);
         print(InArgumentsFile, Format_1060, fclr);
         print(InArgumentsFile, Format_1061, VacuumPressure);
@@ -545,8 +543,6 @@ namespace TARCOGOutput {
     {
 
         // Using/Aliasing
-        using DataGlobals::KelvinConv;
-
         // Argument array dimensioning
         EP_SIZE_CHECK(LayerType, maxlay);
         EP_SIZE_CHECK(nmix, maxlay1);
@@ -595,8 +591,8 @@ namespace TARCOGOutput {
         print(InArgumentsFile, Format_1014);
         print(InArgumentsFile, "\n");
         print(InArgumentsFile, Format_1055, esky);
-        print(InArgumentsFile, Format_1016, trmout, trmout - KelvinConv);
-        print(InArgumentsFile, Format_1020, trmin, trmin - KelvinConv);
+        print(InArgumentsFile, Format_1016, trmout, trmout - DataGlobalConstants::KelvinConv());
+        print(InArgumentsFile, Format_1020, trmin, trmin - DataGlobalConstants::KelvinConv());
         print(InArgumentsFile, Format_1019, ebsky);
         print(InArgumentsFile, Format_10191, ebroom);
         print(InArgumentsFile, Format_1017, Gout);
@@ -685,8 +681,6 @@ namespace TARCOGOutput {
     {
 
         // Using/Aliasing
-        using DataGlobals::KelvinConv;
-
         // Argument array dimensioning
         EP_SIZE_CHECK(q, maxlay3);
         EP_SIZE_CHECK(qv, maxlay1);
@@ -779,7 +773,7 @@ namespace TARCOGOutput {
         print(OutArgumentsFile, "\n");
         print(OutArgumentsFile, Format_2350);
         print(OutArgumentsFile, "\n");
-        print(OutArgumentsFile, Format_2105, tamb, tamb - KelvinConv);
+        print(OutArgumentsFile, Format_2105, tamb, tamb - DataGlobalConstants::KelvinConv());
         print(OutArgumentsFile, Format_2180, q(1));
 
         // bi  Write out layer properties:
@@ -788,25 +782,25 @@ namespace TARCOGOutput {
             {
                 auto const SELECT_CASE_var(LayerType(i));
                 if (SELECT_CASE_var == SPECULAR) { // Specular layer
-                    print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - KelvinConv);
+                    print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv());
                     print(OutArgumentsFile, Format_2190, i, q(2 * i));
-                    print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - KelvinConv);
+                    print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv());
                 } else if (SELECT_CASE_var == VENETBLIND_HORIZ || SELECT_CASE_var == VENETBLIND_VERT) { // Venetian blind
-                    print(OutArgumentsFile, Format_2111, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - KelvinConv);
+                    print(OutArgumentsFile, Format_2111, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv());
                     print(OutArgumentsFile, Format_2195, i, q(2 * i), i, ShadeGapKeffConv(i));
-                    print(OutArgumentsFile, Format_2111, 2 * i, theta(2 * i), theta(2 * i) - KelvinConv);
+                    print(OutArgumentsFile, Format_2111, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv());
                 } else if (SELECT_CASE_var == WOVSHADE) { // Venetian blind
-                    print(OutArgumentsFile, Format_2112, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - KelvinConv);
+                    print(OutArgumentsFile, Format_2112, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv());
                     print(OutArgumentsFile, Format_2195, i, q(2 * i), i, ShadeGapKeffConv(i));
-                    print(OutArgumentsFile, Format_2112, 2 * i, theta(2 * i), theta(2 * i) - KelvinConv);
+                    print(OutArgumentsFile, Format_2112, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv());
                 } else if (SELECT_CASE_var == DIFFSHADE) { // Venetian blind
-                    print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - KelvinConv);
+                    print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv());
                     print(OutArgumentsFile, Format_2190, i, q(2 * i));
-                    print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - KelvinConv);
+                    print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv());
                 } else {
-                    print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - KelvinConv);
+                    print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv());
                     print(OutArgumentsFile, Format_2199, i, q(2 * i));
-                    print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - KelvinConv);
+                    print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv());
                 }
             }
 
@@ -832,7 +826,7 @@ namespace TARCOGOutput {
             }
         } // i - layers
 
-        print(OutArgumentsFile, Format_2115, troom, troom - KelvinConv);
+        print(OutArgumentsFile, Format_2115, troom, troom - DataGlobalConstants::KelvinConv());
 
         print(OutArgumentsFile, "\n");
 

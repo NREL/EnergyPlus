@@ -1442,8 +1442,6 @@ namespace ThermalISO15099Calc {
         //   index     iteration step
 
         // Using
-        using DataGlobals::StefanBoltzmann;
-
         // Locals
         //    0 - don't create debug output files
         //    1 - append results to existing debug output file
@@ -2062,8 +2060,8 @@ namespace ThermalISO15099Calc {
             k = 2 * i - 1;
             Rf(i) = Radiation(k);
             Rb(i) = Radiation(k + 1);
-            Ebf(i) = StefanBoltzmann * pow_4(theta(k));
-            Ebb(i) = StefanBoltzmann * pow_4(theta(k + 1));
+            Ebf(i) = DataGlobalConstants::StefanBoltzmann() * pow_4(theta(k));
+            Ebb(i) = DataGlobalConstants::StefanBoltzmann() * pow_4(theta(k + 1));
         }
         // end if
 
@@ -2078,7 +2076,7 @@ namespace ThermalISO15099Calc {
             qr_gap_in = Rf(nlayer) - Rb(nlayer - 1);
 
             if (IsShadingLayer(LayerType(1))) {
-                ShadeEmisRatioOut = qr_gap_out / (emis(3) * StefanBoltzmann * (pow_4(theta(3)) - pow_4(trmout)));
+                ShadeEmisRatioOut = qr_gap_out / (emis(3) * DataGlobalConstants::StefanBoltzmann() * (pow_4(theta(3)) - pow_4(trmout)));
                 // qc_gap_out = qprim(3) - qr_gap_out
                 // qcgapout2 = qcgas(1)
                 // Hc_modified_out = (qc_gap_out / (theta(3) - tout))
@@ -2086,7 +2084,7 @@ namespace ThermalISO15099Calc {
             }
 
             if (IsShadingLayer(LayerType(nlayer))) {
-                ShadeEmisRatioIn = qr_gap_in / (emis(2 * nlayer - 2) * StefanBoltzmann * (pow_4(trmin) - pow_4(theta(2 * nlayer - 2))));
+                ShadeEmisRatioIn = qr_gap_in / (emis(2 * nlayer - 2) * DataGlobalConstants::StefanBoltzmann() * (pow_4(trmin) - pow_4(theta(2 * nlayer - 2))));
                 qc_gap_in = q(2 * nlayer - 1) - qr_gap_in;
                 hc_modified_in = (qc_gap_in / (tind - theta(2 * nlayer - 2)));
                 ShadeHcModifiedIn = hc_modified_in;
@@ -2139,8 +2137,6 @@ namespace ThermalISO15099Calc {
         //   delta   delta T per unit length
 
         // Using
-        using DataGlobals::StefanBoltzmann;
-
         // Argument array dimensioning
         EP_SIZE_CHECK(gap, MaxGap);
         EP_SIZE_CHECK(thick, maxlay);
@@ -2177,8 +2173,8 @@ namespace ThermalISO15099Calc {
             j = 2 * i;
             theta(j - 1) = tout + x(j - 1) * delta;
             theta(j) = tout + x(j) * delta;
-            Ebf(i) = StefanBoltzmann * pow_4(theta(j - 1));
-            Ebb(i) = StefanBoltzmann * pow_4(theta(j));
+            Ebf(i) = DataGlobalConstants::StefanBoltzmann() * pow_4(theta(j - 1));
+            Ebb(i) = DataGlobalConstants::StefanBoltzmann() * pow_4(theta(j));
         }
 
         for (i = 1; i <= nlayer + 1; ++i) {
@@ -2205,8 +2201,6 @@ namespace ThermalISO15099Calc {
         //***********************************************************************
 
         // Using
-        using DataGlobals::StefanBoltzmann;
-
         // Argument array dimensioning
         EP_SIZE_CHECK(theta, maxlay2);
         EP_SIZE_CHECK(Tgap, maxlay1);
@@ -2238,8 +2232,8 @@ namespace ThermalISO15099Calc {
             j = 2 * i;
             told(j) = theta(j);
             told(j - 1) = theta(j - 1);
-            theta(j - 1) = root_4(Ebf(i) / StefanBoltzmann);
-            theta(j) = root_4(Ebb(i) / StefanBoltzmann);
+            theta(j - 1) = root_4(Ebf(i) / DataGlobalConstants::StefanBoltzmann());
+            theta(j) = root_4(Ebb(i) / DataGlobalConstants::StefanBoltzmann());
             if (i != 1) {
                 Tgap(i) = (theta(j - 1) + theta(j - 2)) / 2;
             }
@@ -3350,8 +3344,6 @@ namespace ThermalISO15099Calc {
     {
 
         // Using/Aliasing
-        using DataGlobals::KelvinConv;
-
         // Locals
         // character(len=*), intent(inout) :: ErrorMessage
 
@@ -3383,10 +3375,10 @@ namespace ThermalISO15099Calc {
         print(files.TarcogIterationsFile, "*************************************************************************************************\n");
         print(files.TarcogIterationsFile, "Iteration number: {:5}\n" , index);
 
-        print(files.TarcogIterationsFile, "Trmin = {:8.4F}\n" , trmin - KelvinConv);
-        print(files.TarcogIterationsFile, "Troom = {:12.6F}\n" , troom - KelvinConv);
-        print(files.TarcogIterationsFile, "Trmout = {:8.4F}\n" , trmout - KelvinConv);
-        print(files.TarcogIterationsFile, "Tamb = {:12.6F}\n" , tamb - KelvinConv);
+        print(files.TarcogIterationsFile, "Trmin = {:8.4F}\n" , trmin - DataGlobalConstants::KelvinConv());
+        print(files.TarcogIterationsFile, "Troom = {:12.6F}\n" , troom - DataGlobalConstants::KelvinConv());
+        print(files.TarcogIterationsFile, "Trmout = {:8.4F}\n" , trmout - DataGlobalConstants::KelvinConv());
+        print(files.TarcogIterationsFile, "Tamb = {:12.6F}\n" , tamb - DataGlobalConstants::KelvinConv());
 
         print(files.TarcogIterationsFile, "Ebsky = {:8.4F}\n" , ebsky);
         print(files.TarcogIterationsFile, "Ebroom = {:8.4F}\n" , ebroom);
@@ -3461,9 +3453,9 @@ namespace ThermalISO15099Calc {
         print(files.TarcogIterationsFile, "\n");
 
         // write temperatures
-        print(files.TarcogIterationsFile, "{:16.8F}   \n", theta(1) - KelvinConv);
+        print(files.TarcogIterationsFile, "{:16.8F}   \n", theta(1) - DataGlobalConstants::KelvinConv());
         for (i = 2; i <= 2 * nlayer; ++i) {
-            print(files.TarcogIterationsFile, "   {:16.8F}   \n", theta(i) - KelvinConv);
+            print(files.TarcogIterationsFile, "   {:16.8F}   \n", theta(i) - DataGlobalConstants::KelvinConv());
         }
         print(files.TarcogIterationsFile, "\n");
 
@@ -3483,9 +3475,9 @@ namespace ThermalISO15099Calc {
             print(files.IterationCSVFile, dynFormat);
             print(files.IterationCSVFile, "\n");
         }
-        print(files.IterationCSVFile, "{:16.8F}   \n", theta(1) - KelvinConv);
+        print(files.IterationCSVFile, "{:16.8F}   \n", theta(1) - DataGlobalConstants::KelvinConv());
         for (i = 2; i <= 2 * nlayer; ++i) {
-            print(files.IterationCSVFile, "   {:16.8F}   \n", theta(i) - KelvinConv);
+            print(files.IterationCSVFile, "   {:16.8F}   \n", theta(i) - DataGlobalConstants::KelvinConv());
         }
         print(files.IterationCSVFile, "\n");
 

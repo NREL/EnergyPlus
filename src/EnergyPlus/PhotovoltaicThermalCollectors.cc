@@ -578,7 +578,7 @@ namespace PhotovoltaicThermalCollectors {
 
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                    DataPlant::PlantLoop(this->WLoopNum).FluidName,
-                                                                   DataGlobals::HWInitConvTemp,
+                                                                   DataGlobalConstants::HWInitConvTemp(),
                                                                    DataPlant::PlantLoop(this->WLoopNum).FluidIndex,
                                                                    RoutineName);
 

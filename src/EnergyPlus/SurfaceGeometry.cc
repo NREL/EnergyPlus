@@ -2023,7 +2023,7 @@ namespace SurfaceGeometry {
             ErrCount = 0;
             for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 Zone(ZoneNum).CalcFloorArea = Zone(ZoneNum).FloorArea;
-                if (Zone(ZoneNum).UserEnteredFloorArea != AutoCalculate) {
+                if (Zone(ZoneNum).UserEnteredFloorArea != DataGlobalConstants::AutoCalculate()) {
                     // Check entered vs calculated
                     if (Zone(ZoneNum).UserEnteredFloorArea > 0.0) { // User entered zone floor area,
                         // produce message if not near calculated
@@ -2809,7 +2809,7 @@ namespace SurfaceGeometry {
                         ShadingTransmittanceVaries = true;
                     }
                 }
-                if (lNumericFieldBlanks(1) || rNumericArgs(1) == AutoCalculate) {
+                if (lNumericFieldBlanks(1) || rNumericArgs(1) == DataGlobalConstants::AutoCalculate()) {
                     numSides = (NumNumbers - 1) / 3;
                     SurfaceTmp(SurfNum).Sides = numSides;
                     if (mod(NumNumbers - 1, 3) != 0) {
@@ -3414,8 +3414,8 @@ namespace SurfaceGeometry {
                 if (SurfaceTmp(SurfNum).Construction > 0) SurfaceTmp(SurfNum).ExtEcoRoof = state.dataConstruction->Construct(SurfaceTmp(SurfNum).Construction).TypeIsEcoRoof;
 
                 SurfaceTmp(SurfNum).ViewFactorGround = rNumericArgs(1);
-                if (lNumericFieldBlanks(1)) SurfaceTmp(SurfNum).ViewFactorGround = AutoCalculate;
-                if (lNumericFieldBlanks(2) || rNumericArgs(2) == AutoCalculate) {
+                if (lNumericFieldBlanks(1)) SurfaceTmp(SurfNum).ViewFactorGround = DataGlobalConstants::AutoCalculate();
+                if (lNumericFieldBlanks(2) || rNumericArgs(2) == DataGlobalConstants::AutoCalculate()) {
                     numSides = (SurfaceNumProp - 2) / 3;
                     SurfaceTmp(SurfNum).Sides = numSides;
                     if (mod(SurfaceNumProp - 2, 3) != 0) {
@@ -3710,7 +3710,7 @@ namespace SurfaceGeometry {
                 }
                 SurfaceTmp(SurfNum).ExtSolar = false;
                 SurfaceTmp(SurfNum).ExtWind = false;
-                SurfaceTmp(SurfNum).ViewFactorGround = AutoCalculate;
+                SurfaceTmp(SurfNum).ViewFactorGround = DataGlobalConstants::AutoCalculate();
 
                 if (SurfaceTmp(SurfNum).ExtBoundCond == ExternalEnvironment) {
                     SurfaceTmp(SurfNum).ExtSolar = true;
@@ -4284,9 +4284,9 @@ namespace SurfaceGeometry {
                 SurfaceTmp(SurfNum).ExtBoundCondName = SurfaceTmp(SurfNum).Name;
             }
             SurfaceTmp(SurfNum).ViewFactorGround = rNumericArgs(1);
-            if (lNumericFieldBlanks(1)) SurfaceTmp(SurfNum).ViewFactorGround = AutoCalculate;
+            if (lNumericFieldBlanks(1)) SurfaceTmp(SurfNum).ViewFactorGround = DataGlobalConstants::AutoCalculate();
 
-            if (lNumericFieldBlanks(3) || rNumericArgs(3) == AutoCalculate) {
+            if (lNumericFieldBlanks(3) || rNumericArgs(3) == DataGlobalConstants::AutoCalculate()) {
                 rNumericArgs(3) = (SurfaceNumProp - 3) / 3;
                 SurfaceTmp(SurfNum).Sides = rNumericArgs(3);
                 if (mod(SurfaceNumProp - 3, 3) != 0) {
@@ -5421,7 +5421,7 @@ namespace SurfaceGeometry {
                     ShadingTransmittanceVaries = true;
                 }
             }
-            if (lNumericFieldBlanks(1) || rNumericArgs(1) == AutoCalculate) {
+            if (lNumericFieldBlanks(1) || rNumericArgs(1) == DataGlobalConstants::AutoCalculate()) {
                 rNumericArgs(1) = (NumNumbers - 1) / 3;
                 SurfaceTmp(SurfNum).Sides = rNumericArgs(1);
                 if (mod(NumNumbers - 1, 3) != 0) {
@@ -7795,7 +7795,7 @@ namespace SurfaceGeometry {
             SurfaceTmp(SurfNum).CosAzim = std::cos(SurfWorldAz * DataGlobalConstants::DegToRadians());
             SurfaceTmp(SurfNum).SinTilt = std::sin(SurfTilt * DataGlobalConstants::DegToRadians());
             SurfaceTmp(SurfNum).CosTilt = std::cos(SurfTilt * DataGlobalConstants::DegToRadians());
-            if (SurfaceTmp(SurfNum).ViewFactorGround == AutoCalculate) {
+            if (SurfaceTmp(SurfNum).ViewFactorGround == DataGlobalConstants::AutoCalculate()) {
                 SurfaceTmp(SurfNum).ViewFactorGround = 0.5 * (1.0 - SurfaceTmp(SurfNum).CosTilt);
             }
             // Outward normal unit vector (pointing away from room)
@@ -9173,7 +9173,7 @@ namespace SurfaceGeometry {
             }
             alpF++;
 
-            if (lNumericFieldBlanks(numF) || rNumericArgs(numF) == AutoCalculate) {
+            if (lNumericFieldBlanks(numF) || rNumericArgs(numF) == DataGlobalConstants::AutoCalculate()) {
                 kivaManager.settings.deepGroundDepth = 40.0;
             } else {
                 kivaManager.settings.deepGroundDepth = rNumericArgs(numF);
@@ -10268,7 +10268,7 @@ namespace SurfaceGeometry {
             } else if (areOppositeWallsSame(ZoneStruct, oppositeWallArea, distanceBetweenOppositeWalls)) {
                 CalcVolume = oppositeWallArea * distanceBetweenOppositeWalls;
                 volCalcMethod = zoneVolumeCalculationMethod::opWallAreaTimesDistance;
-            } else if (Zone(ZoneNum).Volume == AutoCalculate) { // no user entered zone volume
+            } else if (Zone(ZoneNum).Volume == DataGlobalConstants::AutoCalculate()) { // no user entered zone volume
                 ShowSevereError("For zone: " + Zone(ZoneNum).Name +
                                 " it is not possible to calculate the volume from the surrounding surfaces so either provide the volume value or "
                                 "define all the surfaces to fully enclose the zone.");

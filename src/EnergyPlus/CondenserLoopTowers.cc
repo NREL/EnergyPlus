@@ -1870,7 +1870,7 @@ namespace CondenserLoopTowers {
 
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                 DataGlobals::InitConvTemp,
+                                                                 DataGlobalConstants::InitConvTemp(),
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                  RoutineName);
 
@@ -2372,7 +2372,7 @@ namespace CondenserLoopTowers {
                     if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                         Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                              DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                             DataGlobals::InitConvTemp,
+                                                                             DataGlobalConstants::InitConvTemp(),
                                                                              DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                              RoutineName);
                         Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -2444,7 +2444,7 @@ namespace CondenserLoopTowers {
                 if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                     Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                          DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                         DataGlobals::InitConvTemp,
+                                                                         DataGlobalConstants::InitConvTemp(),
                                                                          DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                          RoutineName);
                     Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -2525,7 +2525,7 @@ namespace CondenserLoopTowers {
 
                     Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                          DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                         DataGlobals::InitConvTemp,
+                                                                         DataGlobalConstants::InitConvTemp(),
                                                                          DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                          RoutineName);
                     Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -3424,14 +3424,14 @@ namespace CondenserLoopTowers {
                 } else { // probably no plant sizing object
                     Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                DataGlobals::InitConvTemp,
+                                                                DataGlobalConstants::InitConvTemp(),
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                 RoutineName);
                     this->WaterTemp = DesTowerInletWaterTemp; // 35.0; // design condition
                 }
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                        DataGlobals::InitConvTemp,
+                                                        DataGlobalConstants::InitConvTemp(),
                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                         RoutineName);
 
@@ -3689,7 +3689,7 @@ namespace CondenserLoopTowers {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                            DataGlobals::InitConvTemp,
+                                                            DataGlobalConstants::InitConvTemp(),
                                                             DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                             RoutineName);
                     Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -5236,7 +5236,7 @@ namespace CondenserLoopTowers {
             DeltaTwb = std::abs(OutletAirWetBulb - InletAirWetBulb);
             // Add KelvinConv to denominator below convert OutletAirWetBulbLast to Kelvin to avoid divide by zero.
             // Wet bulb error units are delta K/K
-            WetBulbError = std::abs((OutletAirWetBulb - OutletAirWetBulbLast) / (OutletAirWetBulbLast + DataGlobals::KelvinConv));
+            WetBulbError = std::abs((OutletAirWetBulb - OutletAirWetBulbLast) / (OutletAirWetBulbLast + DataGlobalConstants::KelvinConv()));
         }
 
         if (QactualLocal >= 0.0) {

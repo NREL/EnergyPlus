@@ -82,8 +82,6 @@ namespace DataEnvironment {
 
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
-    using DataGlobals::KelvinConv;
-
     // Data
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
@@ -308,7 +306,7 @@ namespace DataEnvironment {
         SkyClearness = Real64();
         SkyBrightness = Real64();
         TotalCloudCover = 0.0;
-        OpaqueCloudCover = 0.0; 
+        OpaqueCloudCover = 0.0;
         StdBaroPress = 101325.0;
         StdRhoAir = Real64();
         TimeZoneNumber = Real64();
@@ -575,7 +573,7 @@ namespace DataEnvironment {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 BaseTemp; // Base temperature at Z
 
-        BaseTemp = OutDryBulbTempAt(Z) + KelvinConv;
+        BaseTemp = OutDryBulbTempAt(Z) + DataGlobalConstants::KelvinConv();
 
         if (Z <= 0.0) {
             LocalAirPressure = 0.0;

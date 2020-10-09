@@ -961,7 +961,7 @@ namespace DataSurfaces {
             value = SurfWinIRfromParentZone(ExtBoundCond) + QHTRadSysSurf(ExtBoundCond) + QHWBaseboardSurf(ExtBoundCond) +
                     QSteamBaseboardSurf(ExtBoundCond) + QElecBaseboardSurf(ExtBoundCond);
         } else {
-            Real64 tout = getOutsideAirTemperature(t_SurfNum) + KelvinConv;
+            Real64 tout = getOutsideAirTemperature(t_SurfNum) + DataGlobalConstants::KelvinConv();
             value = state.dataWindowManager->sigma * pow_4(tout);
             value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
                     ViewFactorGroundIR * value;

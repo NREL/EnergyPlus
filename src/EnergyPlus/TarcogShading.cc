@@ -610,7 +610,6 @@ namespace TarcogShading {
         //**************************************************************************************************************
 
         // Using/Aliasing
-        using DataGlobals::KelvinConv;
         // Argument array dimensioning
         EP_SIZE_CHECK(iprop1, maxgas);
         EP_SIZE_CHECK(frct1, maxgas);
@@ -679,7 +678,7 @@ namespace TarcogShading {
         TGapOld1 = 0.0;
         TGapOld2 = 0.0;
         tilt = DataGlobalConstants::Pi() / 180 * (angle - 90);
-        T0 = 0.0 + KelvinConv;
+        T0 = 0.0 + DataGlobalConstants::KelvinConv();
         A1eqin = 0.0;
         A2eqout = 0.0;
         A1eqout = 0.0;
@@ -904,7 +903,6 @@ namespace TarcogShading {
         //**************************************************************************************************************
 
         // Using/Aliasing
-        using DataGlobals::KelvinConv;
         // Argument array dimensioning
         EP_SIZE_CHECK(iprop1, maxgas);
         EP_SIZE_CHECK(frct1, maxgas);
@@ -950,7 +948,7 @@ namespace TarcogShading {
         bool converged;
 
         tilt = DataGlobalConstants::Pi() / 180.0 * (angle - 90.0);
-        T0 = 0.0 + KelvinConv;
+        T0 = 0.0 + DataGlobalConstants::KelvinConv();
 
         GASSES90(T0, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con0, visc0, dens0, cp0, pr0, 1, nperr, ErrorMessage);
         // call gasses90(Tenv, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con1, visc1, dens1, cp1, pr1, 1, &

@@ -138,11 +138,11 @@ namespace WindowManager {
                 aTemp = aLayer->getTemperature(aSide);
                 state.dataWindowManager->thetas(i) = aTemp;
                 if (i == 1) {
-                    SurfOutsideTemp = aTemp - KelvinConv;
+                    SurfOutsideTemp = aTemp - DataGlobalConstants::KelvinConv();
                 }
                 ++i;
             }
-            SurfInsideTemp = aTemp - KelvinConv;
+            SurfInsideTemp = aTemp - DataGlobalConstants::KelvinConv();
             if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                 auto EffShBlEmiss = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), window.EffShBlindEmiss);
                 auto EffGlEmiss = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), window.EffGlassEmiss);
@@ -177,7 +177,7 @@ namespace WindowManager {
             auto NetIRHeatGainShade = ShadeArea * EpsShIR2 * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep), 4) - rmir) +
                                       EpsShIR1 * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep - 1), 4) - rmir) * RhoGlIR2 * TauShIR / ShGlReflFacIR;
             auto NetIRHeatGainGlass = ShadeArea * (glassEmiss * TauShIR / ShGlReflFacIR) * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglface), 4) - rmir);
-            auto tind = surface.getInsideAirTemperature(SurfNum) + KelvinConv;
+            auto tind = surface.getInsideAirTemperature(SurfNum) + DataGlobalConstants::KelvinConv();
             auto ConvHeatGainFrZoneSideOfShade = ShadeArea * HConvIn(SurfNum) * (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep) - tind);
             SurfWinHeatGain(SurfNum) = SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
             SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
@@ -194,7 +194,7 @@ namespace WindowManager {
 
             auto glassTemperature = aGlassLayer->getSurface(Side::Back)->getTemperature();
             SurfWinEffInsSurfTemp(SurfNum) =
-                (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (glassTemperature - KelvinConv)) / (EffShBlEmiss + EffGlEmiss);
+                (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (glassTemperature - DataGlobalConstants::KelvinConv())) / (EffShBlEmiss + EffGlEmiss);
 
         } else {
             // Another adoptation to old source that looks suspicious. Check if heat flow through
@@ -232,8 +232,8 @@ namespace WindowManager {
             SurfaceWindow(SurfNum).ThetaFace(2 * k) = state.dataWindowManager->thetas(2 * k);
 
             // temperatures for reporting
-            FenLaySurfTempFront(k, SurfNum) = state.dataWindowManager->thetas(2 * k - 1) - KelvinConv;
-            FenLaySurfTempBack(k, SurfNum) = state.dataWindowManager->thetas(2 * k) - KelvinConv;
+            FenLaySurfTempFront(k, SurfNum) = state.dataWindowManager->thetas(2 * k - 1) - DataGlobalConstants::KelvinConv();
+            FenLaySurfTempBack(k, SurfNum) = state.dataWindowManager->thetas(2 * k) - DataGlobalConstants::KelvinConv();
         }
     }
 
@@ -594,7 +594,7 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates indoor environment object from surface properties in EnergyPlus
-        auto tin = m_Surface.getInsideAirTemperature(m_SurfNum) + KelvinConv;
+        auto tin = m_Surface.getInsideAirTemperature(m_SurfNum) + DataGlobalConstants::KelvinConv();
         auto hcin = HConvIn(m_SurfNum);
 
         auto IR = m_Surface.getInsideIR(m_SurfNum);
@@ -616,7 +616,7 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates outdoor environment object from surface properties in EnergyPlus
-        double tout = m_Surface.getOutsideAirTemperature(m_SurfNum) + KelvinConv;
+        double tout = m_Surface.getOutsideAirTemperature(m_SurfNum) + DataGlobalConstants::KelvinConv();
         double IR = m_Surface.getOutsideIR(state, m_SurfNum);
         // double dirSolRad = QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
         double swRadiation = m_Surface.getSWIncident(m_SurfNum);

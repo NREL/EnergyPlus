@@ -141,7 +141,7 @@ namespace ThermalComfort {
     }                                            // namespace
 
     // MODULE PARAMETER DEFINITIONS
-    Real64 const TAbsConv(KelvinConv); // Converter for absolute temperature
+    Real64 const TAbsConv(DataGlobalConstants::KelvinConv()); // Converter for absolute temperature
     Real64 const ActLevelConv(58.2);   // Converter for activity level (1Met = 58.2 W/m2)
     Real64 const BodySurfArea(1.8);    // Dubois body surface area of the human body (m2)
     Real64 const RadSurfEff(0.72);     // Fraction of surface effective for radiation
@@ -1979,9 +1979,6 @@ namespace ThermalComfort {
         // Locals
         Real64 SurfaceTemp;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const KelvinConv(273.15); // Conversion from Celsius to Kelvin
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;
         Real64 SurfTempEmissAngleFacSummed;
@@ -1995,13 +1992,13 @@ namespace ThermalComfort {
         auto &thisAngFacList(AngleFactorList(AngleFacNum));
 
         for (SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
-            SurfaceTemp = TH(2, 1, thisAngFacList.SurfacePtr(SurfNum)) + KelvinConv;
+            SurfaceTemp = TH(2, 1, thisAngFacList.SurfacePtr(SurfNum)) + DataGlobalConstants::KelvinConv();
             SurfEAF = state.dataConstruction->Construct(Surface(thisAngFacList.SurfacePtr(SurfNum)).Construction).InsideAbsorpThermal * thisAngFacList.AngleFactor(SurfNum);
             SurfTempEmissAngleFacSummed += SurfEAF * pow_4(SurfaceTemp);
             SumSurfaceEmissAngleFactor += SurfEAF;
         }
 
-        CalcAngleFactorMRT = root_4(SurfTempEmissAngleFacSummed / SumSurfaceEmissAngleFactor) - KelvinConv;
+        CalcAngleFactorMRT = root_4(SurfTempEmissAngleFacSummed / SumSurfaceEmissAngleFactor) - DataGlobalConstants::KelvinConv();
 
         return CalcAngleFactorMRT;
     }
@@ -2174,11 +2171,11 @@ namespace ThermalComfort {
         // If high temperature radiant heater present and on, then must account for this in MRT calculation
         if (QHTRadSysToPerson(ZoneNum) > 0.0 || QCoolingPanelToPerson(ZoneNum) > 0.0 || QHWBaseboardToPerson(ZoneNum) > 0.0 ||
             QSteamBaseboardToPerson(ZoneNum) > 0.0 || QElecBaseboardToPerson(ZoneNum) > 0.0) {
-            RadTemp += KelvinConv; // Convert to Kelvin
+            RadTemp += DataGlobalConstants::KelvinConv(); // Convert to Kelvin
             RadTemp = root_4(pow_4(RadTemp) + ((QHTRadSysToPerson(ZoneNum) + QCoolingPanelToPerson(ZoneNum) + QHWBaseboardToPerson(ZoneNum) +
                                                 QSteamBaseboardToPerson(ZoneNum) + QElecBaseboardToPerson(ZoneNum)) /
                                                AreaEff / StefanBoltzmannConst));
-            RadTemp -= KelvinConv; // Convert back to Celsius
+            RadTemp -= DataGlobalConstants::KelvinConv(); // Convert back to Celsius
         }
 
         CalcRadTemp = RadTemp;

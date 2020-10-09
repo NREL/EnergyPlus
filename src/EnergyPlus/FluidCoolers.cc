@@ -733,7 +733,7 @@ namespace FluidCoolers {
 
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                 DataGlobals::InitConvTemp,
+                                                                 DataGlobalConstants::InitConvTemp(),
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                  RoutineName);
             this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
@@ -871,7 +871,7 @@ namespace FluidCoolers {
             if (PltSizCondNum > 0) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                        DataGlobals::InitConvTemp,
+                                                        DataGlobalConstants::InitConvTemp(),
                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                         CalledFrom);
                 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -914,7 +914,7 @@ namespace FluidCoolers {
                         }
                         rho = FluidProperties::GetDensityGlycol(state,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                DataGlobals::InitConvTemp,
+                                                                DataGlobalConstants::InitConvTemp(),
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                 CalledFrom);
                         Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -987,7 +987,7 @@ namespace FluidCoolers {
                         }
                         rho = FluidProperties::GetDensityGlycol(state,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                DataGlobals::InitConvTemp,
+                                                                DataGlobalConstants::InitConvTemp(),
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                 CalledFrom);
                         Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1052,7 +1052,7 @@ namespace FluidCoolers {
                     }
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                            DataGlobals::InitConvTemp,
+                                                            DataGlobalConstants::InitConvTemp(),
                                                             DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                             CalledFrom);
                     Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1159,7 +1159,7 @@ namespace FluidCoolers {
             if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                        DataGlobals::InitConvTemp,
+                                                        DataGlobalConstants::InitConvTemp(),
                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                         CalledFrom);
                 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1311,7 +1311,7 @@ namespace FluidCoolers {
             if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->FluidCoolerLowSpeedNomCap > 0.0) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                        DataGlobals::InitConvTemp,
+                                                        DataGlobalConstants::InitConvTemp(),
                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                         CalledFrom);
                 Cp = FluidProperties::GetSpecificHeatGlycol(state,

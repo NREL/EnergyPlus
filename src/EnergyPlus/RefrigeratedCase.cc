@@ -2846,7 +2846,7 @@ namespace RefrigeratedCase {
 
                 RefrigRack(RackNum).CondenserAirFlowRate = Numbers(8);
                 if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap &&
-                    RefrigRack(RackNum).CondenserAirFlowRate <= 0.0 && RefrigRack(RackNum).CondenserAirFlowRate != DataGlobals::AutoCalculate) {
+                    RefrigRack(RackNum).CondenserAirFlowRate <= 0.0 && RefrigRack(RackNum).CondenserAirFlowRate != DataGlobalConstants::AutoCalculate()) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", " + cNumericFieldNames(8) +
                                     " cannot be less than or equal to zero.");
                     ErrorsFound = true;
@@ -2869,7 +2869,7 @@ namespace RefrigeratedCase {
 
                 RefrigRack(RackNum).EvapPumpPower = Numbers(11);
                 if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap && RefrigRack(RackNum).EvapPumpPower < 0.0 &&
-                    RefrigRack(RackNum).EvapPumpPower != DataGlobals::AutoCalculate) {
+                    RefrigRack(RackNum).EvapPumpPower != DataGlobalConstants::AutoCalculate()) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", " + cNumericFieldNames(11) +
                                     " cannot be less than zero.");
                     ErrorsFound = true;
@@ -3054,12 +3054,12 @@ namespace RefrigeratedCase {
                 // set condenser air flow and evap water pump power if autocalculated
                 // autocalculate condenser evap water pump if needed
                 if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap &&
-                    RefrigRack(RackNum).EvapPumpPower == DataGlobals::AutoCalculate) {
+                    RefrigRack(RackNum).EvapPumpPower == DataGlobalConstants::AutoCalculate()) {
                     RefrigRack(RackNum).EvapPumpPower = CondPumpRatePower * RefrigRack(RackNum).TotalRackLoad;
                 }
                 // autocalculate evap condenser air volume flow rate if needed
                 if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap &&
-                    RefrigRack(RackNum).CondenserAirFlowRate == DataGlobals::AutoCalculate) {
+                    RefrigRack(RackNum).CondenserAirFlowRate == DataGlobalConstants::AutoCalculate()) {
                     RefrigRack(RackNum).CondenserAirFlowRate = AirVolRateEvapCond * RefrigRack(RackNum).TotalRackLoad;
                 }
 
@@ -5078,7 +5078,7 @@ namespace RefrigeratedCase {
 
                 // Now do evaporative condenser auto sizing because it is a function of the system's cooling load
                 if (Condenser(CondNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
-                    if (Condenser(CondNum).RatedAirFlowRate == DataGlobals::AutoCalculate) {
+                    if (Condenser(CondNum).RatedAirFlowRate == DataGlobalConstants::AutoCalculate()) {
                         Condenser(CondNum).RatedAirFlowRate = AirVolRateEvapCond * Condenser(CondNum).RatedCapacity;
                     }
                     if (Condenser(CondNum).RatedAirFlowRate <= 0.0) {
@@ -5086,7 +5086,7 @@ namespace RefrigeratedCase {
                                         "\", Evaporative Condenser Air Volume Flow Rate cannot be less than or equal to zero.");
                         ErrorsFound = true;
                     }
-                    if (Condenser(CondNum).EvapPumpPower == DataGlobals::AutoCalculate) {
+                    if (Condenser(CondNum).EvapPumpPower == DataGlobalConstants::AutoCalculate()) {
                         Condenser(CondNum).EvapPumpPower = CondPumpRatePower * Condenser(CondNum).RatedCapacity;
                     }
                     if (Condenser(CondNum).EvapPumpPower < 0.0) {

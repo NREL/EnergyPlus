@@ -798,7 +798,7 @@ namespace Pumps {
             } else {
                 // Calc Condensate Pump Water Volume Flow Rate
                 SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineNameNoColon);
-                TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName);
+                TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp(), DummyWaterIndex, RoutineName);
                 PumpEquip(PumpNum).NomVolFlowRate = (PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity) / TempWaterDensity;
             }
 
@@ -1440,7 +1440,7 @@ namespace Pumps {
         if (PumpEquip(PumpNum).PumpInitFlag && BeginEnvrnFlag) {
             if (PumpEquip(PumpNum).PumpType == Pump_Cond) {
 
-                TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName);
+                TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp(), DummyWaterIndex, RoutineName);
                 SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineName);
                 PumpEquip(PumpNum).NomVolFlowRate = (PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity) / TempWaterDensity;
 
@@ -1468,7 +1468,7 @@ namespace Pumps {
             } else {
                 TempWaterDensity = GetDensityGlycol(state,
                                                     PlantLoop(PumpEquip(PumpNum).LoopNum).FluidName,
-                                                    DataGlobals::InitConvTemp,
+                                                    DataGlobalConstants::InitConvTemp(),
                                                     PlantLoop(PumpEquip(PumpNum).LoopNum).FluidIndex,
                                                     RoutineName);
                 mdotMax = PumpEquip(PumpNum).NomVolFlowRate * TempWaterDensity;
@@ -2052,11 +2052,11 @@ namespace Pumps {
         if (PumpEquip(PumpNum).LoopNum > 0) {
             TempWaterDensity = GetDensityGlycol(state,
                                                 PlantLoop(PumpEquip(PumpNum).LoopNum).FluidName,
-                                                DataGlobals::InitConvTemp,
+                                                DataGlobalConstants::InitConvTemp(),
                                                 PlantLoop(PumpEquip(PumpNum).LoopNum).FluidIndex,
                                                 RoutineName);
         } else {
-            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName);
+            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp(), DummyWaterIndex, RoutineName);
         }
 
         // note: we assume pump impeller efficiency is 78% for autosizing
@@ -2104,7 +2104,7 @@ namespace Pumps {
                     if (!PlantLoop(PumpEquip(PumpNum).LoopNum).LoopSide(PumpEquip(PumpNum).LoopSideNum).BranchPumpsExist) {
                         // size pump to full flow of plant loop
                         if (PumpEquip(PumpNum).PumpType == Pump_Cond) {
-                            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName);
+                            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp(), DummyWaterIndex, RoutineName);
                             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineNameSizePumps);
                             PumpEquip(PumpNum).NomSteamVolFlowRate = PlantSizData(PlantSizNum).DesVolFlowRate * PumpSizFac;
                             PumpEquip(PumpNum).NomVolFlowRate = PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
@@ -2116,7 +2116,7 @@ namespace Pumps {
                         DesVolFlowRatePerBranch = PlantSizData(PlantSizNum).DesVolFlowRate /
                                                   PlantLoop(PumpEquip(PumpNum).LoopNum).LoopSide(PumpEquip(PumpNum).LoopSideNum).TotalPumps;
                         if (PumpEquip(PumpNum).PumpType == Pump_Cond) {
-                            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName);
+                            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp(), DummyWaterIndex, RoutineName);
                             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineNameSizePumps);
                             PumpEquip(PumpNum).NomSteamVolFlowRate = DesVolFlowRatePerBranch * PumpSizFac;
                             PumpEquip(PumpNum).NomVolFlowRate = PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity / TempWaterDensity;

@@ -590,7 +590,7 @@ namespace HVACCooledBeam {
             InWaterNode = CoolBeam(CBNum).CWInNode;
             OutWaterNode = CoolBeam(CBNum).CWOutNode;
             rho = GetDensityGlycol(state, PlantLoop(CoolBeam(CBNum).CWLoopNum).FluidName,
-                                   DataGlobals::CWInitConvTemp,
+                                   DataGlobalConstants::CWInitConvTemp(),
                                    PlantLoop(CoolBeam(CBNum).CWLoopNum).FluidIndex,
                                    RoutineName);
             CoolBeam(CBNum).MaxCoolWaterMassFlow = rho * CoolBeam(CBNum).MaxCoolWaterVolFlow;
@@ -695,7 +695,6 @@ namespace HVACCooledBeam {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataGlobals::AutoCalculate;
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -736,7 +735,7 @@ namespace HVACCooledBeam {
                 MyPlantSizingIndex("cooled beam unit", CoolBeam(CBNum).Name, CoolBeam(CBNum).CWInNode, CoolBeam(CBNum).CWOutNode, ErrorsFound);
         }
 
-        if (CoolBeam(CBNum).Kin == AutoCalculate) {
+        if (CoolBeam(CBNum).Kin == DataGlobalConstants::AutoCalculate()) {
             if (CoolBeam(CBNum).CBType_Num == Passive_Cooled_Beam) {
                 CoolBeam(CBNum).Kin = 0.0;
             } else {
@@ -785,13 +784,13 @@ namespace HVACCooledBeam {
 
                         rho = GetDensityGlycol(state,
                                                PlantLoop(CoolBeam(CBNum).CWLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobalConstants::CWInitConvTemp(),
                                                PlantLoop(CoolBeam(CBNum).CWLoopNum).FluidIndex,
                                                RoutineName);
 
                         Cp = GetSpecificHeatGlycol(state,
                                                    PlantLoop(CoolBeam(CBNum).CWLoopNum).FluidName,
-                                                   DataGlobals::CWInitConvTemp,
+                                                   DataGlobalConstants::CWInitConvTemp(),
                                                    PlantLoop(CoolBeam(CBNum).CWLoopNum).FluidIndex,
                                                    RoutineName);
 
@@ -820,7 +819,7 @@ namespace HVACCooledBeam {
         if (CoolBeam(CBNum).NumBeams == AutoSize) {
             rho = GetDensityGlycol(state,
                                    PlantLoop(CoolBeam(CBNum).CWLoopNum).FluidName,
-                                   DataGlobals::CWInitConvTemp,
+                                   DataGlobalConstants::CWInitConvTemp(),
                                    PlantLoop(CoolBeam(CBNum).CWLoopNum).FluidIndex,
                                    RoutineName);
 
@@ -838,13 +837,13 @@ namespace HVACCooledBeam {
                 if (PltSizCoolNum > 0) {
                     rho = GetDensityGlycol(state,
                                            PlantLoop(CoolBeam(CBNum).CWLoopNum).FluidName,
-                                           DataGlobals::CWInitConvTemp,
+                                           DataGlobalConstants::CWInitConvTemp(),
                                            PlantLoop(CoolBeam(CBNum).CWLoopNum).FluidIndex,
                                            RoutineName);
 
                     Cp = GetSpecificHeatGlycol(state,
                                                PlantLoop(CoolBeam(CBNum).CWLoopNum).FluidName,
-                                               DataGlobals::CWInitConvTemp,
+                                               DataGlobalConstants::CWInitConvTemp(),
                                                PlantLoop(CoolBeam(CBNum).CWLoopNum).FluidIndex,
                                                RoutineName);
                     DesCoilLoad =

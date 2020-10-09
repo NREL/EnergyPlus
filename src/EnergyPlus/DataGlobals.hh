@@ -66,22 +66,6 @@ struct EnergyPlusData;
 
 namespace DataGlobals {
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    extern Real64 const KelvinConv;        // Conversion factor for C to K and K to C
-    extern Real64 const InitConvTemp;      // [deg C], standard init vol to mass flow conversion temp
-    extern Real64 const AutoCalculate;     // automatically calculate some fields.
-    extern Real64 const CWInitConvTemp;    // [deg C], standard init chilled water vol to mass flow conversion temp
-    extern Real64 const HWInitConvTemp;    // [deg C], standard init hot water vol to mass flow conversion temp
-    extern Real64 const SteamInitConvTemp; // [deg C], standard init steam vol to mass flow conversion temp
-
-    extern Real64 const StefanBoltzmann;   // Stefan-Boltzmann constant in W/(m2*K4)
-    extern Real64 const UniversalGasConst; // (J/mol*K)
-
-    extern Real64 const convertJtoGJ; // Conversion factor for J to GJ
-
     // Parameters for EMS Calling Points
     extern int const emsCallFromZoneSizing;                           // Identity where EMS called from
     extern int const emsCallFromSystemSizing;                         // Identity where EMS called from

@@ -271,6 +271,15 @@ namespace DataGlobalConstants {
     Real64 constexpr BigNumber () { return std::numeric_limits< Real64 >::max(); }  // Max Number real used for initializations
     Real64 constexpr rTinyValue () { return std::numeric_limits< Real64 >::epsilon(); }   // Tiny value to replace use of TINY(x)
     std::string::size_type constexpr MaxNameLength () { return 100; }       // Maximum Name Length in Characters -- should be the same as MaxAlphaArgLength in InputProcessor module
+    Real64 constexpr KelvinConv () { return 273.15; }                       // Conversion factor for C to K and K to C
+    Real64 constexpr InitConvTemp () { return 5.05; }                       // [deg C], standard init vol to mass flow conversion temp
+    Real64 constexpr AutoCalculate () { return -99999.0; }                  // automatically calculate some fields.
+    Real64 constexpr CWInitConvTemp () { return 5.05; }                     // [deg C], standard init chilled water vol to mass flow conversion temp
+    Real64 constexpr HWInitConvTemp () { return 60.0; }                     // [deg C], standard init hot water vol to mass flow conversion temp
+    Real64 constexpr SteamInitConvTemp () { return 100.0; }                 // [deg C], standard init steam vol to mass flow conversion temp
+    Real64 constexpr StefanBoltzmann () { return 5.6697E-8; }               // Stefan-Boltzmann constant in W/(m2*K4)
+    Real64 constexpr UniversalGasConst () { return 8314.462175; }           //  (J/mol*K)
+    Real64 constexpr convertJtoGJ () { return 1.0E-9; }                     // Conversion factor for J to GJ
 
     int AssignResourceTypeNum(std::string const &ResourceTypeChar);
     std::string GetResourceTypeChar(int ResourceTypeNum);

@@ -112,7 +112,6 @@ namespace TranspiredCollector {
     //   See EngineeringReference for details
 
     // Using/Aliasing
-    using DataGlobals::KelvinConv;
     using DataHeatBalance::QRadSWOutIncident;
     using DataVectorTypes::Vector;
 
@@ -913,9 +912,6 @@ namespace TranspiredCollector {
         Real64 const k(0.0267); // thermal conductivity (W/m K) for air at 300 K
         // (Mills 1999 Heat Transfer)
         Real64 const Sigma(5.6697e-08); // Stefan-Boltzmann constant
-        //  REAL(r64), PARAMETER  :: KelvinConv = KelvinConv         ! Conversion from Celsius to Kelvin
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
 
         // DERIVED TYPE DEFINITIONS:
         // na
@@ -1076,8 +1072,8 @@ namespace TranspiredCollector {
             InitExteriorConvectionCoeff(state, SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = Surface(SurfPtr).Construction;
             AbsThermSurf = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
-            TsoK = TH(1, 1, SurfPtr) + KelvinConv;
-            TscollK = UTSC(UTSCNum).TcollLast + KelvinConv;
+            TsoK = TH(1, 1, SurfPtr) + DataGlobalConstants::KelvinConv();
+            TscollK = UTSC(UTSCNum).TcollLast + DataGlobalConstants::KelvinConv();
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TscollK) - pow_4(TsoK)) / (TscollK - TsoK);
         }
         //		AreaSum = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below

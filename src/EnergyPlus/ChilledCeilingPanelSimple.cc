@@ -793,7 +793,7 @@ namespace CoolingPanelSimple {
                 // set design mass flow rates
                 if (ThisCP.WaterInletNode > 0) {
                     rho = GetDensityGlycol(
-                        state, PlantLoop(ThisCP.LoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+                        state, PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::CWInitConvTemp(), PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
                     ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
                     InitComponentNodes(0.0,
                                        ThisCP.WaterMassFlowRateMax,
@@ -811,7 +811,7 @@ namespace CoolingPanelSimple {
         if (BeginEnvrnFlag && MyEnvrnFlag(CoolingPanelNum)) {
             // Initialize
 
-            rho = GetDensityGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, InitConvTemp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+            rho = GetDensityGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::InitConvTemp(), PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
 
             ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
 

@@ -1147,11 +1147,11 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
 
     HWMaxVolFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate;
     HWDensity = GetDensityGlycol(state, PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
-                                 DataGlobals::HWInitConvTemp,
+                                 DataGlobalConstants::HWInitConvTemp(),
                                  PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                  "xxx");
     CpHW = GetSpecificHeatGlycol(state, PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
-                                 DataGlobals::HWInitConvTemp,
+                                 DataGlobalConstants::HWInitConvTemp(),
                                  PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                  "xxx");
     HWPlantDeltaTDesign = PlantSizData(PltSizHeatNum).DeltaT;

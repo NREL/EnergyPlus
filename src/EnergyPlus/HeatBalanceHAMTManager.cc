@@ -1524,7 +1524,7 @@ namespace HeatBalanceHAMTManager {
 
         TempSurfInP = cells(Intcell(sid)).rhp1 * PsyPsatFnTemp(cells(Intcell(sid)).tempp1);
 
-        RhoVaporSurfIn(sid) = TempSurfInP / (461.52 * (MAT(Surface(sid).Zone) + KelvinConv));
+        RhoVaporSurfIn(sid) = TempSurfInP / (461.52 * (MAT(Surface(sid).Zone) + DataGlobalConstants::KelvinConv()));
     }
 
     void UpdateHeatBalHAMT(int const sid)
@@ -1754,7 +1754,7 @@ namespace HeatBalanceHAMTManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        WVDC = (2.e-7 * std::pow(Temperature + KelvinConv, 0.81)) / ambp;
+        WVDC = (2.e-7 * std::pow(Temperature + DataGlobalConstants::KelvinConv(), 0.81)) / ambp;
 
         return WVDC;
     }

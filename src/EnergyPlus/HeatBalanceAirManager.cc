@@ -1971,7 +1971,7 @@ namespace HeatBalanceAirManager {
             }
 
             Ventilation(VentiCount).OpenEff = rNumericArgs(2);
-            if (Ventilation(VentiCount).OpenEff != AutoCalculate &&
+            if (Ventilation(VentiCount).OpenEff != DataGlobalConstants::AutoCalculate() &&
                 (Ventilation(VentiCount).OpenEff < 0.0 || Ventilation(VentiCount).OpenEff > 1.0)) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
                                 " must be between 0 and 1.");
@@ -1992,7 +1992,7 @@ namespace HeatBalanceAirManager {
             }
 
             Ventilation(VentiCount).DiscCoef = rNumericArgs(5);
-            if (Ventilation(VentiCount).DiscCoef != AutoCalculate &&
+            if (Ventilation(VentiCount).DiscCoef != DataGlobalConstants::AutoCalculate() &&
                 (Ventilation(VentiCount).DiscCoef < 0.0 || Ventilation(VentiCount).DiscCoef > 1.0)) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(5) +
                                 " must be between 0 and 1.");

@@ -1515,7 +1515,7 @@ namespace VentilatedSlab {
 
                 if (state.dataVentilatedSlab->VentSlab(Item).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating && !MyPlantScanFlag(Item)) {
                     rho = GetDensityGlycol(
-                        state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName, HWInitConvTemp, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex, RoutineName);
+                        state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName, DataGlobalConstants::HWInitConvTemp(), PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex, RoutineName);
 
                     state.dataVentilatedSlab->VentSlab(Item).MaxHotWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MaxVolHotWaterFlow;
                     state.dataVentilatedSlab->VentSlab(Item).MinHotWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MinVolHotWaterFlow;
@@ -1551,7 +1551,7 @@ namespace VentilatedSlab {
                 if ((state.dataVentilatedSlab->VentSlab(Item).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling) ||
                     (state.dataVentilatedSlab->VentSlab(Item).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling)) {
                     rho = GetDensityGlycol(state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidName,
-                                           DataGlobals::CWInitConvTemp,
+                                           DataGlobalConstants::CWInitConvTemp(),
                                            PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidIndex,
                                            RoutineName);
                     state.dataVentilatedSlab->VentSlab(Item).MaxColdWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MaxVolColdWaterFlow;
@@ -2057,11 +2057,11 @@ namespace VentilatedSlab {
                                     DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                                 }
                                 rho = GetDensityGlycol(state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName,
-                                                       HWInitConvTemp,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex,
                                                        RoutineName);
                                 Cp = GetSpecificHeatGlycol(state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName,
-                                                           HWInitConvTemp,
+                                                           DataGlobalConstants::HWInitConvTemp(),
                                                            PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex,
                                                            RoutineName);
                                 MaxVolHotWaterFlowDes = DesCoilLoad / (WaterCoilSizDeltaT * Cp * rho);
@@ -2175,8 +2175,8 @@ namespace VentilatedSlab {
                                     GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataVentilatedSlab->VentSlab(Item).HCoil_FluidIndex, RoutineName);
                                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
                                 SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataVentilatedSlab->VentSlab(Item).HCoil_FluidIndex, RoutineName);
-                                Cp = GetSpecificHeatGlycol(state, fluidNameWater, HWInitConvTemp, DummyWaterIndex, RoutineName);
-                                rho = GetDensityGlycol(state, fluidNameWater, HWInitConvTemp, DummyWaterIndex, RoutineName);
+                                Cp = GetSpecificHeatGlycol(state, fluidNameWater, DataGlobalConstants::HWInitConvTemp(), DummyWaterIndex, RoutineName);
+                                rho = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::HWInitConvTemp(), DummyWaterIndex, RoutineName);
                                 MaxVolHotSteamFlowDes =
                                     DesCoilLoad / ((PlantSizData(PltSizHeatNum).DeltaT * Cp * rho) + SteamDensity * LatentHeatSteam);
                             } else {

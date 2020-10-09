@@ -1894,8 +1894,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     ScheduleManager::Schedule(3).CurrentValue = 22.0; // Grd temp
 
     int SurfNum;
-    Real64 const StefanBoltzmann(5.6697E-8);
-    Real64 const KelvinConv(273.15);
     for (SurfNum = 1; SurfNum <= 6; SurfNum++) {
         DataHeatBalSurface::TH(1, 1, SurfNum) = 20;         // Surf temp
         DataSurfaces::Surface(SurfNum).OutDryBulbTemp = 22; // Air temp
@@ -1913,17 +1911,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     EXPECT_DOUBLE_EQ(0.25, DataSurfaces::Surface(3).ViewFactorSkyIR);
     EXPECT_DOUBLE_EQ(0.25, DataSurfaces::Surface(3).ViewFactorGroundIR);
     // Test if sky and grd view factor and temperature correctly overwritten
-    EXPECT_DOUBLE_EQ((StefanBoltzmann * 0.9 * 0.3 * (pow_4(20.0 + KelvinConv) - pow_4(15.0 + KelvinConv)) / (20.0 - 15.0)),
+    EXPECT_DOUBLE_EQ((DataGlobalConstants::StefanBoltzmann() * 0.9 * 0.3 * (pow_4(20.0 + DataGlobalConstants::KelvinConv()) - pow_4(15.0 + DataGlobalConstants::KelvinConv())) / (20.0 - 15.0)),
                      DataHeatBalSurface::HSkyExtSurf(1));
-    EXPECT_DOUBLE_EQ((StefanBoltzmann * 0.9 * 0.1 * (pow_4(20.0 + KelvinConv) - pow_4(22.0 + KelvinConv)) / (20.0 - 22.0)),
+    EXPECT_DOUBLE_EQ((DataGlobalConstants::StefanBoltzmann() * 0.9 * 0.1 * (pow_4(20.0 + DataGlobalConstants::KelvinConv()) - pow_4(22.0 + DataGlobalConstants::KelvinConv())) / (20.0 - 22.0)),
                      DataHeatBalSurface::HGrdExtSurf(1));
 
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.9 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv)), DataHeatBalSurface::QRadLWOutSrdSurfs(1));
-    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.9 *
-                         (0.3 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv)) + 0.3 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv))),
+    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann() * 0.9 * 0.6 * (pow_4(25.0 + DataGlobalConstants::KelvinConv()) - pow_4(20.0 + DataGlobalConstants::KelvinConv())), DataHeatBalSurface::QRadLWOutSrdSurfs(1));
+    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann() * 0.9 *
+                         (0.3 * (pow_4(25.0 + DataGlobalConstants::KelvinConv()) - pow_4(20.0 + DataGlobalConstants::KelvinConv())) + 0.3 * (pow_4(25.0 + DataGlobalConstants::KelvinConv()) - pow_4(20.0 + DataGlobalConstants::KelvinConv()))),
                      DataHeatBalSurface::QRadLWOutSrdSurfs(2));
-    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.9 * 0.5 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv)), DataHeatBalSurface::QRadLWOutSrdSurfs(3));
+    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann() * 0.9 * 0.5 * (pow_4(25.0 + DataGlobalConstants::KelvinConv()) - pow_4(20.0 + DataGlobalConstants::KelvinConv())), DataHeatBalSurface::QRadLWOutSrdSurfs(3));
     EXPECT_DOUBLE_EQ(0.0, DataHeatBalSurface::QRadLWOutSrdSurfs(4));
 }
 

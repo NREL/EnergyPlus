@@ -784,7 +784,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                           DataGlobals::InitConvTemp,
+                                                           DataGlobalConstants::InitConvTemp(),
                                                            DataPlant::PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                            RoutineNameNoColon);
             this->DemandSideLoop.MassFlowRateMax = rho * this->DemandSideLoop.DesignVolumeFlowRate;
@@ -799,7 +799,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
             rho = FluidProperties::GetDensityGlycol(state,
                                                     DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidName,
-                                                    DataGlobals::InitConvTemp,
+                                                    DataGlobalConstants::InitConvTemp(),
                                                     DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                     RoutineNameNoColon);
             this->SupplySideLoop.MassFlowRateMax = rho * this->SupplySideLoop.DesignVolumeFlowRate;
@@ -940,13 +940,13 @@ namespace PlantHeatExchangerFluidToFluid {
 
                     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                        DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidName,
-                                                                       DataGlobals::InitConvTemp,
+                                                                       DataGlobalConstants::InitConvTemp(),
                                                                        DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                                        RoutineName);
 
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                    DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidName,
-                                                                   DataGlobals::InitConvTemp,
+                                                                   DataGlobalConstants::InitConvTemp(),
                                                                    DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                                    RoutineName);
 
@@ -1025,13 +1025,13 @@ namespace PlantHeatExchangerFluidToFluid {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidName,
-                                                           DataGlobals::InitConvTemp,
+                                                           DataGlobalConstants::InitConvTemp(),
                                                            DataPlant::PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                            RoutineName);
             Real64 SupSideMdot = this->SupplySideLoop.DesignVolumeFlowRate * rho;
             rho = FluidProperties::GetDensityGlycol(state,
                                                     DataPlant::PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                    DataGlobals::InitConvTemp,
+                                                    DataGlobalConstants::InitConvTemp(),
                                                     DataPlant::PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                     RoutineName);
             Real64 DmdSideMdot = this->DemandSideLoop.DesignVolumeFlowRate * rho;

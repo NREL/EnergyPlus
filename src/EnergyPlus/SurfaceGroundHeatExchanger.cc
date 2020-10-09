@@ -120,7 +120,6 @@ namespace SurfaceGroundHeatExchanger {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
-    using DataGlobals::KelvinConv;
     using namespace DataLoopNode;
 
     // Use statements for access to subroutines in other modules
@@ -1288,8 +1287,8 @@ namespace SurfaceGroundHeatExchanger {
         // set previous surface temp
         OldSurfTemp = this->TtopHistory(1);
         // absolute temperatures
-        SurfTempAbs = OldSurfTemp + KelvinConv;
-        SkyTempAbs = ThisSkyTemp + KelvinConv;
+        SurfTempAbs = OldSurfTemp + DataGlobalConstants::KelvinConv();
+        SkyTempAbs = ThisSkyTemp + DataGlobalConstants::KelvinConv();
 
         // ASHRAE simple convection coefficient model for external surfaces.
         ConvCoef = CalcASHRAESimpExtConvectCoeff(this->TopRoughness, ThisWindSpeed);
@@ -1341,8 +1340,8 @@ namespace SurfaceGroundHeatExchanger {
             // make a surface heat balance and solve for temperature
             OldSurfTemp = this->TbtmHistory(1);
             // absolute temperatures
-            SurfTempAbs = OldSurfTemp + KelvinConv;
-            ExtTempAbs = ThisDryBulb + KelvinConv;
+            SurfTempAbs = OldSurfTemp + DataGlobalConstants::KelvinConv();
+            ExtTempAbs = ThisDryBulb + DataGlobalConstants::KelvinConv();
 
             // ASHRAE simple convection coefficient model for external surfaces.
             ConvCoef = CalcASHRAESimpExtConvectCoeff(this->TopRoughness, ThisWindSpeed);

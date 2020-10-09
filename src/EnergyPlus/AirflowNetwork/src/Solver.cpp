@@ -100,7 +100,6 @@ namespace AirflowNetwork {
     using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::OutHumRat;
     using DataEnvironment::StdBaroPress;
-    using DataGlobals::KelvinConv;
     using DataSurfaces::Surface;
 
     //std::vector<AirProperties> properties;
@@ -1110,11 +1109,11 @@ namespace AirflowNetwork {
         if (LFLAG) {
             // Initialization by linear relation.
             if (PDROP >= 0.0) {
-                RhoCor = (propN.temperature + KelvinConv) / (Tave + KelvinConv);
+                RhoCor = (propN.temperature + DataGlobalConstants::KelvinConv()) / (Tave + DataGlobalConstants::KelvinConv());
                 Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                 DF[0] = coef * propN.density / propN.viscosity * Ctl;
             } else {
-                RhoCor = (propM.temperature + KelvinConv) / (Tave + KelvinConv);
+                RhoCor = (propM.temperature + DataGlobalConstants::KelvinConv()) / (Tave + DataGlobalConstants::KelvinConv());
                 Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                 DF[0] = coef * propM.density / propM.viscosity * Ctl;
             }
@@ -1124,7 +1123,7 @@ namespace AirflowNetwork {
             if (PDROP >= 0.0) {
                 // Flow in positive direction.
                 // Laminar flow.
-                RhoCor = (propN.temperature + KelvinConv) / (Tave + KelvinConv);
+                RhoCor = (propN.temperature + DataGlobalConstants::KelvinConv()) / (Tave + DataGlobalConstants::KelvinConv());
                 Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                 CDM = coef * propN.density / propN.viscosity * Ctl;
                 FL = CDM * PDROP;
@@ -1137,7 +1136,7 @@ namespace AirflowNetwork {
             } else {
                 // Flow in negative direction.
                 // Laminar flow.
-                RhoCor = (propM.temperature + KelvinConv) / (Tave + KelvinConv);
+                RhoCor = (propM.temperature + DataGlobalConstants::KelvinConv()) / (Tave + DataGlobalConstants::KelvinConv());
                 Ctl = std::pow(RhozNorm / propM.density / RhoCor, 2.0 * expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                 CDM = coef * propM.density / propM.viscosity * Ctl;
                 FL = CDM * PDROP;

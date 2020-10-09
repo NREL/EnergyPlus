@@ -603,7 +603,7 @@ namespace InternalHeatGains {
                     if (NumNumber >= 5 && !lNumericFieldBlanks(5)) {
                         People(Loop).UserSpecSensFrac = IHGNumbers(5);
                     } else {
-                        People(Loop).UserSpecSensFrac = AutoCalculate;
+                        People(Loop).UserSpecSensFrac = DataGlobalConstants::AutoCalculate();
                     }
 
                     if (NumNumber == 6 && !lNumericFieldBlanks(6)) {
@@ -4767,7 +4767,7 @@ namespace InternalHeatGains {
 
             print(state.files.eio, "{:.3R},", People(Loop).FractionRadiant);
             print(state.files.eio, "{:.3R},", People(Loop).FractionConvected);
-            if (People(Loop).UserSpecSensFrac == AutoCalculate) {
+            if (People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate()) {
                 print(state.files.eio, "AutoCalculate,");
             } else {
                 print(state.files.eio, "{:.3R},", People(Loop).UserSpecSensFrac);
@@ -5291,7 +5291,7 @@ namespace InternalHeatGains {
                 ActivityLevel_WperPerson = GetCurrentScheduleValue(People(Loop).ActivityLevelPtr);
                 TotalPeopleGain = NumberOccupants * ActivityLevel_WperPerson;
                 // if the user did not specify a sensible fraction, calculate the sensible heat gain
-                if (People(Loop).UserSpecSensFrac == AutoCalculate) {
+                if (People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate()) {
                     if (!(IsZoneDV(NZ) || IsZoneUI(NZ))) {
                         SensiblePeopleGain =
                             NumberOccupants * (C(1) + ActivityLevel_WperPerson * (C(2) + ActivityLevel_WperPerson * C(3)) +

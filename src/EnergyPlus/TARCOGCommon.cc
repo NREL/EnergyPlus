@@ -193,7 +193,6 @@ namespace TARCOGCommon {
     {
 
         // Using/Aliasing
-        using DataGlobals::StefanBoltzmann;
         using namespace TARCOGParams;
 
         // Locals
@@ -236,7 +235,7 @@ namespace TARCOGCommon {
             }
 
             // second row
-            a(k, k + 1) = emis(front) * StefanBoltzmann * pow_3(theta(front));
+            a(k, k + 1) = emis(front) * DataGlobalConstants::StefanBoltzmann() * pow_3(theta(front));
             a(k + 1, k + 1) = -1.0;
             if (i != 1) {
                 a(k - 2, k + 1) = rir(front);
@@ -247,7 +246,7 @@ namespace TARCOGCommon {
 
             // third row
             a(k + 2, k + 2) = -1.0;
-            a(k + 3, k + 2) = emis(back) * StefanBoltzmann * pow_3(theta(back));
+            a(k + 3, k + 2) = emis(back) * DataGlobalConstants::StefanBoltzmann() * pow_3(theta(back));
             if (i != 1) {
                 a(k - 2, k + 2) = tir(front);
             }

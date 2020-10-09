@@ -98,7 +98,6 @@ namespace WindowComplexManager {
     using namespace DataComplexFenestration;
     using namespace DataVectorTypes;
     using namespace DataBSDFWindow;
-    using DataGlobals::KelvinConv;
     using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::NumOfZones;
     using DataGlobals::TimeStepZoneSec;
@@ -2470,7 +2469,6 @@ namespace WindowComplexManager {
 
         using namespace DataBSDFWindow;
         using DataGlobals::AnyLocalEnvironmentsInModel;
-        using DataGlobals::StefanBoltzmann;
         using DataHeatBalance::GasCoeffsAir;
         using DataHeatBalance::SupportPillar;
         using DataLoopNode::Node;
@@ -2791,7 +2789,7 @@ namespace WindowComplexManager {
         CalcDeflection = WindowThermalModel(ThermalModelNum).DeflectionModel;
         SDScalar = WindowThermalModel(ThermalModelNum).SDScalar;
         VacuumPressure = WindowThermalModel(ThermalModelNum).VacuumPressureLimit;
-        Tini = WindowThermalModel(ThermalModelNum).InitialTemperature - KelvinConv;
+        Tini = WindowThermalModel(ThermalModelNum).InitialTemperature - DataGlobalConstants::KelvinConv();
         Pini = WindowThermalModel(ThermalModelNum).InitialPressure;
 
         nlayer = state.dataConstruction->Construct(ConstrNum).TotSolidLayers;
@@ -2844,7 +2842,7 @@ namespace WindowComplexManager {
                 }
             }
 
-            tind = RefAirTemp + KelvinConv; // Inside air temperature
+            tind = RefAirTemp + DataGlobalConstants::KelvinConv(); // Inside air temperature
 
             // now get "outside" air temperature
             if (SurfNumAdj > 0) { // Interzone window
@@ -2889,9 +2887,9 @@ namespace WindowComplexManager {
                     }
                 }
 
-                tout = RefAirTemp + KelvinConv; // outside air temperature
+                tout = RefAirTemp + DataGlobalConstants::KelvinConv(); // outside air temperature
 
-                tsky = MRT(ZoneNumAdj) + KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
+                tsky = MRT(ZoneNumAdj) + DataGlobalConstants::KelvinConv(); // TODO this misses IR from sources such as high temp radiant and baseboards
 
                 //  ! Add long-wave radiation from adjacent zone absorbed by glass layer closest to the adjacent zone.
                 //  AbsRadGlassFace(1) = AbsRadGlassFace(1) + QRadThermInAbs(SurfNumAdj)
@@ -2915,19 +2913,19 @@ namespace WindowComplexManager {
                         for (SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
                             SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                             SrdSurfTempAbs =
-                                GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + KelvinConv;
-                            OutSrdIR += StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
+                                GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv();
+                            OutSrdIR += DataGlobalConstants::StefanBoltzmann() * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
                         }
                     }
                 }
                 if (Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
                     if (IsRain) {               // Raining: since wind exposed, outside window surface gets wet
-                        tout = Surface(SurfNum).OutWetBulbTemp + KelvinConv;
+                        tout = Surface(SurfNum).OutWetBulbTemp + DataGlobalConstants::KelvinConv();
                     } else { // Dry
-                        tout = Surface(SurfNum).OutDryBulbTemp + KelvinConv;
+                        tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
                     }
                 } else { // Window not exposed to wind
-                    tout = Surface(SurfNum).OutDryBulbTemp + KelvinConv;
+                    tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
                 }
                 // tsky = SkyTemp + TKelvin
                 tsky = SkyTempKelvin;
@@ -2951,7 +2949,7 @@ namespace WindowComplexManager {
             // IR incident on window from zone surfaces and high-temp radiant sources
             rmir = SurfWinIRfromParentZone(SurfNum) + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
                    QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum);
-            trmin = root_4(rmir / StefanBoltzmann); // TODO check model equation.
+            trmin = root_4(rmir / DataGlobalConstants::StefanBoltzmann()); // TODO check model equation.
 
             // outdoor wind speed
             if (!Surface(SurfNum).ExtWind) {
@@ -3347,9 +3345,9 @@ namespace WindowComplexManager {
             // For all cases, get total window heat gain for reporting. See CalcWinFrameAndDividerTemps for
             // contribution of frame and divider.
 
-            SurfInsideTemp = theta(2 * nlayer) - KelvinConv;
+            SurfInsideTemp = theta(2 * nlayer) - DataGlobalConstants::KelvinConv();
             SurfWinEffInsSurfTemp(SurfNum) = SurfInsideTemp;
-            SurfOutsideTemp = theta(1) - KelvinConv;
+            SurfOutsideTemp = theta(1) - DataGlobalConstants::KelvinConv();
             SurfOutsideEmiss = emis(1);
 
             IncidentSolar = Surface(SurfNum).Area * QRadSWOutIncident(SurfNum);
@@ -3414,8 +3412,8 @@ namespace WindowComplexManager {
             // WinGapConvHtFlowRep(SurfNum) = 0.0d0
             // WinGapConvHtFlowRepEnergy(SurfNum) = 0.0d0
             TotAirflowGap = SurfWinAirflowThisTS(SurfNum) * Surface(SurfNum).Width;
-            TAirflowGapOutlet = KelvinConv; // TODO Need to calculate this
-            TAirflowGapOutletC = TAirflowGapOutlet - KelvinConv;
+            TAirflowGapOutlet = DataGlobalConstants::KelvinConv(); // TODO Need to calculate this
+            TAirflowGapOutletC = TAirflowGapOutlet - DataGlobalConstants::KelvinConv();
             SurfWinTAirflowGapOutlet(SurfNum) = TAirflowGapOutletC;
             if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
                 ConvHeatFlowForced = sum(qv); // TODO.  figure forced ventilation heat flow in Watts
@@ -3493,17 +3491,17 @@ namespace WindowComplexManager {
             if (ShadeFlag == IntShadeOn) SurfWinConvCoeffWithShade(SurfNum) = 0.0;
 
             if (ShadeFlag == IntShadeOn) {
-                SurfInsideTemp = theta(2 * ngllayer + 2) - KelvinConv;
+                SurfInsideTemp = theta(2 * ngllayer + 2) - DataGlobalConstants::KelvinConv();
 
                 // // Get properties of inside shading layer
 
                 Real64 EffShBlEmiss = SurfaceWindow(SurfNum).EffShBlindEmiss[0];
                 Real64 EffGlEmiss = SurfaceWindow(SurfNum).EffGlassEmiss[0];
                 SurfWinEffInsSurfTemp(SurfNum) =
-                    (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (theta(2 * ngllayer) - KelvinConv)) / (EffShBlEmiss + EffGlEmiss);
+                    (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (theta(2 * ngllayer) - DataGlobalConstants::KelvinConv())) / (EffShBlEmiss + EffGlEmiss);
 
             } else {
-                SurfOutsideTemp = theta(1) - KelvinConv;
+                SurfOutsideTemp = theta(1) - DataGlobalConstants::KelvinConv();
             }
 
             for (k = 1; k <= nlayer; ++k) {
@@ -3511,8 +3509,8 @@ namespace WindowComplexManager {
                 SurfaceWindow(SurfNum).ThetaFace(2 * k) = theta(2 * k);
 
                 // temperatures for reporting
-                FenLaySurfTempFront(k, SurfNum) = theta(2 * k - 1) - KelvinConv;
-                FenLaySurfTempBack(k, SurfNum) = theta(2 * k) - KelvinConv;
+                FenLaySurfTempFront(k, SurfNum) = theta(2 * k - 1) - DataGlobalConstants::KelvinConv();
+                FenLaySurfTempBack(k, SurfNum) = theta(2 * k) - DataGlobalConstants::KelvinConv();
                 // thetas(k) = theta(k)
             }
         }

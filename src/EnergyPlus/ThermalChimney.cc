@@ -718,7 +718,7 @@ namespace ThermalChimney {
                     if (TempSurfIn(SurfNum) > TemporaryWallSurfTemp) {
                         TemporaryWallSurfTemp = TempSurfIn(SurfNum);
                         ConvTransCoeffWallFluid = HConvIn(SurfNum);
-                        SurfTempAbsorberWall = TempSurfIn(SurfNum) + KelvinConv;
+                        SurfTempAbsorberWall = TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv();
                     }
                 }
             }
@@ -732,7 +732,7 @@ namespace ThermalChimney {
                     if (Surface(SurfNum).Width > TempmajorW) {
                         TempmajorW = Surface(SurfNum).Width;
                         ConvTransCoeffGlassFluid = HConvIn(SurfNum);
-                        SurfTempGlassCover = TempSurfIn(SurfNum) + KelvinConv;
+                        SurfTempGlassCover = TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv();
                     }
                 }
             }
@@ -757,7 +757,7 @@ namespace ThermalChimney {
                 TCZoneNumCounter = ThermalChimneySys(Loop).ZonePtr(TCZoneNum);
                 RoomAirTemp += ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum) * MAT(TCZoneNumCounter);
             }
-            RoomAirTemp += KelvinConv;
+            RoomAirTemp += DataGlobalConstants::KelvinConv();
 
             Process1 = 0.0;
             Process2 = 0.0;
@@ -887,7 +887,7 @@ namespace ThermalChimney {
             if (ThermalChimneyReport(Loop).OverallTCMassFlow != (TCVolumeAirFlowRate * AirDensityThermalChim)) {
                 ThermalChimneyReport(Loop).OverallTCMassFlow = ThermalChimneyReport(Loop).OverallTCVolumeFlow * AirDensityThermalChim;
             }
-            ThermalChimneyReport(Loop).OutletAirTempThermalChim = ThermChimSubTemp(NTC) - KelvinConv;
+            ThermalChimneyReport(Loop).OutletAirTempThermalChim = ThermChimSubTemp(NTC) - DataGlobalConstants::KelvinConv();
 
             if (GetCurrentScheduleValue(ThermalChimneySys(Loop).SchedPtr) <= 0.0) {
                 for (TCZoneNum = 1; TCZoneNum <= ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {

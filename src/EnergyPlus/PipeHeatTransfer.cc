@@ -270,7 +270,6 @@ namespace PipeHeatTransfer {
         int const NumPipeSections(20);
         int const NumberOfDepthNodes(8); // Number of nodes in the cartesian grid-Should be an even # for now
         Real64 const SecondsInHour(DataGlobalConstants::SecInHour());
-        Real64 const HoursInDay(24.0);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // Set to true if errors in input,
@@ -1278,7 +1277,6 @@ namespace PipeHeatTransfer {
         using DataEnvironment::SOLCOS;
         using DataEnvironment::WindSpeed;
         using DataGlobals::HourOfDay;
-        using DataGlobals::KelvinConv;
         using DataGlobals::TimeStep;
         using DataLoopNode::Node;
 
@@ -1348,8 +1346,8 @@ namespace PipeHeatTransfer {
 
                             // If on soil boundary, load up local variables and perform calculations
                             NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex);
-                            PastNodeTempAbs = NodePast + KelvinConv;
-                            SkyTempAbs = SkyTemp + KelvinConv;
+                            PastNodeTempAbs = NodePast + DataGlobalConstants::KelvinConv();
+                            SkyTempAbs = SkyTemp + DataGlobalConstants::KelvinConv();
                             TopRoughness = this->SoilRoughness;
                             TopThermAbs = this->SoilThermAbs;
                             TopSolarAbs = this->SoilSolarAbs;

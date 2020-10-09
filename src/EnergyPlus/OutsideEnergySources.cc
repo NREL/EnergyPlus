@@ -418,12 +418,12 @@ namespace OutsideEnergySources {
         if (PltSizNum > 0) {
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                 DataGlobals::InitConvTemp,
+                                                                 DataGlobalConstants::InitConvTemp(),
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                  "SizeDistrict" + typeName);
             Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                      DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                     DataGlobals::InitConvTemp,
+                                                                     DataGlobalConstants::InitConvTemp(),
                                                                      DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                      "SizeDistrict" + typeName);
             Real64 const NomCapDes = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate;

@@ -3021,7 +3021,7 @@ namespace DXCoils {
             }
 
             DXCoil(DXCoilNum).RatedAirVolFlowRate(1) = Numbers(7);
-            if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) != AutoCalculate) {
+            if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) != DataGlobalConstants::AutoCalculate()) {
                 if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) <= 0.0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("..." + cNumericFields(7) + " must be > 0.0.  entered value=[" + TrimSigDigits(Numbers(7), 3) + "].");
@@ -3031,7 +3031,7 @@ namespace DXCoils {
 
             DXCoil(DXCoilNum).RatedHPWHCondWaterFlow = Numbers(8);
             // move to init
-            if (DXCoil(DXCoilNum).RatedHPWHCondWaterFlow != AutoCalculate) {
+            if (DXCoil(DXCoilNum).RatedHPWHCondWaterFlow != DataGlobalConstants::AutoCalculate()) {
                 if (DXCoil(DXCoilNum).RatedHPWHCondWaterFlow <= 0.0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("..." + cNumericFields(8) + " must be > 0.0  entered value=[" + TrimSigDigits(Numbers(8), 3) + "].");
@@ -3467,7 +3467,7 @@ namespace DXCoils {
             }
 
             DXCoil(DXCoilNum).RatedAirVolFlowRate(1) = Numbers(7);
-            if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) != AutoCalculate) {
+            if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) != DataGlobalConstants::AutoCalculate()) {
                 if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) <= 0.0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("..." + cNumericFields(7) + " must be > 0.0.  entered value=[" + TrimSigDigits(Numbers(7), 3) + "].");
@@ -6776,7 +6776,7 @@ namespace DXCoils {
                 Mode = DehumidModeNum * 2 + CapacityStageNum;
                 if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped ||
                     DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped) {
-                    if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) == AutoCalculate) {
+                    if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) == DataGlobalConstants::AutoCalculate()) {
                         // report autocalculated sizing
                         PrintFlag = true;
                         CompName = DXCoil(DXCoilNum).Name;
@@ -6794,7 +6794,7 @@ namespace DXCoils {
                         PrintFlag = false;
                     }
 
-                    if (DXCoil(DXCoilNum).RatedHPWHCondWaterFlow == AutoCalculate) {
+                    if (DXCoil(DXCoilNum).RatedHPWHCondWaterFlow == DataGlobalConstants::AutoCalculate()) {
                         // report autocalculated sizing
                         PrintFlag = true;
                         CompName = DXCoil(DXCoilNum).Name;
