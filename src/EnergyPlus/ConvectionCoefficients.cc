@@ -2615,7 +2615,7 @@ namespace ConvectionCoefficients {
             Real64 ZoneVolFlowRate = CalcZoneSystemVolFlowRate(ZoneNum);
 
             // Calculate ACH
-            return ZoneVolFlowRate / ZoneVolume * SecInHour;
+            return ZoneVolFlowRate / ZoneVolume * DataGlobalConstants::SecInHour();
         }
     }
 
@@ -2832,7 +2832,7 @@ namespace ConvectionCoefficients {
                 ACH = 0.0;
             } else {
                 // Calculate ACH
-                ACH = ZoneMassFlowRate / AirDensity / ZoneVolume * SecInHour;
+                ACH = ZoneMassFlowRate / AirDensity / ZoneVolume * DataGlobalConstants::SecInHour();
                 // Limit ACH to range of correlation
                 ACH = min(ACH, MaxACH);
                 ACH = max(ACH, 0.0);
@@ -6076,7 +6076,7 @@ namespace ConvectionCoefficients {
         if (Zone(ZoneNum).IsControlled) {
             ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(Node(ZoneNode).Temp, OutBaroPress));
-            AirChangeRate = (Node(ZoneNode).MassFlowRate * SecInHour) / (AirDensity * Zone(ZoneNum).Volume);
+            AirChangeRate = (Node(ZoneNode).MassFlowRate * DataGlobalConstants::SecInHour()) / (AirDensity * Zone(ZoneNum).Volume);
             if (ZoneEquipConfig(ZoneNum).EquipListIndex > 0) {
                 for (EquipNum = 1; EquipNum <= ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
                     if (allocated(ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums)) {

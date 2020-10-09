@@ -993,7 +993,7 @@ namespace SimulationManager {
 
         TimeStepZone = 1.0 / double(NumOfTimeStepInHour);
         MinutesPerTimeStep = TimeStepZone * 60;
-        TimeStepZoneSec = TimeStepZone * SecInHour;
+        TimeStepZoneSec = TimeStepZone * DataGlobalConstants::SecInHour();
 
         CurrentModuleObject = "ConvergenceLimits";
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -1327,7 +1327,7 @@ namespace SimulationManager {
                         DataGlobals::NumOfTimeStepInHour = 1;
                         DataGlobals::TimeStepZone = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
                         DataGlobals::MinutesPerTimeStep = DataGlobals::TimeStepZone * 60;
-                        DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * SecInHour;
+                        DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
                     }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError(

@@ -213,8 +213,6 @@ namespace ThermalChimney {
         Real64 const FlowFractionTolerance(0.0001); // Smallest deviation from unity for the sum of all fractions
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //    CHARACTER(len=MaxNameLength), DIMENSION(23) :: AlphaName
-        //    REAL(r64) , DIMENSION(63)              :: IHGNumbers
         int NumAlpha;
         int NumNumber;
         Real64 AllRatiosSummed;
@@ -223,13 +221,6 @@ namespace ThermalChimney {
         int IOStat;
         int Loop;
         int Loop1;
-
-        //  ALLOCATE(MCPTThermChim(NumOfZones))
-        //  MCPTThermChim=0.0
-        //  ALLOCATE(MCPThermChim(NumOfZones))
-        //  MCPThermChim=0.0
-        //  ALLOCATE(ThermChimAMFL(NumOfZones))
-        //  ThermChimAMFL=0.0
 
         // Following used for reporting
         ZnRptThermChim.allocate(NumOfZones);
@@ -957,7 +948,7 @@ namespace ThermalChimney {
         Real64 CpAir;
         Real64 TSMult;
 
-        TSMult = TimeStepSys * SecInHour;
+        TSMult = TimeStepSys * DataGlobalConstants::SecInHour();
 
         for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
 

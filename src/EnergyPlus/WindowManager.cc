@@ -4296,7 +4296,7 @@ namespace WindowManager {
                 vv(imax) = vv(j);
             }
             indx(j) = imax;
-            if (ajac(j, j) == 0.0) ajac(j, j) = rTinyValue;
+            if (ajac(j, j) == 0.0) ajac(j, j) = DataGlobalConstants::rTinyValue();
             if (j != n) {
                 dum = 1.0 / ajac(j, j);
                 for (i = j + 1; i <= n; ++i) {
@@ -8439,7 +8439,7 @@ namespace WindowManager {
 
             INDX(j) = imax;
             if (j != N) {
-                if (A(j, j) == 0.0) A(j, j) = rTinyValue;
+                if (A(j, j) == 0.0) A(j, j) = DataGlobalConstants::rTinyValue();
 
                 dum = 1.0 / A(j, j);
                 for (i = j + 1; i <= N; ++i) {
@@ -8448,7 +8448,7 @@ namespace WindowManager {
             }
         }
 
-        if (A(N, N) == 0.0) A(N, N) = rTinyValue;
+        if (A(N, N) == 0.0) A(N, N) = DataGlobalConstants::rTinyValue();
     }
 
     //*****************************************************************************************

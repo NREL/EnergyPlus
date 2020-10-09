@@ -2092,7 +2092,7 @@ namespace PlantHeatExchangerFluidToFluid {
         DataLoopNode::Node(this->DemandSideLoop.outletNodeNum).Temp = this->DemandSideLoop.OutletTemp;
         DataLoopNode::Node(this->SupplySideLoop.outletNodeNum).Temp = this->SupplySideLoop.OutletTemp;
 
-        this->HeatTransferEnergy = this->HeatTransferRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->HeatTransferEnergy = this->HeatTransferRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         if ((std::abs(this->HeatTransferRate) > DataHVACGlobals::SmallLoad) && (this->DemandSideLoop.InletMassFlowRate > 0.0) &&
             (this->SupplySideLoop.InletMassFlowRate > 0.0)) {

@@ -5860,17 +5860,17 @@ namespace CondenserLoopTowers {
         //   total water usage
         // update report variables
         this->EvaporationVdot = EvapVdot;
-        this->EvaporationVol = EvapVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        this->EvaporationVol = EvapVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
         this->DriftVdot = driftVdot;
-        this->DriftVol = driftVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        this->DriftVol = driftVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
         this->BlowdownVdot = BlowDownVdot;
-        this->BlowdownVol = BlowDownVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        this->BlowdownVol = BlowDownVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
         this->MakeUpVdot = makeUpVdot;
-        this->MakeUpVol = makeUpVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        this->MakeUpVol = makeUpVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
         this->TankSupplyVdot = tankSupplyVdot;
-        this->TankSupplyVol = tankSupplyVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        this->TankSupplyVol = tankSupplyVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
         this->StarvedMakeUpVdot = StarvedVdot;
-        this->StarvedMakeUpVol = StarvedVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        this->StarvedMakeUpVol = StarvedVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     }
 
     void CoolingTower::update()
@@ -5966,7 +5966,7 @@ namespace CondenserLoopTowers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the tower.
 
-        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (!RunFlag) {
             this->InletWaterTemp = DataLoopNode::Node(this->WaterInletNodeNum).Temp;

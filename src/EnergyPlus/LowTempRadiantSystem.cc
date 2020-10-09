@@ -2344,7 +2344,7 @@ namespace LowTempRadiantSystem {
             // So, the day should be the previous day, the hour should bethe last hour of the
             // day, and the time step should be the last time step.
             this->lastDayOfSim = DataGlobals::DayOfSim - 1;
-            this->lastHourOfDay = int(DataGlobals::HoursInDay);
+            this->lastHourOfDay = int(DataGlobalConstants::HoursInDay());
             this->lastTimeStep = DataGlobals::NumOfTimeStepInHour;
         } else if (DataGlobals::BeginHourFlag) {
             // It's not the beginning of the day but it is the beginning of an hour other than
@@ -4891,12 +4891,12 @@ namespace LowTempRadiantSystem {
     Real64 ConstantFlowRadiantSystemData::calculateCurrentDailyAverageODB(EnergyPlusData& state)
     {
         Real64 sum = 0.0;
-        for (int hourNumber = 1; hourNumber <= DataGlobals::HoursInDay; ++hourNumber) {
+        for (int hourNumber = 1; hourNumber <= DataGlobalConstants::HoursInDay(); ++hourNumber) {
             for (int timeStepNumber = 1; timeStepNumber <= DataGlobals::NumOfTimeStepInHour; ++timeStepNumber) {
                 sum += state.dataWeatherManager->TodayOutDryBulbTemp(timeStepNumber, hourNumber);
             }
         }
-        return sum / double(DataGlobals::HoursInDay * DataGlobals::NumOfTimeStepInHour);
+        return sum / double(DataGlobalConstants::HoursInDay() * DataGlobals::NumOfTimeStepInHour);
     }
 
     void ElectricRadiantSystemData::calculateLowTemperatureRadiantSystem(EnergyPlusData &state,
@@ -5611,7 +5611,6 @@ namespace LowTempRadiantSystem {
     {
 
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
@@ -5644,11 +5643,11 @@ namespace LowTempRadiantSystem {
             this->WaterOutletTemp = this->WaterInletTemp;
         }
 
-        this->HeatEnergy = this->HeatPower * TimeStepSys * SecInHour;
-        this->CoolEnergy = this->CoolPower * TimeStepSys * SecInHour;
+        this->HeatEnergy = this->HeatPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->CoolEnergy = this->CoolPower * TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (this->CondCausedShutDown) {
-            this->CondCausedTimeOff = TimeStepSys * SecInHour;
+            this->CondCausedTimeOff = TimeStepSys * DataGlobalConstants::SecInHour();
         } else {
             this->CondCausedTimeOff = 0.0;
         }
@@ -5658,7 +5657,6 @@ namespace LowTempRadiantSystem {
     {
 
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
@@ -5717,13 +5715,13 @@ namespace LowTempRadiantSystem {
             this->PumpHeattoFluid = 0.0;
         }
 
-        this->HeatEnergy = this->HeatPower * TimeStepSys * SecInHour;
-        this->CoolEnergy = this->CoolPower * TimeStepSys * SecInHour;
-        this->PumpEnergy = this->PumpPower * TimeStepSys * SecInHour;
-        this->PumpHeattoFluidEnergy = this->PumpHeattoFluid * TimeStepSys * SecInHour;
+        this->HeatEnergy = this->HeatPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->CoolEnergy = this->CoolPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->PumpEnergy = this->PumpPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->PumpHeattoFluidEnergy = this->PumpHeattoFluid * TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (this->CondCausedShutDown) {
-            this->CondCausedTimeOff = TimeStepSys * SecInHour;
+            this->CondCausedTimeOff = TimeStepSys * DataGlobalConstants::SecInHour();
         } else {
             this->CondCausedTimeOff = 0.0;
         }
@@ -5733,7 +5731,6 @@ namespace LowTempRadiantSystem {
     {
 
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::TimeStepSys;
 
@@ -5746,7 +5743,7 @@ namespace LowTempRadiantSystem {
         totalRadSysPower *= double(Zone(this->ZonePtr).Multiplier * Zone(this->ZonePtr).ListMultiplier);
 
         this->ElecPower = totalRadSysPower;
-        this->ElecEnergy = this->ElecPower * TimeStepSys * SecInHour;
+        this->ElecEnergy = this->ElecPower * TimeStepSys * DataGlobalConstants::SecInHour();
         this->HeatPower = this->ElecPower;
         this->HeatEnergy = this->ElecEnergy;
     }

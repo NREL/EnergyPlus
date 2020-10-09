@@ -3740,7 +3740,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state.dataCondenserLoopTowers->towers(1).Qactual = 1.0;
     state.dataCondenserLoopTowers->towers(1).FanEnergy = 50.0;
 
-    Real64 TimeStepSysSec = DataHVACGlobals::TimeStepSys * SecInHour;
+    Real64 TimeStepSysSec = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
     Real64 reliefEnergy = 2.0 * TimeStepSysSec;
     Real64 condenserReject = 1.0 * TimeStepSysSec + 50.0;
 
@@ -8334,8 +8334,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
 
     GatherHeatGainReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
-    EXPECT_EQ(1.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*SecInHour, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqHt);
-    EXPECT_EQ(0.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*SecInHour, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl);
+    EXPECT_EQ(1.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*DataGlobalConstants::SecInHour(), DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqHt);
+    EXPECT_EQ(0.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*DataGlobalConstants::SecInHour(), DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl);
     EXPECT_EQ(1000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUHt);
     EXPECT_EQ(-2000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUCl);
 }

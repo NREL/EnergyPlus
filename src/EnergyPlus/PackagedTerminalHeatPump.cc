@@ -145,7 +145,6 @@ namespace PackagedTerminalHeatPump {
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::NumOfZones;
     using DataGlobals::ScheduleAlwaysOn;
-    using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
     using namespace DataHVACGlobals;
     using DXCoils::DXCoilPartLoadRatio;
@@ -6861,7 +6860,7 @@ namespace PackagedTerminalHeatPump {
 
         // FLOW
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         PTUnit(PTUnitNum).TotCoolEnergy = PTUnit(PTUnitNum).TotCoolEnergyRate * ReportingConstant;
         PTUnit(PTUnitNum).TotHeatEnergy = PTUnit(PTUnitNum).TotHeatEnergyRate * ReportingConstant;
         PTUnit(PTUnitNum).SensCoolEnergy = PTUnit(PTUnitNum).SensCoolEnergyRate * ReportingConstant;

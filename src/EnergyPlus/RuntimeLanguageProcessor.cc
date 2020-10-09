@@ -523,8 +523,6 @@ namespace RuntimeLanguageProcessor {
         Array1D_bool ReadyForElse(IfDepthAllowed);
         Array1D_bool ReadyForEndif(IfDepthAllowed);
 
-        //  CHARACTER(len=2*MaxNameLength), DIMENSION(:), ALLOCATABLE :: DummyError
-
         // FLOW:
         LineNum = 1;
         NestedIfDepth = 0;
@@ -2639,8 +2637,6 @@ namespace RuntimeLanguageProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int GlobalNum;
         int StackNum;
-        // unused0909  INTEGER    :: NumPrograms
-        // unused0909  INTEGER    :: NumFunctions
         int ErrorNum;
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
@@ -2648,8 +2644,6 @@ namespace RuntimeLanguageProcessor {
         bool ErrorsFound(false);
         int VariableNum(0); // temporary
         int RuntimeReportVarNum;
-        // unused0909  INTEGER    :: Pos
-        // unused0909  CHARACTER(len=MaxNameLength) :: VariableName
         bool Found;
         static std::string FreqString;    // temporary
         static std::string VarTypeString; // temporary

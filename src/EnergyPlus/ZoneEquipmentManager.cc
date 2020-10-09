@@ -4606,7 +4606,6 @@ namespace ZoneEquipmentManager {
         using DataContaminantBalance::ZoneAirGC;
         using DataGlobals::HourOfDay;
         using DataGlobals::KickOffSimulation;
-        using DataGlobals::SecInHour;
         using DataHeatBalance::Ventilation;
         using DataHVACGlobals::CycleOn;
         using DataHVACGlobals::CycleOnZoneFansOnly;
@@ -4919,12 +4918,12 @@ namespace ZoneEquipmentManager {
                         if (!KickOffSimulation) {
                             if (!(ZoneEquipAvail(NZ) == CycleOn || ZoneEquipAvail(NZ) == CycleOnZoneFansOnly) ||
                                 !AirflowNetwork::AirflowNetworkZoneFlag(NZ))
-                                ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * SecInHour;
+                                ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour();
                         } else if (!AirflowNetwork::AirflowNetworkZoneFlag(NZ)) {
-                            ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * SecInHour;
+                            ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour();
                         }
                     } else {
-                        ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * SecInHour;
+                        ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour();
                     }
                 }
                 // Intake fans will add some heat to the air, raising the temperature for an intake fan...

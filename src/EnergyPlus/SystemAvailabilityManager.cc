@@ -751,7 +751,7 @@ namespace SystemAvailabilityManager {
                 NCycSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 NCycSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_NightCycle;
                 NCycSysAvailMgrData(SysAvailNum).TempTolRange = rNumericArgs(1);
-                CyclingTimeSteps = nint((rNumericArgs(2) / SecInHour) * double(NumOfTimeStepInHour));
+                CyclingTimeSteps = nint((rNumericArgs(2) / DataGlobalConstants::SecInHour()) * double(NumOfTimeStepInHour));
                 CyclingTimeSteps = max(1, CyclingTimeSteps);
                 NCycSysAvailMgrData(SysAvailNum).CyclingTimeSteps = CyclingTimeSteps;
                 NCycSysAvailMgrData(SysAvailNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));

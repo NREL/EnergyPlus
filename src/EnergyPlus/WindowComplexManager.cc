@@ -101,7 +101,6 @@ namespace WindowComplexManager {
     using DataGlobals::KelvinConv;
     using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::NumOfZones;
-    using DataGlobals::rTinyValue;
     using DataGlobals::TimeStepZoneSec;
     using namespace DataSurfaces; // , ONLY: TotSurfaces,TotWindows,Surface,SurfaceWindow   !update this later
     using DataEnvironment::CloudFraction;
@@ -2441,7 +2440,7 @@ namespace WindowComplexManager {
                 assert(false);
             }
         }
-        if (std::abs(Cost) < rTinyValue) Cost = 0.0;
+        if (std::abs(Cost) < DataGlobalConstants::rTinyValue()) Cost = 0.0;
         if (Cost < 0.0) Theta = DataGlobalConstants::Pi() - Theta; // This signals ray out of hemisphere
     }
 

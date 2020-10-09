@@ -1262,7 +1262,7 @@ namespace SolarCollectors {
 
         int SurfNum = this->Surface;
         int ParamNum = this->Parameters;
-        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         Real64 TempWater = this->SavedTempOfWater;
         Real64 TempAbsPlate = this->SavedTempOfAbsPlate;
         Real64 TempOutdoorAir = DataSurfaces::Surface(SurfNum).OutDryBulbTemp;
@@ -2010,7 +2010,7 @@ namespace SolarCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates report variables.
 
-        Real64 TimeStepInSecond = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 TimeStepInSecond = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         this->Energy = this->Power * TimeStepInSecond;
         this->HeatEnergy = this->HeatRate * TimeStepInSecond;

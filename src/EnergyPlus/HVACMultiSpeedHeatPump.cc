@@ -4079,7 +4079,7 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         MSHeatPumpReport(MSHeatPumpNum).ElecPowerConsumption = MSHeatPump(MSHeatPumpNum).ElecPower * ReportingConstant; // + &
         MSHeatPumpReport(MSHeatPumpNum).HeatRecoveryEnergy = MSHeatPump(MSHeatPumpNum).HeatRecoveryRate * ReportingConstant;
 

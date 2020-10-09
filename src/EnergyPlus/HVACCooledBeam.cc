@@ -112,7 +112,6 @@ namespace HVACCooledBeam {
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::NumOfZones;
     using DataGlobals::ScheduleAlwaysOn;
-    using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
     using namespace ScheduleManager;
     using DataHVACGlobals::SmallAirVolFlow;
@@ -1376,7 +1375,7 @@ namespace HVACCooledBeam {
 
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         // report the WaterCoil energy from this component
         CoolBeam(CBNum).BeamCoolingEnergy = CoolBeam(CBNum).BeamCoolingRate * ReportingConstant;
         CoolBeam(CBNum).SupAirCoolingEnergy = CoolBeam(CBNum).SupAirCoolingRate * ReportingConstant;

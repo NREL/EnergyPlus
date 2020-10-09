@@ -253,18 +253,24 @@ namespace DataGlobalConstants {
         DesignDay = 1,
         RunPeriodDesign = 2,
         RunPeriodWeather = 3,
-        HVACSizeDesignDay = 4,                                              // a regular design day run during HVAC Sizing Simulation
-        HVACSizeRunPeriodDesign = 5,                                        // a weather period design day run during HVAC Sizing Simulation
-        ReadAllWeatherData = 6                                              // a weather period for reading all weather data prior to the simulation
+        HVACSizeDesignDay = 4,          // a regular design day run during HVAC Sizing Simulation
+        HVACSizeRunPeriodDesign = 5,    // a weather period design day run during HVAC Sizing Simulation
+        ReadAllWeatherData = 6          // a weather period for reading all weather data prior to the simulation
     };
 
     Real64 constexpr MaxEXPArg () { return 709.78; }                        // maximum exponent in EXP() function
     Real64 constexpr Pi () { return 3.14159265358979324; }                  // Pi 3.1415926535897932384626435
     Real64 constexpr PiOvr2 () { return Pi() / 2.0; }                       // Pi/2
-    Real64 constexpr TwoPi () { return 2.0 * Pi(); }                        // 2*Pi 6.2831853071795864769252868
+    Real64 constexpr TwoPi () { return 2.0 * Pi(); }                        // 2*Pi 6.2831853071795864769252868r
     Real64 constexpr GravityConstant () { return 9.807; }
     Real64 constexpr DegToRadians () { return Pi() / 180.0; }               // Conversion for Degrees to Radians
     Real64 constexpr RadToDeg () { return 180.0 / Pi(); }                   // Conversion for Radians to Degrees
+    Real64 constexpr SecInHour () { return 3600.0; }                        // Conversion for hours to seconds
+    Real64 constexpr HoursInDay () { return 24.0; }                         // Number of Hours in Day
+    Real64 constexpr SecsInDay () { return SecInHour() * HoursInDay(); }    // Number of seconds in Day
+    Real64 constexpr BigNumber () { return std::numeric_limits< Real64 >::max(); }  // Max Number real used for initializations
+    Real64 constexpr rTinyValue () { return std::numeric_limits< Real64 >::epsilon(); }   // Tiny value to replace use of TINY(x)
+    std::string::size_type constexpr MaxNameLength () { return 100; }       // Maximum Name Length in Characters -- should be the same as MaxAlphaArgLength in InputProcessor module
 
     int AssignResourceTypeNum(std::string const &ResourceTypeChar);
     std::string GetResourceTypeChar(int ResourceTypeNum);

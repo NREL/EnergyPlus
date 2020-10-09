@@ -2161,7 +2161,7 @@ namespace IntegratedHeatPump {
             break;
         }
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
 
         IntegratedHeatPumps(DXCoilNum).Energy = IntegratedHeatPumps(DXCoilNum).TotalPower * ReportingConstant; // total electric energy consumption
                                                                                                                // [J]
@@ -2267,7 +2267,7 @@ namespace IntegratedHeatPump {
         WHHeatTimeSav = IntegratedHeatPumps(DXCoilNum).SHDWHRunTime;
         if (IHPOperationMode::SCDWHMode == IntegratedHeatPumps(DXCoilNum).CurMode) {
             WHHeatVolSave = IntegratedHeatPumps(DXCoilNum).WaterFlowAccumVol + Node(IntegratedHeatPumps(DXCoilNum).WaterTankoutNod).MassFlowRate /
-                                                                                   983.0 * TimeStepSys * SecInHour; // 983 - water density at 60 C
+                                                                                   983.0 * TimeStepSys * DataGlobalConstants::SecInHour(); // 983 - water density at 60 C
         } else {
             WHHeatVolSave = 0.0;
         }
@@ -2314,7 +2314,7 @@ namespace IntegratedHeatPump {
         {
             IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::DWHMode;
         } else if (SensLoad > SmallLoad) {
-            IntegratedHeatPumps(DXCoilNum).SHDWHRunTime = WHHeatTimeSav + TimeStepSys * SecInHour;
+            IntegratedHeatPumps(DXCoilNum).SHDWHRunTime = WHHeatTimeSav + TimeStepSys * DataGlobalConstants::SecInHour();
 
             if (WHHeatTimeSav > IntegratedHeatPumps(DXCoilNum).TimeLimitSHDWH) {
                 IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SHDWHElecHeatOnMode;

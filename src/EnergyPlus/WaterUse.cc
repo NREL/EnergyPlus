@@ -925,7 +925,7 @@ namespace WaterUse {
             } else {
                 this->SensibleRate = ScheduleManager::GetCurrentScheduleValue(this->SensibleFracSchedule) * this->TotalMassFlowRate *
                                      Psychrometrics::CPHW(DataGlobals::InitConvTemp) * (this->MixedTemp - DataHeatBalFanSys::MAT(this->Zone));
-                this->SensibleEnergy = this->SensibleRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                this->SensibleEnergy = this->SensibleRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
             }
 
             if (this->LatentFracSchedule == 0) {
@@ -938,14 +938,14 @@ namespace WaterUse {
                 Real64 RhoAirDry = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataHeatBalFanSys::MAT(this->Zone), 0.0);
                 Real64 ZoneMassMax =
                     (ZoneHumRatSat - ZoneHumRat) * RhoAirDry * DataHeatBalance::Zone(this->Zone).Volume; // Max water that can be evaporated to zone
-                Real64 FlowMassMax = this->TotalMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // Max water in flow
+                Real64 FlowMassMax = this->TotalMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour(); // Max water in flow
                 Real64 MoistureMassMax = min(ZoneMassMax, FlowMassMax);
 
                 this->MoistureMass = ScheduleManager::GetCurrentScheduleValue(this->LatentFracSchedule) * MoistureMassMax;
-                this->MoistureRate = this->MoistureMass / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+                this->MoistureRate = this->MoistureMass / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
 
                 this->LatentRate = this->MoistureRate * Psychrometrics::PsyHfgAirFnWTdb(ZoneHumRat, DataHeatBalFanSys::MAT(this->Zone));
-                this->LatentEnergy = this->LatentRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                this->LatentEnergy = this->LatentRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
             }
 
             this->DrainMassFlowRate = this->TotalMassFlowRate - this->MoistureRate;
@@ -1309,9 +1309,9 @@ namespace WaterUse {
             thisWEq.HotVolFlowRate = thisWEq.HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
             thisWEq.TotalVolFlowRate = thisWEq.ColdVolFlowRate + thisWEq.HotVolFlowRate;
 
-            thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            thisWEq.HotVolume = thisWEq.HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            thisWEq.HotVolume = thisWEq.HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
             if (thisWEq.Connections == 0) {
                 thisWEq.Power = thisWEq.HotMassFlowRate * Psychrometrics::CPHW(DataGlobals::InitConvTemp) * (thisWEq.HotTemp - thisWEq.ColdTemp);
@@ -1320,7 +1320,7 @@ namespace WaterUse {
                                 (thisWEq.HotTemp - state.dataWaterUse->WaterConnections(thisWEq.Connections).ReturnTemp);
             }
 
-            thisWEq.Energy = thisWEq.Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            thisWEq.Energy = thisWEq.Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         }
     }
 
@@ -1344,9 +1344,9 @@ namespace WaterUse {
             thisWEq.ColdVolFlowRate = thisWEq.ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
             thisWEq.HotVolFlowRate = thisWEq.HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
             thisWEq.TotalVolFlowRate = thisWEq.ColdVolFlowRate + thisWEq.HotVolFlowRate;
-            thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            thisWEq.HotVolume = thisWEq.HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            thisWEq.HotVolume = thisWEq.HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
             if (thisWEq.Connections == 0) {
                 thisWEq.Power = thisWEq.HotMassFlowRate * Psychrometrics::CPHW(DataGlobals::InitConvTemp) * (thisWEq.HotTemp - thisWEq.ColdTemp);
@@ -1355,18 +1355,18 @@ namespace WaterUse {
                                 (thisWEq.HotTemp - state.dataWaterUse->WaterConnections(thisWEq.Connections).ReturnTemp);
             }
 
-            thisWEq.Energy = thisWEq.Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            thisWEq.Energy = thisWEq.Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         }
 
         this->ColdVolFlowRate = this->ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
         this->HotVolFlowRate = this->HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
         this->TotalVolFlowRate = this->ColdVolFlowRate + this->HotVolFlowRate;
-        this->ColdVolume = this->ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->HotVolume = this->HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->TotalVolume = this->TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->ColdVolume = this->ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->HotVolume = this->HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->TotalVolume = this->TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         this->Power = this->HotMassFlowRate * Psychrometrics::CPHW(DataGlobals::InitConvTemp) * (this->HotTemp - this->ReturnTemp);
-        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->RecoveryEnergy = this->RecoveryRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->RecoveryEnergy = this->RecoveryRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     void CalcWaterUseZoneGains(EnergyPlusData &state)

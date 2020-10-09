@@ -3341,7 +3341,7 @@ namespace PlantCentralGSHP {
         Real64 SecInTimeStep; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
         int ChillerHeaterNum; // Chiller heater number
 
-        SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         for (ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
             this->ChillerHeater(ChillerHeaterNum).Report.ChillerFalseLoad =
@@ -3367,7 +3367,7 @@ namespace PlantCentralGSHP {
         //       DATE WRITTEN:    Feb 2013
 
         // Number of seconds per HVAC system time step, to convert from W (J/s) to J
-        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
             this->ChillerHeater(ChillerHeaterNum).Report.ChillerFalseLoad =

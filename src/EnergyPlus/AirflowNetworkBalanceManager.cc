@@ -144,7 +144,6 @@ namespace AirflowNetworkBalanceManager {
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::NumOfZones;
     using DataGlobals::ScheduleAlwaysOn;
-    using DataGlobals::SecInHour;
     using DataGlobals::TimeStepZone;
     using DataGlobals::WarmupFlag;
     using DataHeatBalance::TotCrossMixing;
@@ -6911,7 +6910,7 @@ namespace AirflowNetworkBalanceManager {
                                                                      (pow_4(TDuctSurf_K) - pow_4(TSurfj_K)); // Radiant load for this surface [W]
                         int SurfNum = VFObj.LinkageSurfaceData(j).SurfaceNum;
                         Real64 ZoneSurfaceArea = Surface(SurfNum).Area;
-                        QRadSurfAFNDuct(SurfNum) += VFObj.LinkageSurfaceData(j).SurfaceRadLoad * TimeStepSys * SecInHour /
+                        QRadSurfAFNDuct(SurfNum) += VFObj.LinkageSurfaceData(j).SurfaceRadLoad * TimeStepSys * DataGlobalConstants::SecInHour() /
                                                     ZoneSurfaceArea;              // Energy to each surface per unit area [J/m2]
                         VFObj.QRad += VFObj.LinkageSurfaceData(j).SurfaceRadLoad; // Total radiant load from all surfaces for this system timestep [W]
                     }
@@ -7981,7 +7980,7 @@ namespace AirflowNetworkBalanceManager {
             onceSurfFlag.dimension(AirflowNetworkNumOfLinks, false);
             onetime = true;
         }
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
 
         ZoneTotalExfiltrationHeatLoss = 0.0;
 
@@ -10930,7 +10929,7 @@ namespace AirflowNetworkBalanceManager {
 
         CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
         RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
-        InfilVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp / CpAir / RhoAir) * TimeStepSys * SecInHour;
+        InfilVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp / CpAir / RhoAir) * TimeStepSys * DataGlobalConstants::SecInHour();
         ACH = InfilVolume / (TimeStepSys * Zone(ZoneNum).Volume);
 
         return ACH;

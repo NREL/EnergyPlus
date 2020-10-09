@@ -13923,7 +13923,7 @@ namespace UnitarySystems {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variable for the coils.
 
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         Real64 SensibleOutput = 0.0; // sensible output rate, {W}
         Real64 LatentOutput = 0.0;   // latent output rate, {W}
@@ -14169,7 +14169,7 @@ namespace UnitarySystems {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const routineName("UnitarySystemHeatRecovery");
 
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         int HeatRecInNode = this->m_HeatRecoveryInletNodeNum;
         int HeatRecOutNode = this->m_HeatRecoveryOutletNodeNum;

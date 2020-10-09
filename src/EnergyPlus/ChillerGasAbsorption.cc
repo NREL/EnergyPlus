@@ -1864,12 +1864,12 @@ namespace ChillerGasAbsorption {
         }
 
         // convert power to energy and instantaneous use to use over the time step
-        this->CoolingEnergy = this->CoolingLoad * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->TowerEnergy = this->TowerLoad * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->FuelEnergy = this->FuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->CoolFuelEnergy = this->CoolFuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->ElectricEnergy = this->ElectricPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->CoolElectricEnergy = this->CoolElectricPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->CoolingEnergy = this->CoolingLoad * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->TowerEnergy = this->TowerLoad * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->FuelEnergy = this->FuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->CoolFuelEnergy = this->CoolFuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->ElectricEnergy = this->ElectricPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->CoolElectricEnergy = this->CoolElectricPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         if (this->CoolFuelUseRate != 0.0) {
             this->FuelCOP = this->CoolingLoad / this->CoolFuelUseRate;
         } else {
@@ -1894,11 +1894,11 @@ namespace ChillerGasAbsorption {
         }
 
         // convert power to energy and instantaneous use to use over the time step
-        this->HeatingEnergy = this->HeatingLoad * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->FuelEnergy = this->FuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->HeatFuelEnergy = this->HeatFuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->ElectricEnergy = this->ElectricPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->HeatElectricEnergy = this->HeatElectricPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->HeatingEnergy = this->HeatingLoad * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->FuelEnergy = this->FuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->HeatFuelEnergy = this->HeatFuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->ElectricEnergy = this->ElectricPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->HeatElectricEnergy = this->HeatElectricPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
 } // namespace ChillerGasAbsorption

@@ -219,13 +219,11 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &state,
     // Returns ground temperature when time is in seconds
 
     // USE STATEMENTS:
-    using DataGlobals::SecsInDay;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     depth = _depth;
 
-    simTimeInDays = seconds / SecsInDay;
+    simTimeInDays = seconds / DataGlobalConstants::SecsInDay();
 
     if (simTimeInDays > state.dataWeatherManager->NumDaysInYear) {
         simTimeInDays = remainder(simTimeInDays, state.dataWeatherManager->NumDaysInYear);

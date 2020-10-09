@@ -116,7 +116,6 @@ namespace HeatRecovery {
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::ScheduleAlwaysOn;
-    using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
     using DataGlobals::WarmupFlag;
     using namespace DataLoopNode;
@@ -3296,7 +3295,7 @@ namespace HeatRecovery {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         ExchCond(ExNum).ElecUseEnergy = ExchCond(ExNum).ElecUseRate * ReportingConstant;
         ExchCond(ExNum).SensHeatingEnergy = ExchCond(ExNum).SensHeatingRate * ReportingConstant;
         ExchCond(ExNum).LatHeatingEnergy = ExchCond(ExNum).LatHeatingRate * ReportingConstant;

@@ -389,8 +389,6 @@ namespace EconomicTariff {
         int jObj;      // loop index for objects
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(100)  :: AlphaArray !character string data
-        // REAL(r64),                        DIMENSION(100)  :: NumArray  !numeric data
         int IOStat; // IO Status when calling get input subroutine
         int found;
         bool isNotNumeric;
@@ -859,8 +857,6 @@ namespace EconomicTariff {
         int iInObj;    // loop index variable for reading in objects
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(100)  :: cAlphaArgs !character string data
-        // REAL(r64),                        DIMENSION(100)  :: rNumericArgs  !numeric data
         int IOStat; // IO Status when calling get input subroutine
         bool isNotNumeric;
         int jFld;
@@ -943,8 +939,6 @@ namespace EconomicTariff {
         int iInObj;    // loop index variable for reading in objects
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(100)  :: cAlphaArgs !character string data
-        // REAL(r64),                        DIMENSION(100)  :: rNumericArgs  !numeric data
         int IOStat; // IO Status when calling get input subroutine
         bool isNotNumeric;
         int jFld;
@@ -1016,8 +1010,6 @@ namespace EconomicTariff {
         int iInObj;    // loop index variable for reading in objects
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(100)  :: cAlphaArgs !character string data
-        // REAL(r64),                        DIMENSION(100)  :: rNumericArgs  !numeric data
         int IOStat; // IO Status when calling get input subroutine
         bool isNotNumeric;
         int jBlk;               // loop index for blocks
@@ -1121,8 +1113,6 @@ namespace EconomicTariff {
         int iInObj;    // loop index variable for reading in objects
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(100)  :: cAlphaArgs !character string data
-        // REAL(r64),                        DIMENSION(100)  :: rNumericArgs  !numeric data
         int IOStat; // IO Status when calling get input subroutine
         bool isNotNumeric;
         int jFld;
@@ -1192,8 +1182,6 @@ namespace EconomicTariff {
         int iInObj;    // loop index variable for reading in objects
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(100)  :: cAlphaArgs !character string data
-        // REAL(r64),                        DIMENSION(100)  :: rNumericArgs  !numeric data
         int IOStat; // IO Status when calling get input subroutine
         int jVal;
         int variablePt;
@@ -1269,8 +1257,6 @@ namespace EconomicTariff {
         int iInObj;    // loop index variable for reading in objects
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(100)  :: cAlphaArgs !character string data
-        // REAL(r64),                        DIMENSION(100)  :: rNumericArgs  !numeric data
         int IOStat; // IO Status when calling get input subroutine
         int jLine;
         int jFld;
@@ -2734,7 +2720,6 @@ namespace EconomicTariff {
         //   calculation.
 
         using DataEnvironment::Month;
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStepZoneSec;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -2765,7 +2750,7 @@ namespace EconomicTariff {
                 tariff(iTariff).collectEnergy += curInstantValue;
                 tariff(iTariff).collectTime += TimeStepZoneSec;
                 // added *SecInHour when adding RTP support August 2008
-                if (tariff(iTariff).collectTime >= tariff(iTariff).demWinTime * SecInHour) {
+                if (tariff(iTariff).collectTime >= tariff(iTariff).demWinTime * DataGlobalConstants::SecInHour()) {
                     // get current value that has been converted into desired units
                     curDemand = tariff(iTariff).demandConv * tariff(iTariff).collectEnergy / tariff(iTariff).collectTime;
                     curEnergy = tariff(iTariff).energyConv * tariff(iTariff).collectEnergy;

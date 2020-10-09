@@ -374,14 +374,13 @@ namespace PVWatts {
     void PVWattsGenerator::calc(EnergyPlusData& state)
     {
         using DataGlobals::HourOfDay;
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::TimeStepSys;
 
         // We only run this once for each zone time step.
         if (!DataGlobals::BeginTimeStepFlag) {
-            m_outputDCEnergy = m_outputDCPower * TimeStepSys * SecInHour;
+            m_outputDCEnergy = m_outputDCPower * TimeStepSys * DataGlobalConstants::SecInHour();
             return;
         }
 
@@ -422,7 +421,7 @@ namespace PVWatts {
         m_cellTemperature = pwr_st.pvt;
         m_planeOfArrayIrradiance = pwr_st.poa;
         m_outputDCPower = pwr_st.dc;
-        m_outputDCEnergy = m_outputDCPower * TimeStepSys * SecInHour;
+        m_outputDCEnergy = m_outputDCPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     void PVWattsGenerator::getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy)

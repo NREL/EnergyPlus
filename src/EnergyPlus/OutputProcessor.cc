@@ -122,7 +122,6 @@ namespace OutputProcessor {
     using DataEnvironment::Year;
     using DataGlobals::DayOfSim;
     using DataGlobals::HourOfDay;
-    using DataGlobals::MaxNameLength;
     using DataGlobals::MinutesPerTimeStep;
     using DataGlobals::StdOutputRecordCount;
     using namespace DataGlobalConstants;

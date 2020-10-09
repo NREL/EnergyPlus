@@ -710,7 +710,7 @@ namespace EarthTube {
         Real64 CpAir;
         Real64 ReportingConstant; // reporting constant for this module
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
 
         for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
 

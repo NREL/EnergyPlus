@@ -2894,7 +2894,7 @@ namespace HeatingCoils {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         // report the HeatingCoil energy from this component
         HeatingCoil(CoilNum).HeatingCoilRate = HeatingCoil(CoilNum).HeatingCoilLoad;
         HeatingCoil(CoilNum).HeatingCoilLoad *= ReportingConstant;

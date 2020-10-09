@@ -491,11 +491,8 @@ namespace DaylightingDevices {
         using General::SafeDivide;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // unused1208  CHARACTER(len=MaxNameLength), &
-        //                   DIMENSION(20) :: Alphas                ! Alpha items for object
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int IOStatus;                   // Used in GetObjectItem
-        // unused1208  REAL(r64), DIMENSION(9)             :: Numbers               ! Numeric items for object
         int NumAlphas;         // Number of Alphas for each GetObjectItem call
         int NumNumbers;        // Number of Numbers for each GetObjectItem call
         int PipeNum;           // TDD pipe object number

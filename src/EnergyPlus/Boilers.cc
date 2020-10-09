@@ -922,7 +922,7 @@ namespace Boilers {
         // PURPOSE OF THIS SUBROUTINE:
         // boiler simulation reporting
 
-        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         int const BoilerInletNode = this->BoilerInletNodeNum;
         int const BoilerOutletNode = this->BoilerOutletNodeNum;
 

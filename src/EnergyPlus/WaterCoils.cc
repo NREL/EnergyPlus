@@ -4795,7 +4795,7 @@ namespace WaterCoils {
                 }
             }
         }
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         // report the WaterCoil energy from this component
         state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilEnergy = state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate * ReportingConstant;
         state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilEnergy = state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate * ReportingConstant;

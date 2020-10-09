@@ -1681,10 +1681,10 @@ namespace CoolingPanelSimple {
         this->ConvPower = -this->ConvPower;
         this->RadPower = -this->RadPower;
 
-        this->TotEnergy = this->TotPower * TimeStepSys * SecInHour;
-        this->Energy = this->Power * TimeStepSys * SecInHour;
-        this->ConvEnergy = this->ConvPower * TimeStepSys * SecInHour;
-        this->RadEnergy = this->RadPower * TimeStepSys * SecInHour;
+        this->TotEnergy = this->TotPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->Energy = this->Power * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->ConvEnergy = this->ConvPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->RadEnergy = this->RadPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     Real64 SumHATsurf(int const ZoneNum) // Zone number

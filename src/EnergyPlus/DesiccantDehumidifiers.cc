@@ -3185,7 +3185,7 @@ namespace DesiccantDehumidifiers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
 
         {
             auto const SELECT_CASE_var(DesicDehum(DesicDehumNum).DehumTypeCode);

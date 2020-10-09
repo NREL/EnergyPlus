@@ -327,14 +327,14 @@ namespace ChillerElectricEIR {
                 // If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
                 // since it is not used elsewhere for connection
                 if (DataIPShortCuts::lAlphaFieldBlanks(7)) {
-                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobals::MaxNameLength - 25) { // protect against long name leading to > 100 chars
+                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobalConstants::MaxNameLength() - 25) { // protect against long name leading to > 100 chars
                         DataIPShortCuts::cAlphaArgs(7) = DataIPShortCuts::cAlphaArgs(1) + " INLET NODE FOR CONDENSER";
                     } else {
                         DataIPShortCuts::cAlphaArgs(7) = DataIPShortCuts::cAlphaArgs(1).substr(0, 75) + " INLET NODE FOR CONDENSER";
                     }
                 }
                 if (DataIPShortCuts::lAlphaFieldBlanks(8)) {
-                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobals::MaxNameLength - 26) { // protect against long name leading to > 100 chars
+                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobalConstants::MaxNameLength() - 26) { // protect against long name leading to > 100 chars
                         DataIPShortCuts::cAlphaArgs(8) = DataIPShortCuts::cAlphaArgs(1) + " OUTLET NODE FOR CONDENSER";
                     } else {
                         DataIPShortCuts::cAlphaArgs(8) = DataIPShortCuts::cAlphaArgs(1).substr(0, 74) + " OUTLET NODE FOR CONDENSER";
@@ -2275,7 +2275,7 @@ namespace ChillerElectricEIR {
         //  Reporting
 
         // Number of seconds per HVAC system time step, to convert from W (J/s) to J
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (MyLoad >= 0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             // Set node conditions
@@ -2346,15 +2346,15 @@ namespace ChillerElectricEIR {
 
             // Set node flow rates;  for these load based models
             // assume that sufficient evaporator flow rate is available
-            this->ChillerFalseLoad = this->ChillerFalseLoadRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            this->EvapEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            this->CondEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->ChillerFalseLoad = this->ChillerFalseLoadRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            this->EvapEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            this->CondEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
             this->EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
             this->CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             this->CondOutletTemp = DataLoopNode::Node(this->CondOutletNodeNum).Temp;
             this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
-            this->CondenserFanEnergyConsumption = this->CondenserFanPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->CondenserFanEnergyConsumption = this->CondenserFanPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
             if (this->Power != 0.0) {
                 this->ActualCOP = (this->QEvaporator + this->ChillerFalseLoadRate) / this->Power;
             } else {
@@ -2368,7 +2368,7 @@ namespace ChillerElectricEIR {
             if (this->HeatRecActive) {
 
                 PlantUtilities::SafeCopyPlantNode(this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
-                this->EnergyHeatRecovery = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                this->EnergyHeatRecovery = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
                 DataLoopNode::Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
                 this->HeatRecInletTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
                 this->HeatRecMassFlow = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;

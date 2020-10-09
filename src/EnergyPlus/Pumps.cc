@@ -104,7 +104,6 @@ namespace Pumps {
     // Using/Aliasing
     using DataGlobals::AnyEnergyManagementSystemInModel;
     using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::SecInHour;
     using DataHVACGlobals::CycleOn;
     using DataHVACGlobals::ForceOff;
     using DataHVACGlobals::NumCondLoops;
@@ -2278,16 +2277,16 @@ namespace Pumps {
             PumpEquipReport(PumpNum).PumpHeattoFluid = PumpHeattoFluid;
             PumpEquipReport(PumpNum).OutletTemp = Node(OutletNode).Temp;
             PumpEquip(PumpNum).Power = Power;
-            PumpEquip(PumpNum).Energy = PumpEquip(PumpNum).Power * TimeStepSys * SecInHour;
+            PumpEquip(PumpNum).Energy = PumpEquip(PumpNum).Power * TimeStepSys * DataGlobalConstants::SecInHour();
             PumpEquipReport(PumpNum).ShaftPower = ShaftPower;
-            PumpEquipReport(PumpNum).PumpHeattoFluidEnergy = PumpHeattoFluid * TimeStepSys * SecInHour;
+            PumpEquipReport(PumpNum).PumpHeattoFluidEnergy = PumpHeattoFluid * TimeStepSys * DataGlobalConstants::SecInHour();
             if (PumpType == Pump_ConSpeed || PumpType == Pump_VarSpeed || PumpType == Pump_Cond) {
                 PumpEquipReport(PumpNum).NumPumpsOperating = 1;
             } else if (PumpType == PumpBank_ConSpeed || PumpType == PumpBank_VarSpeed) {
                 PumpEquipReport(PumpNum).NumPumpsOperating = NumPumpsRunning;
             }
             PumpEquipReport(PumpNum).ZoneTotalGainRate = Power - PumpHeattoFluid;
-            PumpEquipReport(PumpNum).ZoneTotalGainEnergy = PumpEquipReport(PumpNum).ZoneTotalGainRate * TimeStepSys * SecInHour;
+            PumpEquipReport(PumpNum).ZoneTotalGainEnergy = PumpEquipReport(PumpNum).ZoneTotalGainRate * TimeStepSys * DataGlobalConstants::SecInHour();
             PumpEquipReport(PumpNum).ZoneConvGainRate = (1 - PumpEquip(PumpNum).SkinLossRadFraction) * PumpEquipReport(PumpNum).ZoneTotalGainRate;
             PumpEquipReport(PumpNum).ZoneRadGainRate = PumpEquip(PumpNum).SkinLossRadFraction * PumpEquipReport(PumpNum).ZoneTotalGainRate;
         }

@@ -1836,7 +1836,7 @@ namespace ZoneContaminantPredictorCorrector {
                     // to determine system added/subtracted moisture.
                     CO2Gain = ZoneCO2Gain(ZoneNum) * RhoAir * 1.0e6;
 
-                    SysTimeStepInSeconds = SecInHour * TimeStepSys;
+                    SysTimeStepInSeconds = DataGlobalConstants::SecInHour() * TimeStepSys;
 
                     // Calculate the coefficients for the 3rd Order derivative for final
                     // zone CO2.  The A, B, C coefficients are analogous to the CO2 balance.
@@ -1943,7 +1943,7 @@ namespace ZoneContaminantPredictorCorrector {
                     // to determine system added/subtracted moisture.
                     GCGain = ZoneGCGain(ZoneNum) * RhoAir * 1.0e6;
 
-                    SysTimeStepInSeconds = SecInHour * TimeStepSys;
+                    SysTimeStepInSeconds = DataGlobalConstants::SecInHour() * TimeStepSys;
 
                     // Calculate the coefficients for the 3rd Order derivative for final
                     // zone GC.  The A, B, C coefficients are analogous to the GC balance.
@@ -2162,7 +2162,7 @@ namespace ZoneContaminantPredictorCorrector {
         Real64 UpperBound(0.0); // Upper bound of number of people
 
         Real64 SysTimeStepInSeconds(0.0);
-        SysTimeStepInSeconds = SecInHour * TimeStepSys;
+        SysTimeStepInSeconds = DataGlobalConstants::SecInHour() * TimeStepSys;
 
         Zone(ZoneNum).ZoneMeasuredCO2Concentration = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
 
@@ -2208,8 +2208,8 @@ namespace ZoneContaminantPredictorCorrector {
                 }
 
                 // Add threshold for air change rate
-                ACH_inf = max(0.0, min(10.0, M_inf / (CpAir * AirDensity / SecInHour * Zone(ZoneNum).Volume)));
-                M_inf = ACH_inf * Zone(ZoneNum).Volume * AirDensity / SecInHour;
+                ACH_inf = max(0.0, min(10.0, M_inf / (CpAir * AirDensity / DataGlobalConstants::SecInHour() * Zone(ZoneNum).Volume)));
+                M_inf = ACH_inf * Zone(ZoneNum).Volume * AirDensity / DataGlobalConstants::SecInHour();
                 Zone(ZoneNum).MCPIHM = M_inf;
                 Zone(ZoneNum).InfilOAAirChangeRateHM = ACH_inf;
             }
@@ -2512,7 +2512,7 @@ namespace ZoneContaminantPredictorCorrector {
                 ZoneMassFlowRate += Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate / ZoneMult;
             }
 
-            SysTimeStepInSeconds = SecInHour * TimeStepSys;
+            SysTimeStepInSeconds = DataGlobalConstants::SecInHour() * TimeStepSys;
 
             // Calculate the coefficients for the 3rd order derivative for final
             // zone humidity ratio.  The A, B, C coefficients are analogous to the

@@ -119,7 +119,6 @@ namespace WindowAC {
     using DataGlobals::BeginDayFlag;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::CoilDX_CoolingHXAssisted;
@@ -1262,7 +1261,7 @@ namespace WindowAC {
 
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
 
         state.dataWindowAC->WindAC(WindACNum).SensCoolEnergy = state.dataWindowAC->WindAC(WindACNum).SensCoolEnergyRate * ReportingConstant;
         state.dataWindowAC->WindAC(WindACNum).TotCoolEnergy = state.dataWindowAC->WindAC(WindACNum).TotCoolEnergyRate * ReportingConstant;

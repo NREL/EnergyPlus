@@ -136,7 +136,6 @@ namespace FanCoilUnits {
     using DataGlobals::BeginDayFlag;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;
@@ -4668,7 +4667,7 @@ namespace FanCoilUnits {
         Real64 ReportingConstant;
 
         // FLOW
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         FanCoil(FanCoilNum).HeatEnergy = FanCoil(FanCoilNum).HeatPower * ReportingConstant;
         FanCoil(FanCoilNum).SensCoolEnergy = FanCoil(FanCoilNum).SensCoolPower * ReportingConstant;
         FanCoil(FanCoilNum).TotCoolEnergy = FanCoil(FanCoilNum).TotCoolPower * ReportingConstant;

@@ -8315,7 +8315,6 @@ namespace HeatBalanceSurfaceManager {
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::SkyTemp;
         using DataEnvironment::SunIsUp;
-        using DataGlobals::SecInHour;
         using DataSurfaces::ExtVentedCavity;
         using DataSurfaces::OSCM;
         using DataSurfaces::Surface;
@@ -8402,7 +8401,7 @@ namespace HeatBalanceSurfaceManager {
         ExtVentedCavity(CavNum).HrPlen = HrPlen;
         ExtVentedCavity(CavNum).HcPlen = HcPlen;
         ExtVentedCavity(CavNum).PassiveACH =
-            (MdotVent / RhoAir) * (1.0 / (ExtVentedCavity(CavNum).ProjArea * ExtVentedCavity(CavNum).PlenGapThick)) * SecInHour;
+            (MdotVent / RhoAir) * (1.0 / (ExtVentedCavity(CavNum).ProjArea * ExtVentedCavity(CavNum).PlenGapThick)) * DataGlobalConstants::SecInHour();
         ExtVentedCavity(CavNum).PassiveMdotVent = MdotVent;
         ExtVentedCavity(CavNum).PassiveMdotWind = VdotWind * RhoAir;
         ExtVentedCavity(CavNum).PassiveMdotTherm = VdotThermal * RhoAir;

@@ -181,7 +181,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
                                                 DataLoopNode::NodeData &condOutletNode,
                                                 Real64 LoadSHR)
 {
-    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
     if (useAlternateMode == DataHVACGlobals::coilSubcoolReheatMode) {
         Real64 totalCoolingRate;
@@ -321,7 +321,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlus::EnergyPlusData &sta
     currentMode.CalcOperatingMode(state, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
 
     // scaling term to get rate into consumptions
-    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
     // calculate crankcase heater operation
     if (DataEnvironment::OutDryBulbTemp < this->maxOutdoorDrybulbForBasin) {

@@ -109,7 +109,6 @@ namespace HeatPumpWaterToWaterSimple {
     using DataGlobals::DayOfSim;
     using DataGlobals::HourOfDay;
     using DataGlobals::KelvinConv;
-    using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataGlobals::WarmupFlag;
@@ -1784,7 +1783,7 @@ namespace HeatPumpWaterToWaterSimple {
         LoadSideOutletTemp = LoadSideInletTemp - QLoad / (LoadSideMassFlowRate * CpLoadSide);
         SourceSideOutletTemp = SourceSideInletTemp + QSource / (SourceSideMassFlowRate * CpSourceSide);
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
 
         this->reportPower = Power;
         this->reportEnergy = Power * ReportingConstant;
@@ -1963,7 +1962,7 @@ namespace HeatPumpWaterToWaterSimple {
         LoadSideOutletTemp = LoadSideInletTemp + QLoad / (LoadSideMassFlowRate * CpLoadSide);
         SourceSideOutletTemp = SourceSideInletTemp - QSource / (SourceSideMassFlowRate * CpSourceSide);
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
 
         this->reportPower = Power;
         this->reportEnergy = Power * ReportingConstant;

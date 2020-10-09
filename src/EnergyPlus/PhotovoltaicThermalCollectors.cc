@@ -948,7 +948,7 @@ namespace PhotovoltaicThermalCollectors {
                 this->Report.ThermEfficiency = Eff;
                 this->Report.ThermHeatGain = PotentialHeatGain;
                 this->Report.ThermPower = this->Report.ThermHeatGain;
-                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
                 this->Report.ThermHeatLoss = 0.0;
                 this->Report.TinletWorkFluid = Tinlet;
                 this->Report.MdotWorkFluid = mdot;
@@ -1014,7 +1014,7 @@ namespace PhotovoltaicThermalCollectors {
                 this->Report.ThermHeatLoss = mdot * CpInlet * (Tinlet - this->Report.ToutletWorkFluid);
                 this->Report.ThermHeatGain = 0.0;
                 this->Report.ThermPower = -1.0 * this->Report.ThermHeatLoss;
-                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
                 this->Report.ThermEfficiency = 0.0;
                 this->Simple.LastCollectorTemp = Tcollector;
                 this->Report.BypassStatus = BypassFraction;

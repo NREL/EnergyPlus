@@ -2022,10 +2022,10 @@ namespace ChillerIndirectAbsorption {
         } // IF(GeneratorInletNode .GT. 0)THEN
 
         // convert power to energy
-        this->GeneratorEnergy = this->QGenerator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->PumpingEnergy = this->PumpingPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->GeneratorEnergy = this->QGenerator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->PumpingEnergy = this->PumpingPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         //                              ------
         //                            /        \.

@@ -1453,7 +1453,6 @@ namespace SurfaceGroundHeatExchanger {
         // This subroutine simply produces output for Surface ground heat exchangers
 
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
 
@@ -1465,12 +1464,12 @@ namespace SurfaceGroundHeatExchanger {
         // update other variables from module variables
         this->HeatTransferRate = SourceFlux * this->SurfaceArea;
         this->SurfHeatTransferRate = this->SurfaceArea * (TopSurfFlux + BtmSurfFlux);
-        this->Energy = SourceFlux * this->SurfaceArea * TimeStepSys * SecInHour;
+        this->Energy = SourceFlux * this->SurfaceArea * TimeStepSys * DataGlobalConstants::SecInHour();
         this->TopSurfaceTemp = TopSurfTemp;
         this->BtmSurfaceTemp = BtmSurfTemp;
         this->TopSurfaceFlux = TopSurfFlux;
         this->BtmSurfaceFlux = BtmSurfFlux;
-        this->SurfEnergy = SurfaceArea * (TopSurfFlux + BtmSurfFlux) * TimeStepSys * SecInHour;
+        this->SurfEnergy = SurfaceArea * (TopSurfFlux + BtmSurfFlux) * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
 } // namespace SurfaceGroundHeatExchanger

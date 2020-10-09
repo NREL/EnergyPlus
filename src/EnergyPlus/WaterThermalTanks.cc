@@ -6189,7 +6189,7 @@ namespace WaterThermalTanks {
             Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, TankTemp_loc, waterIndex, RoutineName);
         }
 
-        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         Real64 TimeRemaining = SecInTimeStep;
         int CycleOnCount_loc = 0;
         int MaxCycles = SecInTimeStep;
@@ -7014,7 +7014,7 @@ namespace WaterThermalTanks {
         const Real64 TimeElapsed_loc = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
         // Seconds in one DataGlobals::TimeStep (s)
-        const Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        const Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         // Advance tank simulation to the next system DataGlobals::TimeStep, if applicable
         if (this->TimeElapsed != TimeElapsed_loc) {
@@ -7853,7 +7853,7 @@ namespace WaterThermalTanks {
         }         // validsourcetype
 
         DesupHtr.OffCycParaFuelRate = DesupHtr.OffCycParaLoad;
-        DesupHtr.OffCycParaFuelEnergy = DesupHtr.OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        DesupHtr.OffCycParaFuelEnergy = DesupHtr.OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         // check that water heater tank cut-in temp is greater than desuperheater cut-in temp
         Real64 desupHtrSetPointTemp = DesupHtr.SetPointTemp;
@@ -8215,14 +8215,14 @@ namespace WaterThermalTanks {
             DesupHtr.HeaterRate = 0.0;
         }
 
-        DesupHtr.HeaterEnergy = DesupHtr.HeaterRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        DesupHtr.HeaterEnergy = DesupHtr.HeaterRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         DesupHtr.DesuperheaterPLR = partLoadRatio;
         DesupHtr.OnCycParaFuelRate = DesupHtr.OnCycParaLoad * partLoadRatio;
-        DesupHtr.OnCycParaFuelEnergy = DesupHtr.OnCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        DesupHtr.OnCycParaFuelEnergy = DesupHtr.OnCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         DesupHtr.OffCycParaFuelRate = DesupHtr.OffCycParaLoad * (1 - partLoadRatio);
-        DesupHtr.OffCycParaFuelEnergy = DesupHtr.OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        DesupHtr.OffCycParaFuelEnergy = DesupHtr.OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         DesupHtr.PumpPower = DesupHtr.PumpElecPower * (partLoadRatio);
-        DesupHtr.PumpEnergy = DesupHtr.PumpPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        DesupHtr.PumpEnergy = DesupHtr.PumpPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         // Update used waste heat (just in case multiple users of waste heat use same source)
         if (DesupHtr.ValidSourceType) {
@@ -8506,7 +8506,7 @@ namespace WaterThermalTanks {
             //   If HPWH compressor is available and unit is off for another reason, off-cycle parasitics are calculated
             if (AvailSchedule != 0) {
                 HeatPump.OffCycParaFuelRate = HeatPump.OffCycParaLoad * (1.0 - state.dataWaterThermalTanks->hpPartLoadRatio);
-                HeatPump.OffCycParaFuelEnergy = HeatPump.OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                HeatPump.OffCycParaFuelEnergy = HeatPump.OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
             }
 
             //   Warn if HPWH compressor cut-in temperature is less than the water heater tank's set point temp
@@ -9435,9 +9435,9 @@ namespace WaterThermalTanks {
 
         HeatPump.HeatingPLR = state.dataWaterThermalTanks->hpPartLoadRatio;
         HeatPump.OnCycParaFuelRate = HeatPump.OnCycParaLoad * state.dataWaterThermalTanks->hpPartLoadRatio;
-        HeatPump.OnCycParaFuelEnergy = HeatPump.OnCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        HeatPump.OnCycParaFuelEnergy = HeatPump.OnCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         HeatPump.OffCycParaFuelRate = HeatPump.OffCycParaLoad * (1.0 - state.dataWaterThermalTanks->hpPartLoadRatio);
-        HeatPump.OffCycParaFuelEnergy = HeatPump.OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        HeatPump.OffCycParaFuelEnergy = HeatPump.OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
             HeatPump.ControlTempAvg = this->TankTempAvg;
             HeatPump.ControlTempFinal = this->TankTemp;
@@ -10470,7 +10470,7 @@ namespace WaterThermalTanks {
                     }
 
                     tmpMaxCapacity = SumPeopleAllZones * this->Sizing.RecoveryCapacityPerPerson * (Tfinish - Tstart) *
-                                     (1.0 / DataGlobals::SecInHour) * rho * Cp; // m3/hr/person | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
+                                     (1.0 / DataGlobalConstants::SecInHour()) * rho * Cp; // m3/hr/person | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
                 }
 
                 if (this->VolumeWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
@@ -10512,7 +10512,7 @@ namespace WaterThermalTanks {
                         Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                     }
                     tmpMaxCapacity = SumFloorAreaAllZones * this->Sizing.RecoveryCapacityPerArea * (Tfinish - Tstart) *
-                                     (1.0 / DataGlobals::SecInHour) * rho * Cp; // m2 | m3/hr/m2 | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
+                                     (1.0 / DataGlobalConstants::SecInHour()) * rho * Cp; // m2 | m3/hr/m2 | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
                 }
                 if (this->VolumeWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->Volume = tmpTankVolume;
@@ -10553,7 +10553,7 @@ namespace WaterThermalTanks {
                         Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                     }
                     tmpMaxCapacity = this->Sizing.NumberOfUnits * this->Sizing.RecoveryCapacityPerUnit * (Tfinish - Tstart) *
-                                     (1.0 / DataGlobals::SecInHour) * rho * Cp; // m3/hr/ea | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
+                                     (1.0 / DataGlobalConstants::SecInHour()) * rho * Cp; // m3/hr/ea | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
                 }
 
                 if (this->VolumeWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
@@ -10632,7 +10632,7 @@ namespace WaterThermalTanks {
 
             if (SELECT_CASE_var == SizeEnum::PeakDraw) {
                 if (this->VolumeWasAutoSized)
-                    tmpTankVolume = this->Sizing.TankDrawTime * this->UseDesignVolFlowRate * DataGlobals::SecInHour; // hours | m3/s | (3600 s/1 hour)
+                    tmpTankVolume = this->Sizing.TankDrawTime * this->UseDesignVolFlowRate * DataGlobalConstants::SecInHour(); // hours | m3/s | (3600 s/1 hour)
                 if (this->VolumeWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->Volume = tmpTankVolume;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
@@ -10660,7 +10660,7 @@ namespace WaterThermalTanks {
                             Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                         }
                         tmpMaxCapacity = (this->Volume * rho * Cp * (Tfinish - Tstart)) /
-                                         (this->Sizing.RecoveryTime * DataGlobals::SecInHour); // m3 | kg/m3 | J/Kg/K | K | seconds
+                                         (this->Sizing.RecoveryTime * DataGlobalConstants::SecInHour()); // m3 | kg/m3 | J/Kg/K | K | seconds
                     } else {
                         ShowFatalError("SizeTankForSupplySide: Tank=\"" + this->Name +
                                        "\", requested sizing for max capacity but entered Recovery Time is zero.");
@@ -10777,18 +10777,18 @@ namespace WaterThermalTanks {
                         Real64 eff = this->UseEffectiveness;
                         if ((Tpdesign >= 58.0) && (!this->IsChilledWaterTank)) {
                             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                                this->UseDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobals::SecInHour * eff)) *
+                                this->UseDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobalConstants::SecInHour() * eff)) *
                                                              std::log((Tpdesign - Tfinish) / (Tpdesign - Tstart));
                             } else {
-                                tmpUseDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobals::SecInHour * eff)) *
+                                tmpUseDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobalConstants::SecInHour() * eff)) *
                                                           std::log((Tpdesign - Tfinish) / (Tpdesign - Tstart));
                             }
                         } else if ((Tpdesign <= 8.0) && (this->IsChilledWaterTank)) {
                             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                                this->UseDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobals::SecInHour * eff)) *
+                                this->UseDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobalConstants::SecInHour() * eff)) *
                                                              std::log((Tpdesign - Tfinish) / (Tpdesign - Tstart));
                             } else {
-                                tmpUseDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobals::SecInHour * eff)) *
+                                tmpUseDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobalConstants::SecInHour() * eff)) *
                                                           std::log((Tpdesign - Tfinish) / (Tpdesign - Tstart));
                             }
                         } else {
@@ -10860,18 +10860,18 @@ namespace WaterThermalTanks {
                         if ((Tpdesign >= 58.0) && (!this->IsChilledWaterTank)) {
 
                             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                                this->SourceDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobals::SecInHour * eff)) *
+                                this->SourceDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobalConstants::SecInHour() * eff)) *
                                                                 std::log((Tpdesign - Tfinish) / (Tpdesign - Tstart));
                             } else {
-                                tmpSourceDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobals::SecInHour * eff)) *
+                                tmpSourceDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobalConstants::SecInHour() * eff)) *
                                                              std::log((Tpdesign - Tfinish) / (Tpdesign - Tstart));
                             }
                         } else if ((Tpdesign <= 8.0) && (this->IsChilledWaterTank)) {
                             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                                this->SourceDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobals::SecInHour * eff)) *
+                                this->SourceDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobalConstants::SecInHour() * eff)) *
                                                                 std::log((Tpdesign - Tfinish) / (Tpdesign - Tstart));
                             } else {
-                                tmpSourceDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobals::SecInHour * eff)) *
+                                tmpSourceDesignVolFlowRate = -1.0 * (TankVolume / (tankRecoverhours * DataGlobalConstants::SecInHour() * eff)) *
                                                              std::log((Tpdesign - Tfinish) / (Tpdesign - Tstart));
                             }
                         } else {
@@ -10972,7 +10972,7 @@ namespace WaterThermalTanks {
                     Real64 DrawDesignVolFlowRate = ScheduleManager::GetScheduleMaxValue(this->FlowRateSchedule) * this->MassFlowRateMax / rho;
 
                     if (this->VolumeWasAutoSized) {
-                        tmpTankVolume = this->Sizing.TankDrawTime * DrawDesignVolFlowRate * DataGlobals::SecInHour; // hours | m3/s | (3600 s/1 hour)
+                        tmpTankVolume = this->Sizing.TankDrawTime * DrawDesignVolFlowRate * DataGlobalConstants::SecInHour(); // hours | m3/s | (3600 s/1 hour)
                         this->Volume = tmpTankVolume;
                         BaseSizer::reportSizerOutput(this->Type, this->Name, "Tank Volume [m3]", this->Volume);
                     }
@@ -10982,7 +10982,7 @@ namespace WaterThermalTanks {
                             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
 
                             tmpMaxCapacity = (this->Volume * rho * Cp * (Tfinish - Tstart)) /
-                                             (this->Sizing.RecoveryTime * DataGlobals::SecInHour); // m3 | kg/m3 | J/Kg/K | K | seconds
+                                             (this->Sizing.RecoveryTime * DataGlobalConstants::SecInHour()); // m3 | kg/m3 | J/Kg/K | K | seconds
                         } else {
                             ShowFatalError("SizeStandAloneWaterHeater: Tank=\"" + this->Name +
                                            "\", requested sizing for max capacity but entered Recovery Time is zero.");
@@ -11142,7 +11142,7 @@ namespace WaterThermalTanks {
                         Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                         tmpMaxCapacity = SumPeopleAllZones * this->Sizing.RecoveryCapacityPerPerson * (Tfinish - Tstart) *
-                                         (1.0 / DataGlobals::SecInHour) * rho * Cp; // m3/hr/person | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
+                                         (1.0 / DataGlobalConstants::SecInHour()) * rho * Cp; // m3/hr/person | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
                     }
 
                     if (this->VolumeWasAutoSized) {
@@ -11165,7 +11165,7 @@ namespace WaterThermalTanks {
                         Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                         tmpMaxCapacity = SumFloorAreaAllZones * this->Sizing.RecoveryCapacityPerArea * (Tfinish - Tstart) *
-                                         (1.0 / DataGlobals::SecInHour) * rho * Cp; // m2 | m3/hr/m2 | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
+                                         (1.0 / DataGlobalConstants::SecInHour()) * rho * Cp; // m2 | m3/hr/m2 | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
                     }
                     if (this->VolumeWasAutoSized) {
                         this->Volume = tmpTankVolume;
@@ -11183,7 +11183,7 @@ namespace WaterThermalTanks {
                         Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                         tmpMaxCapacity = this->Sizing.NumberOfUnits * this->Sizing.RecoveryCapacityPerUnit * (Tfinish - Tstart) *
-                                         (1.0 / DataGlobals::SecInHour) * rho * Cp; // m3/hr/ea | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
+                                         (1.0 / DataGlobalConstants::SecInHour()) * rho * Cp; // m3/hr/ea | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
                     }
 
                     if (this->VolumeWasAutoSized) {
@@ -11251,7 +11251,7 @@ namespace WaterThermalTanks {
         //       MODIFIED       na
         //       RE-ENGINEERED  Feb 2004, PGE
 
-        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         this->UnmetEnergy = this->UnmetRate * SecInTimeStep;
         this->LossEnergy = this->LossRate * SecInTimeStep;
@@ -11317,7 +11317,7 @@ namespace WaterThermalTanks {
 
             Real64 TotalDrawMass = 0.243402 * Psychrometrics::RhoH2O(DataGlobals::InitConvTemp); // 64.3 gal * rho
             Real64 DrawMass = TotalDrawMass / 6.0;                                               // 6 equal draws
-            Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
             Real64 DrawMassFlowRate = DrawMass / SecInTimeStep;
             Real64 FuelEnergy_loc = 0.0;
             FirstTimeFlag = true;

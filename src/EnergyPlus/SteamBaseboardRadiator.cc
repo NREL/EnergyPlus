@@ -1472,10 +1472,10 @@ namespace SteamBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        SteamBaseboard(BaseboardNum).TotEnergy = SteamBaseboard(BaseboardNum).TotPower * TimeStepSys * SecInHour;
-        SteamBaseboard(BaseboardNum).Energy = SteamBaseboard(BaseboardNum).Power * TimeStepSys * SecInHour;
-        SteamBaseboard(BaseboardNum).ConvEnergy = SteamBaseboard(BaseboardNum).ConvPower * TimeStepSys * SecInHour;
-        SteamBaseboard(BaseboardNum).RadEnergy = SteamBaseboard(BaseboardNum).RadPower * TimeStepSys * SecInHour;
+        SteamBaseboard(BaseboardNum).TotEnergy = SteamBaseboard(BaseboardNum).TotPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        SteamBaseboard(BaseboardNum).Energy = SteamBaseboard(BaseboardNum).Power * TimeStepSys * DataGlobalConstants::SecInHour();
+        SteamBaseboard(BaseboardNum).ConvEnergy = SteamBaseboard(BaseboardNum).ConvPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        SteamBaseboard(BaseboardNum).RadEnergy = SteamBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     Real64 SumHATsurf(int const ZoneNum) // Zone number

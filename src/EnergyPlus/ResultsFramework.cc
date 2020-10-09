@@ -78,7 +78,6 @@ namespace ResultsFramework {
     using namespace OutputProcessor;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::InitConvTemp;
-    using DataGlobals::SecInHour;
     using OutputProcessor::RealVariableType;
     using OutputProcessor::RealVariables;
 

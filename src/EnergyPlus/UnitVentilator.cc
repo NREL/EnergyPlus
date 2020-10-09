@@ -3812,7 +3812,6 @@ namespace UnitVentilator {
         // na
 
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
 
         // Locals
@@ -3831,10 +3830,10 @@ namespace UnitVentilator {
         // na
 
         // FLOW:
-        UnitVent(UnitVentNum).HeatEnergy = UnitVent(UnitVentNum).HeatPower * TimeStepSys * SecInHour;
-        UnitVent(UnitVentNum).SensCoolEnergy = UnitVent(UnitVentNum).SensCoolPower * TimeStepSys * SecInHour;
-        UnitVent(UnitVentNum).TotCoolEnergy = UnitVent(UnitVentNum).TotCoolPower * TimeStepSys * SecInHour;
-        UnitVent(UnitVentNum).ElecEnergy = UnitVent(UnitVentNum).ElecPower * TimeStepSys * SecInHour;
+        UnitVent(UnitVentNum).HeatEnergy = UnitVent(UnitVentNum).HeatPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        UnitVent(UnitVentNum).SensCoolEnergy = UnitVent(UnitVentNum).SensCoolPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        UnitVent(UnitVentNum).TotCoolEnergy = UnitVent(UnitVentNum).TotCoolPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        UnitVent(UnitVentNum).ElecEnergy = UnitVent(UnitVentNum).ElecPower * TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (UnitVent(UnitVentNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!DataGlobals::SysSizingCalc) {

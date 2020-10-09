@@ -4711,8 +4711,6 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  CHARACTER(len=MaxNameLength), DIMENSION(MaxZonesInList + 1) :: Alphas
-        //  REAL(r64), DIMENSION(8)              :: Numbers
         int NumAlphas;
         int NumNumbers;
         int IOStatus;
@@ -5088,8 +5086,6 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  CHARACTER(len=MaxNameLength), DIMENSION(MaxZonesInList + 1) :: Alphas
-        //  REAL(r64), DIMENSION(8)              :: Numbers
 
         Zone(ZoneLoop).Name = cAlphaArgs(1);
         if (NumNumbers >= 1) Zone(ZoneLoop).RelNorth = rNumericArgs(1);

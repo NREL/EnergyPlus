@@ -117,7 +117,6 @@ namespace PoweredInductionUnits {
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::NumOfZones;
     using DataGlobals::ScheduleAlwaysOn;
-    using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::PlenumInducedMassFlow;
     using DataHVACGlobals::SingleCoolingSetPoint;
@@ -2119,8 +2118,8 @@ namespace PoweredInductionUnits {
 
         // FLOW
 
-        PIU(PIUNum).HeatingEnergy = PIU(PIUNum).HeatingRate * TimeStepSys * SecInHour;
-        PIU(PIUNum).SensCoolEnergy = PIU(PIUNum).SensCoolRate * TimeStepSys * SecInHour;
+        PIU(PIUNum).HeatingEnergy = PIU(PIUNum).HeatingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        PIU(PIUNum).SensCoolEnergy = PIU(PIUNum).SensCoolRate * TimeStepSys * DataGlobalConstants::SecInHour();
 
         // set zone OA Volume flow rate
         PIU(PIUNum).CalcOutdoorAirVolumeFlowRate(state);

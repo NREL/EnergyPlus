@@ -2878,7 +2878,6 @@ namespace General {
 
         // Using/Aliasing
         using DataGlobals::CurrentTime;
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -2907,7 +2906,7 @@ namespace General {
         // Maybe later TimeStepZone, TimeStepSys and SysTimeElapsed could also be specified
         // as real.
         CurrentHVACTime = (CurrentTime - TimeStepZone) + SysTimeElapsed + TimeStepSys;
-        GetCurrentHVACTime = CurrentHVACTime * SecInHour;
+        GetCurrentHVACTime = CurrentHVACTime * DataGlobalConstants::SecInHour();
 
         return GetCurrentHVACTime;
     }
@@ -2931,7 +2930,6 @@ namespace General {
 
         // Using/Aliasing
         using DataGlobals::CurrentTime;
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
 
@@ -2957,7 +2955,7 @@ namespace General {
         // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
         // erronously truncate all sub-minute system time steps down to the closest full minute.
         PreviousHVACTime = (CurrentTime - TimeStepZone) + SysTimeElapsed;
-        GetPreviousHVACTime = PreviousHVACTime * SecInHour;
+        GetPreviousHVACTime = PreviousHVACTime * DataGlobalConstants::SecInHour();
 
         return GetPreviousHVACTime;
     }
@@ -3223,8 +3221,6 @@ namespace General {
         static std::string LineRptOption1;
         static std::string VarDictOption1;
         static std::string VarDictOption2;
-        //  LOGICAL,SAVE :: SchRpt = .FALSE.
-        //  CHARACTER(len=MaxNameLength) :: SchRptOption
 
         if (GetReportInput) {
 
@@ -3573,8 +3569,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::MaxNameLength;
-
         // Argument array dimensioning
 
         // Locals
@@ -3596,13 +3590,13 @@ namespace General {
         std::string::size_type const ItemLength = len(ZoneName) + ItemNameLength;
         ResultName = ZoneName + ' ' + ItemName;
         bool TooLong = false;
-        if (ItemLength > MaxNameLength) {
+        if (ItemLength > DataGlobalConstants::MaxNameLength()) {
             ShowWarningError(calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
             ShowContinueError("Object Name=\"" + ItemName + "\".");
             ShowContinueError("ZoneList/Zone Name=\"" + ZoneName + "\".");
-            ShowContinueError("Item length=[" + RoundSigDigits(int(ItemLength)) + "] > Maximum Length=[" + RoundSigDigits(MaxNameLength) +
+            ShowContinueError("Item length=[" + RoundSigDigits(int(ItemLength)) + "] > Maximum Length=[" + RoundSigDigits(DataGlobalConstants::MaxNameLength()) +
                               "]. You may need to shorten the names.");
-            ShowContinueError("Shortening the Object Name by [" + RoundSigDigits(int(MaxZoneNameLength + 1 + ItemNameLength - MaxNameLength)) +
+            ShowContinueError("Shortening the Object Name by [" + RoundSigDigits(int(MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength())) +
                               "] characters will assure uniqueness for this ZoneList.");
             ShowContinueError("name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
             TooLong = true;

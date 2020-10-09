@@ -13314,7 +13314,7 @@ namespace DXCoils {
             }
         }
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
 
         {
             auto const SELECT_CASE_var(DXCoil(DXCoilNum).DXCoilType_Num);

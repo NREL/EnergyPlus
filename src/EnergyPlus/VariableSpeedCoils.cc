@@ -5463,7 +5463,7 @@ namespace VariableSpeedCoils {
         //  Add power to global variable so power can be summed by parent object
         DXElecCoolingPower =  state.dataVariableSpeedCoils->Winput;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         // Update heat pump data structure
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power =  state.dataVariableSpeedCoils->Winput;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal =  state.dataVariableSpeedCoils->QLoadTotal;
@@ -6007,7 +6007,7 @@ namespace VariableSpeedCoils {
         //  Add power to global variable so power can be summed by parent object
         DXElecCoolingPower =  state.dataVariableSpeedCoils->Winput;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         // Update heat pump data structure
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower * RuntimeFrac; // water heating pump power
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power =  state.dataVariableSpeedCoils->Winput;
@@ -6481,7 +6481,7 @@ namespace VariableSpeedCoils {
         //  Add power to global variable so power can be summed by parent object
         DXElecHeatingPower = state.dataVariableSpeedCoils->Winput;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         // Update heat pump data structure
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power = state.dataVariableSpeedCoils->Winput;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal = state.dataVariableSpeedCoils->QLoadTotal;
@@ -7149,7 +7149,7 @@ namespace VariableSpeedCoils {
             Node(WaterOutletNode).Enthalpy = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletWaterEnthalpy;
         }
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power * ReportingConstant;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal * ReportingConstant;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySensible = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSensible * ReportingConstant;

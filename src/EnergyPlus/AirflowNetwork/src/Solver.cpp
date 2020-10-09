@@ -101,7 +101,6 @@ namespace AirflowNetwork {
     using DataEnvironment::OutHumRat;
     using DataEnvironment::StdBaroPress;
     using DataGlobals::KelvinConv;
-    using DataGlobals::rTinyValue;
     using DataSurfaces::Surface;
 
     //std::vector<AirProperties> properties;
@@ -785,7 +784,7 @@ namespace AirflowNetwork {
                     C = CCF(n) * CEF(n);
                 } else {
                     //            IF (CCF(N) .EQ. 0.0d0) CCF(N)=TINY(CCF(N))  ! 1.0E-40
-                    if (CCF(n) == 0.0) CCF(n) = rTinyValue; // 1.0E-40 (Epsilon)
+                    if (CCF(n) == 0.0) CCF(n) = DataGlobalConstants::rTinyValue(); // 1.0E-40 (Epsilon)
                     PCF(n) = CCF(n);
                     C = CCF(n);
                 }

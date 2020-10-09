@@ -1595,7 +1595,7 @@ namespace SteamCoils {
         // na
 
         // Report the SteamCoil energy from this component
-        SteamCoil(CoilNum).TotSteamHeatingCoilEnergy = SteamCoil(CoilNum).TotSteamHeatingCoilRate * TimeStepSys * SecInHour;
+        SteamCoil(CoilNum).TotSteamHeatingCoilEnergy = SteamCoil(CoilNum).TotSteamHeatingCoilRate * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     // End of Reporting subroutines for the SteamCoil Module

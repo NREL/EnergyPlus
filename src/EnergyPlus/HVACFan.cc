@@ -1082,7 +1082,7 @@ namespace HVACFan {
 
     void FanSystem::report()
     {
-        m_fanEnergy = m_fanPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        m_fanEnergy = m_fanPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         m_deltaTemp = m_outletAirTemp - m_inletAirTemp;
     }
 

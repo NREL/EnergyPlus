@@ -169,14 +169,12 @@ namespace OutputReportTabular {
     //                                      |--> MonthlyTable --> MonthlyColumns
 
     // Using/Aliasing
-    using DataGlobals::BigNumber;
     using DataGlobals::CurrentTime;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::DoOutputReporting;
     using DataGlobals::DoWeathSim;
     using DataGlobals::HourOfDay;
     using DataGlobals::NumOfZones;
-    using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataGlobals::TimeStepZoneSec;
@@ -1098,8 +1096,6 @@ namespace OutputReportTabular {
         OutputProcessor::StoreType AvgSumVar;
         OutputProcessor::TimeStepType StepTypeVar;
         OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None); // Units enum
-        // CHARACTER(len=MaxNameLength), DIMENSION(:), ALLOCATABLE :: NamesOfKeys      ! Specific key name
-        // INTEGER, DIMENSION(:) , ALLOCATABLE                     :: IndexesForKeyVar ! Array index
         Array1D_string UniqueKeyNames;
         int UniqueKeyCount;
         int iKey;
@@ -4013,7 +4009,7 @@ namespace OutputReportTabular {
                             elapsedTime = TimeStepZone;
                         }
                         if (OutputTableBinned(iInObj).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                            curValue /= (elapsedTime * SecInHour);
+                            curValue /= (elapsedTime * DataGlobalConstants::SecInHour());
                         }
                         // round the value to the number of signficant digits used in the final output report
                         if (curIntervalSize < 1) {
@@ -4203,7 +4199,7 @@ namespace OutputReportTabular {
                             // per MJW when a summed variable is used divide it by the length of the time step
                             if (MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                 if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
-                                    curValue /= (TimeStepSys * SecInHour);
+                                    curValue /= (TimeStepSys * DataGlobalConstants::SecInHour());
                                 } else {
                                     curValue /= TimeStepZoneSec;
                                 }
@@ -4220,7 +4216,7 @@ namespace OutputReportTabular {
                             // per MJW when a summed variable is used divide it by the length of the time step
                             if (MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                 if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
-                                    curValue /= (TimeStepSys * SecInHour);
+                                    curValue /= (TimeStepSys * DataGlobalConstants::SecInHour());
                                 } else {
                                     curValue /= TimeStepZoneSec;
                                 }
@@ -4317,7 +4313,7 @@ namespace OutputReportTabular {
                                     // When a summed variable is used divide it by the length of the time step
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
-                                            scanValue /= (TimeStepSys * SecInHour);
+                                            scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour());
                                         } else {
                                             scanValue /= TimeStepZoneSec;
                                         }
@@ -4361,7 +4357,7 @@ namespace OutputReportTabular {
                                 } else if (SELECT_CASE_var == aggTypeMaximumDuringHoursShown) {
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
-                                            scanValue /= (TimeStepSys * SecInHour);
+                                            scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour());
                                         } else {
                                             scanValue /= TimeStepZoneSec;
                                         }
@@ -4373,7 +4369,7 @@ namespace OutputReportTabular {
                                 } else if (SELECT_CASE_var == aggTypeMinimumDuringHoursShown) {
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
-                                            scanValue /= (TimeStepSys * SecInHour);
+                                            scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour());
                                         } else {
                                             scanValue /= TimeStepZoneSec;
                                         }
@@ -4910,7 +4906,7 @@ namespace OutputReportTabular {
 
         static Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(DataEnvironment::OutHumRat, DataEnvironment::OutDryBulbTemp);
         static Real64 RhoWater = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
-        Real64 TimeStepSysSec = TimeStepSys * SecInHour;
+        Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour();
         SysTotalHVACReliefHeatLoss = 0;
         SysTotalHVACRejectHeatLoss = 0;
 
@@ -5224,16 +5220,16 @@ namespace OutputReportTabular {
             Real64 ZoneEqHeatorCool =
                 ZnAirRpt(iZone).SumMCpDTsystem + ZnAirRpt(iZone).SumNonAirSystem * mult - ATUHeat(iZone) - ATUCool(iZone);
             if (ZoneEqHeatorCool > 0.0) {
-                ZonePreDefRep(iZone).SHGSAnZoneEqHt += ZoneEqHeatorCool * TimeStepSys * SecInHour;
+                ZonePreDefRep(iZone).SHGSAnZoneEqHt += ZoneEqHeatorCool * TimeStepSys * DataGlobalConstants::SecInHour();
             } else {
-                ZonePreDefRep(iZone).SHGSAnZoneEqCl += ZoneEqHeatorCool * TimeStepSys * SecInHour;
+                ZonePreDefRep(iZone).SHGSAnZoneEqCl += ZoneEqHeatorCool * TimeStepSys * DataGlobalConstants::SecInHour();
             }
             // Interzone Air Transfer Heat Addition
             // Interzone Air Transfer Heat Removal
             if (ZnAirRpt(iZone).SumMCpDTzones > 0.0) {
-                ZonePreDefRep(iZone).SHGSAnIzaAdd += ZnAirRpt(iZone).SumMCpDTzones * mult * TimeStepSys * SecInHour;
+                ZonePreDefRep(iZone).SHGSAnIzaAdd += ZnAirRpt(iZone).SumMCpDTzones * mult * TimeStepSys * DataGlobalConstants::SecInHour();
             } else {
-                ZonePreDefRep(iZone).SHGSAnIzaRem += ZnAirRpt(iZone).SumMCpDTzones * mult * TimeStepSys * SecInHour;
+                ZonePreDefRep(iZone).SHGSAnIzaRem += ZnAirRpt(iZone).SumMCpDTzones * mult * TimeStepSys * DataGlobalConstants::SecInHour();
             }
             // Window Heat Addition
             // Window Heat Removal
@@ -5242,9 +5238,9 @@ namespace OutputReportTabular {
             // Infiltration Heat Addition
             // Infiltration Heat Removal
             if (ZnAirRpt(iZone).SumMCpDtInfil > 0.0) {
-                ZonePreDefRep(iZone).SHGSAnInfilAdd += ZnAirRpt(iZone).SumMCpDtInfil * mult * TimeStepSys * SecInHour;
+                ZonePreDefRep(iZone).SHGSAnInfilAdd += ZnAirRpt(iZone).SumMCpDtInfil * mult * TimeStepSys * DataGlobalConstants::SecInHour();
             } else {
-                ZonePreDefRep(iZone).SHGSAnInfilRem += ZnAirRpt(iZone).SumMCpDtInfil * mult * TimeStepSys * SecInHour;
+                ZonePreDefRep(iZone).SHGSAnInfilRem += ZnAirRpt(iZone).SumMCpDtInfil * mult * TimeStepSys * DataGlobalConstants::SecInHour();
             }
             // Equipment Sensible Heat Addition
             // Equipment Sensible Heat Removal
@@ -6489,7 +6485,7 @@ namespace OutputReportTabular {
             }
             // full load hours per week
             if ((Lights(iLight).DesignLevel * gatherElapsedTimeBEPS) > 0) {
-                HrsPerWeek = 24 * 7 * Lights(iLight).SumConsumption / (Lights(iLight).DesignLevel * gatherElapsedTimeBEPS * SecInHour);
+                HrsPerWeek = 24 * 7 * Lights(iLight).SumConsumption / (Lights(iLight).DesignLevel * gatherElapsedTimeBEPS * DataGlobalConstants::SecInHour());
                 PreDefTableEntry(pdchInLtFullLoadHrs, Lights(iLight).Name, HrsPerWeek);
             }
             PreDefTableEntry(pdchInLtConsump, Lights(iLight).Name, Lights(iLight).SumConsumption * mult / 1000000000.0);
@@ -6513,7 +6509,7 @@ namespace OutputReportTabular {
             // full load hours per week
             if ((state.dataExteriorEnergyUse->ExteriorLights(iLight).DesignLevel * gatherElapsedTimeBEPS) > 0) {
                 HrsPerWeek =
-                    24 * 7 * state.dataExteriorEnergyUse->ExteriorLights(iLight).SumConsumption / (state.dataExteriorEnergyUse->ExteriorLights(iLight).DesignLevel * gatherElapsedTimeBEPS * SecInHour);
+                    24 * 7 * state.dataExteriorEnergyUse->ExteriorLights(iLight).SumConsumption / (state.dataExteriorEnergyUse->ExteriorLights(iLight).DesignLevel * gatherElapsedTimeBEPS * DataGlobalConstants::SecInHour());
                 PreDefTableEntry(pdchExLtFullLoadHrs, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, HrsPerWeek);
             }
             PreDefTableEntry(pdchExLtConsump, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, state.dataExteriorEnergyUse->ExteriorLights(iLight).SumConsumption / 1000000000.0);
@@ -7243,7 +7239,6 @@ namespace OutputReportTabular {
         Real64 aboveTotal;
         Real64 belowTotal;
         Real64 tableTotal;
-        // CHARACTER(len=MaxNameLength):: repNameWithUnits ! For time bin reports, varible name with units
         std::string repNameWithUnitsandscheduleName;
         Real64 repStDev; // standard deviation
         Real64 repMean;
@@ -11922,10 +11917,8 @@ namespace OutputReportTabular {
         Array1D_int columnWidth(1);
         Array1D_string rowHead;
         Array2D_string tableBody;
-        // CHARACTER(len=MaxNameLength),ALLOCATABLE, DIMENSION(:)     :: unique
         Array1D_int unique;
         int numUnique;
-        // CHARACTER(len=MaxNameLength)                               :: curRecSurf
         int curRecSurf;
         std::string listOfSurf;
         int iShadRel;
@@ -12670,14 +12663,14 @@ namespace OutputReportTabular {
             TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
             for (iZone = 1; iZone <= NumOfZones; ++iZone) {
                 infilInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
-                    ((ZnAirRpt(iZone).InfilHeatGain - ZnAirRpt(iZone).InfilHeatLoss) / (TimeStepSys * SecInHour)); // zone infiltration
+                    ((ZnAirRpt(iZone).InfilHeatGain - ZnAirRpt(iZone).InfilHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour())); // zone infiltration
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     infilInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
                         (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiSenGainW -
                          AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiSenLossW); // air flow network
                 }
                 infilLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) =
-                    ((ZnAirRpt(iZone).InfilLatentGain - ZnAirRpt(iZone).InfilLatentLoss) / (TimeStepSys * SecInHour)); // zone infiltration
+                    ((ZnAirRpt(iZone).InfilLatentGain - ZnAirRpt(iZone).InfilLatentLoss) / (TimeStepSys * DataGlobalConstants::SecInHour())); // zone infiltration
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     infilLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
                         (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiLatGainW -
@@ -12685,14 +12678,14 @@ namespace OutputReportTabular {
                 }
 
                 zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
-                    ((ZnAirRpt(iZone).VentilHeatGain - ZnAirRpt(iZone).VentilHeatLoss) / (TimeStepSys * SecInHour)); // zone ventilation
+                    ((ZnAirRpt(iZone).VentilHeatGain - ZnAirRpt(iZone).VentilHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour())); // zone ventilation
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
                         (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentSenGainW -
                          AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentSenLossW); // air flow network
                 }
                 zoneVentLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) =
-                    ((ZnAirRpt(iZone).VentilLatentGain - ZnAirRpt(iZone).VentilLatentLoss) / (TimeStepSys * SecInHour)); // zone ventilation
+                    ((ZnAirRpt(iZone).VentilLatentGain - ZnAirRpt(iZone).VentilLatentLoss) / (TimeStepSys * DataGlobalConstants::SecInHour())); // zone ventilation
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
                         (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentLatGainW -
@@ -12700,14 +12693,14 @@ namespace OutputReportTabular {
                 }
 
                 interZoneMixInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
-                    ((ZnAirRpt(iZone).MixHeatGain - ZnAirRpt(iZone).MixHeatLoss) / (TimeStepSys * SecInHour)); // zone mixing
+                    ((ZnAirRpt(iZone).MixHeatGain - ZnAirRpt(iZone).MixHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour())); // zone mixing
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     interZoneMixInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
                         (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixSenGainW -
                          AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixSenLossW); // air flow network
                 }
                 interZoneMixLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) =
-                    ((ZnAirRpt(iZone).MixLatentGain - ZnAirRpt(iZone).MixLatentLoss) / (TimeStepSys * SecInHour)); // zone mixing
+                    ((ZnAirRpt(iZone).MixLatentGain - ZnAirRpt(iZone).MixLatentLoss) / (TimeStepSys * DataGlobalConstants::SecInHour())); // zone mixing
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     interZoneMixLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
                         (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixLatGainW -

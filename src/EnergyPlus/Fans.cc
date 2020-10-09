@@ -2603,7 +2603,6 @@ namespace Fans {
         // na
 
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
 
         // Locals
@@ -2621,7 +2620,7 @@ namespace Fans {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        Fan(FanNum).FanEnergy = Fan(FanNum).FanPower * TimeStepSys * SecInHour;
+        Fan(FanNum).FanEnergy = Fan(FanNum).FanPower * TimeStepSys * DataGlobalConstants::SecInHour();
         Fan(FanNum).DeltaTemp = Fan(FanNum).OutletAirTemp - Fan(FanNum).InletAirTemp;
 
         if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {

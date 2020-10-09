@@ -2690,7 +2690,6 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         // na
 
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
@@ -2711,14 +2710,14 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
 
         // FLOW:
 
-        OutAirUnit(OAUnitNum).TotHeatingEnergy = OutAirUnit(OAUnitNum).TotHeatingRate * TimeStepSys * SecInHour;
-        OutAirUnit(OAUnitNum).SensHeatingEnergy = OutAirUnit(OAUnitNum).SensHeatingRate * TimeStepSys * SecInHour;
-        OutAirUnit(OAUnitNum).LatHeatingEnergy = OutAirUnit(OAUnitNum).LatHeatingRate * TimeStepSys * SecInHour;
-        OutAirUnit(OAUnitNum).SensCoolingEnergy = OutAirUnit(OAUnitNum).SensCoolingRate * TimeStepSys * SecInHour;
-        OutAirUnit(OAUnitNum).LatCoolingEnergy = OutAirUnit(OAUnitNum).LatCoolingRate * TimeStepSys * SecInHour;
-        OutAirUnit(OAUnitNum).TotCoolingEnergy = OutAirUnit(OAUnitNum).TotCoolingRate * TimeStepSys * SecInHour;
+        OutAirUnit(OAUnitNum).TotHeatingEnergy = OutAirUnit(OAUnitNum).TotHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        OutAirUnit(OAUnitNum).SensHeatingEnergy = OutAirUnit(OAUnitNum).SensHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        OutAirUnit(OAUnitNum).LatHeatingEnergy = OutAirUnit(OAUnitNum).LatHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        OutAirUnit(OAUnitNum).SensCoolingEnergy = OutAirUnit(OAUnitNum).SensCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        OutAirUnit(OAUnitNum).LatCoolingEnergy = OutAirUnit(OAUnitNum).LatCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        OutAirUnit(OAUnitNum).TotCoolingEnergy = OutAirUnit(OAUnitNum).TotCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
         OutAirUnit(OAUnitNum).AirMassFlow = OutAirUnit(OAUnitNum).OutAirMassFlow;
-        OutAirUnit(OAUnitNum).ElecFanEnergy = OutAirUnit(OAUnitNum).ElecFanRate * TimeStepSys * SecInHour;
+        OutAirUnit(OAUnitNum).ElecFanEnergy = OutAirUnit(OAUnitNum).ElecFanRate * TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (OutAirUnit(OAUnitNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!DataGlobals::SysSizingCalc) {

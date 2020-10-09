@@ -1838,7 +1838,7 @@ namespace FluidCoolers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the fluid cooler.
 
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         auto &waterInletNode = this->WaterInletNodeNum;
         if (!RunFlag) {
             this->InletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;

@@ -1136,7 +1136,6 @@ namespace HeatBalanceIntRadExchange {
         int index;
         int inx1;
         int inx2;
-        // unused  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: ZoneSurfaceNames
 
         NoUserInputF = true;
         UserFZoneIndex = inputProcessor->getObjectItemNum(state, "ZoneProperty:UserViewFactors", ZoneName);

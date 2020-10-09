@@ -96,8 +96,6 @@ namespace WindTurbine {
   //  using namespace DataGenerators;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::ScheduleAlwaysOn;
-    using DataGlobals::SecInHour;
-
     static std::string const BlankString;
 
     void SimWindTurbine(EnergyPlusData &state,
@@ -980,7 +978,7 @@ namespace WindTurbine {
 
         using DataHVACGlobals::TimeStepSys;
 
-        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Energy = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Power * TimeStepSys * SecInHour;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Energy = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Power * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     //*****************************************************************************************

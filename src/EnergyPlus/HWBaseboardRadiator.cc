@@ -1686,10 +1686,10 @@ namespace HWBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        HWBaseboard(BaseboardNum).TotEnergy = HWBaseboard(BaseboardNum).TotPower * TimeStepSys * SecInHour;
-        HWBaseboard(BaseboardNum).Energy = HWBaseboard(BaseboardNum).Power * TimeStepSys * SecInHour;
-        HWBaseboard(BaseboardNum).ConvEnergy = HWBaseboard(BaseboardNum).ConvPower * TimeStepSys * SecInHour;
-        HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * TimeStepSys * SecInHour;
+        HWBaseboard(BaseboardNum).TotEnergy = HWBaseboard(BaseboardNum).TotPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        HWBaseboard(BaseboardNum).Energy = HWBaseboard(BaseboardNum).Power * TimeStepSys * DataGlobalConstants::SecInHour();
+        HWBaseboard(BaseboardNum).ConvEnergy = HWBaseboard(BaseboardNum).ConvPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     Real64 SumHATsurf(int const ZoneNum) // Zone number

@@ -121,7 +121,6 @@ namespace Photovoltaics {
     using DataGlobals::BeginSimFlag;
     using DataGlobals::EndEnvrnFlag;
     using DataGlobals::KelvinConv;
-    using DataGlobals::SecInHour;
     using DataHVACGlobals::TimeStepSys;
 
     // Data
@@ -822,7 +821,6 @@ namespace Photovoltaics {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHeatBalance::QRadSWOutIncident;
         using DataHVACGlobals::TimeStepSys;
         using DataSurfaces::Surface;
@@ -877,7 +875,7 @@ namespace Photovoltaics {
             PVarray(thisPV).SurfaceSink = PVarray(thisPV).Report.DCPower;
 
             // array energy, power * timestep
-            PVarray(thisPV).Report.DCEnergy = PVarray(thisPV).Report.DCPower * (TimeStepSys * SecInHour);
+            PVarray(thisPV).Report.DCEnergy = PVarray(thisPV).Report.DCPower * (TimeStepSys * DataGlobalConstants::SecInHour());
             PVarray(thisPV).Report.ArrayEfficiency = Eff;
         } else { // not enough incident solar, zero things out
 
@@ -909,7 +907,7 @@ namespace Photovoltaics {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int thisZone; // working index for zones
 
-        PVarray(PVnum).Report.DCEnergy = PVarray(PVnum).Report.DCPower * (TimeStepSys * SecInHour);
+        PVarray(PVnum).Report.DCEnergy = PVarray(PVnum).Report.DCPower * (TimeStepSys * DataGlobalConstants::SecInHour());
 
         // add check for multiplier.  if surface is attached to a zone that is on a multiplier
         // then PV production should be multiplied out as well
@@ -1223,7 +1221,6 @@ namespace Photovoltaics {
         // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::HourOfDay;
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHeatBalance::QRadSWOutIncident;
@@ -1308,7 +1305,6 @@ namespace Photovoltaics {
 
         // Using/Aliasing
         using DataGlobals::MinutesPerTimeStep;
-        using DataGlobals::SecInHour;
         using DataSurfaces::Surface;
         //  USE DataPhotovoltaics, ONLY:CellTemp,LastCellTemp
         using DataHeatBalance::Zone;

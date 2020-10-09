@@ -113,7 +113,6 @@ namespace TranspiredCollector {
 
     // Using/Aliasing
     using DataGlobals::KelvinConv;
-    using DataGlobals::SecInHour;
     using DataHeatBalance::QRadSWOutIncident;
     using DataVectorTypes::Vector;
 
@@ -983,8 +982,6 @@ namespace TranspiredCollector {
         Real64 TaHX;            // leaving air temperature from heat exchanger (entering plenum)
         Real64 Taplen;          // Air temperature in plen and outlet node.
         Real64 SensHeatingRate; // Rate at which the system is heating outdoor air
-        //  INTEGER, SAVE    :: VsucErrCount=0 !  warning message counter
-        //  CHARACTER(len=MaxNameLength) :: VsucErrString !  warning message counter string
         Real64 AlessHoles; // Area for Kutscher's relation
 
         // Active UTSC calculation
@@ -1198,7 +1195,7 @@ namespace TranspiredCollector {
         UTSC(UTSCNum).SupOutEnth = PsyHFnTdbW(UTSC(UTSCNum).SupOutTemp, UTSC(UTSCNum).SupOutHumRat);
         UTSC(UTSCNum).SupOutMassFlow = Mdot;
         UTSC(UTSCNum).SensHeatingRate = SensHeatingRate;
-        UTSC(UTSCNum).SensHeatingEnergy = SensHeatingRate * TimeStepSys * SecInHour;
+        UTSC(UTSCNum).SensHeatingEnergy = SensHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour();
         UTSC(UTSCNum).PassiveACH = 0.0;
         UTSC(UTSCNum).PassiveMdotVent = 0.0;
         UTSC(UTSCNum).PassiveMdotWind = 0.0;
@@ -1329,7 +1326,7 @@ namespace TranspiredCollector {
         UTSC(UTSCNum).SupOutMassFlow = 0.0;
         UTSC(UTSCNum).SensHeatingRate = 0.0;
         UTSC(UTSCNum).SensHeatingEnergy = 0.0;
-        UTSC(UTSCNum).PassiveACH = (MdotVent / RhoAir) * (1.0 / (UTSC(UTSCNum).ProjArea * UTSC(UTSCNum).PlenGapThick)) * SecInHour;
+        UTSC(UTSCNum).PassiveACH = (MdotVent / RhoAir) * (1.0 / (UTSC(UTSCNum).ProjArea * UTSC(UTSCNum).PlenGapThick)) * DataGlobalConstants::SecInHour();
         UTSC(UTSCNum).PassiveMdotVent = MdotVent;
         UTSC(UTSCNum).PassiveMdotWind = VdotWind * RhoAir;
         UTSC(UTSCNum).PassiveMdotTherm = VdotThermal * RhoAir;

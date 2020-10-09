@@ -70,14 +70,6 @@ namespace DataGlobals {
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
-    extern Real64 const SecInHour;                     // Conversion for hours to seconds
-    extern Real64 const HoursInDay;                    // Number of Hours in Day
-    extern Real64 const SecsInDay;                     // Number of seconds in Day
-    extern Real64 const BigNumber;                     // Max Number real used for initializations
-    extern Real64 const rTinyValue;                    // Tiny value to replace use of TINY(x)
-    extern std::string::size_type const MaxNameLength; // Maximum Name Length in Characters -- should be the same
-    // as MaxAlphaArgLength in InputProcessor module
-
     extern Real64 const KelvinConv;        // Conversion factor for C to K and K to C
     extern Real64 const InitConvTemp;      // [deg C], standard init vol to mass flow conversion temp
     extern Real64 const AutoCalculate;     // automatically calculate some fields.

@@ -122,7 +122,6 @@ namespace GroundHeatExchangers {
     using DataGlobals::BeginTimeStepFlag;
     using DataGlobals::DayOfSim;
     using DataGlobals::HourOfDay;
-    using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataGlobals::WarmupFlag;
@@ -607,8 +606,6 @@ namespace GroundHeatExchangers {
     {
 
         int const numDaysInYear(365);
-        using DataGlobals::HoursInDay;
-        using DataGlobals::SecInHour;
 
         // Minimum simulation time for which finite line source method is applicable
         Real64 const lntts_min_for_long_timestep = -8.5;
@@ -625,7 +622,7 @@ namespace GroundHeatExchangers {
         // Determine how many g-function pairs to generate based on user defined maximum simulation time
         while (true) {
             Real64 maxPossibleSimTime = exp(tempLNTTS.back()) * t_s;
-            if (maxPossibleSimTime < myRespFactors->maxSimYears * numDaysInYear * HoursInDay * SecInHour) {
+            if (maxPossibleSimTime < myRespFactors->maxSimYears * numDaysInYear * DataGlobalConstants::HoursInDay() * DataGlobalConstants::SecInHour()) {
                 tempLNTTS.push_back(tempLNTTS.back() + lnttsStepSize);
             } else {
                 break;
@@ -1688,7 +1685,7 @@ namespace GroundHeatExchangers {
         // PURPOSE OF THIS SUBROUTINE:
         // calculate annual time constant for ground conduction
 
-        timeSS = (pow_2(bhLength) / (9.0 * soil.diffusivity)) / SecInHour / 8760.0;
+        timeSS = (pow_2(bhLength) / (9.0 * soil.diffusivity)) / DataGlobalConstants::SecInHour() / 8760.0;
         timeSSFactor = timeSS * 8760.0;
     }
 
@@ -3329,7 +3326,7 @@ namespace GroundHeatExchangers {
         Real64 fluidDensity;
         bool errFlag;
 
-        Real64 currTime = ((DayOfSim - 1) * 24 + (HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed) * SecInHour;
+        Real64 currTime = ((DayOfSim - 1) * 24 + (HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
 
         // Init more variables
         if (myFlag) {
@@ -3438,7 +3435,7 @@ namespace GroundHeatExchangers {
         bool errFlag;
         Real64 CurTime;
 
-        CurTime = ((DayOfSim - 1) * 24 + (HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed) * SecInHour;
+        CurTime = ((DayOfSim - 1) * 24 + (HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
 
         // Init more variables
         if (myFlag) {

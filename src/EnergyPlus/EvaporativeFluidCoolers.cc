@@ -2443,12 +2443,12 @@ namespace EvaporativeFluidCoolers {
 
         //   total water usage
         // update report variables
-        this->EvaporationVol = this->EvaporationVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-        this->DriftVol = this->DriftVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-        this->BlowdownVol = this->BlowdownVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-        this->MakeUpVol = this->MakeUpVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-        this->TankSupplyVol = this->TankSupplyVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-        this->StarvedMakeUpVol = this->StarvedMakeUpVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        this->EvaporationVol = this->EvaporationVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+        this->DriftVol = this->DriftVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+        this->BlowdownVol = this->BlowdownVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+        this->MakeUpVol = this->MakeUpVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+        this->TankSupplyVol = this->TankSupplyVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+        this->StarvedMakeUpVol = this->StarvedMakeUpVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     }
 
     void EvapFluidCoolerSpecs::UpdateEvapFluidCooler()
@@ -2546,7 +2546,7 @@ namespace EvaporativeFluidCoolers {
 
         Real64 ReportingConstant;
 
-        ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (!RunFlag) {
             this->fluidCoolerInletWaterTemp = DataLoopNode::Node(this->WaterInletNode).Temp;

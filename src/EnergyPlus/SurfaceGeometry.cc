@@ -13090,7 +13090,7 @@ namespace SurfaceGeometry {
                             DataHeatBalance::AirBoundaryMixingZone2.push_back(zoneNum2);
                             DataHeatBalance::AirBoundaryMixingSched.push_back(state.dataConstruction->Construct(surf.Construction).AirBoundaryMixingSched);
                             Real64 mixingVol = state.dataConstruction->Construct(surf.Construction).AirBoundaryACH * min(Zone(zoneNum1).Volume, Zone(zoneNum2).Volume) /
-                                               DataGlobals::SecInHour;
+                                               DataGlobalConstants::SecInHour();
                             DataHeatBalance::AirBoundaryMixingVol.push_back(mixingVol);
                         }
                     }

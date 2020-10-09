@@ -225,10 +225,10 @@ namespace EnergyPlus {
                 // The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
                 // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
                 // which would be carried over from the previous environment
-                thisDomain.Cur.CurSimTimeStepSize = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
+                thisDomain.Cur.CurSimTimeStepSize = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
                 thisDomain.Cur.CurSimTimeSeconds = ((DataGlobals::DayOfSim - 1) * 24 + (DataGlobals::HourOfDay - 1) +
                                                     (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone +
-                                                    DataHVACGlobals::SysTimeElapsed) * DataGlobals::SecInHour;
+                                                    DataHVACGlobals::SysTimeElapsed) * DataGlobalConstants::SecInHour();
 
                 // There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
                 if ((DataGlobals::BeginSimFlag && thisDomain.BeginSimInit) ||
@@ -2186,7 +2186,7 @@ namespace EnergyPlus {
             // The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
             // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
             // which would be carried over from the previous environment
-            this->Cur.CurSimTimeStepSize = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->Cur.CurSimTimeStepSize = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
             this->Cur.CurSimTimeSeconds = (DataGlobals::DayOfSim - 1) * 24 + (DataGlobals::HourOfDay - 1) +
                                           (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone +
                                           DataHVACGlobals::SysTimeElapsed;
@@ -4454,13 +4454,13 @@ namespace EnergyPlus {
             Latitude_Radians = DataGlobalConstants::Pi() / 180.0 * Latitude_Degrees;
 
             // The day of year at this point in the simulation
-            DayOfYear = int(this->Cur.CurSimTimeSeconds / DataGlobals::SecsInDay);
+            DayOfYear = int(this->Cur.CurSimTimeSeconds / DataGlobalConstants::SecsInDay());
 
             // The number of seconds into the current day
-            CurSecondsIntoToday = int(mod(this->Cur.CurSimTimeSeconds, DataGlobals::SecsInDay));
+            CurSecondsIntoToday = int(mod(this->Cur.CurSimTimeSeconds, DataGlobalConstants::SecsInDay()));
 
             // The number of hours into today
-            HourOfDay = int(CurSecondsIntoToday / DataGlobals::SecInHour);
+            HourOfDay = int(CurSecondsIntoToday / DataGlobalConstants::SecInHour());
 
             // For convenience convert to Kelvin once
             CurAirTempK = this->Cur.CurAirTemp + 273.15;

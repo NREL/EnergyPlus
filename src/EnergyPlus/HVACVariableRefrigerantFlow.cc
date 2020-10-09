@@ -8839,7 +8839,7 @@ namespace HVACVariableRefrigerantFlow {
         IndexToTUInTUList = VRFTU(VRFTUNum).IndexToTUInTUList;
         HRHeatRequestFlag = TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList);
         HRCoolRequestFlag = TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList);
-        ReportingConstant = DataHVACGlobals::TimeStepSys * SecInHour;
+        ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         // account for terminal unit parasitic On/Off power use
         // account for heat recovery first since these flags will be FALSE otherwise, each TU may have different operating mode
@@ -8986,7 +8986,7 @@ namespace HVACVariableRefrigerantFlow {
 
         Real64 ReportingConstant; // - conversion constant for energy
 
-        ReportingConstant = DataHVACGlobals::TimeStepSys * SecInHour;
+        ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         //   calculate VRF condenser power/energy use
         VRF(VRFCond).CoolElecConsumption = VRF(VRFCond).ElecCoolingPower * ReportingConstant;

@@ -3966,7 +3966,7 @@ namespace HVACUnitaryBypassVAV {
         // PURPOSE OF THIS SUBROUTINE:
         // Fills some of the report variables for the changeover-bypass VAV system
 
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         CBVAV(CBVAVNum).TotCoolEnergy = CBVAV(CBVAVNum).TotCoolEnergyRate * ReportingConstant;
         CBVAV(CBVAVNum).TotHeatEnergy = CBVAV(CBVAVNum).TotHeatEnergyRate * ReportingConstant;

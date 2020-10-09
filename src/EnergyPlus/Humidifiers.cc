@@ -106,7 +106,6 @@ namespace Humidifiers {
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::ScheduleAlwaysOn;
-    using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
@@ -1307,7 +1306,6 @@ namespace Humidifiers {
 
         // Using/Aliasing
         using DataGlobals::BeginTimeStepFlag;
-        using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using DataWater::WaterStorage;
 
@@ -1341,9 +1339,9 @@ namespace Humidifiers {
                 TankSupplyVdot = AvailTankVdot;
             }
 
-            TankSupplyVol = TankSupplyVdot * (TimeStepSys * SecInHour);
+            TankSupplyVol = TankSupplyVdot * (TimeStepSys * DataGlobalConstants::SecInHour());
             StarvedSupplyVdot = StarvedVdot;
-            StarvedSupplyVol = StarvedVdot * (TimeStepSys * SecInHour);
+            StarvedSupplyVol = StarvedVdot * (TimeStepSys * DataGlobalConstants::SecInHour());
         }
     }
 
@@ -1440,10 +1438,10 @@ namespace Humidifiers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        ElecUseEnergy = ElecUseRate * TimeStepSys * SecInHour;
-        WaterCons = WaterConsRate * TimeStepSys * SecInHour;
-        GasUseEnergy = GasUseRate * TimeStepSys * SecInHour;
-        AuxElecUseEnergy = AuxElecUseRate * TimeStepSys * SecInHour;
+        ElecUseEnergy = ElecUseRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        WaterCons = WaterConsRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        GasUseEnergy = GasUseRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        AuxElecUseEnergy = AuxElecUseRate * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     int GetAirInletNodeNum(EnergyPlusData &state,

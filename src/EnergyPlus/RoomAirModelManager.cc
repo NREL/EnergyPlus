@@ -110,7 +110,7 @@ namespace RoomAirModelManager {
 
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
-    using namespace DataGlobals; // ,                ONLY : MaxNameLength
+    using namespace DataGlobals;
     using namespace DataRoomAirModel;
     using General::RoundSigDigits;
 
