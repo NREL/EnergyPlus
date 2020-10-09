@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -362,25 +363,25 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state) {
                         "System",
                         "Average",
                         this->name);
-    SetupOutputVariable("Cooling Coil Condenser Inlet Temperature",
+    SetupOutputVariable(state, "Cooling Coil Condenser Inlet Temperature",
                         OutputProcessor::Unit::C,
                         this->condenserInletTemperature,
                         "System",
                         "Average",
                         this->name);
-    SetupOutputVariable("Cooling Coil Dehumidification Mode",
+    SetupOutputVariable(state, "Cooling Coil Dehumidification Mode",
                         OutputProcessor::Unit::None,
                         this->dehumidificationMode,
                         "System",
                         "Average",
                         this->name);
-    SetupOutputVariable("Cooling Coil Waste Heat Power",
+    SetupOutputVariable(state, "Cooling Coil Waste Heat Power",
                         OutputProcessor::Unit::W,
                         this->wasteHeatEnergyRate,
                         "System",
                         "Average",
                         this->name);
-    SetupOutputVariable("Cooling Coil Waste Heat Energy",
+    SetupOutputVariable(state, "Cooling Coil Waste Heat Energy",
                         OutputProcessor::Unit::J,
                         this->wasteHeatEnergy,
                         "System",
@@ -443,13 +444,13 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state) {
                             "COOLING",
                             _,
                             "System");
-        SetupOutputVariable("Cooling Coil Evaporative Condenser Water Volume Flow Rate",
+        SetupOutputVariable(state, "Cooling Coil Evaporative Condenser Water Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             this->evaporativeCondSupplyTankVolumeFlow,
                             "System",
                             "Average",
                             this->name);
-        SetupOutputVariable("Cooling Coil Evaporative Condenser Water Volume",
+        SetupOutputVariable(state, "Cooling Coil Evaporative Condenser Water Volume",
                             OutputProcessor::Unit::m3,
                             this->evaporativeCondSupplyTankConsump,
                             "System",
@@ -460,7 +461,7 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state) {
                             "Cooling",
                             _,
                             "System");
-        SetupOutputVariable("Cooling Coil Evaporative Condenser Mains Supply Water Volume",
+        SetupOutputVariable(state, "Cooling Coil Evaporative Condenser Mains Supply Water Volume",
                             OutputProcessor::Unit::m3,
                             this->evaporativeCondSupplyTankConsump,
                             "System",
@@ -505,14 +506,14 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state) {
     }
 
     if (this->isSecondaryDXCoilInZone) {
-        SetupOutputVariable("Secondary Coil Heat Rejection Rate",
+        SetupOutputVariable(state, "Secondary Coil Heat Rejection Rate",
                             OutputProcessor::Unit::W,
                             this->secCoilSensHeatRejEnergyRate,
                             "System",
                             "Average",
                             this->name);
 
-        SetupOutputVariable("Secondary Coil Heat Rejection Energy",
+        SetupOutputVariable(state, "Secondary Coil Heat Rejection Energy",
                             OutputProcessor::Unit::J,
                             this->secCoilSensHeatRejEnergy,
                             "System",
