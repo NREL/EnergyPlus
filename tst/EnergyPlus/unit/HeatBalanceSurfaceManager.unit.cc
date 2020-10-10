@@ -2569,10 +2569,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     dataConstruction.Construct.allocate(DataHeatBalance::TotConstructs);
-    DataHeatBalSurface::ZoneVMULT.allocate(DataGlobals::NumOfZones);
+    DataHeatBalSurface::SolEnclVMULT.allocate(DataGlobals::NumOfZones);
     dataConstruction.Construct(1).TransDiff = 0.1;
-    DataHeatBalSurface::ZoneVMULT(1) = 1.0;
-    DataHeatBalSurface::ZoneVMULT(2) = 1.0;
+    DataHeatBalSurface::SolEnclVMULT(1) = 1.0;
+    DataHeatBalSurface::SolEnclVMULT(2) = 1.0;
 
     DataSurfaces::Surface(1).HeatTransSurf = true;
     DataSurfaces::Surface(1).Construction = 1;

@@ -374,7 +374,6 @@ namespace HeatBalanceSurfaceManager {
         using InternalHeatGains::ManageInternalHeatGains;
         // RJH DElight Modification Begin
         using namespace DElightManagerF;
-        using namespace std::chrono;
         // RJH DElight Modification End
 
         // Locals
@@ -1461,7 +1460,7 @@ namespace HeatBalanceSurfaceManager {
         SUMH.dimension(TotSurfaces, 0);
 
         TH.dimension(2, Construction::MaxCTFTerms, TotSurfaces, 0.0);
-        SurfTempSurfOut.dimension(TotSurfaces, 0.0);
+        SurfTempOut.dimension(TotSurfaces, 0.0);
         TempSurfInRep.dimension(TotSurfaces, 0.0);
         TempSurfInMovInsRep.dimension(TotSurfaces, 0.0);
         QConvInReport.dimension(TotSurfaces, 0.0);
@@ -1604,7 +1603,7 @@ namespace HeatBalanceSurfaceManager {
 
             if (Surface(loop).ExtBoundCond != KivaFoundation) {
                 SetupOutputVariable(state,
-                    "Surface Outside Face Temperature", OutputProcessor::Unit::C, SurfTempSurfOut(loop), "Zone", "State", Surface(loop).Name);
+                    "Surface Outside Face Temperature", OutputProcessor::Unit::C, SurfTempOut(loop), "Zone", "State", Surface(loop).Name);
             }
 
             SetupOutputVariable(state,
@@ -2068,10 +2067,8 @@ namespace HeatBalanceSurfaceManager {
 
         // unused  ALLOCATE(QBV(NumOfZones))
         // unused  QBV=0.0
-        ZoneQC.dimension(NumOfZones, 0.0);
-        ZoneQD.dimension(NumOfZones, 0.0);
-        ZoneQDforDaylight.dimension(NumOfZones, 0.0);
-        ZoneQDV.dimension(NumOfZones, 0.0);
+        SolEnclQD.dimension(NumOfZones, 0.0);
+        SolEnclQDforDaylight.dimension(NumOfZones, 0.0);
         QL.dimension(NumOfZones, 0.0);
 
         // UCSD
@@ -2171,7 +2168,7 @@ namespace HeatBalanceSurfaceManager {
                 HAirExtSurf(SurfNum) = 0.0;
                 HSkyExtSurf(SurfNum) = 0.0;
                 HGrdExtSurf(SurfNum) = 0.0;
-                SurfTempSurfOut(SurfNum) = 0.0;
+                SurfTempOut(SurfNum) = 0.0;
                 TempSurfInRep(SurfNum) = 0.0;
                 TempSurfInMovInsRep(SurfNum) = 0.0;
                 QConvInReport(SurfNum) = 0.0;
@@ -2539,10 +2536,8 @@ namespace HeatBalanceSurfaceManager {
         if (!SunIsUp || (BeamSolarRad + GndSolarRad + DifSolarRad <= 0.0)) { // Sun is down
 
             for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
-                ZoneQD(zoneNum) = 0.0;
-                ZoneQDforDaylight(zoneNum) = 0.0;
-                ZoneQC(zoneNum) = 0.0;
-                ZoneQDV(zoneNum) = 0.0;
+                SolEnclQD(zoneNum) = 0.0;
+                SolEnclQDforDaylight(zoneNum) = 0.0;
                 ZoneTransSolar(zoneNum) = 0.0;
                 ZoneBmSolFrExtWinsRep(zoneNum) = 0.0;
                 ZoneBmSolFrIntWinsRep(zoneNum) = 0.0;
@@ -2662,7 +2657,7 @@ namespace HeatBalanceSurfaceManager {
                 //  DBZone needs to subtract this part since it is already counted in DBZone.
                 //  Use InitialZoneDifSolReflW (Rob's previous work) as it better counts initial distribution of
                 //   diffuse solar rather than using weighted area*absorptance
-                ZoneQDforDaylight(ZoneNum) =
+                SolEnclQDforDaylight(ZoneNum) =
                     (DBZone(ZoneNum) - DBZoneIntWin(ZoneNum)) * BeamSolarRad + DBZoneSSG(ZoneNum) + InitialZoneDifSolReflW(ZoneNum);
 
                 // RJH 08/30/07 - Substitute InitialZoneDifSolReflW(ZoneNum) for DSZone and DGZone here
@@ -2673,14 +2668,14 @@ namespace HeatBalanceSurfaceManager {
                 // QD(ZoneNum)  = DBZone(ZoneNum)*BeamSolarRad  &
                 //                +DSZone(ZoneNum)*DifSolarRad  &
                 //                +DGZone(ZoneNum)*GndSolarRad
-                ZoneQD(ZoneNum) = DBZone(ZoneNum) * BeamSolarRad + DBZoneSSG(ZoneNum) + InitialZoneDifSolReflW(ZoneNum);
+                SolEnclQD(ZoneNum) = DBZone(ZoneNum) * BeamSolarRad + DBZoneSSG(ZoneNum) + InitialZoneDifSolReflW(ZoneNum);
             }
 
             // Flux of diffuse solar in each zone
 
             QSDifSol = 0.0;
             for (int enclNum = 1; enclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclNum) {
-                QSDifSol(enclNum) = ZoneQDforDaylight(enclNum);
+                QSDifSol(enclNum) = SolEnclQDforDaylight(enclNum);
             }
 
             if (InterZoneWindow) {
@@ -2690,7 +2685,7 @@ namespace HeatBalanceSurfaceManager {
                         auto lZone(FractDifShortZtoZ.index(enclNum, 1)); // Tuned Linear indexing
                         for (int otherEnclNum = 1; otherEnclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++otherEnclNum, ++lZone) {
                             if ((otherEnclNum != enclNum) && (RecDifShortFromZ(otherEnclNum))) {
-                                QSDifSol_sum += FractDifShortZtoZ[lZone] * ZoneQDforDaylight(otherEnclNum); // [ lZone ] == ( enclNum, otherEnclNum )
+                                QSDifSol_sum += FractDifShortZtoZ[lZone] * SolEnclQDforDaylight(otherEnclNum); // [ lZone ] == ( enclNum, otherEnclNum )
                             }
                         }
                         QSDifSol(enclNum) += QSDifSol_sum;
@@ -2700,9 +2695,9 @@ namespace HeatBalanceSurfaceManager {
 
             for (int enclNum = 1; enclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclNum) {
                 if (InterZoneWindow)
-                    QSDifSol(enclNum) *= FractDifShortZtoZ(enclNum, enclNum) * ZoneVMULT(enclNum);
+                    QSDifSol(enclNum) *= FractDifShortZtoZ(enclNum, enclNum) * SolEnclVMULT(enclNum);
                 else
-                    QSDifSol(enclNum) *= ZoneVMULT(enclNum);
+                    QSDifSol(enclNum) *= SolEnclVMULT(enclNum);
             }
 
             //    RJH - 09-12-07 commented out report varariable calcs here since they refer to old distribution method
@@ -2932,8 +2927,6 @@ namespace HeatBalanceSurfaceManager {
                                     for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                         AbsDiffWin(Lay) = dataConstruction.Construct(ConstrNum).AbsDiff(Lay);
                                     }
-
-                                    ShadeFlag = SurfWinShadingFlag(SurfNum);
 
                                     if (ShadeFlag > 0) { // Shaded window
 
@@ -3525,7 +3518,7 @@ namespace HeatBalanceSurfaceManager {
             for (int zoneNum : DataViewFactorInformation::ZoneSolarInfo(enclosureNum).ZoneNums) {
                 sumZoneQLTSW += ZoneIntGain(zoneNum).QLTSW;
             }
-            QS(enclosureNum) = ZoneQD(enclosureNum) + sumZoneQLTSW;
+            QS(enclosureNum) = SolEnclQD(enclosureNum) + sumZoneQLTSW;
             QSLights(enclosureNum) = sumZoneQLTSW;
         }
 
@@ -3542,8 +3535,8 @@ namespace HeatBalanceSurfaceManager {
                             for (int zoneNum : DataViewFactorInformation::ZoneSolarInfo(OtherenclosureNum).ZoneNums) {
                                 sumZoneQLTSW += ZoneIntGain(zoneNum).QLTSW;
                             }
-                            QS(enclosureNum) += FractDifShortZtoZ(enclosureNum, OtherenclosureNum) * (ZoneQD(OtherenclosureNum) + sumZoneQLTSW);
-                            ZoneDifSolFrIntWinsRep(enclosureNum) += FractDifShortZtoZ(enclosureNum, OtherenclosureNum) * ZoneQD(OtherenclosureNum);
+                            QS(enclosureNum) += FractDifShortZtoZ(enclosureNum, OtherenclosureNum) * (SolEnclQD(OtherenclosureNum) + sumZoneQLTSW);
+                            ZoneDifSolFrIntWinsRep(enclosureNum) += FractDifShortZtoZ(enclosureNum, OtherenclosureNum) * SolEnclQD(OtherenclosureNum);
                             ZoneDifSolFrIntWinsRepEnergy(enclosureNum) = ZoneDifSolFrIntWinsRep(enclosureNum) * TimeStepZoneSec;
                         }
                     }
@@ -3573,12 +3566,12 @@ namespace HeatBalanceSurfaceManager {
         // COMPUTE CONVECTIVE GAINS AND ZONE FLUX DENSITY.
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
             if (InterZoneWindow) {
-                QS(enclosureNum) *= FractDifShortZtoZ(enclosureNum, enclosureNum) * ZoneVMULT(enclosureNum);
+                QS(enclosureNum) *= FractDifShortZtoZ(enclosureNum, enclosureNum) * SolEnclVMULT(enclosureNum);
                 // CR 8695, VMULT not based on visible
-                QSLights(enclosureNum) *= FractDifShortZtoZ(enclosureNum, enclosureNum) * ZoneVMULT(enclosureNum);
+                QSLights(enclosureNum) *= FractDifShortZtoZ(enclosureNum, enclosureNum) * SolEnclVMULT(enclosureNum);
             } else {
-                QS(enclosureNum) *= ZoneVMULT(enclosureNum);
-                QSLights(enclosureNum) *= ZoneVMULT(enclosureNum);
+                QS(enclosureNum) *= SolEnclVMULT(enclosureNum);
+                QSLights(enclosureNum) *= SolEnclVMULT(enclosureNum);
             }
         }
 
@@ -4138,9 +4131,9 @@ namespace HeatBalanceSurfaceManager {
 
         // FLOW:
 
-        if (!allocated(ZoneVMULT)) {
-            ZoneVMULT.dimension(DataViewFactorInformation::NumOfSolarEnclosures, 0.0);
-            ZoneVCONV.dimension(DataViewFactorInformation::NumOfSolarEnclosures, 0.0);
+        if (!allocated(SolEnclVMULT)) {
+            SolEnclVMULT.dimension(DataViewFactorInformation::NumOfSolarEnclosures, 0.0);
+//            ZoneVCONV.dimension(DataViewFactorInformation::NumOfSolarEnclosures, 0.0);
         }
         if (ComputeIntSWAbsorpFactorsfirstTime) {
             FirstCalcZone.dimension(NumOfZones, true);
@@ -4264,7 +4257,7 @@ namespace HeatBalanceSurfaceManager {
             }     // End of loop over surfaces in zone
 
             if (SUM1 > SmallestAreaAbsProductAllowed) { // Everything is okay, proceed with the regular calculation
-                ZoneVMULT(enclosureNum) = 1.0 / SUM1;
+                SolEnclVMULT(enclosureNum) = 1.0 / SUM1;
 
             } else { // the sum of area*solar absorptance for all surfaces in the zone is zero--either the user screwed up
                 // or they really want to disallow any solar from being absorbed on the inside surfaces.  Fire off a
@@ -4277,7 +4270,7 @@ namespace HeatBalanceSurfaceManager {
                                      DataViewFactorInformation::ZoneSolarInfo(enclosureNum).Name);
                     FirstCalcZone(enclosureNum) = false;
                 }
-                ZoneVMULT(enclosureNum) = 0.0;
+                SolEnclVMULT(enclosureNum) = 0.0;
             }
         } // End of zone/enclosure loop
     }
@@ -4321,8 +4314,8 @@ namespace HeatBalanceSurfaceManager {
             if (!Zone(surfZoneNum).HasInterZoneWindow) continue;
             int NZ = Surface(SurfNum).SolarEnclIndex;
             int MZ = Surface(Surface(SurfNum).ExtBoundCond).SolarEnclIndex;
-            FractDifShortZtoZ(NZ, MZ) += dataConstruction.Construct(Surface(SurfNum).Construction).TransDiff * ZoneVMULT(NZ) * Surface(SurfNum).Area;
-            if (ZoneVMULT(NZ) != 0.0) RecDifShortFromZ(NZ) = true;
+            FractDifShortZtoZ(NZ, MZ) += dataConstruction.Construct(Surface(SurfNum).Construction).TransDiff * SolEnclVMULT(NZ) * Surface(SurfNum).Area;
+            if (SolEnclVMULT(NZ) != 0.0) RecDifShortFromZ(NZ) = true;
         }
         //          Compute fractions for multiple passes.
 
@@ -7064,7 +7057,7 @@ namespace HeatBalanceSurfaceManager {
                 Real64 &TH11(TH(1, 1, SurfNum));
                 Real64 &TH12(TH(2, 1, SurfNum));
                 TH12 = TempSurfInRep(SurfNum) = TempSurfIn(SurfNum);
-                SurfTempSurfOut(SurfNum) = TH11; // For reporting
+                SurfTempOut(SurfNum) = TH11; // For reporting
 
                 if (SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
                     // Tubular daylighting devices are treated as one big object with an effective R value.
@@ -7079,7 +7072,7 @@ namespace HeatBalanceSurfaceManager {
 
                     // Set outside temp reporting variable of TDD:DOME (since it gets skipped otherwise)
                     // Reset outside temp variables of TDD:DIFFUSER equal to outside temp of TDD:DOME
-                    TH11 = SurfTempSurfOut(SurfNum) = SurfTempSurfOut(domeNum) = TH(1, 1, domeNum);
+                    TH11 = SurfTempOut(SurfNum) = SurfTempOut(domeNum) = TH(1, 1, domeNum);
                 }
 
                 if ((TH12 > MaxSurfaceTempLimit) || (TH12 < MinSurfaceTempLimit)) {
@@ -7101,7 +7094,7 @@ namespace HeatBalanceSurfaceManager {
                 // By going through all of the surfaces, this should pick up the other side as well as affect the next iteration.
                 // [ SurfNum - 1 ] == ( 1, 1, SurfNum )
                 // [ l211 + surfExtBoundCond ] == ( 2, 1, surfExtBoundCond )
-                SurfTempSurfOut(SurfNum) = TH[SurfNum - 1] = TH[l211 + surfExtBoundCond];
+                SurfTempOut(SurfNum) = TH[SurfNum - 1] = TH[l211 + surfExtBoundCond];
             }
 
             ++InsideSurfIterations;
@@ -7773,7 +7766,7 @@ namespace HeatBalanceSurfaceManager {
                     Real64 &TH11(TH(1, 1, surfNum));
                     Real64 &TH12(TH(2, 1, surfNum));
                     TH12 = TempSurfInRep(surfNum) = TempSurfIn(surfNum);
-                    SurfTempSurfOut(surfNum) = TH11; // For reporting
+                    SurfTempOut(surfNum) = TH11; // For reporting
 
                     if (SurfWinOriginalClass(surfNum) == SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
                         // Tubular daylighting devices are treated as one big object with an effective R value.
@@ -7788,7 +7781,7 @@ namespace HeatBalanceSurfaceManager {
 
                         // Set outside temp reporting variable of TDD:DOME (since it gets skipped otherwise)
                         // Reset outside temp variables of TDD:DIFFUSER equal to outside temp of TDD:DOME
-                        TH11 = SurfTempSurfOut(surfNum) = SurfTempSurfOut(domeNum) = TH(1, 1, domeNum);
+                        TH11 = SurfTempOut(surfNum) = SurfTempOut(domeNum) = TH(1, 1, domeNum);
                     }
 
                     if ((TH12 > MaxSurfaceTempLimit) || (TH12 < MinSurfaceTempLimit)) {
@@ -7810,8 +7803,8 @@ namespace HeatBalanceSurfaceManager {
                 // By going through all of the surfaces, this should pick up the other side as well as affect the next iteration.
                 // [ SurfNum - 1 ] == ( 1, 1, SurfNum )
                 // [ l211 + surfExtBoundCond ] == ( 2, 1, surfExtBoundCond )
-                SurfTempSurfOut(SurfNum) = TH[SurfNum - 1] = TH[l211 + surfExtBoundCond];
-                TH11Surf(SurfNum) = SurfTempSurfOut(SurfNum);
+                SurfTempOut(SurfNum) = TH[SurfNum - 1] = TH[l211 + surfExtBoundCond];
+                TH11Surf(SurfNum) = SurfTempOut(SurfNum);
             }
 
             ++InsideSurfIterations;

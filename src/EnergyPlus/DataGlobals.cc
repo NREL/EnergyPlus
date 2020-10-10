@@ -257,7 +257,6 @@ namespace DataGlobals {
     std::function<void(EnergyPlus::Error e, const std::string &)> errorCallback;
 
     bool eplusRunningViaAPI;
-    double timer_1(0.0);
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
@@ -350,7 +349,6 @@ namespace DataGlobals {
         ioFiles.mtr.close();
         ioFiles.err_stream.reset();
         eplusRunningViaAPI = false;
-        timer_1 = 0.0;
     }
 
 } // namespace DataGlobals

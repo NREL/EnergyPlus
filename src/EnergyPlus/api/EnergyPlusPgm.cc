@@ -404,7 +404,6 @@ int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepat
         EnergyPlus::ShowSevereError(e.what());
         return EnergyPlus::AbortEnergyPlus(state);
     }
-//    std::cout << "Solar timer: " << EnergyPlus::DataGlobals::timer_1 << "\n";
     return wrapUpEnergyPlus(state);
 }
 

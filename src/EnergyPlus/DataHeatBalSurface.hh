@@ -205,26 +205,23 @@ namespace DataHeatBalSurface {
 
     extern Array1D<Real64> SurfOpaqInsFaceBeamSolAbsorbed; // Opaque surface inside face absorbed beam solar,
     // for reporting (W)
-    extern Array1D<Real64> SurfTempSurfOut; // Temperature of the Outside Surface for each heat transfer surface
+    extern Array1D<Real64> SurfTempOut; // Temperature of the Outside Surface for each heat transfer surface
     // used for reporting purposes only.  Ref: TH(x,1,1)
     extern Array1D<Real64> SurfQRadSWOutMvIns; // Short wave radiation absorbed on outside of movable insulation
     // unusedREAL(r64), ALLOCATABLE, DIMENSION(:) :: QBV                 !Beam solar absorbed by interior shades in a zone, plus
     // diffuse from beam not absorbed in zone, plus
     // beam absorbed at inside surfaces
-    extern Array1D<Real64> ZoneQC; // Short-Wave Radiation Converted Direct To Convection
-    extern Array1D<Real64> ZoneQD; // Diffuse solar radiation in a zone from sky and ground diffuse entering
+    extern Array1D<Real64> SolEnclQD; // Diffuse solar radiation in a zone from sky and ground diffuse entering
     // through exterior windows and reflecting from interior surfaces,
     // beam from exterior windows reflecting from interior surfaces,
     // and beam entering through interior windows (considered diffuse)
-    extern Array1D<Real64> ZoneQDforDaylight; // Diffuse solar radiation in a zone from sky and ground diffuse entering
+    extern Array1D<Real64> SolEnclQDforDaylight; // Diffuse solar radiation in a zone from sky and ground diffuse entering
     // through exterior windows, beam from exterior windows reflecting
     // from interior surfaces, and beam entering through interior windows
     //(considered diffuse)
     // Originally QD, now used only for QSDifSol calc for daylighting
-    extern Array1D<Real64> ZoneQDV; // Diffuse solar radiation in a zone from sky and ground diffuse entering
-    // through exterior windows
-    extern Array1D<Real64> ZoneVMULT;             // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
-    extern Array1D<Real64> ZoneVCONV;             // Fraction Of Short-Wave Radiation From Lights Converted To Convection
+    extern Array1D<Real64> SolEnclVMULT;             // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
+//    extern Array1D<Real64> ZoneVCONV;             // Fraction Of Short-Wave Radiation From Lights Converted To Convection
     extern Array1D<Real64> SurfNetLWRadToSurf;    // Net interior long wavelength radiation to a surface from other surfaces
     extern Array1D<Real64> ZoneMRT;           // Zone Mean Radiant Temperature
     extern Array1D<Real64> SurfOpaqQRadSWLightsInAbs; // Short wave from Lights radiation absorbed on inside of opaque surface
