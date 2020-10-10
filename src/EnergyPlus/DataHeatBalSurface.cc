@@ -214,16 +214,16 @@ namespace DataHeatBalSurface {
     // unusedREAL(r64), ALLOCATABLE, DIMENSION(:) :: QBV                 !Beam solar absorbed by interior shades in a zone, plus
     // diffuse from beam not absorbed in zone, plus
     // beam absorbed at inside surfaces
-    Array1D<Real64> SolEnclQD; // Diffuse solar radiation in a zone from sky and ground diffuse entering
+    Array1D<Real64> EnclSolQD; // Diffuse solar radiation in a zone from sky and ground diffuse entering
     // through exterior windows and reflecting from interior surfaces,
     // beam from exterior windows reflecting from interior surfaces,
     // and beam entering through interior windows (considered diffuse)
-    Array1D<Real64> SolEnclQDforDaylight; // Diffuse solar radiation in a zone from sky and ground diffuse entering
+    Array1D<Real64> EnclSolQDforDaylight; // Diffuse solar radiation in a zone from sky and ground diffuse entering
     // through exterior windows, beam from exterior windows reflecting
     // from interior surfaces, and beam entering through interior windows
     // (considered diffuse)
     // Originally QD, now used only for QSDifSol calc for daylighting
-    Array1D<Real64> SolEnclVMULT;             // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
+    Array1D<Real64> EnclSolVMULT;             // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
     Array1D<Real64> SurfNetLWRadToSurf;    // Net interior long wavelength radiation to a surface from other surfaces
     Array1D<Real64> ZoneMRT;           // Zone Mean Radiant Temperature
     Array1D<Real64> SurfOpaqQRadSWLightsInAbs; // Short wave from Lights radiation absorbed on inside of opaque surface
@@ -343,9 +343,9 @@ namespace DataHeatBalSurface {
         SurfOpaqInsFaceBeamSolAbsorbed.deallocate();
         SurfTempOut.deallocate();
         SurfQRadSWOutMvIns.deallocate();
-        SolEnclQD.deallocate();
-        SolEnclQDforDaylight.deallocate();
-        SolEnclVMULT.deallocate();
+        EnclSolQD.deallocate();
+        EnclSolQDforDaylight.deallocate();
+        EnclSolVMULT.deallocate();
         SurfNetLWRadToSurf.deallocate();
         ZoneMRT.deallocate();
         SurfOpaqQRadSWLightsInAbs.deallocate();
