@@ -4133,7 +4133,6 @@ namespace HeatBalanceSurfaceManager {
 
         if (!allocated(SolEnclVMULT)) {
             SolEnclVMULT.dimension(DataViewFactorInformation::NumOfSolarEnclosures, 0.0);
-//            ZoneVCONV.dimension(DataViewFactorInformation::NumOfSolarEnclosures, 0.0);
         }
         if (ComputeIntSWAbsorpFactorsfirstTime) {
             FirstCalcZone.dimension(NumOfZones, true);

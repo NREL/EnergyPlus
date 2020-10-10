@@ -224,7 +224,6 @@ namespace DataHeatBalSurface {
     // (considered diffuse)
     // Originally QD, now used only for QSDifSol calc for daylighting
     Array1D<Real64> SolEnclVMULT;             // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
-//    Array1D<Real64> ZoneVCONV;             // Fraction Of Short-Wave Radiation From Lights Converted To Convection
     Array1D<Real64> SurfNetLWRadToSurf;    // Net interior long wavelength radiation to a surface from other surfaces
     Array1D<Real64> ZoneMRT;           // Zone Mean Radiant Temperature
     Array1D<Real64> SurfOpaqQRadSWLightsInAbs; // Short wave from Lights radiation absorbed on inside of opaque surface
@@ -347,7 +346,6 @@ namespace DataHeatBalSurface {
         SolEnclQD.deallocate();
         SolEnclQDforDaylight.deallocate();
         SolEnclVMULT.deallocate();
-//        ZoneVCONV.deallocate();
         SurfNetLWRadToSurf.deallocate();
         ZoneMRT.deallocate();
         SurfOpaqQRadSWLightsInAbs.deallocate();
