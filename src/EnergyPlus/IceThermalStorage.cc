@@ -1119,7 +1119,7 @@ namespace IceThermalStorage {
             int NumNums;
             int IOStat;
 
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state, DataIPShortCuts::cCurrentModuleObject,
                                           iceNum,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -1166,7 +1166,7 @@ namespace IceThermalStorage {
             SimplePcmStorage(iceNum).FinishUA = DataIPShortCuts::rNumericArgs(5);
 
             // Get Plant Inlet Node Num
-            SimplePcmStorage(iceNum).PltInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+            SimplePcmStorage(iceNum).PltInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                                                            ErrorsFound,
                                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                                            DataIPShortCuts::cAlphaArgs(1),
@@ -1176,7 +1176,8 @@ namespace IceThermalStorage {
                                                                                            DataLoopNode::ObjectIsNotParent);
 
             // Get Plant Outlet Node Num
-            SimplePcmStorage(iceNum).PltOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
+            SimplePcmStorage(iceNum).PltOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                                            DataIPShortCuts::cAlphaArgs(4),
                                                                                             ErrorsFound,
                                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                                             DataIPShortCuts::cAlphaArgs(1),
@@ -2149,7 +2150,7 @@ namespace IceThermalStorage {
         }
         Real64 DemandMdot = this->DesignMassFlowRate;
 
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, 
             DataPlant::PlantLoop(this->LoopNum).FluidName, TempIn, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
         Real64 MyLoad2 = (DemandMdot * Cp * (TempIn - TempSetPt));
@@ -2175,7 +2176,7 @@ namespace IceThermalStorage {
             Real64 MaxCap;
             Real64 MinCap;
             Real64 OptCap;
-            this->CalcPcmStorageCapacity(MaxCap, MinCap, OptCap);
+            this->CalcPcmStorageCapacity(state, MaxCap, MinCap, OptCap);
             this->CalcPcmStorageCharge();
 
             //***** Discharging Process for ITS *****************************************
@@ -2187,8 +2188,8 @@ namespace IceThermalStorage {
             Real64 MaxCap;
             Real64 MinCap;
             Real64 OptCap;
-            this->CalcPcmStorageCapacity(MaxCap, MinCap, OptCap);
-            this->CalcPcmStorageDischarge(MyLoad, RunFlag, MaxCap);
+            this->CalcPcmStorageCapacity(state, MaxCap, MinCap, OptCap);
+            this->CalcPcmStorageDischarge(state, MyLoad, RunFlag, MaxCap);
         } // Based on input of U value, deciding Dormant/Charge/Discharge process
 
         // Update Node properties: mdot and Temperature
@@ -2223,7 +2224,7 @@ namespace IceThermalStorage {
                 ShowFatalError("InitSimplePcmStorage: Program terminated due to previous condition(s).");
             }
 
-            this->setupOutputVars();
+            this->setupOutputVars(state);
             this->MyPlantScanFlag = false;
         }
 
@@ -2270,28 +2271,28 @@ namespace IceThermalStorage {
         if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlag2 = true;
     }
 
-    void SimplePcmStorageData::setupOutputVars()
+    void SimplePcmStorageData::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable("Pcm Thermal Storage Requested Load", OutputProcessor::Unit::W, this->MyLoad, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Pcm Thermal Storage Requested Load", OutputProcessor::Unit::W, this->MyLoad, "System", "Average", this->Name);
 
-        SetupOutputVariable("Pcm Thermal Storage End Fraction", OutputProcessor::Unit::None, this->PcmFracRemain, "Zone", "Average", this->Name);
+        SetupOutputVariable(state, "Pcm Thermal Storage End Fraction", OutputProcessor::Unit::None, this->PcmFracRemain, "Zone", "Average", this->Name);
 
-        SetupOutputVariable("Pcm Thermal Storage Mass Flow Rate", OutputProcessor::Unit::kg_s, this->PcmTSmdot, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Pcm Thermal Storage Mass Flow Rate", OutputProcessor::Unit::kg_s, this->PcmTSmdot, "System", "Average", this->Name);
 
-        SetupOutputVariable("Pcm Thermal Storage Inlet Temperature", OutputProcessor::Unit::C, this->PcmTSInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Pcm Thermal Storage Inlet Temperature", OutputProcessor::Unit::C, this->PcmTSInletTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable("Pcm Thermal Storage Outlet Temperature", OutputProcessor::Unit::C, this->PcmTSOutletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Pcm Thermal Storage Outlet Temperature", OutputProcessor::Unit::C, this->PcmTSOutletTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state, 
             "Pcm Thermal Storage Cooling Discharge Rate", OutputProcessor::Unit::W, this->PcmTSCoolingRate_rep, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state, 
             "Pcm Thermal Storage Cooling Discharge Energy", OutputProcessor::Unit::J, this->PcmTSCoolingEnergy_rep, "System", "Sum", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Pcm Thermal Storage Cooling Charge Rate", OutputProcessor::Unit::W, this->PcmTSChargingRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state, 
             "Pcm Thermal Storage Cooling Charge Energy", OutputProcessor::Unit::J, this->PcmTSChargingEnergy, "System", "Sum", this->Name);
     }
 
@@ -2420,7 +2421,7 @@ namespace IceThermalStorage {
         */
     }
 
-    void SimplePcmStorageData::CalcPcmStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap)
+    void SimplePcmStorageData::CalcPcmStorageCapacity(EnergyPlusData &state, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap)
     {
         //------------------------------------------------------------------------
         // FIRST PROCESS (MyLoad = 0.0 as IN)
@@ -2460,7 +2461,8 @@ namespace IceThermalStorage {
         MinCap = PcmTSCoolingRateMin;
     }
 
-    void SimplePcmStorageData::CalcPcmStorageDischarge(Real64 const myLoad, // operating load
+    void SimplePcmStorageData::CalcPcmStorageDischarge(EnergyPlusData &state,
+                                                       Real64 const myLoad, // operating load
                                                        bool const RunFlag,  // TRUE when ice storage operating
                                                        Real64 const MaxCap  // Max possible discharge rate (positive value)
     )
@@ -2506,7 +2508,7 @@ namespace IceThermalStorage {
         //----------------------------
         int loopNum = this->LoopNum;
 
-        Real64 CpFluid = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(loopNum).FluidName,
+        Real64 CpFluid = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(loopNum).FluidName,
                                                            DataLoopNode::Node(this->PltInletNodeNum).Temp,
                                                            DataPlant::PlantLoop(loopNum).FluidIndex,
                                                            RoutineName);

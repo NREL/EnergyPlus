@@ -2989,7 +2989,7 @@ namespace IntegratedHeatPump {
             ++DXCoilNum;
             AlfaFieldIncre = 1;
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state, CurrentModuleObject,
                                           CoilCounter,
                                           AlphArray,
                                           NumAlphas,
@@ -3014,7 +3014,7 @@ namespace IntegratedHeatPump {
             Coiltype = IntegratedHeatPumps(DXCoilNum).SCCoilType;
             CoilName = IntegratedHeatPumps(DXCoilNum).SCCoilName;
 
-            ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+            ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
             if (IsNotOK) {
                 ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                 ErrorsFound = true;
@@ -3032,7 +3032,7 @@ namespace IntegratedHeatPump {
             Coiltype = IntegratedHeatPumps(DXCoilNum).SHCoilType;
             CoilName = IntegratedHeatPumps(DXCoilNum).SHCoilName;
 
-            ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+            ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
             if (IsNotOK) {
                 ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                 ErrorsFound = true;
@@ -3051,7 +3051,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).DWHCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).DWHCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -3071,7 +3071,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).SCWHCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).SCWHCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -3091,7 +3091,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -3111,7 +3111,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -3133,7 +3133,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -3153,7 +3153,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -3175,7 +3175,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).EnDehumCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).EnDehumCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -3201,7 +3201,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).GridSCCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).GridSCCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -3227,7 +3227,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).GridSHCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).GridSHCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -3723,7 +3723,7 @@ namespace IntegratedHeatPump {
             }
 
             
-            if (!lAlphaBlanks(2)) IntegratedHeatPumps(DXCoilNum).WaterTankoutNod = GetOnlySingleNode(
+            if (!lAlphaBlanks(2)) IntegratedHeatPumps(DXCoilNum).WaterTankoutNod = GetOnlySingleNode(state,
                 AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Sensor, 2, ObjectIsNotParent);
 
             // outdoor air node connections for water heating coils
@@ -3861,7 +3861,7 @@ namespace IntegratedHeatPump {
             ++DXCoilNum;
             AlfaFieldIncre = 1;
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state, CurrentModuleObject,
                                           CoilCounter,
                                           AlphArray,
                                           NumAlphas,
@@ -3887,7 +3887,7 @@ namespace IntegratedHeatPump {
             Coiltype = IntegratedHeatPumps(DXCoilNum).SCCoilType;
             CoilName = IntegratedHeatPumps(DXCoilNum).SCCoilName;
 
-            ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+            ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
             if (IsNotOK) {
                 ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                 ErrorsFound = true;
@@ -3905,7 +3905,7 @@ namespace IntegratedHeatPump {
             Coiltype = IntegratedHeatPumps(DXCoilNum).SHCoilType;
             CoilName = IntegratedHeatPumps(DXCoilNum).SHCoilName;
 
-            ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+            ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
             if (IsNotOK) {
                 ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                 ErrorsFound = true;
@@ -3924,7 +3924,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).DWHCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).DWHCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -3950,7 +3950,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).SCWHCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).SCWHCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -3970,7 +3970,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -3990,7 +3990,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -4012,7 +4012,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).EnDehumCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).EnDehumCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -4038,7 +4038,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).GridSCCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).GridSCCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -4064,7 +4064,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).LDDehumCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).LDDehumCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -4089,7 +4089,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).LDRegenCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).LDRegenCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -4114,7 +4114,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).EvapCoolCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -4136,7 +4136,7 @@ namespace IntegratedHeatPump {
                 Coiltype = IntegratedHeatPumps(DXCoilNum).GridSHCoilType;
                 CoilName = IntegratedHeatPumps(DXCoilNum).GridSHCoilName;
 
-                ValidateComponent(Coiltype, CoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, Coiltype, CoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -4928,91 +4928,91 @@ namespace IntegratedHeatPump {
             //				                     static_cast< int >( IntegratedHeatPumps( DXCoilNum ).CurMode ),
             //				                     "System", "Average",
             //				                     IntegratedHeatPumps( DXCoilNum ).Name );
-            SetupOutputVariable("Integrated Heat Pump Air Loop Mass Flow Rate",
+            SetupOutputVariable(state, "Integrated Heat Pump Air Loop Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 IntegratedHeatPumps(DXCoilNum).AirLoopFlowRate,
                                 "System",
                                 "Average",
                                 IntegratedHeatPumps(DXCoilNum).Name);
-            SetupOutputVariable("Integrated Heat Pump Condenser Water Mass Flow Rate",
+            SetupOutputVariable(state, "Integrated Heat Pump Condenser Water Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 IntegratedHeatPumps(DXCoilNum).TankSourceWaterMassFlowRate,
                                 "System",
                                 "Average",
                                 IntegratedHeatPumps(DXCoilNum).Name);
-            SetupOutputVariable("Integrated Heat Pump Air Total Cooling Rate",
+            SetupOutputVariable(state, "Integrated Heat Pump Air Total Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 IntegratedHeatPumps(DXCoilNum).TotalCoolingRate,
                                 "System",
                                 "Average",
                                 IntegratedHeatPumps(DXCoilNum).Name);
-            SetupOutputVariable("Integrated Heat Pump Air Heating Rate",
+            SetupOutputVariable(state, "Integrated Heat Pump Air Heating Rate",
                                 OutputProcessor::Unit::W,
                                 IntegratedHeatPumps(DXCoilNum).TotalSpaceHeatingRate,
                                 "System",
                                 "Average",
                                 IntegratedHeatPumps(DXCoilNum).Name);
-            SetupOutputVariable("Integrated Heat Pump Water Heating Rate",
+            SetupOutputVariable(state, "Integrated Heat Pump Water Heating Rate",
                                 OutputProcessor::Unit::W,
                                 IntegratedHeatPumps(DXCoilNum).TotalWaterHeatingRate,
                                 "System",
                                 "Average",
                                 IntegratedHeatPumps(DXCoilNum).Name);
-            SetupOutputVariable("Integrated Heat Pump Electricity Rate",
+            SetupOutputVariable(state, "Integrated Heat Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 IntegratedHeatPumps(DXCoilNum).TotalPower,
                                 "System",
                                 "Average",
                                 IntegratedHeatPumps(DXCoilNum).Name);
-            SetupOutputVariable("Integrated Heat Pump Air Latent Cooling Rate",
+            SetupOutputVariable(state, "Integrated Heat Pump Air Latent Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 IntegratedHeatPumps(DXCoilNum).TotalLatentLoad,
                                 "System",
                                 "Average",
                                 IntegratedHeatPumps(DXCoilNum).Name);
-            SetupOutputVariable("Integrated Heat Pump Source Heat Transfer Rate",
+            SetupOutputVariable(state, "Integrated Heat Pump Source Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 IntegratedHeatPumps(DXCoilNum).Qsource,
                                 "System",
                                 "Average",
                                 IntegratedHeatPumps(DXCoilNum).Name);
-            SetupOutputVariable("Integrated Heat Pump COP",
+            SetupOutputVariable(state, "Integrated Heat Pump COP",
                                 OutputProcessor::Unit::None,
                                 IntegratedHeatPumps(DXCoilNum).TotalCOP,
                                 "System",
                                 "Average",
                                 IntegratedHeatPumps(DXCoilNum).Name);
-            SetupOutputVariable("Integrated Heat Pump Electricity Energy",
+            SetupOutputVariable(state, "Integrated Heat Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 IntegratedHeatPumps(DXCoilNum).Energy,
                                 "System",
                                 "Summed",
                                 IntegratedHeatPumps(DXCoilNum).Name);
-            SetupOutputVariable("Integrated Heat Pump Air Total Cooling Energy",
+            SetupOutputVariable(state, "Integrated Heat Pump Air Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalCooling,
                                 "System",
                                 "Summed",
                                 IntegratedHeatPumps(DXCoilNum).Name);
-            SetupOutputVariable("Integrated Heat Pump Air Heating Energy",
+            SetupOutputVariable(state, "Integrated Heat Pump Air Heating Energy",
                                 OutputProcessor::Unit::J,
                                 IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalHeating,
                                 "System",
                                 "Summed",
                                 IntegratedHeatPumps(DXCoilNum).Name);
-            SetupOutputVariable("Integrated Heat Pump Water Heating Energy",
+            SetupOutputVariable(state, "Integrated Heat Pump Water Heating Energy",
                                 OutputProcessor::Unit::J,
                                 IntegratedHeatPumps(DXCoilNum).EnergyLoadTotalWaterHeating,
                                 "System",
                                 "Summed",
                                 IntegratedHeatPumps(DXCoilNum).Name);
-            SetupOutputVariable("Integrated Heat Pump Air Latent Cooling Energy",
+            SetupOutputVariable(state, "Integrated Heat Pump Air Latent Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 IntegratedHeatPumps(DXCoilNum).EnergyLatent,
                                 "System",
                                 "Summed",
                                 IntegratedHeatPumps(DXCoilNum).Name);
-            SetupOutputVariable("Integrated Heat Pump Source Heat Transfer Energy",
+            SetupOutputVariable(state, "Integrated Heat Pump Source Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 IntegratedHeatPumps(DXCoilNum).EnergySource,
                                 "System",

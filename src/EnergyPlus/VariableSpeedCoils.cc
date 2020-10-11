@@ -1147,7 +1147,7 @@ namespace VariableSpeedCoils {
             if (lAlphaBlanks(10)) {
                 VarSpeedCoil(DXCoilNum).GridScheduleIndex = 0;
             } else {
-                VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(AlphArray(10));
+                VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(state, AlphArray(10));
                 if (VarSpeedCoil(DXCoilNum).GridScheduleIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFields(10) + "=\"" + AlphArray(10) + "\"Missing");
@@ -1879,7 +1879,7 @@ namespace VariableSpeedCoils {
             if (lAlphaBlanks(8)) {
                 VarSpeedCoil(DXCoilNum).GridScheduleIndex = 0;
             } else {
-                VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(AlphArray(8));
+                VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(state, AlphArray(8));
                 if (VarSpeedCoil(DXCoilNum).GridScheduleIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFields(8) + "=\"" + AlphArray(8) + "\"Missing");
@@ -2288,7 +2288,7 @@ namespace VariableSpeedCoils {
             if (lAlphaBlanks(11)) {
                 VarSpeedCoil(DXCoilNum).GridScheduleIndex = 0;
             } else {
-                VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(AlphArray(11));
+                VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(state, AlphArray(11));
                 if (VarSpeedCoil(DXCoilNum).GridScheduleIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("..." + cAlphaFields(11) + "=\"" + AlphArray(11) + "\"Missing");
@@ -2582,7 +2582,8 @@ namespace VariableSpeedCoils {
 
             AlfaFieldIncre = 1;
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           CoilCounter,
                                           AlphArray,
                                           NumAlphas,
@@ -2631,7 +2632,8 @@ namespace VariableSpeedCoils {
 
             AlfaFieldIncre = 1;
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           CoilCounter,
                                           AlphArray,
                                           NumAlphas,

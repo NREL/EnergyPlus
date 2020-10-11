@@ -341,9 +341,9 @@ namespace IceThermalStorage {
 
         void CalcPcmStorageDormant();
 
-        void CalcPcmStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
+        void CalcPcmStorageCapacity(EnergyPlusData &state, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
 
-        void CalcPcmStorageDischarge(Real64 myLoad, bool RunFlag, Real64 MaxCap);
+        void CalcPcmStorageDischarge(EnergyPlusData &state, Real64 myLoad, bool RunFlag, Real64 MaxCap);
 
         void CalcQpcmDischageMaxByNtu(Real64 &QpcmMin);
 
@@ -359,7 +359,7 @@ namespace IceThermalStorage {
 
         void RecordOutput(Real64 myLoad, bool RunFlag);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
     };
 

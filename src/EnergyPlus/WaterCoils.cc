@@ -906,7 +906,8 @@ namespace WaterCoils {
 
             CoilNum = NumSimpHeat + NumFlatFin + NumCooling + LiqDesiccantDehumNum;
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           LiqDesiccantDehumNum,
                                           AlphArray,
                                           NumAlphas,
@@ -932,7 +933,7 @@ namespace WaterCoils {
             if (lAlphaBlanks(2)) {
                 state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
             } else {
-                state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = GetScheduleIndex(AlphArray(2));
+                state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                 if (state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr == 0) {
                     ShowSevereError(CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + AlphArray(2) + " for " + cAlphaFields(1) +
                                     '=' + AlphArray(1));
@@ -975,13 +976,13 @@ namespace WaterCoils {
                 state.dataWaterCoils->WaterCoil(CoilNum).UseDesignSlnDeltaConcentration = false;
             }
 
-            state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = GetOnlySingleNode(
+            state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = GetOnlySingleNode(state, 
                 AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
-            state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = GetOnlySingleNode(
+            state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = GetOnlySingleNode(state, 
                 AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
-            state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(
+            state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state, 
                 AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(
+            state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state, 
                 AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             {
@@ -1049,7 +1050,8 @@ namespace WaterCoils {
 
             // Setup Report variables for the Design input Cooling Coils
             // CurrentModuleObject = "Coil:Cooling:Water"
-            SetupOutputVariable("Liquid Desiccant Coil Total Energy",
+            SetupOutputVariable(state,
+                                "Liquid Desiccant Coil Total Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWaterCoils->WaterCoil(CoilNum).TotDehumidificationCoilEnergy,
                                 "System",
@@ -1060,7 +1062,8 @@ namespace WaterCoils {
                                 "COOLINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable("Liquid Desiccant Coil Source Side Heat Transfer Energy",
+            SetupOutputVariable(state,
+                                "Liquid Desiccant Coil Source Side Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWaterCoils->WaterCoil(CoilNum).TotDehumidificationCoilEnergy,
                                 "System",
@@ -1071,19 +1074,22 @@ namespace WaterCoils {
                                 "COOLINGCOILS",
                                 _,
                                 "System");
-               SetupOutputVariable("Liquid Desiccant Coil Sensible Cooling Energy",
+            SetupOutputVariable(state,
+                                "Liquid Desiccant Coil Sensible Cooling Energy",
                    OutputProcessor::Unit::J,
                     state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilEnergy,
                     "System",
                     "Sum",
                     state.dataWaterCoils->WaterCoil(CoilNum).Name);
-                SetupOutputVariable("Liquid Desiccant Coil Total Cooling Rate",
+            SetupOutputVariable(state,
+                                "Liquid Desiccant Coil Total Cooling Rate",
                     OutputProcessor::Unit::W,
                     state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate,
                    "System",
                    "Average",
                    state.dataWaterCoils->WaterCoil(CoilNum).Name);
-               SetupOutputVariable("Liquid Desiccant Coil Sensible Cooling Rate",
+            SetupOutputVariable(state,
+                                "Liquid Desiccant Coil Sensible Cooling Rate",
                    OutputProcessor::Unit::W,
                    state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate,
                     "System",
@@ -1098,13 +1104,15 @@ namespace WaterCoils {
 
             if (state.dataWaterCoils->WaterCoil(CoilNum).CondensateCollectMode == state.dataWaterCoils->CondensateToTank) {
 
-                SetupOutputVariable("Cooling Coil Condensate Volume Flow Rate",
+                SetupOutputVariable(state,
+                                    "Cooling Coil Condensate Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot,
                                     "System",
                                     "Average",
                                     state.dataWaterCoils->WaterCoil(CoilNum).Name);
-                SetupOutputVariable("Cooling Coil Condensate Volume",
+                SetupOutputVariable(state,
+                                    "Cooling Coil Condensate Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataWaterCoils->WaterCoil(CoilNum).CondensateVol,
                                     "System",
