@@ -4655,6 +4655,7 @@ namespace WaterCoils {
         Real64 HSSeff, WSSeff = 1.0, TSSeff = 1.0, HSSeff_p;
         Real64 TsoG = 20.0;
         Real64 TSSeff_G = 20.0;
+        Real64 Tcri; 
 
         int iter_Tso, itmax_Tso = 10, icvg_Tso = 0;
         Real64 ResultX_Tso = 1.0, X1_Tso = 1.0, Y1_Tso = 1.0, error_Tso;
@@ -4796,6 +4797,14 @@ namespace WaterCoils {
         Qtot = ma * (Hao - Hai);            //mso * Hso - msi * Hsi;      // Res7  // J
         Wevaprate = ma * (Wao - Wai);                             // dRes10 = ma * (Wao - Wai) - WEVAPRATE;
         QSen = ma * PsyCpAirFnW(0.5 * (Wai + Wao)) * (Tao - Tai); // J
+
+        Tcri = Tcristal(MatlOfLiqDesiccant,  max(Xsi,Xso));
+
+        
+        if (min(Tsi, Tso) < Tcri) {
+            ShowWarningError("the liquid desiccant has a crystallization risk");
+        }
+
 
         //  ********************* new calcuation code: end *************************
         /*
@@ -6120,6 +6129,103 @@ namespace WaterCoils {
         double _AIR_H_TW = cpad * T + W * (hfgd + cpwd * T);
         return (_AIR_H_TW);
     };
+
+    double Tcristal(int MatlOfLiqDesiccant, const double xsi)
+    {
+        double dRet = 0.0;
+
+        const double MoleW_LiCl = 42.39;    // g/mole
+        const double MoleW_H2O = 18.02;     // g/mole
+        const double dTcH2O = 374 + 273.14; // critical water temperature [K]
+
+        const double dNumH2O = ((1.0 - xsi) / MoleW_H2O) / (xsi / MoleW_LiCl);
+
+        double dA[3] = {0.0, 0.0, 0.0};
+        double dB[4] = {0.0, 0.0, 0.0, 0.0};
+
+        double dTheta = 0.0;
+
+        if (xsi <= 0.253) // ice line
+        {
+            dA[0] = 0.422088;
+            dA[1] = -0.090410;
+            dA[2] = -2.936350;
+        } else if (xsi <= 0.287) {
+            dA[0] = -0.005340;
+            dA[1] = 2.015890;
+            dA[2] = -3.114590;
+        } else if (xsi <= 0.369) {
+            dA[0] = -0.560360;
+            dA[1] = 4.723080;
+            dA[2] = -5.811050;
+        } else if (xsi <= 0.452) {
+            dA[0] = -0.315220;
+            dA[1] = 2.822480;
+            dA[2] = -2.624330;
+        } else if (xsi <= 0.558) {
+            dA[0] = -1.312310;
+            dA[1] = 6.177670;
+            dA[2] = -5.034790;
+        } else {
+            dA[0] = -1.356800;
+            dA[1] = 3.448540;
+            dA[2] = 0.0;
+        };
+
+        if (xsi <= 0.2985) // ice line
+        {
+            dB[0] = 0.422088;
+            dB[1] = -0.066933;
+            dB[2] = -0.282395;
+            dB[3] = -355.514247;
+        } else if (xsi <= 0.4984) {
+            dB[0] = -0.378950;
+            dB[1] = 3.456900;
+            dB[2] = -3.531310;
+            dB[3] = 0.0;
+        } else if (xsi <= 0.5663) {
+            dB[0] = -0.519970;
+            dB[1] = 3.400970;
+            dB[2] = -2.851290;
+            dB[3] = 0.0;
+        } else if (xsi <= 0.7486) {
+            dB[0] = -2.385836;
+            dB[1] = 8.084829;
+            dB[2] = -5.303476;
+            dB[3] = 0.0;
+        } else {
+            dB[0] = -2.807560;
+            dB[1] = 4.678250;
+            dB[2] = 0.0;
+            dB[3] = 0.0;
+        };
+
+        switch (MatlOfLiqDesiccant) {
+        case 2:
+            if (xsi <= 0.2985) // ice line
+            {
+                dTheta = dB[0] + dB[1] * xsi + dB[2] * pow(xsi, 2.5);
+            } else { // cristalization line
+                dTheta = dB[0] + dB[1] * xsi + dB[2] * pow(xsi, 2.0) + dB[3] * pow(xsi, 7.5);
+            };
+            break;
+        default:
+            if (xsi <= 0.253) // ice line
+            {
+                dTheta = dA[0] + dA[1] * xsi + dA[2] * pow(xsi, 2.5);
+            } else { // cristalization line
+                dTheta = dA[0] + dA[1] * xsi + dA[2] * xsi * xsi;
+            };
+            break;
+        }
+
+        dRet = dTheta * dTcH2O;              // cristalization temperature [K]
+        dRet = (dRet - 273.14) * 1.8 + 32.0; // convert to [F]
+
+        return (dRet);
+    }
+
+
 
 
 

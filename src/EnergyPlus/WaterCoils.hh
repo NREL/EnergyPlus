@@ -451,6 +451,7 @@ namespace WaterCoils {
                             Array1D<Real64> const &Par); // Par(1) = desired enthaply H [J/kg]
 
     double PsyHFnTdbW_new(double T, double W);
+    double Tcristal(int MatlOfLiqDesiccant, const double xsi);
 
     // Subroutine for caculating outlet condition if coil is wet , for Cooling Coil
 
