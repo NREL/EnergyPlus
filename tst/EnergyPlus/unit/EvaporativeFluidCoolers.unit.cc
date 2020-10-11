@@ -163,7 +163,7 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     // Call the routine to be tested and see if the fix is correct
     PlantLocation loc = PlantLocation(1, 1, 1, 1);
     thisEFC.onInitLoopEquip(state, loc);
-    thisEFC.getDesignCapacities(pl, MaxLoad, MinLoad, OptLoad);
+    thisEFC.getDesignCapacities(state, pl, MaxLoad, MinLoad, OptLoad);
     EXPECT_NEAR(MaxLoad, ExpectedMaxLoad,0.01);
     EXPECT_NEAR(MinLoad, ExpectedMinLoad,0.01);
     EXPECT_NEAR(OptLoad, ExpectedOptLoad,0.01);

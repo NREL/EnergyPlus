@@ -59,6 +59,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace MatrixDataManager {
 
     // Using/Aliasing
@@ -108,9 +111,9 @@ namespace MatrixDataManager {
 
     // Functions
 
-    void GetMatrixInput();
+    void GetMatrixInput(EnergyPlusData &state);
 
-    int MatrixIndex(std::string const &MatrixName);
+    int MatrixIndex(EnergyPlusData &state, std::string const &MatrixName);
 
     void Get2DMatrix(int const Idx, // pointer index to location in MatData
                      Array2S<Real64> Mat2D);

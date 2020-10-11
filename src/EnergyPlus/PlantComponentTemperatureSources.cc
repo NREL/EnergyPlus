@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -67,7 +66,6 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PlantComponentTemperatureSources.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -109,10 +107,10 @@ namespace PlantComponentTemperatureSources {
         WaterSource.deallocate();
     }
 
-    PlantComponent *WaterSourceSpecs::factory(std::string const &objectName)
+    PlantComponent *WaterSourceSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         if (getWaterSourceInput) {
-            GetWaterSourceInput();
+            GetWaterSourceInput(state);
             getWaterSourceInput = false;
         }
 
@@ -148,7 +146,7 @@ namespace PlantComponentTemperatureSources {
 
         if (this->MyFlag) {
             // setup output variables once here
-            this->setupOutputVars();
+            this->setupOutputVars(state);
             // Locate the component on the plant loops for later usage
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
@@ -173,7 +171,8 @@ namespace PlantComponentTemperatureSources {
         // Initialize critical Demand Side Variables at the beginning of each environment
         if (this->MyEnvironFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
-            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->Location.loopNum).FluidName,
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           DataPlant::PlantLoop(this->Location.loopNum).FluidName,
                                                            DataGlobals::InitConvTemp,
                                                            DataPlant::PlantLoop(this->Location.loopNum).FluidIndex,
                                                            RoutineName);
@@ -201,7 +200,8 @@ namespace PlantComponentTemperatureSources {
         }
 
         // Calculate specific heat
-        Real64 cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->Location.loopNum).FluidName,
+        Real64 cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           DataPlant::PlantLoop(this->Location.loopNum).FluidName,
                                                            this->BoundaryTemp,
                                                            DataPlant::PlantLoop(this->Location.loopNum).FluidIndex,
                                                            RoutineName);
@@ -255,20 +255,20 @@ namespace PlantComponentTemperatureSources {
         // the calc routine will update the outlet temp and heat transfer rate/energies
     }
 
-    void WaterSourceSpecs::setupOutputVars()
+    void WaterSourceSpecs::setupOutputVars(EnergyPlusData &state)
     {
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Plant Temperature Source Component Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Plant Temperature Source Component Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Plant Temperature Source Component Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Plant Temperature Source Component Source Temperature", OutputProcessor::Unit::C, this->BoundaryTemp, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Plant Temperature Source Component Heat Transfer Rate", OutputProcessor::Unit::W, this->HeatRate, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Plant Temperature Source Component Heat Transfer Energy", OutputProcessor::Unit::J, this->HeatEnergy, "System", "Sum", this->Name);
         if (DataGlobals::AnyEnergyManagementSystemInModel) {
             SetupEMSActuator("PlantComponent:TemperatureSource",
@@ -366,7 +366,7 @@ namespace PlantComponentTemperatureSources {
         }
     }
 
-    void WaterSourceSpecs::calculate()
+    void WaterSourceSpecs::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -379,7 +379,8 @@ namespace PlantComponentTemperatureSources {
 
         if (this->MassFlowRate > 0.0) {
             this->OutletTemp = this->BoundaryTemp;
-            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->Location.loopNum).FluidName,
+            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                               DataPlant::PlantLoop(this->Location.loopNum).FluidName,
                                                                this->BoundaryTemp,
                                                                DataPlant::PlantLoop(this->Location.loopNum).FluidIndex,
                                                                RoutineName);
@@ -404,11 +405,11 @@ namespace PlantComponentTemperatureSources {
                                     bool EP_UNUSED(RunFlag))
     {
         this->initialize(state, CurLoad);
-        this->calculate();
+        this->calculate(state);
         this->update();
     }
 
-    void WaterSourceSpecs::getDesignCapacities(const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void WaterSourceSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
 
         MaxLoad = DataGlobals::BigNumber;
@@ -428,7 +429,7 @@ namespace PlantComponentTemperatureSources {
         this->autosize();
     }
 
-    void GetWaterSourceInput()
+    void GetWaterSourceInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -475,7 +476,8 @@ namespace PlantComponentTemperatureSources {
 
         // fill arrays
         for (int SourceNum = 1; SourceNum <= NumSources; ++SourceNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           SourceNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -490,7 +492,7 @@ namespace PlantComponentTemperatureSources {
 
             WaterSource(SourceNum).Name = cAlphaArgs(1);
 
-            WaterSource(SourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(2),
+            WaterSource(SourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state, cAlphaArgs(2),
                                                                                       ErrorsFound,
                                                                                       cCurrentModuleObject,
                                                                                       cAlphaArgs(1),
@@ -498,7 +500,7 @@ namespace PlantComponentTemperatureSources {
                                                                                       DataLoopNode::NodeConnectionType_Inlet,
                                                                                       1,
                                                                                       DataLoopNode::ObjectIsNotParent);
-            WaterSource(SourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(3),
+            WaterSource(SourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, cAlphaArgs(3),
                                                                                        ErrorsFound,
                                                                                        cCurrentModuleObject,
                                                                                        cAlphaArgs(1),
@@ -519,7 +521,7 @@ namespace PlantComponentTemperatureSources {
             } else if (cAlphaArgs(4) == "SCHEDULED") {
                 WaterSource(SourceNum).TempSpecType = modTempSpecType_Schedule;
                 WaterSource(SourceNum).TempSpecScheduleName = cAlphaArgs(5);
-                WaterSource(SourceNum).TempSpecScheduleNum = ScheduleManager::GetScheduleIndex(cAlphaArgs(5));
+                WaterSource(SourceNum).TempSpecScheduleNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(5));
                 if (WaterSource(SourceNum).TempSpecScheduleNum == 0) {
                     ShowSevereError("Input error for " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                     ShowContinueError("Invalid schedule name in field " + cAlphaFieldNames(5) + '=' + cAlphaArgs(5));

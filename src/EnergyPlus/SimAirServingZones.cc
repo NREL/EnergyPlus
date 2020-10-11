@@ -96,7 +96,6 @@
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Humidifiers.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
@@ -562,7 +561,8 @@ namespace SimAirServingZones {
 
             CurrentModuleObject = "AirLoopHVAC";
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           AirSysNum,
                                           Alphas,
                                           NumAlphas,
@@ -603,9 +603,9 @@ namespace SimAirServingZones {
             state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum.allocate(state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumReturnNodes);
             // fill the return air node arrays with node numbers
             state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopReturnNodeNum(1) =
-                GetOnlySingleNode(Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
             if (!lAlphaBlanks(7)) {
-                state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1) = GetOnlySingleNode(
+                state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1) = GetOnlySingleNode(state,
                     Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
             } else {
                 // If no return path, set this to zero to trigger special handling when calling UpdateHVACInterface
@@ -696,7 +696,8 @@ namespace SimAirServingZones {
             }
             // Get the supply nodes
             ErrInList = false;
-            GetNodeNums(Alphas(8),
+            GetNodeNums(state,
+                        Alphas(8),
                         NumNodes,
                         NodeNums,
                         ErrInList,
@@ -735,7 +736,8 @@ namespace SimAirServingZones {
                 state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).SupplyDuctType(I) = 0;
             }
             ErrInList = false;
-            GetNodeNums(Alphas(9),
+            GetNodeNums(state,
+                        Alphas(9),
                         NumNodes,
                         NodeNums,
                         ErrInList,
@@ -824,7 +826,7 @@ namespace SimAirServingZones {
                 PrimaryAirSystem(AirSysNum).Branch(BranchNum).DuctType = Main;
 
                 // If first node is an outdoor air node, then consider this to have a simple OA system (many places check for this)
-                if (OutAirNodeManager::CheckOutAirNodeNumber(InletNodeNumbers(1))) {
+                if (OutAirNodeManager::CheckOutAirNodeNumber(state, InletNodeNumbers(1))) {
                     PrimaryAirSystem(AirSysNum).OASysExists = true;
                     PrimaryAirSystem(AirSysNum).isAllOA = true;
                     PrimaryAirSystem(AirSysNum).OASysInletNodeNum = InletNodeNumbers(1);
@@ -869,7 +871,7 @@ namespace SimAirServingZones {
                             OASysContListNum = GetOASysControllerListIndex(state, OANum);
                             OAMixNum = FindOAMixerMatchForOASystem(state, OANum);
                             if (OAMixNum > 0) {
-                                PrimaryAirSystem(AirSysNum).OAMixOAInNodeNum = GetOAMixerInletNodeNumber(OAMixNum);
+                                PrimaryAirSystem(AirSysNum).OAMixOAInNodeNum = GetOAMixerInletNodeNumber(state, OAMixNum);
                             } else {
                                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name + "\", item not found.");
                                 ShowContinueError("OutdoorAir:Mixer for AirLoopHVAC:OutdoorAirSystem=\"" + CompNames(CompNum) + "\" not found.");
@@ -972,9 +974,9 @@ namespace SimAirServingZones {
             MixerExists = false;
 
             if (ConnectorListName != "") {
-                ConListNum = inputProcessor->getObjectItemNum("ConnectorList", ConnectorListName);
+                ConListNum = inputProcessor->getObjectItemNum(state, "ConnectorList", ConnectorListName);
                 if (ConListNum > 0) {
-                    inputProcessor->getObjectItem("ConnectorList", ConListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
+                    inputProcessor->getObjectItem(state, "ConnectorList", ConListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
                     if ((UtilityRoutines::SameString(Alphas(2), "Connector:Splitter")) ||
                         (UtilityRoutines::SameString(Alphas(4), "Connector:Splitter"))) {
                         SplitterExists = true;
@@ -1117,9 +1119,9 @@ namespace SimAirServingZones {
             NumControllers = 0;
             if (ControllerListName != "") { // If not blank, then must be there and valid
                 // Loop through the controller lists until you find the one attached to this primary air system
-                ControllerListNum = inputProcessor->getObjectItemNum("AirLoopHVAC:ControllerList", ControllerListName);
+                ControllerListNum = inputProcessor->getObjectItemNum(state, "AirLoopHVAC:ControllerList", ControllerListName);
                 if (ControllerListNum > 0) {
-                    inputProcessor->getObjectItem("AirLoopHVAC:ControllerList", ControllerListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
+                    inputProcessor->getObjectItem(state, "AirLoopHVAC:ControllerList", ControllerListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
                     // Check the current controller list and if it matches input names
                     NumControllers = (NumAlphas - 1) / 2; // Subtract off the controller list name first
                     // store all the controller data
@@ -1136,7 +1138,7 @@ namespace SimAirServingZones {
                         PrimaryAirSystem(AirSysNum).ControllerName(ControllerNum) = ControllerName;
                         PrimaryAirSystem(AirSysNum).ControllerType(ControllerNum) = ControllerType;
                         IsNotOK = false;
-                        ValidateComponent(ControllerType, ControllerName, IsNotOK, CurrentModuleObject);
+                        ValidateComponent(state, ControllerType, ControllerName, IsNotOK, CurrentModuleObject);
                         if (IsNotOK) {
                             ShowContinueError(RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem(AirSysNum).Name +
                                               "\", for ControllerList=\"" + ControllerListName + "\".");
@@ -1152,7 +1154,7 @@ namespace SimAirServingZones {
                 }
             }
             if (NumOASysSimpControllers > 0) {
-                inputProcessor->getObjectItem("AirLoopHVAC:ControllerList", OASysContListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
+                inputProcessor->getObjectItem(state, "AirLoopHVAC:ControllerList", OASysContListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
                 // allocate air primary system controller lists if not already done
                 if (NumControllers == 0) {
                     PrimaryAirSystem(AirSysNum).NumControllers = NumOASysSimpControllers;
@@ -1461,7 +1463,7 @@ namespace SimAirServingZones {
         }
 
         for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
-            SetupOutputVariable("Air System Simulation Cycle On Off Status",
+            SetupOutputVariable(state, "Air System Simulation Cycle On Off Status",
                                 OutputProcessor::Unit::None,
                                 state.dataAirLoop->PriAirSysAvailMgr(AirSysNum).AvailStatus,
                                 "HVAC",
@@ -2567,9 +2569,9 @@ namespace SimAirServingZones {
 
         // Set up output variables
         if (!OutputSetupFlag) {
-            SetupOutputVariable("Air System Simulation Maximum Iteration Count", OutputProcessor::Unit::None, IterMax, "HVAC", "Sum", "SimAir");
-            SetupOutputVariable("Air System Simulation Iteration Count", OutputProcessor::Unit::None, IterTot, "HVAC", "Sum", "SimAir");
-            SetupOutputVariable("Air System Component Model Simulation Calls", OutputProcessor::Unit::None, NumCallsTot, "HVAC", "Sum", "SimAir");
+            SetupOutputVariable(state, "Air System Simulation Maximum Iteration Count", OutputProcessor::Unit::None, IterMax, "HVAC", "Sum", "SimAir");
+            SetupOutputVariable(state, "Air System Simulation Iteration Count", OutputProcessor::Unit::None, IterTot, "HVAC", "Sum", "SimAir");
+            SetupOutputVariable(state, "Air System Component Model Simulation Calls", OutputProcessor::Unit::None, NumCallsTot, "HVAC", "Sum", "SimAir");
             OutputSetupFlag = true;
         }
 
@@ -3758,7 +3760,7 @@ namespace SimAirServingZones {
                                                          latOut);
 
             } else if (SELECT_CASE_var == Duct) { // 'Duct'
-                SimDuct(CompName, FirstHVACIteration, CompIndex);
+                SimDuct(state, CompName, FirstHVACIteration, CompIndex);
 
             } else {
             }

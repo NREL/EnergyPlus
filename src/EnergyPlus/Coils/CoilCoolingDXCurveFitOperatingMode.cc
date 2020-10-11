@@ -61,7 +61,7 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
+void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
 {
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
@@ -104,7 +104,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlusData
     }
 }
 
-CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlusData &state, const std::string& name_to_find)
+CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlus::EnergyPlusData &state, const std::string& name_to_find)
 {
     int numModes = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitOperatingMode::object_name);
     if (numModes <= 0) {
@@ -116,7 +116,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlu
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
         inputProcessor->getObjectItem(
-            CoilCoolingDXCurveFitOperatingMode::object_name, modeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+            state, CoilCoolingDXCurveFitOperatingMode::object_name, modeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
         if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }
@@ -152,7 +152,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlu
     }
 }
 
-void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
+void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
 {
 
     std::string RoutineName = "sizeOperatingMode";
@@ -164,7 +164,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     Real64 TempSize = this->original_input_specs.rated_evaporator_air_flow_rate;
     CoolingAirFlowSizer sizingCoolingAirFlow;
     std::string stringOverride = "Rated Evaporator Air Flow Rate [m3/s]";
-    if (DataGlobals::isEpJSON) stringOverride = "rated_evaporator_air_flow_rate";
+    if (state.dataGlobal->isEpJSON) stringOverride = "rated_evaporator_air_flow_rate";
     sizingCoolingAirFlow.overrideSizingString(stringOverride);
     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
     this->ratedEvapAirFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
@@ -190,7 +190,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
 
     AutoCalculateSizer sizerCondAirFlow;
     stringOverride = "Rated Condenser Air Flow Rate [m3/s]";
-    if (DataGlobals::isEpJSON) stringOverride = "rated_condenser_air_flow_rate";
+    if (state.dataGlobal->isEpJSON) stringOverride = "rated_condenser_air_flow_rate";
     sizerCondAirFlow.overrideSizingString(stringOverride);
     sizerCondAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
     this->ratedCondAirFlowRate = sizerCondAirFlow.size(state, TempSize, errorsFound);
@@ -216,7 +216,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     }
 }
 
-void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlusData &state,
+void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlusData &state,
                                                            const DataLoopNode::NodeData &inletNode,
                                                            DataLoopNode::NodeData &outletNode,
                                                            Real64 &PLR,

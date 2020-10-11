@@ -173,14 +173,14 @@ namespace SwimmingPool {
         void initialize(EnergyPlusData &state, bool FirstHVACIteration // true during the first HVAC iteration
         );
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
         void initSwimmingPoolPlantLoopIndex(EnergyPlusData &state);
 
         void initSwimmingPoolPlantNodeFlow(bool MyPlantScanFlagPool // logical flag true when plant index has not yet been set
         );
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
 
         void calcSwimmingPoolEvap(Real64 &EvapRate, // Evaporation rate
                                   int SurfNum,      // Surface index
@@ -196,7 +196,7 @@ namespace SwimmingPool {
 
     void clear_state();
 
-    void GetSwimmingPool();
+    void GetSwimmingPool(EnergyPlusData &state);
 
     void SimSwimmingPool(EnergyPlusData &state, bool FirstHVACIteration);
 
@@ -204,7 +204,7 @@ namespace SwimmingPool {
 
     Real64 SumHATsurf(int ZoneNum); // Zone number
 
-    void ReportSwimmingPool();
+    void ReportSwimmingPool(EnergyPlusData &state);
 
     Real64 MakeUpWaterVolFlowFunct(Real64 MakeUpWaterMassFlowRate, Real64 Density);
 

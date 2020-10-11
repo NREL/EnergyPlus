@@ -61,7 +61,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace ScheduleManager {
 
@@ -191,33 +193,35 @@ namespace ScheduleManager {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void ProcessScheduleInput(IOFiles &ioFiles);
+    void ProcessScheduleInput(EnergyPlusData &state);
 
-    void ReportScheduleDetails(IOFiles &ioFiles, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
+    void ReportScheduleDetails(EnergyPlusData &state, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
 
     // Returns the CurrentScheduleValue
     Real64 GetCurrentScheduleValue(int const ScheduleIndex);
 
     // Updates each schedule value to the current timestep
     // Uses EMS value if actuated, otherwise calls LookUpScheduleValue with ThisHour=DataGlobals::HourOfDay, ThisTimeStep=DataGlobals::TimeStep
-    void UpdateScheduleValues();
+    void UpdateScheduleValues(EnergyPlusData &state);
 
     // Looks up a given Schedule value for an hour & timestep, minding whether DST is enabled or not
-    Real64 LookUpScheduleValue(int const ScheduleIndex,
+    Real64 LookUpScheduleValue(EnergyPlusData &state,
+                               int const ScheduleIndex,
                                int const ThisHour,
                                int const ThisTimeStep = -1 // Negative => unspecified, will use NumOfTimeStepInHour
     );
 
-    int GetScheduleIndex(std::string const &ScheduleName);
+    int GetScheduleIndex(EnergyPlusData &state, std::string const &ScheduleName);
 
-    std::string GetScheduleType(int const ScheduleIndex);
+    std::string GetScheduleType(EnergyPlusData &state, int const ScheduleIndex);
 
-    int GetDayScheduleIndex(std::string &ScheduleName);
+    int GetDayScheduleIndex(EnergyPlusData &state, std::string &ScheduleName);
 
     void
-    GetScheduleValuesForDay(int const ScheduleIndex, Array2S<Real64> DayValues, Optional_int_const JDay = _, Optional_int_const CurDayofWeek = _);
+    GetScheduleValuesForDay(EnergyPlusData &state, int const ScheduleIndex, Array2S<Real64> DayValues, Optional_int_const JDay = _, Optional_int_const CurDayofWeek = _);
 
-    void GetSingleDayScheduleValues(int const DayScheduleIndex, // Index of the DaySchedule for values
+    void GetSingleDayScheduleValues(EnergyPlusData &state,
+                                    int const DayScheduleIndex, // Index of the DaySchedule for values
                                     Array2S<Real64> DayValues   // Returned set of values
     );
 
@@ -306,9 +310,9 @@ namespace ScheduleManager {
 
     Real64 GetScheduleMaxValue(int const ScheduleIndex); // Which Schedule being tested
 
-    std::string GetScheduleName(int const ScheduleIndex);
+    std::string GetScheduleName(EnergyPlusData &state, int const ScheduleIndex);
 
-    void ReportScheduleValues();
+    void ReportScheduleValues(EnergyPlusData &state);
 
     void ReportOrphanSchedules();
 

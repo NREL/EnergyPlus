@@ -435,7 +435,8 @@ namespace HVACDXSystem {
         // Get the data for the DX Cooling System
         for (DXCoolSysNum = 1; DXCoolSysNum <= NumDXSystem; ++DXCoolSysNum) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           DXCoolSysNum,
                                           Alphas,
                                           NumAlphas,
@@ -453,7 +454,7 @@ namespace HVACDXSystem {
             if (lAlphaBlanks(2)) {
                 DXCoolingSystem(DXCoolSysNum).SchedPtr = ScheduleAlwaysOn;
             } else {
-                DXCoolingSystem(DXCoolSysNum).SchedPtr = GetScheduleIndex(Alphas(2));
+                DXCoolingSystem(DXCoolSysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (DXCoolingSystem(DXCoolSysNum).SchedPtr == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
@@ -462,14 +463,14 @@ namespace HVACDXSystem {
             }
 
             DXCoolingSystem(DXCoolSysNum).DXCoolingCoilInletNodeNum =
-                GetOnlySingleNode(Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
             DXCoolingSystem(DXCoolSysNum).DXCoolingCoilOutletNodeNum =
-                GetOnlySingleNode(Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
 
             TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             DXCoolingSystem(DXCoolSysNum).DXSystemControlNodeNum =
-                GetOnlySingleNode(Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsParent);
             if (DXCoolingSystem(DXCoolSysNum).DXSystemControlNodeNum == 0) {
                 ShowSevereError(CurrentModuleObject + ": control node must be input");
                 ShowContinueError("Error occurred in " + cAlphaFields(1) + '=' + Alphas(1));
@@ -565,7 +566,7 @@ namespace HVACDXSystem {
                 ErrorsFound = true;
             }
 
-            ValidateComponent(
+            ValidateComponent(state,
                 DXCoolingSystem(DXCoolSysNum).CoolingCoilType, DXCoolingSystem(DXCoolSysNum).CoolingCoilName, IsNotOK, CurrentModuleObject);
             if (IsNotOK) {
                 ShowContinueError("In " + CurrentModuleObject + " = \"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
@@ -689,46 +690,46 @@ namespace HVACDXSystem {
         for (DXSystemNum = 1; DXSystemNum <= NumDXSystem; ++DXSystemNum) {
             // Setup Report variables for the DXCoolingSystem that is not reported in the components themselves
             if (UtilityRoutines::SameString(DXCoolingSystem(DXSystemNum).CoolingCoilType, "Coil:Cooling:DX:TwoSpeed")) {
-                SetupOutputVariable("Coil System Cycling Ratio",
+                SetupOutputVariable(state, "Coil System Cycling Ratio",
                                     OutputProcessor::Unit::None,
                                     DXCoolingSystem(DXSystemNum).CycRatio,
                                     "System",
                                     "Average",
                                     DXCoolingSystem(DXSystemNum).Name);
-                SetupOutputVariable("Coil System Compressor Speed Ratio",
+                SetupOutputVariable(state, "Coil System Compressor Speed Ratio",
                                     OutputProcessor::Unit::None,
                                     DXCoolingSystem(DXSystemNum).SpeedRatio,
                                     "System",
                                     "Average",
                                     DXCoolingSystem(DXSystemNum).Name);
             } else if (UtilityRoutines::SameString(DXCoolingSystem(DXSystemNum).CoolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
-                SetupOutputVariable("Coil System Cycling Ratio",
+                SetupOutputVariable(state, "Coil System Cycling Ratio",
                                     OutputProcessor::Unit::None,
                                     DXCoolingSystem(DXSystemNum).CycRatio,
                                     "System",
                                     "Average",
                                     DXCoolingSystem(DXSystemNum).Name);
-                SetupOutputVariable("Coil System Compressor Speed Ratio",
+                SetupOutputVariable(state, "Coil System Compressor Speed Ratio",
                                     OutputProcessor::Unit::None,
                                     DXCoolingSystem(DXSystemNum).SpeedRatio,
                                     "System",
                                     "Average",
                                     DXCoolingSystem(DXSystemNum).Name);
-                SetupOutputVariable("Coil System Compressor Speed Number",
+                SetupOutputVariable(state, "Coil System Compressor Speed Number",
                                     OutputProcessor::Unit::None,
                                     DXCoolingSystem(DXSystemNum).SpeedNum,
                                     "System",
                                     "Average",
                                     DXCoolingSystem(DXSystemNum).Name);
             } else {
-                SetupOutputVariable("Coil System Part Load Ratio",
+                SetupOutputVariable(state, "Coil System Part Load Ratio",
                                     OutputProcessor::Unit::None,
                                     DXCoolingSystem(DXSystemNum).PartLoadFrac,
                                     "System",
                                     "Average",
                                     DXCoolingSystem(DXSystemNum).Name);
             }
-            SetupOutputVariable("Coil System Frost Control Status",
+            SetupOutputVariable(state, "Coil System Frost Control Status",
                                 OutputProcessor::Unit::None,
                                 DXCoolingSystem(DXSystemNum).FrostControlStatus,
                                 "System",

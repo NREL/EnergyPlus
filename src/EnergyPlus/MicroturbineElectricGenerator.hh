@@ -202,7 +202,8 @@ namespace MicroturbineElectricGenerator {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+        void getDesignCapacities(EnergyPlusData &state,
+                                 const PlantLocation &EP_UNUSED(calledFromLocation),
                                  Real64 &EP_UNUSED(MaxLoad),
                                  Real64 &EP_UNUSED(MinLoad),
                                  Real64 &EP_UNUSED(OptLoad)) override;
@@ -219,7 +220,7 @@ namespace MicroturbineElectricGenerator {
 
         void UpdateMTGeneratorRecords();
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };

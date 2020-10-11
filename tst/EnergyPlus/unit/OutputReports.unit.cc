@@ -125,14 +125,14 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(state, state.files, foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(state, foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(state.files, foundErrors); // read construction data
+    HeatBalanceManager::GetConstructData(state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
-    HeatBalanceManager::GetZoneData(foundErrors); // read zone data
+    HeatBalanceManager::GetZoneData(state, foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
@@ -143,13 +143,13 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state, state.files, foundErrors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     // reset eio stream
     has_eio_output(true);
 
-    DetailsForSurfaces(state.files, 10); // 10 = Details Only, Surface details report
+    DetailsForSurfaces(state, 10); // 10 = Details Only, Surface details report
     std::string const eiooutput = delimited_string(
         {"! <Zone Surfaces>,Zone Name,# Surfaces", "! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces",
          "! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm,Construction,Nominal U (w/o film coefs) "

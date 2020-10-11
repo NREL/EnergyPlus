@@ -51,10 +51,8 @@
 #include <vector>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -446,7 +444,7 @@ PlantCoinicidentAnalysis::PlantCoinicidentAnalysis(
     plantSizingIndex = sizingIndex;
 }
 
-void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, IOFiles &ioFiles, int const HVACSizingIterCount)
+void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, int const HVACSizingIterCount)
 {
     using DataSizing::GlobalCoolingSizingFactorMode;
     using DataSizing::GlobalCoolSizingFactor;
@@ -552,7 +550,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, IOFi
 
     // add a seperate eio summary report about what happened, did demand trap get used, what were the key values.
     if (!eioHeaderDoneOnce) {
-        print(ioFiles.eio,"{}", "! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass "
+        print(state.files.eio,"{}", "! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass "
                                              "Flow{kg/s},Measured Demand {W},Demand Calculated Mass Flow{kg/s},Sizes Changed {Yes/No},Previous "
                                              "Volume Flow Rate {m3/s},New Volume Flow Rate {m3/s},Demand Check Applied {Yes/No},Sizing Factor "
                                              "{},Normalized Change {},Specific Heat{J/kg-K},Density {kg/m3}\n");
@@ -570,7 +568,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, IOFi
         chDemandTrapUsed = "No";
     }
 
-    print(ioFiles.eio,
+    print(state.files.eio,
           "Plant Coincident Sizing Algorithm,{},{},{:.7R},{:.2R},{:.7R},{},{:.6R},{:.6R},{},{:.4R},{:.6R},{:.4R},{:.4R}\n",
           name,
           chIteration,

@@ -96,11 +96,11 @@ TEST_F(EnergyPlusFixture, WCEClear)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
-    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state, ErrorsFound);
     WindowManager::initWindowModel(state);
-    WindowManager::InitWindowOpticalCalculations(state, state.files);
-    HeatBalanceManager::InitHeatBalance(state, state.files);
+    WindowManager::InitWindowOpticalCalculations(state);
+    HeatBalanceManager::InitHeatBalance(state);
 
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
     auto solarLayer = aWinConstSimp.getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Solar, 1);
@@ -188,11 +188,11 @@ TEST_F(EnergyPlusFixture, WCEVenetian)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
-    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state, ErrorsFound);
     WindowManager::initWindowModel(state);
-    WindowManager::InitWindowOpticalCalculations(state, state.files);
-    HeatBalanceManager::InitHeatBalance(state, state.files);
+    WindowManager::InitWindowOpticalCalculations(state);
+    HeatBalanceManager::InitHeatBalance(state);
 
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
     auto solarLayer = aWinConstSimp.getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Solar, 1);
@@ -266,11 +266,11 @@ TEST_F(EnergyPlusFixture, WCEShade)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
-    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state, ErrorsFound);
     WindowManager::initWindowModel(state);
-    WindowManager::InitWindowOpticalCalculations(state, state.files);
-    HeatBalanceManager::InitHeatBalance(state, state.files);
+    WindowManager::InitWindowOpticalCalculations(state);
+    HeatBalanceManager::InitHeatBalance(state);
 
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
     auto solarLayer = aWinConstSimp.getEquivalentLayer(state, FenestrationCommon::WavelengthRange::Solar, 1);

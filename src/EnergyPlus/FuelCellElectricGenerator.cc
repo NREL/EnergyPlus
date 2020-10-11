@@ -70,7 +70,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneratorFuelSupply.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -120,7 +119,7 @@ namespace FuelCellElectricGenerator {
     {
         // Process the input data
         if (getFuelCellInputFlag) {
-            getFuelCellInput(state, state.files);
+            getFuelCellInput(state);
             getFuelCellInputFlag = false;
         }
 
@@ -140,7 +139,7 @@ namespace FuelCellElectricGenerator {
     {
         // Process the input data
         if (getFuelCellInputFlag) {
-            getFuelCellInput(state, state.files);
+            getFuelCellInput(state);
             getFuelCellInputFlag = false;
         }
 
@@ -176,7 +175,7 @@ namespace FuelCellElectricGenerator {
         this->UpdateFuelCellGeneratorRecords();
     }
 
-    void getFuelCellInput(EnergyPlusData &state, IOFiles &ioFiles)
+    void getFuelCellInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brent Griffith
@@ -211,7 +210,8 @@ namespace FuelCellElectricGenerator {
 
         // first load in FuelCell names
         for (int GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           GeneratorNum,
                                           AlphArray,
                                           NumAlphas,
@@ -247,7 +247,8 @@ namespace FuelCellElectricGenerator {
         }
 
         for (int FCPMNum = 1; FCPMNum <= NumFuelCellPMs; ++FCPMNum) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           FCPMNum,
                                           AlphArray,
                                           NumAlphas,
@@ -334,7 +335,7 @@ namespace FuelCellElectricGenerator {
                 FuelCell(thisFuelCell).FCPM.NdotDilutionAir = NumArray(22);
                 FuelCell(thisFuelCell).FCPM.StackHeatLossToDilution = NumArray(23);
                 FuelCell(thisFuelCell).FCPM.DilutionInletNodeName = AlphArray(7);
-                FuelCell(thisFuelCell).FCPM.DilutionInletNode = NodeInputManager::GetOnlySingleNode(AlphArray(7),
+                FuelCell(thisFuelCell).FCPM.DilutionInletNode = NodeInputManager::GetOnlySingleNode(state, AlphArray(7),
                                                                                                     ErrorsFound,
                                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                                     AlphArray(1),
@@ -343,7 +344,7 @@ namespace FuelCellElectricGenerator {
                                                                                                     1,
                                                                                                     DataLoopNode::ObjectIsNotParent);
                 FuelCell(thisFuelCell).FCPM.DilutionExhaustNodeName = AlphArray(8);
-                FuelCell(thisFuelCell).FCPM.DilutionExhaustNode = NodeInputManager::GetOnlySingleNode(AlphArray(8),
+                FuelCell(thisFuelCell).FCPM.DilutionExhaustNode = NodeInputManager::GetOnlySingleNode(state, AlphArray(8),
                                                                                                       ErrorsFound,
                                                                                                       DataIPShortCuts::cCurrentModuleObject,
                                                                                                       AlphArray(1),
@@ -368,10 +369,10 @@ namespace FuelCellElectricGenerator {
             }
         } // loop over NumFuelCellPMs
 
-        GeneratorFuelSupply::GetGeneratorFuelSupplyInput(state, ioFiles);
+        GeneratorFuelSupply::GetGeneratorFuelSupplyInput(state);
 
         for (int FuelSupNum = 1; FuelSupNum <= DataGenerators::NumGeneratorFuelSups; ++FuelSupNum) {
-            GeneratorFuelSupply::SetupFuelConstituentData(ioFiles, FuelSupNum, ErrorsFound);
+            GeneratorFuelSupply::SetupFuelConstituentData(state, FuelSupNum, ErrorsFound);
         }
 
         // set fuel supply ID in Fuel cell structure
@@ -393,7 +394,8 @@ namespace FuelCellElectricGenerator {
         }
 
         for (int FCAirSupNum = 1; FCAirSupNum <= NumFuelCellAirSups; ++FCAirSupNum) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           FCAirSupNum,
                                           AlphArray,
                                           NumAlphas,
@@ -414,7 +416,7 @@ namespace FuelCellElectricGenerator {
                 FuelCell(thisFuelCell).AirSup.NodeName = AlphArray(2);
 
                 // check the node connections
-                FuelCell(thisFuelCell).AirSup.SupNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(2),
+                FuelCell(thisFuelCell).AirSup.SupNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(2),
                                                                                                ErrorsFound,
                                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                                AlphArray(1),
@@ -589,7 +591,8 @@ namespace FuelCellElectricGenerator {
         }
 
         for (int FCWaterSupNum = 1; FCWaterSupNum <= NumFCWaterSups; ++FCWaterSupNum) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           FCWaterSupNum,
                                           AlphArray,
                                           NumAlphas,
@@ -627,7 +630,7 @@ namespace FuelCellElectricGenerator {
                     FuelCell(thisFuelCell).WaterSup.WaterTempMode = DataGenerators::WaterInReformAirNode;
 
                     FuelCell(thisFuelCell).WaterSup.NodeName = AlphArray(5);
-                    FuelCell(thisFuelCell).WaterSup.NodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(5),
+                    FuelCell(thisFuelCell).WaterSup.NodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(5),
                                                                                                   ErrorsFound,
                                                                                                   DataIPShortCuts::cCurrentModuleObject,
                                                                                                   AlphArray(1),
@@ -640,7 +643,7 @@ namespace FuelCellElectricGenerator {
                     FuelCell(thisFuelCell).WaterSup.WaterTempMode = DataGenerators::WaterInReformWaterNode;
 
                     FuelCell(thisFuelCell).WaterSup.NodeName = AlphArray(5);
-                    FuelCell(thisFuelCell).WaterSup.NodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(5),
+                    FuelCell(thisFuelCell).WaterSup.NodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(5),
                                                                                                   ErrorsFound,
                                                                                                   DataIPShortCuts::cCurrentModuleObject,
                                                                                                   AlphArray(1),
@@ -660,7 +663,7 @@ namespace FuelCellElectricGenerator {
                     ErrorsFound = true;
                 }
 
-                FuelCell(thisFuelCell).WaterSup.SchedNum = ScheduleManager::GetScheduleIndex(AlphArray(6));
+                FuelCell(thisFuelCell).WaterSup.SchedNum = ScheduleManager::GetScheduleIndex(state, AlphArray(6));
                 if ((FuelCell(thisFuelCell).WaterSup.SchedNum == 0) &&
                     (FuelCell(thisFuelCell).WaterSup.WaterTempMode == DataGenerators::WaterInReformSchedule)) {
                     ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + AlphArray(6));
@@ -691,7 +694,8 @@ namespace FuelCellElectricGenerator {
         }
 
         for (int FCAuxHeatNum = 1; FCAuxHeatNum <= NumFuelCellAuxilHeaters; ++FCAuxHeatNum) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           FCAuxHeatNum,
                                           AlphArray,
                                           NumAlphas,
@@ -763,7 +767,8 @@ namespace FuelCellElectricGenerator {
         }
 
         for (int FCHXNum = 1; FCHXNum <= NumFCExhaustGasHXs; ++FCHXNum) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           FCHXNum,
                                           AlphArray,
                                           NumAlphas,
@@ -784,7 +789,7 @@ namespace FuelCellElectricGenerator {
                 FuelCell(thisFuelCell).ExhaustHX.WaterInNodeName = AlphArray(2);
                 FuelCell(thisFuelCell).ExhaustHX.WaterOutNodeName = AlphArray(3);
                 // find node ids for water path
-                FuelCell(thisFuelCell).ExhaustHX.WaterInNode = NodeInputManager::GetOnlySingleNode(AlphArray(2),
+                FuelCell(thisFuelCell).ExhaustHX.WaterInNode = NodeInputManager::GetOnlySingleNode(state, AlphArray(2),
                                                                                                    ErrorsFound,
                                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                                    AlphArray(1),
@@ -792,7 +797,7 @@ namespace FuelCellElectricGenerator {
                                                                                                    DataLoopNode::NodeConnectionType_Inlet,
                                                                                                    1,
                                                                                                    DataLoopNode::ObjectIsNotParent);
-                FuelCell(thisFuelCell).ExhaustHX.WaterOutNode = NodeInputManager::GetOnlySingleNode(AlphArray(3),
+                FuelCell(thisFuelCell).ExhaustHX.WaterOutNode = NodeInputManager::GetOnlySingleNode(state, AlphArray(3),
                                                                                                     ErrorsFound,
                                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                                     AlphArray(1),
@@ -804,7 +809,7 @@ namespace FuelCellElectricGenerator {
                     DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Heat Recovery Nodes");
 
                 FuelCell(thisFuelCell).ExhaustHX.ExhaustOutNodeName = AlphArray(4);
-                FuelCell(thisFuelCell).ExhaustHX.ExhaustOutNode = NodeInputManager::GetOnlySingleNode(AlphArray(4),
+                FuelCell(thisFuelCell).ExhaustHX.ExhaustOutNode = NodeInputManager::GetOnlySingleNode(state, AlphArray(4),
                                                                                                       ErrorsFound,
                                                                                                       DataIPShortCuts::cCurrentModuleObject,
                                                                                                       AlphArray(1),
@@ -866,7 +871,8 @@ namespace FuelCellElectricGenerator {
         }
 
         for (int StorageNum = 1; StorageNum <= NumFCElecStorageUnits; ++StorageNum) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           StorageNum,
                                           AlphArray,
                                           NumAlphas,
@@ -922,7 +928,8 @@ namespace FuelCellElectricGenerator {
         }
 
         for (int FCPCUNum = 1; FCPCUNum <= NumFCPowerCondUnits; ++FCPCUNum) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           FCPCUNum,
                                           AlphArray,
                                           NumAlphas,
@@ -979,7 +986,8 @@ namespace FuelCellElectricGenerator {
 
         if (NumFCStackCoolers > 0) { // get stack cooler input data
             for (int FCScoolNum = 1; FCScoolNum <= NumFCStackCoolers; ++FCScoolNum) {
-                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              DataIPShortCuts::cCurrentModuleObject,
                                               FCScoolNum,
                                               AlphArray,
                                               NumAlphas,
@@ -1001,7 +1009,7 @@ namespace FuelCellElectricGenerator {
 
                     FuelCell(thisFuelCell).StackCooler.WaterOutNodeName = AlphArray(3);
 
-                    FuelCell(thisFuelCell).StackCooler.WaterInNode = NodeInputManager::GetOnlySingleNode(AlphArray(2),
+                    FuelCell(thisFuelCell).StackCooler.WaterInNode = NodeInputManager::GetOnlySingleNode(state, AlphArray(2),
                                                                                                          ErrorsFound,
                                                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                                                          AlphArray(1),
@@ -1009,7 +1017,7 @@ namespace FuelCellElectricGenerator {
                                                                                                          DataLoopNode::NodeConnectionType_Inlet,
                                                                                                          1,
                                                                                                          DataLoopNode::ObjectIsNotParent);
-                    FuelCell(thisFuelCell).StackCooler.WaterOutNode = NodeInputManager::GetOnlySingleNode(AlphArray(3),
+                    FuelCell(thisFuelCell).StackCooler.WaterOutNode = NodeInputManager::GetOnlySingleNode(state, AlphArray(3),
                                                                                                           ErrorsFound,
                                                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                                                           AlphArray(1),
@@ -1055,15 +1063,15 @@ namespace FuelCellElectricGenerator {
 
         for (int genNum = 1; genNum <= NumFuelCellGenerators; ++genNum) {
             auto &thisGen = FuelCell(genNum);
-            thisGen.setupOutputVars();
+            thisGen.setupOutputVars(state);
         }
     }
 
-    void FCDataStruct::setupOutputVars()
+    void FCDataStruct::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->Report.ACPowerGen, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->Report.ACPowerGen, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Produced AC Electricity Energy",
+        SetupOutputVariable(state, "Generator Produced AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Report.ACEnergyGen,
                             "System",
@@ -1075,9 +1083,9 @@ namespace FuelCellElectricGenerator {
                             _,
                             "Plant");
 
-        SetupOutputVariable("Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->Report.qHX, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->Report.qHX, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Produced Thermal Energy",
+        SetupOutputVariable(state, "Generator Produced Thermal Energy",
                             OutputProcessor::Unit::J,
                             this->Report.HXenergy,
                             "System",
@@ -1089,7 +1097,7 @@ namespace FuelCellElectricGenerator {
                             _,
                             "Plant");
 
-        SetupOutputVariable("Generator Fuel HHV Basis Energy",
+        SetupOutputVariable(state, "Generator Fuel HHV Basis Energy",
                             OutputProcessor::Unit::J,
                             this->Report.FuelEnergyHHV,
                             "System",
@@ -1101,19 +1109,19 @@ namespace FuelCellElectricGenerator {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, this->Report.FuelEnergyUseRateHHV, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Generator Zone Sensible Heat Transfer Rate", OutputProcessor::Unit::W, this->Report.SkinLossPower, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Generator Zone Sensible Heat Transfer Energy", OutputProcessor::Unit::J, this->Report.SkinLossEnergy, "System", "Sum", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Generator Zone Convection Heat Transfer Rate", OutputProcessor::Unit::W, this->Report.SkinLossConvect, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Generator Zone Radiation Heat Transfer Rate", OutputProcessor::Unit::W, this->Report.SkinLossRadiat, "System", "Average", this->Name);
 
         if (this->FCPM.ZoneID > 0) {
@@ -1127,212 +1135,212 @@ namespace FuelCellElectricGenerator {
         }
 
         if (DataGlobals::DisplayAdvancedReportVariables) { // show extra data originally needed for detailed comparative testing
-            SetupOutputVariable("Generator Air Inlet Temperature", OutputProcessor::Unit::C, this->Report.TairInlet, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Generator Air Inlet Temperature", OutputProcessor::Unit::C, this->Report.TairInlet, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Power Module Entering Air Temperature",
+            SetupOutputVariable(state, "Generator Power Module Entering Air Temperature",
                                 OutputProcessor::Unit::C,
                                 this->Report.TairIntoFCPM,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Air Molar Flow Rate", OutputProcessor::Unit::kmol_s, this->Report.NdotAir, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Power Module Entering Air Enthalpy",
+            SetupOutputVariable(state, "Generator Power Module Entering Air Enthalpy",
                                 OutputProcessor::Unit::W,
                                 this->Report.TotAirInEnthalphy,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Blower Electricity Rate", OutputProcessor::Unit::W, this->Report.BlowerPower, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Blower Electricity Energy", OutputProcessor::Unit::J, this->Report.BlowerEnergy, "System", "Sum", this->Name);
+            SetupOutputVariable(state, "Generator Blower Electricity Energy", OutputProcessor::Unit::J, this->Report.BlowerEnergy, "System", "Sum", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Blower Skin Heat Loss Rate", OutputProcessor::Unit::W, this->Report.BlowerSkinLoss, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Fuel Inlet Temperature", OutputProcessor::Unit::C, this->Report.TfuelInlet, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Power Module Entering Fuel Temperature",
+            SetupOutputVariable(state, "Generator Power Module Entering Fuel Temperature",
                                 OutputProcessor::Unit::C,
                                 this->Report.TfuelIntoFCPM,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Fuel Molar Flow Rate", OutputProcessor::Unit::kmol_s, this->Report.NdotFuel, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Fuel Consumption LHV Basis Energy", OutputProcessor::Unit::J, this->Report.FuelEnergyLHV, "System", "Sum", this->Name);
 
-            SetupOutputVariable("Generator Fuel Consumption Rate LHV Basis",
+            SetupOutputVariable(state, "Generator Fuel Consumption Rate LHV Basis",
                                 OutputProcessor::Unit::W,
                                 this->Report.FuelEnergyUseRateLHV,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Power Module Entering Fuel Enthalpy",
+            SetupOutputVariable(state, "Generator Power Module Entering Fuel Enthalpy",
                                 OutputProcessor::Unit::W,
                                 this->Report.TotFuelInEnthalpy,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Fuel Compressor Electricity Rate",
+            SetupOutputVariable(state, "Generator Fuel Compressor Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 this->Report.FuelCompressPower,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Fuel Compressor Electricity Energy", OutputProcessor::Unit::J, this->Report.FuelCompressEnergy, "System", "Sum", this->Name);
 
-            SetupOutputVariable("Generator Fuel Compressor Skin Heat Loss Rate",
+            SetupOutputVariable(state, "Generator Fuel Compressor Skin Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 this->Report.FuelCompressSkinLoss,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Fuel Reformer Water Inlet Temperature",
+            SetupOutputVariable(state, "Generator Fuel Reformer Water Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 this->Report.TwaterInlet,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Power Module Entering Reforming Water Temperature",
+            SetupOutputVariable(state, "Generator Power Module Entering Reforming Water Temperature",
                                 OutputProcessor::Unit::C,
                                 this->Report.TwaterIntoFCPM,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Fuel Reformer Water Molar Flow Rate",
+            SetupOutputVariable(state, "Generator Fuel Reformer Water Molar Flow Rate",
                                 OutputProcessor::Unit::kmol_s,
                                 this->Report.NdotWater,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Fuel Reformer Water Pump Electricity Rate",
+            SetupOutputVariable(state, "Generator Fuel Reformer Water Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 this->Report.WaterPumpPower,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Fuel Reformer Water Pump Electricity Energy",
+            SetupOutputVariable(state, "Generator Fuel Reformer Water Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.WaterPumpEnergy,
                                 "System",
                                 "Sum",
                                 this->Name);
 
-            SetupOutputVariable("Generator Power Module Entering Reforming Water Enthalpy",
+            SetupOutputVariable(state, "Generator Power Module Entering Reforming Water Enthalpy",
                                 OutputProcessor::Unit::W,
                                 this->Report.WaterIntoFCPMEnthalpy,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Product Gas Temperature", OutputProcessor::Unit::C, this->Report.TprodGas, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Product Gas Enthalpy", OutputProcessor::Unit::W, this->Report.EnthalProdGas, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Product Gas Molar Flow Rate", OutputProcessor::Unit::kmol_s, this->Report.NdotProdGas, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Product Gas Ar Molar Flow Rate", OutputProcessor::Unit::kmol_s, this->Report.NdotProdAr, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Product Gas CO2 Molar Flow Rate",
+            SetupOutputVariable(state, "Generator Product Gas CO2 Molar Flow Rate",
                                 OutputProcessor::Unit::kmol_s,
                                 this->Report.NdotProdCO2,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Product Gas H2O Vapor Molar Flow Rate",
+            SetupOutputVariable(state, "Generator Product Gas H2O Vapor Molar Flow Rate",
                                 OutputProcessor::Unit::kmol_s,
                                 this->Report.NdotProdH2O,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Product Gas N2 Molar Flow Rate", OutputProcessor::Unit::kmol_s, this->Report.NdotProdN2, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Product Gas O2 Molar Flow Rate", OutputProcessor::Unit::kmol_s, this->Report.NdotProdO2, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Heat Recovery Exit Gas Temperature", OutputProcessor::Unit::C, this->Report.THXexh, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Heat Recovery Exit Gas H2O Vapor Fraction",
+            SetupOutputVariable(state, "Generator Heat Recovery Exit Gas H2O Vapor Fraction",
                                 OutputProcessor::Unit::None,
                                 this->Report.WaterVaporFractExh,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Heat Recovery Water Condensate Molar Flow Rate",
+            SetupOutputVariable(state, "Generator Heat Recovery Water Condensate Molar Flow Rate",
                                 OutputProcessor::Unit::kmol_s,
                                 this->Report.CondensateRate,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Inverter Loss Power", OutputProcessor::Unit::W, this->Report.PCUlosses, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Generator Inverter Loss Power", OutputProcessor::Unit::W, this->Report.PCUlosses, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Produced DC Electricity Rate", OutputProcessor::Unit::W, this->Report.DCPowerGen, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator DC Power Efficiency", OutputProcessor::Unit::None, this->Report.DCPowerEff, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Electric Storage Charge State",
+            SetupOutputVariable(state, "Generator Electric Storage Charge State",
                                 OutputProcessor::Unit::J,
                                 this->Report.ElectEnergyinStorage,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator DC Storage Charging Power", OutputProcessor::Unit::W, this->Report.StoredPower, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator DC Storage Charging Energy", OutputProcessor::Unit::J, this->Report.StoredEnergy, "System", "Sum", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator DC Storage Discharging Power", OutputProcessor::Unit::W, this->Report.DrawnPower, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator DC Storage Discharging Energy", OutputProcessor::Unit::J, this->Report.DrawnEnergy, "System", "Sum", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Ancillary AC Electricity Rate", OutputProcessor::Unit::W, this->Report.ACancillariesPower, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Ancillary AC Electricity Energy", OutputProcessor::Unit::J, this->Report.ACancillariesEnergy, "System", "Sum", this->Name);
 
-            SetupOutputVariable("Generator Fuel Cell Model Iteration Count",
+            SetupOutputVariable(state, "Generator Fuel Cell Model Iteration Count",
                                 OutputProcessor::Unit::None,
                                 this->Report.SeqSubstIterations,
                                 "System",
                                 "Sum",
                                 this->Name);
 
-            SetupOutputVariable("Generator Root Solver Iteration Count",
+            SetupOutputVariable(state, "Generator Root Solver Iteration Count",
                                 OutputProcessor::Unit::None,
                                 this->Report.RegulaFalsiIterations,
                                 "System",
@@ -1871,7 +1879,7 @@ namespace FuelCellElectricGenerator {
 
             this->CalcFuelCellAuxHeater();
 
-            this->CalcFuelCellGenHeatRecovery();
+            this->CalcFuelCellGenHeatRecovery(state);
             // calculation Step 11, If imbalance below threshold, then exit out of do loop.
 
             if ((std::abs(MagofImbalance) < std::abs(DataGenerators::ImBalanceTol * this->FCPM.Pel)) && (iter > 2)) {
@@ -2846,7 +2854,7 @@ namespace FuelCellElectricGenerator {
         this->AuxilHeat.GasLibID = this->FCPM.GasLibID;
     }
 
-    void FCDataStruct::CalcFuelCellGenHeatRecovery() // Generator number
+    void FCDataStruct::CalcFuelCellGenHeatRecovery(EnergyPlusData &state) // Generator number
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brent Griffith
@@ -2888,7 +2896,7 @@ namespace FuelCellElectricGenerator {
                 this->ExhaustHX.THXexh = TprodGasIn - this->ExhaustHX.qHX / (NdotGas * CpProdGasMol * 1000.0);
 
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-                    DataPlant::PlantLoop(this->CWLoopNum).FluidName, TwaterIn, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
+                    state, DataPlant::PlantLoop(this->CWLoopNum).FluidName, TwaterIn, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
 
                 if (this->ExhaustHX.WaterMassFlowRate * Cp <= 0.0) {
                     this->ExhaustHX.WaterOutletTemp = TwaterIn;
@@ -3100,20 +3108,20 @@ namespace FuelCellElectricGenerator {
         this->ExhaustHX.WaterOutletEnthalpy = DataLoopNode::Node(this->ExhaustHX.WaterInNode).Enthalpy + this->ExhaustHX.qHX;
     }
 
-    void FCDataStruct::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void FCDataStruct::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MaxLoad = 0.0;
         MinLoad = 0.0;
         OptLoad = 0.0;
     }
 
-    void FCDataStruct::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
+    void FCDataStruct::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                 bool FirstHVACIteration,
                                 Real64 &EP_UNUSED(CurLoad),
                                 bool EP_UNUSED(RunFlag))
     {
         if (this->TypeOf == DataPlant::TypeOf_Generator_FCStackCooler) {
-            PlantUtilities::UpdateComponentHeatRecoverySide(this->CWLoopNum,
+            PlantUtilities::UpdateComponentHeatRecoverySide(state, this->CWLoopNum,
                                                             this->CWLoopSideNum,
                                                             DataPlant::TypeOf_Generator_FCStackCooler,
                                                             this->StackCooler.WaterInNode,
@@ -3124,7 +3132,7 @@ namespace FuelCellElectricGenerator {
                                                             this->Report.HeatRecMdot,
                                                             FirstHVACIteration);
         } else if (this->TypeOf == DataPlant::TypeOf_Generator_FCExhaust) {
-            PlantUtilities::UpdateComponentHeatRecoverySide(this->CWLoopNum,
+            PlantUtilities::UpdateComponentHeatRecoverySide(state, this->CWLoopNum,
                                                             this->CWLoopSideNum,
                                                             DataPlant::TypeOf_Generator_FCExhaust,
                                                             this->ExhaustHX.WaterInNode,
@@ -3236,7 +3244,8 @@ namespace FuelCellElectricGenerator {
             this->Inverter.PCUlosses = 0.0;
             this->Inverter.QairIntake = 0.0;
 
-            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                                            DataGenerators::InitHRTemp,
                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                            RoutineName);

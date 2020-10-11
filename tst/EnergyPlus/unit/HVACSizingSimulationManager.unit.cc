@@ -168,7 +168,7 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
 
     HVACSizingSimulationManager testSizeSimManagerObj;
 
-    testSizeSimManagerObj.DetermineSizingAnalysesNeeded();
+    testSizeSimManagerObj.DetermineSizingAnalysesNeeded(state);
 
     EXPECT_EQ(1, testSizeSimManagerObj.plantCoincAnalyObjs[0].supplySideInletNodeNum);
 
@@ -288,7 +288,7 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
 
     // check plant resizing
     EXPECT_DOUBLE_EQ(2.0, PlantLoop(1).MaxMassFlowRate); // original size
-    testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments(state, state.files, 1);
+    testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments(state, 1);
     EXPECT_DOUBLE_EQ(2.4, PlantLoop(1).MaxMassFlowRate); // resize check
 
     // check that the data are as expected in the logs
@@ -361,7 +361,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
 
     HVACSizingSimulationManager testSizeSimManagerObj;
 
-    testSizeSimManagerObj.DetermineSizingAnalysesNeeded();
+    testSizeSimManagerObj.DetermineSizingAnalysesNeeded(state);
 
     EXPECT_EQ(1, testSizeSimManagerObj.plantCoincAnalyObjs[0].supplySideInletNodeNum);
 
@@ -428,7 +428,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
 
     // check plant resizing
     EXPECT_DOUBLE_EQ(2.0, PlantLoop(1).MaxMassFlowRate); // original size
-    testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments(state, state.files, 1);
+    testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments(state, 1);
     EXPECT_DOUBLE_EQ(2.4, PlantLoop(1).MaxMassFlowRate); // resize check
 
     // check that the data are as expected in the logs
@@ -494,7 +494,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
 
     HVACSizingSimulationManager testSizeSimManagerObj;
 
-    testSizeSimManagerObj.DetermineSizingAnalysesNeeded();
+    testSizeSimManagerObj.DetermineSizingAnalysesNeeded(state);
 
     EXPECT_EQ(1, testSizeSimManagerObj.plantCoincAnalyObjs[0].supplySideInletNodeNum);
 
@@ -562,7 +562,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
     testSizeSimManagerObj.PostProcessLogs();
 
     EXPECT_DOUBLE_EQ(2.0, PlantLoop(1).MaxMassFlowRate); // original size
-    testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments(state, state.files, 1);
+    testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments(state, 1);
     EXPECT_DOUBLE_EQ(2.4, PlantLoop(1).MaxMassFlowRate); // resize check
 }
 
@@ -578,7 +578,7 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
 
     HVACSizingSimulationManager testSizeSimManagerObj;
 
-    testSizeSimManagerObj.DetermineSizingAnalysesNeeded();
+    testSizeSimManagerObj.DetermineSizingAnalysesNeeded(state);
 
     EXPECT_EQ(1, testSizeSimManagerObj.plantCoincAnalyObjs[0].supplySideInletNodeNum);
 
@@ -651,10 +651,10 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
     testSizeSimManagerObj.PostProcessLogs();
 
     EXPECT_DOUBLE_EQ(2.0, PlantLoop(1).MaxMassFlowRate); // original size
-    testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments(state, state.files, 1);
+    testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments(state, 1);
     EXPECT_DOUBLE_EQ(2.4, PlantLoop(1).MaxMassFlowRate); // resize check
 
-    testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments(state, state.files, 1);
+    testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments(state, 1);
 
     testSizeSimManagerObj.sizingLogger.IncrementSizingPeriodSet();
 }

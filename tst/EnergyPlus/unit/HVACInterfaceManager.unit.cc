@@ -88,7 +88,7 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
 
     // LoopSideInlet_MdotCpDeltaT should be < LoopSideInlet_McpDTdt
     // Therefore CapExcessStorageTime AND TotalTime will increase by 1 timestep
-    UpdateHalfLoopInletTemp(1, 1, TankOutletTemp);
+    UpdateHalfLoopInletTemp(state, 1, 1, TankOutletTemp);
     EXPECT_NEAR(-500, PlantLoop(1).LoopSide(2).LoopSideInlet_MdotCpDeltaT, 0.001);
     EXPECT_NEAR(2928.82, PlantLoop(1).LoopSide(2).LoopSideInlet_McpDTdt, 0.001);
     EXPECT_EQ(1, PlantLoop(1).LoopSide(2).LoopSideInlet_CapExcessStorageTime);
@@ -98,7 +98,7 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
 
     // LoopSideInlet_MdotCpDeltaT should be > LoopSideInlet_McpDTdt
     // Therefore TotalTime will increase by 1 more timestep, but CapExcessStorageTime will NOT increase
-    UpdateHalfLoopInletTemp(1, 1, TankOutletTemp);
+    UpdateHalfLoopInletTemp(state, 1, 1, TankOutletTemp);
     EXPECT_NEAR(-500, PlantLoop(1).LoopSide(2).LoopSideInlet_MdotCpDeltaT, .001);
     EXPECT_NEAR(-588.264, PlantLoop(1).LoopSide(2).LoopSideInlet_McpDTdt, .001);
     EXPECT_EQ(1, PlantLoop(1).LoopSide(2).LoopSideInlet_CapExcessStorageTime);
