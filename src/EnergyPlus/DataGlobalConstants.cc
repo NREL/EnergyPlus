@@ -303,22 +303,6 @@ namespace DataGlobalConstants {
     int const iGeneratorWindTurbine(7);
     int const iGeneratorPVWatts(8);
 
-    int const iEvapCoolerDirectCELDEKPAD(1001);
-    int const iEvapCoolerInDirectCELDEKPAD(1002);
-    int const iEvapCoolerInDirectWETCOIL(1003);
-    int const iEvapCoolerInDirectRDDSpecial(1004);
-    int const iEvapCoolerDirectResearchSpecial(1005);
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataGlobalConstants
-
-    // Functions
-
     int AssignResourceTypeNum(std::string const &ResourceTypeChar)
     {
 

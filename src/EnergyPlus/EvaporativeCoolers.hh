@@ -96,6 +96,15 @@ namespace EvaporativeCoolers {
     extern int const WetModulated;    // the evaporative cooler Research Special is modulated in wet Mode
     extern int const WetFull;         // the evaporative cooler Research Special is run in full capacity in Wet Mode
 
+    enum class EvapCoolerType {
+        Unassigned,
+        DirectCELDEKPAD,
+        InDirectCELDEKPAD,
+        InDirectWETCOIL,
+        InDirectRDDSpecial,
+        DirectResearchSpecial
+    };
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE EvapCoolers
 
     // Types
@@ -105,7 +114,7 @@ namespace EvaporativeCoolers {
         // Members
         std::string EvapCoolerName; // Name of the EvapCooler
         int EquipIndex;
-        int EvapCoolerType;          // Type of the EvapCooler (parameters in DataGlobalConstants.cc
+        EvapCoolerType EvapCoolerType; // Type of the EvapCooler (parameters in DataGlobalConstants.cc
         std::string EvapControlType; // Type of Control for the EvapCooler
         std::string Schedule;        // HeatingCoil Operation Schedule
         int SchedPtr;                // Pointer to the correct schedule
@@ -204,7 +213,8 @@ namespace EvaporativeCoolers {
 
         // Default Constructor
         EvapConditions()
-            : EquipIndex(0), EvapCoolerType(0), SchedPtr(0), VolFlowRate(0.0), DesVolFlowRate(0.0), OutletTemp(0.0), OuletWetBulbTemp(0.0),
+            : EquipIndex(0), EvapCoolerType(EvapCoolerType::Unassigned), SchedPtr(0), VolFlowRate(0.0), DesVolFlowRate(0.0),
+              OutletTemp(0.0), OuletWetBulbTemp(0.0),
               OutletHumRat(0.0), OutletEnthalpy(0.0), OutletPressure(0.0), OutletMassFlowRate(0.0), OutletMassFlowRateMaxAvail(0.0),
               OutletMassFlowRateMinAvail(0.0), InitFlag(false), InletNode(0), OutletNode(0), SecondaryInletNode(0), SecondaryOutletNode(0),
               TertiaryInletNode(0), InletMassFlowRate(0.0), InletMassFlowRateMaxAvail(0.0), InletMassFlowRateMinAvail(0.0), InletTemp(0.0),
@@ -260,12 +270,12 @@ namespace EvaporativeCoolers {
         Real64 ThresholdCoolingLoad;
         std::string EvapCooler_1_ObjectClassName;
         std::string EvapCooler_1_Name;
-        int EvapCooler_1_Type_Num;
+        EvapCoolerType EvapCooler_1_Type_Num;
         int EvapCooler_1_Index;
         bool EvapCooler_1_AvailStatus;
         std::string EvapCooler_2_ObjectClassName;
         std::string EvapCooler_2_Name;
-        int EvapCooler_2_Type_Num;
+        EvapCoolerType EvapCooler_2_Type_Num;
         int EvapCooler_2_Index;
         bool EvapCooler_2_AvailStatus;
         Real64 OAInletRho;                    // fills internal variable, current inlet air density [kg/m3]
@@ -306,7 +316,8 @@ namespace EvaporativeCoolers {
               UnitReliefNodeNum(0), FanType_Num(0), FanIndex(0), ActualFanVolFlowRate(0.0), FanAvailSchedPtr(0), FanInletNodeNum(0),
               FanOutletNodeNum(0), OpMode(0), DesignAirVolumeFlowRate(0.0), DesignAirMassFlowRate(0.0), DesignFanSpeedRatio(0.0), FanSpeedRatio(0.0),
               FanLocation(0), ControlSchemeType(0), TimeElapsed(0.0), ThrottlingRange(0.0), IsOnThisTimestep(false), WasOnLastTimestep(false),
-              ThresholdCoolingLoad(0.0), EvapCooler_1_Type_Num(0), EvapCooler_1_Index(0), EvapCooler_1_AvailStatus(false), EvapCooler_2_Type_Num(0),
+              ThresholdCoolingLoad(0.0), EvapCooler_1_Type_Num(EvapCoolerType::Unassigned), EvapCooler_1_Index(0),
+              EvapCooler_1_AvailStatus(false), EvapCooler_2_Type_Num(EvapCoolerType::Unassigned),
               EvapCooler_2_Index(0), EvapCooler_2_AvailStatus(false), OAInletRho(0.0), OAInletCp(0.0), OAInletTemp(0.0), OAInletHumRat(0.0),
               OAInletMassFlowRate(0.0), UnitOutletTemp(0.0), UnitOutletHumRat(0.0), UnitOutletMassFlowRate(0.0), UnitReliefTemp(0.0),
               UnitReliefHumRat(0.0), UnitReliefMassFlowRate(0.0), UnitTotalCoolingRate(0.0), UnitTotalCoolingEnergy(0.0),

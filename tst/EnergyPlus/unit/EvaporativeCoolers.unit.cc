@@ -72,7 +72,6 @@ using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::EvaporativeCoolers;
-using EnergyPlus::DataGlobalConstants::iEvapCoolerInDirectRDDSpecial;
 
 namespace EnergyPlus {
 
@@ -493,7 +492,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler)
     DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.4;
 
     // set up the structure to size the flow rates for an RDDSpecial
-    thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerInDirectRDDSpecial;
+    thisEvapCooler.EvapCoolerType = EvapCoolerType::InDirectRDDSpecial;
     thisEvapCooler.DesVolFlowRate = DataSizing::AutoSize;
     thisEvapCooler.PadArea = 0.0;
     thisEvapCooler.PadDepth = 0.0;
@@ -508,7 +507,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler)
     EXPECT_NEAR(1.0, thisEvapCooler.DesVolFlowRate, 0.0001);
 
     // now let's try to size some of the pad properties
-    thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerDirectCELDEKPAD;
+    thisEvapCooler.EvapCoolerType = EvapCoolerType::DirectCELDEKPAD;
     thisEvapCooler.DesVolFlowRate = 1.0;
     thisEvapCooler.PadArea = DataSizing::AutoSize;
     thisEvapCooler.PadDepth = DataSizing::AutoSize;
@@ -525,7 +524,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler)
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "NOT-MyEvapCooler";
 
     // set up the structure to size the flow rates for an indirect celdekpad
-    thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerInDirectCELDEKPAD;
+    thisEvapCooler.EvapCoolerType = EvapCoolerType::InDirectCELDEKPAD;
     thisEvapCooler.DesVolFlowRate = DataSizing::AutoSize;
     thisEvapCooler.PadArea = 0.0;
     thisEvapCooler.PadDepth = 0.0;
@@ -730,7 +729,7 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     state.dataCurveManager->PerfCurve(CurveNum).Var1Max = 1.0;
 
     // set up the flow rates for a direct RDDSpecial
-    thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerDirectResearchSpecial;
+    thisEvapCooler.EvapCoolerType = EvapCoolerType::DirectResearchSpecial;
     thisEvapCooler.EvapCoolerName = "MyDirectEvapCoolerRS";
     thisEvapCooler.SchedPtr = DataGlobals::ScheduleAlwaysOn;
     thisEvapCooler.PumpPowerModifierCurveIndex = CurveNum;

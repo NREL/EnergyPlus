@@ -233,12 +233,6 @@ namespace DataGlobalConstants {
     extern int const iGeneratorWindTurbine;
     extern int const iGeneratorPVWatts;
 
-    extern int const iEvapCoolerDirectCELDEKPAD;
-    extern int const iEvapCoolerInDirectCELDEKPAD;
-    extern int const iEvapCoolerInDirectWETCOIL;
-    extern int const iEvapCoolerInDirectRDDSpecial;
-    extern int const iEvapCoolerDirectResearchSpecial;
-
     enum class CallIndicator {
         BeginDay,
         DuringDay,
@@ -286,7 +280,7 @@ namespace DataGlobalConstants {
     Real64 constexpr MaxEXPArg () { return 709.78; }                        // maximum exponent in EXP() function
     Real64 constexpr Pi () { return 3.14159265358979324; }                  // Pi 3.1415926535897932384626435
     Real64 constexpr PiOvr2 () { return Pi() / 2.0; }                       // Pi/2
-    Real64 constexpr TwoPi () { return 2.0 * Pi(); }                        // 2*Pi 6.2831853071795864769252868r
+    Real64 constexpr TwoPi () { return 2.0 * Pi(); }                        // 2*Pi 6.2831853071795864769252868
     Real64 constexpr GravityConstant () { return 9.807; }
     Real64 constexpr DegToRadians () { return Pi() / 180.0; }               // Conversion for Degrees to Radians
     Real64 constexpr RadToDeg () { return 180.0 / Pi(); }                   // Conversion for Radians to Degrees
