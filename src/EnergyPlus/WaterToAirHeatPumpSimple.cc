@@ -115,7 +115,6 @@ namespace WaterToAirHeatPumpSimple {
     // Use statements for data only modules
     // Use statements for access to subroutines in other modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using namespace DataSizing;
@@ -235,7 +234,7 @@ namespace WaterToAirHeatPumpSimple {
                                    HPTimeConstant,
                                    FanDelayTime,
                                    SensLoad,
-                                   constant_zero,
+                                   DataPrecisionGlobals::constant_zero,
                                    CyclingScheme,
                                    OnOffAirFlowRatio,
                                    FirstHVACIteration);

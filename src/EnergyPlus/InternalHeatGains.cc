@@ -124,7 +124,6 @@ namespace InternalHeatGains {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
@@ -1571,7 +1570,7 @@ namespace InternalHeatGains {
                     if (Zone(zonePt).FloorArea > 0.0) {
                         PreDefTableEntry(pdchInLtDens, liteName, Lights(Loop).DesignLevel / Zone(zonePt).FloorArea, 4);
                     } else {
-                        PreDefTableEntry(pdchInLtDens, liteName, constant_zero, 4);
+                        PreDefTableEntry(pdchInLtDens, liteName, DataPrecisionGlobals::constant_zero, 4);
                     }
                     PreDefTableEntry(pdchInLtArea, liteName, Zone(zonePt).FloorArea * mult);
                     PreDefTableEntry(pdchInLtPower, liteName, Lights(Loop).DesignLevel * mult);
@@ -1585,7 +1584,7 @@ namespace InternalHeatGains {
         if (sumArea > 0.0) {
             PreDefTableEntry(pdchInLtDens, "Interior Lighting Total", sumPower / sumArea, 4); //** line 792
         } else {
-            PreDefTableEntry(pdchInLtDens, "Interior Lighting Total", constant_zero, 4);
+            PreDefTableEntry(pdchInLtDens, "Interior Lighting Total", DataPrecisionGlobals::constant_zero, 4);
         }
         PreDefTableEntry(pdchInLtArea, "Interior Lighting Total", sumArea);
         PreDefTableEntry(pdchInLtPower, "Interior Lighting Total", sumPower);

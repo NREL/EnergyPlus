@@ -57,7 +57,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -101,8 +100,7 @@ namespace Psychrometrics {
     // more research on hfg calc
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-#ifdef EP_psych_errors
+    #ifdef EP_psych_errors
     using namespace DataGlobals;
     using namespace DataEnvironment;
 #endif

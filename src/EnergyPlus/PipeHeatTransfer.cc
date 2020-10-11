@@ -67,7 +67,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
@@ -116,7 +115,6 @@ namespace PipeHeatTransfer {
     // OTHER NOTES: Equation Numbers listed in buried pipe routines are from Piechowski's thesis
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace GroundTemperatureManager;
     using DataPlant::TypeOf_PipeExterior;
     using DataPlant::TypeOf_PipeInterior;

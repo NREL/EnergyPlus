@@ -51,7 +51,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -81,7 +80,6 @@ namespace DataEnvironment {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     // Data
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.

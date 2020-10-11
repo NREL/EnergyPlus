@@ -63,7 +63,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -126,7 +125,6 @@ namespace DXCoils {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using namespace DataHVACGlobals;
@@ -8728,7 +8726,7 @@ namespace DXCoils {
                 A0 = 0.0;
             }
             ADiff = -A0 / AirMassFlow;
-            if (ADiff >= EXP_LowerLimit) {
+            if (ADiff >= DataPrecisionGlobals::EXP_LowerLimit) {
                 CBF = std::exp(ADiff);
             } else {
                 CBF = 0.0;
@@ -9677,7 +9675,7 @@ namespace DXCoils {
                 A0 = 0.0;
             }
             ADiff = -A0 / AirMassFlow;
-            if (ADiff >= EXP_LowerLimit) {
+            if (ADiff >= DataPrecisionGlobals::EXP_LowerLimit) {
                 CBF = std::exp(ADiff);
             } else {
                 CBF = 0.0;
@@ -11058,7 +11056,7 @@ namespace DXCoils {
             A0 = 0.0;
         }
         ADiff = -A0 / AirMassFlowRate;
-        if (ADiff >= EXP_LowerLimit) {
+        if (ADiff >= DataPrecisionGlobals::EXP_LowerLimit) {
             CBFAdj = std::exp(ADiff);
         } else {
             CBFAdj = 1.0e-6;
@@ -15923,7 +15921,7 @@ namespace DXCoils {
                 A0 = 0.0;
             }
             ADiff = -A0 / AirMassFlow;
-            if (ADiff >= EXP_LowerLimit) {
+            if (ADiff >= DataPrecisionGlobals::EXP_LowerLimit) {
                 CBF = std::exp(ADiff);
             } else {
                 CBF = 0.0;

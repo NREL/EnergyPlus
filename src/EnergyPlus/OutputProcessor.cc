@@ -72,7 +72,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/General.hh>
@@ -113,7 +112,6 @@ namespace OutputProcessor {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataEnvironment::DayOfMonth;
     using DataEnvironment::DayOfWeek;
     using DataEnvironment::DSTIndicator;
@@ -4036,8 +4034,6 @@ namespace OutputProcessor {
         // na
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
-
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
 
@@ -4903,7 +4899,6 @@ namespace OutputProcessor {
         // na
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         using General::strip_trailing_zeros;
 
         // Locals
@@ -5479,7 +5474,6 @@ void SetupOutputVariable(EnergyPlusData &state,
     // Pointers (as pointers), pointers (as indices), and lots of other KEWL data stuff.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using General::TrimSigDigits;
 
@@ -5722,7 +5716,6 @@ void SetupOutputVariable(EnergyPlusData &state,
     // Pointers (as pointers), pointers (as indices), and lots of other KEWL data stuff.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using General::TrimSigDigits;
 
@@ -5894,8 +5887,6 @@ void SetupOutputVariable(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -5950,7 +5941,6 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using DataEnvironment::EndMonthFlag;
     using DataEnvironment::EndYearFlag;
@@ -6711,7 +6701,6 @@ void GenOutputVariablesAuditReport()
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using DataGlobals::DisplayAdvancedReportVariables;
 
@@ -6814,7 +6803,6 @@ void UpdateMeterReporting(EnergyPlusData &state)
 
     // Using/Aliasing
     using namespace DataIPShortCuts;
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -7075,7 +7063,6 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using General::TrimSigDigits;
 
@@ -7437,7 +7424,6 @@ int GetMeterIndex(std::string const &MeterName)
     // obtain a meter "value".
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using SortAndStringUtilities::SetupAndSort;
 
@@ -7491,7 +7477,6 @@ std::string GetMeterResourceType(int const MeterNumber) // Which Meter Number (f
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
 
     // Return value
@@ -7538,7 +7523,6 @@ Real64 GetCurrentMeterValue(int const MeterNumber) // Which Meter Number (from G
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
 
     // Return value
@@ -7590,7 +7574,6 @@ Real64 GetInstantMeterValue(int const MeterNumber,                             /
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
 
     // Return value
@@ -7779,7 +7762,6 @@ Real64 GetInternalVariableValue(int const varType,    // 1=integer, 2=real, 3=me
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -7863,7 +7845,6 @@ Real64 GetInternalVariableValueExternalInterface(int const varType,    // 1=inte
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -7942,7 +7923,6 @@ int GetNumMeteredVariables(std::string const &EP_UNUSED(ComponentType), // Given
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
 
     // Return value
@@ -8005,7 +7985,6 @@ void GetMeteredVariables(std::string const &ComponentType,                      
     // for metered variables associated with the given ComponentType/Name.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobalConstants;
     using namespace OutputProcessor;
 
@@ -8086,7 +8065,6 @@ void GetMeteredVariables(std::string const &ComponentType,                      
     // for metered variables associated with the given ComponentType/Name.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobalConstants;
     using namespace OutputProcessor;
 
@@ -8190,7 +8168,6 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
     //       2 = HVAC time step
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using ScheduleManager::GetScheduleIndex;
     using ScheduleManager::GetScheduleType;
@@ -8365,7 +8342,6 @@ void GetVariableKeys(EnergyPlusData &state,
     // in the data array for the
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using ScheduleManager::GetScheduleIndex;
 
@@ -8568,7 +8544,6 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
     //       Pollutant:Carbon Equivalent
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     // SUBROUTINE PARAMETER DEFINITIONS:
     //             Now for the Pollution Meters

@@ -492,7 +492,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler)
     DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.4;
 
     // set up the structure to size the flow rates for an RDDSpecial
-    thisEvapCooler.EvapCoolerType = EvapCoolerType::InDirectRDDSpecial;
+    thisEvapCooler.evapCoolerType = EvapCoolerType::IndirectRDDSpecial;
     thisEvapCooler.DesVolFlowRate = DataSizing::AutoSize;
     thisEvapCooler.PadArea = 0.0;
     thisEvapCooler.PadDepth = 0.0;
@@ -507,7 +507,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler)
     EXPECT_NEAR(1.0, thisEvapCooler.DesVolFlowRate, 0.0001);
 
     // now let's try to size some of the pad properties
-    thisEvapCooler.EvapCoolerType = EvapCoolerType::DirectCELDEKPAD;
+    thisEvapCooler.evapCoolerType = EvapCoolerType::DirectCELDEKPAD;
     thisEvapCooler.DesVolFlowRate = 1.0;
     thisEvapCooler.PadArea = DataSizing::AutoSize;
     thisEvapCooler.PadDepth = DataSizing::AutoSize;
@@ -524,7 +524,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler)
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "NOT-MyEvapCooler";
 
     // set up the structure to size the flow rates for an indirect celdekpad
-    thisEvapCooler.EvapCoolerType = EvapCoolerType::InDirectCELDEKPAD;
+    thisEvapCooler.evapCoolerType = EvapCoolerType::IndirectCELDEKPAD;
     thisEvapCooler.DesVolFlowRate = DataSizing::AutoSize;
     thisEvapCooler.PadArea = 0.0;
     thisEvapCooler.PadDepth = 0.0;
@@ -729,7 +729,7 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     state.dataCurveManager->PerfCurve(CurveNum).Var1Max = 1.0;
 
     // set up the flow rates for a direct RDDSpecial
-    thisEvapCooler.EvapCoolerType = EvapCoolerType::DirectResearchSpecial;
+    thisEvapCooler.evapCoolerType = EvapCoolerType::DirectResearchSpecial;
     thisEvapCooler.EvapCoolerName = "MyDirectEvapCoolerRS";
     thisEvapCooler.SchedPtr = DataGlobals::ScheduleAlwaysOn;
     thisEvapCooler.PumpPowerModifierCurveIndex = CurveNum;

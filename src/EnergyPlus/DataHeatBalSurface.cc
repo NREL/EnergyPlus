@@ -47,8 +47,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataHeatBalSurface.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-
 namespace EnergyPlus {
 
 namespace DataHeatBalSurface {
@@ -62,8 +60,6 @@ namespace DataHeatBalSurface {
     // heat balances which are now "external" subroutines.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // MODULE PARAMETER DEFINITIONS
     Real64 const MinSurfaceTempLimit(-100.0);            // Lowest inside surface temperature allowed in Celsius

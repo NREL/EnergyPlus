@@ -54,7 +54,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/TARCOGArgs.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGasses90.hh>
@@ -102,7 +101,6 @@ namespace ThermalISO15099Calc {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace TARCOGGassesParams;
     using namespace TARCOGParams;
     using namespace TARCOGArgs;

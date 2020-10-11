@@ -101,7 +101,6 @@ namespace ThermalComfort {
     // the people statements and perform the requested thermal comfort evaluations
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutDryBulbTemp;
@@ -917,7 +916,7 @@ namespace ThermalComfort {
             // Calculate the Fanger PPD (Predicted Percentage of Dissatisfied), as a %
 
             Real64 expTest1 = -0.03353 * pow_4(PMV) - 0.2179 * pow_2(PMV);
-            if (expTest1 > EXP_LowerLimit) {
+            if (expTest1 > DataPrecisionGlobals::EXP_LowerLimit) {
                 PPD = 100.0 - 95.0 * std::exp(expTest1);
             } else {
                 PPD = 100.0;

@@ -51,7 +51,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGOutput.hh>
@@ -85,7 +84,6 @@ namespace TARCOGOutput {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace TARCOGCommon;
     using namespace TARCOGGassesParams;
     using namespace TARCOGParams;

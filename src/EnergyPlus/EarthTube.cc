@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EarthTube.hh>
 #include <EnergyPlus/General.hh>
@@ -88,7 +87,6 @@ namespace EarthTube {
     // Cambridge Massachusetts, MIT Press, 1989, pp 206-212
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalFanSys;

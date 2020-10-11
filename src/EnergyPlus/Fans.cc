@@ -102,7 +102,6 @@ namespace Fans {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using DataEnvironment::StdRhoAir;
@@ -3155,7 +3154,7 @@ namespace Fans {
             MotEff = Fan(FanNum).MotEff;
             MotInAirFrac = Fan(FanNum).MotInAirFrac;
             RhoAir = StdRhoAir;
-            CpAir = PsyCpAirFnW(constant_zero);
+            CpAir = PsyCpAirFnW(DataPrecisionGlobals::constant_zero);
             DesignDeltaT = (DeltaP / (RhoAir * CpAir * TotEff)) * (MotEff + MotInAirFrac * (1.0 - MotEff));
         } else {
             DesignDeltaT = 0.0;

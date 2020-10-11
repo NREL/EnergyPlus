@@ -114,7 +114,6 @@ namespace Photovoltaics {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataPhotovoltaics;
     using DataGlobals::BeginDayFlag;
     using DataGlobals::BeginEnvrnFlag;
@@ -1442,11 +1441,11 @@ namespace Photovoltaics {
 
                 //   NEWTON --> ISC  (STARTVALUE: ISCG1 - BASED ON IL=ISC)
                 ISCG1 = IL;
-                NEWTON(ISC, FUN, FI, ISC, constant_zero, IO, IL, SeriesResistance, AA, ISCG1, EPS);
+                NEWTON(ISC, FUN, FI, ISC, DataPrecisionGlobals::constant_zero, IO, IL, SeriesResistance, AA, ISCG1, EPS);
 
                 //   NEWTON --> VOC  (STARTVALUE: VOCG1 - BASED ON IM=0.0)
                 VOCG1 = (std::log(IL / IO) + 1.0) * AA;
-                NEWTON(VOC, FUN, FV, constant_zero, VOC, IO, IL, SeriesResistance, AA, VOCG1, EPS);
+                NEWTON(VOC, FUN, FV, DataPrecisionGlobals::constant_zero, VOC, IO, IL, SeriesResistance, AA, VOCG1, EPS);
 
                 //  maximum power point tracking
 

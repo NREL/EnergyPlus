@@ -65,7 +65,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -107,7 +106,6 @@ namespace PlantCondLoopOperation {
     // REFERENCES:
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataPlant;
     using DataHVACGlobals::NumCondLoops;
     using DataHVACGlobals::NumPlantLoops;
