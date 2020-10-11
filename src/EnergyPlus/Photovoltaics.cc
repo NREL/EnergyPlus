@@ -142,7 +142,7 @@ namespace Photovoltaics {
     }
 
     void SimPVGenerator(EnergyPlusData &state,
-                        int const EP_UNUSED(GeneratorType), // type of Generator !unused1208
+                        GeneratorType const EP_UNUSED(GeneratorType), // type of Generator !unused1208
                         std::string const &GeneratorName,   // user specified name of Generator
                         int &GeneratorIndex,
                         bool const RunFlag,            // is PV ON or OFF as determined by schedules in ElecLoadCenter
@@ -222,7 +222,7 @@ namespace Photovoltaics {
         ReportPV(PVnum);
     }
 
-    void GetPVGeneratorResults(int const EP_UNUSED(GeneratorType), // type of Generator !unused1208
+    void GetPVGeneratorResults(GeneratorType const EP_UNUSED(GeneratorType), // type of Generator !unused1208
                                int const GeneratorIndex,
                                Real64 &GeneratorPower,  // electrical power
                                Real64 &GeneratorEnergy, // electrical energy

@@ -469,10 +469,10 @@ void ElectricPowerServiceManager::reportPVandWindCapacity()
     for (auto &lc : elecLoadCenterObjs) {
         if (lc->numGenerators > 0) {
             for (auto &g : lc->elecGenCntrlObj) {
-                if (g->compGenTypeOf_Num == DataGlobalConstants::iGeneratorPV) {
+                if (g->compGenTypeOf_Num == GeneratorType::PV) {
                     pvTotalCapacity_ += g->maxPowerOut;
                 }
-                if (g->compGenTypeOf_Num == DataGlobalConstants::iGeneratorWindTurbine) {
+                if (g->compGenTypeOf_Num == GeneratorType::WindTurbine) {
                     windTotalCapacity_ += g->maxPowerOut;
                 }
             }
@@ -937,7 +937,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         if (inverterObj->modelType() == DCtoACInverter::InverterModelType::pvWatts) {
             Real64 totalDCCapacity = 0.0;
             for (const auto &generatorController : elecGenCntrlObj) {
-                if (generatorController->generatorType != GeneratorController::GeneratorType::pvWatts) {
+                if (generatorController->generatorType != GeneratorType::PVWatts) {
                     errorsFound = true;
                     ShowSevereError(routineName + "ElectricLoadCenter:Distribution=\"" + name_ + "\",");
                     ShowContinueError("ElectricLoadCenter:Inverter:PVWatts can only be used with Generator:PVWatts");
@@ -1977,7 +1977,8 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
                                          Real64 ratedElecPowerOutput,
                                          std::string const &availSchedName,
                                          Real64 thermalToElectRatio)
-    : compGenTypeOf_Num(0), compPlantTypeOf_Num(0), generatorType(GeneratorType::notYetSet), generatorIndex(0), maxPowerOut(0.0), availSchedPtr(0),
+    : compGenTypeOf_Num(GeneratorType::Unassigned), compPlantTypeOf_Num(0), generatorType(GeneratorType::Unassigned),
+      generatorIndex(0), maxPowerOut(0.0), availSchedPtr(0),
       powerRequestThisTimestep(0.0), onThisTimestep(false), eMSPowerRequest(0.0), eMSRequestOn(false), plantInfoFound(false),
       cogenLocation(PlantLocation(0, 0, 0, 0)), nominalThermElectRatio(0.0), dCElectricityProd(0.0), dCElectProdRate(0.0), electricityProd(0.0),
       electProdRate(0.0), thermalProd(0.0), thermProdRate(0.0), errCountNegElectProd_(0)
@@ -1988,32 +1989,32 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     name = objectName;
     typeOfName = objectType;
     if (UtilityRoutines::SameString(objectType, "Generator:InternalCombustionEngine")) {
-        generatorType = GeneratorType::iCEngine;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorICEngine;
+        generatorType = GeneratorType::ICEngine;
+        compGenTypeOf_Num = GeneratorType::ICEngine;
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_ICEngine;
         compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:CombustionTurbine")) {
-        generatorType = GeneratorType::combTurbine;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorCombTurbine;
+        generatorType = GeneratorType::CombTurbine;
+        compGenTypeOf_Num = GeneratorType::CombTurbine;
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_CTurbine;
         compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:MicroTurbine")) {
-        generatorType = GeneratorType::microturbine;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorMicroturbine;
+        generatorType = GeneratorType::Microturbine;
+        compGenTypeOf_Num = GeneratorType::Microturbine;
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_MicroTurbine;
         compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:Photovoltaic")) {
-        generatorType = GeneratorType::pV;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorPV;
+        generatorType = GeneratorType::PV;
+        compGenTypeOf_Num = GeneratorType::PV;
         compPlantTypeOf_Num = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
         compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:PVWatts")) {
-        generatorType = GeneratorType::pvWatts;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorPVWatts;
+        generatorType = GeneratorType::PVWatts;
+        compGenTypeOf_Num = GeneratorType::PVWatts;
         compPlantTypeOf_Num = DataPlant::TypeOf_Other;
     } else if (UtilityRoutines::SameString(objectType, "Generator:FuelCell")) {
-        generatorType = GeneratorType::fuelCell;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorFuelCell;
+        generatorType = GeneratorType::FuelCell;
+        compGenTypeOf_Num = GeneratorType::FuelCell;
         // fuel cell has two possible plant component types, stack cooler and exhaust gas HX.
         // exhaust gas HX is required and it assumed that it has more thermal capacity and is used for control
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_FCExhaust;
@@ -2021,13 +2022,13 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
         auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
         compPlantName = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->ExhaustHX.Name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:MicroCHP")) {
-        generatorType = GeneratorType::microCHP;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorMicroCHP;
+        generatorType = GeneratorType::MicroCHP;
+        compGenTypeOf_Num = GeneratorType::MicroCHP;
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_MicroCHP;
         compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:WindTurbine")) {
-        generatorType = GeneratorType::windTurbine;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorWindTurbine;
+        generatorType = GeneratorType::WindTurbine;
+        compGenTypeOf_Num = GeneratorType::WindTurbine;
         compPlantTypeOf_Num = DataPlant::TypeOf_Other;
     } else {
         ShowSevereError(routineName + DataIPShortCuts::cCurrentModuleObject + " invalid entry.");
@@ -2044,9 +2045,9 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
             ShowContinueError("Invalid availability schedule = " + availSchedName);
             ShowContinueError("Schedule was not found ");
         } else {
-            if (generatorType == GeneratorType::pvWatts) {
+            if (generatorType == GeneratorType::PVWatts) {
                 ShowWarningError(routineName + DataIPShortCuts::cCurrentModuleObject + ", Availability Schedule for Generator:PVWatts '" + objectName +  "' will be be ignored (runs all the time).");
-            } else if (generatorType == GeneratorType::pV) {
+            } else if (generatorType == GeneratorType::PV) {
                 // It should only warn if Performance type is SimplePV (DataPhotovoltaics::iSimplePVModel).
                 // Except you need GetPVInput to have run already etc
                 // Note: you can't use DataIPShortCuts::cAlphaArgs etc or it'll override what will still need to be processed in
@@ -2104,7 +2105,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
 {
     // Select and call models and also collect results for load center power conditioning and reporting
     switch (generatorType) {
-    case GeneratorType::iCEngine: {
+    case GeneratorType::ICEngine: {
 
         auto thisICE = ICEngineElectricGenerator::ICEngineGeneratorSpecs::factory(state, name);
 
@@ -2124,7 +2125,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::combTurbine: {
+    case GeneratorType::CombTurbine: {
 
         auto thisCTE = CTElectricGenerator::CTGeneratorData::factory(state, name);
         // dummy vars
@@ -2143,15 +2144,15 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::pV: {
-        Photovoltaics::SimPVGenerator(state, DataGlobalConstants::iGeneratorPV, name, generatorIndex, runFlag, myElecLoadRequest);
+    case GeneratorType::PV: {
+        Photovoltaics::SimPVGenerator(state, GeneratorType::PV, name, generatorIndex, runFlag, myElecLoadRequest);
         Photovoltaics::GetPVGeneratorResults(
-            DataGlobalConstants::iGeneratorPV, generatorIndex, dCElectProdRate, dCElectricityProd, thermProdRate, thermalProd);
+            GeneratorType::PV, generatorIndex, dCElectProdRate, dCElectricityProd, thermProdRate, thermalProd);
         electricPowerOutput = dCElectProdRate;
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::pvWatts: {
+    case GeneratorType::PVWatts: {
         PVWatts::PVWattsGenerator &pvwattsGenerator(PVWatts::GetOrCreatePVWattsGenerator(state, name));
         pvwattsGenerator.calc(state);
         pvwattsGenerator.getResults(dCElectProdRate, dCElectricityProd, thermProdRate, thermalProd);
@@ -2159,7 +2160,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::fuelCell: {
+    case GeneratorType::FuelCell: {
         auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
         dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->SimFuelCellGenerator(state, runFlag, myElecLoadRequest, FirstHVACIteration);
         electProdRate = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.ACPowerGen;
@@ -2170,7 +2171,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::microCHP: {
+    case GeneratorType::MicroCHP: {
         auto thisMCHP = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, name);
 
         // simulate
@@ -2195,7 +2196,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::microturbine: {
+    case GeneratorType::Microturbine: {
         auto thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, name);
 
         // dummy vars
@@ -2214,15 +2215,15 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::windTurbine: {
-        WindTurbine::SimWindTurbine(state, DataGlobalConstants::iGeneratorWindTurbine, name, generatorIndex, runFlag, myElecLoadRequest);
+    case GeneratorType::WindTurbine: {
+        WindTurbine::SimWindTurbine(state, GeneratorType::WindTurbine, name, generatorIndex, runFlag, myElecLoadRequest);
         WindTurbine::GetWTGeneratorResults(state,
-            DataGlobalConstants::iGeneratorWindTurbine, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd);
+            GeneratorType::WindTurbine, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd);
         electricPowerOutput = electProdRate;
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::notYetSet: {
+    case GeneratorType::Unassigned: {
         // do nothing
         break;
     }

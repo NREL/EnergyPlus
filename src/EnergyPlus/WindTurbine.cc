@@ -99,7 +99,7 @@ namespace WindTurbine {
     static std::string const BlankString;
 
     void SimWindTurbine(EnergyPlusData &state,
-                        int const EP_UNUSED(GeneratorType), // Type of Generator
+                        GeneratorType const EP_UNUSED(GeneratorType), // Type of Generator
                         std::string const &GeneratorName,   // User specified name of Generator
                         int &GeneratorIndex,                // Generator index
                         bool const RunFlag,                 // ON or OFF
@@ -155,7 +155,7 @@ namespace WindTurbine {
     }
 
     void GetWTGeneratorResults(EnergyPlusData &state,
-                               int const EP_UNUSED(GeneratorType), // Type of Generator
+                               GeneratorType const EP_UNUSED(GeneratorType), // Type of Generator
                                int const GeneratorIndex,           // Generator number
                                Real64 &GeneratorPower,             // Electrical power
                                Real64 &GeneratorEnergy,            // Electrical energy

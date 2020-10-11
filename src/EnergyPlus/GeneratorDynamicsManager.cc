@@ -149,7 +149,7 @@ namespace GeneratorDynamicsManager {
     }
 
     void ManageGeneratorControlState(EnergyPlusData &state,
-                                     int const GeneratorType,                     // type of Generator
+                                     GeneratorType const GeneratorType,  // type of Generator
                                      std::string const &EP_UNUSED(GeneratorName), // user specified name of Generator
                                      int const GeneratorNum,                      // Generator number
                                      bool const RunFlagElectCenter,               // TRUE when Generator operating per electric load center request
@@ -279,7 +279,7 @@ namespace GeneratorDynamicsManager {
         // get index for this generator in dynamics control structure
         {
             auto const SELECT_CASE_var(GeneratorType);
-            if (SELECT_CASE_var == iGeneratorMicroCHP) {
+            if (SELECT_CASE_var == GeneratorType::MicroCHP) {
                 DynaCntrlNum = MicroCHPElectricGenerator::MicroCHP(GeneratorNum).DynamicsControlID;
                 // OutletCWnode = MicroCHPElectricGenerator::MicroCHP(GeneratorNum)%PlantOutletNodeID
                 InletCWnode = MicroCHPElectricGenerator::MicroCHP(GeneratorNum).PlantInletNodeID;
@@ -288,7 +288,7 @@ namespace GeneratorDynamicsManager {
                     InternalFlowControl = true;
                 }
                 LimitMinMdotcw = MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.MinWaterMdot;
-            } else if (SELECT_CASE_var == iGeneratorFuelCell) {
+            } else if (SELECT_CASE_var == GeneratorType::FuelCell) {
                 // not yet
             } else {
             }
@@ -425,7 +425,7 @@ namespace GeneratorDynamicsManager {
                         }
 
                     } else if (GeneratorDynamics(DynaCntrlNum).WarmUpByEngineTemp) {
-                        if (GeneratorType == iGeneratorMicroCHP) {
+                        if (GeneratorType == GeneratorType::MicroCHP) {
                             // only change to normal if this is result from completed timestep, not just an interation
                             if (MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.TengLast >= GeneratorDynamics(DynaCntrlNum).TnomEngOp) {
                                 newOpMode = OpModeNormal;
@@ -616,12 +616,12 @@ namespace GeneratorDynamicsManager {
             {
                 auto const SELECT_CASE_var(GeneratorType);
 
-                if (SELECT_CASE_var == iGeneratorFuelCell) {
+                if (SELECT_CASE_var == GeneratorType::FuelCell) {
                     // constant power level during start up (modeling artifact)
                     //? hours or seconds here?
                     Pel = GeneratorDynamics(DynaCntrlNum).StartUpElectProd / GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay;
 
-                } else if (SELECT_CASE_var == iGeneratorMicroCHP) {
+                } else if (SELECT_CASE_var == GeneratorType::MicroCHP) {
 
                     Pel = PelInput * PLRforSubtimestepStartUp;
                 }
@@ -669,7 +669,7 @@ namespace GeneratorDynamicsManager {
         // now do record keeping for amount of time spent in various operating modes
         {
             auto const SELECT_CASE_var(GeneratorType);
-            if (SELECT_CASE_var == iGeneratorMicroCHP) {
+            if (SELECT_CASE_var == GeneratorType::MicroCHP) {
                 // first clear out values
                 MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.OffModeTime = 0.0;
                 MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.StandyByModeTime = 0.0;
@@ -732,7 +732,7 @@ namespace GeneratorDynamicsManager {
                     }
                 }
 
-            } else if (SELECT_CASE_var == iGeneratorFuelCell) {
+            } else if (SELECT_CASE_var == GeneratorType::FuelCell) {
                 // not yet using this control manager
             } else {
             }
@@ -744,7 +744,7 @@ namespace GeneratorDynamicsManager {
         OperatingMode = newOpMode;
     }
 
-    void ManageGeneratorFuelFlow(int const GeneratorType,                     // type of Generator
+    void ManageGeneratorFuelFlow(GeneratorType const GeneratorType,                     // type of Generator
                                  std::string const &EP_UNUSED(GeneratorName), // user specified name of Generator
                                  int const GeneratorNum,                      // Generator number
                                  bool const EP_UNUSED(RunFlag),               // TRUE when Generator operating
@@ -801,7 +801,7 @@ namespace GeneratorDynamicsManager {
         // get index from GeneratorNum
         {
             auto const SELECT_CASE_var(GeneratorType);
-            if (SELECT_CASE_var == iGeneratorMicroCHP) {
+            if (SELECT_CASE_var == GeneratorType::MicroCHP) {
                 DynaCntrlNum = MicroCHPElectricGenerator::MicroCHP(GeneratorNum).DynamicsControlID;
             }
         }

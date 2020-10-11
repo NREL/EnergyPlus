@@ -294,15 +294,6 @@ namespace DataGlobalConstants {
                                          cRT_OtherFuel1,
                                          cRT_OtherFuel2});
 
-    int const iGeneratorICEngine(1);
-    int const iGeneratorCombTurbine(2);
-    int const iGeneratorPV(3);
-    int const iGeneratorFuelCell(4);
-    int const iGeneratorMicroCHP(5);
-    int const iGeneratorMicroturbine(6);
-    int const iGeneratorWindTurbine(7);
-    int const iGeneratorPVWatts(8);
-
     int AssignResourceTypeNum(std::string const &ResourceTypeChar)
     {
 

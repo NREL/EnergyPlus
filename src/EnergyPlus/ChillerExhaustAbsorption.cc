@@ -457,10 +457,10 @@ namespace ChillerExhaustAbsorption {
             thisChiller.TypeOf = cAlphaArgs(17);
 
             if (UtilityRoutines::SameString(cAlphaArgs(17), "Generator:MicroTurbine")) {
-                thisChiller.CompType_Num = DataGlobalConstants::iGeneratorMicroturbine;
-                thisChiller.ExhuastSourceName = cAlphaArgs(18);
+                thisChiller.CompType_Num = GeneratorType::Microturbine;
+                thisChiller.ExhaustSourceName = cAlphaArgs(18);
 
-                auto thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, thisChiller.ExhuastSourceName);
+                auto thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, thisChiller.ExhaustSourceName);
                 thisChiller.ExhaustAirInletNodeNum =
                     dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs *>(thisMTG)->CombustionAirOutletNodeNum;
             }

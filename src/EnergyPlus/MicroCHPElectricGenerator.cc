@@ -760,7 +760,7 @@ namespace MicroCHPElectricGenerator {
         bool RunFlag(false);
 
         GeneratorDynamicsManager::ManageGeneratorControlState(state,
-                                                              DataGlobalConstants::iGeneratorMicroCHP,
+                                                              GeneratorType::MicroCHP,
                                                               this->Name,
                                                               this->DynamicsControlID,
                                                               RunFlagElectCenter,
@@ -883,7 +883,7 @@ namespace MicroCHPElectricGenerator {
                     bool ConstrainedDecreasingNdot(false);
                     Real64 MdotFuelAllowed = 0.0;
 
-                    GeneratorDynamicsManager::ManageGeneratorFuelFlow(DataGlobalConstants::iGeneratorMicroCHP,
+                    GeneratorDynamicsManager::ManageGeneratorFuelFlow(GeneratorType::MicroCHP,
                                                                       this->Name,
                                                                       this->DynamicsControlID,
                                                                       RunFlag,
@@ -997,7 +997,7 @@ namespace MicroCHPElectricGenerator {
                 bool ConstrainedDecreasingNdot(false);
                 Real64 MdotFuelAllowed = 0.0;
 
-                GeneratorDynamicsManager::ManageGeneratorFuelFlow(DataGlobalConstants::iGeneratorMicroCHP,
+                GeneratorDynamicsManager::ManageGeneratorFuelFlow(GeneratorType::MicroCHP,
                                                                   this->Name,
                                                                   this->DynamicsControlID,
                                                                   RunFlag,

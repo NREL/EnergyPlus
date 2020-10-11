@@ -224,15 +224,6 @@ namespace DataGlobalConstants {
     extern int const ResourceTypeInitialOffset; // to reach "ValidTypes"
     extern Array1D_string const cRT_ValidTypes;
 
-    extern int const iGeneratorICEngine;
-    extern int const iGeneratorCombTurbine;
-    extern int const iGeneratorPV;
-    extern int const iGeneratorFuelCell;
-    extern int const iGeneratorMicroCHP;
-    extern int const iGeneratorMicroturbine;
-    extern int const iGeneratorWindTurbine;
-    extern int const iGeneratorPVWatts;
-
     enum class CallIndicator {
         BeginDay,
         DuringDay,
