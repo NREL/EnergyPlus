@@ -60,6 +60,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -353,12 +354,12 @@ namespace DataRuntimeLanguage {
         // Members
         // structure for Erl program calling managers
         std::string Name;          // user defined name for calling manager
-        DataGlobalConstants::EMSCallFrom CallingPoint; // EMS Calling point for this manager, see parameters emsCallFrom*
+        EMSManager::EMSCallFrom CallingPoint; // EMS Calling point for this manager, see parameters emsCallFrom*
         int NumErlPrograms;        // count of total number of Erl programs called by this manager
         Array1D_int ErlProgramARR; // list of integer pointers to Erl programs used by this manager
 
         // Default Constructor
-        EMSProgramCallManagementType() : CallingPoint(DataGlobalConstants::EMSCallFrom::Unassigned), NumErlPrograms(0)
+        EMSProgramCallManagementType() : CallingPoint(EMSManager::EMSCallFrom::Unassigned), NumErlPrograms(0)
         {
         }
     };

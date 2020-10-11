@@ -62,7 +62,7 @@ namespace EnergyPlus {
 namespace PluginManagement {
     std::unique_ptr<PluginManager> pluginManager;
 
-    std::map<DataGlobalConstants::EMSCallFrom, std::vector<std::function<void(void *)>>> callbacks;
+    std::map<EMSManager::EMSCallFrom, std::vector<std::function<void(void *)>>> callbacks;
     std::vector<PluginInstance> plugins;
     std::vector<PluginTrendVariable> trends;
     std::vector<std::string> globalVariableNames;
@@ -72,7 +72,7 @@ namespace PluginManagement {
     bool fullyReady = false;
     bool apiErrorFlag = false;
 
-    void registerNewCallback(EnergyPlusData &EP_UNUSED(state), DataGlobalConstants::EMSCallFrom iCalledFrom, const std::function<void(void *)> &f)
+    void registerNewCallback(EnergyPlusData &EP_UNUSED(state), EMSManager::EMSCallFrom iCalledFrom, const std::function<void(void *)> &f)
     {
         callbacks[iCalledFrom].push_back(f);
     }
@@ -93,7 +93,7 @@ namespace PluginManagement {
         return (int)callbacks.size();
     }
 
-    void runAnyRegisteredCallbacks(EnergyPlusData &state, DataGlobalConstants::EMSCallFrom iCalledFrom, bool &anyRan)
+    void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan)
     {
         if (DataGlobals::KickOffSimulation) return;
         for (auto const &cb : callbacks[iCalledFrom]) {
@@ -923,97 +923,97 @@ namespace PluginManagement {
     }
 
 #if LINK_WITH_PYTHON == 1
-    bool PluginInstance::run(EnergyPlusData &state, DataGlobalConstants::EMSCallFrom iCalledFrom) const
+    bool PluginInstance::run(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom) const
     {
         // returns true if a plugin actually ran
         PyObject *pFunctionName = nullptr;
         const char * functionName = nullptr;
-        if (iCalledFrom == DataGlobalConstants::EMSCallFrom::BeginNewEnvironment) {
+        if (iCalledFrom == EMSManager::EMSCallFrom::BeginNewEnvironment) {
             if (this->bHasBeginNewEnvironment) {
                 pFunctionName = this->pBeginNewEnvironment;
                 functionName = this->sHookBeginNewEnvironment;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::BeginZoneTimestepBeforeSetCurrentWeather) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::BeginZoneTimestepBeforeSetCurrentWeather) {
             if (this->bHasBeginZoneTimestepBeforeSetCurrentWeather) {
                 pFunctionName = this->pBeginZoneTimestepBeforeSetCurrentWeather;
                 functionName = this->sHookBeginZoneTimestepBeforeSetCurrentWeather;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::ZoneSizing) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::ZoneSizing) {
             if (this->bHasEndOfZoneSizing) {
                 pFunctionName = this->pEndOfZoneSizing;
                 functionName = this->sHookEndOfZoneSizing;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::SystemSizing) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::SystemSizing) {
             if (this->bHasEndOfSystemSizing) {
                 pFunctionName = this->pEndOfSystemSizing;
                 functionName = this->sHookEndOfSystemSizing;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::BeginNewEnvironmentAfterWarmUp) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::BeginNewEnvironmentAfterWarmUp) {
             if (this->bHasAfterNewEnvironmentWarmUpIsComplete) {
                 pFunctionName = this->pAfterNewEnvironmentWarmUpIsComplete;
                 functionName = this->sHookAfterNewEnvironmentWarmUpIsComplete;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::BeginTimestepBeforePredictor) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::BeginTimestepBeforePredictor) {
             if (this->bHasBeginTimestepBeforePredictor) {
                 pFunctionName = this->pBeginTimestepBeforePredictor;
                 functionName = this->sHookBeginTimestepBeforePredictor;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::BeforeHVACManagers) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::BeforeHVACManagers) {
             if (this->bHasAfterPredictorBeforeHVACManagers) {
                 pFunctionName = this->pAfterPredictorBeforeHVACManagers;
                 functionName = this->sHookAfterPredictorBeforeHVACManagers;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::AfterHVACManagers) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::AfterHVACManagers) {
             if (this->bHasAfterPredictorAfterHVACManagers) {
                 pFunctionName = this->pAfterPredictorAfterHVACManagers;
                 functionName = this->sHookAfterPredictorAfterHVACManagers;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::HVACIterationLoop) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::HVACIterationLoop) {
             if (this->bHasInsideHVACSystemIterationLoop) {
                 pFunctionName = this->pInsideHVACSystemIterationLoop;
                 functionName = this->sHookInsideHVACSystemIterationLoop;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::EndSystemTimestepBeforeHVACReporting) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::EndSystemTimestepBeforeHVACReporting) {
             if (this->bHasEndOfSystemTimestepBeforeHVACReporting) {
                 pFunctionName = this->pEndOfSystemTimestepBeforeHVACReporting;
                 functionName = this->sHookEndOfSystemTimestepBeforeHVACReporting;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::EndSystemTimestepAfterHVACReporting) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::EndSystemTimestepAfterHVACReporting) {
             if (this->bHasEndOfSystemTimestepAfterHVACReporting) {
                 pFunctionName = this->pEndOfSystemTimestepAfterHVACReporting;
                 functionName = this->sHookEndOfSystemTimestepAfterHVACReporting;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::EndZoneTimestepBeforeZoneReporting) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::EndZoneTimestepBeforeZoneReporting) {
             if (this->bHasEndOfZoneTimestepBeforeZoneReporting) {
                 pFunctionName = this->pEndOfZoneTimestepBeforeZoneReporting;
                 functionName = this->sHookEndOfZoneTimestepBeforeZoneReporting;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::EndZoneTimestepAfterZoneReporting) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::EndZoneTimestepAfterZoneReporting) {
             if (this->bHasEndOfZoneTimestepAfterZoneReporting) {
                 pFunctionName = this->pEndOfZoneTimestepAfterZoneReporting;
                 functionName = this->sHookEndOfZoneTimestepAfterZoneReporting;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::ComponentGetInput) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::ComponentGetInput) {
             if (this->bHasAfterComponentInputReadIn) {
                 pFunctionName = this->pAfterComponentInputReadIn;
                 functionName = this->sHookAfterComponentInputReadIn;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::UserDefinedComponentModel) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::UserDefinedComponentModel) {
             if (this->bHasUserDefinedComponentModel) {
                 pFunctionName = this->pUserDefinedComponentModel;
                 functionName = this->sHookUserDefinedComponentModel;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::UnitarySystemSizing) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::UnitarySystemSizing) {
             if (this->bHasUnitarySystemSizing) {
                 pFunctionName = this->pUnitarySystemSizing;
                 functionName = this->sHookUnitarySystemSizing;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance) {
             if (this->bHasBeginZoneTimestepBeforeInitHeatBalance) {
                 pFunctionName = this->pBeginZoneTimestepBeforeInitHeatBalance;
                 functionName = this->sHookBeginZoneTimestepBeforeInitHeatBalance;
             }
-        } else if (iCalledFrom == DataGlobalConstants::EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance) {
+        } else if (iCalledFrom == EMSManager::EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance) {
             if (this->bHasBeginZoneTimestepAfterInitHeatBalance) {
                 pFunctionName = this->pBeginZoneTimestepAfterInitHeatBalance;
                 functionName = this->sHookBeginZoneTimestepAfterInitHeatBalance;
@@ -1340,7 +1340,7 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
     void PluginManager::runSingleUserDefinedPlugin(EnergyPlusData &state, int index)
     {
-        plugins[index].run(state, DataGlobalConstants::EMSCallFrom::UserDefinedComponentModel);
+        plugins[index].run(state, EMSManager::EMSCallFrom::UserDefinedComponentModel);
     }
 #else
     void PluginManager::runSingleUserDefinedPlugin(EnergyPlusData &EP_UNUSED(state), int EP_UNUSED(index))

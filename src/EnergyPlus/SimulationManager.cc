@@ -453,7 +453,7 @@ namespace SimulationManager {
             CreateEnergyReportStructure();
             bool anyEMSRan;
             ManageEMS(state,
-                      DataGlobalConstants::EMSCallFrom::SetupSimulation,
+                      EMSManager::EMSCallFrom::SetupSimulation,
                       anyEMSRan,
                       ObjexxFCL::Optional_int_const()); // point to finish setup processing EMS, sensor ready now
 
@@ -544,7 +544,7 @@ namespace SimulationManager {
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
-            ManageEMS(state, DataGlobalConstants::EMSCallFrom::BeginNewEnvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+            ManageEMS(state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
                 if (state.dataGlobal->stopSimulation) break;

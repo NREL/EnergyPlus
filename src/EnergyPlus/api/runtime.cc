@@ -108,162 +108,162 @@ void registerExternalHVACManager(EnergyPlusState state, void (*f)(EnergyPlusStat
 
 void callbackBeginNewEnvironment(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::BeginNewEnvironment, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::BeginNewEnvironment, f);
 }
 
 void callbackBeginNewEnvironment(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::BeginNewEnvironment, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::BeginNewEnvironment, f);
 }
 
 void callbackBeginZoneTimestepBeforeSetCurrentWeather(EnergyPlusState state, std::function<void(EnergyPlusState)> const& f) {
     auto* thisState = reinterpret_cast<EnergyPlus::EnergyPlusData*>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::BeginZoneTimestepBeforeSetCurrentWeather, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::BeginZoneTimestepBeforeSetCurrentWeather, f);
 }
 
 void callbackBeginZoneTimestepBeforeSetCurrentWeather(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto* thisState = reinterpret_cast<EnergyPlus::EnergyPlusData*>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::BeginZoneTimestepBeforeSetCurrentWeather, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::BeginZoneTimestepBeforeSetCurrentWeather, f);
 }
 
 void callbackAfterNewEnvironmentWarmupComplete(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::BeginNewEnvironmentAfterWarmUp, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::BeginNewEnvironmentAfterWarmUp, f);
 }
 
 void callbackAfterNewEnvironmentWarmupComplete(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::BeginNewEnvironmentAfterWarmUp, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::BeginNewEnvironmentAfterWarmUp, f);
 }
 
 void callbackBeginZoneTimeStepBeforeInitHeatBalance(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance, f);
 }
 
 void callbackBeginZoneTimeStepBeforeInitHeatBalance(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance, f);
 }
 
 void callbackBeginZoneTimeStepAfterInitHeatBalance(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, f);
 }
 
 void callbackBeginZoneTimeStepAfterInitHeatBalance(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, f);
 }
 
 void callbackBeginTimeStepBeforePredictor(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::BeginTimestepBeforePredictor, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, f);
 }
 
 void callbackBeginTimeStepBeforePredictor(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::BeginTimestepBeforePredictor, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, f);
 }
 
 void callbackAfterPredictorBeforeHVACManagers(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::BeforeHVACManagers, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::BeforeHVACManagers, f);
 }
 
 void callbackAfterPredictorBeforeHVACManagers(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::BeforeHVACManagers, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::BeforeHVACManagers, f);
 }
 
 void callbackAfterPredictorAfterHVACManagers(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::AfterHVACManagers, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::AfterHVACManagers, f);
 }
 
 void callbackAfterPredictorAfterHVACManagers(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::AfterHVACManagers, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::AfterHVACManagers, f);
 }
 
 void callbackInsideSystemIterationLoop(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::HVACIterationLoop, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::HVACIterationLoop, f);
 }
 
 void callbackInsideSystemIterationLoop(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::HVACIterationLoop, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::HVACIterationLoop, f);
 }
 
 void callbackEndOfZoneTimeStepBeforeZoneReporting(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::EndZoneTimestepBeforeZoneReporting, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::EndZoneTimestepBeforeZoneReporting, f);
 }
 
 void callbackEndOfZoneTimeStepBeforeZoneReporting(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::EndZoneTimestepBeforeZoneReporting, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::EndZoneTimestepBeforeZoneReporting, f);
 }
 
 void callbackEndOfZoneTimeStepAfterZoneReporting(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::EndZoneTimestepAfterZoneReporting, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::EndZoneTimestepAfterZoneReporting, f);
 }
 
 void callbackEndOfZoneTimeStepAfterZoneReporting(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::EndZoneTimestepAfterZoneReporting, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::EndZoneTimestepAfterZoneReporting, f);
 }
 
 void callbackEndOfSystemTimeStepBeforeHVACReporting(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::EndSystemTimestepBeforeHVACReporting, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::EndSystemTimestepBeforeHVACReporting, f);
 }
 
 void callbackEndOfSystemTimeStepBeforeHVACReporting(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::EndSystemTimestepBeforeHVACReporting, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::EndSystemTimestepBeforeHVACReporting, f);
 }
 
 void callbackEndOfSystemTimeStepAfterHVACReporting(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::EndSystemTimestepAfterHVACReporting, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::EndSystemTimestepAfterHVACReporting, f);
 }
 
 void callbackEndOfSystemTimeStepAfterHVACReporting(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::EndSystemTimestepAfterHVACReporting, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::EndSystemTimestepAfterHVACReporting, f);
 }
 
 void callbackEndOfZoneSizing(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::ZoneSizing, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::ZoneSizing, f);
 }
 
 void callbackEndOfZoneSizing(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::ZoneSizing, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::ZoneSizing, f);
 }
 
 void callbackEndOfSystemSizing(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::SystemSizing, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::SystemSizing, f);
 }
 
 void callbackEndOfSystemSizing(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::SystemSizing, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::SystemSizing, f);
 }
 
 void callbackEndOfAfterComponentGetInput(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::ComponentGetInput, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::ComponentGetInput, f);
 }
 
 void callbackEndOfAfterComponentGetInput(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::ComponentGetInput, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::ComponentGetInput, f);
 }
 
 //void callbackUserDefinedComponentModel(EnergyPlusState state, std::function<void ()> f) {
@@ -276,10 +276,10 @@ void callbackEndOfAfterComponentGetInput(EnergyPlusState state, void (*f)(Energy
 
 void callbackUnitarySystemSizing(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::UnitarySystemSizing, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::UnitarySystemSizing, f);
 }
 
 void callbackUnitarySystemSizing(EnergyPlusState state, void (*f)(EnergyPlusState)) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::DataGlobalConstants::EMSCallFrom::UnitarySystemSizing, f);
+    EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::UnitarySystemSizing, f);
 }

@@ -662,7 +662,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_EMS_Override)
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     // Calls SetupNodeSetpointsAsActuator (via InitEMS, which calls GetEMSInput too)
-    EMSManager::ManageEMS(state, DataGlobalConstants::EMSCallFrom::SetupSimulation, anyRan);
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::SetupSimulation, anyRan);
     EXPECT_GT(EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable, 0);
     EXPECT_EQ(1, DataRuntimeLanguage::numActuatorsUsed);
 
@@ -707,7 +707,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_Python_Override)
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     // Calls SetupNodeSetpointsAsActuator (via InitEMS, which calls GetEMSInput too)
-    EMSManager::ManageEMS(state, DataGlobalConstants::EMSCallFrom::SetupSimulation, anyRan);
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::SetupSimulation, anyRan);
     EXPECT_GT(EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable, 0);
     EXPECT_EQ(0, DataRuntimeLanguage::numActuatorsUsed);
 

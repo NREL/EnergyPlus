@@ -999,7 +999,7 @@ namespace Fans {
         }
 
         bool anyRan;
-        ManageEMS(state, DataGlobalConstants::EMSCallFrom::ComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
+        ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
         MySizeFlag.dimension(state.dataFans->NumFans, true);
     }
 
