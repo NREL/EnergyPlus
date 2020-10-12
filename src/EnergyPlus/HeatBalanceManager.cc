@@ -5917,8 +5917,8 @@ namespace HeatBalanceManager {
             if (thisSurface.Class == DataSurfaces::SurfaceClass_Window) {
                 auto &thisConstruct(thisSurface.Construction);
                 if (!dataConstruction.Construct(thisConstruct).WindowTypeBSDF && !dataConstruction.Construct(thisConstruct).TypeIsAirBoundaryInteriorWindow) {
-                    FenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
-                    FenLaySurfTempBack(dataConstruction.Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
+                    SurfWinFenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
+                    SurfWinFenLaySurfTempBack(dataConstruction.Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
                 }
             }
         }

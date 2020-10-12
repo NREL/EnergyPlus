@@ -1458,9 +1458,9 @@ namespace DaylightingDevices {
         // REFERENCES: na
 
         // Using/Aliasing
-        using DataHeatBalance::QRadSWOutIncident;
-        using DataHeatBalance::QRadSWwinAbs;
-        using DataHeatBalance::QRadSWwinAbsTot;
+        using DataHeatBalance::SurfQRadSWOutIncident;
+        using DataHeatBalance::SurfWinQRadSWwinAbs;
+        using DataHeatBalance::SurfWinQRadSWwinAbsTot;
         using DataHeatBalance::QS;
         using DataSurfaces::SurfWinTransSolar;
 
@@ -1483,18 +1483,17 @@ namespace DaylightingDevices {
 
             // Calculate diffuse solar reflected back up the pipe by the inside surface of the TDD:DIFFUSER
             // All solar arriving at the diffuser is assumed to be isotropically diffuse by this point
-            QRefl = (QRadSWOutIncident(DiffSurf) - QRadSWwinAbsTot(DiffSurf)) * Surface(DiffSurf).Area - SurfWinTransSolar(DiffSurf);
+            QRefl = (SurfQRadSWOutIncident(DiffSurf) - SurfWinQRadSWwinAbsTot(DiffSurf)) * Surface(DiffSurf).Area - SurfWinTransSolar(DiffSurf);
 
             // Add diffuse interior shortwave reflected from zone surfaces and from zone sources, lights, etc.
             QRefl += QS(Surface(DiffSurf).SolarEnclIndex) * Surface(DiffSurf).Area * transDiff;
 
-            TotTDDPipeGain = SurfWinTransSolar(TDDPipe(PipeNum).Dome) - QRadSWOutIncident(DiffSurf) * Surface(DiffSurf).Area +
+            TotTDDPipeGain = SurfWinTransSolar(TDDPipe(PipeNum).Dome) - SurfQRadSWOutIncident(DiffSurf) * Surface(DiffSurf).Area +
                              QRefl * (1.0 - TDDPipe(PipeNum).TransSolIso / transDiff) +
-                             QRadSWwinAbs(1, TDDPipe(PipeNum).Dome) * Surface(DiffSurf).Area / 2.0 +
-                             QRadSWwinAbs(1, DiffSurf) * Surface(DiffSurf).Area / 2.0; // Solar entering pipe | Solar exiting pipe | Absorbed due to
+                             SurfWinQRadSWwinAbs(1, TDDPipe(PipeNum).Dome) * Surface(DiffSurf).Area / 2.0 +
+                             SurfWinQRadSWwinAbs(1, DiffSurf) * Surface(DiffSurf).Area / 2.0; // Solar entering pipe | Solar exiting pipe | Absorbed due to
                                                                                        // reflections on the way out | Inward absorbed solar from dome
                                                                                        // glass | Inward absorbed solar from diffuser glass
-
             TDDPipe(PipeNum).PipeAbsorbedSolar = max(0.0, TotTDDPipeGain); // Report variable [W]
 
             for (TZoneNum = 1; TZoneNum <= TDDPipe(PipeNum).NumOfTZones; ++TZoneNum) {

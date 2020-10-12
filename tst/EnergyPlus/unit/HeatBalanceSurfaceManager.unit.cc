@@ -120,16 +120,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
 
     DataHeatBalSurface::CTFConstOutPart.allocate(SurfNum);
     DataHeatBalSurface::CTFConstOutPart(SurfNum) = 1.0;
-    DataHeatBalSurface::QRadSWOutAbs.allocate(SurfNum);
-    DataHeatBalSurface::QRadSWOutAbs(SurfNum) = 1.0;
+    DataHeatBalSurface::SurfOpaqQRadSWOutAbs.allocate(SurfNum);
+    DataHeatBalSurface::SurfOpaqQRadSWOutAbs(SurfNum) = 1.0;
     DataHeatBalSurface::TempSurfIn.allocate(SurfNum);
     DataHeatBalSurface::TempSurfIn(SurfNum) = 1.0;
-    DataHeatBalSurface::QRadSWOutMvIns.allocate(SurfNum);
-    DataHeatBalSurface::QRadSWOutMvIns(SurfNum) = 1.0;
-    DataHeatBalSurface::QRadLWOutSrdSurfs.allocate(SurfNum);
-    DataHeatBalSurface::QRadLWOutSrdSurfs(SurfNum) = 1.0;
-    DataHeatBalSurface::QAdditionalHeatSourceOutside.allocate(SurfNum);
-    DataHeatBalSurface::QAdditionalHeatSourceOutside(SurfNum) = 0.0;
+    DataHeatBalSurface::SurfQRadSWOutMvIns.allocate(SurfNum);
+    DataHeatBalSurface::SurfQRadSWOutMvIns(SurfNum) = 1.0;
+    DataHeatBalSurface::SurfQRadLWOutSrdSurfs.allocate(SurfNum);
+    DataHeatBalSurface::SurfQRadLWOutSrdSurfs(SurfNum) = 1.0;
+    DataHeatBalSurface::SurfQAdditionalHeatSourceOutside.allocate(SurfNum);
+    DataHeatBalSurface::SurfQAdditionalHeatSourceOutside(SurfNum) = 0.0;
 
     DataHeatBalSurface::TH.allocate(2, 2, 1);
     DataSurfaces::Surface.allocate(SurfNum);
@@ -1919,12 +1919,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
                      DataHeatBalSurface::HGrdExtSurf(1));
 
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.9 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv)), DataHeatBalSurface::QRadLWOutSrdSurfs(1));
+    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.9 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv)), DataHeatBalSurface::SurfQRadLWOutSrdSurfs(1));
     EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.9 *
                          (0.3 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv)) + 0.3 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv))),
-                     DataHeatBalSurface::QRadLWOutSrdSurfs(2));
-    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.9 * 0.5 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv)), DataHeatBalSurface::QRadLWOutSrdSurfs(3));
-    EXPECT_DOUBLE_EQ(0.0, DataHeatBalSurface::QRadLWOutSrdSurfs(4));
+                     DataHeatBalSurface::SurfQRadLWOutSrdSurfs(2));
+    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.9 * 0.5 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv)), DataHeatBalSurface::SurfQRadLWOutSrdSurfs(3));
+    EXPECT_DOUBLE_EQ(0.0, DataHeatBalSurface::SurfQRadLWOutSrdSurfs(4));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest)
@@ -2461,10 +2461,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     // Test Additional Heat Source Calculation
     CalcHeatBalanceOutsideSurf(state);
-    EXPECT_EQ(-0.1, DataHeatBalSurface::QAdditionalHeatSourceOutside(1));
+    EXPECT_EQ(-0.1, DataHeatBalSurface::SurfQAdditionalHeatSourceOutside(1));
 
     CalcHeatBalanceInsideSurf(state);
-    EXPECT_EQ(0.1, DataHeatBalSurface::QAdditionalHeatSourceInside(6));
+    EXPECT_EQ(0.1, DataHeatBalSurface::SurfQAdditionalHeatSourceInside(6));
 
     DataZoneEquipment::ZoneEquipConfig.deallocate();
     DataSizing::ZoneEqSizing.deallocate();
@@ -2569,10 +2569,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     dataConstruction.Construct.allocate(DataHeatBalance::TotConstructs);
-    DataHeatBalSurface::VMULT.allocate(DataGlobals::NumOfZones);
+    DataHeatBalSurface::EnclSolVMULT.allocate(DataGlobals::NumOfZones);
     dataConstruction.Construct(1).TransDiff = 0.1;
-    DataHeatBalSurface::VMULT(1) = 1.0;
-    DataHeatBalSurface::VMULT(2) = 1.0;
+    DataHeatBalSurface::EnclSolVMULT(1) = 1.0;
+    DataHeatBalSurface::EnclSolVMULT(2) = 1.0;
 
     DataSurfaces::Surface(1).HeatTransSurf = true;
     DataSurfaces::Surface(1).Construction = 1;
@@ -3109,9 +3109,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     DataHeatBalance::ZoneBmSolFrIntWinsRep(1) = 10.0;
     DataEnvironment::SunIsUp = false;
     InitIntSolarDistribution();
-    EXPECT_EQ(0.0, DataHeatBalance::IntBmIncInsSurfIntensRep(1));
+    EXPECT_EQ(0.0, DataHeatBalance::SurfIntBmIncInsSurfIntensRep(1));
     DataEnvironment::SunIsUp = true;
     InitIntSolarDistribution();
-    EXPECT_NEAR(1.666667, DataHeatBalance::IntBmIncInsSurfIntensRep(1), 0.00001);
+    EXPECT_NEAR(1.666667, DataHeatBalance::SurfIntBmIncInsSurfIntensRep(1), 0.00001);
 }
 } // namespace EnergyPlus
