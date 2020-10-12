@@ -1987,8 +1987,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     state.dataConstruction->Construct(2).TotLayers = SurfsForRegWindow;
     state.dataConstruction->Construct(3).TotLayers = 1;
 
-    FenLaySurfTempFront.dimension(10, DataSurfaces::TotSurfaces, 0.0);
-    FenLaySurfTempBack.dimension(10, DataSurfaces::TotSurfaces, 0.0);
+    SurfWinFenLaySurfTempFront.dimension(10, DataSurfaces::TotSurfaces, 0.0);
+    SurfWinFenLaySurfTempBack.dimension(10, DataSurfaces::TotSurfaces, 0.0);
     DataHeatBalSurface::TH.dimension(2, Construction::MaxCTFTerms, DataSurfaces::TotSurfaces, 0.0);
 
     DataHeatBalSurface::TH(1,1,1) = 21.0;
@@ -2003,16 +2003,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     HeatBalanceManager::UpdateWindowFaceTempsNonBSDFWin(state);
 
     // First surface is NOT a window so these should NOT be set
-    EXPECT_NEAR(FenLaySurfTempFront(1,1),ZeroResult,0.0001);
-    EXPECT_NEAR(FenLaySurfTempBack(1,1),ZeroResult,0.0001);
+    EXPECT_NEAR(SurfWinFenLaySurfTempFront(1,1),ZeroResult,0.0001);
+    EXPECT_NEAR(SurfWinFenLaySurfTempBack(1,1),ZeroResult,0.0001);
 
     // Second surface is a window so these should be set
-    EXPECT_NEAR(FenLaySurfTempFront(1,2),DataHeatBalSurface::TH(1,1,2),0.0001);
-    EXPECT_NEAR(FenLaySurfTempBack(SurfsForRegWindow,2),DataHeatBalSurface::TH(2,1,2),0.0001);
+    EXPECT_NEAR(SurfWinFenLaySurfTempFront(1,2),DataHeatBalSurface::TH(1,1,2),0.0001);
+    EXPECT_NEAR(SurfWinFenLaySurfTempBack(SurfsForRegWindow,2),DataHeatBalSurface::TH(2,1,2),0.0001);
 
     // Third surface is a window but is also a BSDF (complex window) so these should NOT be set
-    EXPECT_NEAR(FenLaySurfTempFront(1,3),ZeroResult,0.0001);
-    EXPECT_NEAR(FenLaySurfTempBack(1,3),ZeroResult,0.0001);
+    EXPECT_NEAR(SurfWinFenLaySurfTempFront(1,3),ZeroResult,0.0001);
+    EXPECT_NEAR(SurfWinFenLaySurfTempBack(1,3),ZeroResult,0.0001);
 
 }
 

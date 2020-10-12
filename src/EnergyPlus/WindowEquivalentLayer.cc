@@ -832,7 +832,7 @@ namespace WindowEquivalentLayer {
                 // The IR radiance of this window's "exterior" surround is the IR radiance
                 // from surfaces and high-temp radiant sources in the adjacent zone
                 outir = SurfWinIRfromParentZone(SurfNumAdj) + QHTRadSysSurf(SurfNumAdj) + QCoolingPanelSurf(SurfNumAdj) +
-                        QHWBaseboardSurf(SurfNumAdj) + QSteamBaseboardSurf(SurfNumAdj) + QElecBaseboardSurf(SurfNumAdj) + QRadThermInAbs(SurfNumAdj);
+                        QHWBaseboardSurf(SurfNumAdj) + QSteamBaseboardSurf(SurfNumAdj) + QElecBaseboardSurf(SurfNumAdj) + SurfQRadThermInAbs(SurfNumAdj);
 
             } else { // Exterior window (ExtBoundCond = 0)
                      // Calculate LWR from surrounding surfaces if defined for an exterior window
@@ -880,11 +880,11 @@ namespace WindowEquivalentLayer {
         // Indoor mean radiant temperature.
         // IR incident on window from zone surfaces and high-temp radiant sources
         rmir = SurfWinIRfromParentZone(SurfNum) + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
-               QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum) + QRadThermInAbs(SurfNum);
+               QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum) + SurfQRadThermInAbs(SurfNum);
         TRMIN = root_4(rmir / StefanBoltzmann); // TODO check model equation.
 
         NL = CFS(EQLNum).NL;
-        QAllSWwinAbs({1, NL + 1}) = QRadSWwinAbs({1, NL + 1}, SurfNum);
+        QAllSWwinAbs({1, NL + 1}) = SurfWinQRadSWwinAbs({1, NL + 1}, SurfNum);
         //  Solve energy balance(s) for temperature at each node/layer and
         //  heat flux, including components, between each pair of nodes/layers
         ASHWAT_ThermalCalc(state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, QAllSWwinAbs({1, NL + 1}), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);

@@ -232,8 +232,8 @@ namespace WindowManager {
             SurfaceWindow(SurfNum).ThetaFace(2 * k) = state.dataWindowManager->thetas(2 * k);
 
             // temperatures for reporting
-            FenLaySurfTempFront(k, SurfNum) = state.dataWindowManager->thetas(2 * k - 1) - KelvinConv;
-            FenLaySurfTempBack(k, SurfNum) = state.dataWindowManager->thetas(2 * k) - KelvinConv;
+            SurfWinFenLaySurfTempFront(k, SurfNum) = state.dataWindowManager->thetas(2 * k - 1) - KelvinConv;
+            SurfWinFenLaySurfTempBack(k, SurfNum) = state.dataWindowManager->thetas(2 * k) - KelvinConv;
         }
     }
 
@@ -458,9 +458,9 @@ namespace WindowManager {
         auto swRadiation = surface.getSWIncident(t_SurfNum);
         if (swRadiation > 0) {
 
-            auto absCoeff = QRadSWwinAbs(t_Index, t_SurfNum) / swRadiation;
+            auto absCoeff = SurfWinQRadSWwinAbs(t_Index, t_SurfNum) / swRadiation;
             if ((2 * t_Index - 1) == m_TotLay) {
-                absCoeff += QRadThermInAbs(t_SurfNum) / swRadiation;
+                absCoeff += SurfQRadThermInAbs(t_SurfNum) / swRadiation;
             }
 
             aSolidLayer->setSolarAbsorptance(absCoeff);
