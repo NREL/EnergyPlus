@@ -334,7 +334,6 @@ struct UnitVentilatorsData : BaseGlobalStruct {
 
     // Default Constructor
     UnitVentilatorsData() = default;
-    {}
 };
 } // namespace EnergyPlus
 
