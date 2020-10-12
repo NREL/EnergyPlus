@@ -7855,7 +7855,7 @@ namespace SetPointManager {
         Array1D_int VarTypes;                              // Variable Types (1=integer, 2=real, 3=meter)
         Array1D<OutputProcessor::TimeStepType> IndexTypes; // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar;        // units from enum for each variable
-        Array1D_int ResourceTypes;                         // ResourceTypes for each variable
+        std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;   // ResourceTypes for each variable
         Array1D_string EndUses;                            // EndUses for each variable
         Array1D_string Groups;                             // Groups for each variable
         Array1D_string Names;                              // Variable Names for each variable
@@ -7881,7 +7881,11 @@ namespace SetPointManager {
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
         unitsForVar.allocate(NumVariables);
-        ResourceTypes.allocate(NumVariables);
+
+        for (int varN = 1; varN <= NumVariables; ++varN) {
+            ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+        }
+
         EndUses.allocate(NumVariables);
         Groups.allocate(NumVariables);
         Names.allocate(NumVariables);
@@ -7897,7 +7901,12 @@ namespace SetPointManager {
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
         unitsForVar.allocate(NumVariables);
-        ResourceTypes.allocate(NumVariables);
+
+        ResourceTypes.clear();
+        for (int varN = 1; varN <= NumVariables; ++varN) {
+            ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+        }
+
         EndUses.allocate(NumVariables);
         Groups.allocate(NumVariables);
         Names.allocate(NumVariables);
@@ -7914,7 +7923,12 @@ namespace SetPointManager {
             VarTypes.allocate(NumVariables);
             IndexTypes.allocate(NumVariables);
             unitsForVar.allocate(NumVariables);
-            ResourceTypes.allocate(NumVariables);
+
+            ResourceTypes.clear();
+            for (int varN = 1; varN <= NumVariables; ++varN) {
+                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+            }
+
             EndUses.allocate(NumVariables);
             Groups.allocate(NumVariables);
             Names.allocate(NumVariables);
@@ -7932,7 +7946,12 @@ namespace SetPointManager {
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
         unitsForVar.allocate(NumVariables);
-        ResourceTypes.allocate(NumVariables);
+
+        ResourceTypes.clear();
+        for (int varN = 1; varN <= NumVariables; ++varN) {
+            ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+        }
+
         EndUses.allocate(NumVariables);
         Groups.allocate(NumVariables);
         Names.allocate(NumVariables);

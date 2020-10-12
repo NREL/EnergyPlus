@@ -2464,7 +2464,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
             VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmTypeFluidTCtrl;
             VRF(VRFNum).FuelType = "Electricity";
-            VRF(VRFNum).FuelTypeNum = DataGlobalConstants::iRT_Electricity;
+            VRF(VRFNum).FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
 
             if (lAlphaFieldBlanks(2)) {
                 VRF(VRFNum).SchedPtr = ScheduleAlwaysOn;
@@ -2828,7 +2828,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
             VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmTypeFluidTCtrl;
             VRF(VRFNum).FuelType = "Electricity";
-            VRF(VRFNum).FuelTypeNum = DataGlobalConstants::iRT_Electricity;
+            VRF(VRFNum).FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
 
             if (lAlphaFieldBlanks(2)) {
                 VRF(VRFNum).SchedPtr = ScheduleAlwaysOn;
@@ -4863,7 +4863,7 @@ namespace HVACVariableRefrigerantFlow {
             }
 
             if (VRF(NumCond).DefrostStrategy == Resistive ||
-                (VRF(NumCond).DefrostStrategy == ReverseCycle && VRF(NumCond).FuelTypeNum == DataGlobalConstants::iRT_Electricity)) {
+                (VRF(NumCond).DefrostStrategy == ReverseCycle && VRF(NumCond).FuelTypeNum == DataGlobalConstants::ResourceType::Electricity)) {
                 SetupOutputVariable(state, "VRF Heat Pump Defrost Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRF(NumCond).DefrostPower,

@@ -79,55 +79,58 @@ namespace DataGlobalConstants {
     extern int const endUseCogeneration;
 
     // Resource Types
-    extern int const iRT_None;
-    extern int const iRT_Electricity;
-    extern int const iRT_Natural_Gas;
-    extern int const iRT_Gasoline;
-    extern int const iRT_Diesel;
-    extern int const iRT_Coal;
-    extern int const iRT_FuelOil_1;
-    extern int const iRT_FuelOil_2;
-    extern int const iRT_Propane;
-    extern int const iRT_Water;
-    extern int const iRT_EnergyTransfer;
-    extern int const iRT_Steam;
-    extern int const iRT_DistrictCooling;
-    extern int const iRT_DistrictHeating;
-    extern int const iRT_ElectricityProduced;
-    extern int const iRT_ElectricityPurchased;
-    extern int const iRT_ElectricitySurplusSold;
-    extern int const iRT_ElectricityNet;
-    extern int const iRT_SolarWater;
-    extern int const iRT_SolarAir;
-    extern int const iRT_SO2;
-    extern int const iRT_NOx;
-    extern int const iRT_N2O;
-    extern int const iRT_PM;
-    extern int const iRT_PM2_5;
-    extern int const iRT_PM10;
-    extern int const iRT_CO;
-    extern int const iRT_CO2;
-    extern int const iRT_CH4;
-    extern int const iRT_NH3;
-    extern int const iRT_NMVOC;
-    extern int const iRT_Hg;
-    extern int const iRT_Pb;
-    extern int const iRT_NuclearHigh;
-    extern int const iRT_NuclearLow;
-    extern int const iRT_WaterEnvironmentalFactors;
-    extern int const iRT_CarbonEquivalent;
-    extern int const iRT_Source;
-    extern int const iRT_PlantLoopHeatingDemand;
-    extern int const iRT_PlantLoopCoolingDemand;
-    extern int const iRT_OnSiteWater;
-    extern int const iRT_MainsWater;
-    extern int const iRT_RainWater;
-    extern int const iRT_WellWater;
-    extern int const iRT_Condensate;
-    extern int const iRT_OtherFuel1;
-    extern int const iRT_OtherFuel2;
-    extern int const NumOfResourceTypes;
-    extern int const ResourceTypeInitialOffset;
+    enum class ResourceType {
+        Unknown,
+        None,
+        Electricity,
+        Natural_Gas,
+        Gasoline,
+        Diesel,
+        Coal,
+        FuelOil_1,
+        FuelOil_2,
+        Propane,
+        Water,
+        EnergyTransfer,
+        Steam,
+        DistrictCooling,
+        DistrictHeating,
+        ElectricityProduced,
+        ElectricityPurchased,
+        ElectricitySurplusSold,
+        ElectricityNet,
+        SolarWater,
+        SolarAir,
+        SO2,
+        NOx,
+        N2O,
+        PM,
+        PM2_5,
+        PM10,
+        CO,
+        CO2,
+        CH4,
+        NH3,
+        NMVOC,
+        Hg,
+        Pb,
+        NuclearHigh,
+        NuclearLow,
+        WaterEnvironmentalFactors,
+        CarbonEquivalent,
+        Source,
+        PlantLoopHeatingDemand,
+        PlantLoopCoolingDemand,
+        OnSiteWater,
+        MainsWater,
+        RainWater,
+        WellWater,
+        Condensate,
+        OtherFuel1,
+        OtherFuel2
+    };
+
+    extern std::vector<ResourceType> AllResourceTypes;
 
     enum class CallIndicator {
         BeginDay,
@@ -171,8 +174,8 @@ namespace DataGlobalConstants {
     Real64 constexpr UniversalGasConst () { return 8314.462175; }           // Universal Gas Constant (J/mol*K)
     Real64 constexpr convertJtoGJ () { return 1.0E-9; }                     // Conversion factor for J to GJ
 
-    int AssignResourceTypeNum(std::string const &ResourceTypeChar);
-    std::string GetResourceTypeChar(int ResourceTypeNum);
+    ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar);
+    std::string GetResourceTypeChar(ResourceType ResourceTypeNum);
 
 } // namespace DataGlobalConstants
 

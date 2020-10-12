@@ -4723,7 +4723,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
 
     // Additional tests for fuel type input
     EXPECT_EQ(VRF(VRFTUNum).FuelType, "Electricity");
-    EXPECT_EQ(VRF(VRFTUNum).FuelTypeNum, DataGlobalConstants::iRT_Electricity);
+    EXPECT_EQ(VRF(VRFTUNum).FuelTypeNum, DataGlobalConstants::ResourceType::Electricity);
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
@@ -7921,7 +7921,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
     HeatingCoils::CoilIsSuppHeater = true;
     HeatingCoils::HeatingCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
     HeatingCoils::HeatingCoil(CoilNum).HeatingCoilType = thisVRFTU.SuppHeatCoilType;
-    HeatingCoils::HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::iRT_Electricity;
+    HeatingCoils::HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
     HeatingCoils::HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
     HeatingCoils::HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     HeatingCoils::HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
@@ -7985,7 +7985,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
     HeatingCoils::CoilIsSuppHeater = true;
     HeatingCoils::HeatingCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
     HeatingCoils::HeatingCoil(CoilNum).HeatingCoilType = thisVRFTU.SuppHeatCoilType;
-    HeatingCoils::HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::iRT_Natural_Gas;
+    HeatingCoils::HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
     HeatingCoils::HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
     HeatingCoils::HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     HeatingCoils::HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
@@ -8056,7 +8056,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
     state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
 
-    // state.dataWaterCoils->WaterCoil(CoilNum).FuelType_Num = DataGlobalConstants::iRT_Natural_Gas;
+    // state.dataWaterCoils->WaterCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
     state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
     state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = thisVRFTU.SuppHeatCoilFluidInletNode;
@@ -14250,7 +14250,7 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_EQ(1.00, maxEIRfLowPLRXInput);               // getinput checks this
     EXPECT_GT(thisHeatEIRFPLR.Var1Min, thisVRF.MinPLR); // expect warning message
     EXPECT_EQ(thisVRF.FuelType, "Electricity"); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
-    EXPECT_EQ(thisVRF.FuelTypeNum, DataGlobalConstants::iRT_Electricity); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
+    EXPECT_EQ(thisVRF.FuelTypeNum, DataGlobalConstants::ResourceType::Electricity); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
 }
 
 

@@ -413,7 +413,7 @@ namespace HeatingCoils {
             CoilNum = ElecCoilNum;
 
             CurrentModuleObject = "Coil:Heating:Electric";
-            HeatingCoil(CoilNum).FuelType_Num = iRT_Electricity;
+            HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -516,7 +516,7 @@ namespace HeatingCoils {
             CoilNum = NumElecCoil + ElecCoilNum;
 
             CurrentModuleObject = "Coil:Heating:Electric:MultiStage";
-            HeatingCoil(CoilNum).FuelType_Num = iRT_Electricity;
+            HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -666,10 +666,10 @@ namespace HeatingCoils {
             coil.HCoilType_Num = Coil_HeatingGasOrOtherFuel;
 
             coil.FuelType_Num = AssignResourceTypeNum(Alphas(3));
-            if (!(coil.FuelType_Num == iRT_Natural_Gas || coil.FuelType_Num == iRT_Propane || coil.FuelType_Num == iRT_Diesel ||
-                  coil.FuelType_Num == iRT_Gasoline || coil.FuelType_Num == iRT_FuelOil_1 || coil.FuelType_Num == iRT_FuelOil_2 ||
-                  coil.FuelType_Num == iRT_OtherFuel1 || coil.FuelType_Num == iRT_OtherFuel2 || coil.FuelType_Num == iRT_Coal) ||
-                coil.FuelType_Num == 0) {
+            if (!(coil.FuelType_Num == DataGlobalConstants::ResourceType::Natural_Gas || coil.FuelType_Num == DataGlobalConstants::ResourceType::Propane || coil.FuelType_Num == DataGlobalConstants::ResourceType::Diesel ||
+                  coil.FuelType_Num == DataGlobalConstants::ResourceType::Gasoline || coil.FuelType_Num == DataGlobalConstants::ResourceType::FuelOil_1 || coil.FuelType_Num == DataGlobalConstants::ResourceType::FuelOil_2 ||
+                  coil.FuelType_Num == DataGlobalConstants::ResourceType::OtherFuel1 || coil.FuelType_Num == DataGlobalConstants::ResourceType::OtherFuel2 || coil.FuelType_Num == DataGlobalConstants::ResourceType::Coal) ||
+                coil.FuelType_Num == DataGlobalConstants::ResourceType::None) {
                 ShowSevereError(RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(3) + " entered =" + Alphas(3) + " for " +
                                 cAlphaFields(1) + '=' + Alphas(1));
                 InputErrorsFound = true;
@@ -763,7 +763,7 @@ namespace HeatingCoils {
             CoilNum = NumElecCoil + NumElecCoilMultiStage + NumFuelCoil + FuelCoilNum;
 
             CurrentModuleObject = "Coil:Heating:Gas:MultiStage";
-            HeatingCoil(CoilNum).FuelType_Num = iRT_Natural_Gas;
+            HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -924,7 +924,7 @@ namespace HeatingCoils {
             CoilNum = NumElecCoil + NumElecCoilMultiStage + NumFuelCoil + NumGasCoilMultiStage + DesuperheaterCoilNum;
 
             CurrentModuleObject = "Coil:Heating:Desuperheater";
-            HeatingCoil(CoilNum).FuelType_Num = iRT_Electricity;
+            HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,

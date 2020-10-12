@@ -2987,7 +2987,7 @@ namespace SimulationManager {
         Array1D_int VarTypes;
         Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
         Array1D_string VarNames;
-        Array1D_int ResourceTypes;
+        std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;
         Array1D_string EndUses;
         Array1D_string Groups;
 
@@ -3004,7 +3004,11 @@ namespace SimulationManager {
             VarTypes.dimension(NumVariables, 0);
             VarNames.allocate(NumVariables);
             unitsForVar.allocate(NumVariables);
-            ResourceTypes.dimension(NumVariables, 0);
+
+            for (int idx = 1; idx <= NumVariables; ++idx) {
+                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::None));
+            }
+
             EndUses.allocate(NumVariables);
             Groups.allocate(NumVariables);
             GetMeteredVariables(CompSets(Loop).CType,
@@ -3025,7 +3029,7 @@ namespace SimulationManager {
                       VarIDs(Loop1),
                       VarNames(Loop1),
                       unitEnumToString(unitsForVar(Loop1)),
-                      GetResourceTypeChar(ResourceTypes(Loop1)),
+                      GetResourceTypeChar(ResourceTypes.at(Loop1)),
                       EndUses(Loop1),
                       Groups(Loop1)
                       // TODO: Should call OutputProcessor::StandardTimeStepTypeKey(IndexTypes(Loop1)) to return "Zone" or "HVAC"
@@ -3038,7 +3042,6 @@ namespace SimulationManager {
             VarIDs.deallocate();
             VarNames.deallocate();
             unitsForVar.deallocate();
-            ResourceTypes.deallocate();
             EndUses.deallocate();
             Groups.deallocate();
         }

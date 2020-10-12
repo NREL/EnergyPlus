@@ -48,6 +48,9 @@
 #ifndef UtilityRoutines_hh_INCLUDED
 #define UtilityRoutines_hh_INCLUDED
 
+// C++ Headers
+#include <functional>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array1S.fwd.hh>
@@ -56,9 +59,8 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-
-#include <functional>
 
 namespace EnergyPlus {
 
@@ -573,7 +575,10 @@ namespace UtilityRoutines {
 
     bool ValidateFuelType(std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound, bool const &AllowSteamAndDistrict = false);
 
-    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput, std::string &FuelTypeOutput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
+    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
+                                                   std::string &FuelTypeOutput,
+                                                   DataGlobalConstants::ResourceType &FuelTypeNum,
+                                                   bool &FuelTypeErrorsFound);
 
 } // namespace UtilityRoutines
 

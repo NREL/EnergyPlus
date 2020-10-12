@@ -5017,7 +5017,7 @@ namespace EconomicTariff {
         MinTariffIndex.deallocate();
     }
 
-    void GetMonthlyCostForResource(int const inResourceNumber, Array1A<Real64> outMonthlyCosts)
+    void GetMonthlyCostForResource(DataGlobalConstants::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts)
     {
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   May 2010
