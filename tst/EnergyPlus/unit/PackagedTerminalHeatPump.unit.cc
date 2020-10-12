@@ -443,7 +443,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     // Test for #7053:
     // Fake that there is at least one UnitarySystemPerformance:Multispeed object
     UnitarySystems::DesignSpecMSHP fakeDesignSpecMSHP;
-    UnitarySystems::designSpecMSHP.push_back(fakeDesignSpecMSHP);
+    state.dataUnitarySystems->designSpecMSHP.push_back(fakeDesignSpecMSHP);
 
     bool ErrorsFound(false);
     GetZoneData(state, ErrorsFound);
