@@ -84,6 +84,7 @@ namespace EnergyPlus {
         this->dataGlobal = std::unique_ptr<DataGlobal>(new DataGlobal);
         this->dataPipes = std::unique_ptr<PipesData>(new PipesData);
         this->dataPlantChillers = std::unique_ptr<PlantChillersData>(new PlantChillersData);
+        this->dataUFADManager = std::unique_ptr<UFADManagerData>(new UFADManagerData);
         this->dataUnitarySystems = std::unique_ptr<UnitarySystemsData>(new UnitarySystemsData);
         this->dataUnitHeaters = std::unique_ptr<UnitHeatersData>(new UnitHeatersData);
         this->dataUnitVentilators = std::unique_ptr<UnitVentilatorsData>(new UnitVentilatorsData);
@@ -139,6 +140,7 @@ namespace EnergyPlus {
         this->dataGlobal->clear_state();
         this->dataPipes->clear_state();
         this->dataPlantChillers->clear_state();
+        this->dataUFADManager->clear_state();
         this->dataUnitarySystems->clear_state();
         this->dataUnitHeaters->clear_state();
         this->dataUnitVentilators->clear_state();
