@@ -95,7 +95,7 @@ namespace WindowManager {
     // Initialize window optical properties with Windows-CalcEngine routines that are BSDF based
     //void InitWCE_BSDFOpticalData();
 
-    void InitWCE_SimplifiedOpticalData(EnergyPlusData &state, IOFiles &ioFiles);
+    void InitWCE_SimplifiedOpticalData(EnergyPlusData &state);
 
     std::shared_ptr<SingleLayerOptics::CBSDFLayer> getBSDFLayer(EnergyPlusData &state,
                                                                 const Material::MaterialProperties & t_Material,

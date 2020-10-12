@@ -263,7 +263,7 @@ namespace Pumps {
         }
 
         // Set pump flow rate and calculate power
-        CalcPumps(PumpNum, FlowRequest, PumpRunning);
+        CalcPumps(state, PumpNum, FlowRequest, PumpRunning);
 
         // Update pump reporting data
         ReportPumps(PumpNum);
@@ -377,7 +377,8 @@ namespace Pumps {
 
         for (NumVarPump = 1; NumVarPump <= NumVarSpeedPumps; ++NumVarPump) {
             PumpNum = NumVarPump;
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           NumVarPump,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -394,10 +395,10 @@ namespace Pumps {
             PumpEquip(PumpNum).PumpType = Pump_VarSpeed; //'Pump:VariableSpeed'
             PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpVariableSpeed;
 
-            PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(
+            PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
-            PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(
+            PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Water Nodes");
 
@@ -414,7 +415,7 @@ namespace Pumps {
 
             // Input the optional schedule for the pump
             PumpEquip(PumpNum).PumpSchedule = cAlphaArgs(5);
-            PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(cAlphaArgs(5));
+            PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(state, cAlphaArgs(5));
             if (!lAlphaFieldBlanks(5) && !(PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
                 ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(5));
                 ShowContinueError("Schedule named =[" + cAlphaArgs(5) + "]. was not found and will not be used.");
@@ -487,7 +488,7 @@ namespace Pumps {
                 if (cAlphaArgs(7) == "MANUALCONTROL") {
                     PumpEquip(PumpNum).VFD.VFDControlType = VFDManual;
                     PumpEquip(PumpNum).VFD.ManualRPMSchedName = cAlphaArgs(8);
-                    PumpEquip(PumpNum).VFD.ManualRPMSchedIndex = GetScheduleIndex(cAlphaArgs(8));
+                    PumpEquip(PumpNum).VFD.ManualRPMSchedIndex = GetScheduleIndex(state, cAlphaArgs(8));
                     if (PumpEquip(PumpNum).VFD.ManualRPMSchedIndex <= 0) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name +
                                         "\", At least one scheduled VFD schedule input was invalid.");
@@ -502,13 +503,13 @@ namespace Pumps {
                 } else if (cAlphaArgs(7) == "PRESSURESETPOINTCONTROL") {
                     PumpEquip(PumpNum).VFD.VFDControlType = VFDAutomatic;
                     PumpEquip(PumpNum).VFD.LowerPsetSchedName = cAlphaArgs(9);
-                    PumpEquip(PumpNum).VFD.LowerPsetSchedIndex = GetScheduleIndex(cAlphaArgs(9));
+                    PumpEquip(PumpNum).VFD.LowerPsetSchedIndex = GetScheduleIndex(state, cAlphaArgs(9));
                     PumpEquip(PumpNum).VFD.UpperPsetSchedName = cAlphaArgs(10);
-                    PumpEquip(PumpNum).VFD.UpperPsetSchedIndex = GetScheduleIndex(cAlphaArgs(10));
+                    PumpEquip(PumpNum).VFD.UpperPsetSchedIndex = GetScheduleIndex(state, cAlphaArgs(10));
                     PumpEquip(PumpNum).VFD.MinRPMSchedName = cAlphaArgs(11);
-                    PumpEquip(PumpNum).VFD.MinRPMSchedIndex = GetScheduleIndex(cAlphaArgs(11));
+                    PumpEquip(PumpNum).VFD.MinRPMSchedIndex = GetScheduleIndex(state, cAlphaArgs(11));
                     PumpEquip(PumpNum).VFD.MaxRPMSchedName = cAlphaArgs(12);
-                    PumpEquip(PumpNum).VFD.MaxRPMSchedIndex = GetScheduleIndex(cAlphaArgs(12));
+                    PumpEquip(PumpNum).VFD.MaxRPMSchedIndex = GetScheduleIndex(state, cAlphaArgs(12));
                     if (min(PumpEquip(PumpNum).VFD.LowerPsetSchedIndex,
                             PumpEquip(PumpNum).VFD.UpperPsetSchedIndex,
                             PumpEquip(PumpNum).VFD.MinRPMSchedIndex,
@@ -583,7 +584,8 @@ namespace Pumps {
 
         for (NumConstPump = 1; NumConstPump <= NumConstSpeedPumps; ++NumConstPump) {
             PumpNum = NumVarSpeedPumps + NumConstPump;
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           NumConstPump,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -600,10 +602,10 @@ namespace Pumps {
             PumpEquip(PumpNum).PumpType = Pump_ConSpeed; //'Pump:ConstantSpeed'
             PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpConstantSpeed;
 
-            PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(
+            PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
-            PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(
+            PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Water Nodes");
 
@@ -642,7 +644,7 @@ namespace Pumps {
 
             // Input the optional schedule for the pump
             PumpEquip(PumpNum).PumpSchedule = cAlphaArgs(5);
-            PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(cAlphaArgs(5));
+            PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(state, cAlphaArgs(5));
             if (!lAlphaFieldBlanks(5) && !(PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
                 ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(5));
                 ShowContinueError("Schedule named =[" + cAlphaArgs(5) + "]. was not found and will not be used.");
@@ -721,7 +723,8 @@ namespace Pumps {
         cCurrentModuleObject = cPump_Cond;
         for (NumCondPump = 1; NumCondPump <= NumCondensatePumps; ++NumCondPump) {
             PumpNum = NumCondPump + NumVarSpeedPumps + NumConstSpeedPumps;
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           NumCondPump,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -738,10 +741,10 @@ namespace Pumps {
             PumpEquip(PumpNum).PumpType = Pump_Cond; //'Pump:VariableSpeed:Condensate'
             PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpCondensate;
 
-            PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(
+            PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
-            PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(
+            PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Water Nodes");
 
@@ -750,7 +753,7 @@ namespace Pumps {
 
             // Input the optional schedule for the pump
             PumpEquip(PumpNum).PumpSchedule = cAlphaArgs(4);
-            PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(cAlphaArgs(4));
+            PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(state, cAlphaArgs(4));
             if (!lAlphaFieldBlanks(4) && !(PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
                 ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(4));
                 ShowContinueError("Schedule named =[" + cAlphaArgs(4) + "]. was not found and will not be used.");
@@ -795,8 +798,8 @@ namespace Pumps {
                 PumpEquip(PumpNum).NomVolFlowRateWasAutoSized = true;
             } else {
                 // Calc Condensate Pump Water Volume Flow Rate
-                SteamDensity = GetSatDensityRefrig(fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineNameNoColon);
-                TempWaterDensity = GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName);
+                SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineNameNoColon);
+                TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName);
                 PumpEquip(PumpNum).NomVolFlowRate = (PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity) / TempWaterDensity;
             }
 
@@ -831,7 +834,8 @@ namespace Pumps {
         cCurrentModuleObject = cPumpBank_VarSpeed;
         for (NumVarPumpBankSimple = 1; NumVarPumpBankSimple <= NumPumpBankSimpleVar; ++NumVarPumpBankSimple) {
             PumpNum = NumVarPumpBankSimple + NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps;
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           NumVarPumpBankSimple,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -848,10 +852,10 @@ namespace Pumps {
             PumpEquip(PumpNum).PumpType = PumpBank_VarSpeed; //'HeaderedPumps:VariableSpeed'
             PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpBankVariableSpeed;
 
-            PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(
+            PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
-            PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(
+            PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Water Nodes");
 
@@ -881,7 +885,7 @@ namespace Pumps {
 
             // Input the optional schedule for the pump
             PumpEquip(PumpNum).PumpSchedule = cAlphaArgs(6);
-            PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(cAlphaArgs(6));
+            PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(state, cAlphaArgs(6));
             if (!lAlphaFieldBlanks(6) && !(PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
                 ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(6));
                 ShowContinueError("Schedule named =[" + cAlphaArgs(6) + "]. was not found and will not be used.");
@@ -953,7 +957,8 @@ namespace Pumps {
         cCurrentModuleObject = cPumpBank_ConSpeed;
         for (NumConstPumpBankSimple = 1; NumConstPumpBankSimple <= NumPumpBankSimpleConst; ++NumConstPumpBankSimple) {
             PumpNum = NumConstPumpBankSimple + NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps + NumPumpBankSimpleVar;
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           NumConstPumpBankSimple,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -970,10 +975,10 @@ namespace Pumps {
             PumpEquip(PumpNum).PumpType = PumpBank_ConSpeed; //'HeaderedPumps:ConstantSpeed'
             PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpBankConstantSpeed;
 
-            PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(
+            PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
-            PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(
+            PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Water Nodes");
 
@@ -1002,7 +1007,7 @@ namespace Pumps {
 
             // Input the optional schedule for the pump
             PumpEquip(PumpNum).PumpSchedule = cAlphaArgs(6);
-            PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(cAlphaArgs(6));
+            PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(state, cAlphaArgs(6));
             if (!lAlphaFieldBlanks(6) && !(PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
                 ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(6));
                 ShowContinueError("Schedule named =[" + cAlphaArgs(6) + "]. was not found and will not be used.");
@@ -1080,7 +1085,7 @@ namespace Pumps {
             if (PumpEquip(PumpNum).PumpType == Pump_VarSpeed || PumpEquip(PumpNum).PumpType == Pump_ConSpeed ||
                 PumpEquip(PumpNum).PumpType == Pump_Cond) {
 
-                SetupOutputVariable("Pump Electricity Energy",
+                SetupOutputVariable(state, "Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     PumpEquip(PumpNum).Energy,
                                     "System",
@@ -1091,29 +1096,29 @@ namespace Pumps {
                                     "Pumps",
                                     PumpEquip(PumpNum).EndUseSubcategoryName,
                                     "Plant");
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "Pump Electricity Rate", OutputProcessor::Unit::W, PumpEquip(PumpNum).Power, "System", "Average", PumpEquip(PumpNum).Name);
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "Pump Shaft Power", OutputProcessor::Unit::W, PumpEquipReport(PumpNum).ShaftPower, "System", "Average", PumpEquip(PumpNum).Name);
-                SetupOutputVariable("Pump Fluid Heat Gain Rate",
+                SetupOutputVariable(state, "Pump Fluid Heat Gain Rate",
                                     OutputProcessor::Unit::W,
                                     PumpEquipReport(PumpNum).PumpHeattoFluid,
                                     "System",
                                     "Average",
                                     PumpEquip(PumpNum).Name);
-                SetupOutputVariable("Pump Fluid Heat Gain Energy",
+                SetupOutputVariable(state, "Pump Fluid Heat Gain Energy",
                                     OutputProcessor::Unit::J,
                                     PumpEquipReport(PumpNum).PumpHeattoFluidEnergy,
                                     "System",
                                     "Sum",
                                     PumpEquip(PumpNum).Name);
-                SetupOutputVariable("Pump Outlet Temperature",
+                SetupOutputVariable(state, "Pump Outlet Temperature",
                                     OutputProcessor::Unit::C,
                                     PumpEquipReport(PumpNum).OutletTemp,
                                     "System",
                                     "Average",
                                     PumpEquip(PumpNum).Name);
-                SetupOutputVariable("Pump Mass Flow Rate",
+                SetupOutputVariable(state, "Pump Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     PumpEquipReport(PumpNum).PumpMassFlowRate,
                                     "System",
@@ -1123,7 +1128,7 @@ namespace Pumps {
             if (PumpEquip(PumpNum).PumpType == PumpBank_VarSpeed ||
                 PumpEquip(PumpNum).PumpType == PumpBank_ConSpeed) { // CurrentModuleObject='HeaderedPumps'
 
-                SetupOutputVariable("Pump Electricity Energy",
+                SetupOutputVariable(state, "Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     PumpEquip(PumpNum).Energy,
                                     "System",
@@ -1134,35 +1139,35 @@ namespace Pumps {
                                     "Pumps",
                                     PumpEquip(PumpNum).EndUseSubcategoryName,
                                     "Plant");
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "Pump Electricity Rate", OutputProcessor::Unit::W, PumpEquip(PumpNum).Power, "System", "Average", PumpEquip(PumpNum).Name);
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "Pump Shaft Power", OutputProcessor::Unit::W, PumpEquipReport(PumpNum).ShaftPower, "System", "Average", PumpEquip(PumpNum).Name);
-                SetupOutputVariable("Pump Fluid Heat Gain Rate",
+                SetupOutputVariable(state, "Pump Fluid Heat Gain Rate",
                                     OutputProcessor::Unit::W,
                                     PumpEquipReport(PumpNum).PumpHeattoFluid,
                                     "System",
                                     "Average",
                                     PumpEquip(PumpNum).Name);
-                SetupOutputVariable("Pump Fluid Heat Gain Energy",
+                SetupOutputVariable(state, "Pump Fluid Heat Gain Energy",
                                     OutputProcessor::Unit::J,
                                     PumpEquipReport(PumpNum).PumpHeattoFluidEnergy,
                                     "System",
                                     "Sum",
                                     PumpEquip(PumpNum).Name);
-                SetupOutputVariable("Pump Outlet Temperature",
+                SetupOutputVariable(state, "Pump Outlet Temperature",
                                     OutputProcessor::Unit::C,
                                     PumpEquipReport(PumpNum).OutletTemp,
                                     "System",
                                     "Average",
                                     PumpEquip(PumpNum).Name);
-                SetupOutputVariable("Pump Mass Flow Rate",
+                SetupOutputVariable(state, "Pump Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     PumpEquipReport(PumpNum).PumpMassFlowRate,
                                     "System",
                                     "Average",
                                     PumpEquip(PumpNum).Name);
-                SetupOutputVariable("Pump Operating Pumps Count",
+                SetupOutputVariable(state, "Pump Operating Pumps Count",
                                     OutputProcessor::Unit::None,
                                     PumpEquipReport(PumpNum).NumPumpsOperating,
                                     "System",
@@ -1188,25 +1193,25 @@ namespace Pumps {
 
             if (PumpEquip(PumpNum).HeatLossesToZone) {
                 // setup skin loss output vars
-                SetupOutputVariable("Pump Zone Total Heating Rate",
+                SetupOutputVariable(state, "Pump Zone Total Heating Rate",
                                     OutputProcessor::Unit::W,
                                     PumpEquipReport(PumpNum).ZoneTotalGainRate,
                                     "System",
                                     "Average",
                                     PumpEquip(PumpNum).Name);
-                SetupOutputVariable("Pump Zone Total Heating Energy",
+                SetupOutputVariable(state, "Pump Zone Total Heating Energy",
                                     OutputProcessor::Unit::J,
                                     PumpEquipReport(PumpNum).ZoneTotalGainEnergy,
                                     "System",
                                     "Sum",
                                     PumpEquip(PumpNum).Name);
-                SetupOutputVariable("Pump Zone Convective Heating Rate",
+                SetupOutputVariable(state, "Pump Zone Convective Heating Rate",
                                     OutputProcessor::Unit::W,
                                     PumpEquipReport(PumpNum).ZoneConvGainRate,
                                     "System",
                                     "Average",
                                     PumpEquip(PumpNum).Name);
-                SetupOutputVariable("Pump Zone Radiative Heating Rate",
+                SetupOutputVariable(state, "Pump Zone Radiative Heating Rate",
                                     OutputProcessor::Unit::W,
                                     PumpEquipReport(PumpNum).ZoneRadGainRate,
                                     "System",
@@ -1371,7 +1376,7 @@ namespace Pumps {
                 .Comp(PumpEquip(PumpNum).CompNum)
                 .CompNum = PumpNum;
 
-            SizePump(PumpNum);
+            SizePump(state, PumpNum);
 
             // calculate the efficiency for each pump
             // by calculating the efficiency for each pump being simulated.  The calculation
@@ -1427,7 +1432,7 @@ namespace Pumps {
 
         // HVAC Sizing Simulation resizing calls if needed
         if (RedoSizesHVACSimulation && !PlantReSizingCompleted) {
-            SizePump(PumpNum);
+            SizePump(state, PumpNum);
         }
 
         // Begin environment inits
@@ -1436,8 +1441,8 @@ namespace Pumps {
         if (PumpEquip(PumpNum).PumpInitFlag && BeginEnvrnFlag) {
             if (PumpEquip(PumpNum).PumpType == Pump_Cond) {
 
-                TempWaterDensity = GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName);
-                SteamDensity = GetSatDensityRefrig(fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineName);
+                TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName);
+                SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineName);
                 PumpEquip(PumpNum).NomVolFlowRate = (PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity) / TempWaterDensity;
 
                 // set the maximum flow rate on the outlet node
@@ -1462,7 +1467,8 @@ namespace Pumps {
                 PumpEquip(PumpNum).MassFlowRateMin = PumpEquip(PumpNum).MinVolFlowRate * SteamDensity;
 
             } else {
-                TempWaterDensity = GetDensityGlycol(PlantLoop(PumpEquip(PumpNum).LoopNum).FluidName,
+                TempWaterDensity = GetDensityGlycol(state,
+                                                    PlantLoop(PumpEquip(PumpNum).LoopNum).FluidName,
                                                     DataGlobals::InitConvTemp,
                                                     PlantLoop(PumpEquip(PumpNum).LoopNum).FluidIndex,
                                                     RoutineName);
@@ -1714,7 +1720,7 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void CalcPumps(int const PumpNum, Real64 const FlowRequest, bool &PumpRunning)
+    void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowRequest, bool &PumpRunning)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1881,7 +1887,7 @@ namespace Pumps {
 
         // density used for volumetric flow calculations
         LoopDensity = GetDensityGlycol(
-            PlantLoop(PumpEquip(PumpNum).LoopNum).FluidName, Node(InletNode).Temp, PlantLoop(PumpEquip(PumpNum).LoopNum).FluidIndex, RoutineName);
+            state, PlantLoop(PumpEquip(PumpNum).LoopNum).FluidName, Node(InletNode).Temp, PlantLoop(PumpEquip(PumpNum).LoopNum).FluidIndex, RoutineName);
 
         //****************************!
         //***** CALCULATE POWER (1) **!
@@ -1988,7 +1994,7 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void SizePump(int const PumpNum)
+    void SizePump(EnergyPlusData &state, int const PumpNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2045,12 +2051,13 @@ namespace Pumps {
 
         // Calculate density at InitConvTemp once here, to remove RhoH2O calls littered throughout
         if (PumpEquip(PumpNum).LoopNum > 0) {
-            TempWaterDensity = GetDensityGlycol(PlantLoop(PumpEquip(PumpNum).LoopNum).FluidName,
+            TempWaterDensity = GetDensityGlycol(state,
+                                                PlantLoop(PumpEquip(PumpNum).LoopNum).FluidName,
                                                 DataGlobals::InitConvTemp,
                                                 PlantLoop(PumpEquip(PumpNum).LoopNum).FluidIndex,
                                                 RoutineName);
         } else {
-            TempWaterDensity = GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName);
+            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName);
         }
 
         // note: we assume pump impeller efficiency is 78% for autosizing
@@ -2098,8 +2105,8 @@ namespace Pumps {
                     if (!PlantLoop(PumpEquip(PumpNum).LoopNum).LoopSide(PumpEquip(PumpNum).LoopSideNum).BranchPumpsExist) {
                         // size pump to full flow of plant loop
                         if (PumpEquip(PumpNum).PumpType == Pump_Cond) {
-                            TempWaterDensity = GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName);
-                            SteamDensity = GetSatDensityRefrig(fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineNameSizePumps);
+                            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName);
+                            SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineNameSizePumps);
                             PumpEquip(PumpNum).NomSteamVolFlowRate = PlantSizData(PlantSizNum).DesVolFlowRate * PumpSizFac;
                             PumpEquip(PumpNum).NomVolFlowRate = PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
                         } else {
@@ -2110,8 +2117,8 @@ namespace Pumps {
                         DesVolFlowRatePerBranch = PlantSizData(PlantSizNum).DesVolFlowRate /
                                                   PlantLoop(PumpEquip(PumpNum).LoopNum).LoopSide(PumpEquip(PumpNum).LoopSideNum).TotalPumps;
                         if (PumpEquip(PumpNum).PumpType == Pump_Cond) {
-                            TempWaterDensity = GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName);
-                            SteamDensity = GetSatDensityRefrig(fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineNameSizePumps);
+                            TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, DummyWaterIndex, RoutineName);
+                            SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, PumpEquip(PumpNum).FluidIndex, RoutineNameSizePumps);
                             PumpEquip(PumpNum).NomSteamVolFlowRate = DesVolFlowRatePerBranch * PumpSizFac;
                             PumpEquip(PumpNum).NomVolFlowRate = PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
                         } else {

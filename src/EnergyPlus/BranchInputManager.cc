@@ -1037,7 +1037,8 @@ namespace BranchInputManager {
                 lNumericBlanks.dimension(NumNumbers, true);
                 BCount = 0;
                 for (int Count = 1; Count <= state.dataBranchInputManager->NumOfBranches; ++Count) {
-                    inputProcessor->getObjectItem(CurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  CurrentModuleObject,
                                                   Count,
                                                   Alphas,
                                                   NumAlphas,
@@ -1130,7 +1131,7 @@ namespace BranchInputManager {
             }
             state.dataBranchInputManager->Branch(BCount).Component(Comp).CType = Alphas(Loop);
             state.dataBranchInputManager->Branch(BCount).Component(Comp).Name = Alphas(Loop + 1);
-            ValidateComponent(Alphas(Loop), Alphas(Loop + 1), IsNotOK, CurrentModuleObject);
+            ValidateComponent(state, Alphas(Loop), Alphas(Loop + 1), IsNotOK, CurrentModuleObject);
             if (IsNotOK) {
                 ShowContinueError("Occurs on " + CurrentModuleObject + '=' + Alphas(1));
                 ErrFound = true;
@@ -1143,7 +1144,8 @@ namespace BranchInputManager {
                 ConnectionType = NodeConnectionType_Internal;
             }
             if (!lAlphaBlanks(Loop + 2)) {
-                GetNodeNums(state.dataBranchInputManager->Branch(BCount).Component(Comp).InletNodeName,
+                GetNodeNums(state,
+                            state.dataBranchInputManager->Branch(BCount).Component(Comp).InletNodeName,
                             NumNodes,
                             NodeNums,
                             ErrFound,
@@ -1180,7 +1182,8 @@ namespace BranchInputManager {
                 ConnectionType = NodeConnectionType_Internal;
             }
             if (!lAlphaBlanks(Loop + 3)) {
-                GetNodeNums(state.dataBranchInputManager->Branch(BCount).Component(Comp).OutletNodeName,
+                GetNodeNums(state,
+                            state.dataBranchInputManager->Branch(BCount).Component(Comp).OutletNodeName,
                             NumNodes,
                             NodeNums,
                             ErrFound,
@@ -1301,7 +1304,8 @@ namespace BranchInputManager {
         BCount = 0;
         for (Count = 1; Count <= state.dataBranchInputManager->NumOfBranchLists; ++Count) {
             CurrentModuleObject = "BranchList";
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Count,
                                           Alphas,
                                           NumAlphas,
@@ -1461,7 +1465,8 @@ namespace BranchInputManager {
         lAlphaBlanks.dimension(NumAlphas, true);
         lNumericBlanks.dimension(NumNumbers, true);
         for (Count = 1; Count <= state.dataBranchInputManager->NumOfConnectorLists; ++Count) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Count,
                                           Alphas,
                                           NumAlphas,
@@ -1697,7 +1702,8 @@ namespace BranchInputManager {
         lAlphaBlanks.dimension(NumAlphas, true);
         lNumericBlanks.dimension(NumNumbers, true);
         for (Count = 1; Count <= state.dataBranchInputManager->NumSplitters; ++Count) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Count,
                                           Alphas,
                                           NumAlphas,
@@ -1790,7 +1796,7 @@ namespace BranchInputManager {
                 FoundLoop = std::string();
                 MatchedLoop = false;
                 // 3.  Find the loop and type
-                FindAirPlantCondenserLoopFromBranchList(BranchListName, FoundLoop, FoundSupplyDemandAir, MatchedLoop);
+                FindAirPlantCondenserLoopFromBranchList(state, BranchListName, FoundLoop, FoundSupplyDemandAir, MatchedLoop);
                 if (MatchedLoop) {
                     SaveSupplyDemandAir = FoundSupplyDemandAir;
                     SaveLoop = FoundLoop;
@@ -1822,7 +1828,7 @@ namespace BranchInputManager {
                     FoundLoop = std::string();
                     MatchedLoop = false;
                     // 3.  Find the loop and type
-                    FindAirPlantCondenserLoopFromBranchList(BranchListName, FoundLoop, FoundSupplyDemandAir, MatchedLoop);
+                    FindAirPlantCondenserLoopFromBranchList(state, BranchListName, FoundLoop, FoundSupplyDemandAir, MatchedLoop);
                     if (MatchedLoop) {
                         if (SaveSupplyDemandAir != FoundSupplyDemandAir || SaveLoop != FoundLoop) {
                             ShowSevereError("GetSplitterInput: Outlet Splitter Branch=\"" + TestName + "\" does not match types of Inlet Branch.");
@@ -1925,7 +1931,8 @@ namespace BranchInputManager {
         lAlphaBlanks.dimension(NumAlphas, true);
         lNumericBlanks.dimension(NumNumbers, true);
         for (Count = 1; Count <= state.dataBranchInputManager->NumMixers; ++Count) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Count,
                                           Alphas,
                                           NumAlphas,
@@ -2017,7 +2024,7 @@ namespace BranchInputManager {
                 FoundLoop = std::string();
                 MatchedLoop = false;
                 // 3.  Find the loop and type
-                FindAirPlantCondenserLoopFromBranchList(BranchListName, FoundLoop, FoundSupplyDemandAir, MatchedLoop);
+                FindAirPlantCondenserLoopFromBranchList(state, BranchListName, FoundLoop, FoundSupplyDemandAir, MatchedLoop);
                 if (MatchedLoop) {
                     SaveSupplyDemandAir = FoundSupplyDemandAir;
                     SaveLoop = FoundLoop;
@@ -2049,7 +2056,7 @@ namespace BranchInputManager {
                     FoundLoop = std::string();
                     MatchedLoop = false;
                     // 3.  Find the plant loop and type
-                    FindAirPlantCondenserLoopFromBranchList(BranchListName, FoundLoop, FoundSupplyDemandAir, MatchedLoop);
+                    FindAirPlantCondenserLoopFromBranchList(state, BranchListName, FoundLoop, FoundSupplyDemandAir, MatchedLoop);
                     if (MatchedLoop) {
                         if (SaveSupplyDemandAir != FoundSupplyDemandAir || SaveLoop != FoundLoop) {
                             ShowSevereError("GetMixerInput: Outlet Mixer Branch=\"" + TestName + "\" does not match types of Inlet Branch.");
@@ -2080,7 +2087,8 @@ namespace BranchInputManager {
         }
     }
 
-    void FindPlantLoopBranchConnection(std::string const &BranchListName,
+    void FindPlantLoopBranchConnection(EnergyPlusData &state,
+                                       std::string const &BranchListName,
                                        std::string &FoundPlantLoopName,
                                        int &FoundPlantLoopNum,
                                        std::string &FoundSupplyDemand,
@@ -2119,7 +2127,7 @@ namespace BranchInputManager {
         Numbers.allocate(NumNumbers);
 
         for (Num = 1; Num <= NumPlantLoops; ++Num) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
+            inputProcessor->getObjectItem(state, CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
             // Only looking for BranchList here.
             if (Alphas(8) == BranchListName) {
                 FoundPlantLoopName = Alphas(1);
@@ -2142,7 +2150,8 @@ namespace BranchInputManager {
         Numbers.deallocate();
     }
 
-    void FindCondenserLoopBranchConnection(std::string const &BranchListName,
+    void FindCondenserLoopBranchConnection(EnergyPlusData &state,
+                                           std::string const &BranchListName,
                                            std::string &FoundCondLoopName,
                                            int &FoundCondLoopNum,
                                            std::string &FoundSupplyDemand,
@@ -2178,7 +2187,7 @@ namespace BranchInputManager {
         Numbers.allocate(NumNumbers);
 
         for (Num = 1; Num <= NumCondLoops; ++Num) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
+            inputProcessor->getObjectItem(state, CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
             // Only looking for BranchList here.
             if (Alphas(8) == BranchListName) {
                 FoundCondLoopName = Alphas(1);
@@ -2201,7 +2210,8 @@ namespace BranchInputManager {
         Numbers.deallocate();
     }
 
-    void FindAirLoopBranchConnection(std::string const &BranchListName,
+    void FindAirLoopBranchConnection(EnergyPlusData &state,
+                                     std::string const &BranchListName,
                                      std::string &FoundAirLoopName,
                                      int &FoundAirLoopNum,
                                      std::string &FoundAir,
@@ -2239,7 +2249,7 @@ namespace BranchInputManager {
         Numbers.allocate(NumNumbers);
 
         for (Num = 1; Num <= NumAirLoops; ++Num) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
+            inputProcessor->getObjectItem(state, CurrentModuleObject, Num, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
             // Only looking for BranchList here.
             if (Alphas(4) == BranchListName) {
                 FoundAirLoopName = Alphas(1);
@@ -2255,7 +2265,8 @@ namespace BranchInputManager {
         Numbers.deallocate();
     }
 
-    void FindAirPlantCondenserLoopFromBranchList(std::string const &BranchListName, // Branch List Name
+    void FindAirPlantCondenserLoopFromBranchList(EnergyPlusData &state,
+                                                 std::string const &BranchListName, // Branch List Name
                                                  std::string &LoopType,             // LoopType (if found, Plant,Condenser or Air)
                                                  std::string &LoopSupplyDemandAir,  // Supply if "Supply" or Demand if "Demand" or Air if "Air"
                                                  bool &MatchedLoop                  // true if found
@@ -2288,7 +2299,7 @@ namespace BranchInputManager {
         LoopType = std::string();
 
         // Try Plant first
-        FindPlantLoopBranchConnection(BranchListName, FoundLoopName, FoundLoopNum, LoopSupplyDemandAir, FoundLoopVolFlowRate, MatchedLoop);
+        FindPlantLoopBranchConnection(state, BranchListName, FoundLoopName, FoundLoopNum, LoopSupplyDemandAir, FoundLoopVolFlowRate, MatchedLoop);
 
         if (MatchedLoop) LoopType = "Plant";
         if (!MatchedLoop) { // Try Condenser Loop
@@ -2299,7 +2310,7 @@ namespace BranchInputManager {
             MatchedLoop = false;
 
             // Try Condenser
-            FindCondenserLoopBranchConnection(BranchListName, FoundLoopName, FoundLoopNum, LoopSupplyDemandAir, FoundLoopVolFlowRate, MatchedLoop);
+            FindCondenserLoopBranchConnection(state, BranchListName, FoundLoopName, FoundLoopNum, LoopSupplyDemandAir, FoundLoopVolFlowRate, MatchedLoop);
             if (MatchedLoop) LoopType = "Condenser";
         }
 
@@ -2311,7 +2322,7 @@ namespace BranchInputManager {
             MatchedLoop = false;
 
             // Try Air
-            FindAirLoopBranchConnection(BranchListName, FoundLoopName, FoundLoopNum, LoopSupplyDemandAir, FoundLoopVolFlowRate, MatchedLoop);
+            FindAirLoopBranchConnection(state, BranchListName, FoundLoopName, FoundLoopNum, LoopSupplyDemandAir, FoundLoopVolFlowRate, MatchedLoop);
             if (MatchedLoop) LoopType = "Air";
         }
     }
@@ -2393,7 +2404,7 @@ namespace BranchInputManager {
         }
     }
 
-    void TestBranchIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound)
+    void TestBranchIntegrity(EnergyPlusData &state, bool &ErrFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2458,18 +2469,18 @@ namespace BranchInputManager {
 
         BranchNodes.allocate(state.dataBranchInputManager->NumOfBranches);
 
-        print(ioFiles.bnd, "{}\n", "! ===============================================================");
+        print(state.files.bnd, "{}\n", "! ===============================================================");
         static constexpr auto Format_700("! <#Branch Lists>,<Number of Branch Lists>");
-        print(ioFiles.bnd, "{}\n", Format_700);
-        print(ioFiles.bnd, " #Branch Lists,{}\n", state.dataBranchInputManager->NumOfBranchLists);
+        print(state.files.bnd, "{}\n", Format_700);
+        print(state.files.bnd, " #Branch Lists,{}\n", state.dataBranchInputManager->NumOfBranchLists);
         static constexpr auto Format_702("! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>");
-        print(ioFiles.bnd, "{}\n", Format_702);
+        print(state.files.bnd, "{}\n", Format_702);
         static constexpr auto Format_704(
             "! <Branch>,<Branch Count>,<Branch Name>,<Loop Name>,<Loop Type>,<Branch Inlet Node Name>,<Branch Outlet Node Name>");
-        print(ioFiles.bnd, "{}\n", Format_704);
+        print(state.files.bnd, "{}\n", Format_704);
 
         for (BCount = 1; BCount <= state.dataBranchInputManager->NumOfBranchLists; ++BCount) {
-            print(ioFiles.bnd,
+            print(state.files.bnd,
                   " Branch List,{},{},{},{},{}\n",
                   BCount,
                   state.dataBranchInputManager->BranchList(BCount).Name,
@@ -2503,7 +2514,7 @@ namespace BranchInputManager {
             for (Count = 1; Count <= state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames; ++Count) {
                 Found = FoundBranches(Count);
                 if (Found == 0) {
-                    print(ioFiles.bnd,
+                    print(state.files.bnd,
                           "   Branch,{},{},(not found),**Unknown**,**Unknown**,**Unknown**,**Unknown**\n",
                           Count,
                           state.dataBranchInputManager->BranchList(BCount).BranchNames(Count));
@@ -2579,7 +2590,7 @@ namespace BranchInputManager {
                     BranchLoopName = state.dataBranchInputManager->Branch(Found).AssignedLoopName;
                     BranchLoopType = "**Unknown**";
                 }
-                print(ioFiles.bnd,
+                print(state.files.bnd,
                       "   Branch,{},{},{},{},{},{}\n",
                       Count,
                       state.dataBranchInputManager->Branch(Found).Name,
@@ -2663,8 +2674,8 @@ namespace BranchInputManager {
         }
         if (BCount > 0) {
             static constexpr auto Format_706("! <# Orphaned Branches>,<Number of Branches not on Branch Lists>");
-            print(ioFiles.bnd, "{}\n", Format_706);
-            print(ioFiles.bnd, " #Orphaned Branches,{}\n", BCount);
+            print(state.files.bnd, "{}\n", Format_706);
+            print(state.files.bnd, " #Orphaned Branches,{}\n", BCount);
             ShowWarningError("There are orphaned Branches in input. See .bnd file for details.");
 
             BCount = 0;
@@ -2702,7 +2713,7 @@ namespace BranchInputManager {
                     BranchLoopName = state.dataBranchInputManager->Branch(Count).AssignedLoopName;
                     BranchLoopType = "**Unknown**";
                 }
-                print(ioFiles.bnd,
+                print(state.files.bnd,
                       " Branch,{},{},{},{},{},{}\n",
                       BCount,
                       state.dataBranchInputManager->Branch(Count).Name,

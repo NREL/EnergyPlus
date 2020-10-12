@@ -777,7 +777,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2ADU)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
     DataZoneEquipment::GetZoneEquipmentData1(state);
@@ -789,7 +789,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2ADU)
     SingleDuct::GetSysInput(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SplitterComponent::GetSplitterInput();
+    SplitterComponent::GetSplitterInput(state);
     EXPECT_TRUE(compare_err_stream(""));
     SimAirServingZones::GetAirPathData(state);
     // Expect warnings about no controllers, clear err_stream
@@ -1009,7 +1009,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
     DataZoneEquipment::GetZoneEquipmentData1(state);
@@ -1021,7 +1021,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
     SingleDuct::GetSysInput(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SplitterComponent::GetSplitterInput();
+    SplitterComponent::GetSplitterInput(state);
     EXPECT_TRUE(compare_err_stream(""));
     SimAirServingZones::GetAirPathData(state);
     // Expect warnings about no controllers, clear err_stream
@@ -1274,7 +1274,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUa)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
     DataZoneEquipment::GetZoneEquipmentData1(state);
@@ -1286,7 +1286,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUa)
     SingleDuct::GetSysInput(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SplitterComponent::GetSplitterInput();
+    SplitterComponent::GetSplitterInput(state);
     EXPECT_TRUE(compare_err_stream(""));
     SimAirServingZones::GetAirPathData(state);
     // Expect warnings about no controllers, clear err_stream
@@ -1540,7 +1540,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
     DataZoneEquipment::GetZoneEquipmentData1(state);
@@ -1552,7 +1552,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
     SingleDuct::GetSysInput(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SplitterComponent::GetSplitterInput();
+    SplitterComponent::GetSplitterInput(state);
     EXPECT_TRUE(compare_err_stream(""));
     SimAirServingZones::GetAirPathData(state);
     // Expect warnings about no controllers, clear err_stream

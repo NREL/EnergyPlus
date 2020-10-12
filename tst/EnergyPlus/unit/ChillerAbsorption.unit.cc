@@ -1817,7 +1817,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     PlantLoop(GenLoopNum).LoopSide(GenLoopSideNum).FlowLock = 0;
     // run CalcBLASTAbsorberModel
     thisChiller.EquipFlowCtrl = EquipFlowCtrl;
-    thisChiller.calculate(AbsChillEvapLoad, AbsChillRunFlag);
+    thisChiller.calculate(state, AbsChillEvapLoad, AbsChillRunFlag);
     // check generator hot water mass flow rate is proportional to the chilled water flow rate
     EXPECT_EQ(DataLoopNode::Node(GeneratorInletNode).MassFlowRate, GenMassFlowRateTestResult);
     EXPECT_EQ(DataLoopNode::Node(GeneratorOutletNode).MassFlowRate, GenMassFlowRateTestResult);

@@ -159,7 +159,7 @@ namespace CostEstimateManager {
         cCurrentModuleObject = "ComponentCost:LineItem";
 
         for (Item = 1; Item <= state.dataCostEstimateManager->NumLineItems; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+            inputProcessor->getObjectItem(state, cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
             state.dataCostEstimateManager->CostLineItem(Item).LineName = cAlphaArgs(1);
             state.dataCostEstimateManager->CostLineItem(Item).ParentObjType = cAlphaArgs(3);
             state.dataCostEstimateManager->CostLineItem(Item).ParentObjName = cAlphaArgs(4);
@@ -178,7 +178,7 @@ namespace CostEstimateManager {
         cCurrentModuleObject = "ComponentCost:Adjustments";
         NumCostAdjust = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (NumCostAdjust == 1) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+            inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
             state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter = rNumericArgs(1);
             state.dataCostEstimateManager->CurntBldg.DesignFeeFrac = rNumericArgs(2);
             state.dataCostEstimateManager->CurntBldg.ContractorFeeFrac = rNumericArgs(3);
@@ -195,7 +195,7 @@ namespace CostEstimateManager {
         cCurrentModuleObject = "ComponentCost:Reference";
         NumRefAdjust = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (NumRefAdjust == 1) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+            inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
             state.dataCostEstimateManager->RefrncBldg.LineItemTot = rNumericArgs(1);
             state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter = rNumericArgs(2);
             state.dataCostEstimateManager->RefrncBldg.DesignFeeFrac = rNumericArgs(3);

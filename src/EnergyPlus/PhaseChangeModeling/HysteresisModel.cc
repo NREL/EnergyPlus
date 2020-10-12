@@ -47,6 +47,7 @@
 
 #include <ObjexxFCL/Array1D.hh>
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -62,10 +63,10 @@ namespace HysteresisPhaseChange {
     int numHysteresisModels = 0;
     std::vector<HysteresisPhaseChange> hysteresisPhaseChangeModels;
 
-    HysteresisPhaseChange *HysteresisPhaseChange::factory(const std::string &objectName)
+    HysteresisPhaseChange *HysteresisPhaseChange::factory(EnergyPlusData &state, const std::string &objectName)
     {
         if (getHysteresisModels) {
-            readAllHysteresisModels();
+            readAllHysteresisModels(state);
             getHysteresisModels = false;
         }
         for (auto &hm : hysteresisPhaseChangeModels) {
@@ -317,7 +318,7 @@ namespace HysteresisPhaseChange {
         }
     }
 
-    void readAllHysteresisModels()
+    void readAllHysteresisModels(EnergyPlusData &state)
     {
 
         // convenience variables
@@ -333,7 +334,8 @@ namespace HysteresisPhaseChange {
             int numNumbers;
 
             // get the input data and store it in the Shortcuts structures
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           hmNum,
                                           DataIPShortCuts::cAlphaArgs,
                                           numAlphas,

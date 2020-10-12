@@ -52,6 +52,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 struct CoolingWaterDesAirOutletTempSizer : BaseSizerWithFanHeatInputs
 {
     CoolingWaterDesAirOutletTempSizer()
@@ -61,7 +64,7 @@ struct CoolingWaterDesAirOutletTempSizer : BaseSizerWithFanHeatInputs
     }
     ~CoolingWaterDesAirOutletTempSizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 
     void clearState();
 };

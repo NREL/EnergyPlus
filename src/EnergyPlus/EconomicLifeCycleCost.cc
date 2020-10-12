@@ -251,7 +251,7 @@ namespace EconomicLifeCycleCost {
 
     // Functions
 
-    void GetInputForLifeCycleCost()
+    void GetInputForLifeCycleCost(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -286,11 +286,11 @@ namespace EconomicLifeCycleCost {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (GetInput_GetLifeCycleCostInput) {
-            GetInputLifeCycleCostParameters();
-            GetInputLifeCycleCostRecurringCosts();
-            GetInputLifeCycleCostNonrecurringCost();
-            GetInputLifeCycleCostUsePriceEscalation();
-            GetInputLifeCycleCostUseAdjustment();
+            GetInputLifeCycleCostParameters(state);
+            GetInputLifeCycleCostRecurringCosts(state);
+            GetInputLifeCycleCostNonrecurringCost(state);
+            GetInputLifeCycleCostUsePriceEscalation(state);
+            GetInputLifeCycleCostUseAdjustment(state);
             GetInput_GetLifeCycleCostInput = false;
         }
     }
@@ -346,7 +346,7 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputLifeCycleCostParameters()
+    void GetInputLifeCycleCostParameters(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -377,7 +377,8 @@ namespace EconomicLifeCycleCost {
             LCCparamPresent = false;
         } else if (NumObj == 1) {
             LCCparamPresent = true;
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           AlphaArray,
                                           NumAlphas,
@@ -596,7 +597,7 @@ namespace EconomicLifeCycleCost {
         }
     }
 
-    void GetInputLifeCycleCostRecurringCosts()
+    void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -625,7 +626,8 @@ namespace EconomicLifeCycleCost {
         numRecurringCosts = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         RecurringCosts.allocate(numRecurringCosts);
         for (iInObj = 1; iInObj <= numRecurringCosts; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           AlphaArray,
                                           NumAlphas,
@@ -776,7 +778,7 @@ namespace EconomicLifeCycleCost {
         }
     }
 
-    void GetInputLifeCycleCostNonrecurringCost()
+    void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -811,7 +813,8 @@ namespace EconomicLifeCycleCost {
             NonrecurringCost.allocate(numNonrecurringCost);
         }
         for (iInObj = 1; iInObj <= numNonrecurringCost; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           AlphaArray,
                                           NumAlphas,
@@ -903,7 +906,7 @@ namespace EconomicLifeCycleCost {
         }
     }
 
-    void GetInputLifeCycleCostUsePriceEscalation()
+    void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -937,7 +940,8 @@ namespace EconomicLifeCycleCost {
         }
         if (numUsePriceEscalation > 0) {
             for (iInObj = 1; iInObj <= numUsePriceEscalation; ++iInObj) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               iInObj,
                                               AlphaArray,
                                               NumAlphas,
@@ -1037,7 +1041,7 @@ namespace EconomicLifeCycleCost {
         }
     }
 
-    void GetInputLifeCycleCostUseAdjustment()
+    void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -1072,7 +1076,8 @@ namespace EconomicLifeCycleCost {
         }
         if (numUseAdjustment > 0) {
             for (iInObj = 1; iInObj <= numUseAdjustment; ++iInObj) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               iInObj,
                                               AlphaArray,
                                               NumAlphas,

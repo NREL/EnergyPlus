@@ -49,6 +49,7 @@
 #include <cmath>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
@@ -97,9 +98,6 @@ namespace DataSurfaceLists {
     int NumOfSurfListVentSlab(0);        // Number of surface lists in the user input file
     bool SurfaceListInputsFilled(false); // Set to TRUE after first pass through air loop
 
-    //  CHARACTER(len=*), PARAMETER :: CurrentModuleObject = ' '
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaceLists
-
     // Object Data
     Array1D<SurfaceListData> SurfList;
     Array1D<SlabListData> SlabList;
@@ -115,7 +113,7 @@ namespace DataSurfaceLists {
         SlabList.deallocate();
     }
 
-    void GetSurfaceListsInputs()
+    void GetSurfaceListsInputs(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -183,7 +181,8 @@ namespace DataSurfaceLists {
 
             for (Item = 1; Item <= NumOfSurfaceLists; ++Item) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject1,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject1,
                                               Item,
                                               Alphas,
                                               NumAlphas,
@@ -279,7 +278,8 @@ namespace DataSurfaceLists {
 
             for (Item = 1; Item <= NumOfSurfListVentSlab; ++Item) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject2,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject2,
                                               Item,
                                               Alphas,
                                               NumAlphas,
@@ -370,7 +370,7 @@ namespace DataSurfaceLists {
         if (ErrorsFound) ShowFatalError("GetSurfaceListsInputs: Program terminates due to preceding conditions.");
     }
 
-    int GetNumberOfSurfaceLists()
+    int GetNumberOfSurfaceLists(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -410,7 +410,7 @@ namespace DataSurfaceLists {
         // na
 
         if (!SurfaceListInputsFilled) {
-            GetSurfaceListsInputs();
+            GetSurfaceListsInputs(state);
             SurfaceListInputsFilled = true;
         }
 
@@ -418,7 +418,7 @@ namespace DataSurfaceLists {
         return NumberOfSurfaceLists;
     }
 
-    int GetNumberOfSurfListVentSlab()
+    int GetNumberOfSurfListVentSlab(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -458,7 +458,7 @@ namespace DataSurfaceLists {
         // na
 
         if (!SurfaceListInputsFilled) {
-            GetSurfaceListsInputs();
+            GetSurfaceListsInputs(state);
             SurfaceListInputsFilled = true;
         }
 

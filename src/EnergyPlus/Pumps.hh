@@ -57,6 +57,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace Pumps {
 
     // Using/Aliasing
@@ -282,13 +285,13 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void CalcPumps(int const PumpNum, Real64 const FlowRequest, bool &PumpRunning);
+    void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowRequest, bool &PumpRunning);
 
     //*************************************************************************!
 
     //*************************************************************************!
 
-    void SizePump(int const PumpNum);
+    void SizePump(EnergyPlusData &state, int const PumpNum);
 
     //*************************************************************************!
 

@@ -179,7 +179,8 @@ namespace CoolTower {
         // Obtain inputs
         for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           CoolTowerNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -196,7 +197,7 @@ namespace CoolTower {
             if (lAlphaBlanks(2)) {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = ScheduleAlwaysOn;
             } else {
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr == 0) {
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError("Invalid-Schedule not found " + cAlphaFields(2) + "=\"" + cAlphaArgs(2) + "\".");
@@ -241,7 +242,7 @@ namespace CoolTower {
                 }
             }
 
-            state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr = GetScheduleIndex(cAlphaArgs(6));
+            state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr = GetScheduleIndex(state, cAlphaArgs(6));
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpSchedPtr == 0) {
                 if (lAlphaBlanks(6)) {
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(6) +
@@ -364,91 +365,91 @@ namespace CoolTower {
         if (ErrorsFound) ShowFatalError(CurrentModuleObject + " errors occurred in input.  Program terminates.");
 
         for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
-            SetupOutputVariable("Zone Cooltower Sensible Heat Loss Energy",
+            SetupOutputVariable(state, "Zone Cooltower Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SenHeatLoss,
                                 "System",
                                 "Sum",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Sensible Heat Loss Rate",
+            SetupOutputVariable(state, "Zone Cooltower Sensible Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SenHeatPower,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Latent Heat Loss Energy",
+            SetupOutputVariable(state, "Zone Cooltower Latent Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatLoss,
                                 "System",
                                 "Sum",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Latent Heat Loss Rate",
+            SetupOutputVariable(state, "Zone Cooltower Latent Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatPower,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Air Volume",
+            SetupOutputVariable(state, "Zone Cooltower Air Volume",
                                 OutputProcessor::Unit::m3,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTAirVol,
                                 "System",
                                 "Sum",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Current Density Air Volume Flow Rate",
+            SetupOutputVariable(state, "Zone Cooltower Current Density Air Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRate,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Standard Density Air Volume Flow Rate",
+            SetupOutputVariable(state, "Zone Cooltower Standard Density Air Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRateStd,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Air Mass",
+            SetupOutputVariable(state, "Zone Cooltower Air Mass",
                                 OutputProcessor::Unit::kg,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTAirMass,
                                 "System",
                                 "Sum",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Air Mass Flow Rate",
+            SetupOutputVariable(state, "Zone Cooltower Air Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirMassFlowRate,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Air Inlet Temperature",
+            SetupOutputVariable(state, "Zone Cooltower Air Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletDBTemp,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Air Inlet Humidity Ratio",
+            SetupOutputVariable(state, "Zone Cooltower Air Inlet Humidity Ratio",
                                 OutputProcessor::Unit::kgWater_kgDryAir,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletHumRat,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Air Outlet Temperature",
+            SetupOutputVariable(state, "Zone Cooltower Air Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletTemp,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Air Outlet Humidity Ratio",
+            SetupOutputVariable(state, "Zone Cooltower Air Outlet Humidity Ratio",
                                 OutputProcessor::Unit::kgWater_kgDryAir,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletHumRat,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Pump Electricity Rate",
+            SetupOutputVariable(state, "Zone Cooltower Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpElecPower,
                                 "System",
                                 "Average",
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Pump Electricity Energy",
+            SetupOutputVariable(state, "Zone Cooltower Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpElecConsump,
                                 "System",
@@ -460,13 +461,13 @@ namespace CoolTower {
                                 _,
                                 "System");
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromMains) {
-                SetupOutputVariable("Zone Cooltower Water Volume",
+                SetupOutputVariable(state, "Zone Cooltower Water Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterConsump,
                                     "System",
                                     "Sum",
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-                SetupOutputVariable("Zone Cooltower Mains Water Volume",
+                SetupOutputVariable(state, "Zone Cooltower Mains Water Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterConsump,
                                     "System",
@@ -478,19 +479,19 @@ namespace CoolTower {
                                     _,
                                     "System");
             } else if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
-                SetupOutputVariable("Zone Cooltower Water Volume",
+                SetupOutputVariable(state, "Zone Cooltower Water Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterConsump,
                                     "System",
                                     "Sum",
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-                SetupOutputVariable("Zone Cooltower Storage Tank Water Volume",
+                SetupOutputVariable(state, "Zone Cooltower Storage Tank Water Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterConsump,
                                     "System",
                                     "Sum",
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-                SetupOutputVariable("Zone Cooltower Starved Mains Water Volume",
+                SetupOutputVariable(state, "Zone Cooltower Starved Mains Water Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterStarvMakeup,
                                     "System",

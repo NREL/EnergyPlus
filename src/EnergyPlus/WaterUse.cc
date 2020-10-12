@@ -295,7 +295,8 @@ namespace WaterUse {
             state.dataWaterUse->WaterEquipment.allocate(state.dataWaterUse->numWaterEquipment);
 
             for (int WaterEquipNum = 1; WaterEquipNum <= state.dataWaterUse->numWaterEquipment; ++WaterEquipNum) {
-                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              DataIPShortCuts::cCurrentModuleObject,
                                               WaterEquipNum,
                                               DataIPShortCuts::cAlphaArgs,
                                               NumAlphas,
@@ -314,7 +315,7 @@ namespace WaterUse {
                 state.dataWaterUse->WaterEquipment(WaterEquipNum).PeakVolFlowRate = DataIPShortCuts::rNumericArgs(1);
 
                 if ((NumAlphas > 2) && (!DataIPShortCuts::lAlphaFieldBlanks(3))) {
-                    state.dataWaterUse->WaterEquipment(WaterEquipNum).FlowRateFracSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(3));
+                    state.dataWaterUse->WaterEquipment(WaterEquipNum).FlowRateFracSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(3));
                     // If no FlowRateFracSchedule, fraction defaults to 1.0
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).FlowRateFracSchedule == 0) {
@@ -325,7 +326,7 @@ namespace WaterUse {
                 }
 
                 if ((NumAlphas > 3) && (!DataIPShortCuts::lAlphaFieldBlanks(4))) {
-                    state.dataWaterUse->WaterEquipment(WaterEquipNum).TargetTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(4));
+                    state.dataWaterUse->WaterEquipment(WaterEquipNum).TargetTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(4));
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).TargetTempSchedule == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + DataIPShortCuts::cAlphaArgs(4));
@@ -335,7 +336,7 @@ namespace WaterUse {
                 }
 
                 if ((NumAlphas > 4) && (!DataIPShortCuts::lAlphaFieldBlanks(5))) {
-                    state.dataWaterUse->WaterEquipment(WaterEquipNum).HotTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(5));
+                    state.dataWaterUse->WaterEquipment(WaterEquipNum).HotTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(5));
                     // If no HotTempSchedule, there is no hot water.
                     // HotTempSchedule is ignored if connected to a plant loop via WATER USE CONNECTIONS
 
@@ -347,7 +348,7 @@ namespace WaterUse {
                 }
 
                 if ((NumAlphas > 5) && (!DataIPShortCuts::lAlphaFieldBlanks(6))) {
-                    state.dataWaterUse->WaterEquipment(WaterEquipNum).ColdTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(6));
+                    state.dataWaterUse->WaterEquipment(WaterEquipNum).ColdTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(6));
                     // If no ColdTempSchedule, temperatures will be calculated by WATER MAINS TEMPERATURES object
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).ColdTempSchedule == 0) {
@@ -368,7 +369,7 @@ namespace WaterUse {
                 }
 
                 if ((NumAlphas > 7) && (!DataIPShortCuts::lAlphaFieldBlanks(8))) {
-                    state.dataWaterUse->WaterEquipment(WaterEquipNum).SensibleFracSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(8));
+                    state.dataWaterUse->WaterEquipment(WaterEquipNum).SensibleFracSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(8));
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).SensibleFracSchedule == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + DataIPShortCuts::cAlphaArgs(8));
@@ -378,7 +379,7 @@ namespace WaterUse {
                 }
 
                 if ((NumAlphas > 8) && (!DataIPShortCuts::lAlphaFieldBlanks(9))) {
-                    state.dataWaterUse->WaterEquipment(WaterEquipNum).LatentFracSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(9));
+                    state.dataWaterUse->WaterEquipment(WaterEquipNum).LatentFracSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(9));
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).LatentFracSchedule == 0) {
                         ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + '=' + DataIPShortCuts::cAlphaArgs(9));
@@ -399,7 +400,7 @@ namespace WaterUse {
             state.dataWaterUse->WaterConnections.allocate(state.dataWaterUse->numWaterConnections);
 
             for (int WaterConnNum = 1; WaterConnNum <= state.dataWaterUse->numWaterConnections; ++WaterConnNum) {
-                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                inputProcessor->getObjectItem(state, DataIPShortCuts::cCurrentModuleObject,
                                               WaterConnNum,
                                               DataIPShortCuts::cAlphaArgs,
                                               NumAlphas,
@@ -414,7 +415,7 @@ namespace WaterUse {
                 state.dataWaterUse->WaterConnections(WaterConnNum).Name = DataIPShortCuts::cAlphaArgs(1);
 
                 if ((!DataIPShortCuts::lAlphaFieldBlanks(2)) || (!DataIPShortCuts::lAlphaFieldBlanks(3))) {
-                    state.dataWaterUse->WaterConnections(WaterConnNum).InletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2),
+                    state.dataWaterUse->WaterConnections(WaterConnNum).InletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(2),
                                                                                                    ErrorsFound,
                                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                                    DataIPShortCuts::cAlphaArgs(1),
@@ -422,7 +423,7 @@ namespace WaterUse {
                                                                                                    DataLoopNode::NodeConnectionType_Inlet,
                                                                                                    1,
                                                                                                    DataLoopNode::ObjectIsNotParent);
-                    state.dataWaterUse->WaterConnections(WaterConnNum).OutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+                    state.dataWaterUse->WaterConnections(WaterConnNum).OutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                                                                     ErrorsFound,
                                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                                     DataIPShortCuts::cAlphaArgs(1),
@@ -461,7 +462,7 @@ namespace WaterUse {
                 }
 
                 if (!DataIPShortCuts::lAlphaFieldBlanks(6)) {
-                    state.dataWaterUse->WaterConnections(WaterConnNum).HotTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(6));
+                    state.dataWaterUse->WaterConnections(WaterConnNum).HotTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(6));
                     // If no HotTempSchedule, there is no hot water.
                     // HotTempSchedule is ignored if connected to a plant loop via WATER USE CONNECTIONS
 
@@ -473,7 +474,7 @@ namespace WaterUse {
                 }
 
                 if (!DataIPShortCuts::lAlphaFieldBlanks(7)) {
-                    state.dataWaterUse->WaterConnections(WaterConnNum).ColdTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(7));
+                    state.dataWaterUse->WaterConnections(WaterConnNum).ColdTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(7));
                     // If no ColdTempSchedule, temperatures will be calculated by WATER MAINS TEMPERATURES object
 
                     if (state.dataWaterUse->WaterConnections(WaterConnNum).ColdTempSchedule == 0) {
@@ -581,29 +582,29 @@ namespace WaterUse {
 
     void WaterEquipmentType::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Equipment Hot Water Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HotMassFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Equipment Cold Water Mass Flow Rate", OutputProcessor::Unit::kg_s, this->ColdMassFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Equipment Total Mass Flow Rate", OutputProcessor::Unit::kg_s, this->TotalMassFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Equipment Hot Water Volume Flow Rate", OutputProcessor::Unit::m3_s, this->HotVolFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Equipment Cold Water Volume Flow Rate", OutputProcessor::Unit::m3_s, this->ColdVolFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Equipment Total Volume Flow Rate", OutputProcessor::Unit::m3_s, this->TotalVolFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable("Water Use Equipment Hot Water Volume", OutputProcessor::Unit::m3, this->HotVolume, "System", "Sum", this->Name);
+        SetupOutputVariable(state, "Water Use Equipment Hot Water Volume", OutputProcessor::Unit::m3, this->HotVolume, "System", "Sum", this->Name);
 
-        SetupOutputVariable("Water Use Equipment Cold Water Volume", OutputProcessor::Unit::m3, this->ColdVolume, "System", "Sum", this->Name);
+        SetupOutputVariable(state, "Water Use Equipment Cold Water Volume", OutputProcessor::Unit::m3, this->ColdVolume, "System", "Sum", this->Name);
 
-        SetupOutputVariable("Water Use Equipment Total Volume",
+        SetupOutputVariable(state, "Water Use Equipment Total Volume",
                             OutputProcessor::Unit::m3,
                             this->TotalVolume,
                             "System",
@@ -614,7 +615,7 @@ namespace WaterUse {
                             "WATERSYSTEMS",
                             this->EndUseSubcatName,
                             "Plant");
-        SetupOutputVariable("Water Use Equipment Mains Water Volume",
+        SetupOutputVariable(state, "Water Use Equipment Mains Water Volume",
                             OutputProcessor::Unit::m3,
                             this->TotalVolume,
                             "System",
@@ -626,23 +627,23 @@ namespace WaterUse {
                             this->EndUseSubcatName,
                             "Plant");
 
-        SetupOutputVariable("Water Use Equipment Hot Water Temperature", OutputProcessor::Unit::C, this->HotTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Water Use Equipment Hot Water Temperature", OutputProcessor::Unit::C, this->HotTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable("Water Use Equipment Cold Water Temperature", OutputProcessor::Unit::C, this->ColdTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Water Use Equipment Cold Water Temperature", OutputProcessor::Unit::C, this->ColdTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Equipment Target Water Temperature", OutputProcessor::Unit::C, this->TargetTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Equipment Mixed Water Temperature", OutputProcessor::Unit::C, this->MixedTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Equipment Drain Water Temperature", OutputProcessor::Unit::C, this->DrainTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable("Water Use Equipment Heating Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Water Use Equipment Heating Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
 
         if (this->Connections == 0) {
-            SetupOutputVariable("Water Use Equipment Heating Energy",
+            SetupOutputVariable(state, "Water Use Equipment Heating Energy",
                                 OutputProcessor::Unit::J,
                                 this->Energy,
                                 "System",
@@ -655,7 +656,7 @@ namespace WaterUse {
                                 "Plant");
 
         } else if (state.dataWaterUse->WaterConnections(this->Connections).StandAlone) {
-            SetupOutputVariable("Water Use Equipment Heating Energy",
+            SetupOutputVariable(state, "Water Use Equipment Heating Energy",
                                 OutputProcessor::Unit::J,
                                 this->Energy,
                                 "System",
@@ -668,7 +669,7 @@ namespace WaterUse {
                                 "Plant");
 
         } else { // The EQUIPMENT is coupled to a plant loop via a CONNECTIONS object
-            SetupOutputVariable("Water Use Equipment Heating Energy",
+            SetupOutputVariable(state, "Water Use Equipment Heating Energy",
                                 OutputProcessor::Unit::J,
                                 this->Energy,
                                 "System",
@@ -682,23 +683,23 @@ namespace WaterUse {
         }
 
         if (this->Zone > 0) {
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Water Use Equipment Zone Sensible Heat Gain Rate", OutputProcessor::Unit::W, this->SensibleRate, "System", "Average", this->Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Water Use Equipment Zone Sensible Heat Gain Energy", OutputProcessor::Unit::J, this->SensibleEnergy, "System", "Sum", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Water Use Equipment Zone Latent Gain Rate", OutputProcessor::Unit::W, this->LatentRate, "System", "Average", this->Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Water Use Equipment Zone Latent Gain Energy", OutputProcessor::Unit::J, this->LatentEnergy, "System", "Sum", this->Name);
 
-            SetupOutputVariable("Water Use Equipment Zone Moisture Gain Mass Flow Rate",
+            SetupOutputVariable(state, "Water Use Equipment Zone Moisture Gain Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 this->MoistureRate,
                                 "System",
                                 "Average",
                                 this->Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Water Use Equipment Zone Moisture Gain Mass", OutputProcessor::Unit::kg, this->MoistureMass, "System", "Sum", this->Name);
 
             SetupZoneInternalGain(this->Zone,
@@ -712,79 +713,79 @@ namespace WaterUse {
         }
     }
 
-    void WaterConnectionsType::setupOutputVars(EnergyPlusData &EP_UNUSED(state))
+    void WaterConnectionsType::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Connections Hot Water Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HotMassFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Connections Cold Water Mass Flow Rate", OutputProcessor::Unit::kg_s, this->ColdMassFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Connections Total Mass Flow Rate", OutputProcessor::Unit::kg_s, this->TotalMassFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable("Water Use Connections Drain Water Mass Flow Rate",
+        SetupOutputVariable(state, "Water Use Connections Drain Water Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             this->DrainMassFlowRate,
                             "System",
                             "Average",
                             this->Name);
 
-        SetupOutputVariable("Water Use Connections Heat Recovery Mass Flow Rate",
+        SetupOutputVariable(state, "Water Use Connections Heat Recovery Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             this->RecoveryMassFlowRate,
                             "System",
                             "Average",
                             this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Connections Hot Water Volume Flow Rate", OutputProcessor::Unit::m3_s, this->HotVolFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Connections Cold Water Volume Flow Rate", OutputProcessor::Unit::m3_s, this->ColdVolFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Connections Total Volume Flow Rate", OutputProcessor::Unit::m3_s, this->TotalVolFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable("Water Use Connections Hot Water Volume", OutputProcessor::Unit::m3, this->HotVolume, "System", "Sum", this->Name);
+        SetupOutputVariable(state, "Water Use Connections Hot Water Volume", OutputProcessor::Unit::m3, this->HotVolume, "System", "Sum", this->Name);
 
-        SetupOutputVariable("Water Use Connections Cold Water Volume", OutputProcessor::Unit::m3, this->ColdVolume, "System", "Sum", this->Name);
+        SetupOutputVariable(state, "Water Use Connections Cold Water Volume", OutputProcessor::Unit::m3, this->ColdVolume, "System", "Sum", this->Name);
 
-        SetupOutputVariable("Water Use Connections Total Volume", OutputProcessor::Unit::m3, this->TotalVolume, "System", "Sum",
+        SetupOutputVariable(state, "Water Use Connections Total Volume", OutputProcessor::Unit::m3, this->TotalVolume, "System", "Sum",
                             this->Name); //, &
         // ResourceTypeKey='Water', EndUseKey='DHW', EndUseSubKey=EndUseSubcategoryName, GroupKey='Plant')
         // tHIS WAS double counting
 
-        SetupOutputVariable("Water Use Connections Hot Water Temperature", OutputProcessor::Unit::C, this->HotTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Water Use Connections Hot Water Temperature", OutputProcessor::Unit::C, this->HotTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Connections Cold Water Temperature", OutputProcessor::Unit::C, this->ColdTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Connections Drain Water Temperature", OutputProcessor::Unit::C, this->DrainTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Connections Return Water Temperature", OutputProcessor::Unit::C, this->ReturnTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Connections Waste Water Temperature", OutputProcessor::Unit::C, this->WasteTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Connections Heat Recovery Water Temperature", OutputProcessor::Unit::C, this->RecoveryTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Connections Heat Recovery Effectiveness", OutputProcessor::Unit::None, this->Effectiveness, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Connections Heat Recovery Rate", OutputProcessor::Unit::W, this->RecoveryRate, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Use Connections Heat Recovery Energy", OutputProcessor::Unit::J, this->RecoveryEnergy, "System", "Sum", this->Name);
         // Does this go on a meter?
 
         // To do:  Add report variable for starved flow when tank can't deliver?
 
         if (!this->StandAlone) {
-            SetupOutputVariable("Water Use Connections Plant Hot Water Energy",
+            SetupOutputVariable(state, "Water Use Connections Plant Hot Water Energy",
                                 OutputProcessor::Unit::J,
                                 this->Energy,
                                 "System",

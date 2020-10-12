@@ -118,9 +118,9 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     InternalHeatGains::GetInternalHeatGainsInput(state);
@@ -167,9 +167,9 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(state), std::runtime_error);
@@ -219,9 +219,9 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(state), std::runtime_error);
@@ -287,8 +287,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
 
     bool ErrorsFound1(false);
 
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
-    HeatBalanceManager::GetZoneData(ErrorsFound1);
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
+    HeatBalanceManager::GetZoneData(state, ErrorsFound1);
     ASSERT_FALSE(ErrorsFound1);
 
     ScheduleManager::ScheduleInputProcessed = true;
@@ -471,7 +471,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -653,7 +653,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     EXPECT_FALSE(has_err_output());
 
     bool ErrorsFound(false);
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     InternalHeatGains::GetInternalHeatGainsInput(state);
 
@@ -883,7 +883,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -1038,7 +1038,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
 
     bool ErrorsFound(false);
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -1299,15 +1299,15 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     DataGlobals::NumOfTimeStepInHour = 1;                 // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;                 // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
     DataEnvironment::DayOfYear_Schedule = 1;
     DataEnvironment::DayOfMonth = 1;
     DataEnvironment::DayOfWeek = 1;
     DataGlobals::HourOfDay = 1;
     DataGlobals::TimeStep = 1;
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
 
@@ -1560,7 +1560,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyGoodInletNode)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -1783,7 +1783,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyBadInletNode)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -2009,7 +2009,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesG
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -2236,7 +2236,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesB
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -2462,7 +2462,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_WarnMissingInletNode)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
