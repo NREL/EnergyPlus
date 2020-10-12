@@ -333,7 +333,7 @@ struct UnitVentilatorsData : BaseGlobalStruct {
     }
 
     // Default Constructor
-    UnitVentilatorsData() : cMO_UnitVentilator("ZoneHVAC:UnitVentilator"), Heating_ElectricCoilType(1), Heating_GasCoilType(2), Heating_WaterCoilType(3), Heating_SteamCoilType(4), Cooling_CoilWaterCooling(1), Cooling_CoilDetailedCooling(2), Cooling_CoilHXAssisted(3), VariablePercent(1), FixedTemperature(2), FixedOAControl(3), On(1), Off(0), NoneOption(0), BothOption(1), HeatingOption(2), CoolingOption(3), HCoilOn(false), NumOfUnitVents(0), OAMassFlowRate(0.0), QZnReq(0.0), GetUnitVentilatorInputFlag(true), MyOneTimeFlag(true), ZoneEquipmentListChecked(false)
+    UnitVentilatorsData() = default;
     {}
 };
 } // namespace EnergyPlus
