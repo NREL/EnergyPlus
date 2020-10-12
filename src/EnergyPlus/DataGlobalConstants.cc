@@ -102,150 +102,55 @@ namespace DataGlobalConstants {
     int const endUseCogeneration(14);
 
     // Resource Types
-    std::string const cRT_None("None");
     int const iRT_None(1000);
-    std::string const cRT_Electricity("Electricity");
     int const iRT_Electricity(1001);
-    std::string const cRT_Natural_Gas("NaturalGas");
     int const iRT_Natural_Gas(1002);
-    std::string const cRT_Gasoline("Gasoline");
     int const iRT_Gasoline(1003);
-    std::string const cRT_Diesel("Diesel");
     int const iRT_Diesel(1004);
-    std::string const cRT_Coal("Coal");
     int const iRT_Coal(1005);
-    std::string const cRT_FuelOil_1("FuelOilNo1");
     int const iRT_FuelOil_1(1006);
-    std::string const cRT_FuelOil_2("FuelOilNo2");
     int const iRT_FuelOil_2(1007);
-    std::string const cRT_Propane("Propane");
     int const iRT_Propane(1008);
-    std::string const cRT_Water("Water");
     int const iRT_Water(1009);
-    std::string const cRT_EnergyTransfer("EnergyTransfer");
     int const iRT_EnergyTransfer(1010);
-    std::string const cRT_Steam("Steam");
     int const iRT_Steam(1011);
-    std::string const cRT_DistrictCooling("DistrictCooling");
     int const iRT_DistrictCooling(1012);
-    std::string const cRT_DistrictHeating("DistrictHeating");
     int const iRT_DistrictHeating(1013);
-    std::string const cRT_ElectricityProduced("ElectricityProduced");
     int const iRT_ElectricityProduced(1014);
-    std::string const cRT_ElectricityPurchased("ElectricityPurchased");
     int const iRT_ElectricityPurchased(1015);
-    std::string const cRT_ElectricitySurplusSold("ElectricitySurplusSold");
     int const iRT_ElectricitySurplusSold(1016);
-    std::string const cRT_ElectricityNet("ElectricityNet");
     int const iRT_ElectricityNet(1017);
-    std::string const cRT_SolarWater("SolarWater");
     int const iRT_SolarWater(1018);
-    std::string const cRT_SolarAir("SolarAir");
     int const iRT_SolarAir(1019);
-    std::string const cRT_SO2("SO2");
     int const iRT_SO2(1020);
-    std::string const cRT_NOx("NOx");
     int const iRT_NOx(1021);
-    std::string const cRT_N2O("N2O");
     int const iRT_N2O(1022);
-    std::string const cRT_PM("PM");
     int const iRT_PM(1023);
-    std::string const cRT_PM2_5("PM2.5");
     int const iRT_PM2_5(1024);
-    std::string const cRT_PM10("PM10");
     int const iRT_PM10(1025);
-    std::string const cRT_CO("CO");
     int const iRT_CO(1026);
-    std::string const cRT_CO2("CO2");
     int const iRT_CO2(1027);
-    std::string const cRT_CH4("CH4");
     int const iRT_CH4(1028);
-    std::string const cRT_NH3("NH3");
     int const iRT_NH3(1029);
-    std::string const cRT_NMVOC("NMVOC");
     int const iRT_NMVOC(1030);
-    std::string const cRT_Hg("Hg");
     int const iRT_Hg(1031);
-    std::string const cRT_Pb("Pb");
     int const iRT_Pb(1032);
-    std::string const cRT_NuclearHigh("NuclearHigh");
     int const iRT_NuclearHigh(1033);
-    std::string const cRT_NuclearLow("NuclearLow");
     int const iRT_NuclearLow(1034);
-    std::string const cRT_WaterEnvironmentalFactors("WaterEnvironmentalFactors");
     int const iRT_WaterEnvironmentalFactors(1035);
-    std::string const cRT_CarbonEquivalent("Carbon Equivalent");
     int const iRT_CarbonEquivalent(1036);
-    std::string const cRT_Source("Source");
     int const iRT_Source(1037);
-    std::string const cRT_PlantLoopHeatingDemand("PlantLoopHeatingDemand");
     int const iRT_PlantLoopHeatingDemand(1038);
-    std::string const cRT_PlantLoopCoolingDemand("PlantLoopCoolingDemand");
     int const iRT_PlantLoopCoolingDemand(1039);
-    std::string const cRT_OnSiteWater("OnSiteWater");
     int const iRT_OnSiteWater(1040);
-    std::string const cRT_MainsWater("MainsWater");
     int const iRT_MainsWater(1041);
-    std::string const cRT_RainWater("RainWater");
     int const iRT_RainWater(1042);
-    std::string const cRT_WellWater("WellWater");
     int const iRT_WellWater(1043);
-    std::string const cRT_Condensate("Condensate");
     int const iRT_Condensate(1044);
-    std::string const cRT_OtherFuel1("OtherFuel1");
     int const iRT_OtherFuel1(1045);
-    std::string const cRT_OtherFuel2("OtherFuel2");
     int const iRT_OtherFuel2(1046);
     int const NumOfResourceTypes(46);
     int const ResourceTypeInitialOffset(1000); // to reach "ValidTypes"
-    Array1D_string const cRT_ValidTypes({0, NumOfResourceTypes},
-                                        {cRT_None,
-                                         cRT_Electricity,
-                                         cRT_Natural_Gas,
-                                         cRT_Gasoline,
-                                         cRT_Diesel,
-                                         cRT_Coal,
-                                         cRT_FuelOil_1,
-                                         cRT_FuelOil_2,
-                                         cRT_Propane,
-                                         cRT_Water,
-                                         cRT_EnergyTransfer,
-                                         cRT_Steam,
-                                         cRT_DistrictCooling,
-                                         cRT_DistrictHeating,
-                                         cRT_ElectricityProduced,
-                                         cRT_ElectricityPurchased,
-                                         cRT_ElectricitySurplusSold,
-                                         cRT_ElectricityNet,
-                                         cRT_SolarWater,
-                                         cRT_SolarAir,
-                                         cRT_SO2,
-                                         cRT_NOx,
-                                         cRT_N2O,
-                                         cRT_PM,
-                                         cRT_PM2_5,
-                                         cRT_PM10,
-                                         cRT_CO,
-                                         cRT_CO2,
-                                         cRT_CH4,
-                                         cRT_NH3,
-                                         cRT_NMVOC,
-                                         cRT_Hg,
-                                         cRT_Pb,
-                                         cRT_NuclearHigh,
-                                         cRT_NuclearLow,
-                                         cRT_WaterEnvironmentalFactors,
-                                         cRT_CarbonEquivalent,
-                                         cRT_Source,
-                                         cRT_PlantLoopHeatingDemand,
-                                         cRT_PlantLoopCoolingDemand,
-                                         cRT_OnSiteWater,
-                                         cRT_MainsWater,
-                                         cRT_RainWater,
-                                         cRT_WellWater,
-                                         cRT_Condensate,
-                                         cRT_OtherFuel1,
-                                         cRT_OtherFuel2});
 
     int AssignResourceTypeNum(std::string const &ResourceTypeChar)
     {

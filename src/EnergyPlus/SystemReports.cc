@@ -4051,11 +4051,6 @@ namespace SystemReports {
 
         if (!AirLoopLoadsReportEnabled) return;
 
-        // following for debug
-        //    CHARACTER(len=60) :: cEnergyType
-
-        //    cEnergyType=cRT_ValidTypes(EnergyType-ResourceTypeInitialOffset)
-
         // Find enum for the component type string
         ComponentTypes comp_type;
         auto const it = component_map.find(CompType);

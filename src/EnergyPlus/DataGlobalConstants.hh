@@ -79,103 +79,55 @@ namespace DataGlobalConstants {
     extern int const endUseCogeneration;
 
     // Resource Types
-    extern std::string const cRT_None;
     extern int const iRT_None;
-    extern std::string const cRT_Electricity;
     extern int const iRT_Electricity;
-    extern std::string const cRT_Natural_Gas;
     extern int const iRT_Natural_Gas;
-    extern std::string const cRT_Gasoline;
     extern int const iRT_Gasoline;
-    extern std::string const cRT_Diesel;
     extern int const iRT_Diesel;
-    extern std::string const cRT_Coal;
     extern int const iRT_Coal;
-    extern std::string const cRT_FuelOil_1;
     extern int const iRT_FuelOil_1;
-    extern std::string const cRT_FuelOil_2;
     extern int const iRT_FuelOil_2;
-    extern std::string const cRT_Propane;
     extern int const iRT_Propane;
-    extern std::string const cRT_Water;
     extern int const iRT_Water;
-    extern std::string const cRT_EnergyTransfer;
     extern int const iRT_EnergyTransfer;
-    extern std::string const cRT_Steam;
     extern int const iRT_Steam;
-    extern std::string const cRT_DistrictCooling;
     extern int const iRT_DistrictCooling;
-    extern std::string const cRT_DistrictHeating;
     extern int const iRT_DistrictHeating;
-    extern std::string const cRT_ElectricityProduced;
     extern int const iRT_ElectricityProduced;
-    extern std::string const cRT_ElectricityPurchased;
     extern int const iRT_ElectricityPurchased;
-    extern std::string const cRT_ElectricitySurplusSold;
     extern int const iRT_ElectricitySurplusSold;
-    extern std::string const cRT_ElectricityNet;
     extern int const iRT_ElectricityNet;
-    extern std::string const cRT_SolarWater;
     extern int const iRT_SolarWater;
-    extern std::string const cRT_SolarAir;
     extern int const iRT_SolarAir;
-    extern std::string const cRT_SO2;
     extern int const iRT_SO2;
-    extern std::string const cRT_NOx;
     extern int const iRT_NOx;
-    extern std::string const cRT_N2O;
     extern int const iRT_N2O;
-    extern std::string const cRT_PM;
     extern int const iRT_PM;
-    extern std::string const cRT_PM2_5;
     extern int const iRT_PM2_5;
-    extern std::string const cRT_PM10;
     extern int const iRT_PM10;
-    extern std::string const cRT_CO;
     extern int const iRT_CO;
-    extern std::string const cRT_CO2;
     extern int const iRT_CO2;
-    extern std::string const cRT_CH4;
     extern int const iRT_CH4;
-    extern std::string const cRT_NH3;
     extern int const iRT_NH3;
-    extern std::string const cRT_NMVOC;
     extern int const iRT_NMVOC;
-    extern std::string const cRT_Hg;
     extern int const iRT_Hg;
-    extern std::string const cRT_Pb;
     extern int const iRT_Pb;
-    extern std::string const cRT_NuclearHigh;
     extern int const iRT_NuclearHigh;
-    extern std::string const cRT_NuclearLow;
     extern int const iRT_NuclearLow;
-    extern std::string const cRT_WaterEnvironmentalFactors;
     extern int const iRT_WaterEnvironmentalFactors;
-    extern std::string const cRT_CarbonEquivalent;
     extern int const iRT_CarbonEquivalent;
-    extern std::string const cRT_Source;
     extern int const iRT_Source;
-    extern std::string const cRT_PlantLoopHeatingDemand;
     extern int const iRT_PlantLoopHeatingDemand;
-    extern std::string const cRT_PlantLoopCoolingDemand;
     extern int const iRT_PlantLoopCoolingDemand;
-    extern std::string const cRT_OnSiteWater;
     extern int const iRT_OnSiteWater;
-    extern std::string const cRT_MainsWater;
     extern int const iRT_MainsWater;
-    extern std::string const cRT_RainWater;
     extern int const iRT_RainWater;
-    extern std::string const cRT_WellWater;
     extern int const iRT_WellWater;
-    extern std::string const cRT_Condensate;
     extern int const iRT_Condensate;
-    extern std::string const cRT_OtherFuel1;
     extern int const iRT_OtherFuel1;
-    extern std::string const cRT_OtherFuel2;
     extern int const iRT_OtherFuel2;
     extern int const NumOfResourceTypes;
-    extern int const ResourceTypeInitialOffset; // to reach "ValidTypes"
-    extern Array1D_string const cRT_ValidTypes;
+    extern int const ResourceTypeInitialOffset;
 
     enum class CallIndicator {
         BeginDay,
@@ -216,7 +168,7 @@ namespace DataGlobalConstants {
     Real64 constexpr HWInitConvTemp () { return 60.0; }                     // [deg C], standard init hot water vol to mass flow conversion temp
     Real64 constexpr SteamInitConvTemp () { return 100.0; }                 // [deg C], standard init steam vol to mass flow conversion temp
     Real64 constexpr StefanBoltzmann () { return 5.6697E-8; }               // Stefan-Boltzmann constant in W/(m2*K4)
-    Real64 constexpr UniversalGasConst () { return 8314.462175; }           //  (J/mol*K)
+    Real64 constexpr UniversalGasConst () { return 8314.462175; }           // Universal Gas Constant (J/mol*K)
     Real64 constexpr convertJtoGJ () { return 1.0E-9; }                     // Conversion factor for J to GJ
 
     int AssignResourceTypeNum(std::string const &ResourceTypeChar);
