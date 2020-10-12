@@ -220,7 +220,6 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/TranspiredCollector.hh>
 #include <EnergyPlus/UFADManager.hh>
-#include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
@@ -397,7 +396,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     TranspiredCollector::clear_state();
     UFADManager::clear_state();
     UnitarySystems::clear_state();
-    UnitHeater::clear_state();
     UtilityRoutines::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();
