@@ -2756,7 +2756,7 @@ namespace ConvectionCoefficients {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = [&, SurfNum](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
                     return CalcCeilingDiffuserIntConvCoeff(
                         state, ACH, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height, state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow);
                 };
@@ -6121,7 +6121,7 @@ namespace ConvectionCoefficients {
         if (UserCurve.HcFnTempDiffDivHeightCurveNum > 0) {
             HcFnTempDiffDivHeight = CurveValue(state, UserCurve.HcFnTempDiffDivHeightCurveNum,
                                                (std::abs(TH(2, 1, SurfNum) - tmpAirTemp) / Surface(SurfNum).IntConvZoneWallHeight));
-            HcFnTempDiffDivHeightFn = [&, SurfNum](double Tsurf, double Tamb, double, double, double) -> double {
+            HcFnTempDiffDivHeightFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CurveValue(state, UserCurve.HcFnTempDiffDivHeightCurveNum, std::abs(Tsurf - Tamb) / Surface(SurfNum).IntConvZoneWallHeight);
             };
         }
@@ -6218,7 +6218,7 @@ namespace ConvectionCoefficients {
                 HnFnTempDiffDivHeight =
                     CurveValue(state, UserCurve.HnFnTempDiffDivHeightCurveNum,
                                ((std::abs(TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp)) / Surface(SurfNum).OutConvFaceHeight));
-                HnFnTempDiffDivHeightFn = [&, SurfNum](double Tsurf, double Tamb, double, double, double) -> double {
+                HnFnTempDiffDivHeightFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                     return CurveValue(state, UserCurve.HnFnTempDiffDivHeightCurveNum, ((std::abs(Tsurf - Tamb)) / Surface(SurfNum).OutConvFaceHeight));
                 };
             }
