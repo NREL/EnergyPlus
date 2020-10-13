@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -124,7 +125,7 @@ namespace OutAirNodeManager {
         GetOutAirNodesInputFlag = true;
     }
 
-    void SetOutAirNodes()
+    void SetOutAirNodes(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -156,13 +157,13 @@ namespace OutAirNodeManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (GetOutAirNodesInputFlag) { // First time subroutine has been entered
-            GetOutAirNodesInput();     // Get OutAir Nodes data
+            GetOutAirNodesInput(state);     // Get OutAir Nodes data
             GetOutAirNodesInputFlag = false;
         }
         InitOutAirNodes();
     }
 
-    void GetOutAirNodesInput()
+    void GetOutAirNodesInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -248,7 +249,8 @@ namespace OutAirNodeManager {
             // Loop over all outside air inlet nodes in the input and count them
             CurrentModuleObject = "OutdoorAir:NodeList";
             for (OutAirInletNodeListNum = 1; OutAirInletNodeListNum <= NumOutAirInletNodeLists; ++OutAirInletNodeListNum) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               OutAirInletNodeListNum,
                                               Alphas,
                                               NumAlphas,
@@ -265,7 +267,8 @@ namespace OutAirNodeManager {
                     //  To support HVAC diagram, every outside inlet node must have a unique fluid stream number
                     //  GetNodeNums will increment the value across a node list, the starting value must be incremented
                     //  here across lists and across objects
-                    GetNodeNums(Alphas(AlphaNum),
+                    GetNodeNums(state,
+                                Alphas(AlphaNum),
                                 NumNodes,
                                 NodeNums,
                                 ErrInList,
@@ -304,7 +307,8 @@ namespace OutAirNodeManager {
             // Loop over all single outside air nodes in the input
             CurrentModuleObject = "OutdoorAir:Node";
             for (OutsideAirNodeSingleNum = 1; OutsideAirNodeSingleNum <= NumOutsideAirNodeSingles; ++OutsideAirNodeSingleNum) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               OutsideAirNodeSingleNum,
                                               Alphas,
                                               NumAlphas,
@@ -320,7 +324,8 @@ namespace OutAirNodeManager {
                 //  To support HVAC diagram, every outside inlet node must have a unique fluid stream number
                 //  GetNodeNums will increment the value across a node list, the starting value must be incremented
                 //  here across lists and across objects
-                GetNodeNums(Alphas(1),
+                GetNodeNums(state,
+                            Alphas(1),
                             NumNodes,
                             NodeNums,
                             ErrInList,
@@ -366,7 +371,7 @@ namespace OutAirNodeManager {
                 }
 
                 if (NumAlphas > 1 && !lAlphaBlanks(2)) {
-                    Node(NodeNums(1)).OutAirDryBulbSchedNum = GetScheduleIndex(Alphas(2));
+                    Node(NodeNums(1)).OutAirDryBulbSchedNum = GetScheduleIndex(state, Alphas(2));
                     if (Node(NodeNums(1)).OutAirDryBulbSchedNum == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(2) + "\", invalid schedule.");
                         ShowContinueError("Dry Bulb Temperature Schedule not found=\"" + Alphas(2) + "\".");
@@ -375,7 +380,7 @@ namespace OutAirNodeManager {
                 }
 
                 if (NumAlphas > 2 && !lAlphaBlanks(3)) {
-                    Node(NodeNums(1)).OutAirWetBulbSchedNum = GetScheduleIndex(Alphas(3));
+                    Node(NodeNums(1)).OutAirWetBulbSchedNum = GetScheduleIndex(state, Alphas(3));
                     if (Node(NodeNums(1)).OutAirWetBulbSchedNum == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(3) + "\", invalid schedule.");
                         ShowContinueError("Wet Bulb Temperature Schedule not found=\"" + Alphas(3) + "\".");
@@ -384,7 +389,7 @@ namespace OutAirNodeManager {
                 }
 
                 if (NumAlphas > 3 && !lAlphaBlanks(4)) {
-                    Node(NodeNums(1)).OutAirWindSpeedSchedNum = GetScheduleIndex(Alphas(4));
+                    Node(NodeNums(1)).OutAirWindSpeedSchedNum = GetScheduleIndex(state, Alphas(4));
                     if (Node(NodeNums(1)).OutAirWindSpeedSchedNum == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(4) + "\", invalid schedule.");
                         ShowContinueError("Wind Speed Schedule not found=\"" + Alphas(4) + "\".");
@@ -393,7 +398,7 @@ namespace OutAirNodeManager {
                 }
 
                 if (NumAlphas > 4 && !lAlphaBlanks(5)) {
-                    Node(NodeNums(1)).OutAirWindDirSchedNum = GetScheduleIndex(Alphas(5));
+                    Node(NodeNums(1)).OutAirWindDirSchedNum = GetScheduleIndex(state, Alphas(5));
                     if (Node(NodeNums(1)).OutAirWindDirSchedNum == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(5) + "\", invalid schedule.");
                         ShowContinueError("Wind Direction Schedule not found=\"" + Alphas(5) + "\".");
@@ -446,7 +451,7 @@ namespace OutAirNodeManager {
         }
     }
 
-    bool CheckOutAirNodeNumber(int const NodeNumber) // Number of node to check to see if in Outside Air list
+    bool CheckOutAirNodeNumber(EnergyPlusData &state, int const NodeNumber) // Number of node to check to see if in Outside Air list
     {
 
         // FUNCTION INFORMATION:
@@ -486,9 +491,9 @@ namespace OutAirNodeManager {
         // na
 
         if (GetOutAirNodesInputFlag) { // First time subroutine has been entered
-            GetOutAirNodesInput();     // Get Out Air Nodes data
+            GetOutAirNodesInput(state);     // Get Out Air Nodes data
             GetOutAirNodesInputFlag = false;
-            SetOutAirNodes();
+            SetOutAirNodes(state);
         }
 
         if (any_eq(OutsideAirNodeList, NodeNumber)) {
@@ -500,7 +505,8 @@ namespace OutAirNodeManager {
         return Okay;
     }
 
-    void CheckAndAddAirNodeNumber(int const NodeNumber, // Number of node to check to see if in Outside Air list
+    void CheckAndAddAirNodeNumber(EnergyPlusData &state,
+                                  int const NodeNumber, // Number of node to check to see if in Outside Air list
                                   bool &Okay            // True if found, false if not
     )
     {
@@ -543,9 +549,9 @@ namespace OutAirNodeManager {
         static bool errFlag(false);
 
         if (GetOutAirNodesInputFlag) { // First time subroutine has been entered
-            GetOutAirNodesInput();     // Get Out Air Nodes data
+            GetOutAirNodesInput(state);     // Get Out Air Nodes data
             GetOutAirNodesInputFlag = false;
-            SetOutAirNodes();
+            SetOutAirNodes(state);
         }
 
         Okay = false;
@@ -566,7 +572,8 @@ namespace OutAirNodeManager {
                 OutsideAirNodeList(NumOutsideAirNodes) = NodeNumber;
                 TmpNums = OutsideAirNodeList;
                 // register new node..
-                GetNodeNums(NodeID(NodeNumber),
+                GetNodeNums(state,
+                            NodeID(NodeNumber),
                             DummyNumber,
                             TmpNums,
                             errFlag,
@@ -591,7 +598,7 @@ namespace OutAirNodeManager {
         //       DATE WRITTEN   July 2018
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Consolidate a block from both CheckAndAddAirNodeNumber and InitOutAirNodes to set 
+        // Consolidate a block from both CheckAndAddAirNodeNumber and InitOutAirNodes to set
         // up outdoor node values
 
         using Psychrometrics::PsyHFnTdbW;

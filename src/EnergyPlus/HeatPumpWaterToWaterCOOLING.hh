@@ -153,21 +153,22 @@ namespace HeatPumpWaterToWaterCOOLING {
 
         virtual ~GshpPeCoolingSpecs() = default;
 
-        static PlantComponent *factory(const std::string& objectName);
+        static PlantComponent *factory(EnergyPlusData &state, const std::string& objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                       bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation,
+        void getDesignCapacities(EnergyPlusData &state,
+                                 const PlantLocation &calledFromLocation,
                                  Real64 &MaxLoad,
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        void initialize();
+        void initialize(EnergyPlusData &state);
 
-        void calculate(Real64 &MyLoad);
+        void calculate(EnergyPlusData &state, Real64 &MyLoad);
 
         void update();
     };
@@ -177,7 +178,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
     void clear_state();
 
-    void GetGshpInput();
+    void GetGshpInput(EnergyPlusData &state);
 
 } // namespace HeatPumpWaterToWaterCOOLING
 

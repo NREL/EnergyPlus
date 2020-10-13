@@ -388,7 +388,7 @@ class ElectricTransformer
 
 public: // methods
     // Constructor
-    ElectricTransformer(std::string const &objectName);
+    ElectricTransformer(EnergyPlusData &state, std::string const &objectName);
 
     Real64 getLossRateForOutputPower(Real64 const powerOutOfTransformer);
 

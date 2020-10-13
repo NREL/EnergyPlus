@@ -57,7 +57,6 @@
 namespace EnergyPlus {
 
 // Forward declarations
-class IOFiles;
 class InputFile;
 struct EnergyPlusData;
 
@@ -72,7 +71,7 @@ namespace CommandLineInterface {
                      std::string &DataOut                // Output from the retrieval
     );
 
-    int runReadVarsESO(IOFiles &ioFiles);
+    int runReadVarsESO(EnergyPlusData &state);
 
 } // namespace CommandLineInterface
 

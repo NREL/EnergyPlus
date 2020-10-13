@@ -270,15 +270,15 @@ namespace GroundHeatExchangers {
                   updateCurSimTime(true), triggerDesignDayReset(false) {
         }
 
-        virtual void calcGFunctions(IOFiles &ioFiles) = 0;
+        virtual void calcGFunctions(EnergyPlusData &state) = 0;
 
         void calcAggregateLoad();
 
-        void updateGHX();
+        void updateGHX(EnergyPlusData &state);
 
-        void calcGroundHeatExchanger(IOFiles &ioFiles);
+        void calcGroundHeatExchanger(EnergyPlusData &state);
 
-        inline bool isEven(int const val);
+        inline bool isEven(int val);
 
         Real64 interpGFunc(Real64);
 
@@ -299,7 +299,7 @@ namespace GroundHeatExchangers {
 
         virtual void initGLHESimVars(EnergyPlusData &state) = 0;
 
-        virtual Real64 calcHXResistance() = 0;
+        virtual Real64 calcHXResistance(EnergyPlusData &state) = 0;
 
         virtual void getAnnualTimeConstant() = 0;
     };
@@ -341,39 +341,39 @@ namespace GroundHeatExchangers {
         doubleIntegral(std::shared_ptr<GLHEVertSingleStruct> const &bh_i,
                        std::shared_ptr<GLHEVertSingleStruct> const &bh_j, Real64 const &currTime);
 
-        void calcShortTimestepGFunctions();
+        void calcShortTimestepGFunctions(EnergyPlusData &state);
 
         void calcLongTimestepGFunctions();
 
-        void calcGFunctions(IOFiles &ioFiles);
+        void calcGFunctions(EnergyPlusData &state);
 
-        Real64 calcHXResistance();
+        Real64 calcHXResistance(EnergyPlusData &state);
 
         void initGLHESimVars(EnergyPlusData &state);
 
         void getAnnualTimeConstant();
 
-        Real64 getGFunc(Real64 const time);
+        Real64 getGFunc(Real64 time);
 
         void makeThisGLHECacheStruct();
 
         void readCacheFileAndCompareWithThisGLHECache();
 
-        void writeGLHECacheToFile(IOFiles &ioFiles);
+        void writeGLHECacheToFile(EnergyPlusData &state);
 
-        Real64 calcBHAverageResistance();
+        Real64 calcBHAverageResistance(EnergyPlusData &state);
 
-        Real64 calcBHTotalInternalResistance();
+        Real64 calcBHTotalInternalResistance(EnergyPlusData &state);
 
-        Real64 calcBHGroutResistance();
+        Real64 calcBHGroutResistance(EnergyPlusData &state);
 
         Real64 calcPipeConductionResistance();
 
-        Real64 calcPipeConvectionResistance();
+        Real64 calcPipeConvectionResistance(EnergyPlusData &state);
 
-        Real64 frictionFactor(Real64 const reynoldsNum);
+        Real64 frictionFactor(Real64 reynoldsNum);
 
-        Real64 calcPipeResistance();
+        Real64 calcPipeResistance(EnergyPlusData &state);
 
         void combineShortAndLongTimestepGFunctions();
     };
@@ -407,37 +407,36 @@ namespace GroundHeatExchangers {
                   trenchSpacing(0.0), numCoils(0), monthOfMinSurfTemp(0), maxSimYears(0.0), minSurfTemp(0.0) {
         }
 
-        Real64 calcHXResistance();
+        Real64 calcHXResistance(EnergyPlusData &state) override;
 
-        void calcGFunctions(IOFiles &ioFiles);
+        void calcGFunctions(EnergyPlusData &state) override;
 
-        void initGLHESimVars(EnergyPlusData &state);
+        void initGLHESimVars(EnergyPlusData &state) override;
 
-        void getAnnualTimeConstant();
+        void getAnnualTimeConstant() override;
 
-        Real64 doubleIntegral(int const m, int const n, int const m1, int const n1, Real64 const t, int const I0,
-                              int const J0);
+        Real64 doubleIntegral(int m, int n, int m1, int n1, Real64 t, int I0,
+                              int J0);
 
-        Real64 integral(int const m, int const n, int const m1, int const n1, Real64 const t, Real64 const eta,
-                        Real64 const J0);
+        Real64 integral(int m, int n, int m1, int n1, Real64 t, Real64 eta,
+                        Real64 J0);
 
-        Real64 distance(int const m, int const n, int const m1, int const n1, Real64 const eta, Real64 const theta);
+        Real64 distance(int m, int n, int m1, int n1, Real64 eta, Real64 theta);
 
-        Real64 distanceToFictRing(int const m, int const n, int const m1, int const n1, Real64 const eta,
-                                  Real64 const theta);
+        Real64 distanceToFictRing(int m, int n, int m1, int n1, Real64 eta,
+                                  Real64 theta);
 
-        Real64 distToCenter(int const m, int const n, int const m1, int const n1);
+        Real64 distToCenter(int m, int n, int m1, int n1);
 
-        Real64 nearFieldResponseFunction(int const m, int const n, int const m1, int const n1, Real64 const eta,
-                                         Real64 const theta, Real64 const t);
+        Real64 nearFieldResponseFunction(int m, int n, int m1, int n1, Real64 eta, Real64 theta, Real64 t);
 
-        Real64 midFieldResponseFunction(int const m, int const n, int const m1, int const n1, Real64 const t);
+        Real64 midFieldResponseFunction(int m, int n, int m1, int n1, Real64 t);
 
-        Real64 getGFunc(Real64 const time);
+        Real64 getGFunc(Real64 time) override;
 
-        void makeThisGLHECacheStruct();
+        void makeThisGLHECacheStruct() override;
 
-        void readCacheFileAndCompareWithThisGLHECache();
+        void readCacheFileAndCompareWithThisGLHECache() override;
     };
 
     void clear_state();

@@ -362,7 +362,8 @@ namespace FaultsManager {
         for (int jFault_EvapCoolerFouling = 1; jFault_EvapCoolerFouling <= NumFaultyEvapCoolerFouling; ++jFault_EvapCoolerFouling) {
 
             cFaultCurrentObject = cFaults(16); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject,
+            inputProcessor->getObjectItem(state,
+                                          cFaultCurrentObject,
                                           jFault_EvapCoolerFouling,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -383,7 +384,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(2)) {
                 FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).AvaiSchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).AvaiSchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).AvaiSchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) +
                                     "\" not found.");
@@ -396,7 +397,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(3)) {
                 FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).SeveritySchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).SeveritySchedPtr = GetScheduleIndex(cAlphaArgs(3));
+                FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).SeveritySchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
                                     "\" not found.");
@@ -457,7 +458,8 @@ namespace FaultsManager {
         for (int jFault_ChillerFouling = 1; jFault_ChillerFouling <= NumFaultyChillerFouling; ++jFault_ChillerFouling) {
 
             cFaultCurrentObject = cFaults(15); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject,
+            inputProcessor->getObjectItem(state,
+                                          cFaultCurrentObject,
                                           jFault_ChillerFouling,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -478,7 +480,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(2)) {
                 FaultsChillerFouling(jFault_ChillerFouling).AvaiSchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsChillerFouling(jFault_ChillerFouling).AvaiSchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                FaultsChillerFouling(jFault_ChillerFouling).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (FaultsChillerFouling(jFault_ChillerFouling).AvaiSchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) +
                                     "\" not found.");
@@ -491,7 +493,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(3)) {
                 FaultsChillerFouling(jFault_ChillerFouling).SeveritySchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsChillerFouling(jFault_ChillerFouling).SeveritySchedPtr = GetScheduleIndex(cAlphaArgs(3));
+                FaultsChillerFouling(jFault_ChillerFouling).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (FaultsChillerFouling(jFault_ChillerFouling).SeveritySchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
                                     "\" not found.");
@@ -706,7 +708,8 @@ namespace FaultsManager {
         for (int jFault_BoilerFouling = 1; jFault_BoilerFouling <= NumFaultyBoilerFouling; ++jFault_BoilerFouling) {
 
             cFaultCurrentObject = cFaults(14); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject,
+            inputProcessor->getObjectItem(state,
+                                          cFaultCurrentObject,
                                           jFault_BoilerFouling,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -727,7 +730,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(2)) {
                 FaultsBoilerFouling(jFault_BoilerFouling).AvaiSchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsBoilerFouling(jFault_BoilerFouling).AvaiSchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                FaultsBoilerFouling(jFault_BoilerFouling).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (FaultsBoilerFouling(jFault_BoilerFouling).AvaiSchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) +
                                     "\" not found.");
@@ -740,7 +743,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(3)) {
                 FaultsBoilerFouling(jFault_BoilerFouling).SeveritySchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsBoilerFouling(jFault_BoilerFouling).SeveritySchedPtr = GetScheduleIndex(cAlphaArgs(3));
+                FaultsBoilerFouling(jFault_BoilerFouling).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (FaultsBoilerFouling(jFault_BoilerFouling).SeveritySchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
                                     "\" not found.");
@@ -791,7 +794,8 @@ namespace FaultsManager {
         for (int jFault_CoilSAT = 1; jFault_CoilSAT <= NumFaultyCoilSATSensor; ++jFault_CoilSAT) {
 
             cFaultCurrentObject = cFaults(13); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject,
+            inputProcessor->getObjectItem(state,
+                                          cFaultCurrentObject,
                                           jFault_CoilSAT,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -812,7 +816,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(2)) {
                 FaultsCoilSATSensor(jFault_CoilSAT).AvaiSchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsCoilSATSensor(jFault_CoilSAT).AvaiSchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                FaultsCoilSATSensor(jFault_CoilSAT).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (FaultsCoilSATSensor(jFault_CoilSAT).AvaiSchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) +
                                     "\" not found.");
@@ -825,7 +829,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(3)) {
                 FaultsCoilSATSensor(jFault_CoilSAT).SeveritySchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsCoilSATSensor(jFault_CoilSAT).SeveritySchedPtr = GetScheduleIndex(cAlphaArgs(3));
+                FaultsCoilSATSensor(jFault_CoilSAT).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (FaultsCoilSATSensor(jFault_CoilSAT).SeveritySchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
                                     "\" not found.");
@@ -880,7 +884,7 @@ namespace FaultsManager {
 
                     // Read in coil input if not done yet
                     if (SteamCoils::GetSteamCoilsInputFlag) {
-                        SteamCoils::GetSteamCoilInput();
+                        SteamCoils::GetSteamCoilInput(state);
                         SteamCoils::GetSteamCoilsInputFlag = false;
                     }
                     // Check the coil name and coil type
@@ -999,7 +1003,8 @@ namespace FaultsManager {
         for (int jFault_TowerFouling = 1; jFault_TowerFouling <= NumFaultyTowerFouling; ++jFault_TowerFouling) {
 
             cFaultCurrentObject = cFaults(12); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject,
+            inputProcessor->getObjectItem(state,
+                                          cFaultCurrentObject,
                                           jFault_TowerFouling,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1020,7 +1025,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(2)) {
                 FaultsTowerFouling(jFault_TowerFouling).AvaiSchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsTowerFouling(jFault_TowerFouling).AvaiSchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                FaultsTowerFouling(jFault_TowerFouling).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (FaultsTowerFouling(jFault_TowerFouling).AvaiSchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) +
                                     "\" not found.");
@@ -1033,7 +1038,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(3)) {
                 FaultsTowerFouling(jFault_TowerFouling).SeveritySchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsTowerFouling(jFault_TowerFouling).SeveritySchedPtr = GetScheduleIndex(cAlphaArgs(3));
+                FaultsTowerFouling(jFault_TowerFouling).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (FaultsTowerFouling(jFault_TowerFouling).SeveritySchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
                                     "\" not found.");
@@ -1103,7 +1108,8 @@ namespace FaultsManager {
         for (int jFault_CondenserSWT = 1; jFault_CondenserSWT <= NumFaultyCondenserSWTSensor; ++jFault_CondenserSWT) {
 
             cFaultCurrentObject = cFaults(11); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject,
+            inputProcessor->getObjectItem(state,
+                                          cFaultCurrentObject,
                                           jFault_CondenserSWT,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1124,7 +1130,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(2)) {
                 FaultsCondenserSWTSensor(jFault_CondenserSWT).AvaiSchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsCondenserSWTSensor(jFault_CondenserSWT).AvaiSchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                FaultsCondenserSWTSensor(jFault_CondenserSWT).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (FaultsCondenserSWTSensor(jFault_CondenserSWT).AvaiSchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) +
                                     "\" not found.");
@@ -1137,7 +1143,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(3)) {
                 FaultsCondenserSWTSensor(jFault_CondenserSWT).SeveritySchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsCondenserSWTSensor(jFault_CondenserSWT).SeveritySchedPtr = GetScheduleIndex(cAlphaArgs(3));
+                FaultsCondenserSWTSensor(jFault_CondenserSWT).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (FaultsCondenserSWTSensor(jFault_CondenserSWT).SeveritySchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
                                     "\" not found.");
@@ -1198,7 +1204,8 @@ namespace FaultsManager {
         for (int jFault_ChillerSWT = 1; jFault_ChillerSWT <= NumFaultyChillerSWTSensor; ++jFault_ChillerSWT) {
 
             cFaultCurrentObject = cFaults(10); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject,
+            inputProcessor->getObjectItem(state,
+                                          cFaultCurrentObject,
                                           jFault_ChillerSWT,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1219,7 +1226,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(2)) {
                 FaultsChillerSWTSensor(jFault_ChillerSWT).AvaiSchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsChillerSWTSensor(jFault_ChillerSWT).AvaiSchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                FaultsChillerSWTSensor(jFault_ChillerSWT).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (FaultsChillerSWTSensor(jFault_ChillerSWT).AvaiSchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) +
                                     "\" not found.");
@@ -1232,7 +1239,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(3)) {
                 FaultsChillerSWTSensor(jFault_ChillerSWT).SeveritySchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsChillerSWTSensor(jFault_ChillerSWT).SeveritySchedPtr = GetScheduleIndex(cAlphaArgs(3));
+                FaultsChillerSWTSensor(jFault_ChillerSWT).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (FaultsChillerSWTSensor(jFault_ChillerSWT).SeveritySchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
                                     "\" not found.");
@@ -1430,7 +1437,8 @@ namespace FaultsManager {
             }
 
             cFaultCurrentObject = cFaults(9); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject,
+            inputProcessor->getObjectItem(state,
+                                          cFaultCurrentObject,
                                           jFault_AirFilter,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1471,7 +1479,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(4)) {
                 FaultsFouledAirFilters(jFault_AirFilter).AvaiSchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsFouledAirFilters(jFault_AirFilter).AvaiSchedPtr = GetScheduleIndex(cAlphaArgs(4));
+                FaultsFouledAirFilters(jFault_AirFilter).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
                 if (FaultsFouledAirFilters(jFault_AirFilter).AvaiSchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
                                     "\" not found.");
@@ -1484,7 +1492,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(5)) {
                 FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterPressFracSchePtr = -1; // returns schedule value of 1
             } else {
-                FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterPressFracSchePtr = GetScheduleIndex(cAlphaArgs(5));
+                FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterPressFracSchePtr = GetScheduleIndex(state, cAlphaArgs(5));
                 if (FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterPressFracSchePtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
                                     "\" not found.");
@@ -1511,7 +1519,8 @@ namespace FaultsManager {
         for (int jFault_Humidistat = 1; jFault_Humidistat <= NumFaultyHumidistat; ++jFault_Humidistat) {
 
             cFaultCurrentObject = cFaults(8); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject,
+            inputProcessor->getObjectItem(state,
+                                          cFaultCurrentObject,
                                           jFault_Humidistat,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1549,7 +1558,7 @@ namespace FaultsManager {
                 if (lAlphaFieldBlanks(4)) {
                     FaultsHumidistatOffset(jFault_Humidistat).AvaiSchedPtr = -1; // returns schedule value of 1
                 } else {
-                    FaultsHumidistatOffset(jFault_Humidistat).AvaiSchedPtr = GetScheduleIndex(cAlphaArgs(4));
+                    FaultsHumidistatOffset(jFault_Humidistat).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
                     if (FaultsHumidistatOffset(jFault_Humidistat).AvaiSchedPtr == 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" +
                                         cAlphaArgs(4) + "\" not found.");
@@ -1562,7 +1571,7 @@ namespace FaultsManager {
                 if (lAlphaFieldBlanks(5)) {
                     FaultsHumidistatOffset(jFault_Humidistat).SeveritySchedPtr = -1; // returns schedule value of 1
                 } else {
-                    FaultsHumidistatOffset(jFault_Humidistat).SeveritySchedPtr = GetScheduleIndex(cAlphaArgs(5));
+                    FaultsHumidistatOffset(jFault_Humidistat).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(5));
                     if (FaultsHumidistatOffset(jFault_Humidistat).SeveritySchedPtr == 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
@@ -1585,7 +1594,8 @@ namespace FaultsManager {
         for (int jFault_Thermostat = 1; jFault_Thermostat <= NumFaultyThermostat; ++jFault_Thermostat) {
 
             cFaultCurrentObject = cFaults(7); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject,
+            inputProcessor->getObjectItem(state,
+                                          cFaultCurrentObject,
                                           jFault_Thermostat,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1607,7 +1617,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(3)) {
                 FaultsThermostatOffset(jFault_Thermostat).AvaiSchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsThermostatOffset(jFault_Thermostat).AvaiSchedPtr = GetScheduleIndex(cAlphaArgs(3));
+                FaultsThermostatOffset(jFault_Thermostat).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (FaultsThermostatOffset(jFault_Thermostat).AvaiSchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
                                     "\" not found.");
@@ -1620,7 +1630,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(4)) {
                 FaultsThermostatOffset(jFault_Thermostat).SeveritySchedPtr = -1; // returns schedule value of 1
             } else {
-                FaultsThermostatOffset(jFault_Thermostat).SeveritySchedPtr = GetScheduleIndex(cAlphaArgs(4));
+                FaultsThermostatOffset(jFault_Thermostat).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
                 if (FaultsThermostatOffset(jFault_Thermostat).SeveritySchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
                                     "\" not found.");
@@ -1641,7 +1651,8 @@ namespace FaultsManager {
         for (int jFault_FoulingCoil = 1; jFault_FoulingCoil <= NumFouledCoil; ++jFault_FoulingCoil) {
 
             cFaultCurrentObject = cFaults(6); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject,
+            inputProcessor->getObjectItem(state,
+                                          cFaultCurrentObject,
                                           jFault_FoulingCoil,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1663,7 +1674,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(3)) {
                 FouledCoils(jFault_FoulingCoil).AvaiSchedPtr = -1; // returns schedule value of 1
             } else {
-                FouledCoils(jFault_FoulingCoil).AvaiSchedPtr = GetScheduleIndex(cAlphaArgs(3));
+                FouledCoils(jFault_FoulingCoil).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (FouledCoils(jFault_FoulingCoil).AvaiSchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
                                     "\" not found.");
@@ -1676,7 +1687,7 @@ namespace FaultsManager {
             if (lAlphaFieldBlanks(4)) {
                 FouledCoils(jFault_FoulingCoil).SeveritySchedPtr = -1; // returns schedule value of 1
             } else {
-                FouledCoils(jFault_FoulingCoil).SeveritySchedPtr = GetScheduleIndex(cAlphaArgs(4));
+                FouledCoils(jFault_FoulingCoil).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
                 if (FouledCoils(jFault_FoulingCoil).SeveritySchedPtr == 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" + cAlphaArgs(4) +
                                     "\" not found.");
@@ -1730,7 +1741,7 @@ namespace FaultsManager {
                         FouledCoils(jFault_FoulingCoil).FouledCoiledType = state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num;
                         FouledCoils(jFault_FoulingCoil).FouledCoilNum = CoilNum;
 
-                        SetupOutputVariable("Coil Fouling Factor",
+                        SetupOutputVariable(state, "Coil Fouling Factor",
                                     OutputProcessor::Unit::K_W,
                                     state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFactor,
                                     "System",
@@ -1740,42 +1751,42 @@ namespace FaultsManager {
                         // Coil:Cooling:Water doesn't report UA because it's not variable,
                         // but here, it's useful since we do change it via fouling, so report it
                         if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_Cooling) {
-                            SetupOutputVariable("Cooling Coil Total U Factor Times Area Value",
+                            SetupOutputVariable(state, "Cooling Coil Total U Factor Times Area Value",
                                     OutputProcessor::Unit::W_K,
                                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal,
                                     "System",
                                     "Average",
                                     state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
-                            SetupOutputVariable("Cooling Coil External U Factor Times Area Value",
+                            SetupOutputVariable(state, "Cooling Coil External U Factor Times Area Value",
                                     OutputProcessor::Unit::W_K,
                                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal,
                                     "System",
                                     "Average",
                                     state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
-                            SetupOutputVariable("Cooling Coil Internal U Factor Times Area Value",
+                            SetupOutputVariable(state, "Cooling Coil Internal U Factor Times Area Value",
                                     OutputProcessor::Unit::W_K,
                                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal,
                                     "System",
                                     "Average",
                                     state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
-                            SetupOutputVariable("Cooling Coil Total U Factor Times Area Value Before Fouling",
+                            SetupOutputVariable(state, "Cooling Coil Total U Factor Times Area Value Before Fouling",
                                     OutputProcessor::Unit::W_K,
                                     state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilVariable,
                                     "System",
                                     "Average",
                                     state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
-                            SetupOutputVariable("Cooling Coil External U Factor Times Area Value Before Fouling",
+                            SetupOutputVariable(state, "Cooling Coil External U Factor Times Area Value Before Fouling",
                                     OutputProcessor::Unit::W_K,
                                     state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilExternal,
                                     "System",
                                     "Average",
                                     state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
-                            SetupOutputVariable("Cooling Coil Internal U Factor Times Area Value Before Fouling",
+                            SetupOutputVariable(state, "Cooling Coil Internal U Factor Times Area Value Before Fouling",
                                     OutputProcessor::Unit::W_K,
                                     state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilInternal,
                                     "System",
@@ -1783,7 +1794,7 @@ namespace FaultsManager {
                                     state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                         } else {
-                            SetupOutputVariable("Heating Coil U Factor Times Area Value Before Fouling",
+                            SetupOutputVariable(state, "Heating Coil U Factor Times Area Value Before Fouling",
                                 OutputProcessor::Unit::W_K,
                                 state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilVariable,
                                 "System",
@@ -1806,7 +1817,8 @@ namespace FaultsManager {
             int NumFaultsTemp = inputProcessor->getNumObjectsFound(cFaultCurrentObject);
 
             for (int jj = 1; jj <= NumFaultsTemp; ++jj) {
-                inputProcessor->getObjectItem(cFaultCurrentObject,
+                inputProcessor->getObjectItem(state,
+                                              cFaultCurrentObject,
                                               jj,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -1828,7 +1840,7 @@ namespace FaultsManager {
                 if (lAlphaFieldBlanks(2)) {
                     FaultsEconomizer(j).AvaiSchedPtr = -1; // returns schedule value of 1
                 } else {
-                    FaultsEconomizer(j).AvaiSchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                    FaultsEconomizer(j).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                     if (FaultsEconomizer(j).AvaiSchedPtr == 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" +
                                         cAlphaArgs(2) + "\" not found.");
@@ -1841,7 +1853,7 @@ namespace FaultsManager {
                 if (lAlphaFieldBlanks(3)) {
                     FaultsEconomizer(j).SeveritySchedPtr = -1; // returns schedule value of 1
                 } else {
-                    FaultsEconomizer(j).SeveritySchedPtr = GetScheduleIndex(cAlphaArgs(3));
+                    FaultsEconomizer(j).SeveritySchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                     if (FaultsEconomizer(j).SeveritySchedPtr == 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" +
                                         cAlphaArgs(3) + "\" not found.");

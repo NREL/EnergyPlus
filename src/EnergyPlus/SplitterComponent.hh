@@ -127,14 +127,14 @@ namespace SplitterComponent {
     void clear_state();
 
     void
-    SimAirLoopSplitter(std::string const &CompName, bool const FirstHVACIteration, bool const FirstCall, bool &SplitterInletChanged, int &CompIndex);
+    SimAirLoopSplitter(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, bool const FirstCall, bool &SplitterInletChanged, int &CompIndex);
 
     //*******************************
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetSplitterInput();
+    void GetSplitterInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the HB Module
     //******************************************************************************
@@ -168,12 +168,14 @@ namespace SplitterComponent {
 
     void ReportSplitter(int const SplitterNum);
 
-    int GetSplitterOutletNumber(std::string const &SplitterName, // must match Splitter names for the Splitter type
+    int GetSplitterOutletNumber(EnergyPlusData &state,
+                                std::string const &SplitterName, // must match Splitter names for the Splitter type
                                 int const SplitterNum,           // Index of Splitters
                                 bool &ErrorsFound                // set to true if problem
     );
 
-    Array1D_int GetSplitterNodeNumbers(std::string const &SplitterName, // must match Splitter names for the Splitter type
+    Array1D_int GetSplitterNodeNumbers(EnergyPlusData &state,
+                                       std::string const &SplitterName, // must match Splitter names for the Splitter type
                                        int const SplitterNum,           // Index of Splitters
                                        bool &ErrorsFound                // set to true if problem
     );

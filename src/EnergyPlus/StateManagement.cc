@@ -224,15 +224,6 @@
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
-#include <EnergyPlus/VariableSpeedCoils.hh>
-#include <EnergyPlus/VentilatedSlab.hh>
-#include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/WaterManager.hh>
-#include <EnergyPlus/WaterThermalTanks.hh>
-#include <EnergyPlus/WaterToAirHeatPump.hh>
-#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
-#include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/WindTurbine.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -247,7 +238,7 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataBranchAirLoopPlant::clear_state();
     DataAirSystems::clear_state();
     DataBranchNodeConnections::clear_state();
-    dataConstruction.clear_state();
+    state.dataConstruction->clear_state();
     DataContaminantBalance::clear_state();
     DataConvergParams::clear_state();
     DataDefineEquip::clear_state();
@@ -412,8 +403,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     UnitVentilator::clear_state();
     UserDefinedComponents::clear_state();
     UtilityRoutines::clear_state();
-    VariableSpeedCoils::clear_state();
-    VentilatedSlab::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();
 }

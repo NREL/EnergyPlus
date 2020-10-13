@@ -306,14 +306,14 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(state, state.files, foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(state, foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(state.files, foundErrors); // read construction data
+    HeatBalanceManager::GetConstructData(state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
-    HeatBalanceManager::GetZoneData(foundErrors); // read zone data
+    HeatBalanceManager::GetZoneData(state, foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
@@ -324,7 +324,7 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state, state.files, foundErrors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()
@@ -332,7 +332,7 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
 
     DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 1;
@@ -343,11 +343,11 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     InternalHeatGains::GetInternalHeatGainsInput(state);
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
 
-    GetInputDElightComplexFenestration(foundErrors);
+    GetInputDElightComplexFenestration(state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 

@@ -593,7 +593,7 @@ namespace UnitarySystems {
 
         void reportUnitarySystem(EnergyPlusData &state, int const AirLoopNum);
 
-        void unitarySystemHeatRecovery();
+        void unitarySystemHeatRecovery(EnergyPlusData &state);
 
         void controlUnitarySystemtoSP(EnergyPlusData &state, int const AirLoopNum,          // Primary air loop number
                                       bool const FirstHVACIteration, // True when first HVAC iteration

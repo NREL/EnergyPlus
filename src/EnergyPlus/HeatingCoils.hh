@@ -268,7 +268,7 @@ namespace HeatingCoils {
                                       int const FanOpMode      // Fan operation mode
     );
 
-    void CalcDesuperheaterHeatingCoil(int const CoilNum,     // index to desuperheater heating coil
+    void CalcDesuperheaterHeatingCoil(EnergyPlusData &state, int const CoilNum,     // index to desuperheater heating coil
                                       Real64 const QCoilReq, // load requested by the simulation for load based control [W]
                                       Real64 &QCoilActual    // coil load actually delivered
     );

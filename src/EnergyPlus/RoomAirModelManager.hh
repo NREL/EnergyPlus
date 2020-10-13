@@ -82,21 +82,21 @@ namespace RoomAirModelManager {
 
     void GetAirModelDatas(EnergyPlusData &state);
 
-    void GetUserDefinedPatternData(bool &ErrorsFound); // True if errors found during this get input routine
+    void GetUserDefinedPatternData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetAirNodeData(bool &ErrorsFound); // True if errors found during this get input routine
+    void GetAirNodeData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
     //*****************************************************************************************
 
-    void GetMundtData(bool &ErrorsFound); // True if errors found during this get input routine
+    void GetMundtData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetDisplacementVentData(bool &ErrorsFound); // True if errors found during this get input routine
+    void GetDisplacementVentData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetCrossVentData(bool &ErrorsFound); // True if errors found during this get input routine
+    void GetCrossVentData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetUFADZoneData(bool &ErrorsFound); // True if errors found during this get input routine
+    void GetUFADZoneData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
-    void SharedDVCVUFDataInit(int &ZoneNum);
+    void SharedDVCVUFDataInit(EnergyPlusData &state, int &ZoneNum);
 
     void GetRoomAirflowNetworkData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 

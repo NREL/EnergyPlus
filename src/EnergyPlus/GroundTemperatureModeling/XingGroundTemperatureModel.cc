@@ -63,7 +63,7 @@ namespace EnergyPlus {
 //******************************************************************************
 
 // Xing model factory
-std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(int objectType, std::string objectName)
+std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -94,7 +94,7 @@ std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(int o
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
-        inputProcessor->getObjectItem(cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
         if (objectName == cAlphaArgs(1)) {
             // Read input into object here

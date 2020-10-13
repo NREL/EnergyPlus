@@ -56,7 +56,6 @@
 namespace EnergyPlus {
 
 // Forward declarations
-class IOFiles;
 struct EnergyPlusData;
 
 struct BaseSizerWithFanHeatInputs : BaseSizer {

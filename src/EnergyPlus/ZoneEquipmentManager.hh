@@ -147,10 +147,9 @@ namespace ZoneEquipmentManager {
                                    Real64 &DOASSupHR    // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
     );
 
-    void AutoCalcDOASControlStrategy(EnergyPlusData &state, IOFiles &ioFiles);
+    void AutoCalcDOASControlStrategy(EnergyPlusData &state);
 
     void ReportZoneSizingDOASInputs(EnergyPlusData &state,
-                                    IOFiles &ioFiles,
                                     std::string const &ZoneName,         // the name of the zone
                                     std::string const &DOASCtrlStrategy, // DOAS control strategy
                                     Real64 const DOASLowTemp,            // DOAS design low setpoint temperature [C]
