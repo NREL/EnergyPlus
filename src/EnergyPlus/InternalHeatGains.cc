@@ -5582,7 +5582,7 @@ namespace InternalHeatGains {
                 if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
                 int const radEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
                 if (!doLoadComponentPulseNow) {
-                    QRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
+                    SurfQRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                 } else {
                     curQL = QL(radEnclosureNum);
                     // for the loads component report during the special sizing run increase the radiant portion
@@ -5592,7 +5592,7 @@ namespace InternalHeatGains {
                     // ITABSF is the Inside Thermal Absorptance
                     // TMULT is a multiplier for each zone
                     // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
-                    QRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
+                    SurfQRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                     // store the magnitude and time of the pulse
                     radiantPulseTimestep(CurOverallSimDay, zoneNum) = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
                     radiantPulseReceived(CurOverallSimDay, SurfNum) =
