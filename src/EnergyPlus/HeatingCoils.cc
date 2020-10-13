@@ -311,7 +311,7 @@ namespace HeatingCoils {
         UpdateHeatingCoil(CoilNum);
 
         // Report the current HeatingCoil
-        ReportHeatingCoil(CoilNum);
+        ReportHeatingCoil(CoilNum, CoilIsSuppHeater);
 
         if (present(QCoilActual)) {
             QCoilActual = QCoilActual2;
@@ -2853,7 +2853,7 @@ namespace HeatingCoils {
     // Beginning of Reporting subroutines for the HeatingCoil Module
     // *****************************************************************************
 
-    void ReportHeatingCoil(int const CoilNum)
+    void ReportHeatingCoil(int const CoilNum, bool const coilIsSuppHeater)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2898,6 +2898,11 @@ namespace HeatingCoils {
         HeatingCoil(CoilNum).ElecUseRate = HeatingCoil(CoilNum).ElecUseLoad;
         HeatingCoil(CoilNum).FuelUseLoad *= ReportingConstant;
         HeatingCoil(CoilNum).ElecUseLoad *= ReportingConstant;
+        if (coilIsSuppHeater) {
+            DataHVACGlobals::SuppHeatingCoilPower = HeatingCoil(CoilNum).ElecUseLoad;
+        } else {
+            DataHVACGlobals::ElecHeatingCoilPower = HeatingCoil(CoilNum).ElecUseLoad;
+        }
 
         HeatingCoil(CoilNum).ParasiticFuelLoad = HeatingCoil(CoilNum).ParasiticFuelRate * ReportingConstant;
 

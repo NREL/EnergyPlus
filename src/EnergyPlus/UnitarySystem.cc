@@ -14030,9 +14030,9 @@ namespace UnitarySystems {
             locFanElecPower = Fans::GetFanPower(this->m_FanIndex);
         }
 
-        Real64 ElecCoolingPower = 0.0;
-        Real64 ElecHeatingPower = 0.0;
-        Real64 SuppHeatingPower = 0.0;
+        Real64 elecCoolingPower = 0.0;
+        Real64 elecHeatingPower = 0.0;
+        Real64 suppHeatingPower = 0.0;
 
         {
             auto const SELECT_CASE_var(this->m_CoolingCoilType_Num);
@@ -14050,7 +14050,7 @@ namespace UnitarySystems {
                 if (this->m_LastMode == CoolingMode) {
                     this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_CycRatio) * ReportingConstant;
                 }
-                ElecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
+                elecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedCooling) ||
                        ((SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling) && (this->m_NumOfSpeedCooling > 1))) {
@@ -14066,7 +14066,7 @@ namespace UnitarySystems {
                 if (this->m_LastMode == CoolingMode) {
                     this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac) * ReportingConstant;
                 }
-                ElecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
+                elecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
 
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWater || SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterDetailed) {
 
@@ -14102,7 +14102,7 @@ namespace UnitarySystems {
                         this->CoilSHR = coilCoolingDXs[this->m_CoolingCoilIndex].performance.NormalSHR;
                     }
                 }
-                ElecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
+                elecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_UserDefined || SELECT_CASE_var == DataHVACGlobals::CoilWater_CoolingHXAssisted ||
                        SELECT_CASE_var == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling) {
                 if (CoolingLoad) {
@@ -14124,7 +14124,7 @@ namespace UnitarySystems {
                 if (this->m_LastMode == CoolingMode) {
                     this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac) * ReportingConstant;
                 }
-                ElecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
+                elecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
             }
         }
 
@@ -14144,7 +14144,7 @@ namespace UnitarySystems {
                 if (this->m_LastMode == HeatingMode) {
                     this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac) * ReportingConstant;
                 }
-                ElecHeatingPower = DataHVACGlobals::DXElecHeatingPower;
+                elecHeatingPower = DataHVACGlobals::DXElecHeatingPower;
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGas_MultiStage) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric_MultiStage)) {
@@ -14160,7 +14160,7 @@ namespace UnitarySystems {
                     this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
                 }
 
-                ElecHeatingPower = DataHVACGlobals::ElecHeatingCoilPower;
+                elecHeatingPower = DataHVACGlobals::ElecHeatingCoilPower;
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::CoilDX_HeatingEmpirical) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHP) ||
@@ -14177,7 +14177,7 @@ namespace UnitarySystems {
                     this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
                 }
 
-                ElecHeatingPower = DataHVACGlobals::DXElecHeatingPower;
+                elecHeatingPower = DataHVACGlobals::DXElecHeatingPower;
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_UserDefined) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater)) {
@@ -14201,28 +14201,22 @@ namespace UnitarySystems {
                 if (this->m_LastMode == HeatingMode) {
                     this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
                 }
-                ElecHeatingPower = DataHVACGlobals::ElecHeatingCoilPower;
+                elecHeatingPower = DataHVACGlobals::ElecHeatingCoilPower;
             }
         }
 
         if (!HeatingLoad && !CoolingLoad) {
-            if (this->m_TotalAuxElecPower > 0.0) {
-                this->m_TotalAuxElecPower = this->m_TotalAuxElecPower;
-            }
             this->m_TotalAuxElecPower = this->m_AncillaryOffPower;
         }
 
         if (this->m_SuppCoilExists) {
             auto const SELECT_CASE_var(this->m_HeatingCoilType_Num);
             if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric) {
-                // Yuck, what if main heating coil and supp heating coil are electric
-                // Probably need to save heating coil power when they are simulated to split out main and supp heater
-                SuppHeatingPower = DataHVACGlobals::ElecHeatingCoilPower;
+                suppHeatingPower = DataHVACGlobals::SuppHeatingCoilPower;
             }
         }
 
-        this->m_ElecPower = locFanElecPower + ElecCoolingPower + ElecHeatingPower + SuppHeatingPower + DataHVACGlobals::ElecHeatingCoilPower +
-                            this->m_TotalAuxElecPower;
+        this->m_ElecPower = locFanElecPower + elecCoolingPower + elecHeatingPower + suppHeatingPower + this->m_TotalAuxElecPower;
         this->m_ElecPowerConsumption = this->m_ElecPower * ReportingConstant;
 
         if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||

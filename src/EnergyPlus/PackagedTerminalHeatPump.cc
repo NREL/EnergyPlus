@@ -543,7 +543,7 @@ namespace PackagedTerminalHeatPump {
                 }
             }
         } else {
-            PTUnit(PTUnitNum).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower;
+            PTUnit(PTUnitNum).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + SuppHeatingCoilPower;
         }
     }
 
@@ -583,7 +583,6 @@ namespace PackagedTerminalHeatPump {
         auto &GetHXDXCoilInletNode(HVACHXAssistedCoolingCoil::GetCoilInletNode);
         auto &GetHXDXCoilOutletNode(HVACHXAssistedCoolingCoil::GetCoilOutletNode);
         auto &GetHeatingCoilIndex(HeatingCoils::GetCoilIndex);
-        using HeatingCoils::SimulateHeatingCoilComponents;
         auto &GetHeatingCoilInletNode(HeatingCoils::GetCoilInletNode);
         auto &GetHeatingCoilOutletNode(HeatingCoils::GetCoilOutletNode);
         auto &GetHeatingCoilCapacity(HeatingCoils::GetCoilCapacity);
@@ -6649,7 +6648,7 @@ namespace PackagedTerminalHeatPump {
         // FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
         FirstHVACIteration = (Par(2) == 1.0);
         SimulateHeatingCoilComponents(
-            state, PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, TempSupHeater, PTUnit(PTUnitNum).SuppHeatCoilIndex);
+            state, PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, TempSupHeater, PTUnit(PTUnitNum).SuppHeatCoilIndex, _, true);
         SupSATResidual = Node(PTUnit(PTUnitNum).AirOutNode).Temp - PTUnit(PTUnitNum).MaxSATSupHeat;
 
         return SupSATResidual;
@@ -7768,7 +7767,7 @@ namespace PackagedTerminalHeatPump {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).SuppHeatCoilType_Num);
                     if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
                         SimulateHeatingCoilComponents(
-                            state, PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit(PTUnitNum).SuppHeatCoilIndex);
+                            state, PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit(PTUnitNum).SuppHeatCoilIndex, _, true);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         mdot = 0.0;
                         SetComponentFlowRate(mdot,

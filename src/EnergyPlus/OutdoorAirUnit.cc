@@ -2152,7 +2152,6 @@ namespace OutdoorAirUnit {
         using DataLoopNode::Node;
         using DesiccantDehumidifiers::SimDesiccantDehumidifier;
         using General::TrimSigDigits;
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using HeatRecovery::SimHeatRecovery;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
         using HVACDXSystem::SimDXCoolingSystem;
@@ -2520,7 +2519,6 @@ namespace OutdoorAirUnit {
 
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using SteamCoils::SimulateSteamCoilComponents;
         using WaterCoils::SimulateWaterCoilComponents;
@@ -2576,7 +2574,8 @@ namespace OutdoorAirUnit {
                     Node(OutletNode).HumRat = Node(InletNode).HumRat;
                     Node(OutletNode).MassFlowRate = Node(InletNode).MassFlowRate;
                 }
-                SimulateHeatingCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, QCompReq, CoilIndex);
+                HeatingCoils::SimulateHeatingCoilComponents(
+                    state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, QCompReq, CoilIndex);
 
                 AirMassFlow = Node(InletNode).MassFlowRate;
                 LoadMet = AirMassFlow *
@@ -2599,7 +2598,8 @@ namespace OutdoorAirUnit {
                     Node(OutletNode).HumRat = Node(InletNode).HumRat;
                     Node(OutletNode).MassFlowRate = Node(InletNode).MassFlowRate;
                 }
-                SimulateHeatingCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, QCompReq, CoilIndex);
+                HeatingCoils::SimulateHeatingCoilComponents(
+                    state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, QCompReq, CoilIndex);
 
                 AirMassFlow = Node(InletNode).MassFlowRate;
                 LoadMet = AirMassFlow *

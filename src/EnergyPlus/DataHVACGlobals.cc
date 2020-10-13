@@ -447,6 +447,7 @@ namespace DataHVACGlobals {
     Real64 DXElecCoolingPower(0.0);       // Electric power consumed by DX cooling coil last DX simulation
     Real64 DXElecHeatingPower(0.0);       // Electric power consumed by DX heating coil last DX simulation
     Real64 ElecHeatingCoilPower(0.0);     // Electric power consumed by electric heating coil
+    Real64 SuppHeatingCoilPower(0.0);     // Electric power consumed by electric supplemental heating coil
     Real64 AirToAirHXElecPower(0.0);      // Electric power consumed by Heat Exchanger:Air To Air (Generic or Flat Plate)
     // from last simulation in HeatRecovery.cc
     Real64 UnbalExhMassFlow(0.0);      // unbalanced zone exhaust from a zone equip component [kg/s]
@@ -646,6 +647,7 @@ namespace DataHVACGlobals {
         DXElecCoolingPower = 0.0;
         DXElecHeatingPower = 0.0;
         ElecHeatingCoilPower = 0.0;
+        SuppHeatingCoilPower = 0.0;
         AirToAirHXElecPower = 0.0;
         UnbalExhMassFlow = 0.0;
         BalancedExhMassFlow = 0.0;

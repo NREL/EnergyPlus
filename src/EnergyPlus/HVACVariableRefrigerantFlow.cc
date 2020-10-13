@@ -8601,7 +8601,6 @@ namespace HVACVariableRefrigerantFlow {
 
         using DataZoneEquipment::ZoneEquipConfig;
         using DXCoils::SimDXCoil;
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using MixedAir::SimOAMixer;
         using SingleDuct::SimATMixer;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -11482,7 +11481,6 @@ namespace HVACVariableRefrigerantFlow {
         using General::RoundSigDigits;
         using General::SolveRoot;
         using General::TrimSigDigits;
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using ScheduleManager::GetCurrentScheduleValue;
         using TempSolveRoot::SolveRoot;
 
@@ -11747,7 +11745,6 @@ namespace HVACVariableRefrigerantFlow {
         //		A new physics based VRF model applicable for Fluid Temperature Control.
         using DataZoneEquipment::ZoneEquipConfig;
         using DXCoils::SimDXCoil;
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using MixedAir::SimOAMixer;
         using SingleDuct::SimATMixer;
         using SteamCoils::SimulateSteamCoilComponents;
