@@ -1642,7 +1642,7 @@ namespace EconomicLifeCycleCost {
         }
         // compute the Single Present Value factors based on the discount rate
         SPV.allocate(lengthStudyYears);
-        for (int year = 1; year <= lengthStudyYears; ++lengthStudyYears) {
+        for (int year = 1; year <= lengthStudyYears; ++year) {
             std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
             for (auto iResource : DataGlobalConstants::AllResourceTypes) {
                 yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64> (iResource, 0.0));

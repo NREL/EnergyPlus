@@ -80,7 +80,6 @@ namespace DataGlobalConstants {
 
     // Resource Types
     enum class ResourceType {
-        Unknown,
         None,
         Electricity,
         Natural_Gas,

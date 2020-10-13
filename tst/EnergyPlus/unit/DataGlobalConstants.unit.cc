@@ -106,7 +106,7 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_AssignResourceTypeNum)
     EXPECT_EQ(DataGlobalConstants::ResourceType::CarbonEquivalent, DataGlobalConstants::AssignResourceTypeNum("Carbon Equivalent"));
     EXPECT_EQ(DataGlobalConstants::ResourceType::PlantLoopHeatingDemand, DataGlobalConstants::AssignResourceTypeNum("PlantLoopHeatingDemand"));
     EXPECT_EQ(DataGlobalConstants::ResourceType::PlantLoopCoolingDemand, DataGlobalConstants::AssignResourceTypeNum("PlantLoopCoolingDemand"));
-    EXPECT_EQ(DataGlobalConstants::ResourceType::Unknown, DataGlobalConstants::AssignResourceTypeNum("XYZ"));
+    EXPECT_EQ(DataGlobalConstants::ResourceType::None, DataGlobalConstants::AssignResourceTypeNum("XYZ"));
 }
 
 TEST_F(EnergyPlusFixture, DataGlobalConstants_GetResourceTypeChar)
@@ -157,7 +157,7 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_GetResourceTypeChar)
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::CarbonEquivalent), "Carbon Equivalent");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::PlantLoopHeatingDemand), "PlantLoopHeatingDemand");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::PlantLoopCoolingDemand), "PlantLoopCoolingDemand");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Unknown), "Unknown");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::None), "Unknown");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::None), "Unknown");
 }
 

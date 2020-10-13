@@ -138,7 +138,7 @@ namespace Boilers {
 
         // Default Constructor
         BoilerSpecs()
-            : FuelType(DataGlobalConstants::ResourceType::Unknown), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), Available(false),
+            : FuelType(DataGlobalConstants::ResourceType::None), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), Available(false),
               ON(false), NomCap(0.0),
               NomCapWasAutoSized(false), NomEffic(0.0), TempDesBoilerOut(0.0), FlowMode(DataPlant::FlowMode::NOTSET), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), MassFlowRate(0.0), SizFac(0.0),

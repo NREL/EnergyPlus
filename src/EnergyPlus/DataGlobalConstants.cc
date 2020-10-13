@@ -98,8 +98,7 @@ namespace DataGlobalConstants {
     int const endUseRefrigeration(13);
     int const endUseCogeneration(14);
 
-    std::vector<ResourceType> AllResourceTypes({ResourceType::Unknown,
-                                                ResourceType::None,
+    std::vector<ResourceType> AllResourceTypes({ResourceType::None,
                                                 ResourceType::Electricity,
                                                 ResourceType::Natural_Gas,
                                                 ResourceType::Gasoline,
@@ -177,10 +176,10 @@ namespace DataGlobalConstants {
             } else if (SELECT_CASE_var == "COAL") {
                 return ResourceType::Coal;
 
-            } else if ((SELECT_CASE_var == "FUELOILNO1") || (SELECT_CASE_var == "FuelOilNo1")) {
+            } else if (SELECT_CASE_var == "FUELOILNO1") {
                 return ResourceType::FuelOil_1;
 
-            } else if ((SELECT_CASE_var == "FUELOILNO2") || (SELECT_CASE_var == "FuelOilNo2")) {
+            } else if (SELECT_CASE_var == "FUELOILNO2") {
                 return ResourceType::FuelOil_2;
 
             } else if (SELECT_CASE_var == "PROPANE") {
@@ -301,7 +300,7 @@ namespace DataGlobalConstants {
                 return ResourceType::PlantLoopCoolingDemand;
 
             } else {
-                return ResourceType::Unknown;
+                return ResourceType::None;
             }
         }
     }

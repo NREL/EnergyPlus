@@ -176,7 +176,7 @@ namespace HeatingCoils {
         int AirLoopNum;                      // Airloop number
         // Default Constructor
         HeatingCoilEquipConditions()
-            : HCoilType_Num(0), FuelType_Num(DataGlobalConstants::ResourceType::Unknown), SchedPtr(0), InsuffTemperatureWarn(0),
+            : HCoilType_Num(0), FuelType_Num(DataGlobalConstants::ResourceType::None), SchedPtr(0), InsuffTemperatureWarn(0),
               InletAirMassFlowRate(0.0), OutletAirMassFlowRate(0.0),
               InletAirTemp(0.0), OutletAirTemp(0.0), InletAirHumRat(0.0), OutletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirEnthalpy(0.0),
               HeatingCoilLoad(0.0), HeatingCoilRate(0.0), FuelUseLoad(0.0), ElecUseLoad(0.0), FuelUseRate(0.0), ElecUseRate(0.0), Efficiency(0.0),
