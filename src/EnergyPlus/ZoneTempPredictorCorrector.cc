@@ -92,6 +92,7 @@
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -6291,7 +6292,7 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 // Other convection term is applicable to equivalent layer window (ASHWAT) model
-                if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGain += SurfWinOtherConvHeatGain(SurfNum);
+                if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGain += SurfWinOtherConvHeatGain(SurfNum);
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
                 if (shading_flag == IntShadeOn || shading_flag == IntBlindOn) SumIntGain += SurfWinConvHeatFlowNatural(SurfNum);
@@ -6626,7 +6627,7 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 // Other convection term is applicable to equivalent layer window (ASHWAT) model
-                if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGains += SurfWinOtherConvHeatGain(SurfNum);
+                if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGains += SurfWinOtherConvHeatGain(SurfNum);
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
                 if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn)
@@ -7140,21 +7141,21 @@ namespace ZoneTempPredictorCorrector {
                 if (SELECT_CASE_var == static_cast<int>(AverageMethod::NO)) {
                     PeopleNum = ComfortControlledZone(RelativeZoneNum).SpecificObjectNum;
                     if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-                        GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
                     } else {
-                        GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
                     }
                     if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger))
-                        GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
                 } else if (SELECT_CASE_var == static_cast<int>(AverageMethod::SPE)) {
                     PeopleNum = ComfortControlledZone(RelativeZoneNum).SpecificObjectNum;
                     if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-                        GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
                     } else {
-                        GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
                     }
                     if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger))
-                        GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
                 } else if (SELECT_CASE_var == static_cast<int>(AverageMethod::OBJ)) {
                     ObjectCount = 0;
                     SetPointLo = 0.0;
@@ -7162,10 +7163,10 @@ namespace ZoneTempPredictorCorrector {
                     for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
                         if (ActualZoneNum == People(PeopleNum).ZonePtr) {
                             ++ObjectCount;
-                            GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
+                            GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
                             SetPointLo += Tset;
                             if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                                GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
+                                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
                                 SetPointHi += Tset;
                             }
                         }
@@ -7180,10 +7181,10 @@ namespace ZoneTempPredictorCorrector {
                         if (ActualZoneNum == People(PeopleNum).ZonePtr) {
                             NumberOccupants = People(PeopleNum).NumberOfPeople * GetCurrentScheduleValue(People(PeopleNum).NumberOfPeoplePtr);
                             PeopleCount += NumberOccupants;
-                            GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
+                            GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
                             SetPointLo += Tset * NumberOccupants;
                             if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                                GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
+                                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
                                 SetPointHi += Tset * NumberOccupants;
                             }
                         }
@@ -7212,10 +7213,10 @@ namespace ZoneTempPredictorCorrector {
                         for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
                             if (ActualZoneNum == People(PeopleNum).ZonePtr) {
                                 ++ObjectCount;
-                                GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
+                                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
                                 SetPointLo += Tset;
                                 if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                                    GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
+                                    GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
                                     SetPointHi += Tset;
                                 }
                             }
@@ -7365,7 +7366,8 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void GetComfortSetPoints(int const PeopleNum,
+    void GetComfortSetPoints(EnergyPlusData &state,
+                             int const PeopleNum,
                              int const ComfortControlNum,
                              Real64 const PMVSet,
                              Real64 &Tset // drybulb setpoint temperature for a given PMV value
@@ -7410,14 +7412,14 @@ namespace ZoneTempPredictorCorrector {
         Tmin = ComfortControlledZone(ComfortControlNum).TdbMinSetPoint;
         Tmax = ComfortControlledZone(ComfortControlNum).TdbMaxSetPoint;
 
-        CalcThermalComfortFanger(PeopleNum, Tmin, PMVResult);
+        CalcThermalComfortFanger(state, PeopleNum, Tmin, PMVResult);
         PMVMin = PMVResult;
-        CalcThermalComfortFanger(PeopleNum, Tmax, PMVResult);
+        CalcThermalComfortFanger(state, PeopleNum, Tmax, PMVResult);
         PMVMax = PMVResult;
         if (PMVSet > PMVMin && PMVSet < PMVMax) {
             Par(1) = PMVSet;
             Par(2) = double(PeopleNum);
-            SolveRoot(Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par);
+            TempSolveRoot::SolveRoot(state, Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par);
             if (SolFla == -1) {
                 if (!WarmupFlag) {
                     ++IterLimitExceededNum1;
@@ -7454,7 +7456,8 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    Real64 PMVResidual(Real64 const Tset,
+    Real64 PMVResidual(EnergyPlusData &state,
+                       Real64 const Tset,
                        Array1D<Real64> const &Par // par(1) = PMV set point
     )
     {
@@ -7482,7 +7485,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 PMVresult; // resulting PMV values
 
         PeopleNum = int(Par(2));
-        CalcThermalComfortFanger(PeopleNum, Tset, PMVresult);
+        CalcThermalComfortFanger(state, PeopleNum, Tset, PMVresult);
         PMVResidual = Par(1) - PMVresult;
         return PMVResidual;
     }

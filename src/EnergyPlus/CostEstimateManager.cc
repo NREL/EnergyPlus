@@ -277,7 +277,7 @@ namespace CostEstimateManager {
                     }
 
                     ThisConstructStr = state.dataCostEstimateManager->CostLineItem(Item).ParentObjName;
-                    ThisConstructID = UtilityRoutines::FindItem(ThisConstructStr, dataConstruction.Construct);
+                    ThisConstructID = UtilityRoutines::FindItem(ThisConstructStr, state.dataConstruction->Construct);
                     if (ThisConstructID == 0) { // do any surfaces have the specified construction? If not issue warning.
                         ShowWarningError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName + "\" Construction=\"" +
                                          state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\", no surfaces have the Construction specified");
@@ -540,7 +540,7 @@ namespace CostEstimateManager {
                 } else if (SELECT_CASE_var == "CONSTRUCTION") {
 
                     ThisConstructStr = state.dataCostEstimateManager->CostLineItem(Item).ParentObjName;
-                    ThisConstructID = UtilityRoutines::FindItem(ThisConstructStr, dataConstruction.Construct);
+                    ThisConstructID = UtilityRoutines::FindItem(ThisConstructStr, state.dataConstruction->Construct);
                     // need to determine unique surfacs... some surfaces are shared by zones and hence doubled
                     uniqueSurfMask.dimension(TotSurfaces, true); // init to true and change duplicates to false
                     SurfMultipleARR.dimension(TotSurfaces, 1.0);

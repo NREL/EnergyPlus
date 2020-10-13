@@ -762,28 +762,6 @@ namespace OutputReportTabular {
         // loop and updates the arrays of data that will later being put
         // into the tabular reports.
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         if (t_timeStepType != OutputProcessor::TimeStepType::TimeStepZone && t_timeStepType != OutputProcessor::TimeStepType::TimeStepSystem) {
             ShowFatalError("Invalid reporting requested -- UpdateTabularReports");
         }
@@ -817,7 +795,7 @@ namespace OutputReportTabular {
                 GatherBEPSResultsForTimestep(t_timeStepType);
                 GatherSourceEnergyEndUseResultsForTimestep(t_timeStepType);
                 GatherPeakDemandForTimestep(t_timeStepType);
-                GatherHeatGainReport(t_timeStepType);
+                GatherHeatGainReport(state, t_timeStepType);
                 GatherHeatEmissionReport(state, t_timeStepType);
             }
         }
@@ -4925,8 +4903,6 @@ namespace OutputReportTabular {
         using PackagedThermalStorageCoil::TESCoil;
         using RefrigeratedCase::Condenser;
         using RefrigeratedCase::RefrigRack;
-        using VariableSpeedCoils::NumVarSpeedCoils;
-        using VariableSpeedCoils::VarSpeedCoil;
 
         static int iOACtrl(0);
         static int iCoil(0);
@@ -5019,18 +4995,18 @@ namespace OutputReportTabular {
             }
         }
         // VAV coils - air to air
-        for (iCoil = 1; iCoil <= NumVarSpeedCoils; ++iCoil) {
-            if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                if (VarSpeedCoil(iCoil).CondenserType == AirCooled) {
-                    SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
-                                                  VarSpeedCoil(iCoil).DefrostConsumption + VarSpeedCoil(iCoil).EnergyLoadTotal;
-                } else if (VarSpeedCoil(iCoil).CondenserType == EvapCooled) {
-                    SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).EvapCondPumpElecConsumption + VarSpeedCoil(iCoil).BasinHeaterConsumption +
-                                                  VarSpeedCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
+        for (iCoil = 1; iCoil <= state.dataVariableSpeedCoils->NumVarSpeedCoils; ++iCoil) {
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                if (state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).CondenserType == AirCooled) {
+                    SysTotalHVACRejectHeatLoss += state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).Energy + state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
+                                                  state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).DefrostConsumption + state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).EnergyLoadTotal;
+                } else if (state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).CondenserType == EvapCooled) {
+                    SysTotalHVACRejectHeatLoss += state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).EvapCondPumpElecConsumption + state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).BasinHeaterConsumption +
+                                                  state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
                 }
-            } else if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
-                SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
-                                              VarSpeedCoil(iCoil).DefrostConsumption - VarSpeedCoil(iCoil).EnergyLoadTotal;
+            } else if (state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+                SysTotalHVACRejectHeatLoss += state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).Energy + state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
+                                              state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).DefrostConsumption - state.dataVariableSpeedCoils->VarSpeedCoil(iCoil).EnergyLoadTotal;
             }
         }
 
@@ -5098,7 +5074,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherHeatGainReport(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
+    void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -5185,21 +5161,7 @@ namespace OutputReportTabular {
         using LowTempRadiantSystem::NumOfHydrLowTempRadSys;
         using OutputReportPredefined::pdrSensibleGain;
         using OutputReportPredefined::reportName;
-        using VentilatedSlab::NumOfVentSlabs;
-        using VentilatedSlab::VentSlab;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int iZone(0);
         static int iRadiant(0);
         static int iunit(0);
@@ -5304,14 +5266,14 @@ namespace OutputReportTabular {
         curZone = 0;
         // HVAC Input Heated Surface Heating
         // HVAC Input Cooled Surface Cooling
-        for (iRadiant = 1; iRadiant <= NumOfVentSlabs; ++iRadiant) {
-            curZone = VentSlab(iRadiant).ZonePtr;
+        for (iRadiant = 1; iRadiant <= state.dataVentilatedSlab->NumOfVentSlabs; ++iRadiant) {
+            curZone = state.dataVentilatedSlab->VentSlab(iRadiant).ZonePtr;
             mult = Zone(curZone).Multiplier * Zone(curZone).ListMultiplier;
             if ((curZone > 0) && (curZone <= NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnSurfHt += VentSlab(iRadiant).RadHeatingEnergy * mult;
-                ZonePreDefRep(curZone).SHGSAnSurfCl -= VentSlab(iRadiant).RadCoolingEnergy * mult;
-                radiantHeat(curZone) = VentSlab(iRadiant).RadHeatingPower * mult;
-                radiantCool(curZone) = -VentSlab(iRadiant).RadCoolingPower * mult;
+                ZonePreDefRep(curZone).SHGSAnSurfHt += state.dataVentilatedSlab->VentSlab(iRadiant).RadHeatingEnergy * mult;
+                ZonePreDefRep(curZone).SHGSAnSurfCl -= state.dataVentilatedSlab->VentSlab(iRadiant).RadCoolingEnergy * mult;
+                radiantHeat(curZone) = state.dataVentilatedSlab->VentSlab(iRadiant).RadHeatingPower * mult;
+                radiantCool(curZone) = -state.dataVentilatedSlab->VentSlab(iRadiant).RadCoolingPower * mult;
             }
         }
         for (iRadiant = 1; iRadiant <= NumOfHydrLowTempRadSys; ++iRadiant) {

@@ -439,7 +439,7 @@ namespace EMSManager {
 
         if (GetEMSUserInput) {
             SetupZoneInfoAsInternalDataAvail();
-            SetupWindowShadingControlActuators();
+            SetupWindowShadingControlActuators(state);
             SetupSurfaceConvectionActuators();
             SetupSurfaceConstructionActuators();
             SetupSurfaceOutdoorBoundaryConditionActuators();
@@ -1958,7 +1958,7 @@ namespace EMSManager {
         }
     }
 
-    void SetupWindowShadingControlActuators()
+    void SetupWindowShadingControlActuators(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2032,7 +2032,7 @@ namespace EMSManager {
             } else {
                 if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WSC_ST_SwitchableGlazing) {
                     ShowSevereError("Missing shade or blind layer in window construction name = '" +
-                                    dataConstruction.Construct(Surface(loopSurfNum).activeShadedConstruction).Name + "', surface name = '" +
+                                    state.dataConstruction->Construct(Surface(loopSurfNum).activeShadedConstruction).Name + "', surface name = '" +
                                     Surface(loopSurfNum).Name + "'.");
                     ShowContinueError("...'Control Status' or 'Slat Angle' EMS Actuator cannot be set for a construction that does not have a shade "
                                       "or a blind layer.");

@@ -327,7 +327,7 @@ namespace PipeHeatTransfer {
 
             // General user input data
             PipeHT(Item).Construction = cAlphaArgs(2);
-            PipeHT(Item).ConstructionNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), dataConstruction.Construct);
+            PipeHT(Item).ConstructionNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataConstruction->Construct);
 
             if (PipeHT(Item).ConstructionNum == 0) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
@@ -419,7 +419,7 @@ namespace PipeHeatTransfer {
 
             if (PipeHT(Item).ConstructionNum != 0) {
                 PipeHT(Item).ValidatePipeConstruction(
-                    cCurrentModuleObject, cAlphaArgs(2), cAlphaFieldNames(2), PipeHT(Item).ConstructionNum, ErrorsFound);
+                    state, cCurrentModuleObject, cAlphaArgs(2), cAlphaFieldNames(2), PipeHT(Item).ConstructionNum, ErrorsFound);
             }
 
         } // end of input loop
@@ -447,7 +447,7 @@ namespace PipeHeatTransfer {
 
             // General user input data
             PipeHT(Item).Construction = cAlphaArgs(2);
-            PipeHT(Item).ConstructionNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), dataConstruction.Construct);
+            PipeHT(Item).ConstructionNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataConstruction->Construct);
 
             if (PipeHT(Item).ConstructionNum == 0) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
@@ -523,7 +523,7 @@ namespace PipeHeatTransfer {
 
             if (PipeHT(Item).ConstructionNum != 0) {
                 PipeHT(Item).ValidatePipeConstruction(
-                    cCurrentModuleObject, cAlphaArgs(2), cAlphaFieldNames(2), PipeHT(Item).ConstructionNum, ErrorsFound);
+                    state, cCurrentModuleObject, cAlphaArgs(2), cAlphaFieldNames(2), PipeHT(Item).ConstructionNum, ErrorsFound);
             }
 
         } // end of input loop
@@ -552,7 +552,7 @@ namespace PipeHeatTransfer {
 
             // General user input data
             PipeHT(Item).Construction = cAlphaArgs(2);
-            PipeHT(Item).ConstructionNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), dataConstruction.Construct);
+            PipeHT(Item).ConstructionNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataConstruction->Construct);
 
             if (PipeHT(Item).ConstructionNum == 0) {
                 ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
@@ -644,7 +644,7 @@ namespace PipeHeatTransfer {
 
             if (PipeHT(Item).ConstructionNum != 0) {
                 PipeHT(Item).ValidatePipeConstruction(
-                    cCurrentModuleObject, cAlphaArgs(2), cAlphaFieldNames(2), PipeHT(Item).ConstructionNum, ErrorsFound);
+                    state, cCurrentModuleObject, cAlphaArgs(2), cAlphaFieldNames(2), PipeHT(Item).ConstructionNum, ErrorsFound);
             }
 
             // Get ground temperature model
@@ -729,7 +729,8 @@ namespace PipeHeatTransfer {
         }
     }
 
-    void PipeHTData::ValidatePipeConstruction(std::string const &PipeType,         // module object of pipe (error messages)
+    void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
+                                              std::string const &PipeType,         // module object of pipe (error messages)
                                               std::string const &ConstructionName, // construction name of pipe (error messages)
                                               std::string const &FieldName,        // fieldname of pipe (error messages)
                                               int const ConstructionNum,           // pointer into construction data
@@ -779,31 +780,31 @@ namespace PipeHeatTransfer {
         TotThickness = 0.0;
 
         // CTF stuff
-        TotalLayers = dataConstruction.Construct(ConstructionNum).TotLayers;
+        TotalLayers = state.dataConstruction->Construct(ConstructionNum).TotLayers;
         // get pipe properties
         if (TotalLayers == 1) { // no insulation layer
 
-            this->PipeConductivity = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).Conductivity;
-            this->PipeDensity = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).Density;
-            this->PipeCp = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).SpecHeat;
-            this->PipeOD = this->PipeID + 2.0 * dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).Thickness;
+            this->PipeConductivity = dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(1)).Conductivity;
+            this->PipeDensity = dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(1)).Density;
+            this->PipeCp = dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(1)).SpecHeat;
+            this->PipeOD = this->PipeID + 2.0 * dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(1)).Thickness;
             this->InsulationOD = this->PipeOD;
             this->SumTK =
-                dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).Thickness / dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(1)).Conductivity;
+                dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(1)).Thickness / dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(1)).Conductivity;
 
         } else if (TotalLayers >= 2) { // first layers are insulation, last layer is pipe
 
             for (LayerNum = 1; LayerNum <= TotalLayers - 1; ++LayerNum) {
-                Resistance += dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness /
-                              dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Conductivity;
-                Density = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Density *
-                          dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
-                TotThickness += dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
-                SpHeat = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).SpecHeat *
-                         dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
-                this->InsulationThickness = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
-                this->SumTK += dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness /
-                               dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(LayerNum)).Conductivity;
+                Resistance += dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness /
+                              dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum)).Conductivity;
+                Density = dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum)).Density *
+                          dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
+                TotThickness += dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
+                SpHeat = dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum)).SpecHeat *
+                         dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
+                this->InsulationThickness = dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness;
+                this->SumTK += dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness /
+                               dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum)).Conductivity;
             }
 
             this->InsulationResistance = Resistance;
@@ -812,11 +813,11 @@ namespace PipeHeatTransfer {
             this->InsulationCp = SpHeat / TotThickness;
             this->InsulationThickness = TotThickness;
 
-            this->PipeConductivity = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(TotalLayers)).Conductivity;
-            this->PipeDensity = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(TotalLayers)).Density;
-            this->PipeCp = dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(TotalLayers)).SpecHeat;
+            this->PipeConductivity = dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(TotalLayers)).Conductivity;
+            this->PipeDensity = dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(TotalLayers)).Density;
+            this->PipeCp = dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(TotalLayers)).SpecHeat;
 
-            this->PipeOD = this->PipeID + 2.0 * dataMaterial.Material(dataConstruction.Construct(ConstructionNum).LayerPoint(TotalLayers)).Thickness;
+            this->PipeOD = this->PipeID + 2.0 * dataMaterial.Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(TotalLayers)).Thickness;
             this->InsulationOD = this->PipeOD + 2.0 * this->InsulationThickness;
 
         } else {

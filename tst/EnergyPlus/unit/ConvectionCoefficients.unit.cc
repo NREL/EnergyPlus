@@ -597,14 +597,14 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     DataSurfaces::TotSurfaces = 1;
     DataGlobals::NumOfZones = 1;
     DataSurfaces::Surface.allocate( 1 );
-    dataConstruction.Construct.allocate( 1 );
+    state.dataConstruction->Construct.allocate( 1 );
     DataHeatBalance::Zone.allocate( 1 );
     DataLoopNode::Node.allocate( 1 );
 
     DataSurfaces::Surface( SurfNum ).Zone = 1;
     DataSurfaces::Surface( SurfNum ).Construction = 1;
     DataSurfaces::Surface(SurfNum).TAirRef = 0;
-    dataConstruction.Construct( 1 ).TypeIsWindow = false;
+    state.dataConstruction->Construct( 1 ).TypeIsWindow = false;
     DataHeatBalance::Zone( 1 ).SystemZoneNodeNumber = 1;
     DataHeatBalance::Zone( 1 ).Multiplier = 1.0;
     DataHeatBalance::Zone( 1 ).ListMultiplier = 1.0;

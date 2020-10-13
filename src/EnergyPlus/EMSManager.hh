@@ -133,7 +133,7 @@ namespace EMSManager {
 
     void SetupPrimaryAirSystemAvailMgrAsActuators(EnergyPlusData &state);
 
-    void SetupWindowShadingControlActuators();
+    void SetupWindowShadingControlActuators(EnergyPlusData &state);
 
     void SetupThermostatActuators();
 

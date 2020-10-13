@@ -60,6 +60,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace SolarReflectionManager {
 
     // Using/Aliasing
@@ -115,7 +118,7 @@ namespace SolarReflectionManager {
 
     // Functions
 
-    void InitSolReflRecSurf();
+    void InitSolReflRecSurf(EnergyPlusData &state);
 
     //=====================================================================================================
 
@@ -125,9 +128,9 @@ namespace SolarReflectionManager {
 
     //=================================================================================================
 
-    void CalcBeamSolSpecularReflFactors();
+    void CalcBeamSolSpecularReflFactors(EnergyPlusData &state);
 
-    void FigureBeamSolSpecularReflFactors(int const iHour);
+    void FigureBeamSolSpecularReflFactors(EnergyPlusData &state, int const iHour);
 
     //=================================================================================================
 

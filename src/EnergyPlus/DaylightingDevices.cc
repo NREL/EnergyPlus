@@ -289,8 +289,8 @@ namespace DaylightingDevices {
             for (PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum) {
                 // Initialize optical properties
                 TDDPipe(PipeNum).AspectRatio = TDDPipe(PipeNum).TotLength / TDDPipe(PipeNum).Diameter;
-                TDDPipe(PipeNum).ReflectVis = 1.0 - dataConstruction.Construct(TDDPipe(PipeNum).Construction).InsideAbsorpVis;
-                TDDPipe(PipeNum).ReflectSol = 1.0 - dataConstruction.Construct(TDDPipe(PipeNum).Construction).InsideAbsorpSolar;
+                TDDPipe(PipeNum).ReflectVis = 1.0 - state.dataConstruction->Construct(TDDPipe(PipeNum).Construction).InsideAbsorpVis;
+                TDDPipe(PipeNum).ReflectSol = 1.0 - state.dataConstruction->Construct(TDDPipe(PipeNum).Construction).InsideAbsorpSolar;
 
                 // Calculate the beam transmittance table for visible and solar spectrum
                 // First time thru use the visible reflectance
@@ -339,8 +339,8 @@ namespace DaylightingDevices {
                 } // Loop
 
                 // Calculate the solar isotropic diffuse and horizon transmittances.  These values are constant for a given TDD.
-                TDDPipe(PipeNum).TransSolIso = CalcTDDTransSolIso(PipeNum);
-                TDDPipe(PipeNum).TransSolHorizon = CalcTDDTransSolHorizon(PipeNum);
+                TDDPipe(PipeNum).TransSolIso = CalcTDDTransSolIso(state, PipeNum);
+                TDDPipe(PipeNum).TransSolHorizon = CalcTDDTransSolHorizon(state, PipeNum);
 
                 // Initialize thermal properties
                 SumTZoneLengths = 0.0;
@@ -429,8 +429,8 @@ namespace DaylightingDevices {
 
             ShelfSurf = Shelf(ShelfNum).OutSurf;
             if (ShelfSurf > 0) {
-                Shelf(ShelfNum).OutReflectVis = 1.0 - dataConstruction.Construct(Shelf(ShelfNum).Construction).OutsideAbsorpVis;
-                Shelf(ShelfNum).OutReflectSol = 1.0 - dataConstruction.Construct(Shelf(ShelfNum).Construction).OutsideAbsorpSolar;
+                Shelf(ShelfNum).OutReflectVis = 1.0 - state.dataConstruction->Construct(Shelf(ShelfNum).Construction).OutsideAbsorpVis;
+                Shelf(ShelfNum).OutReflectSol = 1.0 - state.dataConstruction->Construct(Shelf(ShelfNum).Construction).OutsideAbsorpSolar;
 
                 if (Shelf(ShelfNum).ViewFactor < 0) CalcViewFactorToShelf(ShelfNum);
 
@@ -547,9 +547,9 @@ namespace DaylightingDevices {
                         ErrorsFound = true;
                     }
 
-                    if (dataConstruction.Construct(Surface(SurfNum).Construction).TotGlassLayers > 1) {
+                    if (state.dataConstruction->Construct(Surface(SurfNum).Construction).TotGlassLayers > 1) {
                         ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) + " construction (" +
-                                        dataConstruction.Construct(Surface(SurfNum).Construction).Name + ") must have only 1 glass layer.");
+                                        state.dataConstruction->Construct(Surface(SurfNum).Construction).Name + ") must have only 1 glass layer.");
                         ErrorsFound = true;
                     }
 
@@ -565,7 +565,7 @@ namespace DaylightingDevices {
                         ErrorsFound = true;
                     }
 
-                    if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) {
+                    if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) {
                         ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) +
                                         " Equivalent Layer Window is not supported.");
                         ErrorsFound = true;
@@ -600,17 +600,17 @@ namespace DaylightingDevices {
                         ErrorsFound = true;
                     }
 
-                    if (dataConstruction.Construct(Surface(SurfNum).Construction).TotGlassLayers > 1) {
+                    if (state.dataConstruction->Construct(Surface(SurfNum).Construction).TotGlassLayers > 1) {
                         ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) + " construction (" +
-                                        dataConstruction.Construct(Surface(SurfNum).Construction).Name + ") must have only 1 glass layer.");
+                                        state.dataConstruction->Construct(Surface(SurfNum).Construction).Name + ") must have only 1 glass layer.");
                         ErrorsFound = true;
                     }
 
-                    if (dataConstruction.Construct(Surface(SurfNum).Construction).TransDiff <= 1.0e-10) {
+                    if (state.dataConstruction->Construct(Surface(SurfNum).Construction).TransDiff <= 1.0e-10) {
                         ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) + " construction (" +
-                                        dataConstruction.Construct(Surface(SurfNum).Construction).Name + ") invalid value.");
+                                        state.dataConstruction->Construct(Surface(SurfNum).Construction).Name + ") invalid value.");
                         ShowContinueError("Diffuse solar transmittance of construction [" +
-                                          RoundSigDigits(dataConstruction.Construct(Surface(SurfNum).Construction).TransDiff, 4) + "] too small for calculations.");
+                                          RoundSigDigits(state.dataConstruction->Construct(Surface(SurfNum).Construction).TransDiff, 4) + "] too small for calculations.");
                         ErrorsFound = true;
                     }
 
@@ -641,7 +641,7 @@ namespace DaylightingDevices {
                         ErrorsFound = true;
                     }
 
-                    if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) {
+                    if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) {
                         ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(2) +
                                         " Equivalent Layer Window is not supported.");
                         ErrorsFound = true;
@@ -654,13 +654,13 @@ namespace DaylightingDevices {
                 }
 
                 // Construction
-                TDDPipe(PipeNum).Construction = UtilityRoutines::FindItemInList(cAlphaArgs(4), dataConstruction.Construct);
+                TDDPipe(PipeNum).Construction = UtilityRoutines::FindItemInList(cAlphaArgs(4), state.dataConstruction->Construct);
 
                 if (TDDPipe(PipeNum).Construction == 0) {
                     ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Pipe construction " + cAlphaArgs(4) + " not found.");
                     ErrorsFound = true;
                 } else {
-                    dataConstruction.Construct(TDDPipe(PipeNum).Construction).IsUsed = true;
+                    state.dataConstruction->Construct(TDDPipe(PipeNum).Construction).IsUsed = true;
                 }
 
                 if (rNumericArgs(1) > 0) {
@@ -828,7 +828,7 @@ namespace DaylightingDevices {
                         ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) + " must have 4 sides.");
                         ErrorsFound = true;
                     }
-                    if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) {
+                    if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) {
                         ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) +
                                         " Equivalent Layer Window is not supported.");
                         ErrorsFound = true;
@@ -894,19 +894,19 @@ namespace DaylightingDevices {
 
                         // Get outside shelf construction (required if outside shelf is specified)
                         if (cAlphaArgs(5) != "") {
-                            ConstrNum = UtilityRoutines::FindItemInList(cAlphaArgs(5), dataConstruction.Construct);
+                            ConstrNum = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataConstruction->Construct);
 
                             if (ConstrNum == 0) {
                                 ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Outside shelf construction " + cAlphaArgs(5) +
                                                 " not found.");
                                 ErrorsFound = true;
-                            } else if (dataConstruction.Construct(ConstrNum).TypeIsWindow) {
+                            } else if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) {
                                 ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Outside shelf construction " + cAlphaArgs(5) +
                                                 " must not have WindowMaterial:Glazing.");
                                 ErrorsFound = true;
                             } else {
                                 Shelf(ShelfNum).Construction = ConstrNum;
-                                dataConstruction.Construct(ConstrNum).IsUsed = true;
+                                state.dataConstruction->Construct(ConstrNum).IsUsed = true;
                             }
                         } else {
                             ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) +
@@ -933,7 +933,7 @@ namespace DaylightingDevices {
                         Surface(SurfNum).BaseSurf = SurfNum;
                         Surface(SurfNum).HeatTransSurf = true;
                         Surface(SurfNum).Construction = ConstrNum; // Kludge to allow shading surface to be a heat transfer surface
-                        dataConstruction.Construct(ConstrNum).IsUsed = true;
+                        state.dataConstruction->Construct(ConstrNum).IsUsed = true;
                     }
                 }
 
@@ -1029,7 +1029,7 @@ namespace DaylightingDevices {
         return CalcPipeTransBeam;
     }
 
-    Real64 CalcTDDTransSolIso(int const PipeNum) // TDD pipe object number
+    Real64 CalcTDDTransSolIso(EnergyPlusData &state, int const PipeNum) // TDD pipe object number
     {
 
         // SUBROUTINE INFORMATION:
@@ -1081,7 +1081,7 @@ namespace DaylightingDevices {
             Real64 P = COSI; // Angular distribution function: P = COS(Incident Angle) for diffuse isotropic
 
             // Calculate total TDD transmittance for given angle
-            trans = TransTDD(PipeNum, COSI, SolarBeam);
+            trans = TransTDD(state, PipeNum, COSI, SolarBeam);
 
             FluxInc += P * SINI * dPH;
             FluxTrans += trans * P * SINI * dPH;
@@ -1094,7 +1094,7 @@ namespace DaylightingDevices {
         return CalcTDDTransSolIso;
     }
 
-    Real64 CalcTDDTransSolHorizon(int const PipeNum) // TDD pipe object number
+    Real64 CalcTDDTransSolHorizon(EnergyPlusData &state, int const PipeNum) // TDD pipe object number
     {
 
         // SUBROUTINE INFORMATION:
@@ -1149,7 +1149,7 @@ namespace DaylightingDevices {
                 Real64 COSI = CosPhi * std::cos(TH - Theta); // Cosine of the incident angle
 
                 // Calculate total TDD transmittance for given angle
-                Real64 trans = TransTDD(PipeNum, COSI, SolarBeam); // Total beam solar transmittance of TDD
+                Real64 trans = TransTDD(state, PipeNum, COSI, SolarBeam); // Total beam solar transmittance of TDD
 
                 FluxInc += COSI * dTH;
                 FluxTrans += trans * COSI * dTH;
@@ -1160,13 +1160,14 @@ namespace DaylightingDevices {
             CalcTDDTransSolHorizon = FluxTrans / FluxInc;
 
         } else {                          // Dome is nearly horizontal and has almost no view of the horizon
-            CalcTDDTransSolHorizon = 0.0; // = TransTDD(PipeNum, ???, SolarBeam) ! Could change to an angle near the horizon
+            CalcTDDTransSolHorizon = 0.0; // = TransTDD(state, PipeNum, ???, SolarBeam) ! Could change to an angle near the horizon
         }
 
         return CalcTDDTransSolHorizon;
     }
 
-    Real64 CalcTDDTransSolAniso(int const PipeNum, // TDD pipe object number
+    Real64 CalcTDDTransSolAniso(EnergyPlusData &state,
+                                int const PipeNum, // TDD pipe object number
                                 Real64 const COSI  // Cosine of the incident angle
     )
     {
@@ -1235,7 +1236,7 @@ namespace DaylightingDevices {
         }
         CircumSolarRad = MultCircumSolar(DomeSurf) * SunlitFrac(TimeStep, HourOfDay, DomeSurf);
 
-        AnisoSkyTDDMult = TDDPipe(PipeNum).TransSolIso * IsoSkyRad + TransTDD(PipeNum, COSI, SolarBeam) * CircumSolarRad +
+        AnisoSkyTDDMult = TDDPipe(PipeNum).TransSolIso * IsoSkyRad + TransTDD(state, PipeNum, COSI, SolarBeam) * CircumSolarRad +
                           TDDPipe(PipeNum).TransSolHorizon * HorizonRad;
 
         if (AnisoSkyMult(DomeSurf) > 0.0) {
@@ -1247,7 +1248,8 @@ namespace DaylightingDevices {
         return CalcTDDTransSolAniso;
     }
 
-    Real64 TransTDD(int const PipeNum,      // TDD pipe object number
+    Real64 TransTDD(EnergyPlusData &state,
+                    int const PipeNum,      // TDD pipe object number
                     Real64 const COSI,      // Cosine of the incident angle
                     int const RadiationType // Radiation type flag
     )
@@ -1306,21 +1308,21 @@ namespace DaylightingDevices {
             auto const SELECT_CASE_var(RadiationType);
 
             if (SELECT_CASE_var == VisibleBeam) {
-                transDome = POLYF(COSI, dataConstruction.Construct(constDome).TransVisBeamCoef);
+                transDome = POLYF(COSI, state.dataConstruction->Construct(constDome).TransVisBeamCoef);
                 transPipe = InterpolatePipeTransBeam(COSI, TDDPipe(PipeNum).PipeTransVisBeam);
-                transDiff = dataConstruction.Construct(constDiff).TransDiffVis; // May want to change to POLYF also!
+                transDiff = state.dataConstruction->Construct(constDiff).TransDiffVis; // May want to change to POLYF also!
 
                 TransTDD = transDome * transPipe * transDiff;
 
             } else if (SELECT_CASE_var == SolarBeam) {
-                transDome = POLYF(COSI, dataConstruction.Construct(constDome).TransSolBeamCoef);
+                transDome = POLYF(COSI, state.dataConstruction->Construct(constDome).TransSolBeamCoef);
                 transPipe = InterpolatePipeTransBeam(COSI, TDDPipe(PipeNum).PipeTransSolBeam);
-                transDiff = dataConstruction.Construct(constDiff).TransDiff; // May want to change to POLYF also!
+                transDiff = state.dataConstruction->Construct(constDiff).TransDiff; // May want to change to POLYF also!
 
                 TransTDD = transDome * transPipe * transDiff;
 
             } else if (SELECT_CASE_var == SolarAniso) {
-                TransTDD = CalcTDDTransSolAniso(PipeNum, COSI);
+                TransTDD = CalcTDDTransSolAniso(state, PipeNum, COSI);
 
             } else if (SELECT_CASE_var == SolarIso) {
                 TransTDD = TDDPipe(PipeNum).TransSolIso;
@@ -1431,7 +1433,7 @@ namespace DaylightingDevices {
         return FindTDDPipe;
     }
 
-    void DistributeTDDAbsorbedSolar()
+    void DistributeTDDAbsorbedSolar(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1476,7 +1478,7 @@ namespace DaylightingDevices {
         // FLOW:
         for (PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum) {
             DiffSurf = TDDPipe(PipeNum).Diffuser;
-            transDiff = dataConstruction.Construct(Surface(DiffSurf).Construction).TransDiff;
+            transDiff = state.dataConstruction->Construct(Surface(DiffSurf).Construction).TransDiff;
 
             // Calculate diffuse solar reflected back up the pipe by the inside surface of the TDD:DIFFUSER
             // All solar arriving at the diffuser is assumed to be isotropically diffuse by this point

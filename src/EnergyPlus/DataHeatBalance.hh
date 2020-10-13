@@ -2212,11 +2212,13 @@ namespace DataHeatBalance {
 
     void SetZoneWindDirAt();
 
-    void CheckAndSetConstructionProperties(int ConstrNum, // Construction number to be set/checked
+    void CheckAndSetConstructionProperties(EnergyPlusData &state,
+                                           int ConstrNum, // Construction number to be set/checked
                                            bool &ErrorsFound    // error flag that is set when certain errors have occurred
     );
 
-    int AssignReverseConstructionNumber(int ConstrNum, // Existing Construction number of first surface
+    int AssignReverseConstructionNumber(EnergyPlusData &state,
+                                        int ConstrNum, // Existing Construction number of first surface
                                         bool &ErrorsFound);
 
     void AddVariableSlatBlind(int inBlindNumber, // current Blind Number/pointer to name
@@ -2236,7 +2238,7 @@ namespace DataHeatBalance {
                                          bool &isValid      // returns true if result is valid
     );
 
-    void SetFlagForWindowConstructionWithShadeOrBlindLayer();
+    void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state);
 
 } // namespace DataHeatBalance
 

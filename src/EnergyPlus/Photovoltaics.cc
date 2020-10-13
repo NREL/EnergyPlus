@@ -747,7 +747,7 @@ namespace Photovoltaics {
                 if (!Surface(PVarray(PVnum).SurfacePtr).HeatTransSurf) {
                     ShowSevereError("Must use a surface with heat transfer for IntegratedSurfaceOutsideFace mode in " + PVarray(PVnum).Name);
                     ErrorsFound = true;
-                } else if (!dataConstruction.Construct(Surface(PVarray(PVnum).SurfacePtr).Construction).SourceSinkPresent) {
+                } else if (!state.dataConstruction->Construct(Surface(PVarray(PVnum).SurfacePtr).Construction).SourceSinkPresent) {
                     ShowSevereError("Must use a surface with internal source construction for IntegratedSurfaceOutsideFace mode in " +
                                     PVarray(PVnum).Name);
                     ErrorsFound = true;
@@ -974,7 +974,7 @@ namespace Photovoltaics {
         using DataHeatBalance::SurfCosIncidenceAngle;
         using DataHeatBalance::SurfQRadSWOutIncident;
         using DataHeatBalance::SurfQRadSWOutIncidentBeam;
-        using DataHeatBalSurface::SurfTempSurfOut;
+        using DataHeatBalSurface::SurfTempOut;
         using DataSurfaces::Surface;
         using TranspiredCollector::GetUTSCTsColl;
 
@@ -1031,7 +1031,7 @@ namespace Photovoltaics {
 
                 } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
                     // get back-of-module temperature from elsewhere in EnergyPlus
-                    PVarray(PVnum).SNLPVCalc.Tback = SurfTempSurfOut(PVarray(PVnum).SurfacePtr);
+                    PVarray(PVnum).SNLPVCalc.Tback = SurfTempOut(PVarray(PVnum).SurfacePtr);
 
                     PVarray(PVnum).SNLPVCalc.Tcell = SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback,
                                                                             PVarray(PVnum).SNLPVinto.IcBeam,
@@ -1313,7 +1313,7 @@ namespace Photovoltaics {
         using DataSurfaces::Surface;
         //  USE DataPhotovoltaics, ONLY:CellTemp,LastCellTemp
         using DataHeatBalance::Zone;
-        using DataHeatBalSurface::SurfTempSurfOut;
+        using DataHeatBalSurface::SurfTempOut;
         using TranspiredCollector::GetUTSCTsColl;
 
         // Locals
@@ -1411,7 +1411,7 @@ namespace Photovoltaics {
                                 (1.0 -
                                  std::exp(-PVarray(PVnum).TRNSYSPVModule.HeatLossCoef / PVarray(PVnum).TRNSYSPVModule.HeatCapacity * PVTimeStep));
                     } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
-                        CellTemp = SurfTempSurfOut(PVarray(PVnum).SurfacePtr) + KelvinConv;
+                        CellTemp = SurfTempOut(PVarray(PVnum).SurfacePtr) + KelvinConv;
                     } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
                         GetUTSCTsColl(PVarray(PVnum).UTSCPtr, CellTemp);
                         CellTemp += KelvinConv;
@@ -1484,7 +1484,7 @@ namespace Photovoltaics {
                                (PVarray(PVnum).TRNSYSPVcalc.LastCellTempK - Tambient) *
                                    std::exp(-PVarray(PVnum).TRNSYSPVModule.HeatLossCoef / PVarray(PVnum).TRNSYSPVModule.HeatCapacity * PVTimeStep);
                 } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
-                    CellTemp = SurfTempSurfOut(PVarray(PVnum).SurfacePtr) + KelvinConv;
+                    CellTemp = SurfTempOut(PVarray(PVnum).SurfacePtr) + KelvinConv;
                 } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
                     GetUTSCTsColl(PVarray(PVnum).UTSCPtr, CellTemp);
                     CellTemp += KelvinConv;

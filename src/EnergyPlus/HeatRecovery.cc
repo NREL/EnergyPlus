@@ -1591,8 +1591,8 @@ namespace HeatRecovery {
                         }
                     } else if (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                         // how to support VS dx coil here?
-                        FullLoadOutAirTemp = VariableSpeedCoils::VarSpeedCoil(CompanionCoilIndex).OutletAirDBTemp;
-                        FullLoadOutAirHumRat = VariableSpeedCoils::VarSpeedCoil(CompanionCoilIndex).OutletAirHumRat;
+                        FullLoadOutAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirDBTemp;
+                        FullLoadOutAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirHumRat;
                     }
 
                 } else {

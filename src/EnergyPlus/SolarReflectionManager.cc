@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -113,7 +114,7 @@ namespace SolarReflectionManager {
 
     // Functions
 
-    void InitSolReflRecSurf()
+    void InitSolReflRecSurf(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -521,9 +522,9 @@ namespace SolarReflectionManager {
                         ObsConstrNum = Surface(NearestHitSurfNum).Construction;
                         if (ObsConstrNum > 0) {
                             // Exterior building surface is nearest hit
-                            if (!dataConstruction.Construct(ObsConstrNum).TypeIsWindow) {
+                            if (!state.dataConstruction->Construct(ObsConstrNum).TypeIsWindow) {
                                 // Obstruction is not a window, i.e., is an opaque surface
-                                SolReflRecSurf(RecSurfNum).HitPtSolRefl(RayNum, RecPtNum) = 1.0 - dataConstruction.Construct(ObsConstrNum).OutsideAbsorpSolar;
+                                SolReflRecSurf(RecSurfNum).HitPtSolRefl(RayNum, RecPtNum) = 1.0 - state.dataConstruction->Construct(ObsConstrNum).OutsideAbsorpSolar;
                             } else {
                                 // Obstruction is a window. Assume it is bare so that there is no beam-to-diffuse reflection
                                 // (beam-to-beam reflection is calculated in subroutine CalcBeamSolSpecularReflFactors).
@@ -838,7 +839,7 @@ namespace SolarReflectionManager {
 
     //=================================================================================================
 
-    void CalcBeamSolSpecularReflFactors()
+    void CalcBeamSolSpecularReflFactors(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -879,16 +880,16 @@ namespace SolarReflectionManager {
             ReflFacBmToBmSolObs = 0.0;
             CosIncAveBmToBmSolObs = 0.0;
             for (IHr = 1; IHr <= 24; ++IHr) {
-                FigureBeamSolSpecularReflFactors(IHr);
+                FigureBeamSolSpecularReflFactors(state, IHr);
             }    // End of IHr loop
         } else { // timestep integrated solar, use current hour of day
             ReflFacBmToBmSolObs(HourOfDay, {1, TotSurfaces}) = 0.0;
             CosIncAveBmToBmSolObs(HourOfDay, {1, TotSurfaces}) = 0.0;
-            FigureBeamSolSpecularReflFactors(HourOfDay);
+            FigureBeamSolSpecularReflFactors(state, HourOfDay);
         }
     }
 
-    void FigureBeamSolSpecularReflFactors(int const iHour)
+    void FigureBeamSolSpecularReflFactors(EnergyPlusData &state, int const iHour)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1046,12 +1047,12 @@ namespace SolarReflectionManager {
                                 SpecReflectance = 0.0;
                                 if (Surface(ReflSurfNum).Class == SurfaceClass::Window) {
                                     ConstrNumRefl = Surface(ReflSurfNum).Construction;
-                                    SpecReflectance = POLYF(std::abs(CosIncAngRefl), dataConstruction.Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
+                                    SpecReflectance = POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                                 }
                                 if (Surface(ReflSurfNum).ShadowingSurf && Surface(ReflSurfNum).ShadowSurfGlazingConstruct > 0) {
                                     ConstrNumRefl = Surface(ReflSurfNum).ShadowSurfGlazingConstruct;
                                     SpecReflectance = Surface(ReflSurfNum).ShadowSurfGlazingFrac *
-                                                      POLYF(std::abs(CosIncAngRefl), dataConstruction.Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
+                                                      POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                                 }
                                 // Angle of incidence of reflected beam on receiving surface
                                 CosIncAngRec = dot(SolReflRecSurf(RecSurfNum).NormVec, SunVecMir);

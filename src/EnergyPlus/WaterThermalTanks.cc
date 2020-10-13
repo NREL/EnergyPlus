@@ -1388,7 +1388,7 @@ namespace WaterThermalTanks {
                 if (HPWH.bIsIHP) {
                     HPWH.DXCoilType = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE";
                 } else {
-                    HPWH.DXCoilType = VariableSpeedCoils::VarSpeedCoil(HPWH.DXCoilNum).VarSpeedCoilType;
+                    HPWH.DXCoilType = state.dataVariableSpeedCoils->VarSpeedCoil(HPWH.DXCoilNum).VarSpeedCoilType;
                 }
             } else {
                 // this is a single speed coil
@@ -1541,8 +1541,8 @@ namespace WaterThermalTanks {
             }
             // issue #5630, set fan info in coils.
             if (bIsVScoil) {
-                VariableSpeedCoils::setVarSpeedHPWHFanTypeNum(HPWH.DXCoilNum, HPWH.FanType_Num);
-                VariableSpeedCoils::setVarSpeedHPWHFanIndex(HPWH.DXCoilNum, HPWH.FanNum);
+                VariableSpeedCoils::setVarSpeedHPWHFanTypeNum(state, HPWH.DXCoilNum, HPWH.FanType_Num);
+                VariableSpeedCoils::setVarSpeedHPWHFanIndex(state, HPWH.DXCoilNum, HPWH.FanNum);
             } else {
                 DXCoils::SetDXCoolingCoilData(
                     state, HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanName);
@@ -5991,7 +5991,7 @@ namespace WaterThermalTanks {
                 // IntegratedHeatPump::SimIHP(modBlankString, HPWaterHeater(HPNum).DXCoilNum,
                 //	0, EMP1, EMP2, EMP3, 0, 0.0, 1, 0.0, 0.0, 0.0, false, 0.0); //conduct the sizing operation in the IHP
                 int VSCoilID = IntegratedHeatPump::IntegratedHeatPumps(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).SCWHCoilIndex;
-                state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed = VariableSpeedCoils::VarSpeedCoil(VSCoilID).NumOfSpeeds;
+                state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).NumOfSpeeds;
 
             } else if (UtilityRoutines::SameString(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed") &&
                        (state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed == 0)) {
@@ -6013,7 +6013,7 @@ namespace WaterThermalTanks {
                                                           0.0,
                                                           0.0); // conduct the sizing operation in the VS WSHP
                 int VSCoilID = state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum;
-                state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed = VariableSpeedCoils::VarSpeedCoil(VSCoilID).NumOfSpeeds;
+                state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).NumOfSpeeds;
                 // below pass the flow rates from the VS coil to the water heater object
             }
 
@@ -6026,11 +6026,11 @@ namespace WaterThermalTanks {
 
                 // scale air flow rates
                 Real64 MulSpeedFlowScale =
-                    VariableSpeedCoils::VarSpeedCoil(VSCoilID).RatedAirVolFlowRate /
-                    VariableSpeedCoils::VarSpeedCoil(VSCoilID).MSRatedAirVolFlowRate(VariableSpeedCoils::VarSpeedCoil(VSCoilID).NormSpedLevel);
+                    state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).RatedAirVolFlowRate /
+                    state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).NormSpedLevel);
                 for (int Iter = 1; Iter <= state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed; ++Iter) {
                     state.dataWaterThermalTanks->HPWaterHeater(HPNum).HPWHAirVolFlowRate(Iter) =
-                        VariableSpeedCoils::VarSpeedCoil(VSCoilID).MSRatedAirVolFlowRate(Iter) * MulSpeedFlowScale;
+                        state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).MSRatedAirVolFlowRate(Iter) * MulSpeedFlowScale;
                 }
 
                 // check fan flow rate, should be larger than the max flow rate of the VS coil
@@ -6073,16 +6073,16 @@ namespace WaterThermalTanks {
 
                 // scale water flow rates
                 MulSpeedFlowScale =
-                    VariableSpeedCoils::VarSpeedCoil(VSCoilID).RatedWaterVolFlowRate /
-                    VariableSpeedCoils::VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(VariableSpeedCoils::VarSpeedCoil(VSCoilID).NormSpedLevel);
+                    state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).RatedWaterVolFlowRate /
+                    state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).NormSpedLevel);
                 for (int Iter = 1; Iter <= state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed; ++Iter) {
                     state.dataWaterThermalTanks->HPWaterHeater(HPNum).HPWHWaterVolFlowRate(Iter) =
-                        VariableSpeedCoils::VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(Iter) * MulSpeedFlowScale;
+                        state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(Iter) * MulSpeedFlowScale;
                     state.dataWaterThermalTanks->HPWaterHeater(HPNum).HPWHWaterMassFlowRate(Iter) =
-                        VariableSpeedCoils::VarSpeedCoil(VSCoilID).MSRatedWaterMassFlowRate(Iter) * MulSpeedFlowScale;
+                        state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).MSRatedWaterMassFlowRate(Iter) * MulSpeedFlowScale;
                     state.dataWaterThermalTanks->HPWaterHeater(HPNum).MSWaterSpeedRatio(Iter) =
-                        VariableSpeedCoils::VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(Iter) /
-                        VariableSpeedCoils::VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed);
+                        state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(Iter) /
+                        state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed);
                 }
 
                 Real64 rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, HPInletDryBulbTemp, HPInletHumRat);
@@ -7050,7 +7050,7 @@ namespace WaterThermalTanks {
             Real64 CoilTotalHeatingEnergyRate;
             if (HPWH.NumofSpeed > 0) {
                 // VSHPWH
-                VariableSpeedCoils::VariableSpeedCoilData const &Coil = VariableSpeedCoils::VarSpeedCoil(HPWH.DXCoilNum);
+                VariableSpeedCoils::VariableSpeedCoilData const &Coil = state.dataVariableSpeedCoils->VarSpeedCoil(HPWH.DXCoilNum);
                 CoilTotalHeatingEnergyRate = Coil.TotalHeatingEnergyRate;
             } else {
                 // Single speed HPWH
@@ -7923,7 +7923,7 @@ namespace WaterThermalTanks {
             } else if (DesupHtr.ReclaimHeatingSource == CoilObjEnum::DXVariableCooling) {
                 AverageWasteHeat = DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity -
                                    DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal;
-                DesupHtr.DXSysPLR = VariableSpeedCoils::VarSpeedCoil(SourceID).PartLoadRatio;
+                DesupHtr.DXSysPLR = state.dataVariableSpeedCoils->VarSpeedCoil(SourceID).PartLoadRatio;
             } else if (DesupHtr.ReclaimHeatingSource == CoilObjEnum::AirWaterHeatPumpEQ) {
                 AverageWasteHeat = DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -
                                    DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal;
@@ -9763,14 +9763,14 @@ namespace WaterThermalTanks {
         } else {
             assert(this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified);
             // For a stratified tank, the PLR is applied to the Coil.TotalHeatingEnergyRate
-            // whether that's a VariableSpeedCoils::VarSpeedCoil or DXCoils::DXCoil.
+            // whether that's a state.dataVariableSpeedCoils->VarSpeedCoil or DXCoils::DXCoil.
             // Here we create a pointer to the TotalHeatingEnergyRate for the appropriate coil type.
             Real64 *CoilTotalHeatingEnergyRatePtr;
             if (isVariableSpeed) {
                 if (HeatPump.bIsIHP)
                     CoilTotalHeatingEnergyRatePtr = &IntegratedHeatPump::IntegratedHeatPumps(HeatPump.DXCoilNum).TotalWaterHeatingRate;
                 else
-                    CoilTotalHeatingEnergyRatePtr = &VariableSpeedCoils::VarSpeedCoil(HeatPump.DXCoilNum).TotalHeatingEnergyRate;
+                    CoilTotalHeatingEnergyRatePtr = &state.dataVariableSpeedCoils->VarSpeedCoil(HeatPump.DXCoilNum).TotalHeatingEnergyRate;
             } else {
                 CoilTotalHeatingEnergyRatePtr = &DXCoils::DXCoil(HeatPump.DXCoilNum).TotalHeatingEnergyRate;
             }
@@ -11422,7 +11422,7 @@ namespace WaterThermalTanks {
                         Real64 RhoWater = Psychrometrics::RhoH2O(this->TankTemp);
                         auto &HPWH = state.dataWaterThermalTanks->HPWaterHeater(HPNum);
                         this->SetVSHPWHFlowRates(state,
-                            HPWH, VariableSpeedCoils::VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel, 1.0, RhoWater, MdotWater, true);
+                            HPWH, state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel, 1.0, RhoWater, MdotWater, true);
                         //       simulate the HPWH coil/fan to find heating capacity
                         Real64 EMP1 = 0.0;
                         Real64 EMP2 = 0.0;
@@ -11443,7 +11443,7 @@ namespace WaterThermalTanks {
                                                                       EMP3,
                                                                       1,
                                                                       1.0,
-                                                                      VariableSpeedCoils::VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
+                                                                      state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                                                                       1.0,
                                                                       0.0,
                                                                       0.0,
@@ -11462,7 +11462,7 @@ namespace WaterThermalTanks {
                                                                       EMP3,
                                                                       1,
                                                                       1.0,
-                                                                      VariableSpeedCoils::VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
+                                                                      state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                                                                       1.0,
                                                                       0.0,
                                                                       0.0,
@@ -11478,7 +11478,7 @@ namespace WaterThermalTanks {
                                                                       EMP3,
                                                                       1,
                                                                       1.0,
-                                                                      VariableSpeedCoils::VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
+                                                                      state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                                                                       1.0,
                                                                       0.0,
                                                                       0.0,
@@ -11497,7 +11497,7 @@ namespace WaterThermalTanks {
                                                                       EMP3,
                                                                       1,
                                                                       1.0,
-                                                                      VariableSpeedCoils::VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
+                                                                      state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                                                                       1.0,
                                                                       0.0,
                                                                       0.0,
@@ -11509,9 +11509,9 @@ namespace WaterThermalTanks {
                             }
                         }
 
-                        this->MaxCapacity = VariableSpeedCoils::VSHPWHHeatingCapacity;
-                        this->MinCapacity = VariableSpeedCoils::VSHPWHHeatingCapacity;
-                        this->Efficiency = VariableSpeedCoils::VSHPWHHeatingCOP;
+                        this->MaxCapacity = state.dataVariableSpeedCoils->VSHPWHHeatingCapacity;
+                        this->MinCapacity = state.dataVariableSpeedCoils->VSHPWHHeatingCapacity;
+                        this->Efficiency = state.dataVariableSpeedCoils->VSHPWHHeatingCOP;
                     } else {
                         bIsVSCoil = false;
                         //       simulate the HPWH coil/fan to find heating capacity
@@ -11659,7 +11659,7 @@ namespace WaterThermalTanks {
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchSWHType, equipName, state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Type);
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchSWHVol, equipName, this->Volume);
             if (bIsVSCoil) {
-                OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchSWHHeatIn, equipName, VariableSpeedCoils::VSHPWHHeatingCapacity);
+                OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchSWHHeatIn, equipName, state.dataVariableSpeedCoils->VSHPWHHeatingCapacity);
             } else {
                 OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchSWHHeatIn, equipName, DXCoils::HPWHHeatingCapacity);
             }

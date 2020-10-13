@@ -215,13 +215,15 @@ namespace SurfaceGeometry {
                             int &NeedToAddSubSurfaces     // Number of surfaces to add, based on unentered IZ surfaces
     );
 
-    void CheckWindowShadingControlFrameDivider(std::string const &cRoutineName, // routine name calling this one (for error messages)
+    void CheckWindowShadingControlFrameDivider(EnergyPlusData &state,
+                                               std::string const &cRoutineName, // routine name calling this one (for error messages)
                                                bool &ErrorsFound,               // true if errors have been found or are found here
                                                int const SurfNum,               // current surface number
                                                int const FrameField             // field number for frame/divider
     );
 
-    void CheckSubSurfaceMiscellaneous(std::string const &cRoutineName,           // routine name calling this one (for error messages)
+    void CheckSubSurfaceMiscellaneous(EnergyPlusData &state,
+                                      std::string const &cRoutineName,           // routine name calling this one (for error messages)
                                       bool &ErrorsFound,                         // true if errors have been found or are found here
                                       int const SurfNum,                         // current surface number
                                       std::string const &SubSurfaceName,         // name of the surface
@@ -304,7 +306,7 @@ namespace SurfaceGeometry {
 
     void GetWindowShadingControlData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void InitialAssociateWindowShadingControlFenestration(bool &ErrorsFound, int &SurfNum);
+    void InitialAssociateWindowShadingControlFenestration(EnergyPlusData &state, bool &ErrorsFound, int &SurfNum);
 
     void FinalAssociateWindowShadingControlFenestration(bool &ErrorsFound);
 
@@ -382,26 +384,29 @@ namespace SurfaceGeometry {
                                       Vector &CompCoordTranslVector // Coordinate Translation Vector
     );
 
-    void CreateShadedWindowConstruction(int const SurfNum, // Surface number
+    void CreateShadedWindowConstruction(EnergyPlusData &state,
+                                        int const SurfNum, // Surface number
                                         int const WSCPtr,  // Pointer to WindowShadingControl for SurfNum
                                         int const ShDevNum, // Shading device material number for WSCptr
                                         int const shadeControlIndex // index to the Surface().windowShadingControlList,
                                               // Surface().shadedConstructionList, and Surface().shadedStormWinConstructionList
     );
 
-    void CreateStormWindowConstructions();
+    void CreateStormWindowConstructions(EnergyPlusData &state);
 
     int createAirMaterialFromDistance(Real64 distance, std::string namePrefix); //return new material number
 
     // create a new construction with storm based on an old construction and storm and gap materials
-    int createConstructionWithStorm(int oldConstruction, std::string name, int stormMaterial, int gapMaterial);
+    int createConstructionWithStorm(EnergyPlusData &state, int oldConstruction, std::string name, int stormMaterial, int gapMaterial);
 
-    void ModifyWindow(int const SurfNum,    // SurfNum has construction of glazing system from Window5 Data File;
+    void ModifyWindow(EnergyPlusData &state,
+                      int const SurfNum,    // SurfNum has construction of glazing system from Window5 Data File;
                       bool &ErrorsFound,    // Set to true if errors found
                       int &AddedSubSurfaces // Subsurfaces added when window references a
     );
 
-    void AddWindow(int const SurfNum,    // SurfNum has construction of glazing system from Window5 Data File;
+    void AddWindow(EnergyPlusData &state,
+                   int const SurfNum,    // SurfNum has construction of glazing system from Window5 Data File;
                    bool &ErrorsFound,    // Set to true if errors found
                    int &AddedSubSurfaces // Subsurfaces added when window references a
     );
@@ -415,7 +420,8 @@ namespace SurfaceGeometry {
 
     void SetupShadeSurfacesForSolarCalcs(EnergyPlusData &state);
 
-    void SetupEnclosuresAndAirBoundaries(Array1D<DataViewFactorInformation::ZoneViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
+    void SetupEnclosuresAndAirBoundaries(EnergyPlusData &state,
+                                         Array1D<DataViewFactorInformation::ZoneViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
                                          SurfaceGeometry::enclosureType const &EnclosureType,                       // Radiant or Solar
                                          bool &ErrorsFound);                                                        // Set to true if errors found
 
@@ -426,7 +432,8 @@ namespace SurfaceGeometry {
     bool isRectangle(int const ThisSurf // Current surface number
     );
 
-    void CheckForReversedLayers(bool &RevLayerDiffs,    // true when differences are discovered in interzone constructions
+    void CheckForReversedLayers(EnergyPlusData &state,
+                                bool &RevLayerDiffs,    // true when differences are discovered in interzone constructions
                                 int const ConstrNum,    // construction index
                                 int const ConstrNumRev, // construction index for reversed construction
                                 int const TotalLayers   // total layers for construction definition

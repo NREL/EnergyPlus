@@ -291,14 +291,15 @@ namespace ThermalComfort {
 
     void InitThermalComfort(EnergyPlusData &state);
 
-    void CalcThermalComfortFanger(Optional_int_const PNum = _,     // People number for thermal comfort control
+    void CalcThermalComfortFanger(EnergyPlusData &state,
+                                  Optional_int_const PNum = _,     // People number for thermal comfort control
                                   Optional<Real64 const> Tset = _, // Temperature setpoint for thermal comfort control
                                   Optional<Real64> PMVResult = _   // PMV value for thermal comfort control
     );
 
-    void CalcThermalComfortPierce();
+    void CalcThermalComfortPierce(EnergyPlusData &state);
 
-    void CalcThermalComfortKSU();
+    void CalcThermalComfortKSU(EnergyPlusData &state);
 
     void DERIV(int &TempIndiceNum,         // Number of temperature indices  unused1208
                Array1D<Real64> &Temp,      // Temperature unused1208
@@ -309,13 +310,13 @@ namespace ThermalComfort {
 
     void GetAngleFactorList(EnergyPlusData &state);
 
-    Real64 CalcAngleFactorMRT(int const AngleFacNum);
+    Real64 CalcAngleFactorMRT(EnergyPlusData &state, int const AngleFacNum);
 
-    Real64 CalcSurfaceWeightedMRT(int const ZoneNum, int const SurfNum);
+    Real64 CalcSurfaceWeightedMRT(EnergyPlusData &state, int const ZoneNum, int const SurfNum);
 
     Real64 CalcSatVapPressFromTemp(Real64 const Temp);
 
-    Real64 CalcRadTemp(int const PeopleListNum); // Type of MRT calculation (zone averaged or surface weighted)
+    Real64 CalcRadTemp(EnergyPlusData &state, int const PeopleListNum); // Type of MRT calculation (zone averaged or surface weighted)
 
     void CalcThermalComfortSimpleASH55();
 

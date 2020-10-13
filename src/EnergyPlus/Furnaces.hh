@@ -65,7 +65,6 @@ struct EnergyPlusData;
 namespace Furnaces {
 
     // Using/Aliasing
-    using VariableSpeedCoils::MaxSpedLevels;
 
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -131,7 +130,8 @@ namespace Furnaces {
     // Types
 
     struct FurnaceEquipConditions
-    {
+    { 
+        int MaxSpedLevels = 10;
         // Members
         std::string Name;                   // Name of the Furnace
         int FurnaceType_Num;                // Numeric Equivalent for Furnace Type

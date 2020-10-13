@@ -1003,7 +1003,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave incident to the surface
 
-        return  SurfQRadSWOutIncident(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
+        return SurfQRadSWOutIncident(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
     Real64 SurfaceData::getSWBeamIncident(const int t_SurfNum)
@@ -1034,7 +1034,7 @@ namespace DataSurfaces {
         return  SurfQRadSWOutIncidentSkyDiffuse(t_SurfNum) + SurfQRadSWOutIncidentGndDiffuse(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
-    int SurfaceData::getTotLayers() const
+    int SurfaceData::getTotLayers(EnergyPlusData &state) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -1045,7 +1045,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Returns total number of layer for current surface
 
-        auto &construction(dataConstruction.Construct(Construction));
+        auto &construction(state.dataConstruction->Construct(Construction));
         return construction.TotLayers;
     }
 

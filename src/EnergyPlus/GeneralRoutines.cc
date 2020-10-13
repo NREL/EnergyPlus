@@ -1154,7 +1154,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
         InitExteriorConvectionCoeff(state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = Surface(SurfPtr).Construction;
-        AbsThermSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+        AbsThermSurf = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
         TsoK = TH(1, 1, SurfPtr) + KelvinConv;
         TsBaffK = TmpTsBaf + KelvinConv;
         if (TsBaffK == TsoK) {        // avoid divide by zero
