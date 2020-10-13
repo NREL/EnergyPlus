@@ -166,6 +166,7 @@ namespace DataGlobalConstants {
     Real64 constexpr StefanBoltzmann () { return 5.6697E-8; }               // Stefan-Boltzmann constant in W/(m2*K4)
     Real64 constexpr UniversalGasConst () { return 8314.462175; }           // Universal Gas Constant (J/mol*K)
     Real64 constexpr convertJtoGJ () { return 1.0E-9; }                     // Conversion factor for J to GJ
+    int constexpr MaxSpeedLevels () { return 10; }                          // Maximum number of speed that supports
 
     ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar);
     std::string GetResourceTypeChar(ResourceType ResourceTypeNum);

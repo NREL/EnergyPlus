@@ -63,31 +63,6 @@ struct EnergyPlusData;
 
 namespace UnitHeater {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const cMO_UnitHeater;
-
-    // Character parameters for outside air control types:
-    extern std::string const ElectricCoil;
-    extern std::string const GasCoil;
-    extern std::string const WaterHeatingCoil;
-    extern std::string const SteamCoil;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern bool HCoilOn;       // TRUE if the heating coil (gas or electric especially) should be running
-    extern int NumOfUnitHeats; // Number of unit heaters in the input file
-    extern Real64 QZnReq;      // heating or cooling needed by zone [watts]
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE UnitHeater
-
-    // Types
-
     struct UnitHeaterData
     {
         // Members
@@ -170,14 +145,6 @@ namespace UnitHeater {
         }
     };
 
-    // Object Data
-    extern Array1D<UnitHeaterData> UnitHeat;
-    extern Array1D<UnitHeatNumericFieldData> UnitHeatNumericFields;
-
-    // Functions
-
-    void clear_state();
-
     void SimUnitHeater(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
                        int const ZoneNum,             // number of zone being served
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -215,13 +182,58 @@ namespace UnitHeater {
 
     // END SUBROUTINE UpdateUnitHeater
 
-    void ReportUnitHeater(int const UnitHeatNum); // Unit index in unit heater array
+    void ReportUnitHeater(EnergyPlusData &state, int const UnitHeatNum); // Unit index in unit heater array
 
     Real64 CalcUnitHeaterResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // heating coil part load ratio
                                   Array1D<Real64> const &Par  // Function parameters
     );
 
 } // namespace UnitHeater
+
+struct UnitHeatersData : BaseGlobalStruct {
+
+    // MODULE PARAMETER DEFINITIONS
+    std::string const cMO_UnitHeater = "ZoneHVAC:UnitHeater";
+
+    // Character parameters for outside air control types:
+    std::string const ElectricCoil = "ElectricCoil";
+    std::string const GasCoil = "GasCoil";
+    std::string const WaterHeatingCoil = "WaterHeatingCoil";
+    std::string const SteamCoil = "SteamCoil";
+
+    bool HCoilOn;       // TRUE if the heating coil (gas or electric especially) should be running
+    int NumOfUnitHeats; // Number of unit heaters in the input file
+    Real64 QZnReq;      // heating or cooling needed by zone [watts]
+    Array1D_bool MySizeFlag;
+    Array1D_bool CheckEquipName;
+
+    bool InitUnitHeaterOneTimeFlag = true;
+    bool GetUnitHeaterInputFlag = true;
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+    bool SetMassFlowRateToZero = false;    // TRUE when mass flow rates need to be set to zero
+
+    // Object Data
+    Array1D<UnitHeater::UnitHeaterData> UnitHeat;
+    Array1D<UnitHeater::UnitHeatNumericFieldData> UnitHeatNumericFields;
+
+    void clear_state() override
+    {
+        HCoilOn = false;
+        NumOfUnitHeats = 0;
+        QZnReq = 0.0;
+        MySizeFlag.deallocate();
+        CheckEquipName.deallocate();
+        UnitHeat.deallocate();
+        UnitHeatNumericFields.deallocate();
+        InitUnitHeaterOneTimeFlag = true;
+        GetUnitHeaterInputFlag = true;
+        ZoneEquipmentListChecked = false;
+        SetMassFlowRateToZero = false;
+    }
+
+    // Default Constructor
+    UnitHeatersData() = default;
+};
 
 } // namespace EnergyPlus
 

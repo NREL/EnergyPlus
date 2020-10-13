@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
@@ -222,7 +223,6 @@ namespace WaterThermalTanks {
 
     struct HeatPumpWaterHeaterData : PlantComponent
     {
-        int MaxSpedLevels = 10;
         // Members
         std::string Name;                                   // Name of heat pump water heater
         std::string Type;                                   // Type of water heater (HEAT PUMP:WATER HEATER)
@@ -375,10 +375,10 @@ namespace WaterThermalTanks {
               ShowSetPointWarning(true), HPWaterHeaterSensibleCapacity(0.0), HPWaterHeaterLatentCapacity(0.0), WrappedCondenserBottomLocation(0.0),
               WrappedCondenserTopLocation(0.0), ControlSensor1Height(-1.0), ControlSensor1Node(1), ControlSensor1Weight(1.0),
               ControlSensor2Height(-1.0), ControlSensor2Node(2), ControlSensor2Weight(0.0), ControlTempAvg(0.0), ControlTempFinal(0.0),
-              AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(MaxSpedLevels, 0.0),
-              HPWHAirMassFlowRate(MaxSpedLevels, 0.0), HPWHWaterVolFlowRate(MaxSpedLevels, 0.0),
-              HPWHWaterMassFlowRate(MaxSpedLevels, 0.0), MSAirSpeedRatio(MaxSpedLevels, 0.0),
-              MSWaterSpeedRatio(MaxSpedLevels, 0.0), bIsIHP(false), MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true),
+              AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(DataGlobalConstants::MaxSpeedLevels(), 0.0),
+              HPWHAirMassFlowRate(DataGlobalConstants::MaxSpeedLevels(), 0.0), HPWHWaterVolFlowRate(DataGlobalConstants::MaxSpeedLevels(), 0.0),
+              HPWHWaterMassFlowRate(DataGlobalConstants::MaxSpeedLevels(), 0.0), MSAirSpeedRatio(DataGlobalConstants::MaxSpeedLevels(), 0.0),
+              MSWaterSpeedRatio(DataGlobalConstants::MaxSpeedLevels(), 0.0), bIsIHP(false), MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true),
               CheckHPWHEquipName(true), myOneTimeInitFlag(true)
         {
         }
