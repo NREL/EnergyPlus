@@ -1040,7 +1040,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     // USE DataLoopNode    , ONLY: Node
     using ConvectionCoefficients::InitExteriorConvectionCoeff;
     using DataGlobals::BeginEnvrnFlag;
-    using DataHeatBalance::QRadSWOutIncident;
+    using DataHeatBalance::SurfQRadSWOutIncident;
     using DataHeatBalSurface::TH;
     using DataSurfaces::Surface;
     using DataSurfaces::SurfaceData;
@@ -1154,7 +1154,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
         InitExteriorConvectionCoeff(state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = Surface(SurfPtr).Construction;
-        AbsThermSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+        AbsThermSurf = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
         TsoK = TH(1, 1, SurfPtr) + KelvinConv;
         TsBaffK = TmpTsBaf + KelvinConv;
         if (TsBaffK == TsoK) {        // avoid divide by zero
@@ -1217,7 +1217,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     //	Tso = sum( TH( 1, 1, SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
     Tso = sum_product_sub(TH(1, 1, _), Surface, &SurfaceData::Area, SurfPtrARR) / A; // Autodesk:F2C++ Functions handle array subscript usage
     //	Isc = sum( QRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    Isc = sum_product_sub(QRadSWOutIncident, Surface, &SurfaceData::Area, SurfPtrARR) / A; // Autodesk:F2C++ Functions handle array subscript usage
+    Isc = sum_product_sub(SurfQRadSWOutIncident, Surface, &SurfaceData::Area, SurfPtrARR) / A; // Autodesk:F2C++ Functions handle array subscript usage
 
     TmeanK = 0.5 * (TmpTsBaf + Tso) + KelvinConv;
 

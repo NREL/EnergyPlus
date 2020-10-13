@@ -115,7 +115,7 @@ namespace TranspiredCollector {
     using DataGlobals::DegToRadians;
     using DataGlobals::KelvinConv;
     using DataGlobals::SecInHour;
-    using DataHeatBalance::QRadSWOutIncident;
+    using DataHeatBalance::SurfQRadSWOutIncident;
     using DataVectorTypes::Vector;
 
     // Data
@@ -1080,7 +1080,7 @@ namespace TranspiredCollector {
             LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
             InitExteriorConvectionCoeff(state, SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = Surface(SurfPtr).Construction;
-            AbsThermSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+            AbsThermSurf = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
             TsoK = TH(1, 1, SurfPtr) + KelvinConv;
             TscollK = UTSC(UTSCNum).TcollLast + KelvinConv;
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TscollK) - pow_4(TsoK)) / (TscollK - TsoK);
@@ -1115,7 +1115,7 @@ namespace TranspiredCollector {
 
         //		Isc = sum( QRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum;
         ////Autodesk:F2C++ Array subscript usage: Replaced by below
-        Isc = sum_product_sub(QRadSWOutIncident, Surface, &SurfaceData::Area, UTSC(UTSCNum).SurfPtrs) /
+        Isc = sum_product_sub(SurfQRadSWOutIncident, Surface, &SurfaceData::Area, UTSC(UTSCNum).SurfPtrs) /
               AreaSum; // Autodesk:F2C++ Functions handle array subscript usage
         //		Tso = sum( TH( UTSC( UTSCNum ).SurfPtrs, 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array
         // subscript usage: Replaced by below

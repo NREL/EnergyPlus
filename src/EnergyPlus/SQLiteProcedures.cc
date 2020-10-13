@@ -155,7 +155,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             sqlite->addMaterialData(materialNum, dataMaterial.Material(materialNum));
         }
         for (int constructNum = 1; constructNum <= DataHeatBalance::TotConstructs; ++constructNum) {
-            auto const &construction = dataConstruction.Construct(constructNum);
+            auto const &construction = state.dataConstruction->Construct(constructNum);
             if (construction.TotGlassLayers == 0) {
                 sqlite->addConstructionData(constructNum, construction, construction.UValue);
             } else {

@@ -81,15 +81,17 @@ namespace DaylightingDevices {
                              Real64 const Theta // Angle of entry in radians
     );
 
-    Real64 CalcTDDTransSolIso(int const PipeNum); // TDD pipe object number
+    Real64 CalcTDDTransSolIso(EnergyPlusData &state, int const PipeNum); // TDD pipe object number
 
-    Real64 CalcTDDTransSolHorizon(int const PipeNum); // TDD pipe object number
+    Real64 CalcTDDTransSolHorizon(EnergyPlusData &state, int const PipeNum); // TDD pipe object number
 
-    Real64 CalcTDDTransSolAniso(int const PipeNum, // TDD pipe object number
+    Real64 CalcTDDTransSolAniso(EnergyPlusData &state,
+                                int const PipeNum, // TDD pipe object number
                                 Real64 const COSI  // Cosine of the incident angle
     );
 
-    Real64 TransTDD(int const PipeNum,      // TDD pipe object number
+    Real64 TransTDD(EnergyPlusData &state,
+                    int const PipeNum,      // TDD pipe object number
                     Real64 const COSI,      // Cosine of the incident angle
                     int const RadiationType // Radiation type flag
     );
@@ -100,7 +102,7 @@ namespace DaylightingDevices {
 
     int FindTDDPipe(int const WinNum);
 
-    void DistributeTDDAbsorbedSolar();
+    void DistributeTDDAbsorbedSolar(EnergyPlusData &state);
 
     void CalcViewFactorToShelf(int const ShelfNum); // Daylighting shelf object number
 

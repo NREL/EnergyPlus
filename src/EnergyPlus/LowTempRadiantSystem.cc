@@ -578,7 +578,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Error checking for zones and construction information
-            thisRadSys.errorCheckZonesAndConstructions(ErrorsFound);
+            thisRadSys.errorCheckZonesAndConstructions(state, ErrorsFound);
 
             thisRadSys.FluidToSlabHeatTransfer = thisRadSys.getFluidToSlabHeatTransferInput(Alphas(5));
             thisRadSys.TubeDiameterInner = Numbers(1);
@@ -902,7 +902,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Error checking for zones and construction information
-            thisCFloSys.errorCheckZonesAndConstructions(ErrorsFound);
+            thisCFloSys.errorCheckZonesAndConstructions(state, ErrorsFound);
 
             thisCFloSys.FluidToSlabHeatTransfer = thisCFloSys.getFluidToSlabHeatTransferInput(Alphas(5));
             thisCFloSys.TubeDiameterInner = Numbers(1);
@@ -1136,7 +1136,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Error checking for zones and construction information
-            thisElecSys.errorCheckZonesAndConstructions(ErrorsFound);
+            thisElecSys.errorCheckZonesAndConstructions(state, ErrorsFound);
 
             // Heating user input data
             // Determine Low Temp Radiant heating design capacity sizing method
@@ -1648,7 +1648,7 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    void RadiantSystemBaseData::errorCheckZonesAndConstructions(bool &errorsFound)
+    void RadiantSystemBaseData::errorCheckZonesAndConstructions(EnergyPlusData &state, bool &errorsFound)
     {
         Real64 zoneMultipliers = 0.0;
         Real64 zoneMultipliersSurface = 0.0;
@@ -1685,10 +1685,10 @@ namespace LowTempRadiantSystem {
             }
 
             // make sure that this construction is defined with a source/sink--this must be the case or it can't serve as a radiant system surface
-            if (!dataConstruction.Construct(Surface(this->SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
+            if (!state.dataConstruction->Construct(Surface(this->SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
                 ShowSevereError("Construction referenced in Radiant System Surface does not have a source/sink present");
                 ShowContinueError("Surface name= " + Surface(this->SurfacePtr(SurfNum)).Name +
-                                  "  Construction name = " + dataConstruction.Construct(Surface(this->SurfacePtr(SurfNum)).Construction).Name);
+                                  "  Construction name = " + state.dataConstruction->Construct(Surface(this->SurfacePtr(SurfNum)).Construction).Name);
                 ShowContinueError("Construction needs to be defined with a \"Construction:InternalSource\" object.");
                 errorsFound = true;
             }
@@ -2903,7 +2903,7 @@ namespace LowTempRadiantSystem {
                     }
                 } else { // Autosize or hard-size with sizing run
                     // CheckZoneSizing is not required here because the tube length calculation is not dependent on zone sizing calculation results
-                    TubeLengthDes = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength();
+                    TubeLengthDes = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength(state);
                     if (IsAutoSize) {
                         HydrRadSys(RadSysNum).TubeLength = TubeLengthDes;
                         BaseSizer::reportSizerOutput(CompType, HydrRadSys(RadSysNum).Name, "Design Size Hydronic Tubing Length [m]", TubeLengthDes);
@@ -3100,7 +3100,7 @@ namespace LowTempRadiantSystem {
                     }
                 } else { // Autosize or hard-size with sizing run
                     // CheckZoneSizing is not required here because the tube length calculation is not dependent on zone sizing calculation results
-                    TubeLengthDes = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength();
+                    TubeLengthDes = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength(state);
                     if (IsAutoSize) {
                         CFloRadSys(RadSysNum).TubeLength = TubeLengthDes;
                         BaseSizer::reportSizerOutput("ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
@@ -3155,7 +3155,7 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    Real64 HydronicSystemBaseData::sizeRadiantSystemTubeLength()
+    Real64 HydronicSystemBaseData::sizeRadiantSystemTubeLength(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3175,7 +3175,7 @@ namespace LowTempRadiantSystem {
 
         for (int surfNum = 1; surfNum <= this->NumOfSurfaces; ++surfNum) {
             auto &thisHydrSysSurf(Surface(this->SurfacePtr(surfNum)));
-            auto &thisHydrSpacing(dataConstruction.Construct(thisHydrSysSurf.Construction).ThicknessPerpend);
+            auto &thisHydrSpacing(state.dataConstruction->Construct(thisHydrSysSurf.Construction).ThicknessPerpend);
             if ((thisHydrSpacing > 0.005) && (thisHydrSpacing < 0.5)) { // limit allowable spacing to between 1cm and 1m
                 tubeLength += thisHydrSysSurf.Area / (2.0 * thisHydrSpacing);
             } else { // if not in allowable limit, default back to 0.15m (15cm or 6 inches)
@@ -3546,9 +3546,9 @@ namespace LowTempRadiantSystem {
                     Cf = RadSysToHBQsrcCoef(SurfNum);
 
                     Cg = CTFTsrcConstPart(SurfNum);
-                    Ch = dataConstruction.Construct(ConstrNum).CTFTSourceQ(0);
-                    Ci = dataConstruction.Construct(ConstrNum).CTFTSourceIn(0);
-                    Cj = dataConstruction.Construct(ConstrNum).CTFTSourceOut(0);
+                    Ch = state.dataConstruction->Construct(ConstrNum).CTFTSourceQ(0);
+                    Ci = state.dataConstruction->Construct(ConstrNum).CTFTSourceIn(0);
+                    Cj = state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0);
 
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
@@ -3758,9 +3758,9 @@ namespace LowTempRadiantSystem {
                                 Ce = RadSysToHBTinCoef(SurfNum);
                                 Cf = RadSysToHBQsrcCoef(SurfNum);
                                 Cg = CTFTsrcConstPart(SurfNum);
-                                Ch = dataConstruction.Construct(ConstrNum).CTFTSourceQ(0);
-                                Ci = dataConstruction.Construct(ConstrNum).CTFTSourceIn(0);
-                                Cj = dataConstruction.Construct(ConstrNum).CTFTSourceOut(0);
+                                Ch = state.dataConstruction->Construct(ConstrNum).CTFTSourceQ(0);
+                                Ci = state.dataConstruction->Construct(ConstrNum).CTFTSourceIn(0);
+                                Cj = state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0);
                                 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
                                 QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
@@ -4573,9 +4573,9 @@ namespace LowTempRadiantSystem {
                 Cf = RadSysToHBQsrcCoef(SurfNum);
 
                 Cg = CTFTsrcConstPart(SurfNum);
-                Ch = dataConstruction.Construct(ConstrNum).CTFTSourceQ(0);
-                Ci = dataConstruction.Construct(ConstrNum).CTFTSourceIn(0);
-                Cj = dataConstruction.Construct(ConstrNum).CTFTSourceOut(0);
+                Ch = state.dataConstruction->Construct(ConstrNum).CTFTSourceQ(0);
+                Ci = state.dataConstruction->Construct(ConstrNum).CTFTSourceIn(0);
+                Cj = state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0);
 
                 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
@@ -5432,7 +5432,7 @@ namespace LowTempRadiantSystem {
 
         if (this->FluidToSlabHeatTransfer == FluidToSlabHeatTransferTypes::ISOStandard) {
 
-            Real64 U = this->calculateUFromISOStandard(SurfNum, WaterMassFlow * FlowFraction);
+            Real64 U = this->calculateUFromISOStandard(state, SurfNum, WaterMassFlow * FlowFraction);
 
             // Calculate the NTU parameter
             // NTU = UA/[(Mdot*Cp)min]
@@ -5473,7 +5473,7 @@ namespace LowTempRadiantSystem {
         return calculateHXEffectivenessTerm;
     }
 
-    Real64 HydronicSystemBaseData::calculateUFromISOStandard(int const SurfNum, Real64 const WaterMassFlow)
+    Real64 HydronicSystemBaseData::calculateUFromISOStandard(EnergyPlusData &state, int const SurfNum, Real64 const WaterMassFlow)
     {
         // Calculates the U-value for a pipe embedded in a radiant system using the information
         // from ISO Standard 11855, Part 2 (2012): "Building environment design — Design, dimensioning,
@@ -5489,7 +5489,7 @@ namespace LowTempRadiantSystem {
         int constructionNumber = DataSurfaces::Surface(SurfNum).Construction;
 
         // Fluid resistance to heat transfer, assumes turbulent flow (Equation B5, p. 38 of ISO Standard 11855-2)
-        Real64 distanceBetweenPipes = 2.0 * dataConstruction.Construct(constructionNumber).ThicknessPerpend;
+        Real64 distanceBetweenPipes = 2.0 * state.dataConstruction->Construct(constructionNumber).ThicknessPerpend;
         Real64 ratioDiameterToMassFlowLength = this->TubeDiameterInner / WaterMassFlow / this->TubeLength;
         Real64 rFluid = 0.125 / DataGlobals::Pi * std::pow(distanceBetweenPipes, 0.13) * std::pow(ratioDiameterToMassFlowLength,0.87);
 

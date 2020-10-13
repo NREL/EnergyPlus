@@ -51,59 +51,17 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
-#include <EnergyPlus/AirLoopHVACDOAS.hh>
-#include <EnergyPlus/BaseboardElectric.hh>
-#include <EnergyPlus/BaseboardRadiator.hh>
-#include <EnergyPlus/Boilers.hh>
-#include <EnergyPlus/BoilerSteam.hh>
-#include <EnergyPlus/BranchInputManager.hh>
-#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
-#include <EnergyPlus/ChillerAbsorption.hh>
-#include <EnergyPlus/ChillerElectricEIR.hh>
-#include <EnergyPlus/ChillerExhaustAbsorption.hh>
-#include <EnergyPlus/ChillerGasAbsorption.hh>
-#include <EnergyPlus/ChillerIndirectAbsorption.hh>
-#include <EnergyPlus/ChillerReformulatedEIR.hh>
-#include <EnergyPlus/CondenserLoopTowers.hh>
-#include <EnergyPlus/ConvectionCoefficients.hh>
-#include <EnergyPlus/CoolTower.hh>
-#include <EnergyPlus/CostEstimateManager.hh>
-#include <EnergyPlus/CrossVentMgr.hh>
-#include <EnergyPlus/CTElectricGenerator.hh>
-#include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/WaterManager.hh>
-#include <EnergyPlus/WaterThermalTanks.hh>
-#include <EnergyPlus/WaterToAirHeatPump.hh>
-#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
-#include <EnergyPlus/WaterUse.hh>
-#include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/WindowAC.hh>
-#include <EnergyPlus/WindowComplexManager.hh>
-#include <EnergyPlus/WindowEquivalentLayer.hh>
-#include <EnergyPlus/WindowManager.hh>
-#include <EnergyPlus/WindTurbine.hh>
-#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
-#include <EnergyPlus/ZoneDehumidifier.hh>
-#include <EnergyPlus/ZoneEquipmentManager.hh>
-#include <EnergyPlus/ZonePlenum.hh>
-#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace OutputProcessor;
@@ -112,22 +70,14 @@ using namespace DataPlant;
 using namespace DataSizing;
 using namespace OutputReportPredefined;
 
-class SizingAnalysisObjectsTest : public testing::Test
+class SizingAnalysisObjectsTest : public EnergyPlusFixture
 {
 
-public:
-    Real64 lowLogVal;
-    Real64 midLogVal;
-    Real64 hiLogVal;
-    Real64 LogVal; // actual variable pointed to
-    int averagingWindow;
-    int logIndex;
-
-    SizingLoggerFramework sizingLoggerFrameObj;
-
-    // constructor for test fixture class
-    SizingAnalysisObjectsTest()
+protected:
+    void SetUp() override
     {
+        EnergyPlus::EnergyPlusFixture::SetUp();
+
         state.files.eio.open_as_stringstream();
         // fill in test log data values
         lowLogVal = 50.0;
@@ -182,21 +132,22 @@ public:
         PlantLoop(1).VolumeWasAutoSized = true;
 
         SetPredefinedTables();
+
     }
 
-    // destructor
-    ~SizingAnalysisObjectsTest()
+    void TearDown() override
     {
-        TotNumLoops = 0;
-        PlantLoop(1).LoopSide.deallocate();
-        PlantLoop.deallocate();
-        state.dataWeatherManager->Environment.deallocate();
-        PlantSizData.deallocate();
-        TimeValue.clear();
-    }
+        EnergyPlus::EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
+    };
 
-
-    EnergyPlusData state;
+public:
+    Real64 lowLogVal;
+    Real64 midLogVal;
+    Real64 hiLogVal;
+    Real64 LogVal; // actual variable pointed to
+    int averagingWindow;
+    int logIndex;
+    SizingLoggerFramework sizingLoggerFrameObj;
 };
 
 TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
