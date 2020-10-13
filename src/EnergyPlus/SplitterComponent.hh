@@ -142,7 +142,7 @@ namespace SplitterComponent {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitAirLoopSplitter(int const SplitterNum, bool const FirstHVACIteration, bool const FirstCall);
+    void InitAirLoopSplitter(EnergyPlusData &state, int const SplitterNum, bool const FirstHVACIteration, bool const FirstCall);
 
     // End Initialization Section of the Module
     //******************************************************************************

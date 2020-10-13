@@ -49,6 +49,7 @@
 #include <cmath>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -180,7 +181,7 @@ namespace SplitterComponent {
             }
         }
 
-        InitAirLoopSplitter(SplitterNum, FirstHVACIteration, FirstCall); // Initialize all Splitter related parameters
+        InitAirLoopSplitter(state, SplitterNum, FirstHVACIteration, FirstCall); // Initialize all Splitter related parameters
 
         CalcAirLoopSplitter(SplitterNum, FirstCall);
 
@@ -348,7 +349,7 @@ namespace SplitterComponent {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitAirLoopSplitter(int const SplitterNum, bool const FirstHVACIteration, bool const FirstCall)
+    void InitAirLoopSplitter(EnergyPlusData &state, int const SplitterNum, bool const FirstHVACIteration, bool const FirstCall)
     {
 
         // SUBROUTINE INFORMATION:
@@ -395,7 +396,7 @@ namespace SplitterComponent {
         // FLOW:
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
 
             // Calculate the air density and enthalpy for standard conditions...
             AirEnthalpy = PsyHFnTdbW(20.0, OutHumRat);
@@ -417,7 +418,7 @@ namespace SplitterComponent {
             MyEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag = true;
         }
 

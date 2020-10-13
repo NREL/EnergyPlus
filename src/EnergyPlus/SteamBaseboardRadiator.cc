@@ -409,7 +409,7 @@ namespace SteamBaseboardRadiator {
             // Get schedule
             SteamBaseboard(BaseboardNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                SteamBaseboard(BaseboardNum).SchedPtr = ScheduleAlwaysOn;
+                SteamBaseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 SteamBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (SteamBaseboard(BaseboardNum).SchedPtr == 0) {
@@ -845,7 +845,7 @@ namespace SteamBaseboardRadiator {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum)) {
             // Initialize
             SteamInletNode = SteamBaseboard(BaseboardNum).SteamInletNode;
             Node(SteamInletNode).Temp = 100.0;
@@ -876,7 +876,7 @@ namespace SteamBaseboardRadiator {
             MyEnvrnFlag(BaseboardNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(BaseboardNum) = true;
         }
 
@@ -1244,7 +1244,6 @@ namespace SteamBaseboardRadiator {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::TimeStepZone;
         using PlantUtilities::SafeCopyPlantNode;
 

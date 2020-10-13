@@ -482,7 +482,6 @@ namespace SurfaceGroundHeatExchanger {
         // Check flags and update data structure
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using namespace DataEnvironment;
         using DataHeatBalance::TotConstructs;
         using DataLoopNode::Node;
@@ -564,7 +563,7 @@ namespace SurfaceGroundHeatExchanger {
             this->InitQTF = false;
         }
 
-        if (this->MyEnvrnFlag && BeginEnvrnFlag) {
+        if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
             OutDryBulb = OutDryBulbTempAt(SurfaceHXHeight);
             this->CTFflux(0) = 0.0;
             this->TbtmHistory = OutDryBulb;
@@ -598,7 +597,7 @@ namespace SurfaceGroundHeatExchanger {
             this->MyEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) this->MyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlag = true;
 
         // always initialize - module variables
         this->SurfaceArea = this->SurfaceLength * this->SurfaceWidth;

@@ -1188,7 +1188,7 @@ namespace HVACControllers {
         SensedNode = ControllerProps(ControlNum).SensedNode;
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(ControlNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ControlNum)) {
 
             rho = GetDensityGlycol(state,
                                    PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidName,
@@ -1211,7 +1211,7 @@ namespace HVACControllers {
             MyEnvrnFlag(ControlNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(ControlNum) = true;
         }
 

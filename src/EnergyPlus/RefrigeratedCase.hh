@@ -1525,13 +1525,13 @@ namespace RefrigeratedCase {
 
     void SetupReportInput(EnergyPlusData &state);
 
-    void InitRefrigeration();
+    void InitRefrigeration(EnergyPlusData &state);
 
     void InitRefrigerationPlantConnections(EnergyPlusData &state);
 
     void SimulateDetailedRefrigerationSystems(EnergyPlusData &state);
 
-    void SimulateDetailedTransRefrigSystems(EnergyPlusData &statex);
+    void SimulateDetailedTransRefrigSystems(EnergyPlusData &state);
 
     void GetRefrigeratedRackIndex(EnergyPlusData &state, std::string const &Name,
                                   int &IndexPtr,

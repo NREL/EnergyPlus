@@ -561,14 +561,14 @@ namespace SolarReflectionManager {
 
     //=====================================================================================================
 
-    void CalcBeamSolDiffuseReflFactors()
+    void CalcBeamSolDiffuseReflFactors(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   September 2003
         //       MODIFIED       TH 4/6/2010, fixed CR 7872
-        //       RE-ENGINEERED  B. Griffith, October 2012, for timestep integrated solar
+        //       RE-ENGINEERED  B. Griffith, October 2012, for timestep integrated solar.
 
         // PURPOSE OF THIS SUBROUTINE:
         // manage calculations for factors for irradiance on exterior heat transfer surfaces due to
@@ -594,7 +594,7 @@ namespace SolarReflectionManager {
         // FLOW:
 
         if (!DetailedSolarTimestepIntegration) {
-            if (BeginSimFlag) {
+            if (state.dataGlobal->BeginSimFlag) {
                 DisplayString("Calculating Beam-to-Diffuse Exterior Solar Reflection Factors");
             } else {
                 DisplayString("Updating Beam-to-Diffuse Exterior Solar Reflection Factors");
@@ -872,7 +872,7 @@ namespace SolarReflectionManager {
 
         // FLOW:
         if (!DetailedSolarTimestepIntegration) {
-            if (BeginSimFlag) {
+            if (state.dataGlobal->BeginSimFlag) {
                 DisplayString("Calculating Beam-to-Beam Exterior Solar Reflection Factors");
             } else {
                 DisplayString("Updating Beam-to-Beam Exterior Solar Reflection Factors");

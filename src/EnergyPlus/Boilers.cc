@@ -456,7 +456,7 @@ namespace Boilers {
             this->MyFlag = false;
         }
 
-        if (this->MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
             // if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidName,
@@ -508,7 +508,7 @@ namespace Boilers {
             this->MyEnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag = true;
         }
 

@@ -114,7 +114,7 @@ namespace Photovoltaics {
     // ********************
     // begin routines for Equivalent one-diode model by Bradley/Ulleberg
 
-    void InitTRNSYSPV(int const PVnum); // the number of the GENERATOR:PHOTOVOLTAICS (passed in)
+    void InitTRNSYSPV(EnergyPlusData &state, int const PVnum); // the number of the GENERATOR:PHOTOVOLTAICS (passed in)
 
     // *************
 

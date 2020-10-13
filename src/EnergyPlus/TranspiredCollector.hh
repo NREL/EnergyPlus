@@ -182,7 +182,7 @@ namespace TranspiredCollector {
 
     void GetTranspiredCollectorInput(EnergyPlusData &state);
 
-    void InitTranspiredCollector(int const UTSCNum); // compindex already checked in calling routine
+    void InitTranspiredCollector(EnergyPlusData &state, int const UTSCNum); // compindex already checked in calling routine
 
     void CalcActiveTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
 

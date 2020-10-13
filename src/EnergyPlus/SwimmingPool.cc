@@ -505,7 +505,7 @@ namespace SwimmingPool {
 
         SwimmingPoolData::initSwimmingPoolPlantLoopIndex(state);
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlagGeneral) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlagGeneral) {
             this->ZeroSourceSumHATsurf = 0.0;
             this->QPoolSrcAvg = 0.0;
             this->HeatTransCoefsAvg = 0.0;
@@ -516,9 +516,9 @@ namespace SwimmingPool {
             this->MyEnvrnFlagGeneral = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlagGeneral = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlagGeneral = true;
 
-        if (DataGlobals::BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             this->PoolWaterTemp = 23.0;
             this->HeatPower = 0.0;
             this->HeatEnergy = 0.0;

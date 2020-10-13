@@ -1735,7 +1735,7 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     DataGlobals::NumOfTimeStepInHour = 4;
     state.dataWeatherManager->LocationGathered = false;
 
@@ -1751,8 +1751,8 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 1;
     DataGlobals::DayOfSim = 1;
-    DataGlobals::BeginEnvrnFlag = true;
-    DataGlobals::BeginDayFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
+    state.dataGlobal->BeginDayFlag = true;
     WeatherManager::ManageWeather(state);
 
     EXPECT_NEAR(DataEnvironment::OutDryBulbTemp, 50.0, 0.000001);
@@ -1766,8 +1766,8 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
     DataGlobals::TimeStep = 3;
     DataGlobals::HourOfDay = 8;
     DataGlobals::DayOfSim = 1;
-    DataGlobals::BeginEnvrnFlag = false;
-    DataGlobals::BeginDayFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
+    state.dataGlobal->BeginDayFlag = false;
     WeatherManager::ManageWeather(state);
 
     EXPECT_NEAR(DataEnvironment::OutDryBulbTemp, 50.0, 0.000001);
@@ -1863,7 +1863,7 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     DataGlobals::NumOfTimeStepInHour = 4;
     state.dataWeatherManager->LocationGathered = false;
 
@@ -1879,8 +1879,8 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 1;
     DataGlobals::DayOfSim = 1;
-    DataGlobals::BeginEnvrnFlag = true;
-    DataGlobals::BeginDayFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
+    state.dataGlobal->BeginDayFlag = true;
     WeatherManager::ManageWeather(state);
 
     // Note that operands for these functions are Hour (0:23) then Timestep

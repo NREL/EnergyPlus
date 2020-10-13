@@ -1654,7 +1654,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
             VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmTypeSysCurve;
             if (lAlphaFieldBlanks(2)) {
-                VRF(VRFNum).SchedPtr = ScheduleAlwaysOn;
+                VRF(VRFNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 VRF(VRFNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (VRF(VRFNum).SchedPtr == 0) {
@@ -2467,7 +2467,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
 
             if (lAlphaFieldBlanks(2)) {
-                VRF(VRFNum).SchedPtr = ScheduleAlwaysOn;
+                VRF(VRFNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 VRF(VRFNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (VRF(VRFNum).SchedPtr == 0) {
@@ -2831,7 +2831,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
 
             if (lAlphaFieldBlanks(2)) {
-                VRF(VRFNum).SchedPtr = ScheduleAlwaysOn;
+                VRF(VRFNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 VRF(VRFNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (VRF(VRFNum).SchedPtr == 0) {
@@ -3253,7 +3253,7 @@ namespace HVACVariableRefrigerantFlow {
             }
             VRFTU(VRFTUNum).VRFTUType_Num = DataHVACGlobals::VRFTUType_ConstVolume;
             if (lAlphaFieldBlanks(2)) {
-                VRFTU(VRFTUNum).SchedPtr = ScheduleAlwaysOn;
+                VRFTU(VRFTUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 VRFTU(VRFTUNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (VRFTU(VRFTUNum).SchedPtr == 0) {
@@ -5924,7 +5924,7 @@ namespace HVACVariableRefrigerantFlow {
         }     // IF (MySizeFlag(VRFTUNum)) THEN
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(VRFTUNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(VRFTUNum)) {
 
             // Change the Volume Flow Rates to Mass Flow Rates
 
@@ -6038,7 +6038,7 @@ namespace HVACVariableRefrigerantFlow {
         } // IF (BeginEnvrnFlag .and. MyEnvrnFlag(VRFTUNum)) THEN
 
         // reset environment flag for next environment
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(VRFTUNum) = true;
             MyVRFCondFlag(VRFCond) = true;
             TerminalUnitList(VRFTU(VRFTUNum).TUListIndex).reset_isSimulatedFlags = true;

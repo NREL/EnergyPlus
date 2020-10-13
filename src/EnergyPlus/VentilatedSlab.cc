@@ -121,8 +121,6 @@ namespace VentilatedSlab {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::BeginTimeStepFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SysSizingCalc;
@@ -240,7 +238,6 @@ namespace VentilatedSlab {
         auto &GetWaterCoilMaxFlowRate(WaterCoils::GetCoilMaxWaterFlowRate);
         auto &GetSteamCoilMaxFlowRate(SteamCoils::GetCoilMaxWaterFlowRate);
         auto &GetHXAssistedCoilFlowRate(HVACHXAssistedCoolingCoil::GetCoilMaxWaterFlowRate);
-        using DataGlobals::ScheduleAlwaysOn;
         using DataHeatBalance::Zone;
         using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
         using ScheduleManager::GetScheduleIndex;
@@ -330,7 +327,7 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->VentSlab(Item).Name = cAlphaArgs(1);
             state.dataVentilatedSlab->VentSlab(Item).SchedName = cAlphaArgs(2);
             if (lAlphaBlanks(2)) {
-                state.dataVentilatedSlab->VentSlab(Item).SchedPtr = ScheduleAlwaysOn;
+                state.dataVentilatedSlab->VentSlab(Item).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 state.dataVentilatedSlab->VentSlab(Item).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2)); // convert schedule name to pointer
                 if (state.dataVentilatedSlab->VentSlab(Item).SchedPtr == 0) {
@@ -1296,7 +1293,6 @@ namespace VentilatedSlab {
         using DataEnvironment::OutHumRat;
         using DataEnvironment::StdRhoAir;
         using DataGlobals::AnyPlantInModel;
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::NumOfZones;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
@@ -1464,7 +1460,7 @@ namespace VentilatedSlab {
         }
 
         // Do the one time initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(Item) && !MyPlantScanFlag(Item)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(Item) && !MyPlantScanFlag(Item)) {
 
             // Coil Part
             InNode = state.dataVentilatedSlab->VentSlab(Item).ReturnAirNode;
@@ -1571,7 +1567,7 @@ namespace VentilatedSlab {
 
         } // ...end start of environment inits
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
 
             MyEnvrnFlag(Item) = true;
         }

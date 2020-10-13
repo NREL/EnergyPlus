@@ -268,7 +268,7 @@ namespace ThermalChimney {
 
             ThermalChimneySys(Loop).SchedName = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                ThermalChimneySys(Loop).SchedPtr = ScheduleAlwaysOn;
+                ThermalChimneySys(Loop).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 ThermalChimneySys(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (ThermalChimneySys(Loop).SchedPtr == 0) {

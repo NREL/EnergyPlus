@@ -366,7 +366,6 @@ namespace LowTempRadiantSystem {
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::ScheduleAlwaysOn;
         using DataHeatBalance::Zone;
         using DataSizing::AutoSize;
         using DataSizing::CapacityPerFloorArea;
@@ -516,7 +515,7 @@ namespace LowTempRadiantSystem {
 
             thisRadSys.SchedName = Alphas(2);
             if (lAlphaBlanks(2)) {
-                thisRadSys.SchedPtr = ScheduleAlwaysOn;
+                thisRadSys.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 thisRadSys.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (thisRadSys.SchedPtr == 0) {
@@ -837,7 +836,7 @@ namespace LowTempRadiantSystem {
 
             thisCFloSys.SchedName = Alphas(2);
             if (lAlphaBlanks(2)) {
-                thisCFloSys.SchedPtr = ScheduleAlwaysOn;
+                thisCFloSys.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 thisCFloSys.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (thisCFloSys.SchedPtr == 0) {
@@ -1081,7 +1080,7 @@ namespace LowTempRadiantSystem {
 
             thisElecSys.SchedName = Alphas(2);
             if (lAlphaBlanks(2)) {
-                thisElecSys.SchedPtr = ScheduleAlwaysOn;
+                thisElecSys.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 thisElecSys.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (thisElecSys.SchedPtr == 0) {
@@ -1708,7 +1707,6 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using DataGlobals::AnyPlantInModel;
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::NumOfZones;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_LowTempRadiant_ConstFlow;
@@ -2043,7 +2041,7 @@ namespace LowTempRadiantSystem {
             }
         }
 
-        if (BeginEnvrnFlag && MyEnvrnFlagGeneral) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlagGeneral) {
             ZeroSourceSumHATsurf = 0.0;
             QRadSysSrcAvg = 0.0;
             LastQRadSysSrc = 0.0;
@@ -2051,12 +2049,12 @@ namespace LowTempRadiantSystem {
             LastTimeStepSys = 0.0;
             MyEnvrnFlagGeneral = false;
         }
-        if (!BeginEnvrnFlag) MyEnvrnFlagGeneral = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlagGeneral = true;
 
         // If we are at the beginning of a new environment OR the warmup period is done and the simulation is starting,
         // then the various changeover variables need to be reset so that we are starting from scratch.
-        if ((BeginEnvrnFlag && FirstHVACIteration) ||
-            (!WarmupFlag && DataGlobals::BeginDayFlag && FirstHVACIteration && DataGlobals::DayOfSim == 1)) {
+        if ((state.dataGlobal->BeginEnvrnFlag && FirstHVACIteration) ||
+            (!WarmupFlag && state.dataGlobal->BeginDayFlag && FirstHVACIteration && DataGlobals::DayOfSim == 1)) {
             // Reset values related to changeover
             if (SystemType == HydronicSystem) {
                 HydrRadSys(RadSysNum).lastOperatingMode = NotOperating;
@@ -2073,7 +2071,7 @@ namespace LowTempRadiantSystem {
         }
 
         if (SystemType == HydronicSystem) {
-            if (BeginEnvrnFlag && MyEnvrnFlagHydr(RadSysNum)) {
+            if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlagHydr(RadSysNum)) {
                 HydrRadSys(RadSysNum).HeatPower = 0.0;
                 HydrRadSys(RadSysNum).HeatEnergy = 0.0;
                 HydrRadSys(RadSysNum).CoolPower = 0.0;
@@ -2107,10 +2105,10 @@ namespace LowTempRadiantSystem {
                 MyEnvrnFlagHydr(RadSysNum) = false;
             }
         } // NumOfHydrLowTempRadSys > 0
-        if (!BeginEnvrnFlag && SystemType == HydronicSystem) MyEnvrnFlagHydr(RadSysNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag && SystemType == HydronicSystem) MyEnvrnFlagHydr(RadSysNum) = true;
 
         if (SystemType == ConstantFlowSystem) {
-            if (BeginEnvrnFlag && MyEnvrnFlagCFlo(RadSysNum)) {
+            if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlagCFlo(RadSysNum)) {
                 CFloRadSys(RadSysNum).WaterInletTemp = 0.0;
                 CFloRadSys(RadSysNum).WaterOutletTemp = 0.0;
                 CFloRadSys(RadSysNum).PumpInletTemp = 0.0;
@@ -2151,20 +2149,20 @@ namespace LowTempRadiantSystem {
             }
 
             if (anyRadiantSystemUsingRunningMeanAverage) {
-                if (DataGlobals::BeginDayFlag && CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay) {
+                if (state.dataGlobal->BeginDayFlag && CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay) {
                     CFloRadSys(RadSysNum).calculateRunningMeanAverageTemperature(state);
                     CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay = false; // only set these once per system
-                } else if (!DataGlobals::BeginDayFlag && !CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay) {
+                } else if (!state.dataGlobal->BeginDayFlag && !CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay) {
                     CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay =
-                        true; // reset so that the next time BeginDayFlag is true this can get set
+                        true; // reset so that the next time state.dataGlobal->BeginDayFlag is true this can get set
                 }
             }
 
         } // NumOfCFloLowTempRadSys > 0
-        if (!BeginEnvrnFlag && SystemType == ConstantFlowSystem) MyEnvrnFlagCFlo(RadSysNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag && SystemType == ConstantFlowSystem) MyEnvrnFlagCFlo(RadSysNum) = true;
 
         if (SystemType == ElectricSystem) {
-            if (BeginEnvrnFlag && MyEnvrnFlagElec(RadSysNum)) {
+            if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlagElec(RadSysNum)) {
                 ElecRadSys(RadSysNum).HeatPower = 0.0;
                 ElecRadSys(RadSysNum).HeatEnergy = 0.0;
                 ElecRadSys(RadSysNum).ElecPower = 0.0;
@@ -2172,7 +2170,7 @@ namespace LowTempRadiantSystem {
             }
             MyEnvrnFlagElec(RadSysNum) = false;
         }
-        if (!BeginEnvrnFlag && SystemType == ElectricSystem) MyEnvrnFlagElec(RadSysNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag && SystemType == ElectricSystem) MyEnvrnFlagElec(RadSysNum) = true;
 
         if (SystemType == ConstantFlowSystem) {
 
@@ -2270,7 +2268,7 @@ namespace LowTempRadiantSystem {
                                          HydrRadSys(RadSysNum).CWBranchNum,
                                          HydrRadSys(RadSysNum).CWCompNum);
                 }
-                if (HydrRadSys(RadSysNum).OperatingMode != NotOperating && FirstHVACIteration) HydrRadSys(RadSysNum).updateOperatingModeHistory();
+                if (HydrRadSys(RadSysNum).OperatingMode != NotOperating && FirstHVACIteration) HydrRadSys(RadSysNum).updateOperatingModeHistory(state);
 
             } else if (SELECT_CASE_var == ConstantFlowSystem) {
                 CFloRadSys(RadSysNum).WaterMassFlowRate = 0.0;
@@ -2320,7 +2318,7 @@ namespace LowTempRadiantSystem {
                                              CFloRadSys(RadSysNum).CWBranchNum,
                                              CFloRadSys(RadSysNum).CWCompNum);
                 }
-                if (CFloRadSys(RadSysNum).OperatingMode != NotOperating && FirstHVACIteration) CFloRadSys(RadSysNum).updateOperatingModeHistory();
+                if (CFloRadSys(RadSysNum).OperatingMode != NotOperating && FirstHVACIteration) CFloRadSys(RadSysNum).updateOperatingModeHistory(state);
 
             } else if (SELECT_CASE_var == ElectricSystem) {
 
@@ -2330,7 +2328,7 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    void HydronicSystemBaseData::updateOperatingModeHistory()
+    void HydronicSystemBaseData::updateOperatingModeHistory(EnergyPlusData &state)
     {
         // Since this is only called when the operating mode is something other than "not operating",
         // the status from the previous system time step is what it did in the last or previous time step.
@@ -2338,7 +2336,7 @@ namespace LowTempRadiantSystem {
         // to "not operating".
         this->lastOperatingMode = this->OperatingMode;
 
-        if (DataGlobals::BeginDayFlag) {
+        if (state.dataGlobal->BeginDayFlag) {
             // The begin day flag is set which mean this is the first time step of the day.
             // This also means that the previous time step was the last time step of yesterday.
             // So, the day should be the previous day, the hour should bethe last hour of the
@@ -2346,7 +2344,7 @@ namespace LowTempRadiantSystem {
             this->lastDayOfSim = DataGlobals::DayOfSim - 1;
             this->lastHourOfDay = int(DataGlobalConstants::HoursInDay());
             this->lastTimeStep = DataGlobals::NumOfTimeStepInHour;
-        } else if (DataGlobals::BeginHourFlag) {
+        } else if (state.dataGlobal->BeginHourFlag) {
             // It's not the beginning of the day but it is the beginning of an hour other than
             // the first hour.  This means that the previous time step was the previous hour of
             // today in the last time step.  So, the day should be the current day, the hour should

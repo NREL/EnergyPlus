@@ -87,7 +87,7 @@ namespace RoomAirModelUserTempPattern {
 
     //****************************************************
 
-    void InitTempDistModel(int const ZoneNum); // index number for the specified zone
+    void InitTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
     void GetSurfHBDataForTempDistModel(int const ZoneNum); // index number for the specified zone
 

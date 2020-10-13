@@ -291,7 +291,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     DataEnvironment::OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
@@ -654,7 +654,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
 
     OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow = DataSizing::AutoSize;
 
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     bool FirstHVACIteration(true);
     int ZoneNum(1);
 
@@ -959,7 +959,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     FinalZoneSizing(CurZoneEqNum).DesHeatDens = DataEnvironment::StdRhoAir;
     FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * FinalZoneSizing(CurZoneEqNum).DesHeatDens;
 
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     bool FirstHVACIteration(true);
     int ZoneNum(1);
 

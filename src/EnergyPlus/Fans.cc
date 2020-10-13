@@ -105,7 +105,6 @@ namespace Fans {
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SysSizingCalc;
     using DataGlobals::WarmupFlag;
@@ -291,7 +290,6 @@ namespace Fans {
         using BranchNodeConnections::TestCompSet;
         using CurveManager::GetCurveIndex;
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::ScheduleAlwaysOn;
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -408,7 +406,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = ScheduleAlwaysOn;
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -471,7 +469,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = ScheduleAlwaysOn;
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -554,7 +552,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = ScheduleAlwaysOn;
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -612,7 +610,7 @@ namespace Fans {
                     }
                 }
             } else {
-                Fan(FanNum).FlowFractSchedNum = ScheduleAlwaysOn;
+                Fan(FanNum).FlowFractSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
             }
 
             if (NumAlphas > 6 && !lAlphaFieldBlanks(7)) {
@@ -692,7 +690,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = ScheduleAlwaysOn;
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -1086,7 +1084,7 @@ namespace Fans {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(FanNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(FanNum)) {
 
             // For all Fan inlet nodes convert the Volume flow to a mass flow
             // unused0909    InNode = Fan(FanNum)%InletNodeNum
@@ -1121,7 +1119,7 @@ namespace Fans {
             MyEnvrnFlag(FanNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(FanNum) = true;
         }
 

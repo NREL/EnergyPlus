@@ -119,7 +119,7 @@ protected:
         DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
         DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum).SystemZoneNodeNumber =
             DataZoneEquipment::ZoneEquipConfig(1).ZoneNode;
-        DataZoneEquipment::ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobals::ScheduleAlwaysOn;
+        DataZoneEquipment::ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
         DataZoneEquipment::ZoneEquipList(1).Name = "ZONEEQUIPMENT";
         int maxEquipCount = 1;
         DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes = maxEquipCount;

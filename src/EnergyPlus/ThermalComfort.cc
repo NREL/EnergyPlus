@@ -388,7 +388,7 @@ namespace ThermalComfort {
 
         if (InitializeOnly) return;
 
-        if (BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             ZoneOccHrs = 0.0;
         }
 
@@ -2744,7 +2744,7 @@ namespace ThermalComfort {
 
         if (initiate) return;
 
-        if (BeginDayFlag && useEpwData) {
+        if (state.dataGlobal->BeginDayFlag && useEpwData) {
             // Update the running average, reset the daily avg
             DailyAveOutTemp(30) = avgDryBulbASH;
             Real64 sum = 0.0;
@@ -2759,7 +2759,7 @@ namespace ThermalComfort {
         }
 
         // If exists BeginMonthFlag we can use it to call InvJulianDay once per month.
-        if (BeginDayFlag && useStatData) {
+        if (state.dataGlobal->BeginDayFlag && useStatData) {
             //  CALL InvJulianDay(DayOfYear,pMonth,pDay,0)
             //  runningAverageASH = monthlyTemp(pMonth)
             runningAverageASH = monthlyTemp(Month);
@@ -2767,7 +2767,7 @@ namespace ThermalComfort {
 
         // Update the daily average
         // IF (BeginHourFlag .and. useEpwData) THEN
-        if (BeginHourFlag) {
+        if (state.dataGlobal->BeginHourFlag) {
             avgDryBulbASH += (OutDryBulbTemp / 24.0);
         }
 
@@ -2961,7 +2961,7 @@ namespace ThermalComfort {
         }
         if (initiate) return;
 
-        if (BeginDayFlag && !firstDaySet) {
+        if (state.dataGlobal->BeginDayFlag && !firstDaySet) {
             // Update the running average, reset the daily avg
             runningAverageCEN = 0.2 * runningAverageCEN + 0.8 * avgDryBulbCEN;
             avgDryBulbCEN = 0.0;
@@ -2970,7 +2970,7 @@ namespace ThermalComfort {
         firstDaySet = false;
 
         // Update the daily average
-        if (BeginHourFlag) {
+        if (state.dataGlobal->BeginHourFlag) {
             avgDryBulbCEN += (OutDryBulbTemp / 24.0);
         }
 

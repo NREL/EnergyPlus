@@ -615,7 +615,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1));   // Air distribution unit equipment type
     EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", PTUnit(1).UnitType); // zoneHVAC equipment type
 
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
     DataEnvironment::OutBaroPress = 101325.0;
@@ -955,7 +955,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
 
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // set zoneNode air condition
     Node(ZoneEquipConfig(1).ZoneNode).Temp = 24.0;
@@ -1360,7 +1360,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
     EXPECT_EQ("ZoneHVAC:PackagedTerminalHeatPump", PTUnit(1).UnitType);     // zoneHVAC equipment type
 
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
     DataEnvironment::OutBaroPress = 101325.0;
@@ -1782,7 +1782,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
 
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // set zoneNode air condition
     Node(ZoneEquipConfig(1).ZoneNode).Temp = 24.0;
@@ -2447,7 +2447,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     EXPECT_EQ("TU1", VRFTU(1).Name);                                        // zoneHVAC equipment name
     // EXPECT_EQ( "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", VRFTU( 1 ).Name ); // zoneHVAC equipment type
 
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
     DataEnvironment::OutBaroPress = 101325.0;
@@ -3125,7 +3125,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1));  // Air distribution unit equipment type
     EXPECT_EQ("TU1", VRFTU(1).Name);                                         // zoneHVAC equipment name
 
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
     DataEnvironment::OutBaroPress = 101325.0;
@@ -4875,7 +4875,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
     EXPECT_EQ("TU1", VRFTU(1).Name);                                        // zoneHVAC equipment name
 
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
     DataEnvironment::OutBaroPress = 101325.0;
@@ -6629,7 +6629,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1));  // Air distribution unit equipment type
     EXPECT_EQ("TU1", VRFTU(1).Name);                                         // zoneHVAC equipment name
 
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
     DataEnvironment::OutBaroPress = 101325.0;
@@ -6874,7 +6874,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, SysATMixer(1).MixerType); // air terminal mixer connection type
     EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
 
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
     DataEnvironment::OutBaroPress = 101325.0;
@@ -7120,7 +7120,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
 
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // set zoneNode air condition
     Node(ZoneEquipConfig(1).ZoneNode).Temp = 24.0;
@@ -7623,7 +7623,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     HWLoopSizingData.DesVolFlowRate = 1.0;
     HWLoopSizingData.DeltaT = 10.0;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataGlobals::DoingSizing = true;
     state.dataFans->LocalTurnFansOff = false;
     state.dataFans->LocalTurnFansOn = true;
@@ -7696,7 +7696,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     Node(thisATMixer.SecInNode).HumRat = Node(zoneEquipConfig.ZoneNode).HumRat;
     Node(thisATMixer.SecInNode).Enthalpy = Node(zoneEquipConfig.ZoneNode).Enthalpy;
 
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     ZoneEqFanCoil = true;
 
     // set predicted heating load
@@ -7742,7 +7742,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
     SysSizingCalc = true;
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     // set predicted cooling load
     zoneSysEnergyDemand.RemainingOutputReqToHeatSP = 0.0;
     zoneSysEnergyDemand.RemainingOutputReqToCoolSP = -5000.0;
@@ -8054,7 +8054,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     HWLoopSizingData.DesVolFlowRate = 1.0;
     HWLoopSizingData.DeltaT = 10.0;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataGlobals::DoingSizing = true;
     state.dataFans->LocalTurnFansOff = false;
     state.dataFans->LocalTurnFansOn = true;
@@ -8127,7 +8127,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     Node(thisATMixer.SecInNode).HumRat = Node(zoneEquipConfig.ZoneNode).HumRat;
     Node(thisATMixer.SecInNode).Enthalpy = Node(zoneEquipConfig.ZoneNode).Enthalpy;
 
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     ZoneEqFanCoil = true;
     // check availability manager Night Cycle parameters
     EXPECT_EQ(SystemAvailabilityManager::ThermostatWithMinimumRunTime, SystemAvailabilityManager::NCycSysAvailMgrData(1).CycRunTimeCntrlType);

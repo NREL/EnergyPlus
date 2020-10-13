@@ -96,8 +96,6 @@ namespace FaultsManager {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using DataGlobals::ScheduleAlwaysOn;
-
     // Data
     // MODULE PARAMETER DEFINITIONS
 

@@ -368,7 +368,7 @@ namespace WeatherManager {
         int DSTActEnMon;
         int DSTActEnDay;
 
-        if (DataGlobals::BeginSimFlag && state.dataWeatherManager->GetEnvironmentFirstCall) {
+        if (state.dataGlobal->BeginSimFlag && state.dataWeatherManager->GetEnvironmentFirstCall) {
 
             DataReportingFlags::PrintEndDataDictionary = true;
 
@@ -1499,14 +1499,14 @@ namespace WeatherManager {
         // Most of the weather handling can be described as "initializations"
         // so most of the work is done via this subroutine.
 
-        if (DataGlobals::BeginSimFlag && state.dataWeatherManager->FirstCall) {
+        if (state.dataGlobal->BeginSimFlag && state.dataWeatherManager->FirstCall) {
 
             state.dataWeatherManager->FirstCall = false;
             DataEnvironment::EndMonthFlag = false;
 
         } // ... end of DataGlobals::BeginSimFlag IF-THEN block.
 
-        if (DataGlobals::BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
 
             // Call and setup the Design Day environment
             if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::RunPeriodWeather) {
@@ -1580,7 +1580,7 @@ namespace WeatherManager {
 
         } // ... end of DataGlobals::BeginEnvrnFlag IF-THEN block.
 
-        if (DataGlobals::BeginDayFlag) {
+        if (state.dataGlobal->BeginDayFlag) {
 
             // Check Holidays, Daylight Saving Time, Ground Temperatures, etc.
 
@@ -1717,7 +1717,7 @@ namespace WeatherManager {
             }
         } // ... end of DataGlobals::BeginDayFlag IF-THEN block.
 
-        if (!DataGlobals::BeginDayFlag && !DataGlobals::WarmupFlag &&
+        if (!state.dataGlobal->BeginDayFlag && !DataGlobals::WarmupFlag &&
             (DataEnvironment::Month != state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth || DataEnvironment::DayOfMonth != state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay) &&
             !state.dataWeatherManager->DatesShouldBeReset && state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
             state.dataWeatherManager->DatesShouldBeReset = true;
@@ -1776,7 +1776,7 @@ namespace WeatherManager {
 
         state.dataWeatherManager->TodayVariables = state.dataWeatherManager->TomorrowVariables; // Transfer Tomorrow's Daily Weather Variables to Today
 
-        if (DataGlobals::BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             DataGlobals::PreviousHour = 24;
         }
 
@@ -3394,7 +3394,7 @@ namespace WeatherManager {
         date_and_time(_, _, _, Date0);
         int CurrentYear = Date0(1);
 
-        if (DataGlobals::BeginSimFlag) {
+        if (state.dataGlobal->BeginSimFlag) {
             state.dataWeatherManager->PrintDDHeader = true;
         }
 

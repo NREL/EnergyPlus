@@ -1645,7 +1645,6 @@ namespace WaterManager {
         // that hold the value of the Last Timestep
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
@@ -1655,7 +1654,7 @@ namespace WaterManager {
         int RainColNum;
         int WellNum;
 
-        if (BeginEnvrnFlag && state.dataWaterManager->MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataWaterManager->MyEnvrnFlag) {
             for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
 
                 WaterStorage(TankNum).LastTimeStepVolume = WaterStorage(TankNum).InitialVolume;
@@ -1677,7 +1676,7 @@ namespace WaterManager {
             state.dataWaterManager->MyEnvrnFlag = false;
             state.dataWaterManager->MyWarmupFlag = true;
         } // end environmental inits
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             state.dataWaterManager->MyEnvrnFlag = true;
         }
 

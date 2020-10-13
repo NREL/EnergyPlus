@@ -101,9 +101,7 @@ namespace Humidifiers {
     // REFERENCES: ASHRAE HVAC 2 Toolkit, page 4-112
 
     // Using/Aliasing
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
@@ -330,7 +328,7 @@ namespace Humidifiers {
             Humidifier(HumNum).HumType_Code = Humidifier_Steam_Electric;
             Humidifier(HumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                Humidifier(HumNum).SchedPtr = ScheduleAlwaysOn;
+                Humidifier(HumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {
@@ -380,7 +378,7 @@ namespace Humidifiers {
             Humidifier(HumNum).HumType_Code = Humidifier_Steam_Gas;
             Humidifier(HumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                Humidifier(HumNum).SchedPtr = ScheduleAlwaysOn;
+                Humidifier(HumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {
@@ -673,7 +671,7 @@ namespace Humidifiers {
             MySetPointCheckFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag = true;
         }
 

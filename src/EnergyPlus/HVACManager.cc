@@ -127,8 +127,6 @@ namespace HVACManager {
     // Using/Aliasing
     using DataGlobals::AnyEnergyManagementSystemInModel;
     using DataGlobals::AnyIdealCondEntSetPointInModel;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::BeginTimeStepFlag;
     using DataGlobals::DayOfSim;
     using DataGlobals::DisplayExtraWarnings;
@@ -343,13 +341,13 @@ namespace HVACManager {
             if (allocated(ZoneAirGCAvg)) ZoneAirGCAvg = 0.0;
         }
 
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             AirLoopsSimOnce = false;
             MyEnvrnFlag = false;
             NumOfSysTimeStepsLastZoneTimeStep = 1;
             PreviousTimeStep = TimeStepZone;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag = true;
         }
 
@@ -534,11 +532,11 @@ namespace HVACManager {
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation();
             } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
-                if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
+                if (state.dataGlobal->BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                     PrintEnvrnStampWarmup = true;
                     PrintEnvrnStampWarmupPrinted = true;
                 }
-                if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
+                if (!state.dataGlobal->BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
                 if (PrintEnvrnStampWarmup) {
                     if (PrintEndDataDictionary && DoOutputReporting && !PrintedWarmup) {
                         print(state.files.eso, "{}\n", EndOfHeaderString);
@@ -573,11 +571,11 @@ namespace HVACManager {
                     if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
                 }
             } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
-                if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
+                if (state.dataGlobal->BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                     PrintEnvrnStampWarmup = true;
                     PrintEnvrnStampWarmupPrinted = true;
                 }
-                if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
+                if (!state.dataGlobal->BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
                 if (PrintEnvrnStampWarmup) {
                     if (PrintEndDataDictionary && DoOutputReporting && !PrintedWarmup) {
                         print(state.files.eso, "{}\n", EndOfHeaderString);
@@ -1817,7 +1815,7 @@ namespace HVACManager {
         }
         ResetAllPlantInterConnectFlags();
 
-        if (BeginEnvrnFlag && MyEnvrnFlag2) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag2) {
             // Following comment is incorrect!  (LKL) Even the first time through this does more than read in data.
             // Zone equipment data needs to be read in before air loop data to allow the
             // determination of which zones are connected to which air loops.
@@ -1826,7 +1824,7 @@ namespace HVACManager {
             ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
             MyEnvrnFlag2 = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag2 = true;
         }
 

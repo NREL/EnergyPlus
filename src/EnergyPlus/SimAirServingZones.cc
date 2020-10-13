@@ -2228,7 +2228,7 @@ namespace SimAirServingZones {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && FirstHVACIteration && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && FirstHVACIteration && MyEnvrnFlag) {
 
             if (NumPrimaryAirSys > 0) {
                 for (auto &e : state.dataAirLoop->PriAirSysAvailMgr) {
@@ -2276,12 +2276,12 @@ namespace SimAirServingZones {
 
         } // End the environment initializations
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag = true;
         }
 
         // Do the Begin Day initializations
-        if (BeginDayFlag) {
+        if (state.dataGlobal->BeginDayFlag) {
         }
 
         // There are no hourly initializations done in the heat balance

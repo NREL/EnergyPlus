@@ -311,7 +311,7 @@ namespace CoolingPanelSimple {
             // Get schedule
             ThisCP.Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                ThisCP.SchedPtr = ScheduleAlwaysOn;
+                ThisCP.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 ThisCP.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ThisCP.SchedPtr == 0) {
@@ -709,7 +709,6 @@ namespace CoolingPanelSimple {
         // Incropera and DeWitt, Fundamentals of Heat and Mass Transfer
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
         using DataZoneEquipment::CheckZoneEquipmentList;
@@ -808,7 +807,7 @@ namespace CoolingPanelSimple {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(CoolingPanelNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CoolingPanelNum)) {
             // Initialize
 
             rho = GetDensityGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::InitConvTemp(), PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
@@ -843,7 +842,7 @@ namespace CoolingPanelSimple {
             MyEnvrnFlag(CoolingPanelNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(CoolingPanelNum) = true;
         }
 
@@ -1494,7 +1493,6 @@ namespace CoolingPanelSimple {
         // Existing code for hot water baseboard models (radiant-convective variety)
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;

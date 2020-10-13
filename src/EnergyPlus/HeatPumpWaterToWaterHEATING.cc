@@ -90,8 +90,6 @@ namespace HeatPumpWaterToWaterHEATING {
     // Which are obtained using Parameter Estimation technique.
 
     // Using/Aliasing
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::BeginSimFlag;
     using DataGlobals::DayOfSim;
     using DataGlobals::HourOfDay;
     using DataGlobals::TimeStep;
@@ -484,7 +482,7 @@ namespace HeatPumpWaterToWaterHEATING {
         static std::string const RoutineName("InitGshp");
 
         // For each new environment
-        if (BeginEnvrnFlag && this->beginEnvironFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->beginEnvironFlag) {
             this->QLoad = 0.0;
             this->QSource = 0.0;
             this->Power = 0.0;
@@ -537,7 +535,7 @@ namespace HeatPumpWaterToWaterHEATING {
             Node(this->SourceSideInletNodeNum).Temp = Node(this->SourceSideOutletNodeNum).TempSetPoint + 30.0;
         }
 
-        if (!BeginEnvrnFlag) this->beginEnvironFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->beginEnvironFlag = true;
 
         // On every call
         this->Running = 0;

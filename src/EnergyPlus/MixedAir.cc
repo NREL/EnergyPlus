@@ -148,11 +148,8 @@ namespace MixedAir {
     using namespace DataLoopNode;
     using namespace DataAirLoop;
     using DataGlobals::AnyEnergyManagementSystemInModel;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DoZoneSizing;
     using DataGlobals::NumOfZones;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using namespace DataEnvironment;
     using namespace DataHVACGlobals;
@@ -924,7 +921,7 @@ namespace MixedAir {
             OAMixerNum = CompIndex;
         }
 
-        InitOAMixer(OAMixerNum, FirstHVACIteration);
+        InitOAMixer(state, OAMixerNum, FirstHVACIteration);
 
         CalcOAMixer(OAMixerNum);
 
@@ -1553,7 +1550,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
                 thisVentilationMechanical.SchName = AlphArray(2);
                 if (lAlphaBlanks(2)) {
-                    thisVentilationMechanical.SchPtr = ScheduleAlwaysOn;
+                    thisVentilationMechanical.SchPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     thisVentilationMechanical.SchPtr = GetScheduleIndex(state, AlphArray(2)); // convert schedule name to pointer
                     if (thisVentilationMechanical.SchPtr == 0) {
@@ -1877,7 +1874,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         thisVentilationMechanical.ZoneOAFlowRate(ventMechZoneNum) = 0.0;
                         thisVentilationMechanical.ZoneOAACHRate = 0.0;
                         thisVentilationMechanical.ZoneOAFlowMethod(ventMechZoneNum) = OAFlowPPer;
-                        thisVentilationMechanical.ZoneOASchPtr(ventMechZoneNum) = ScheduleAlwaysOn;
+                        thisVentilationMechanical.ZoneOASchPtr(ventMechZoneNum) = DataGlobalConstants::ScheduleAlwaysOn();
                         ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name);
                         ShowContinueError("Cannot locate a matching DesignSpecification:OutdoorAir object for Zone=\"" +
                                           thisVentilationMechanical.VentMechZoneName(ventMechZoneNum) + "\".");
@@ -2646,7 +2643,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         //		if ( BeginEnvrnFlag && FirstHVACIteration ) {
         //		}
 
-        //		if ( BeginDayFlag ) {
+        //		if ( state.dataGlobal->BeginDayFlag ) {
         //		}
 
         if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum > -1) return;
@@ -2889,7 +2886,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             OAControllerMySizeFlag(OAControllerNum) = false;
         }
 
-        if (BeginEnvrnFlag && OAControllerMyEnvrnFlag(OAControllerNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && OAControllerMyEnvrnFlag(OAControllerNum)) {
             OANode = thisOAController.OANode;
             RhoAirStdInit = StdRhoAir;
             thisOAController.MinOAMassFlowRate = thisOAController.MinOA * RhoAirStdInit;
@@ -2941,7 +2938,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             }
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             OAControllerMyEnvrnFlag(OAControllerNum) = true;
         }
 
@@ -3468,7 +3465,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         }
     } // namespace MixedAir
 
-    void InitOAMixer(int const OAMixerNum, bool const FirstHVACIteration)
+    void InitOAMixer(EnergyPlusData &state, int const OAMixerNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3507,10 +3504,10 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         InletNode = OAMixer(OAMixerNum).InletNode;
         RelNode = OAMixer(OAMixerNum).RelNode;
 
-        if (BeginEnvrnFlag && FirstHVACIteration) {
+        if (state.dataGlobal->BeginEnvrnFlag && FirstHVACIteration) {
         }
 
-        if (BeginDayFlag) {
+        if (state.dataGlobal->BeginDayFlag) {
         }
 
         if (FirstHVACIteration) {

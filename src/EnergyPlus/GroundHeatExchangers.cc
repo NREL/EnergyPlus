@@ -116,9 +116,6 @@ namespace GroundHeatExchangers {
     //   Ground Heat Exchanger.' Applied Energy. Vol 114, 57-69.
 
     // Using/Aliasing
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::BeginHourFlag;
-    using DataGlobals::BeginSimFlag;
     using DataGlobals::BeginTimeStepFlag;
     using DataGlobals::DayOfSim;
     using DataGlobals::HourOfDay;
@@ -3339,7 +3336,7 @@ namespace GroundHeatExchangers {
             myFlag = false;
         }
 
-        if (myEnvrnFlag && BeginEnvrnFlag) {
+        if (myEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
             myEnvrnFlag = false;
 
@@ -3386,7 +3383,7 @@ namespace GroundHeatExchangers {
         SetComponentFlowRate(massFlowRate, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
         // Reset local environment init flag
-        if (!BeginEnvrnFlag) myEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) myEnvrnFlag = true;
     }
 
     //******************************************************************************
@@ -3448,7 +3445,7 @@ namespace GroundHeatExchangers {
             myFlag = false;
         }
 
-        if (myEnvrnFlag && BeginEnvrnFlag) {
+        if (myEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
             myEnvrnFlag = false;
 
@@ -3479,7 +3476,7 @@ namespace GroundHeatExchangers {
         SetComponentFlowRate(massFlowRate, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
         // Reset local environment init flag
-        if (!BeginEnvrnFlag) myEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) myEnvrnFlag = true;
     }
 
     //******************************************************************************

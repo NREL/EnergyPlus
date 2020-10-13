@@ -122,7 +122,7 @@ namespace SolarReflectionManager {
 
     //=====================================================================================================
 
-    void CalcBeamSolDiffuseReflFactors();
+    void CalcBeamSolDiffuseReflFactors(EnergyPlusData &state);
 
     void FigureBeamSolDiffuseReflFactors(int const iHour);
 

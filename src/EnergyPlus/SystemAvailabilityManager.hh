@@ -567,7 +567,7 @@ namespace SystemAvailabilityManager {
 
     void GetHybridVentilationInputs(EnergyPlusData &state);
 
-    void InitHybridVentSysAvailMgr();
+    void InitHybridVentSysAvailMgr(EnergyPlusData &state);
 
     void CalcHybridVentSysAvailMgr(EnergyPlusData &state,
                                    int const SysAvailNum,              // number of the current scheduled system availability manager

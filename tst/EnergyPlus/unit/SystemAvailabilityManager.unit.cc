@@ -326,7 +326,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     SystemAvailabilityManager::ManageSystemAvailability(state); // 1st time through just gets input
 
     DataGlobals::WarmupFlag = true;
-    DataGlobals::BeginDayFlag = true; // initialize optimum start data to beginning of day data
+    state.dataGlobal->BeginDayFlag = true; // initialize optimum start data to beginning of day data
     DataGlobals::CurrentTime = 1.0;   // set the current time to 1 AM
     SystemAvailabilityManager::ManageSystemAvailability(state);
     EXPECT_EQ(3, SystemAvailabilityManager::OptStartSysAvailMgrData(1).ATGWCZoneNumLo); // zone 3 is farthest from heating set point
@@ -340,7 +340,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
               SystemAvailabilityManager::OptStartSysAvailMgrData(2).AvailStatus); // avail manager should not be set until 6 AM
 
     DataGlobals::WarmupFlag = false;
-    DataGlobals::BeginDayFlag = false; // start processing temp data to find optimum start time
+    state.dataGlobal->BeginDayFlag = false; // start processing temp data to find optimum start time
     DataGlobals::CurrentTime = 2.0;    // set the current time to 2 AM
     SystemAvailabilityManager::ManageSystemAvailability(state);
     // same data as before since zone temps are unchanged
@@ -762,7 +762,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
 
     // Test cycle time reset at beginning of day during warmup
     DataGlobals::WarmupFlag = true;
-    DataGlobals::BeginDayFlag = true;
+    state.dataGlobal->BeginDayFlag = true;
     DataGlobals::SimTimeSteps = 96;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     EXPECT_EQ(DataHVACGlobals::NoAction, SystemAvailabilityManager::NCycSysAvailMgrData(1).AvailStatus);
@@ -898,7 +898,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
 
     // Test cycle time reset at beginning of day during warmup
     DataGlobals::WarmupFlag = true;
-    DataGlobals::BeginDayFlag = true;
+    state.dataGlobal->BeginDayFlag = true;
     DataGlobals::SimTimeSteps = 96;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus);
     EXPECT_EQ(DataHVACGlobals::NoAction, SystemAvailabilityManager::NCycSysAvailMgrData(1).AvailStatus);

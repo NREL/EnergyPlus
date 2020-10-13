@@ -2909,7 +2909,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataZoneTempPredictorCorrector->MyEnvrnFlag && BeginEnvrnFlag) {
+        if (state.dataZoneTempPredictorCorrector->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
             AIRRAT = 0.0;
             ZTM1 = 0.0;
             ZTM2 = 0.0;
@@ -2989,16 +2989,16 @@ namespace ZoneTempPredictorCorrector {
             state.dataZoneTempPredictorCorrector->MyEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             state.dataZoneTempPredictorCorrector->MyEnvrnFlag = true;
         }
 
         // Do the Begin Day initializations
-        if (state.dataZoneTempPredictorCorrector->MyDayFlag && BeginDayFlag) {
+        if (state.dataZoneTempPredictorCorrector->MyDayFlag && state.dataGlobal->BeginDayFlag) {
             state.dataZoneTempPredictorCorrector->MyDayFlag = false;
         }
 
-        if (!BeginDayFlag) {
+        if (!state.dataGlobal->BeginDayFlag) {
             state.dataZoneTempPredictorCorrector->MyDayFlag = true;
         }
 
@@ -4004,7 +4004,7 @@ namespace ZoneTempPredictorCorrector {
                                             state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
                 if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
-                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
+                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
                     LoadToCoolingSetPoint = state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
                 ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToCoolingSetPoint;
@@ -4045,7 +4045,7 @@ namespace ZoneTempPredictorCorrector {
                 if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
                 if (RAFNFrac > 0.0) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
 
-                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
+                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
                     LoadToCoolingSetPoint = state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
 
@@ -4125,7 +4125,7 @@ namespace ZoneTempPredictorCorrector {
                 if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
                 if (RAFNFrac > 0.0) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
 
-                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
+                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
                     LoadToCoolingSetPoint = state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
 

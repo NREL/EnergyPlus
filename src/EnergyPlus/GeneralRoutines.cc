@@ -1039,7 +1039,6 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     using DataEnvironment::WindSpeedAt;
     // USE DataLoopNode    , ONLY: Node
     using ConvectionCoefficients::InitExteriorConvectionCoeff;
-    using DataGlobals::BeginEnvrnFlag;
     using DataHeatBalance::SurfQRadSWOutIncident;
     using DataHeatBalSurface::TH;
     using DataSurfaces::Surface;
@@ -1169,7 +1168,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     }
 
     if (ICSCollectorIsOn) {
-        if (BeginEnvrnFlag && MyICSEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyICSEnvrnFlag) {
             ICSULossbottom = 0.40;
             ICSWaterTemp = 20.0;
         } else {
@@ -1183,7 +1182,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
             }
         }
     }
-    if (!BeginEnvrnFlag) {
+    if (!state.dataGlobal->BeginEnvrnFlag) {
         MyICSEnvrnFlag = true;
     }
     if (A == 0.0) { // should have been caught earlier

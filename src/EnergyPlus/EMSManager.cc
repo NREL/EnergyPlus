@@ -394,7 +394,6 @@ namespace EMSManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataZoneControls::GetZoneAirStatsInputFlag;
@@ -450,7 +449,7 @@ namespace EMSManager {
 
         InitializeRuntimeLanguage(state);
 
-        if ((BeginEnvrnFlag) || (iCalledFrom == EMSCallFrom::ZoneSizing) || (iCalledFrom == EMSCallFrom::SystemSizing) ||
+        if ((state.dataGlobal->BeginEnvrnFlag) || (iCalledFrom == EMSCallFrom::ZoneSizing) || (iCalledFrom == EMSCallFrom::SystemSizing) ||
             (iCalledFrom == EMSCallFrom::UserDefinedComponentModel)) {
 
             // another pass at trying to setup input data.

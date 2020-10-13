@@ -922,7 +922,6 @@ namespace HVACInterfaceManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataLoopNode::Node;
         using namespace DataPlant;
         using DataBranchAirLoopPlant::MassFlowTolerance;
@@ -961,13 +960,13 @@ namespace HVACInterfaceManager {
         NodeNumSecIn = PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn;
         NodeNumSecOut = PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumOut;
 
-        if (MyEnvrnFlag(LoopNum) && BeginEnvrnFlag) {
+        if (MyEnvrnFlag(LoopNum) && state.dataGlobal->BeginEnvrnFlag) {
             PlantCommonPipe(LoopNum).Flow = 0.0;
             PlantCommonPipe(LoopNum).Temp = 0.0;
             PlantCommonPipe(LoopNum).FlowDir = NoRecircFlow;
             MyEnvrnFlag(LoopNum) = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(LoopNum) = true;
         }
 
@@ -1059,7 +1058,6 @@ namespace HVACInterfaceManager {
 
         // Using/Aliasing
         using DataBranchAirLoopPlant::MassFlowTolerance;
-        using DataGlobals::BeginEnvrnFlag;
         using DataLoopNode::Node;
         using DataPlant::DeltaTempTol;
         using DataPlant::DemandSide;
@@ -1125,7 +1123,7 @@ namespace HVACInterfaceManager {
         NodeNumSecOut = PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumOut;
 
         // begin environment inits
-        if (MyEnvrnFlag(LoopNum) && BeginEnvrnFlag) {
+        if (MyEnvrnFlag(LoopNum) && state.dataGlobal->BeginEnvrnFlag) {
             PlantCommonPipe(LoopNum).PriToSecFlow = 0.0;
             PlantCommonPipe(LoopNum).SecToPriFlow = 0.0;
             PlantCommonPipe(LoopNum).PriCPLegFlow = 0.0;
@@ -1133,7 +1131,7 @@ namespace HVACInterfaceManager {
             MyEnvrnFlag(LoopNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(LoopNum) = true;
         }
 

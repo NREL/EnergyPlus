@@ -113,7 +113,6 @@ namespace HighTempRadiantSystem {
     // Using/Aliasing
     using DataGlobals::BeginTimeStepFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::SmallLoad;
 
@@ -348,7 +347,7 @@ namespace HighTempRadiantSystem {
 
             HighTempRadSys(Item).SchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                HighTempRadSys(Item).SchedPtr = ScheduleAlwaysOn;
+                HighTempRadSys(Item).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 HighTempRadSys(Item).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (HighTempRadSys(Item).SchedPtr == 0) {
@@ -703,7 +702,6 @@ namespace HighTempRadiantSystem {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::NumOfZones;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipInputsFilled;
@@ -752,7 +750,7 @@ namespace HighTempRadiantSystem {
             MySizeFlag(RadSysNum) = false;
         }
 
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             ZeroSourceSumHATsurf = 0.0;
             QHTRadSource = 0.0;
             QHTRadSrcAvg = 0.0;
@@ -761,7 +759,7 @@ namespace HighTempRadiantSystem {
             LastTimeStepSys = 0.0;
             MyEnvrnFlag = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag = true;
         }
 
@@ -1182,7 +1180,6 @@ namespace HighTempRadiantSystem {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::TimeStepZone;
         using DataHeatBalFanSys::SumConvHTRadSys;
         using DataHVACGlobals::SysTimeElapsed;

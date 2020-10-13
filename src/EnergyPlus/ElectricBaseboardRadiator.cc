@@ -303,7 +303,7 @@ namespace ElectricBaseboardRadiator {
             ElecBaseboard(BaseboardNum).EquipType = BaseboardRadiator_Electric;
             ElecBaseboard(BaseboardNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                ElecBaseboard(BaseboardNum).SchedPtr = ScheduleAlwaysOn;
+                ElecBaseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 ElecBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ElecBaseboard(BaseboardNum).SchedPtr == 0) {
@@ -628,7 +628,7 @@ namespace ElectricBaseboardRadiator {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum)) {
             // Initialize
             ZeroSourceSumHATsurf = 0.0;
             QBBElecRadSource = 0.0;
@@ -640,7 +640,7 @@ namespace ElectricBaseboardRadiator {
             MyEnvrnFlag(BaseboardNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(BaseboardNum) = true;
         }
 
@@ -963,7 +963,6 @@ namespace ElectricBaseboardRadiator {
         //       MODIFIED       Feb 2010 Daeho Kang for radiant component
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;

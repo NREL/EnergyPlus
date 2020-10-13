@@ -1060,7 +1060,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
@@ -1091,7 +1091,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 
         ++EnvCount;
 
-        DataGlobals::BeginEnvrnFlag = true;
+        state.dataGlobal->BeginEnvrnFlag = true;
         DataGlobals::EndEnvrnFlag = false;
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
@@ -1105,12 +1105,12 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
             if (!DataGlobals::WarmupFlag) {
                 ++DataEnvironment::CurrentOverallSimDay;
             }
-            DataGlobals::BeginDayFlag = true;
+            state.dataGlobal->BeginDayFlag = true;
             DataGlobals::EndDayFlag = false;
 
             for (DataGlobals::HourOfDay = 1; DataGlobals::HourOfDay <= 24; ++DataGlobals::HourOfDay) { // Begin hour loop ...
 
-                DataGlobals::BeginHourFlag = true;
+                state.dataGlobal->BeginHourFlag = true;
                 DataGlobals::EndHourFlag = false;
 
                 for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= DataGlobals::NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
@@ -1140,11 +1140,11 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
-                    DataGlobals::BeginHourFlag = false;
-                    DataGlobals::BeginDayFlag = false;
-                    DataGlobals::BeginEnvrnFlag = false;
-                    DataGlobals::BeginSimFlag = false;
-                    DataGlobals::BeginFullSimFlag = false;
+                    state.dataGlobal->BeginHourFlag = false;
+                    state.dataGlobal->BeginDayFlag = false;
+                    state.dataGlobal->BeginEnvrnFlag = false;
+                    state.dataGlobal->BeginSimFlag = false;
+                    state.dataGlobal->BeginFullSimFlag = false;
 
                 } // TimeStep loop
 
@@ -2151,7 +2151,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
@@ -2182,7 +2182,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 
         ++EnvCount;
 
-        DataGlobals::BeginEnvrnFlag = true;
+        state.dataGlobal->BeginEnvrnFlag = true;
         DataGlobals::EndEnvrnFlag = false;
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
@@ -2196,12 +2196,12 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
             if (!DataGlobals::WarmupFlag) {
                 ++DataEnvironment::CurrentOverallSimDay;
             }
-            DataGlobals::BeginDayFlag = true;
+            state.dataGlobal->BeginDayFlag = true;
             DataGlobals::EndDayFlag = false;
 
             for (DataGlobals::HourOfDay = 1; DataGlobals::HourOfDay <= 24; ++DataGlobals::HourOfDay) { // Begin hour loop ...
 
-                DataGlobals::BeginHourFlag = true;
+                state.dataGlobal->BeginHourFlag = true;
                 DataGlobals::EndHourFlag = false;
 
                 for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= DataGlobals::NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
@@ -2231,11 +2231,11 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
-                    DataGlobals::BeginHourFlag = false;
-                    DataGlobals::BeginDayFlag = false;
-                    DataGlobals::BeginEnvrnFlag = false;
-                    DataGlobals::BeginSimFlag = false;
-                    DataGlobals::BeginFullSimFlag = false;
+                    state.dataGlobal->BeginHourFlag = false;
+                    state.dataGlobal->BeginDayFlag = false;
+                    state.dataGlobal->BeginEnvrnFlag = false;
+                    state.dataGlobal->BeginSimFlag = false;
+                    state.dataGlobal->BeginFullSimFlag = false;
 
                 } // TimeStep loop
 

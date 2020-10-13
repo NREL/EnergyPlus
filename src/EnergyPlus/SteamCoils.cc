@@ -344,7 +344,7 @@ namespace SteamCoils {
             SteamCoil(CoilNum).Name = AlphArray(1);
             SteamCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
-                SteamCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
+                SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 SteamCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                 if (SteamCoil(CoilNum).SchedPtr == 0) {
@@ -563,7 +563,7 @@ namespace SteamCoils {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(CoilNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CoilNum)) {
             // Initialize all report variables to a known state at beginning of simulation
             SteamCoil(CoilNum).TotSteamHeatingCoilEnergy = 0.0;
             SteamCoil(CoilNum).TotSteamCoolingCoilEnergy = 0.0;
@@ -624,7 +624,7 @@ namespace SteamCoils {
             MyEnvrnFlag(CoilNum) = false;
         } // End If for the Begin Environment initializations
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(CoilNum) = true;
         }
 

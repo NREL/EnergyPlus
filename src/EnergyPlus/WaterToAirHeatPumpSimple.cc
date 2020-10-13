@@ -904,7 +904,7 @@ namespace WaterToAirHeatPumpSimple {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(HPNum) && !MyPlantScanFlag(HPNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(HPNum) && !MyPlantScanFlag(HPNum)) {
             // Do the initializations to start simulation
 
             AirInletNode = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum;
@@ -965,7 +965,7 @@ namespace WaterToAirHeatPumpSimple {
 
         } // End If for the Begin Environment initializations
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(HPNum) = true;
         }
 

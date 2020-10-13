@@ -167,6 +167,7 @@ namespace DataGlobalConstants {
     Real64 constexpr UniversalGasConst () { return 8314.462175; }           // Universal Gas Constant (J/mol*K)
     Real64 constexpr convertJtoGJ () { return 1.0E-9; }                     // Conversion factor for J to GJ
     int constexpr MaxSpeedLevels () { return 10; }                          // Maximum number of speed that supports
+    int constexpr ScheduleAlwaysOn () { return -1; }                        // Value when passed to schedule routines gives back 1.0 (on)
 
     ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar);
     std::string GetResourceTypeChar(ResourceType ResourceTypeNum);

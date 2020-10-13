@@ -237,7 +237,7 @@ namespace HeatBalanceManager {
                                bool &ErrorsFound                           // True if there is a problem with the entry requested from the data file
     );
 
-    void SetStormWindowControl();
+    void SetStormWindowControl(EnergyPlusData &state);
 
     void CreateFCfactorConstructions(EnergyPlusData &state,
                                      int &ConstrNum,   // Counter for Constructions

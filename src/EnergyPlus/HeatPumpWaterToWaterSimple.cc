@@ -102,8 +102,6 @@ namespace HeatPumpWaterToWaterSimple {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::BeginSimFlag;
     using DataGlobals::DayOfSim;
     using DataGlobals::HourOfDay;
     using DataGlobals::TimeStep;
@@ -750,7 +748,7 @@ namespace HeatPumpWaterToWaterSimple {
             this->MyPlantScanFlag = false;
         }
 
-        if (this->MyEnvrnFlag && BeginEnvrnFlag) {
+        if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
             // Initialize all report variables to a known state at beginning of simulation
 
             this->reportPower = 0.0;
@@ -808,7 +806,7 @@ namespace HeatPumpWaterToWaterSimple {
             this->MyEnvrnFlag = false;
         }
         // Reset the environment flag
-        if (!BeginEnvrnFlag) this->MyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlag = true;
 
         if (PrevSimTime != CurrentSimTime) {
             PrevSimTime = CurrentSimTime;

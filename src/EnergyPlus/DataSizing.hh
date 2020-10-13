@@ -1133,7 +1133,7 @@ namespace DataSizing {
         // Default Constructor
         OARequirementsData()
             : OAFlowMethod(0), OAFlowPerPerson(0.0), OAFlowPerArea(0.0), OAFlowPerZone(0.0), OAFlowACH(0.0),
-              OAFlowFracSchPtr(DataGlobals::ScheduleAlwaysOn), OAPropCtlMinRateSchPtr(DataGlobals::ScheduleAlwaysOn), CO2MaxMinLimitErrorCount(0),
+              OAFlowFracSchPtr(DataGlobalConstants::ScheduleAlwaysOn()), OAPropCtlMinRateSchPtr(DataGlobalConstants::ScheduleAlwaysOn()), CO2MaxMinLimitErrorCount(0),
               CO2MaxMinLimitErrorIndex(0), CO2GainErrorCount(0), CO2GainErrorIndex(0)
         {
         }

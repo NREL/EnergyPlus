@@ -264,7 +264,7 @@ namespace LowTempRadiantSystem {
         {
         }
 
-        void updateOperatingModeHistory();
+        void updateOperatingModeHistory(EnergyPlusData &state);
 
         void setOperatingModeBasedOnChangeoverDelay();
 

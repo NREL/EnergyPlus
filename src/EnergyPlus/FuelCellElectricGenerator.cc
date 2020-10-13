@@ -3188,7 +3188,7 @@ namespace FuelCellElectricGenerator {
         }
 
         // Do the Begin Environment initializations
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag_Init && !this->MyPlantScanFlag_Init) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag_Init && !this->MyPlantScanFlag_Init) {
 
             DataGenerators::FuelSupply(this->FuelSupNum).PfuelCompEl = 0.0;
             DataGenerators::FuelSupply(this->FuelSupNum).TfuelIntoFCPM = 0.0;
@@ -3268,7 +3268,7 @@ namespace FuelCellElectricGenerator {
             this->MyWarmupFlag_Init = true;
         } // end environmental inits
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag_Init = true;
         }
 
@@ -3314,7 +3314,7 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    void FigureFuelCellZoneGains()
+    void FigureFuelCellZoneGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3333,7 +3333,7 @@ namespace FuelCellElectricGenerator {
 
         if (NumFuelCellGenerators == 0) return;
 
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             for (auto &e : DataGenerators::FuelSupply)
                 e.QskinLoss = 0.0;
             MyEnvrnFlag = false;
@@ -3355,7 +3355,7 @@ namespace FuelCellElectricGenerator {
             }
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) MyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag = true;
 
         // this routine needs to do something for zone gains during sizing
 

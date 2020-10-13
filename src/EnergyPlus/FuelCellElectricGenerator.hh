@@ -608,7 +608,7 @@ namespace FuelCellElectricGenerator {
 
     void getFuelCellInput(EnergyPlusData &state);
 
-    void FigureFuelCellZoneGains();
+    void FigureFuelCellZoneGains(EnergyPlusData &state);
 
     extern bool getFuelCellInputFlag;
     extern int NumFuelCellGenerators;

@@ -876,12 +876,12 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveASH55Test)
     DailyAveOutTemp(29) = 7.941666667;
     DailyAveOutTemp(30) = 9.316666667;
 
-    DataGlobals::BeginDayFlag = true;
+    state.dataGlobal->BeginDayFlag = true;
 
     CalcThermalComfortAdaptiveASH55(state, false);
     EXPECT_NEAR(ThermalComfort::runningAverageASH, 9.29236111, 0.001);
     useEpwData = false;
-    DataGlobals::BeginDayFlag = false;
+    state.dataGlobal->BeginDayFlag = false;
 }
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)

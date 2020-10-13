@@ -203,7 +203,7 @@ namespace TranspiredCollector {
             }
         }
 
-        InitTranspiredCollector(CompIndex);
+        InitTranspiredCollector(state, CompIndex);
 
         // Control point of deciding if transpired collector is active or not.
         auto &UTSC_CI(UTSC(CompIndex));
@@ -255,7 +255,6 @@ namespace TranspiredCollector {
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
-        using DataGlobals::ScheduleAlwaysOn;
         using DataHeatBalance::MediumRough;
         using DataHeatBalance::MediumSmooth;
         using DataHeatBalance::Rough;
@@ -437,7 +436,7 @@ namespace TranspiredCollector {
             }
             UTSC(Item).OSCMPtr = Found;
             if (lAlphaFieldBlanks(3)) {
-                UTSC(Item).SchedPtr = ScheduleAlwaysOn;
+                UTSC(Item).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 UTSC(Item).SchedPtr = GetScheduleIndex(state, Alphas(3));
                 if (UTSC(Item).SchedPtr == 0) {
@@ -729,7 +728,7 @@ namespace TranspiredCollector {
         Alphas.deallocate();
     }
 
-    void InitTranspiredCollector(int const UTSCNum) // compindex already checked in calling routine
+    void InitTranspiredCollector(EnergyPlusData &state, int const UTSCNum) // compindex already checked in calling routine
     {
 
         // SUBROUTINE INFORMATION:
@@ -834,13 +833,13 @@ namespace TranspiredCollector {
             MySetPointCheckFlag = false;
         }
 
-        if (BeginEnvrnFlag && MyEnvrnFlag(UTSCNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(UTSCNum)) {
             UTSC(UTSCNum).TplenLast = 22.5;
             UTSC(UTSCNum).TcollLast = 22.0;
 
             MyEnvrnFlag(UTSCNum) = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(UTSCNum) = true;
         }
 

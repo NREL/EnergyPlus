@@ -278,7 +278,7 @@ namespace PipeHeatTransfer {
                                       bool &ErrorsFound                    // set to true if errors found here
         );
 
-        static void CalcZonePipesHeatGain();
+        static void CalcZonePipesHeatGain(EnergyPlusData &state);
     };
 
     // Object Data

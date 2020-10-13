@@ -843,8 +843,6 @@ namespace PipeHeatTransfer {
 
         // Using/Aliasing
         using DataEnvironment::OutDryBulbTemp;
-        using DataGlobals::BeginEnvrnFlag;
-        using DataGlobals::BeginSimFlag;
         using DataGlobals::DayOfSim;
         using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
@@ -897,7 +895,7 @@ namespace PipeHeatTransfer {
         }
 
         // initialize temperatures by inlet node temp
-        if ((BeginSimFlag && this->BeginSimInit) || (BeginEnvrnFlag && this->BeginSimEnvrn)) {
+        if ((state.dataGlobal->BeginSimFlag && this->BeginSimInit) || (state.dataGlobal->BeginEnvrnFlag && this->BeginSimEnvrn)) {
 
             if (this->EnvironmentPtr == GroundEnv) {
                 for (TimeIndex = PreviousTimeIndex; TimeIndex <= TentativeTimeIndex; ++TimeIndex) {
@@ -932,15 +930,15 @@ namespace PipeHeatTransfer {
             this->BeginSimEnvrn = false;
         }
 
-        if (!BeginSimFlag) this->BeginSimInit = true;
-        if (!BeginEnvrnFlag) this->BeginSimEnvrn = true;
+        if (!state.dataGlobal->BeginSimFlag) this->BeginSimInit = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->BeginSimEnvrn = true;
 
         // time step in seconds
         nsvDeltaTime = TimeStepSys * DataGlobalConstants::SecInHour();
         nsvNumInnerTimeSteps = int(nsvDeltaTime / InnerDeltaTime);
 
         // previous temps are updated if necessary at start of timestep rather than end
-        if ((FirstHVACIteration && this->FirstHVACupdateFlag) || (BeginEnvrnFlag && this->BeginEnvrnupdateFlag)) {
+        if ((FirstHVACIteration && this->FirstHVACupdateFlag) || (state.dataGlobal->BeginEnvrnFlag && this->BeginEnvrnupdateFlag)) {
 
             // We need to update boundary conditions here, as well as updating the arrays
             if (this->EnvironmentPtr == GroundEnv) {
@@ -984,7 +982,7 @@ namespace PipeHeatTransfer {
             this->FirstHVACupdateFlag = false;
         }
 
-        if (!BeginEnvrnFlag) this->BeginEnvrnupdateFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->BeginEnvrnupdateFlag = true;
         if (!FirstHVACIteration) this->FirstHVACupdateFlag = true;
 
         // Calculate the current sim time for this pipe (not necessarily structure variable, but it is ok for consistency)
@@ -1585,7 +1583,7 @@ namespace PipeHeatTransfer {
 
     //==============================================================================
 
-    void PipeHTData::CalcZonePipesHeatGain()
+    void PipeHTData::CalcZonePipesHeatGain(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1601,17 +1599,15 @@ namespace PipeHeatTransfer {
         // Sums the heat losses from all of the water heaters in the zone to add as a gain to the zone.
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
-
         if (nsvNumOfPipeHT == 0) return;
 
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             for (auto &e : PipeHT)
                 e.ZoneHeatGainRate = 0.0;
             MyEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) MyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag = true;
 
     }
 

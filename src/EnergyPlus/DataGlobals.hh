@@ -66,14 +66,6 @@ struct EnergyPlusData;
 
 namespace DataGlobals {
 
-    extern int const ScheduleAlwaysOn; // Value when passed to schedule routines gives back 1.0 (on)
-
-    extern bool BeginDayFlag;           // True at the start of each day, False after first time step in day
-    extern bool BeginEnvrnFlag;         // True at the start of each environment, False after first time step in environ
-    extern bool beginEnvrnWarmStartFlag;  // Sizing Speed Up true if at the start of each environment, would rather retain thermal history and the like.
-    extern bool BeginHourFlag;          // True at the start of each hour, False after first time step in hour
-    extern bool BeginSimFlag;           // True until any actual simulation (full or sizing) has begun, False after first time step
-    extern bool BeginFullSimFlag;       // True until full simulation has begun, False after first time step
     extern bool BeginTimeStepFlag;      // True at the start of each time step, False after first subtime step of time step
     extern int DayOfSim;                // Counter for days (during the simulation)
     extern int CalendarYear;            // Calendar year of the current day of simulation
@@ -157,6 +149,13 @@ namespace DataGlobals {
 } // namespace DataGlobals
 
     struct DataGlobal : BaseGlobalStruct {
+        bool BeginDayFlag = false;           // True at the start of each day, False after first time step in day
+        bool BeginEnvrnFlag = false;         // True at the start of each environment, False after first time step in environ
+        bool beginEnvrnWarmStartFlag = false; // Sizing Speed Up
+        bool BeginHourFlag = false;          // True at the start of each hour, False after first time step in hour
+        bool BeginSimFlag = false;           // True until any actual simulation (full or sizing) has begun, False after first time step
+        bool BeginFullSimFlag = false;       // True until full simulation has begun, False after first time step
+
         bool AnnualSimulation = false;
         std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
         bool runReadVars= false;
@@ -175,6 +174,13 @@ namespace DataGlobals {
         DataGlobalConstants::KindOfSim KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
 
         void clear_state() override {
+            this->BeginDayFlag = false;
+            this->BeginEnvrnFlag = false;
+            this->beginEnvrnWarmStartFlag = false;
+            this->BeginHourFlag = false;
+            this->BeginSimFlag = false;
+            this->BeginFullSimFlag = false;
+
             this->AnnualSimulation = false;
             this->DayOfSimChr = "0";
             this->runReadVars = false;

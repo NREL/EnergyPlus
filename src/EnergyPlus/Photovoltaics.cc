@@ -115,9 +115,6 @@ namespace Photovoltaics {
 
     // Using/Aliasing
     using namespace DataPhotovoltaics;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::BeginSimFlag;
     using DataGlobals::EndEnvrnFlag;
     using DataHVACGlobals::TimeStepSys;
 
@@ -203,7 +200,7 @@ namespace Photovoltaics {
             } else if (SELECT_CASE_var == iTRNSYSPVModel) {
                 // 'PhotovoltaicPeformance:EquivalentOne-Diode' (aka. 5-parameter TRNSYS type 180 model)
 
-                InitTRNSYSPV(PVnum);
+                InitTRNSYSPV(state, PVnum);
 
                 CalcTRNSYSPV(PVnum, RunFlag);
 
@@ -1191,7 +1188,7 @@ namespace Photovoltaics {
     // ********************
     // begin routines for Equivalent one-diode model by Bradley/Ulleberg
 
-    void InitTRNSYSPV(int const PVnum) // the number of the GENERATOR:PHOTOVOLTAICS (passed in)
+    void InitTRNSYSPV(EnergyPlusData &state, int const PVnum) // the number of the GENERATOR:PHOTOVOLTAICS (passed in)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1215,7 +1212,6 @@ namespace Photovoltaics {
         // USE STATEMENTS:
         //  USE DataPhotovoltaics, ONLY:CellTemp,LastCellTemp
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
@@ -1248,14 +1244,14 @@ namespace Photovoltaics {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(PVnum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(PVnum)) {
 
             PVarray(PVnum).TRNSYSPVcalc.CellTempK = Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
             PVarray(PVnum).TRNSYSPVcalc.LastCellTempK = Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
             MyEnvrnFlag(PVnum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(PVnum) = true;
         }
 
