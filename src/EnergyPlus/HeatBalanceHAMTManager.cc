@@ -771,42 +771,42 @@ namespace HeatBalanceHAMTManager {
             if (Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
             conid = Surface(sid).Construction;
             if (conid == 0) continue;
-            for (lid = 1; lid <= dataConstruction.Construct(conid).TotLayers; ++lid) {
-                matid = dataConstruction.Construct(conid).LayerPoint(lid);
+            for (lid = 1; lid <= state.dataConstruction->Construct(conid).TotLayers; ++lid) {
+                matid = state.dataConstruction->Construct(conid).LayerPoint(lid);
                 if (dataMaterial.Material(matid).ROnly) {
-                    ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name + " cannot contain R-only value materials.");
+                    ShowSevereError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name + " cannot contain R-only value materials.");
                     ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name + "\".");
                     ++errorCount;
                     continue;
                 }
 
                 if (dataMaterial.Material(matid).nmu < 0) {
-                    ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
+                    ShowSevereError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name +
                                       "\" does not have required Water Vapor Diffusion Resistance Factor (mu) data.");
                     ++errorCount;
                 }
 
                 if (dataMaterial.Material(matid).niso < 0) {
-                    ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
+                    ShowSevereError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name + "\" does not have required isotherm data.");
                     ++errorCount;
                 }
                 if (dataMaterial.Material(matid).nsuc < 0) {
-                    ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
+                    ShowSevereError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name +
                                       "\" does not have required liquid transport coefficient (suction) data.");
                     ++errorCount;
                 }
                 if (dataMaterial.Material(matid).nred < 0) {
-                    ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
+                    ShowSevereError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name +
                                       "\" does not have required liquid transport coefficient (redistribution) data.");
                     ++errorCount;
                 }
                 if (dataMaterial.Material(matid).ntc < 0) {
                     if (dataMaterial.Material(matid).Conductivity > 0) {
-                        ShowWarningError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
+                        ShowWarningError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
                         ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name +
                                           "\" does not have thermal conductivity data. Using fixed value.");
                         dataMaterial.Material(matid).ntc = 2;
@@ -815,7 +815,7 @@ namespace HeatBalanceHAMTManager {
                         dataMaterial.Material(matid).tcwater(2) = dataMaterial.Material(matid).isodata(dataMaterial.Material(matid).niso);
                         dataMaterial.Material(matid).tcdata(2) = dataMaterial.Material(matid).Conductivity;
                     } else {
-                        ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
+                        ShowSevereError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
                         ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name + "\" does not have required thermal conductivity data.");
                         ++errorCount;
                     }
@@ -838,7 +838,7 @@ namespace HeatBalanceHAMTManager {
                     if (testlen > adjdist) break;
                     --dataMaterial.Material(matid).divs;
                     if (dataMaterial.Material(matid).divs < 1) {
-                        ShowSevereError(RoutineName + "Construction=" + dataConstruction.Construct(conid).Name);
+                        ShowSevereError(RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
                         ShowContinueError("Reference Material=\"" + dataMaterial.Material(matid).Name + "\" is too thin.");
                         ++errorCount;
                         break;
@@ -914,8 +914,8 @@ namespace HeatBalanceHAMTManager {
 
             // Material Cells
             conid = Surface(sid).Construction;
-            for (lid = 1; lid <= dataConstruction.Construct(conid).TotLayers; ++lid) {
-                matid = dataConstruction.Construct(conid).LayerPoint(lid);
+            for (lid = 1; lid <= state.dataConstruction->Construct(conid).TotLayers; ++lid) {
+                matid = state.dataConstruction->Construct(conid).LayerPoint(lid);
 
                 for (did = 1; did <= dataMaterial.Material(matid).divs; ++did) {
                     ++cid;
@@ -1032,12 +1032,12 @@ namespace HeatBalanceHAMTManager {
 
             // write cell origins to initialization output file
             conid = Surface(sid).Construction;
-            print(state.files.eio, "HAMT cells, {},{}", Surface(sid).Name, dataConstruction.Construct(conid).Name);
+            print(state.files.eio, "HAMT cells, {},{}", Surface(sid).Name, state.dataConstruction->Construct(conid).Name);
             for (int concell = 1, concell_end = Intcell(sid) - Extcell(sid) + 1; concell <= concell_end; ++concell) {
                 print(state.files.eio, ",{:4}", concell);
             }
             print(state.files.eio, "\n");
-            print(state.files.eio, "HAMT origins,{},{}", Surface(sid).Name, dataConstruction.Construct(conid).Name);
+            print(state.files.eio, "HAMT origins,{},{}", Surface(sid).Name, state.dataConstruction->Construct(conid).Name);
             for (int cellid = Extcell(sid); cellid <= Intcell(sid); ++cellid) {
                 print(state.files.eio, ",{:10.7F}", cells(cellid).origin(1));
             }

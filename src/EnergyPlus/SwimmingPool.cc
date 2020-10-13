@@ -249,7 +249,7 @@ namespace SwimmingPool {
                 }
             }
 
-            Pool(Item).ErrorCheckSetupPoolSurface(Alphas(1),Alphas(2),cAlphaFields(2),ErrorsFound);
+            Pool(Item).ErrorCheckSetupPoolSurface(state, Alphas(1),Alphas(2),cAlphaFields(2),ErrorsFound);
 
             Pool(Item).AvgDepth = Numbers(1);
             if (Pool(Item).AvgDepth < MinDepth) {
@@ -411,7 +411,8 @@ namespace SwimmingPool {
         }
     }
 
-    void SwimmingPoolData::ErrorCheckSetupPoolSurface(std::string const Alpha1,
+    void SwimmingPoolData::ErrorCheckSetupPoolSurface(EnergyPlusData &state,
+                                                      std::string const Alpha1,
                                                       std::string const Alpha2,
                                                       std::string const cAlphaField2,
                                                       bool &ErrorsFound
@@ -445,7 +446,7 @@ namespace SwimmingPool {
             ShowSevereError(DataSurfaces::Surface(this->SurfacePtr).Name +
                             " is a pool and has movable insulation.  This is not allowed.  Remove the movable insulation for this surface.");
             ErrorsFound = true;
-        } else if (dataConstruction.Construct(DataSurfaces::Surface(this->SurfacePtr).Construction).SourceSinkPresent) {
+        } else if (state.dataConstruction->Construct(DataSurfaces::Surface(this->SurfacePtr).Construction).SourceSinkPresent) {
             ShowSevereError(
                 DataSurfaces::Surface(this->SurfacePtr).Name +
                 " is a pool and uses a construction with a source/sink.  This is not allowed.  Use a standard construction for this surface.");

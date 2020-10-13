@@ -64,9 +64,6 @@ struct EnergyPlusData;
 
 namespace PackagedTerminalHeatPump {
 
-    // Using/Aliasing
-    using VariableSpeedCoils::MaxSpedLevels;
-
     // Data
     // MODULE PARAMETER DEFINITIONS
     // Compressor operation
@@ -119,6 +116,7 @@ namespace PackagedTerminalHeatPump {
 
     struct PTUnitData
     {
+        int MaxSpedLevels = 10;
         // Members
         // input data
         int UnitType_Num;                // paramter equivalent to type of unit

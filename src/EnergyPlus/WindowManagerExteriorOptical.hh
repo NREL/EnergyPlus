@@ -88,6 +88,9 @@ class CMaterialSingleBand;
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace WindowManager {
 
     class CWCEIntegrator;

@@ -356,7 +356,7 @@ namespace HeatBalanceKivaManager {
 
     }
 
-    void KivaInstanceMap::setBoundaryConditions()
+    void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
     {
         std::shared_ptr<Kiva::BoundaryConditions> bcs = instance.bcs;
 
@@ -377,7 +377,7 @@ namespace HeatBalanceKivaManager {
                                DataHeatBalFanSys::QElecBaseboardSurf(floorSurface); // HVAC
 
         bcs->slabConvectiveTemp = DataHeatBalance::TempEffBulkAir(floorSurface) + DataGlobals::KelvinConv;
-        bcs->slabRadiantTemp = ThermalComfort::CalcSurfaceWeightedMRT(zoneNum, floorSurface) + DataGlobals::KelvinConv;
+        bcs->slabRadiantTemp = ThermalComfort::CalcSurfaceWeightedMRT(state, zoneNum, floorSurface) + DataGlobals::KelvinConv;
         bcs->gradeForcedTerm = kmPtr->surfaceConvMap[floorSurface].f;
         bcs->gradeConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
         bcs->slabConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].in;
@@ -397,7 +397,7 @@ namespace HeatBalanceKivaManager {
 
             Real64 &A = DataSurfaces::Surface(wl).Area;
 
-            Real64 Trad = ThermalComfort::CalcSurfaceWeightedMRT(zoneNum, wl);
+            Real64 Trad = ThermalComfort::CalcSurfaceWeightedMRT(state, zoneNum, wl);
             Real64 Tconv = DataHeatBalance::TempEffBulkAir(wl);
 
             QAtotal += Q * A;
@@ -646,7 +646,7 @@ namespace HeatBalanceKivaManager {
         readWeatherData(state);
 
         auto &Surfaces = DataSurfaces::Surface;
-        auto &Constructs = dataConstruction.Construct;
+        auto &Constructs = state.dataConstruction->Construct;
         auto &Materials = dataMaterial.Material;
 
         int inst = 0;
@@ -1061,7 +1061,7 @@ namespace HeatBalanceKivaManager {
             if (kv.constructionNum == 0) {
                 constructionName = "<Default Footing Wall Construction>";
             } else {
-                constructionName = dataConstruction.Construct(kv.constructionNum).Name;
+                constructionName = state.dataConstruction->Construct(kv.constructionNum).Name;
             }
 
             std::string wallSurfaceString = "";
@@ -1097,11 +1097,11 @@ namespace HeatBalanceKivaManager {
         calcKivaSurfaceResults();
     }
 
-    void KivaManager::calcKivaInstances()
+    void KivaManager::calcKivaInstances(EnergyPlusData &state)
     {
         // calculate heat transfer through ground
         for (auto &kv : kivaInstances) {
-            kv.setBoundaryConditions();
+            kv.setBoundaryConditions(state);
             kv.instance.calculate(timestep);
             kv.instance.calculate_surface_averages();
             if (DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 1 && DataGlobals::HourOfDay == 1 && DataGlobals::TimeStep == 1) {

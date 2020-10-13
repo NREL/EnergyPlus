@@ -122,8 +122,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
 
     // Construction
     surface.Construction = 1;
-    dataConstruction.Construct.allocate(1);
-    Construction::ConstructionProps &construction = dataConstruction.Construct(1);
+    state.dataConstruction->Construct.allocate(1);
+    Construction::ConstructionProps &construction = state.dataConstruction->Construct(1);
     construction.TotLayers = 1;
     construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", dataMaterial.Material);
 
@@ -248,8 +248,8 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
 
     // Construction
     surface.Construction = 1;
-    dataConstruction.Construct.allocate(1);
-    Construction::ConstructionProps &construction = dataConstruction.Construct(1);
+    state.dataConstruction->Construct.allocate(1);
+    Construction::ConstructionProps &construction = state.dataConstruction->Construct(1);
     construction.TotLayers = 1;
     construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", dataMaterial.Material);
 
@@ -340,8 +340,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     // Construction
     int constNum = 1;
     surface.Construction = constNum;
-    dataConstruction.Construct.allocate( constNum );
-    Construction::ConstructionProps &construction = dataConstruction.Construct( constNum );
+    state.dataConstruction->Construct.allocate( constNum );
+    Construction::ConstructionProps &construction = state.dataConstruction->Construct( constNum );
     construction.TotLayers = constNum;
     construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("WOOD", dataMaterial.Material);
 

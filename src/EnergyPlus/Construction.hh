@@ -60,7 +60,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct ConstructionData;
 
 namespace Construction {
 
@@ -312,7 +311,7 @@ namespace Construction {
             s0.allocate(3, 4);
         }
 
-        void calculateTransferFunction(bool & ErrorsFound, bool & DoCTFErrorReport);
+        void calculateTransferFunction(EnergyPlusData &state, bool & ErrorsFound, bool & DoCTFErrorReport);
 
         void calculateExponentialMatrix(); // Time step of the resulting CTFs
 
@@ -340,8 +339,6 @@ namespace Construction {
             this->Construct.deallocate();
         }
     };
-
-extern ConstructionData dataConstruction;
 
 }   // namespace EnergyPlus
 

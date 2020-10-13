@@ -978,7 +978,7 @@ namespace DataSurfaces {
 
         static Real64 getSWDiffuseIncident(const int t_SurfNum);
 
-        int getTotLayers() const;
+        int getTotLayers(EnergyPlusData &state) const;
 
         Real64 get_average_height() const;
 
