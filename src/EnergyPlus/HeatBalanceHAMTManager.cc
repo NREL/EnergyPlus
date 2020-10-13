@@ -120,9 +120,9 @@ namespace HeatBalanceHAMTManager {
     using DataHeatBalSurface::MaxSurfaceTempLimitBeforeFatal;
     using DataHeatBalSurface::MinSurfaceTempLimit;
     using DataHeatBalSurface::MinSurfaceTempLimitBeforeFatal;
-    using DataHeatBalSurface::NetLWRadToSurf;
-    using DataHeatBalSurface::QRadSWInAbs;
-    using DataHeatBalSurface::QRadSWOutAbs;
+    using DataHeatBalSurface::SurfNetLWRadToSurf;
+    using DataHeatBalSurface::SurfOpaqQRadSWInAbs;
+    using DataHeatBalSurface::SurfOpaqQRadSWOutAbs;
     using namespace DataHeatBalance;
     using namespace Psychrometrics;
     using DataEnvironment::IsRain;
@@ -1101,7 +1101,7 @@ namespace HeatBalanceHAMTManager {
         // na
 
         // Using/Aliasing
-        using DataHeatBalSurface::QAdditionalHeatSourceInside;
+        using DataHeatBalSurface::SurfQAdditionalHeatSourceInside;
         using DataSurfaces::OSCM;
         using DataSurfaces::OtherSideCondModeledExt;
         using General::RoundSigDigits;
@@ -1201,7 +1201,7 @@ namespace HeatBalanceHAMTManager {
         } else {
             cells(ExtSkycell(sid)).temp = SkyTemp;
 
-            cells(Extcell(sid)).Qadds = Surface(sid).Area * QRadSWOutAbs(sid);
+            cells(Extcell(sid)).Qadds = Surface(sid).Area * SurfOpaqQRadSWOutAbs(sid);
         }
 
         cells(ExtGrncell(sid)).temp = TempOutsideAirFD(sid);
@@ -1225,8 +1225,8 @@ namespace HeatBalanceHAMTManager {
         cells(IntConcell(sid)).htc = HConvInFD(sid);
 
         cells(Intcell(sid)).Qadds =
-            Surface(sid).Area * (QRadSWInAbs(sid) + NetLWRadToSurf(sid) + QHTRadSysSurf(sid) + QCoolingPanelSurf(sid) + QHWBaseboardSurf(sid) +
-                                 QSteamBaseboardSurf(sid) + QElecBaseboardSurf(sid) + QRadThermInAbs(sid) + QAdditionalHeatSourceInside(sid));
+            Surface(sid).Area * (SurfOpaqQRadSWInAbs(sid) + SurfNetLWRadToSurf(sid) + QHTRadSysSurf(sid) + QCoolingPanelSurf(sid) + QHWBaseboardSurf(sid) +
+                                 QSteamBaseboardSurf(sid) + QElecBaseboardSurf(sid) + SurfQRadThermInAbs(sid) + SurfQAdditionalHeatSourceInside(sid));
         // Check, Is this per unit area or for the whole wall.
         //    cells(Intcell(sid))%Qadds=QRadSWInAbs(sid)+NetLWRadToSurf(sid)+QHtRadSysSurf(sid)+QRadThermInAbs(sid)
 
