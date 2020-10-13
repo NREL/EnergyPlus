@@ -45,6 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// C++ Headers
+#include <map>
+
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -53,50 +56,21 @@ namespace EnergyPlus {
 
 namespace DataGlobalConstants {
 
-    // Module containing the data constants for components, meters, etc throughout
-    // EnergyPlus
-
-    // MODULE INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   June 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS MODULE:
-    // Provide a central storage place for various constants and their "integer equivalents"
-    // used throughout EnergyPlus.  Integer equivalents are needed for efficiency in run time.
-
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // End Use Parameters
-    int const NumEndUses(14);
-
-    int const endUseHeating(1);
-    int const endUseCooling(2);
-    int const endUseInteriorLights(3);
-    int const endUseExteriorLights(4);
-    int const endUseInteriorEquipment(5);
-    int const endUseExteriorEquipment(6);
-    int const endUseFans(7);
-    int const endUsePumps(8);
-    int const endUseHeatRejection(9);
-    int const endUseHumidification(10);
-    int const endUseHeatRecovery(11);
-    int const endUseWaterSystem(12);
-    int const endUseRefrigeration(13);
-    int const endUseCogeneration(14);
+    std::map<EndUse, int> iEndUse = {{EndUse::Heating, 1},
+                                     {EndUse::Cooling, 2},
+                                     {EndUse::InteriorLights, 3},
+                                     {EndUse::ExteriorLights, 4},
+                                     {EndUse::InteriorEquipment, 5},
+                                     {EndUse::ExteriorEquipment, 6},
+                                     {EndUse::Fans, 7},
+                                     {EndUse::Pumps, 8},
+                                     {EndUse::HeatRejection, 9},
+                                     {EndUse::Humidification, 10},
+                                     {EndUse::HeatRecovery, 11},
+                                     {EndUse::WaterSystem, 12},
+                                     {EndUse::Refrigeration, 13},
+                                     {EndUse::Cogeneration, 14},
+                                    };
 
     std::vector<ResourceType> AllResourceTypes({ResourceType::None,
                                                 ResourceType::Electricity,

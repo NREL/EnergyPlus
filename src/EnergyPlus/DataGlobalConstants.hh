@@ -48,8 +48,8 @@
 #ifndef DataGlobalConstants_hh_INCLUDED
 #define DataGlobalConstants_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
+// C++ Headers
+#include <map>
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
@@ -58,27 +58,23 @@ namespace EnergyPlus {
 
 namespace DataGlobalConstants {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // End Use Parameters
-    extern int const NumEndUses;
+    enum class EndUse {
+        Heating,
+        Cooling,
+        InteriorLights,
+        ExteriorLights,
+        InteriorEquipment,
+        ExteriorEquipment,
+        Fans,
+        Pumps,
+        HeatRejection,
+        Humidification,
+        HeatRecovery,
+        WaterSystem,
+        Refrigeration,
+        Cogeneration
+    };
 
-    extern int const endUseHeating;
-    extern int const endUseCooling;
-    extern int const endUseInteriorLights;
-    extern int const endUseExteriorLights;
-    extern int const endUseInteriorEquipment;
-    extern int const endUseExteriorEquipment;
-    extern int const endUseFans;
-    extern int const endUsePumps;
-    extern int const endUseHeatRejection;
-    extern int const endUseHumidification;
-    extern int const endUseHeatRecovery;
-    extern int const endUseWaterSystem;
-    extern int const endUseRefrigeration;
-    extern int const endUseCogeneration;
-
-    // Resource Types
     enum class ResourceType {
         None,
         Electricity,
@@ -129,8 +125,6 @@ namespace DataGlobalConstants {
         OtherFuel2
     };
 
-    extern std::vector<ResourceType> AllResourceTypes;
-
     enum class CallIndicator {
         BeginDay,
         DuringDay,
@@ -175,6 +169,9 @@ namespace DataGlobalConstants {
 
     ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar);
     std::string GetResourceTypeChar(ResourceType ResourceTypeNum);
+
+    extern std::vector<ResourceType> AllResourceTypes;
+    extern std::map<EndUse, int> iEndUse;
 
 } // namespace DataGlobalConstants
 

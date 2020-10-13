@@ -461,37 +461,37 @@ namespace OutputProcessor {
         NumExtraVars = 0;
 
         // Initialize end use category names - the indices must match up with endUseNames in OutputReportTabular
-        EndUseCategory.allocate(NumEndUses);
-        EndUseCategory(endUseHeating).Name = "Heating";
-        EndUseCategory(endUseCooling).Name = "Cooling";
-        EndUseCategory(endUseInteriorLights).Name = "InteriorLights";
-        EndUseCategory(endUseExteriorLights).Name = "ExteriorLights";
-        EndUseCategory(endUseInteriorEquipment).Name = "InteriorEquipment";
-        EndUseCategory(endUseExteriorEquipment).Name = "ExteriorEquipment";
-        EndUseCategory(endUseFans).Name = "Fans";
-        EndUseCategory(endUsePumps).Name = "Pumps";
-        EndUseCategory(endUseHeatRejection).Name = "HeatRejection";
-        EndUseCategory(endUseHumidification).Name = "Humidifier";
-        EndUseCategory(endUseHeatRecovery).Name = "HeatRecovery";
-        EndUseCategory(endUseWaterSystem).Name = "WaterSystems";
-        EndUseCategory(endUseRefrigeration).Name = "Refrigeration";
-        EndUseCategory(endUseCogeneration).Name = "Cogeneration";
+        EndUseCategory.allocate(DataGlobalConstants::iEndUse.size());
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)).Name = "Heating";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling)).Name = "Cooling";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)).Name = "InteriorLights";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)).Name = "ExteriorLights";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)).Name = "InteriorEquipment";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)).Name = "ExteriorEquipment";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans)).Name = "Fans";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps)).Name = "Pumps";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)).Name = "HeatRejection";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification)).Name = "Humidifier";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)).Name = "HeatRecovery";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem)).Name = "WaterSystems";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration)).Name = "Refrigeration";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)).Name = "Cogeneration";
 
         // Initialize display names for output table - this could go away if end use key names are changed to match
-        EndUseCategory(endUseHeating).DisplayName = "Heating";
-        EndUseCategory(endUseCooling).DisplayName = "Cooling";
-        EndUseCategory(endUseInteriorLights).DisplayName = "Interior Lighting";
-        EndUseCategory(endUseExteriorLights).DisplayName = "Exterior Lighting";
-        EndUseCategory(endUseInteriorEquipment).DisplayName = "Interior Equipment";
-        EndUseCategory(endUseExteriorEquipment).DisplayName = "Exterior Equipment";
-        EndUseCategory(endUseFans).DisplayName = "Fans";
-        EndUseCategory(endUsePumps).DisplayName = "Pumps";
-        EndUseCategory(endUseHeatRejection).DisplayName = "Heat Rejection";
-        EndUseCategory(endUseHumidification).DisplayName = "Humidification";
-        EndUseCategory(endUseHeatRecovery).DisplayName = "Heat Recovery";
-        EndUseCategory(endUseWaterSystem).DisplayName = "Water Systems";
-        EndUseCategory(endUseRefrigeration).DisplayName = "Refrigeration";
-        EndUseCategory(endUseCogeneration).DisplayName = "Generators";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)).DisplayName = "Heating";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling)).DisplayName = "Cooling";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)).DisplayName = "Interior Lighting";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)).DisplayName = "Exterior Lighting";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)).DisplayName = "Interior Equipment";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)).DisplayName = "Exterior Equipment";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans)).DisplayName = "Fans";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps)).DisplayName = "Pumps";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)).DisplayName = "Heat Rejection";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification)).DisplayName = "Humidification";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)).DisplayName = "Heat Recovery";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem)).DisplayName = "Water Systems";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration)).DisplayName = "Refrigeration";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)).DisplayName = "Generators";
 
         OutputInitialized = true;
 
@@ -3955,12 +3955,11 @@ namespace OutputProcessor {
         // This subroutine manages the list of subcategories for each end-use category.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int EndUseNum;
         int EndUseSubNum;
         int NumSubs;
 
         bool Found = false;
-        for (EndUseNum = 1; EndUseNum <= NumEndUses; ++EndUseNum) {
+        for (size_t EndUseNum = 1; EndUseNum <= DataGlobalConstants::iEndUse.size(); ++EndUseNum) {
             if (UtilityRoutines::SameString(EndUseCategory(EndUseNum).Name, EndUseName)) {
 
                 for (EndUseSubNum = 1; EndUseSubNum <= EndUseCategory(EndUseNum).NumSubcategories; ++EndUseSubNum) {
