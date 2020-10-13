@@ -69,14 +69,20 @@
 // Need a fallback
 #endif
 
+// EnergyPlus Headers
+#include <EnergyPlus/EnergyPlus.hh>
+
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace AirflowNetwork {
 
     extern int lowerLimitErrIdx;
     extern int upperLimitErrIdx;
 
-    Real64 airThermConductivity(Real64 T // Temperature in Celsius
+    Real64 airThermConductivity(EnergyPlusData &state, Real64 T // Temperature in Celsius
     );
 
     Real64 airDynamicVisc(Real64 T // Temperature in Celsius
@@ -87,12 +93,12 @@ namespace AirflowNetwork {
                             Real64 P  // Barometric pressure
     );
 
-    Real64 airThermalDiffusivity(Real64 T, // Temperature in Celsius
+    Real64 airThermalDiffusivity(EnergyPlusData &state, Real64 T, // Temperature in Celsius
                                  Real64 W, // Humidity ratio
                                  Real64 P  // Barometric pressure
     );
 
-    Real64 airPrandtl(Real64 T, // Temperature in Celsius
+    Real64 airPrandtl(EnergyPlusData &state, Real64 T, // Temperature in Celsius
                       Real64 W, // Humidity ratio
                       Real64 P  // Barometric pressure
     );

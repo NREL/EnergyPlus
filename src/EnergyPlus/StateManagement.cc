@@ -392,7 +392,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     ThermalChimney::clear_state();
     ThermalComfort::clear_state();
     TranspiredCollector::clear_state();
-    UtilityRoutines::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();
 }

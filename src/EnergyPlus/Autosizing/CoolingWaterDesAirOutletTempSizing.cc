@@ -104,17 +104,17 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                 ShowWarningError(msg);
                 msg = "    Tair,out  =  " + General::RoundSigDigits(this->autoSizedValue, 3);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "    Twater,in = " + General::RoundSigDigits(this->dataDesInletWaterTemp, 3);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 this->autoSizedValue = this->dataDesInletWaterTemp + 0.5;
                 msg = "....coil leaving air temperature will be reset to:";
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "    Tair,out = " + General::RoundSigDigits(this->autoSizedValue, 3);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
             }
         }
     } else if (this->curSysNum > 0) {
@@ -160,14 +160,14 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                 this->addErrorMessage(msg);
                 ShowWarningError(msg);
                 msg = "    Tair,out  =  " + General::RoundSigDigits(this->autoSizedValue, 3);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "    Twater,in = " + General::RoundSigDigits(this->dataDesInletWaterTemp, 3);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 this->autoSizedValue = this->dataDesInletWaterTemp + 0.5;
                 msg = "....coil leaving air temperature will be reset to:";
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "    Tair,out = " + General::RoundSigDigits(this->autoSizedValue, 3);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
             }
         }
     }

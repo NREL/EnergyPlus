@@ -53,7 +53,7 @@
 
 namespace EnergyPlus {
 
-Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalValue, bool &errorsFound)
+Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -101,13 +101,13 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &EP_UNUSED(state
             std::string msg =
                 this->callingRoutine + ":" + " Coil=\"" + this->compName + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.";
             this->addErrorMessage(msg);
-            ShowWarningError(msg);
+            ShowWarningError(state, msg);
             msg = "    Wair,in =  " + General::RoundSigDigits(this->dataDesInletAirHumRat, 6) + " [kgWater/kgDryAir]";
             this->addErrorMessage(msg);
-            ShowContinueError(msg);
+            ShowContinueError(state, msg);
             msg = "    Wair,out = " + General::RoundSigDigits(this->autoSizedValue, 6) + " [kgWater/kgDryAir]";
             this->addErrorMessage(msg);
-            ShowContinueError(msg);
+            ShowContinueError(state, msg);
             if (this->dataDesInletAirHumRat > 0.016) {
                 this->autoSizedValue = 0.5 * this->dataDesInletAirHumRat;
             } else {
@@ -115,10 +115,10 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &EP_UNUSED(state
             }
             msg = "....coil leaving humidity ratio will be reset to:";
             this->addErrorMessage(msg);
-            ShowContinueError(msg);
+            ShowContinueError(state, msg);
             msg = "    Wair,out = " + General::RoundSigDigits(this->autoSizedValue, 6) + " [kgWater/kgDryAir]";
             this->addErrorMessage(msg);
-            ShowContinueError(msg);
+            ShowContinueError(state, msg);
         }
         // check for dry coil and reset outlet humrat if needed
         Real64 desSatEnthAtWaterInTemp = Psychrometrics::PsyHFnTdbW(
@@ -132,27 +132,27 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &EP_UNUSED(state
                                   "\", Cooling Coil is running dry for sizing and has minimum humidity ratio at saturation for inlet chilled water "
                                   "temperature > design air entering humidity ratio.";
                 this->addErrorMessage(msg);
-                ShowWarningError(msg);
+                ShowWarningError(state, msg);
                 msg = "    Wair,in =  " + General::RoundSigDigits(this->dataDesInletAirHumRat, 6) + " [kgWater/kgDryAir]";
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "    Wair,out = " + General::RoundSigDigits(this->autoSizedValue, 6) + " [kgWater/kgDryAir]";
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "    Inlet chilled water temperature = " + General::RoundSigDigits(this->dataDesInletWaterTemp, 3) + " [C]";
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "    Minimum humidity ratio at saturation for inlet chilled water temperature = " +
                       General::RoundSigDigits(desHumRatAtWaterInTemp, 6) + " [kgWater/kgDryAir]";
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 this->autoSizedValue = this->dataDesInletAirHumRat;
                 msg = "....coil leaving humidity ratio will be reset to:";
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "    Wair,out = " + General::RoundSigDigits(this->autoSizedValue, 6) + " [kgWater/kgDryAir]";
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
             }
         }
     }

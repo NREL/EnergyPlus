@@ -717,7 +717,7 @@ namespace AirflowNetwork {
 //            }
             // Solve linear system for approximate PZ.
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-            FACSKY(newAU, AD, newAU, newIK, NetworkNumOfNodes, NSYM);     // noel
+            FACSKY(state, newAU, AD, newAU, newIK, NetworkNumOfNodes, NSYM);     // noel
             SLVSKY(newAU, AD, newAU, PZ, newIK, NetworkNumOfNodes, NSYM); // noel
 #else
             FACSKY(AU, AD, AU, IK, NetworkNumOfNodes, NSYM);
@@ -766,7 +766,7 @@ namespace AirflowNetwork {
                 CCF(n) = SUMF(n);
             }
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-            FACSKY(newAU, AD, newAU, newIK, NetworkNumOfNodes, NSYM);      // noel
+            FACSKY(state, newAU, AD, newAU, newIK, NetworkNumOfNodes, NSYM);      // noel
             SLVSKY(newAU, AD, newAU, CCF, newIK, NetworkNumOfNodes, NSYM); // noel
 #else
             FACSKY(AU, AD, AU, IK, NetworkNumOfNodes, NSYM);
@@ -809,14 +809,14 @@ namespace AirflowNetwork {
         }
 
         // Error termination.
-        ShowSevereError("Too many iterations (SOLVZP) in Airflow Network simulation");
+        ShowSevereError(state, "Too many iterations (SOLVZP) in Airflow Network simulation");
         ++AirflowNetworkSimu.ExtLargeOpeningErrCount;
         if (AirflowNetworkSimu.ExtLargeOpeningErrCount < 2) {
-            ShowWarningError("AirflowNetwork: SOLVER, Changing values for initialization flag, Relative airflow convergence, Absolute airflow "
+            ShowWarningError(state, "AirflowNetwork: SOLVER, Changing values for initialization flag, Relative airflow convergence, Absolute airflow "
                              "convergence, Convergence acceleration limit or Maximum Iteration Number may solve the problem.");
-            ShowContinueErrorTimeStamp("");
-            ShowContinueError("..Iterations=" + std::to_string(ITER) + ", Max allowed=" + std::to_string(AirflowNetworkSimu.MaxIteration));
-            ShowFatalError("AirflowNetwork: SOLVER, The previous error causes termination.");
+            ShowContinueErrorTimeStamp(state, "");
+            ShowContinueError(state, "..Iterations=" + std::to_string(ITER) + ", Max allowed=" + std::to_string(AirflowNetworkSimu.MaxIteration));
+            ShowFatalError(state, "AirflowNetwork: SOLVER, The previous error causes termination.");
         } else {
             ShowRecurringWarningErrorAtEnd("AirFlowNetwork: Too many iterations (SOLVZP) in AirflowNetwork simulation continues.",
                                            AirflowNetworkSimu.ExtLargeOpeningErrIndex);
@@ -1304,7 +1304,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    void FACSKY(Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
+    void FACSKY(EnergyPlusData &state, Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
                 Array1D<Real64> &AD,   // the main diagonal of [A] before and after factoring
                 Array1D<Real64> &AL,   // the lower triangle of [A] before and after factoring
                 const Array1D_int &IK, // pointer to the top of column/row "K"
@@ -1438,15 +1438,15 @@ namespace AirflowNetwork {
                 }
             }
             if (AD(k) - SUMD == 0.0) {
-                ShowSevereError("AirflowNetworkSolver: L-U factorization in Subroutine FACSKY.");
-                ShowContinueError("The denominator used in L-U factorizationis equal to 0.0 at node = " + AirflowNetworkNodeData(k).Name + '.');
-                ShowContinueError(
+                ShowSevereError(state, "AirflowNetworkSolver: L-U factorization in Subroutine FACSKY.");
+                ShowContinueError(state, "The denominator used in L-U factorizationis equal to 0.0 at node = " + AirflowNetworkNodeData(k).Name + '.');
+                ShowContinueError(state, 
                     "One possible cause is that this node may not be connected directly, or indirectly via airflow network connections ");
-                ShowContinueError(
+                ShowContinueError(state, 
                     "(e.g., AirflowNetwork:Multizone:SurfaceCrack, AirflowNetwork:Multizone:Component:SimpleOpening, etc.), to an external");
-                ShowContinueError("node (AirflowNetwork:MultiZone:Surface).");
-                ShowContinueError("Please send your input file and weather file to EnergyPlus support/development team for further investigation.");
-                ShowFatalError("Preceding condition causes termination.");
+                ShowContinueError(state, "node (AirflowNetwork:MultiZone:Surface).");
+                ShowContinueError(state, "Please send your input file and weather file to EnergyPlus support/development team for further investigation.");
+                ShowFatalError(state, "Preceding condition causes termination.");
             }
             AD(k) = 1.0 / (AD(k) - SUMD);
             JHK = JHK1;

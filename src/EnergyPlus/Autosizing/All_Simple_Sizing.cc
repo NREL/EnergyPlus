@@ -147,7 +147,7 @@ Real64 ZoneHeatingLoadSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _orig
     return this->autoSizedValue;
 }
 
-Real64 ASHRAEMinSATCoolingSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalValue, bool &errorsFound)
+Real64 ASHRAEMinSATCoolingSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -167,14 +167,14 @@ Real64 ASHRAEMinSATCoolingSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _
                 std::string msg =
                     this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
                 this->addErrorMessage(msg);
-                ShowSevereError(msg);
+                ShowSevereError(state, msg);
                 msg = "SizingString = " + this->sizingString +
                       ", DataCapacityUsedForSizing = " + General::TrimSigDigits(this->dataCapacityUsedForSizing, 1);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "SizingString = " + this->sizingString + ", DataFlowUsedForSizing = " + General::TrimSigDigits(this->dataFlowUsedForSizing, 1);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
             }
         }
     } else if (this->curSysNum > 0) {
@@ -191,17 +191,17 @@ Real64 ASHRAEMinSATCoolingSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _
                 std::string msg =
                     this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
                 this->addErrorMessage(msg);
-                ShowSevereError(msg);
+                ShowSevereError(state, msg);
                 msg = "SizingString = " + this->sizingString +
                       ", DataCapacityUsedForSizing = " + General::TrimSigDigits(this->dataCapacityUsedForSizing, 1);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "SizingString = " + this->sizingString + ", DataFlowUsedForSizing = " + General::TrimSigDigits(this->dataFlowUsedForSizing, 1);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "SizingString = " + this->sizingString +
                       ", DataZoneUsedForSizing = " + General::TrimSigDigits(Real64(this->dataZoneUsedForSizing), 0);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
             }
         }
     }
@@ -209,7 +209,7 @@ Real64 ASHRAEMinSATCoolingSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _
     return this->autoSizedValue;
 }
 
-Real64 ASHRAEMaxSATHeatingSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalValue, bool &errorsFound)
+Real64 ASHRAEMaxSATHeatingSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -229,14 +229,14 @@ Real64 ASHRAEMaxSATHeatingSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _
                 std::string msg =
                     this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
                 this->addErrorMessage(msg);
-                ShowSevereError(msg);
+                ShowSevereError(state, msg);
                 msg = "SizingString = " + this->sizingString +
                       ", DataCapacityUsedForSizing = " + General::TrimSigDigits(this->dataCapacityUsedForSizing, 1);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "SizingString = " + this->sizingString + ", DataFlowUsedForSizing = " + General::TrimSigDigits(this->dataFlowUsedForSizing, 1);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
             }
         }
     } else if (this->curSysNum > 0) {
@@ -253,17 +253,17 @@ Real64 ASHRAEMaxSATHeatingSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _
                 std::string msg =
                     this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
                 this->addErrorMessage(msg);
-                ShowSevereError(msg);
+                ShowSevereError(state, msg);
                 msg = "SizingString = " + this->sizingString +
                       ", DataCapacityUsedForSizing = " + General::TrimSigDigits(this->dataCapacityUsedForSizing, 1);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "SizingString = " + this->sizingString + ", DataFlowUsedForSizing = " + General::TrimSigDigits(this->dataFlowUsedForSizing, 1);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "SizingString = " + this->sizingString +
                       ", DataZoneUsedForSizing = " + General::TrimSigDigits(Real64(this->dataZoneUsedForSizing), 0);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
             }
         }
     }
