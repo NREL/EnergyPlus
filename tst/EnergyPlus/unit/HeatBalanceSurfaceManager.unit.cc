@@ -2647,13 +2647,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataHeatBalance::People(1).NumberOfPeoplePtr = 1;
     ScheduleManager::Schedule.allocate(1);
 
-    EnergyPlus::ThermalComfort::ThermalComfortData.allocate(DataHeatBalance::TotPeople);
+    state.dataThermalComforts->ThermalComfortData.allocate(DataHeatBalance::TotPeople);
     DataHeatBalFanSys::ZoneOccPierceSET.dimension(NumOfZones, 0);
     DataHeatBalFanSys::ZoneOccPierceSETLastStep.dimension(NumOfZones, 0);
     DataHeatBalFanSys::ZoneLowSETHours.allocate(NumOfZones);
     DataHeatBalFanSys::ZoneHighSETHours.allocate(NumOfZones);
 
-    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 31;
+    state.dataThermalComforts->ThermalComfortData(1).PierceSET = 31;
     ScheduleManager::Schedule(1).CurrentValue = 0;
 
     // Heat Index Case 1: Zone T < 80 F;
@@ -2661,7 +2661,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataHeatBalFanSys::ZTAV(1) = 25;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.00988; // RH = 50%
     CalcThermalResilience(state);
-    ReportThermalResilience();
+    ReportThermalResilience(state);
     EXPECT_NEAR(25, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(28, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
@@ -2670,7 +2670,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataHeatBalFanSys::ZTAV(1) = 27;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.02035; // RH = 90%
     CalcThermalResilience(state);
-    ReportThermalResilience();
+    ReportThermalResilience(state);
     EXPECT_NEAR(31, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(39, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
@@ -2679,7 +2679,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataHeatBalFanSys::ZTAV(1) = 27;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.0022; // RH = 10%
     CalcThermalResilience(state);
-    ReportThermalResilience();
+    ReportThermalResilience(state);
     EXPECT_NEAR(26, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(23, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
@@ -2688,7 +2688,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataHeatBalFanSys::ZTAV(1) = 30;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.01604; // RH = 60%
     CalcThermalResilience(state);
-    ReportThermalResilience();
+    ReportThermalResilience(state);
     EXPECT_NEAR(33, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
     EXPECT_NEAR(38, DataHeatBalFanSys::ZoneHumidex(1), 1);
 
@@ -2707,40 +2707,40 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_EQ(0, DataHeatBalFanSys::ZoneHighSETHours(1)[0]); // SET Hours
     EXPECT_EQ(0, DataHeatBalFanSys::ZoneHighSETHours(1)[1]); // SET OccupantHours
 
-    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 11.2;
+    state.dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
     ScheduleManager::Schedule(1).CurrentValue = 1;
     for (int hour = 5; hour <= 7; hour++) {
         DataGlobals::HourOfDay = hour;
 //        CalcThermalResilience(state);
-        ReportThermalResilience();
+        ReportThermalResilience(state);
     }
     // Test SET-hours calculation - Heating unmet
     EXPECT_EQ(3, DataHeatBalFanSys::ZoneLowSETHours(1)[0]); // SET Hours = (12.2 - 11.2) * 3 Hours
     EXPECT_EQ(6, DataHeatBalFanSys::ZoneLowSETHours(1)[1]); // SET OccupantHours = (12.2 - 11.2) * 3 Hours * 2 OCC
 
-    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 32;
+    state.dataThermalComforts->ThermalComfortData(1).PierceSET = 32;
     for (int hour = 8; hour <= 10; hour++) {
         DataGlobals::HourOfDay = hour;
-        ReportThermalResilience();
+        ReportThermalResilience(state);
     }
     // Test SET-hours calculation - Cooling unmet
     EXPECT_EQ(6, DataHeatBalFanSys::ZoneHighSETHours(1)[0]); // SET Hours = (32 - 30) * 3 Hours
     EXPECT_EQ(12, DataHeatBalFanSys::ZoneHighSETHours(1)[1]); // SET OccupantHours = (32 - 30) * 3 Hours * 2 OCC
 
-    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 25;
+    state.dataThermalComforts->ThermalComfortData(1).PierceSET = 25;
     for (int hour = 11; hour <= 12; hour++) {
         DataGlobals::HourOfDay = hour;
-        ReportThermalResilience();
+        ReportThermalResilience(state);
     }
-    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 11.2;
+    state.dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
     for (int hour = 13; hour <= 18; hour++) {
         DataGlobals::HourOfDay = hour;
-        ReportThermalResilience();
+        ReportThermalResilience(state);
     }
     ScheduleManager::Schedule(1).CurrentValue = 0;
     for (int hour = 18; hour <= 20; hour++) {
         DataGlobals::HourOfDay = hour;
-        ReportThermalResilience();
+        ReportThermalResilience(state);
     }
 
     // Test SET longest duration calculation

@@ -479,7 +479,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     DataHeatBalance::Zone(1).WindSpeed = 5.0;
 
     SystemAvailabilityManager::HybridVentSysAvailMgrData(1).ControlMode = 5; // 80% acceptance
-    ThermalComfort::runningAverageASH = 20.0;
+    state.dataThermalComforts->runningAverageASH = 20.0;
     DataHeatBalFanSys::MAT(1) = 23.0;
     DataHeatBalance::MRT(1) = 27.0;
 

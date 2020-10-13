@@ -4920,7 +4920,6 @@ namespace SystemAvailabilityManager {
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTdpFnWPb;
         using Psychrometrics::PsyWFnTdbRhPb;
-        using ThermalComfort::runningAverageASH;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5037,10 +5036,10 @@ namespace SystemAvailabilityManager {
                     }
 
                 } else if (SELECT_CASE_var == HybridVentMode_OperT80) {
-                    if (runningAverageASH >= 10.0 && runningAverageASH <= 33.5) {
+                    if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
                         HybridVentSysAvailMgrData(SysAvailNum).OperativeTemp = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
-                        minAdaTem = 0.31 * runningAverageASH + 14.3;
-                        maxAdaTem = 0.31 * runningAverageASH + 21.3;
+                        minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 14.3;
+                        maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 21.3;
                         HybridVentSysAvailMgrData(SysAvailNum).minAdaTem = minAdaTem;
                         HybridVentSysAvailMgrData(SysAvailNum).maxAdaTem = maxAdaTem;
                         if (HybridVentSysAvailMgrData(SysAvailNum).OperativeTemp <= maxAdaTem &&
@@ -5054,10 +5053,10 @@ namespace SystemAvailabilityManager {
                     }
 
                 } else if (SELECT_CASE_var == HybridVentMode_OperT90) {
-                    if (runningAverageASH >= 10.0 && runningAverageASH <= 33.5) {
+                    if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
                         HybridVentSysAvailMgrData(SysAvailNum).OperativeTemp = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
-                        minAdaTem = 0.31 * runningAverageASH + 15.3;
-                        maxAdaTem = 0.31 * runningAverageASH + 20.3;
+                        minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 15.3;
+                        maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 20.3;
                         HybridVentSysAvailMgrData(SysAvailNum).minAdaTem = minAdaTem;
                         HybridVentSysAvailMgrData(SysAvailNum).maxAdaTem = maxAdaTem;
                         if (HybridVentSysAvailMgrData(SysAvailNum).OperativeTemp <= maxAdaTem &&

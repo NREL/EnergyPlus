@@ -311,7 +311,7 @@ namespace HeatBalanceSurfaceManager {
         CalcThermalResilience(state);
 
         if (OutputReportTabular::displayThermalResilienceSummary) {
-            ReportThermalResilience();
+            ReportThermalResilience(state);
         }
 
         if (OutputReportTabular::displayCO2ResilienceSummary) {
@@ -5248,7 +5248,7 @@ namespace HeatBalanceSurfaceManager {
         }
     }
 
-    void ReportThermalResilience() {
+    void ReportThermalResilience(EnergyPlusData &state) {
 
         int HINoBins = 5; // Heat Index range - number of bins
         int HumidexNoBins = 5; // Humidex range - number of bins
@@ -5288,7 +5288,7 @@ namespace HeatBalanceSurfaceManager {
                 ZoneOccPierceSETLastStep(ZoneNum) = ZoneOccPierceSET(ZoneNum);
                 if (ZoneNumOcc(ZoneNum) > 0) {
                     if (People(iPeople).Pierce) {
-                        ZoneOccPierceSET(ZoneNum) = ThermalComfort::ThermalComfortData(iPeople).PierceSET;
+                        ZoneOccPierceSET(ZoneNum) = state.dataThermalComforts->ThermalComfortData(iPeople).PierceSET;
                     } else {
                         ZoneOccPierceSET(ZoneNum) = -1;
                     }

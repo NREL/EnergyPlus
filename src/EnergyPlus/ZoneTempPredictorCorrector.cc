@@ -6794,7 +6794,6 @@ namespace ZoneTempPredictorCorrector {
         bool isAnyZoneOscillatingDuringOccupancy;
         bool isAnyZoneOscillatingInDeadband;
 
-        using ThermalComfort::ThermalComfortInASH55;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
 
         // first time run allocate arrays and setup output variable
@@ -6870,8 +6869,8 @@ namespace ZoneTempPredictorCorrector {
                 if (isOscillate) {
                     state.dataZoneTempPredictorCorrector->ZoneTempOscillate(iZone) = TimeStepSys;
                     isAnyZoneOscillating = true;
-                    if (allocated(ThermalComfortInASH55)) {
-                        if (ThermalComfortInASH55(iZone).ZoneIsOccupied) {
+                    if (allocated(state.dataThermalComforts->ThermalComfortInASH55)) {
+                        if (state.dataThermalComforts->ThermalComfortInASH55(iZone).ZoneIsOccupied) {
                             state.dataZoneTempPredictorCorrector->ZoneTempOscillateDuringOccupancy(iZone) = TimeStepSys;
                             isAnyZoneOscillatingDuringOccupancy = true;
                         }

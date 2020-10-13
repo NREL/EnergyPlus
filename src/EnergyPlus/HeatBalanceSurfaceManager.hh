@@ -136,7 +136,7 @@ namespace HeatBalanceSurfaceManager {
 
     void CalcThermalResilience(EnergyPlusData &state);
 
-    void ReportThermalResilience();
+    void ReportThermalResilience(EnergyPlusData &state);
 
     void ReportCO2Resilience();
 
