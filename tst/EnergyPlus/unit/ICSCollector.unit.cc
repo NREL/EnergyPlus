@@ -109,9 +109,9 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Surface(SurfNum).ExtConvCoeff = 0;
     Surface(SurfNum).ExtWind = false;
     // allocate construction variable data
-    dataConstruction.Construct.allocate(ConstrNum);
-    dataConstruction.Construct(ConstrNum).LayerPoint.allocate(MatNum);
-    dataConstruction.Construct(ConstrNum).LayerPoint(MatNum) = 1;
+    state.dataConstruction->Construct.allocate(ConstrNum);
+    state.dataConstruction->Construct(ConstrNum).LayerPoint.allocate(MatNum);
+    state.dataConstruction->Construct(ConstrNum).LayerPoint(MatNum) = 1;
     dataMaterial.Material.allocate(MatNum);
     dataMaterial.Material(MatNum).AbsorpThermal = 0.8;
     // allocate exterior vented cavaity variable data
@@ -125,8 +125,8 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     TH.allocate(NumOfSurf, 1, 2);
     TH(SurfNum, 1, 1) = 22.0;
     // allocate solar incident radiation variable data
-    QRadSWOutIncident.allocate(1);
-    QRadSWOutIncident(1) = 0.0;
+    SurfQRadSWOutIncident.allocate(1);
+    SurfQRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
     state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
 
@@ -152,7 +152,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Real64 VdotBouyRpt;          // gap buoyancy driven volume flow rate [m3/s]
 
     // call to test fix to resolve crash
-    CalcPassiveExteriorBaffleGap(state, state.files, ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs,
+    CalcPassiveExteriorBaffleGap(state, ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs,
                                  AbsExt, Tilt, AspRat, GapThick, Roughness, QdotSource, TsBaffle, TaGap, HcGapRpt, HrGapRpt, IscRpt,
                                  MdotVentRpt, VdotWindRpt, VdotBouyRpt);
 
@@ -163,12 +163,12 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
 
     // deallocated variables
     Surface.deallocate();
-    dataConstruction.Construct(ConstrNum).LayerPoint.deallocate();
-    dataConstruction.Construct.deallocate();
+    state.dataConstruction->Construct(ConstrNum).LayerPoint.deallocate();
+    state.dataConstruction->Construct.deallocate();
     dataMaterial.Material.deallocate();
     ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
     ExtVentedCavity.deallocate();
     Zone.deallocate();
     TH.deallocate();
-    QRadSWOutIncident.deallocate();
+    SurfQRadSWOutIncident.deallocate();
 }

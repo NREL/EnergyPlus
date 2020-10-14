@@ -133,11 +133,11 @@ namespace DataPlant {
         }
 
 
-        void UpdateLoopSideReportVars(Real64 OtherSideDemand, Real64 LocalRemLoopDemand);
+        void UpdateLoopSideReportVars(EnergyPlusData &state, Real64 OtherSideDemand, Real64 LocalRemLoopDemand);
 
         void CheckLoopExitNode(bool FirstHVACIteration);
 
-        void CalcUnmetPlantDemand();
+        void CalcUnmetPlantDemand(EnergyPlusData &state);
 
     };
 } // namespace DataPlant

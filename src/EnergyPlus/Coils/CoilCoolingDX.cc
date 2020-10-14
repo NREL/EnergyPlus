@@ -51,7 +51,6 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -69,9 +68,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/WaterManager.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/HVACFan.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
@@ -83,7 +80,7 @@ namespace EnergyPlus {
     std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
 }
 
-int CoilCoolingDX::factory(EnergyPlusData &state, std::string const & coilName) {
+int CoilCoolingDX::factory(EnergyPlus::EnergyPlusData &state, std::string const & coilName) {
     if (coilCoolingDXGetInputFlag) {
         CoilCoolingDX::getInput(state);
         coilCoolingDXGetInputFlag = false;
@@ -104,7 +101,7 @@ void CoilCoolingDX::clear_state() {
     coilCoolingDXGetInputFlag = true;
 }
 
-void CoilCoolingDX::getInput(EnergyPlusData &state) {
+void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state) {
     int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(coilCoolingDXObjectName);
     if (numCoolingCoilDXs <= 0) {
         ShowFatalError(R"(No "Coil:Cooling:DX" objects in input file)");
@@ -113,7 +110,7 @@ void CoilCoolingDX::getInput(EnergyPlusData &state) {
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
-        inputProcessor->getObjectItem(coilCoolingDXObjectName, coilNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+        inputProcessor->getObjectItem(state, coilCoolingDXObjectName, coilNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
         CoilCoolingDXInputSpecification input_specs;
         input_specs.name = cAlphaArgs(1);
         input_specs.evaporator_inlet_node_name = cAlphaArgs(2);
@@ -131,7 +128,7 @@ void CoilCoolingDX::getInput(EnergyPlusData &state) {
     }
 }
 
-void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXInputSpecification& input_data)
+void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, const CoilCoolingDXInputSpecification& input_data)
 {
     static const std::string routineName("CoilCoolingDX::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
@@ -146,7 +143,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCo
     }
 
     // other construction below
-    this->evapInletNodeIndex = NodeInputManager::GetOnlySingleNode(input_data.evaporator_inlet_node_name,
+    this->evapInletNodeIndex = NodeInputManager::GetOnlySingleNode(state, input_data.evaporator_inlet_node_name,
                                                                    errorsFound,
                                                                    coilCoolingDXObjectName,
                                                                    input_data.name,
@@ -154,7 +151,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCo
                                                                    DataLoopNode::NodeConnectionType_Inlet,
                                                                    1,
                                                                    DataLoopNode::ObjectIsNotParent);
-    this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode(input_data.evaporator_outlet_node_name,
+    this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state, input_data.evaporator_outlet_node_name,
                                                                     errorsFound,
                                                                     coilCoolingDXObjectName,
                                                                     input_data.name,
@@ -163,7 +160,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCo
                                                                     1,
                                                                     DataLoopNode::ObjectIsNotParent);
 
-    this->condInletNodeIndex = NodeInputManager::GetOnlySingleNode(input_data.condenser_inlet_node_name,
+    this->condInletNodeIndex = NodeInputManager::GetOnlySingleNode(state, input_data.condenser_inlet_node_name,
                                                                    errorsFound,
                                                                    coilCoolingDXObjectName,
                                                                    input_data.name,
@@ -173,14 +170,14 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCo
                                                                    DataLoopNode::ObjectIsNotParent);
 
     // Ultimately, this restriction should go away - condenser inlet node could be from anywhere
-    if (!OutAirNodeManager::CheckOutAirNodeNumber(this->condInletNodeIndex)) {
+    if (!OutAirNodeManager::CheckOutAirNodeNumber(state, this->condInletNodeIndex)) {
         ShowWarningError(routineName + coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
         ShowContinueError("Condenser Inlet Node Name=\"" + input_data.condenser_inlet_node_name +
                           "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
         ShowContinueError("This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
     }
 
-    this->condOutletNodeIndex = NodeInputManager::GetOnlySingleNode(input_data.condenser_outlet_node_name,
+    this->condOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state, input_data.condenser_outlet_node_name,
                                                                         errorsFound,
                                                                         coilCoolingDXObjectName,
                                                                         input_data.name,
@@ -210,7 +207,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCo
     if (input_data.availability_schedule_name.empty()) {
       this->availScheduleIndex = DataGlobals::ScheduleAlwaysOn;
     } else {
-        this->availScheduleIndex = ScheduleManager::GetScheduleIndex(input_data.availability_schedule_name);
+        this->availScheduleIndex = ScheduleManager::GetScheduleIndex(state, input_data.availability_schedule_name);
     }
     if (this->availScheduleIndex == 0) {
         ShowSevereError(routineName + coilCoolingDXObjectName + "=\"" + this->name + "\", invalid");
@@ -226,11 +223,11 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCo
     }
 }
 
-void CoilCoolingDX::oneTimeInit() {
+void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state) {
 
     // setup output variables, needs to be done after object is instantiated and emplaced
-    SetupOutputVariable("Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, this->totalCoolingEnergyRate, "System", "Average", this->name);
-    SetupOutputVariable("Cooling Coil Total Cooling Energy",
+    SetupOutputVariable(state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, this->totalCoolingEnergyRate, "System", "Average", this->name);
+    SetupOutputVariable(state, "Cooling Coil Total Cooling Energy",
                         OutputProcessor::Unit::J,
                         this->totalCoolingEnergy,
                         "System",
@@ -241,12 +238,12 @@ void CoilCoolingDX::oneTimeInit() {
                         "COOLINGCOILS",
                         _,
                         "System");
-    SetupOutputVariable("Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, this->sensCoolingEnergyRate, "System", "Average", this->name);
-    SetupOutputVariable("Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, this->sensCoolingEnergy, "System", "Sum", this->name);
-    SetupOutputVariable("Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, this->latCoolingEnergyRate, "System", "Average", this->name);
-    SetupOutputVariable("Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, this->latCoolingEnergy, "System", "Sum", this->name);
-    SetupOutputVariable("Cooling Coil Electricity Rate", OutputProcessor::Unit::W, this->performance.powerUse, "System", "Average", this->name);
-    SetupOutputVariable("Cooling Coil Electricity Energy",
+    SetupOutputVariable(state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, this->sensCoolingEnergyRate, "System", "Average", this->name);
+    SetupOutputVariable(state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, this->sensCoolingEnergy, "System", "Sum", this->name);
+    SetupOutputVariable(state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, this->latCoolingEnergyRate, "System", "Average", this->name);
+    SetupOutputVariable(state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, this->latCoolingEnergy, "System", "Sum", this->name);
+    SetupOutputVariable(state, "Cooling Coil Electricity Rate", OutputProcessor::Unit::W, this->performance.powerUse, "System", "Average", this->name);
+    SetupOutputVariable(state, "Cooling Coil Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->performance.electricityConsumption,
                         "System",
@@ -257,15 +254,15 @@ void CoilCoolingDX::oneTimeInit() {
                         "COOLING",
                         _,
                         "System");
-    SetupOutputVariable(
+    SetupOutputVariable(state,
         "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, this->coolingCoilRuntimeFraction, "System", "Average", this->name);
-    SetupOutputVariable("Cooling Coil Crankcase Heater Electricity Rate",
+    SetupOutputVariable(state, "Cooling Coil Crankcase Heater Electricity Rate",
                         OutputProcessor::Unit::W,
                         this->performance.crankcaseHeaterPower,
                         "System",
                         "Average",
                         this->name);
-    SetupOutputVariable("Cooling Coil Crankcase Heater Electricity Energy",
+    SetupOutputVariable(state, "Cooling Coil Crankcase Heater Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->performance.crankcaseHeaterElectricityConsumption,
                         "System",
@@ -277,49 +274,49 @@ void CoilCoolingDX::oneTimeInit() {
                         _,
                         "System");
    // Ported from variable speed coil
-    SetupOutputVariable("Cooling Coil Air Mass Flow Rate",
+    SetupOutputVariable(state, "Cooling Coil Air Mass Flow Rate",
         OutputProcessor::Unit::kg_s,
         this->airMassFlowRate,
         "System",
         "Average",
         this->name);
-    SetupOutputVariable("Cooling Coil Air Inlet Temperature",
+    SetupOutputVariable(state, "Cooling Coil Air Inlet Temperature",
         OutputProcessor::Unit::C,
         this->inletAirDryBulbTemp,
         "System",
         "Average",
         this->name);
-    SetupOutputVariable("Cooling Coil Air Inlet Humidity Ratio",
+    SetupOutputVariable(state, "Cooling Coil Air Inlet Humidity Ratio",
         OutputProcessor::Unit::kgWater_kgDryAir,
         this->inletAirHumRat,
         "System",
         "Average",
         this->name);
-    SetupOutputVariable("Cooling Coil Air Outlet Temperature",
+    SetupOutputVariable(state, "Cooling Coil Air Outlet Temperature",
         OutputProcessor::Unit::C,
         this->outletAirDryBulbTemp,
         "System",
         "Average",
         this->name);
-    SetupOutputVariable("Cooling Coil Air Outlet Humidity Ratio",
+    SetupOutputVariable(state, "Cooling Coil Air Outlet Humidity Ratio",
         OutputProcessor::Unit::kgWater_kgDryAir,
         this->outletAirHumRat,
         "System",
         "Average",
         this->name);
-    SetupOutputVariable("Cooling Coil Part Load Ratio",
+    SetupOutputVariable(state, "Cooling Coil Part Load Ratio",
         OutputProcessor::Unit::None,
         this->partLoadRatioReport,
         "System",
         "Average",
         this->name);
-    SetupOutputVariable("Cooling Coil Upper Speed Level",
+    SetupOutputVariable(state, "Cooling Coil Upper Speed Level",
         OutputProcessor::Unit::None,
         this->speedNumReport,
         "System",
         "Average",
         this->name);
-    SetupOutputVariable("Cooling Coil Neighboring Speed Levels Ratio",
+    SetupOutputVariable(state, "Cooling Coil Neighboring Speed Levels Ratio",
         OutputProcessor::Unit::None,
         this->speedRatioReport,
         "System",
@@ -329,13 +326,13 @@ void CoilCoolingDX::oneTimeInit() {
 
 
     if (this->performance.evapCondBasinHeatCap > 0) {
-        SetupOutputVariable("Cooling Coil Basin Heater Electricity Rate",
+        SetupOutputVariable(state, "Cooling Coil Basin Heater Electricity Rate",
                             OutputProcessor::Unit::W,
                             this->performance.basinHeaterPower,
                             "System",
                             "Average",
                             this->name);
-        SetupOutputVariable("Cooling Coil Basin Heater Electricity Energy",
+        SetupOutputVariable(state, "Cooling Coil Basin Heater Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->performance.basinHeaterElectricityConsumption,
                             "System",
@@ -348,9 +345,9 @@ void CoilCoolingDX::oneTimeInit() {
                             "System");
     }
     if (this->condensateTankIndex > 0) {
-        SetupOutputVariable(
+        SetupOutputVariable(state,
                 "Cooling Coil Condensate Volume Flow Rate", OutputProcessor::Unit::m3_s, this->condensateVolumeFlow, "System", "Average", this->name);
-        SetupOutputVariable("Cooling Coil Condensate Volume",
+        SetupOutputVariable(state, "Cooling Coil Condensate Volume",
                             OutputProcessor::Unit::m3,
                             this->condensateVolumeConsumption,
                             "System",
@@ -363,13 +360,13 @@ void CoilCoolingDX::oneTimeInit() {
                             "System");
     }
     if (this->evaporativeCondSupplyTankIndex > 0) {
-        SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Rate",
+        SetupOutputVariable(state, "Cooling Coil Evaporative Condenser Pump Electricity Rate",
                             OutputProcessor::Unit::W,
                             this->evapCondPumpElecPower,
                             "System",
                             "Average",
                             this->name);
-        SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Energy",
+        SetupOutputVariable(state, "Cooling Coil Evaporative Condenser Pump Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->evapCondPumpElecConsumption,
                             "System",
@@ -382,25 +379,25 @@ void CoilCoolingDX::oneTimeInit() {
                             "System");
     }
     if (this->SubcoolReheatFlag) {
-        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode",
+        SetupOutputVariable(state, "SubcoolReheat Cooling Coil Operation Mode",
                             OutputProcessor::Unit::None,
                             this->performance.OperatingMode,
                             "System",
                             "Average",
                             this->name);
-        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode Ratio",
+        SetupOutputVariable(state, "SubcoolReheat Cooling Coil Operation Mode Ratio",
                             OutputProcessor::Unit::None,
                             this->performance.ModeRatio,
                             "System",
                             "Average",
                             this->name);
-        SetupOutputVariable("SubcoolReheat Cooling Coil Recovered Heat Energy Rate",
+        SetupOutputVariable(state, "SubcoolReheat Cooling Coil Recovered Heat Energy Rate",
                             OutputProcessor::Unit::W,
                             this->recoveredHeatEnergyRate,
                             "System",
                             "Average",
                             this->name);
-        SetupOutputVariable("SubcoolReheat Cooling Coil Recovered Heat Energy",
+        SetupOutputVariable(state, "SubcoolReheat Cooling Coil Recovered Heat Energy",
                             OutputProcessor::Unit::J,
                             this->recoveredHeatEnergy,
                             "System",
@@ -452,14 +449,14 @@ void CoilCoolingDX::getDataAfterSizing(Real64 &_normalModeRatedEvapAirFlowRate,
     _normalModeRatedCapacity = this->performance.normalMode.ratedGrossTotalCap;
 }
 
-void CoilCoolingDX::size(EnergyPlusData &state) {
+void CoilCoolingDX::size(EnergyPlus::EnergyPlusData &state) {
     this->performance.size(state);
 }
 
-void CoilCoolingDX::simulate(EnergyPlusData &state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR)
+void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR)
 {
     if (this->myOneTimeInitFlag) {
-        this->oneTimeInit();
+        this->oneTimeInit(state);
         this->myOneTimeInitFlag = false;
     }
 

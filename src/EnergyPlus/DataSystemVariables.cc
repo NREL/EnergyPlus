@@ -54,7 +54,6 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -202,7 +201,7 @@ namespace DataSystemVariables {
 
     // Functions
 
-    void CheckForActualFileName(IOFiles &ioFiles,
+    void CheckForActualFileName(EnergyPlusData &state,
                                 std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
                                 std::string &CheckedFileName,             // Blank if not found.
@@ -233,7 +232,7 @@ namespace DataSystemVariables {
         std::string::size_type pos;
 
         if (firstTime) {
-            ioFiles.audit.ensure_open("CheckForActualFileName", ioFiles.outputControl.audit);
+            state.files.audit.ensure_open("CheckForActualFileName", state.files.outputControl.audit);
             get_environment_variable(cInputPath1, envinputpath1);
             if (envinputpath1 != blank) {
                 pos = index(envinputpath1, pathChar, true); // look backwards for pathChar
@@ -268,7 +267,7 @@ namespace DataSystemVariables {
             if (FileSystem::fileExists(pathsToCheck[i].first)) {
                 FileFound = true;
                 CheckedFileName = pathsToCheck[i].first;
-                print(ioFiles.audit, "{}={}\n", "found (" + pathsToCheck[i].second +")", getAbsolutePath(CheckedFileName));
+                print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second +")", getAbsolutePath(CheckedFileName));
                 return;
             } else {
                 std::pair <std::string,std::string> currentPath(getParentDirectoryPath(getAbsolutePath(pathsToCheck[i].first)), pathsToCheck[i].second);
@@ -281,7 +280,7 @@ namespace DataSystemVariables {
                 if (!found){
                     pathsChecked.push_back(currentPath);
                 }
-                print(ioFiles.audit, "{}={}\n", "not found (" + pathsToCheck[i].second +")\"", getAbsolutePath(pathsToCheck[i].first));
+                print(state.files.audit, "{}={}\n", "not found (" + pathsToCheck[i].second +")\"", getAbsolutePath(pathsToCheck[i].first));
             }
         }
         if (!FileFound) {
@@ -342,7 +341,7 @@ namespace DataSystemVariables {
 
         get_environment_variable(DDOnlyEnvVar, cEnvValue);
         DDOnly = env_var_on(cEnvValue); // Yes or True
-        if (DataGlobals::DDOnlySimulation) DDOnly = true;
+        if (state.dataGlobal->DDOnlySimulation) DDOnly = true;
 
         get_environment_variable(ReverseDDEnvVar, cEnvValue);
         ReverseDD = env_var_on(cEnvValue); // Yes or True

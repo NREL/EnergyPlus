@@ -281,7 +281,7 @@ namespace EconomicLifeCycleCost {
 
     // Functions
 
-    void GetInputForLifeCycleCost();
+    void GetInputForLifeCycleCost(EnergyPlusData &state);
 
     void ComputeLifeCycleCostAndReport(EnergyPlusData &state);
 
@@ -293,15 +293,15 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputLifeCycleCostParameters();
+    void GetInputLifeCycleCostParameters(EnergyPlusData &state);
 
-    void GetInputLifeCycleCostRecurringCosts();
+    void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state);
 
-    void GetInputLifeCycleCostNonrecurringCost();
+    void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state);
 
-    void GetInputLifeCycleCostUsePriceEscalation();
+    void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state);
 
-    void GetInputLifeCycleCostUseAdjustment();
+    void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state);
 
     int MonthToMonthNumber(std::string const &inMonthString, int const inDefaultMonth);
 

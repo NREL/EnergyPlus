@@ -249,7 +249,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
 
     DataGlobals::NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 1;
@@ -261,7 +261,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     DataEnvironment::DayOfWeekTomorrow = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     DataZoneEquipment::ZoneEquipAvail.allocate(6);
 
@@ -371,13 +371,13 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     EXPECT_TRUE(DataHVACGlobals::OptStartData.OptStartFlag(6)); // avail manager should be set to cycle on for Zone 6
 
     // Check that the system restores setpoints to unoccupied setpoints and don't use occupied setpoints post-occupancy
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state, state.files);
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state);
     DataHeatBalFanSys::TempControlType.allocate(DataGlobals::NumOfZones);
     DataHeatBalFanSys::TempZoneThermostatSetPoint.allocate(DataGlobals::NumOfZones);
 
     DataGlobals::CurrentTime = 19.0; // set the current time to 7 PM which is post-occupancy
     SystemAvailabilityManager::ManageSystemAvailability(state);
-    ZoneTempPredictorCorrector::CalcZoneAirTempSetPoints(state, state.files);
+    ZoneTempPredictorCorrector::CalcZoneAirTempSetPoints(state);
 
     EXPECT_EQ(DataHVACGlobals::NoAction, SystemAvailabilityManager::OptStartSysAvailMgrData(1).AvailStatus); // avail manager should be set to no action
     EXPECT_EQ(15.0, DataHeatBalFanSys::ZoneThermostatSetPointLo(1)); // 15.0C is the unoccupied heating setpoint
@@ -631,10 +631,10 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleGetInput)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     // get system availability schedule
-    SystemAvailabilityManager::GetSysAvailManagerInputs();
+    SystemAvailabilityManager::GetSysAvailManagerInputs(state);
     // check the three cycling run time control types
     EXPECT_EQ(3, SystemAvailabilityManager::NumNCycSysAvailMgrs);
     EXPECT_EQ(SystemAvailabilityManager::FixedRunTime, SystemAvailabilityManager::NCycSysAvailMgrData(1).CycRunTimeCntrlType);

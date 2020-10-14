@@ -317,7 +317,7 @@ namespace PurchasedAirManager {
                          int const ActualZoneNum,
                          int &CompIndex);
 
-    void GetPurchasedAir();
+    void GetPurchasedAir(EnergyPlusData &state);
 
     void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum,
                           bool const FirstHVACIteration, // unused1208
@@ -350,17 +350,17 @@ namespace PurchasedAirManager {
 
     void ReportPurchasedAir(int const PurchAirNum);
 
-    Real64 GetPurchasedAirOutAirMassFlow(int const PurchAirNum);
+    Real64 GetPurchasedAirOutAirMassFlow(EnergyPlusData &state, int const PurchAirNum);
 
-    int GetPurchasedAirZoneInletAirNode(int const PurchAirNum);
+    int GetPurchasedAirZoneInletAirNode(EnergyPlusData &state, int const PurchAirNum);
 
-    int GetPurchasedAirReturnAirNode(int const PurchAirNum);
+    int GetPurchasedAirReturnAirNode(EnergyPlusData &state, int const PurchAirNum);
 
-    Real64 GetPurchasedAirMixedAirTemp(int const PurchAirNum);
+    Real64 GetPurchasedAirMixedAirTemp(EnergyPlusData &state, int const PurchAirNum);
 
-    Real64 GetPurchasedAirMixedAirHumRat(int const PurchAirNum);
+    Real64 GetPurchasedAirMixedAirHumRat(EnergyPlusData &state, int const PurchAirNum);
 
-    bool CheckPurchasedAirForReturnPlenum(int const &ReturnPlenumIndex);
+    bool CheckPurchasedAirForReturnPlenum(EnergyPlusData &state, int const &ReturnPlenumIndex);
 
     void InitializePlenumArrays(int const PurchAirNum);
 

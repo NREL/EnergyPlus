@@ -58,13 +58,13 @@ using namespace EnergyPlus;
 
 TEST_F(EnergyPlusFixture, File_Not_Found_ERR_Output)
 {
-    IOFiles ioFiles = IOFiles();
     std::string filePath = "./NonExistentFile.txt";
     FileSystem::makeNativePath(filePath);
     std::string expectedError = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(filePath));
     bool fileFound = false;
     std::string fullPath;
-    DataSystemVariables::CheckForActualFileName(ioFiles, filePath, fileFound, fullPath);
+    std::string contextString = "Test File_Not_Found_ERR_Output";
+    DataSystemVariables::CheckForActualFileName(this->state, filePath, fileFound, fullPath, contextString);
     EXPECT_FALSE(fileFound);
     EXPECT_TRUE(match_err_stream(expectedError));
 }

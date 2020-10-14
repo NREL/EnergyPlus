@@ -432,17 +432,17 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
 
     DataGlobals::NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedule data
+    ScheduleManager::ProcessScheduleInput(state); // read schedule data
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);
     // OutputProcessor::TimeValue.allocate(2);
-    DataGlobals::DDOnlySimulation = true;
+    state.dataGlobal->DDOnlySimulation = true;
 
     SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
-    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
+    HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
     DataGlobals::BeginSimFlag = true;
     DataGlobals::BeginEnvrnFlag = true;

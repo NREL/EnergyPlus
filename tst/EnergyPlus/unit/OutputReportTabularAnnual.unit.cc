@@ -84,7 +84,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GetInput)
 
     DataGlobals::DoWeathSim = true;
 
-    GetInputTabularAnnual();
+    GetInputTabularAnnual(state);
 
     EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
 
@@ -130,7 +130,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
     Real64 extLitPow;
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable(state, "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -140,7 +140,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable(state, "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -150,7 +150,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable(state, "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -160,13 +160,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
-    SetupOutputVariable("Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
-    SetupOutputVariable("Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
+    SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
+    SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
+    SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
 
     DataGlobals::DoWeathSim = true;
 
-    GetInputTabularAnnual(); // this also calls setupGathering
+    GetInputTabularAnnual(state); // this also calls setupGathering
     EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
 
     std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin();
@@ -201,7 +201,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
     Real64 extLitPow;
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable(state, "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -211,7 +211,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable(state, "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -221,7 +221,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable(state, "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -231,14 +231,14 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
-    SetupOutputVariable("Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
-    SetupOutputVariable("Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
+    SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
+    SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
+    SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
 
     DataGlobals::DoWeathSim = true;
     DataGlobals::TimeStepZone = 0.25;
 
-    GetInputTabularAnnual();
+    GetInputTabularAnnual(state);
     EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
 
     extLitPow = 2.01;
@@ -266,10 +266,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
 
 
     std::vector<AnnualTable> annualTables;
-    annualTables.push_back(AnnualTable("PEAK ELECTRICTY ANNUAL MYTH REPORT", "", ""));
+    annualTables.push_back(AnnualTable(state, "PEAK ELECTRICTY ANNUAL MYTH REPORT", "", ""));
     annualTables.back().addFieldSet("HEATING:MYTH:VARIABLE", AnnualFieldSet::AggregationKind::hoursPositive, 2);
     annualTables.back().addFieldSet("ELECTRICITY:MYTH", AnnualFieldSet::AggregationKind::maximumDuringHoursShown, 2);
-    annualTables.back().setupGathering();
+    annualTables.back().setupGathering(state);
 
     OutputProcessor::EnergyMeters(1).CurTSValue = -10.;
     OutputProcessor::EnergyMeters(2).CurTSValue = 50.;
@@ -329,7 +329,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
     ASSERT_TRUE(process_idf(idf_objects));
 
     Real64 facilUse;
-    SetupOutputVariable("Misc Facility Electric Energy",
+    SetupOutputVariable(state, "Misc Facility Electric Energy",
                         OutputProcessor::Unit::J,
                         facilUse,
                         "Zone",
@@ -347,7 +347,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
 
     DataGlobals::DoWeathSim = true;
 
-    OutputReportTabularAnnual::GetInputTabularAnnual();
+    OutputReportTabularAnnual::GetInputTabularAnnual(state);
 
     EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
 
@@ -386,7 +386,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
     ASSERT_TRUE(process_idf(idf_objects));
 
     Real64 facilUse;
-    SetupOutputVariable("Misc Facility Electric Energy",
+    SetupOutputVariable(state, "Misc Facility Electric Energy",
                         OutputProcessor::Unit::J,
                         facilUse,
                         "Zone",
@@ -404,7 +404,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
 
     DataGlobals::DoWeathSim = true;
 
-    OutputReportTabularAnnual::GetInputTabularAnnual();
+    OutputReportTabularAnnual::GetInputTabularAnnual(state);
 
     EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
 

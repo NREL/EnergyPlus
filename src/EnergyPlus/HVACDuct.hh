@@ -57,6 +57,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace HVACDuct {
 
     // Using/Aliasing
@@ -95,20 +98,21 @@ namespace HVACDuct {
 
     void clear_state();
 
-    void SimDuct(std::string const &CompName,   // name of the duct component
-                 bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
+    void SimDuct(EnergyPlusData &state,
+                 std::string const &CompName,   // name of the duct component
+                 bool FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
                  int &CompIndex                 // index of duct component
     );
 
-    void GetDuctInput();
+    void GetDuctInput(EnergyPlusData &state);
 
-    void InitDuct(int const DuctNum); // number of the current duct being simulated
+    void InitDuct(int DuctNum); // number of the current duct being simulated
 
-    void CalcDuct(int const DuctNum); // number of the current duct being simulated !unused1208
+    void CalcDuct(int DuctNum); // number of the current duct being simulated !unused1208
 
-    void UpdateDuct(int const DuctNum); // number of the current duct being simulated
+    void UpdateDuct(int DuctNum); // number of the current duct being simulated
 
-    void ReportDuct(int const DuctNum); // number of the current duct being simulated !unused1208
+    void ReportDuct(int DuctNum); // number of the current duct being simulated !unused1208
 
 } // namespace HVACDuct
 

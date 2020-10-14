@@ -69,6 +69,7 @@
 
 class IdfParser;
 class Validation;
+struct EnergyPlusData;
 
 namespace EnergyPlus {
 
@@ -109,7 +110,7 @@ public:
 
     void markObjectAsUsed(const std::string &objectType, const std::string &objectName);
 
-    void processInput();
+    void processInput(EnergyPlusData &state);
 
     int getNumSectionsFound(std::string const &SectionWord);
 
@@ -125,7 +126,8 @@ public:
 
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
-    void getObjectItem(std::string const &Object,
+    void getObjectItem(EnergyPlusData &state,
+                       std::string const &Object,
                        int const Number,
                        Array1S_string Alphas,
                        int &NumAlphas,
@@ -137,15 +139,17 @@ public:
                        Optional<Array1D_string> AlphaFieldNames = _,
                        Optional<Array1D_string> NumericFieldNames = _);
 
-    int getIDFObjNum(std::string const &Object, int const Number);
+    int getIDFObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
 
-    int getJSONObjNum(std::string const &Object, int const Number);
+    int getJSONObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
 
-    int getObjectItemNum(std::string const &ObjType, // Object Type (ref: IDD Objects)
+    int getObjectItemNum(EnergyPlusData &state,
+                         std::string const &ObjType, // Object Type (ref: IDD Objects)
                          std::string const &ObjName  // Name of the object type
     );
 
-    int getObjectItemNum(std::string const &ObjType,     // Object Type (ref: IDD Objects)
+    int getObjectItemNum(EnergyPlusData &state,
+                         std::string const &ObjType,     // Object Type (ref: IDD Objects)
                          std::string const &NameTypeVal, // Object "name" field type ( used as search key )
                          std::string const &ObjName      // Name of the object type
     );
@@ -170,7 +174,7 @@ public:
                              int &NumNumeric                // How many Numeric arguments (max) this Object can have
     );
 
-    void preProcessorCheck(bool &PreP_Fatal); // True if a preprocessor flags a fatal error
+    void preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal); // True if a preprocessor flags a fatal error
 
     void preScanReportingVariables();
 
@@ -236,9 +240,10 @@ private:
         std::size_t max_extensible_fields = 0;
     };
 
-    MaxFields findMaxFields(json const &ep_object, std::string const &extension_key, json const &legacy_idd);
+    MaxFields findMaxFields(EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd);
 
-    void setObjectItemValue(json const &ep_object,
+    void setObjectItemValue(EnergyPlusData &state,
+                            json const &ep_object,
                             json const &ep_schema_object,
                             std::string const &field,
                             json const &legacy_field_info,

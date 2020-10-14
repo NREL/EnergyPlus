@@ -170,7 +170,7 @@ namespace DataSystemVariables {
 
     // Functions
 
-    void CheckForActualFileName(IOFiles &ioFiles,
+    void CheckForActualFileName(EnergyPlusData &state,
                                 std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
                                 std::string &foundFileName,             // Blank if not found.

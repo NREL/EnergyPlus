@@ -706,19 +706,19 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    SimulationManager::PostIPProcessing();
+    SimulationManager::PostIPProcessing(state);
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
-    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
+    HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(state.files);
+    OutputProcessor::GetReportVariableInput(state);
     PlantManager::CheckIfAnyPlant();
 
     BranchInputManager::ManageBranchInput(state); // just gets input and
@@ -1456,19 +1456,19 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    SimulationManager::PostIPProcessing();
+    SimulationManager::PostIPProcessing(state);
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
-    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
+    HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(state.files);
+    OutputProcessor::GetReportVariableInput(state);
     PlantManager::CheckIfAnyPlant();
 
     BranchInputManager::ManageBranchInput(state); // just gets input and
