@@ -214,7 +214,6 @@
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
-#include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
@@ -385,7 +384,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     SurfaceGeometry::clear_state();
     SurfaceGroundHeatExchanger::clear_state();
     SystemAvailabilityManager::clear_state();
-    SwimmingPool::clear_state();
     UtilityRoutines::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();
