@@ -400,9 +400,9 @@ namespace PlantCentralGSHP {
 
         void getSizingFactor(Real64 &SizFac) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
         void initialize(EnergyPlusData &state,
                         Real64 MyLoad, // Demand Load
@@ -411,7 +411,7 @@ namespace PlantCentralGSHP {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void SizeWrapper();
+        void SizeWrapper(EnergyPlusData &state);
 
         void CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int LoopNum);
 

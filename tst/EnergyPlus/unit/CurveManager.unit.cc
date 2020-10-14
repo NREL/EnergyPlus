@@ -641,7 +641,7 @@ TEST_F(EnergyPlusFixture, CSV_CarriageReturns_Handling)
     CurveManager::TableFile testTableFile = CurveManager::TableFile();
     std::string testCSV = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/TestCarriageReturn.csv";
     testTableFile.filePath = testCSV;
-    testTableFile.load(IOFiles::getSingleton(), testCSV);
+    testTableFile.load(state, testCSV);
     std::vector<double> TestArray;
     std::size_t col = 2;
     std::size_t row = 1;

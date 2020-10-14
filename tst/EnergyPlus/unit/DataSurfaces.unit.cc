@@ -163,15 +163,15 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(state, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;
-    GetConstructData(state.files, ErrorsFound); // read construction data
+    GetConstructData(state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
     ErrorsFound = false;
-    GetZoneData(ErrorsFound);  // read zone data
+    GetZoneData(state, ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     CosZoneRelNorth.allocate(1);
@@ -183,7 +183,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     SinBldgRelNorth = 0.0;
 
     ErrorsFound = false;
-    GetSurfaceData(state, state.files, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     SetSurfaceOutBulbTempAt();

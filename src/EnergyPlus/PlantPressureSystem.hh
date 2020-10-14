@@ -56,6 +56,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace PlantPressureSystem {
 
     // Functions
@@ -69,7 +72,7 @@ namespace PlantPressureSystem {
                                Optional_int_const BranchNum = _    // Branch num for specific branch simulation
     );
 
-    void InitPressureDrop(int const LoopNum, bool const FirstHVACIteration);
+    void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const FirstHVACIteration);
 
     void BranchPressureDrop(EnergyPlusData &state,
                             int const LoopNum,     // Plant Loop Index

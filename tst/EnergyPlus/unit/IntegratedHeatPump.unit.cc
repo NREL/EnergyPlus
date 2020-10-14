@@ -178,7 +178,7 @@ TEST_F(EnergyPlusFixture, ASIHP_GetMaxSpeedNumIHP)
 
     VariableSpeedCoils::VariableSpeedCoilData vsCoil;
     vsCoil.NumOfSpeeds = 999;
-    VariableSpeedCoils::VarSpeedCoil.push_back(vsCoil);
+    state.dataVariableSpeedCoils->VarSpeedCoil.push_back(vsCoil);
 
     IntegratedHeatPumpData IHP;
     IHP.Name = "ASIHP";

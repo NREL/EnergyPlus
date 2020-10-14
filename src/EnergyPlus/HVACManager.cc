@@ -379,7 +379,7 @@ namespace HVACManager {
         bool anyEMSRan;
         ManageEMS(state, emsCallFromBeginTimestepBeforePredictor, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
-        SetOutAirNodes();
+        SetOutAirNodes(state);
 
         ManageRefrigeratedCaseRacks(state);
 
@@ -444,7 +444,7 @@ namespace HVACManager {
 
         if (UseZoneTimeStepHistory) PreviousTimeStep = TimeStepZone;
         for (SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
-            if (DataGlobals::stopSimulation) break;
+            if (state.dataGlobal->stopSimulation) break;
 
             if (TimeStepSys < TimeStepZone) {
 
@@ -524,9 +524,9 @@ namespace HVACManager {
             // This is where output processor data is updated for System Timestep reporting
             if (!WarmupFlag) {
                 if (DoOutputReporting) {
-                    CalcMoreNodeInfo();
+                    CalcMoreNodeInfo(state);
                     CalculatePollution();
-                    InitEnergyReports(state, state.files);
+                    InitEnergyReports(state);
                     ReportSystemEnergyUse();
                 }
                 if (DoOutputReporting || (ZoneSizingCalc && CompLoadReportIsReq)) {
@@ -580,7 +580,7 @@ namespace HVACManager {
                     }
                     PrintedWarmup = true;
                 }
-                CalcMoreNodeInfo();
+                CalcMoreNodeInfo(state);
                 UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                     if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
@@ -815,15 +815,15 @@ namespace HVACManager {
         PlantManageHalfLoopCalls = 0;
         SetAllPlantSimFlagsToValue(true);
         if (!SimHVACIterSetup) {
-            SetupOutputVariable("HVAC System Solver Iteration Count", OutputProcessor::Unit::None, HVACManageIteration, "HVAC", "Sum", "SimHVAC");
-            SetupOutputVariable("Air System Solver Iteration Count", OutputProcessor::Unit::None, RepIterAir, "HVAC", "Sum", "SimHVAC");
-            SetupOutputVariable("Air System Relief Air Total Heat Loss Energy",
+            SetupOutputVariable(state, "HVAC System Solver Iteration Count", OutputProcessor::Unit::None, HVACManageIteration, "HVAC", "Sum", "SimHVAC");
+            SetupOutputVariable(state, "Air System Solver Iteration Count", OutputProcessor::Unit::None, RepIterAir, "HVAC", "Sum", "SimHVAC");
+            SetupOutputVariable(state, "Air System Relief Air Total Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 DataHeatBalance::SysTotalHVACReliefHeatLoss,
                                 "HVAC",
                                 "Sum",
                                 "SimHVAC");
-            SetupOutputVariable("HVAC System Total Heat Rejection Energy",
+            SetupOutputVariable(state, "HVAC System Total Heat Rejection Energy",
                                 OutputProcessor::Unit::J,
                                 DataHeatBalance::SysTotalHVACRejectHeatLoss,
                                 "HVAC",
@@ -835,15 +835,15 @@ namespace HVACManager {
             SetupInitialPlantCallingOrder();
             SetupBranchControlTypes(); // new routine to do away with input for branch control type
             //    CALL CheckPlantLoopData
-            SetupReports();
+            SetupReports(state);
             if (AnyEnergyManagementSystemInModel) {
                 SetupPlantEMSActuators();
             }
 
             if (TotNumLoops > 0) {
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "Plant Solver Sub Iteration Count", OutputProcessor::Unit::None, PlantManageSubIterations, "HVAC", "Sum", "SimHVAC");
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "Plant Solver Half Loop Calls Count", OutputProcessor::Unit::None, PlantManageHalfLoopCalls, "HVAC", "Sum", "SimHVAC");
                 for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
                     // init plant sizing numbers in main plant data structure
@@ -875,7 +875,7 @@ namespace HVACManager {
         ManageSetPoints(state);
 
         // re-initialize plant loop and nodes.
-        ReInitPlantLoopsAtFirstHVACIteration();
+        ReInitPlantLoopsAtFirstHVACIteration(state);
 
         // Before the HVAC simulation, call ManageSystemAvailability to set
         // the system on/off flags
@@ -910,7 +910,7 @@ namespace HVACManager {
         while ((SimAirLoopsFlag || SimZoneEquipmentFlag || SimNonZoneEquipmentFlag || SimPlantLoopsFlag || SimElecCircuitsFlag) &&
                (HVACManageIteration <= MaxIter)) {
 
-            if (DataGlobals::stopSimulation) break;
+            if (state.dataGlobal->stopSimulation) break;
 
             ManageEMS(state, emsCallFromHVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
 

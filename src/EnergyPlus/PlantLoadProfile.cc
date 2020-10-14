@@ -104,10 +104,10 @@ namespace PlantLoadProfile {
     // Object Data
     Array1D<PlantProfileData> PlantProfile;
 
-    PlantComponent *PlantProfileData::factory(std::string objectName)
+    PlantComponent *PlantProfileData::factory(EnergyPlusData &state, std::string objectName)
     {
         if (GetPlantLoadProfileInputFlag) {
-            GetPlantProfileInput();
+            GetPlantProfileInput(state);
             GetPlantLoadProfileInputFlag = false;
         }
         // Now look for this particular pipe in the list
@@ -162,7 +162,7 @@ namespace PlantLoadProfile {
 
         if (this->MassFlowRate > 0.0) {
             Real64 Cp =
-                GetSpecificHeatGlycol(PlantLoop(this->WLoopNum).FluidName, this->InletTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+                GetSpecificHeatGlycol(state, PlantLoop(this->WLoopNum).FluidName, this->InletTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
             DeltaTemp = this->Power / (this->MassFlowRate * Cp);
         } else {
             this->Power = 0.0;
@@ -236,7 +236,7 @@ namespace PlantLoadProfile {
             Node(OutletNode).Temp = 0.0;
 
             FluidDensityInit =
-                GetDensityGlycol(PlantLoop(this->WLoopNum).FluidName, DataGlobals::InitConvTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+                GetDensityGlycol(state, PlantLoop(this->WLoopNum).FluidName, DataGlobals::InitConvTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
             Real64 MaxFlowMultiplier = GetScheduleMaxValue(this->FlowRateFracSchedule);
 
@@ -263,7 +263,7 @@ namespace PlantLoadProfile {
 
         if (this->EMSOverridePower) this->Power = this->EMSPowerValue;
 
-        FluidDensityInit = GetDensityGlycol(PlantLoop(this->WLoopNum).FluidName, this->InletTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+        FluidDensityInit = GetDensityGlycol(state, PlantLoop(this->WLoopNum).FluidName, this->InletTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
         // Get the scheduled mass flow rate
         this->VolFlowRate = this->PeakVolFlowRate * GetCurrentScheduleValue(this->FlowRateFracSchedule);
@@ -348,7 +348,7 @@ namespace PlantLoadProfile {
     }
 
     // Functions
-    void GetPlantProfileInput()
+    void GetPlantProfileInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -389,7 +389,8 @@ namespace PlantLoadProfile {
             PlantProfile.allocate(NumOfPlantProfile);
 
             for (ProfileNum = 1; ProfileNum <= NumOfPlantProfile; ++ProfileNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               ProfileNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -405,12 +406,12 @@ namespace PlantLoadProfile {
                 PlantProfile(ProfileNum).Name = cAlphaArgs(1);
                 PlantProfile(ProfileNum).TypeNum = TypeOf_PlantLoadProfile; // parameter assigned in DataPlant !DSU
 
-                PlantProfile(ProfileNum).InletNode = GetOnlySingleNode(
+                PlantProfile(ProfileNum).InletNode = GetOnlySingleNode(state,
                     cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-                PlantProfile(ProfileNum).OutletNode = GetOnlySingleNode(
+                PlantProfile(ProfileNum).OutletNode = GetOnlySingleNode(state,
                     cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-                PlantProfile(ProfileNum).LoadSchedule = GetScheduleIndex(cAlphaArgs(4));
+                PlantProfile(ProfileNum).LoadSchedule = GetScheduleIndex(state, cAlphaArgs(4));
 
                 if (PlantProfile(ProfileNum).LoadSchedule == 0) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"  The Schedule for " + cAlphaFieldNames(4) + " called " +
@@ -420,7 +421,7 @@ namespace PlantLoadProfile {
 
                 PlantProfile(ProfileNum).PeakVolFlowRate = rNumericArgs(1);
 
-                PlantProfile(ProfileNum).FlowRateFracSchedule = GetScheduleIndex(cAlphaArgs(5));
+                PlantProfile(ProfileNum).FlowRateFracSchedule = GetScheduleIndex(state, cAlphaArgs(5));
 
                 if (PlantProfile(ProfileNum).FlowRateFracSchedule == 0) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"  The Schedule for " + cAlphaFieldNames(5) + " called " +
@@ -433,21 +434,21 @@ namespace PlantLoadProfile {
                 TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), cCurrentModuleObject + " Nodes");
 
                 // Setup report variables
-                SetupOutputVariable("Plant Load Profile Mass Flow Rate",
+                SetupOutputVariable(state, "Plant Load Profile Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     PlantProfile(ProfileNum).MassFlowRate,
                                     "System",
                                     "Average",
                                     PlantProfile(ProfileNum).Name);
 
-                SetupOutputVariable("Plant Load Profile Heat Transfer Rate",
+                SetupOutputVariable(state, "Plant Load Profile Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     PlantProfile(ProfileNum).Power,
                                     "System",
                                     "Average",
                                     PlantProfile(ProfileNum).Name);
 
-                SetupOutputVariable("Plant Load Profile Heat Transfer Energy",
+                SetupOutputVariable(state, "Plant Load Profile Heat Transfer Energy",
                                     OutputProcessor::Unit::J,
                                     PlantProfile(ProfileNum).Energy,
                                     "System",
@@ -459,7 +460,7 @@ namespace PlantLoadProfile {
                                     _,
                                     "Plant"); // is EndUseKey right?
 
-                SetupOutputVariable("Plant Load Profile Heating Energy",
+                SetupOutputVariable(state, "Plant Load Profile Heating Energy",
                                     OutputProcessor::Unit::J,
                                     PlantProfile(ProfileNum).HeatingEnergy,
                                     "System",
@@ -471,7 +472,7 @@ namespace PlantLoadProfile {
                                     _,
                                     "Plant");
 
-                SetupOutputVariable("Plant Load Profile Cooling Energy",
+                SetupOutputVariable(state, "Plant Load Profile Cooling Energy",
                                     OutputProcessor::Unit::J,
                                     PlantProfile(ProfileNum).CoolingEnergy,
                                     "System",

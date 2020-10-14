@@ -110,10 +110,11 @@ namespace HVACFan {
     }
 
     bool checkIfFanNameIsAFanSystem( // look up to see if input contains a Fan:SystemModel with the name (for use before object construction
+        EnergyPlusData &state,
         std::string const &objectName)
     {
 
-        int testNum = inputProcessor->getObjectItemNum("Fan:SystemModel", objectName);
+        int testNum = inputProcessor->getObjectItemNum(state, "Fan:SystemModel", objectName);
         if (testNum > 0) {
             return true;
         } else {
@@ -397,7 +398,7 @@ namespace HVACFan {
         Array1D<Real64> numericArgs;
         Array1D_string numericFieldNames;
         Array1D_bool isNumericFieldBlank;
-        int objectNum = inputProcessor->getObjectItemNum(locCurrentModuleObject, objectName);
+        int objectNum = inputProcessor->getObjectItemNum(state, locCurrentModuleObject, objectName);
         inputProcessor->getObjectDefMaxArgs(locCurrentModuleObject, numTotFields, numAlphas, numNums);
         if (numAlphas > 0) {
             alphaArgs.allocate(numAlphas);
@@ -410,7 +411,8 @@ namespace HVACFan {
             isNumericFieldBlank.allocate(numNums);
         }
 
-        inputProcessor->getObjectItem(locCurrentModuleObject,
+        inputProcessor->getObjectItem(state,
+                                      locCurrentModuleObject,
                                       objectNum,
                                       alphaArgs,
                                       numAlphas,
@@ -429,14 +431,14 @@ namespace HVACFan {
         if (isAlphaFieldBlank(2)) {
             availSchedIndex = DataGlobals::ScheduleAlwaysOn;
         } else {
-            availSchedIndex = ScheduleManager::GetScheduleIndex(alphaArgs(2));
+            availSchedIndex = ScheduleManager::GetScheduleIndex(state, alphaArgs(2));
             if (availSchedIndex == 0) {
                 ShowSevereError(routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError("Invalid " + alphaFieldNames(2) + " = " + alphaArgs(2));
                 errorsFound = true;
             }
         }
-        inletNodeNum = NodeInputManager::GetOnlySingleNode(alphaArgs(3),
+        inletNodeNum = NodeInputManager::GetOnlySingleNode(state, alphaArgs(3),
                                                            errorsFound,
                                                            locCurrentModuleObject,
                                                            alphaArgs(1),
@@ -444,7 +446,7 @@ namespace HVACFan {
                                                            DataLoopNode::NodeConnectionType_Inlet,
                                                            1,
                                                            DataLoopNode::ObjectIsNotParent);
-        outletNodeNum = NodeInputManager::GetOnlySingleNode(alphaArgs(4),
+        outletNodeNum = NodeInputManager::GetOnlySingleNode(state, alphaArgs(4),
                                                             errorsFound,
                                                             locCurrentModuleObject,
                                                             alphaArgs(1),
@@ -604,10 +606,10 @@ namespace HVACFan {
             ShowFatalError(routineName + "Errors found in input for fan name = " + name + ".  Program terminates.");
         }
 
-        SetupOutputVariable("Fan Electricity Rate", OutputProcessor::Unit::W, m_fanPower, "System", "Average", name);
-        SetupOutputVariable("Fan Rise in Air Temperature", OutputProcessor::Unit::deltaC, m_deltaTemp, "System", "Average", name);
-        SetupOutputVariable("Fan Heat Gain to Air", OutputProcessor::Unit::W, m_powerLossToAir, "System", "Average", name);
-        SetupOutputVariable("Fan Electricity Energy",
+        SetupOutputVariable(state, "Fan Electricity Rate", OutputProcessor::Unit::W, m_fanPower, "System", "Average", name);
+        SetupOutputVariable(state, "Fan Rise in Air Temperature", OutputProcessor::Unit::deltaC, m_deltaTemp, "System", "Average", name);
+        SetupOutputVariable(state, "Fan Heat Gain to Air", OutputProcessor::Unit::W, m_powerLossToAir, "System", "Average", name);
+        SetupOutputVariable(state, "Fan Electricity Energy",
                             OutputProcessor::Unit::J,
                             m_fanEnergy,
                             "System",
@@ -618,12 +620,12 @@ namespace HVACFan {
                             "Fans",
                             m_endUseSubcategoryName,
                             "System");
-        SetupOutputVariable("Fan Air Mass Flow Rate", OutputProcessor::Unit::kg_s, m_outletAirMassFlowRate, "System", "Average", name);
+        SetupOutputVariable(state, "Fan Air Mass Flow Rate", OutputProcessor::Unit::kg_s, m_outletAirMassFlowRate, "System", "Average", name);
         if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds == 1) {
-            SetupOutputVariable("Fan Runtime Fraction", OutputProcessor::Unit::None, m_fanRunTimeFractionAtSpeed[0], "System", "Average", name);
+            SetupOutputVariable(state, "Fan Runtime Fraction", OutputProcessor::Unit::None, m_fanRunTimeFractionAtSpeed[0], "System", "Average", name);
         } else if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1) {
             for (auto speedLoop = 0; speedLoop < m_numSpeeds; ++speedLoop) {
-                SetupOutputVariable("Fan Runtime Fraction Speed " + General::TrimSigDigits(speedLoop + 1) + "",
+                SetupOutputVariable(state, "Fan Runtime Fraction Speed " + General::TrimSigDigits(speedLoop + 1) + "",
                                     OutputProcessor::Unit::None,
                                     m_fanRunTimeFractionAtSpeed[speedLoop],
                                     "System",

@@ -534,7 +534,7 @@ namespace RefrigeratedCase {
 
         void CalculateCompressors(EnergyPlusData &state);
 
-        void CalculateSubcoolers();
+        void CalculateSubcoolers(EnergyPlusData &state);
     };
 
     struct TransRefrigSystemData
@@ -681,7 +681,7 @@ namespace RefrigeratedCase {
 
         void CalcDetailedTransSystem(EnergyPlusData &state, int SysNum);
 
-        void CalcGasCooler(int SysNum);
+        void CalcGasCooler(EnergyPlusData &state, int SysNum);
 
         void CalculateTransCompressors(EnergyPlusData &state);
     };
@@ -1524,7 +1524,7 @@ namespace RefrigeratedCase {
 
     void GetRefrigerationInput(EnergyPlusData &state);
 
-    void SetupReportInput();
+    void SetupReportInput(EnergyPlusData &state);
 
     void InitRefrigeration();
 
@@ -1541,7 +1541,7 @@ namespace RefrigeratedCase {
                                   Optional_string_const ThisObjectType = _,
                                   const Optional_bool_const &SuppressWarning = _);
 
-    void ReportRefrigerationComponents(IOFiles &ioFiles);
+    void ReportRefrigerationComponents(EnergyPlusData &state);
 
     void SumZoneImpacts();
 

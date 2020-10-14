@@ -126,7 +126,7 @@ namespace PluginManagement {
     }
 #endif
 
-    void PluginManager::setupOutputVariables()
+    void PluginManager::setupOutputVariables(EnergyPlusData &state)
     {
 #if LINK_WITH_PYTHON == 1
         // with the PythonPlugin:Variables all set in memory, we can now set them up as outputs as needed
@@ -183,14 +183,14 @@ namespace PluginManagement {
                 if (!isMetered) {
                     // regular output variable, ignore the meter/resource stuff and register the variable
                     if (thisUnit != OutputProcessor::Unit::customEMS) {
-                        SetupOutputVariable(sOutputVariable,
+                        SetupOutputVariable(state, sOutputVariable,
                                             thisUnit,
                                             PluginManagement::globalVariableValues[variableHandle],
                                             sUpdateFreq,
                                             sAvgOrSum,
                                             thisObjectName);
                     } else {
-                        SetupOutputVariable(sOutputVariable,
+                        SetupOutputVariable(state, sOutputVariable,
                                             thisUnit,
                                             PluginManagement::globalVariableValues[variableHandle],
                                             sUpdateFreq,
@@ -363,7 +363,7 @@ namespace PluginManagement {
                     }
 
                     if (sEndUseSubcategory.empty()) { // no subcategory
-                        SetupOutputVariable(sOutputVariable,
+                        SetupOutputVariable(state, sOutputVariable,
                                             thisUnit,
                                             PluginManagement::globalVariableValues[variableHandle],
                                             sUpdateFreq,
@@ -375,7 +375,7 @@ namespace PluginManagement {
                                             _,
                                             sGroupType);
                     } else { // has subcategory
-                        SetupOutputVariable(sOutputVariable,
+                        SetupOutputVariable(state, sOutputVariable,
                                             thisUnit,
                                             PluginManagement::globalVariableValues[variableHandle],
                                             sUpdateFreq,

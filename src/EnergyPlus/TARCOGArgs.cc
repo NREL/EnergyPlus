@@ -49,7 +49,6 @@
 #include <EnergyPlus/DataGlobals.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
 #include <EnergyPlus/TARCOGArgs.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>

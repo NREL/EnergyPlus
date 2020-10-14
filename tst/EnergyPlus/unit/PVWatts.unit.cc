@@ -131,13 +131,13 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputs)
                                                  "Output:Variable,*,Generator Produced DC Electricity Rate,timestep;"});
     process_idf(idfTxt);
     EXPECT_FALSE(has_err_output());
-    PVWattsGenerator &pvw1 = GetOrCreatePVWattsGenerator("PVWattsArray1");
+    PVWattsGenerator &pvw1 = GetOrCreatePVWattsGenerator(state, "PVWattsArray1");
     EXPECT_EQ(pvw1.getModuleType(), ModuleType::PREMIUM);
     EXPECT_EQ(pvw1.getArrayType(), ArrayType::ONE_AXIS);
     EXPECT_DOUBLE_EQ(0.4, pvw1.getGroundCoverageRatio());
-    PVWattsGenerator &pvw2 = GetOrCreatePVWattsGenerator("PVWattsArray2");
+    PVWattsGenerator &pvw2 = GetOrCreatePVWattsGenerator(state, "PVWattsArray2");
     EXPECT_DOUBLE_EQ(0.4, pvw2.getGroundCoverageRatio());
-    PVWattsGenerator &pvw3 = GetOrCreatePVWattsGenerator("PVWattsArray3");
+    PVWattsGenerator &pvw3 = GetOrCreatePVWattsGenerator(state, "PVWattsArray3");
     EXPECT_DOUBLE_EQ(175.0, pvw3.getAzimuth());
     EXPECT_DOUBLE_EQ(21.0, pvw3.getTilt());
     EXPECT_DOUBLE_EQ(0.5, pvw3.getGroundCoverageRatio());
@@ -152,7 +152,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputsFailure)
                                                  "FixedRoofMount,", // misspelled
                                                  ",", "asdf,", ",", ";", "Output:Variable,*,Generator Produced DC Electricity Rate,timestep;"});
     EXPECT_FALSE(process_idf(idfTxt, false));
-    ASSERT_THROW(GetOrCreatePVWattsGenerator("PVWattsArray1"), std::runtime_error);
+    ASSERT_THROW(GetOrCreatePVWattsGenerator(state, "PVWattsArray1"), std::runtime_error);
     std::string const error_string = delimited_string(
         {"   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][array_geometry_type] - \"asdf\" - Failed to match against any enum values.",
          "   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][array_type] - \"FixedRoofMount\" - Failed to match against any enum values.",

@@ -158,9 +158,9 @@ TEST_F(EnergyPlusFixture, Dual_NodeTempSetpoints)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutAirNodeManager::SetOutAirNodes();
+    OutAirNodeManager::SetOutAirNodes(state);
 
-    EMSManager::CheckIfAnyEMS(state.files);
+    EMSManager::CheckIfAnyEMS(state);
 
     EMSManager::FinishProcessingUserInput = true;
 
@@ -199,8 +199,8 @@ TEST_F(EnergyPlusFixture, CheckActuatorInit)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    OutAirNodeManager::SetOutAirNodes();
-    EMSManager::GetEMSInput(state, state.files);
+    OutAirNodeManager::SetOutAirNodes(state);
+    EMSManager::GetEMSInput(state);
 
     // now check that Erl variable is Null
     EXPECT_EQ(DataRuntimeLanguage::ErlVariable(1).Value.Type, DataRuntimeLanguage::ValueNull);
@@ -233,7 +233,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     ASSERT_TRUE(process_idf(idf_objects));
 
     // sets number of EMS objects
-    EMSManager::CheckIfAnyEMS(state.files);
+    EMSManager::CheckIfAnyEMS(state);
 
     // allows NodeSetpoint and AvailabilityManagers actuators to be setup
     EMSManager::FinishProcessingUserInput = true;
@@ -397,7 +397,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     ASSERT_TRUE(process_idf(idf_objects));
 
     // sets number of EMS objects
-    EMSManager::CheckIfAnyEMS(state.files);
+    EMSManager::CheckIfAnyEMS(state);
 
     // allows NodeSetpoint and AvailabilityManagers actuators to be setup
     EMSManager::FinishProcessingUserInput = true;
@@ -702,9 +702,9 @@ TEST_F(EnergyPlusFixture, Test_EMSLogic)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutAirNodeManager::SetOutAirNodes();
+    OutAirNodeManager::SetOutAirNodes(state);
 
-    EMSManager::CheckIfAnyEMS(state.files);
+    EMSManager::CheckIfAnyEMS(state);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
@@ -770,9 +770,9 @@ TEST_F(EnergyPlusFixture, Debug_EMSLogic)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutAirNodeManager::SetOutAirNodes();
+    OutAirNodeManager::SetOutAirNodes(state);
 
-    EMSManager::CheckIfAnyEMS(state.files);
+    EMSManager::CheckIfAnyEMS(state);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
@@ -808,9 +808,9 @@ TEST_F(EnergyPlusFixture, TestAnyRanArgument)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutAirNodeManager::SetOutAirNodes();
-    NodeInputManager::SetupNodeVarsForReporting(state.files);
-    EMSManager::CheckIfAnyEMS(state.files);
+    OutAirNodeManager::SetOutAirNodes(state);
+    NodeInputManager::SetupNodeVarsForReporting(state);
+    EMSManager::CheckIfAnyEMS(state);
 
     EMSManager::FinishProcessingUserInput = true;
 
@@ -847,7 +847,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EMSManager::CheckIfAnyEMS(state.files);
+    EMSManager::CheckIfAnyEMS(state);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
@@ -903,9 +903,9 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutAirNodeManager::SetOutAirNodes();
+    OutAirNodeManager::SetOutAirNodes(state);
 
-    EMSManager::CheckIfAnyEMS(state.files);
+    EMSManager::CheckIfAnyEMS(state);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
@@ -942,7 +942,7 @@ TEST_F(EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    CheckIfAnyEMS(state.files);
+    CheckIfAnyEMS(state);
     EXPECT_TRUE(AnyEnergyManagementSystemInModel);
 }
 
@@ -1084,7 +1084,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
 
     DataGlobals::TimeStepZone = 0.25;
 
-    EMSManager::CheckIfAnyEMS(state.files); // get EMS input
+    EMSManager::CheckIfAnyEMS(state); // get EMS input
     EMSManager::FinishProcessingUserInput = true;
     bool ErrorsFound(false);
     CurveManager::GetCurveInputData(state, ErrorsFound); // process curve for use with EMS
@@ -1588,7 +1588,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     // #7586
     DataSurfaces::Surface.allocate(2);
     EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(2);
-    dataConstruction.Construct.allocate(1);
+    state.dataConstruction->Construct.allocate(1);
     DataSurfaces::WindowShadingControl.allocate(2);
     DataDaylighting::ZoneDaylight.allocate(1);
     DataSurfaces::Surface(1).Name = "Surface1";
@@ -1609,7 +1609,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataSurfaces::Surface(1).activeShadedConstruction = 1;
     DataSurfaces::Surface(2).activeShadedConstruction = 1;
 
-    dataConstruction.Construct(1).Name = "Construction1";
+    state.dataConstruction->Construct(1).Name = "Construction1";
 
     DataSurfaces::WindowShadingControl(1).ShadingType = 0;
     DataSurfaces::WindowShadingControl(2).ShadingType = DataSurfaces::WSC_ST_ExteriorScreen;
@@ -1619,7 +1619,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataSurfaces::Surface(1).activeWindowShadingControl = DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(1)];
     DataSurfaces::Surface(2).activeWindowShadingControl = DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(2)];
 
-    SetupWindowShadingControlActuators();
+    SetupWindowShadingControlActuators(state);
 
     EXPECT_FALSE(DataSurfaces::SurfWinShadingFlagEMSOn(2));
     EXPECT_EQ(DataSurfaces::SurfWinShadingFlagEMSValue(2), 0);
@@ -1739,7 +1739,7 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
     DataGlobals::NumOfTimeStepInHour = 4;
     state.dataWeatherManager->LocationGathered = false;
 
-    EMSManager::CheckIfAnyEMS(state.files);
+    EMSManager::CheckIfAnyEMS(state);
     bool available = false;
     bool errorsFound = false;
     WeatherManager::GetNextEnvironment(state, available, errorsFound);
@@ -1867,7 +1867,7 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
     DataGlobals::NumOfTimeStepInHour = 4;
     state.dataWeatherManager->LocationGathered = false;
 
-    EMSManager::CheckIfAnyEMS(state.files);
+    EMSManager::CheckIfAnyEMS(state);
     bool available = false;
     bool errorsFound = false;
     WeatherManager::GetNextEnvironment(state, available, errorsFound);

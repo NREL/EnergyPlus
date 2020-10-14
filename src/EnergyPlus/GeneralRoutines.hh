@@ -59,7 +59,6 @@
 namespace EnergyPlus {
 
 // Forward declarations
-class IOFiles;
 struct EnergyPlusData;
 
 void GeneralRoutines_clear_state();
@@ -101,13 +100,15 @@ void CheckZoneSizing(std::string const &CompType, // Component Type (e.g. Chille
 void CheckThisZoneForSizing(int const ZoneNum, // zone index to be checked
                             bool &ZoneWasSized);
 
-void ValidateComponent(std::string const &CompType,  // Component Type (e.g. Chiller:Electric)
+void ValidateComponent(EnergyPlusData &state,
+                       std::string const &CompType,  // Component Type (e.g. Chiller:Electric)
                        std::string const &CompName,  // Component Name (e.g. Big Chiller)
                        bool &IsNotOK,                // .TRUE. if this component pair is invalid
                        std::string const &CallString // Context of this pair -- for error message
 );
 
-void ValidateComponent(std::string const &CompType,    // Component Type (e.g. Chiller:Electric)
+void ValidateComponent(EnergyPlusData &state,
+                       std::string const &CompType,    // Component Type (e.g. Chiller:Electric)
                        std::string const &CompValType, // Component "name" field type
                        std::string const &CompName,    // Component Name (e.g. Big Chiller)
                        bool &IsNotOK,                  // .TRUE. if this component pair is invalid
@@ -115,7 +116,6 @@ void ValidateComponent(std::string const &CompType,    // Component Type (e.g. C
 );
 
 void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
-                                  IOFiles &ioFiles,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,        // Area available for venting the gap [m2]
                                   Real64 const Cv,              // Oriface coefficient for volume-based discharge, wind-driven [--]
@@ -153,11 +153,11 @@ void CalcBasinHeaterPower(Real64 const Capacity,     // Basin heater capacity pe
                           Real64 &Power              // Basin heater power (W)
 );
 
-void TestAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound);
+void TestAirPathIntegrity(EnergyPlusData &state, bool &ErrFound);
 
-void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound);
+void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound);
 
-void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound, Array2S_int ValRetAPaths);
+void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_int ValRetAPaths);
 
 void CalcComponentSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
                                        Real64 const TDB2,      // dry-bulb temperature at state 2 {C}

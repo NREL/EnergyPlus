@@ -2060,7 +2060,7 @@ TEST_F(InputProcessorFixture, getObjectItem_json1)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(
+    inputProcessor->getObjectItem(state,
         CurrentModuleObject, NumSQLite, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"SIMPLEANDTABULAR"}), Alphas));
@@ -2109,7 +2109,7 @@ TEST_F(InputProcessorFixture, getObjectItem_json2)
     Array1D_bool lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   NumGasSteamHums,
                                   Alphas,
                                   NumAlphas,
@@ -2183,7 +2183,7 @@ TEST_F(InputProcessorFixture, getObjectItem_json3)
     Array1D_bool lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   numBuildingSurfaceDetailed,
                                   Alphas,
                                   NumAlphas,
@@ -2245,7 +2245,7 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   num_curve_biquadratic_objects,
                                   Alphas,
                                   NumAlphas,
@@ -2309,7 +2309,7 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields2)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   num_curve_biquadratic_objects,
                                   Alphas,
                                   NumAlphas,
@@ -2381,7 +2381,7 @@ TEST_F(InputProcessorFixture, getObjectItem_empty_fields_with_no_defaults)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   num_curve_biquadratic_objects,
                                   Alphas,
                                   NumAlphas,
@@ -2487,7 +2487,7 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_obj_pulled_up_semicolon)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   num_curve_biquadratic_objects,
                                   Alphas,
                                   NumAlphas,
@@ -2589,7 +2589,7 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   NumSizingSystem,
                                   Alphas,
                                   NumAlphas,
@@ -2674,7 +2674,7 @@ TEST_F(InputProcessorFixture, getObjectItem_missing_numerics_with_defaults_and_a
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   NumGasSteamHums,
                                   Alphas,
                                   NumAlphas,
@@ -2748,7 +2748,7 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_autosize_fields)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   NumGasSteamHums,
                                   Alphas,
                                   NumAlphas,
@@ -2847,7 +2847,7 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   num_unitary_systems,
                                   Alphas,
                                   NumAlphas,
@@ -2935,7 +2935,7 @@ TEST_F(InputProcessorFixture, getObjectItem_test_numbers_as_strings)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   num_eq_connections,
                                   Alphas,
                                   NumAlphas,
@@ -2994,7 +2994,7 @@ TEST_F(InputProcessorFixture, getObjectItem_test_zone_input)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(
+    inputProcessor->getObjectItem(state,
         CurrentModuleObject, num_zones, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
@@ -3051,7 +3051,7 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   num_equipment_connections,
                                   Alphas,
                                   NumAlphas,
@@ -3092,7 +3092,7 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
     Array1D_string cAlphaFields2(NumAlphas2);
     Array1D_string cNumericFields2(NumNumbers2);
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   num_equipment_lists,
                                   Alphas2,
                                   NumAlphas2,
@@ -3166,7 +3166,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(
+    inputProcessor->getObjectItem(state,
         CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(7, NumAlphas);
@@ -3193,7 +3193,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
     Array1D_string cAlphaFields2(NumAlphas2);
     Array1D_string cNumericFields2(NumNumbers2);
 
-    inputProcessor->getObjectItem(
+    inputProcessor->getObjectItem(state,
         CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
 
     EXPECT_EQ(7, NumAlphas);
@@ -3252,7 +3252,7 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   num_schedule_type_limits,
                                   Alphas,
                                   NumAlphas,
@@ -3290,7 +3290,7 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
     Array1D_string cAlphaFields2(NumAlphas);
     Array1D_string cNumericFields2(NumNumbers);
 
-    inputProcessor->getObjectItem(
+    inputProcessor->getObjectItem(state,
         CurrentModuleObject, 2, Alphas2, NumAlphas, Numbers2, NumNumbers, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
 
     // Container size is 4500 here!
@@ -3343,7 +3343,7 @@ TEST_F(InputProcessorFixture, getObjectItem_fan_on_off)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(
+    inputProcessor->getObjectItem(state,
         CurrentModuleObject, num_fans, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(4, NumAlphas);
@@ -3407,7 +3407,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(
+    inputProcessor->getObjectItem(state,
         CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
@@ -3431,7 +3431,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
     Array1D_string cAlphaFields2(NumAlphas2);
     Array1D_string cNumericFields2(NumNumbers2);
 
-    inputProcessor->getObjectItem(
+    inputProcessor->getObjectItem(state,
         CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
 
     EXPECT_EQ(1, NumAlphas2);
@@ -3455,7 +3455,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
     Array1D_string cAlphaFields3(NumAlphas3);
     Array1D_string cNumericFields3(NumNumbers3);
 
-    inputProcessor->getObjectItem(
+    inputProcessor->getObjectItem(state,
         CurrentModuleObject, 3, Alphas3, NumAlphas3, Numbers3, NumNumbers3, IOStatus, lNumericBlanks3, lAlphaBlanks3, cAlphaFields3, cNumericFields3);
 
     EXPECT_EQ(1, NumAlphas3);
@@ -3616,7 +3616,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(
+    inputProcessor->getObjectItem(state,
         CurrentModuleObject, num_coils, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(49, NumAlphas);
@@ -3694,30 +3694,30 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
     EXPECT_EQ(1, IOStatus);
     // test logical return for ValidateComponent
     bool IsNotOK = false;
-    ValidateComponent(CurrentModuleObject, "Furnace ACDXCoil 1", IsNotOK, CurrentModuleObject);
+    ValidateComponent(state, CurrentModuleObject, "Furnace ACDXCoil 1", IsNotOK, CurrentModuleObject);
     EXPECT_FALSE(IsNotOK);
-    ValidateComponent(CurrentModuleObject, "Furnace ACDXCoil 2", IsNotOK, CurrentModuleObject);
+    ValidateComponent(state, CurrentModuleObject, "Furnace ACDXCoil 2", IsNotOK, CurrentModuleObject);
     EXPECT_TRUE(IsNotOK);
     IsNotOK = false;
-    ValidateComponent(CurrentModuleObject + "x", "Furnace ACDXCoil 1", IsNotOK, CurrentModuleObject);
+    ValidateComponent(state, CurrentModuleObject + "x", "Furnace ACDXCoil 1", IsNotOK, CurrentModuleObject);
     EXPECT_TRUE(IsNotOK);
 
     // test int return for getObjectItemNum
-    int ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, "Furnace ACDXCoil 1");
+    int ItemNum = inputProcessor->getObjectItemNum(state, CurrentModuleObject, "Furnace ACDXCoil 1");
     EXPECT_GT(ItemNum, 0); // object type and name are correct, ItemNum is > 0
     // corrupt object type
-    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject + "x", "Furnace ACDXCoil 1");
+    ItemNum = inputProcessor->getObjectItemNum(state, CurrentModuleObject + "x", "Furnace ACDXCoil 1");
     EXPECT_EQ(ItemNum, -1); // object type is invalid, ItemNum = -1
     // corrupt object name
-    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, "Furnace ACDXCoil 2");
+    ItemNum = inputProcessor->getObjectItemNum(state, CurrentModuleObject, "Furnace ACDXCoil 2");
     EXPECT_EQ(ItemNum, 0); // object name is invalid, ItemNum = 0
 
     std::string CompValType = "x";
-    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, CompValType, "Furnace ACDXCoil 1");
+    ItemNum = inputProcessor->getObjectItemNum(state, CurrentModuleObject, CompValType, "Furnace ACDXCoil 1");
     EXPECT_EQ(ItemNum, 0); // developer error, CompValType is invalid, ItemNum = 0
 
     CompValType = "indoor_air_inlet_node_name";
-    ItemNum = inputProcessor->getObjectItemNum(CurrentModuleObject, CompValType, "DX Cooling Coil Air Inlet Node");
+    ItemNum = inputProcessor->getObjectItemNum(state, CurrentModuleObject, CompValType, "DX Cooling Coil Air Inlet Node");
     EXPECT_GT(ItemNum, 0); // Object type is valid, CompValType is valid, CompValType name is valid, ItemNum > 0
 }
 
@@ -3782,7 +3782,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(
+    inputProcessor->getObjectItem(state,
         CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(4, NumAlphas);
@@ -3810,7 +3810,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)
     Array1D_string cAlphaFields2(NumAlphas2);
     Array1D_string cNumericFields2(NumNumbers2);
 
-    inputProcessor->getObjectItem(
+    inputProcessor->getObjectItem(state,
         CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2);
 
     EXPECT_EQ(4, NumAlphas2);
@@ -3871,7 +3871,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic2)
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   num_curve_biquad,
                                   Alphas,
                                   NumAlphas,

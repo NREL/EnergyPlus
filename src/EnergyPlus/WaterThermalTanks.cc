@@ -73,7 +73,6 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -166,31 +165,31 @@ namespace WaterThermalTanks {
         this->MinePlantStructForInfo();
         if (calledFromLocation.loopNum > 0) {
             if ((this->SrcSide.loopNum == calledFromLocation.loopNum) || (this->UseSide.loopNum == calledFromLocation.loopNum)) {
-                this->SizeTankForDemandSide();
-                this->SizeDemandSidePlantConnections();
-                this->SizeSupplySidePlantConnections(calledFromLocation.loopNum);
-                this->SizeTankForSupplySide();
+                this->SizeTankForDemandSide(state);
+                this->SizeDemandSidePlantConnections(state);
+                this->SizeSupplySidePlantConnections(state, calledFromLocation.loopNum);
+                this->SizeTankForSupplySide(state);
             } else {
                 return;
             }
         } else {
-            this->SizeTankForDemandSide();
-            this->SizeDemandSidePlantConnections();
-            this->SizeSupplySidePlantConnections();
-            this->SizeTankForSupplySide();
+            this->SizeTankForDemandSide(state);
+            this->SizeDemandSidePlantConnections(state);
+            this->SizeSupplySidePlantConnections(state);
+            this->SizeTankForSupplySide(state);
         }
 
         if (DataPlant::PlantFirstSizesOkayToFinalize) {
             if (!this->IsChilledWaterTank) {
                 this->CalcStandardRatings(state);
             } else {
-                this->ReportCWTankInits(state, state.files);
+                this->ReportCWTankInits(state);
             }
         }
     }
 
     void
-    WaterThermalTankData::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    WaterThermalTankData::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MinLoad = 0.0;
         MaxLoad = this->MaxCapacity;
@@ -276,7 +275,7 @@ namespace WaterThermalTanks {
         this->callerLoopNum = calledFromLocation.loopNum;
 
         if (this->myOneTimeInitFlag) {
-            this->setupOutputVars(state, state.files);
+            this->setupOutputVars(state);
             this->myOneTimeInitFlag = false;
         }
 
@@ -337,7 +336,8 @@ namespace WaterThermalTanks {
         Tank.onInitLoopEquip(state, calledFromLocation);
     }
 
-    void HeatPumpWaterHeaterData::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void HeatPumpWaterHeaterData::getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
+                                                      const PlantLocation &EP_UNUSED(calledFromLocation),
                                                       Real64 &MaxLoad,
                                                       Real64 &MinLoad,
                                                       Real64 &OptLoad)
@@ -363,7 +363,7 @@ namespace WaterThermalTanks {
 
         if (this->myOneTimeInitFlag) {
             if (Tank.myOneTimeInitFlag) {
-                Tank.setupOutputVars(state, state.files);
+                Tank.setupOutputVars(state);
                 Tank.myOneTimeInitFlag = false;
             }
             this->myOneTimeInitFlag = false;
@@ -657,7 +657,8 @@ namespace WaterThermalTanks {
             int NumAlphas;
             int NumNums;
             int IOStat;
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           DesuperheaterNum,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -679,7 +680,7 @@ namespace WaterThermalTanks {
 
             //       convert availability schedule name to pointer
             if (!DataIPShortCuts::lAlphaFieldBlanks(2)) {
-                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(2));
+                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(2));
                 if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr == 0) {
                     ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
@@ -690,7 +691,7 @@ namespace WaterThermalTanks {
             }
 
             //       convert schedule name to pointer
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).SetPointTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(3));
+            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(3));
             if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).SetPointTempSchedule == 0) {
                 ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
@@ -746,7 +747,7 @@ namespace WaterThermalTanks {
                 }
             }
 
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).WaterInletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).WaterInletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                                             ErrorsFound,
                                                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                                                             DataIPShortCuts::cAlphaArgs(1),
@@ -755,7 +756,7 @@ namespace WaterThermalTanks {
                                                                                                             1,
                                                                                                             DataLoopNode::ObjectIsParent);
 
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).WaterOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).WaterOutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
                                                                                                              ErrorsFound,
                                                                                                              DataIPShortCuts::cCurrentModuleObject,
                                                                                                              DataIPShortCuts::cAlphaArgs(1),
@@ -1086,7 +1087,8 @@ namespace WaterThermalTanks {
             int NumAlphas;
             int NumNums;
             int IOStat;
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           HPWaterHeaterNumOfSpecificType,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -1130,7 +1132,7 @@ namespace WaterThermalTanks {
             // Availability Schedule
             // convert schedule name to pointer
             if (!hpwhAlphaBlank[2]) {
-                HPWH.AvailSchedPtr = ScheduleManager::GetScheduleIndex(hpwhAlpha[2]);
+                HPWH.AvailSchedPtr = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[2]);
                 if (HPWH.AvailSchedPtr == 0) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
                     ShowContinueError(hpwhAlphaFieldNames[2] + "=\"" + hpwhAlpha[2] + "\".");
@@ -1143,7 +1145,7 @@ namespace WaterThermalTanks {
             // Compressor Setpoint Temperature Schedule
             // convert schedule name to pointer
             if (!hpwhAlphaBlank[3]) {
-                HPWH.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(hpwhAlpha[3]);
+                HPWH.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[3]);
                 if (HPWH.SetPointTempSchedule == 0) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
                     ShowContinueError(hpwhAlphaFieldNames[3] + "=\"" + hpwhAlpha[3] + "\".");
@@ -1167,7 +1169,7 @@ namespace WaterThermalTanks {
             if (HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterPumped) {
 
                 // Condenser Inlet/Outlet Nodes
-                HPWH.CondWaterInletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[4],
+                HPWH.CondWaterInletNode = NodeInputManager::GetOnlySingleNode(state, hpwhAlpha[4],
                                                                               ErrorsFound,
                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                               HPWH.Name,
@@ -1176,7 +1178,7 @@ namespace WaterThermalTanks {
                                                                               2,
                                                                               DataLoopNode::ObjectIsParent);
                 HPWH.InletNodeName1 = hpwhAlpha[4];
-                HPWH.CondWaterOutletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[5],
+                HPWH.CondWaterOutletNode = NodeInputManager::GetOnlySingleNode(state, hpwhAlpha[5],
                                                                                ErrorsFound,
                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                HPWH.Name,
@@ -1242,7 +1244,7 @@ namespace WaterThermalTanks {
 
                     // Inlet Air Temperature Schedule
                     if (!hpwhAlphaBlank[11 + nAlphaOffset]) {
-                        HPWH.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(hpwhAlpha[11 + nAlphaOffset]);
+                        HPWH.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[11 + nAlphaOffset]);
                         if (HPWH.AmbientTempSchedule == 0) {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
                             ShowContinueError(hpwhAlphaFieldNames[11 + nAlphaOffset] + "=\"" + hpwhAlpha[11 + nAlphaOffset] + "\".");
@@ -1256,7 +1258,7 @@ namespace WaterThermalTanks {
 
                     // Inlet Air Humidity Schedule
                     if (!hpwhAlphaBlank[12 + nAlphaOffset]) {
-                        HPWH.AmbientRHSchedule = ScheduleManager::GetScheduleIndex(hpwhAlpha[12 + nAlphaOffset]);
+                        HPWH.AmbientRHSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[12 + nAlphaOffset]);
                         if (HPWH.AmbientRHSchedule == 0) {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
                             ShowContinueError(hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] + "\".");
@@ -1329,7 +1331,7 @@ namespace WaterThermalTanks {
             HPWH.OutletNodeName2 = hpwhAlpha[17 + nAlphaOffset];
 
             if (!hpwhAlphaBlank[16 + nAlphaOffset] && !hpwhAlphaBlank[17 + nAlphaOffset]) {
-                HPWH.WHUseInletNode = NodeInputManager::GetOnlySingleNode(HPWH.InletNodeName2,
+                HPWH.WHUseInletNode = NodeInputManager::GetOnlySingleNode(state, HPWH.InletNodeName2,
                                                                           ErrorsFound,
                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                           HPWH.Name,
@@ -1337,7 +1339,7 @@ namespace WaterThermalTanks {
                                                                           DataLoopNode::NodeConnectionType_Inlet,
                                                                           1,
                                                                           DataLoopNode::ObjectIsParent);
-                HPWH.WHUseOutletNode = NodeInputManager::GetOnlySingleNode(HPWH.OutletNodeName2,
+                HPWH.WHUseOutletNode = NodeInputManager::GetOnlySingleNode(state, HPWH.OutletNodeName2,
                                                                            ErrorsFound,
                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                            HPWH.Name,
@@ -1386,7 +1388,7 @@ namespace WaterThermalTanks {
                 if (HPWH.bIsIHP) {
                     HPWH.DXCoilType = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE";
                 } else {
-                    HPWH.DXCoilType = VariableSpeedCoils::VarSpeedCoil(HPWH.DXCoilNum).VarSpeedCoilType;
+                    HPWH.DXCoilType = state.dataVariableSpeedCoils->VarSpeedCoil(HPWH.DXCoilNum).VarSpeedCoilType;
                 }
             } else {
                 // this is a single speed coil
@@ -1432,7 +1434,7 @@ namespace WaterThermalTanks {
                 DXCoils::DXCoilData &Coil = DXCoils::DXCoil(HPWH.DXCoilNum);
 
                 HPWH.InletNodeName1 = "DUMMY CONDENSER INLET " + Coil.Name;
-                HPWH.CondWaterInletNode = NodeInputManager::GetOnlySingleNode(HPWH.InletNodeName1,
+                HPWH.CondWaterInletNode = NodeInputManager::GetOnlySingleNode(state, HPWH.InletNodeName1,
                                                                               ErrorsFound,
                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                               HPWH.Name,
@@ -1441,7 +1443,7 @@ namespace WaterThermalTanks {
                                                                               2,
                                                                               DataLoopNode::ObjectIsParent);
                 HPWH.OutletNodeName1 = "DUMMY CONDENSER OUTLET " + Coil.Name;
-                HPWH.CondWaterOutletNode = NodeInputManager::GetOnlySingleNode(HPWH.OutletNodeName1,
+                HPWH.CondWaterOutletNode = NodeInputManager::GetOnlySingleNode(state, HPWH.OutletNodeName1,
                                                                                ErrorsFound,
                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                HPWH.Name,
@@ -1476,7 +1478,7 @@ namespace WaterThermalTanks {
                     HPWH.CrankcaseTempIndicator = CrankTempEnum::Schedule;
                     if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
                         // Compressor Ambient Temperature Schedule
-                        HPWH.CrankcaseTempSchedule = ScheduleManager::GetScheduleIndex(hpwhAlpha[21 + nAlphaOffset]);
+                        HPWH.CrankcaseTempSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[21 + nAlphaOffset]);
                         if (HPWH.CrankcaseTempSchedule == 0) {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
                             ShowContinueError(hpwhAlphaFieldNames[21 + nAlphaOffset] + "=\"" + hpwhAlpha[21 + nAlphaOffset] + "\".");
@@ -1518,7 +1520,7 @@ namespace WaterThermalTanks {
 
             // check that the fan exists
             bool errFlag = false;
-            ValidateComponent(HPWH.FanType, HPWH.FanName, errFlag, DataIPShortCuts::cCurrentModuleObject);
+            ValidateComponent(state, HPWH.FanType, HPWH.FanName, errFlag, DataIPShortCuts::cCurrentModuleObject);
 
             Real64 FanVolFlow = 0.0;
             if (errFlag) {
@@ -1539,8 +1541,8 @@ namespace WaterThermalTanks {
             }
             // issue #5630, set fan info in coils.
             if (bIsVScoil) {
-                VariableSpeedCoils::setVarSpeedHPWHFanTypeNum(HPWH.DXCoilNum, HPWH.FanType_Num);
-                VariableSpeedCoils::setVarSpeedHPWHFanIndex(HPWH.DXCoilNum, HPWH.FanNum);
+                VariableSpeedCoils::setVarSpeedHPWHFanTypeNum(state, HPWH.DXCoilNum, HPWH.FanType_Num);
+                VariableSpeedCoils::setVarSpeedHPWHFanIndex(state, HPWH.DXCoilNum, HPWH.FanNum);
             } else {
                 DXCoils::SetDXCoolingCoilData(
                     state, HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanName);
@@ -1665,7 +1667,7 @@ namespace WaterThermalTanks {
             if (!hpwhAlphaBlank[26 + nAlphaOffset]) {
                 // For the inlet air mixer node, NodeConnectionType is outlet from the HPWH inlet air node
                 if (HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
-                    HPWH.InletAirMixerNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[26 + nAlphaOffset],
+                    HPWH.InletAirMixerNode = NodeInputManager::GetOnlySingleNode(state, hpwhAlpha[26 + nAlphaOffset],
                                                                                  ErrorsFound,
                                                                                  DataIPShortCuts::cCurrentModuleObject + " inlet air mixer",
                                                                                  HPWH.Name,
@@ -1688,7 +1690,7 @@ namespace WaterThermalTanks {
             if (!hpwhAlphaBlank[27 + nAlphaOffset]) {
                 //  For the outlet air splitter node, NodeConnectionType is inlet to the HPWH outlet air node
                 if (HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
-                    HPWH.OutletAirSplitterNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[27 + nAlphaOffset],
+                    HPWH.OutletAirSplitterNode = NodeInputManager::GetOnlySingleNode(state, hpwhAlpha[27 + nAlphaOffset],
                                                                                      ErrorsFound,
                                                                                      DataIPShortCuts::cCurrentModuleObject + "-OUTLET AIR SPLITTER",
                                                                                      HPWH.Name,
@@ -1711,7 +1713,7 @@ namespace WaterThermalTanks {
             if (HPWH.InletAirMixerNode != 0) {
                 // when mixer/splitter nodes are used the HPWH's inlet/outlet node are set up as DataLoopNode::ObjectIsNotParent
 
-                HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[7 + nAlphaOffset],
+                HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(state, hpwhAlpha[7 + nAlphaOffset],
                                                                                 ErrorsFound,
                                                                                 DataIPShortCuts::cCurrentModuleObject + "-INLET AIR MIXER",
                                                                                 HPWH.Name,
@@ -1720,7 +1722,7 @@ namespace WaterThermalTanks {
                                                                                 1,
                                                                                 DataLoopNode::ObjectIsNotParent);
 
-                HPWH.HeatPumpAirOutletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[8 + nAlphaOffset],
+                HPWH.HeatPumpAirOutletNode = NodeInputManager::GetOnlySingleNode(state, hpwhAlpha[8 + nAlphaOffset],
                                                                                  ErrorsFound,
                                                                                  DataIPShortCuts::cCurrentModuleObject + "-OUTLET AIR SPLITTER",
                                                                                  HPWH.Name,
@@ -1729,7 +1731,7 @@ namespace WaterThermalTanks {
                                                                                  1,
                                                                                  DataLoopNode::ObjectIsNotParent);
 
-                HPWH.OutsideAirNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[9 + nAlphaOffset],
+                HPWH.OutsideAirNode = NodeInputManager::GetOnlySingleNode(state, hpwhAlpha[9 + nAlphaOffset],
                                                                           ErrorsFound,
                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                           HPWH.Name,
@@ -1739,14 +1741,14 @@ namespace WaterThermalTanks {
                                                                           DataLoopNode::ObjectIsParent);
                 if (!hpwhAlpha[9 + nAlphaOffset].empty()) {
                     bool Okay;
-                    OutAirNodeManager::CheckAndAddAirNodeNumber(HPWH.OutsideAirNode, Okay);
+                    OutAirNodeManager::CheckAndAddAirNodeNumber(state, HPWH.OutsideAirNode, Okay);
                     if (!Okay) {
                         ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name +
                                          "\": Adding outdoor air node=" + hpwhAlpha[9 + nAlphaOffset]);
                     }
                 }
 
-                HPWH.ExhaustAirNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[10 + nAlphaOffset],
+                HPWH.ExhaustAirNode = NodeInputManager::GetOnlySingleNode(state, hpwhAlpha[10 + nAlphaOffset],
                                                                           ErrorsFound,
                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                           HPWH.Name,
@@ -1760,7 +1762,7 @@ namespace WaterThermalTanks {
                 if (HPWH.InletAirConfiguration == AmbientTempEnum::Schedule) {
                     // for scheduled HPWH's the inlet node is not on any branch or parent object, make it an outlet node
                     // to avoid node connection errors
-                    HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[7 + nAlphaOffset],
+                    HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(state, hpwhAlpha[7 + nAlphaOffset],
                                                                                     ErrorsFound,
                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                     HPWH.Name,
@@ -1769,7 +1771,7 @@ namespace WaterThermalTanks {
                                                                                     1,
                                                                                     DataLoopNode::ObjectIsParent);
 
-                    HPWH.HeatPumpAirOutletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[8 + nAlphaOffset],
+                    HPWH.HeatPumpAirOutletNode = NodeInputManager::GetOnlySingleNode(state, hpwhAlpha[8 + nAlphaOffset],
                                                                                      ErrorsFound,
                                                                                      DataIPShortCuts::cCurrentModuleObject,
                                                                                      HPWH.Name,
@@ -1780,7 +1782,7 @@ namespace WaterThermalTanks {
 
                 } else { // HPWH is connected to a zone with no mixer/splitter nodes
                     if (HPWH.InletAirConfiguration == AmbientTempEnum::TempZone) {
-                        HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[7 + nAlphaOffset],
+                        HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(state, hpwhAlpha[7 + nAlphaOffset],
                                                                                         ErrorsFound,
                                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                                         HPWH.Name,
@@ -1789,7 +1791,7 @@ namespace WaterThermalTanks {
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsParent);
 
-                        HPWH.HeatPumpAirOutletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[8 + nAlphaOffset],
+                        HPWH.HeatPumpAirOutletNode = NodeInputManager::GetOnlySingleNode(state, hpwhAlpha[8 + nAlphaOffset],
                                                                                          ErrorsFound,
                                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                                          HPWH.Name,
@@ -1798,7 +1800,7 @@ namespace WaterThermalTanks {
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsParent);
                     } else { // HPWH is located outdoors
-                        HPWH.OutsideAirNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[9 + nAlphaOffset],
+                        HPWH.OutsideAirNode = NodeInputManager::GetOnlySingleNode(state, hpwhAlpha[9 + nAlphaOffset],
                                                                                   ErrorsFound,
                                                                                   DataIPShortCuts::cCurrentModuleObject,
                                                                                   HPWH.Name,
@@ -1808,14 +1810,14 @@ namespace WaterThermalTanks {
                                                                                   DataLoopNode::ObjectIsParent);
                         if (!hpwhAlphaBlank[9 + nAlphaOffset]) {
                             bool Okay;
-                            OutAirNodeManager::CheckAndAddAirNodeNumber(HPWH.OutsideAirNode, Okay);
+                            OutAirNodeManager::CheckAndAddAirNodeNumber(state, HPWH.OutsideAirNode, Okay);
                             if (!Okay) {
                                 ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name +
                                                  "\": Adding outdoor air node =" + hpwhAlpha[9 + nAlphaOffset]);
                             }
                         }
 
-                        HPWH.ExhaustAirNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[10 + nAlphaOffset],
+                        HPWH.ExhaustAirNode = NodeInputManager::GetOnlySingleNode(state, hpwhAlpha[10 + nAlphaOffset],
                                                                                   ErrorsFound,
                                                                                   DataIPShortCuts::cCurrentModuleObject,
                                                                                   HPWH.Name,
@@ -1909,7 +1911,7 @@ namespace WaterThermalTanks {
 
             // only get the inlet air mixer schedule if the inlet air configuration is zone and outdoor air
             if (!hpwhAlphaBlank[28 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
-                HPWH.InletAirMixerSchPtr = ScheduleManager::GetScheduleIndex(hpwhAlpha[28 + nAlphaOffset]);
+                HPWH.InletAirMixerSchPtr = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[28 + nAlphaOffset]);
                 if (HPWH.InletAirMixerSchPtr == 0) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
                     ShowContinueError(hpwhAlphaFieldNames[28 + nAlphaOffset] + "=\"" + hpwhAlpha[28 + nAlphaOffset] + "\",");
@@ -1924,7 +1926,7 @@ namespace WaterThermalTanks {
                     }
                     //           set outlet air splitter schedule index equal to inlet air mixer schedule index
                     //           (place holder for when zone pressurization/depressurization is allowed and different schedules can be used)
-                    HPWH.OutletAirSplitterSchPtr = ScheduleManager::GetScheduleIndex(hpwhAlpha[28 + nAlphaOffset]);
+                    HPWH.OutletAirSplitterSchPtr = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[28 + nAlphaOffset]);
                 }
             }
 
@@ -2172,7 +2174,8 @@ namespace WaterThermalTanks {
             int NumAlphas;
             int NumNums;
             int IOStat;
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           WaterThermalTankNum,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -2212,7 +2215,7 @@ namespace WaterThermalTanks {
                 Tank.Volume = 0.000001; // = 1 cm3
             }
 
-            Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(2));
+            Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(2));
             if (DataIPShortCuts::lAlphaFieldBlanks(2)) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", missing data.");
                 ShowContinueError("blank field, missing " + DataIPShortCuts::cAlphaFieldNames(2) + " is required");
@@ -2365,7 +2368,7 @@ namespace WaterThermalTanks {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(8));
                 if (SELECT_CASE_var == "SCHEDULE") {
                     Tank.AmbientTempIndicator = AmbientTempEnum::Schedule;
-                    Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(9));
+                    Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(9));
                     if (Tank.AmbientTempSchedule == 0) {
                         ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                         ":  Ambient Temperature Schedule not found = " + DataIPShortCuts::cAlphaArgs(9));
@@ -2383,7 +2386,7 @@ namespace WaterThermalTanks {
 
                 } else if (SELECT_CASE_var == "OUTDOORS") {
                     Tank.AmbientTempIndicator = AmbientTempEnum::OutsideAir;
-                    Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(11),
+                    Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(11),
                                                                                          ErrorsFound,
                                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
@@ -2392,7 +2395,7 @@ namespace WaterThermalTanks {
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
                     if (!DataIPShortCuts::cAlphaArgs(11).empty()) {
-                        if (!OutAirNodeManager::CheckOutAirNodeNumber(Tank.AmbientTempOutsideAirNode)) {
+                        if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                             ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
                             ShowContinueError("...Referenced Node Name=" + DataIPShortCuts::cAlphaArgs(11));
@@ -2417,12 +2420,12 @@ namespace WaterThermalTanks {
 
             Tank.OnCycLossCoeff = DataIPShortCuts::rNumericArgs(15);
             Tank.OnCycLossFracToZone = DataIPShortCuts::rNumericArgs(16);
-            Real64 rho = FluidProperties::GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, Tank.FluidIndex, RoutineName);
+            Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, Tank.FluidIndex, RoutineName);
             Tank.MassFlowRateMax = DataIPShortCuts::rNumericArgs(17) * rho;
 
             if ((DataIPShortCuts::cAlphaArgs(14).empty()) && (DataIPShortCuts::cAlphaArgs(15).empty())) {
                 if (!DataIPShortCuts::cAlphaArgs(12).empty()) {
-                    Tank.FlowRateSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(12));
+                    Tank.FlowRateSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(12));
                     if (Tank.FlowRateSchedule == 0) {
                         ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                         ":  Flow Rate Schedule not found = " + DataIPShortCuts::cAlphaArgs(12));
@@ -2432,7 +2435,7 @@ namespace WaterThermalTanks {
             }
 
             if (!DataIPShortCuts::cAlphaArgs(13).empty()) {
-                Tank.UseInletTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(13));
+                Tank.UseInletTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(13));
                 if (Tank.UseInletTempSchedule == 0) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Cold Water Supply Temperature Schedule not found = " + DataIPShortCuts::cAlphaArgs(13));
@@ -2495,7 +2498,7 @@ namespace WaterThermalTanks {
             }
 
             if ((!DataIPShortCuts::cAlphaArgs(14).empty()) || (!DataIPShortCuts::cAlphaArgs(15).empty())) {
-                Tank.UseInletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(14),
+                Tank.UseInletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(14),
                                                                         ErrorsFound,
                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                         DataIPShortCuts::cAlphaArgs(1),
@@ -2504,7 +2507,7 @@ namespace WaterThermalTanks {
                                                                         1,
                                                                         DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName1 = DataIPShortCuts::cAlphaArgs(14);
-                Tank.UseOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(15),
+                Tank.UseOutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(15),
                                                                          ErrorsFound,
                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                          DataIPShortCuts::cAlphaArgs(1),
@@ -2531,7 +2534,7 @@ namespace WaterThermalTanks {
             }
 
             if ((!DataIPShortCuts::cAlphaArgs(16).empty()) || (!DataIPShortCuts::cAlphaArgs(17).empty())) {
-                Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(16),
+                Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(16),
                                                                            ErrorsFound,
                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                            DataIPShortCuts::cAlphaArgs(1),
@@ -2540,7 +2543,7 @@ namespace WaterThermalTanks {
                                                                            2,
                                                                            DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName2 = DataIPShortCuts::cAlphaArgs(16);
-                Tank.SourceOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(17),
+                Tank.SourceOutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(17),
                                                                             ErrorsFound,
                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                             DataIPShortCuts::cAlphaArgs(1),
@@ -2571,7 +2574,7 @@ namespace WaterThermalTanks {
             }
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(19)) {
-                Tank.SourceSideAltSetpointSchedNum = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(19));
+                Tank.SourceSideAltSetpointSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(19));
                 if (Tank.SourceSideAltSetpointSchedNum == 0) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ":  " +
                                     DataIPShortCuts::cAlphaFieldNames(19) + " not found = " + DataIPShortCuts::cAlphaArgs(19));
@@ -2599,7 +2602,8 @@ namespace WaterThermalTanks {
             int NumAlphas;
             int NumNums;
             int IOStat;
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           WaterThermalTankNum - state.dataWaterThermalTanks->numWaterHeaterMixed,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -2633,7 +2637,7 @@ namespace WaterThermalTanks {
             if (Tank.Volume == DataSizing::AutoSize) {
                 Tank.VolumeWasAutoSized = true;
             }
-            Real64 rho = FluidProperties::GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, Tank.FluidIndex, RoutineName);
+            Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, Tank.FluidIndex, RoutineName);
             Tank.Mass = Tank.Volume * rho;
             Tank.Height = DataIPShortCuts::rNumericArgs(2);
             if (Tank.Height == DataSizing::AutoSize) {
@@ -2689,7 +2693,7 @@ namespace WaterThermalTanks {
                 }
             }
 
-            Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(5));
+            Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(5));
             if (DataIPShortCuts::lAlphaFieldBlanks(5)) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", missing data.");
                 ShowContinueError("blank field, missing " + DataIPShortCuts::cAlphaFieldNames(5) + " is required");
@@ -2731,7 +2735,7 @@ namespace WaterThermalTanks {
                 ErrorsFound = true;
             }
 
-            Tank.SetPointTempSchedule2 = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(6));
+            Tank.SetPointTempSchedule2 = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(6));
             if (DataIPShortCuts::lAlphaFieldBlanks(6)) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", missing data.");
                 ShowContinueError("blank field, missing " + DataIPShortCuts::cAlphaFieldNames(6) + " is required");
@@ -2842,7 +2846,7 @@ namespace WaterThermalTanks {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(10));
                 if (SELECT_CASE_var == "SCHEDULE") {
                     Tank.AmbientTempIndicator = AmbientTempEnum::Schedule;
-                    Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(11));
+                    Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(11));
                     if (Tank.AmbientTempSchedule == 0) {
                         ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                         ":  Ambient Temperature Schedule not found = " + DataIPShortCuts::cAlphaArgs(11));
@@ -2860,7 +2864,7 @@ namespace WaterThermalTanks {
 
                 } else if (SELECT_CASE_var == "OUTDOORS") {
                     Tank.AmbientTempIndicator = AmbientTempEnum::OutsideAir;
-                    Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(13),
+                    Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(13),
                                                                                          ErrorsFound,
                                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
@@ -2869,7 +2873,7 @@ namespace WaterThermalTanks {
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
                     if (!DataIPShortCuts::cAlphaArgs(13).empty()) {
-                        if (!OutAirNodeManager::CheckOutAirNodeNumber(Tank.AmbientTempOutsideAirNode)) {
+                        if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                             ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
                             ShowContinueError("...Referenced Node Name=" + DataIPShortCuts::cAlphaArgs(13));
@@ -2895,12 +2899,12 @@ namespace WaterThermalTanks {
             Tank.OffCycFlueLossFracToZone = DataIPShortCuts::rNumericArgs(21);
 
             // this is temporary until we know fluid type
-            rho = FluidProperties::GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, Tank.FluidIndex, RoutineName);
+            rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, Tank.FluidIndex, RoutineName);
             Tank.MassFlowRateMax = DataIPShortCuts::rNumericArgs(22) * rho;
 
             if ((DataIPShortCuts::cAlphaArgs(16).empty()) && (DataIPShortCuts::cAlphaArgs(17).empty())) {
                 if (!DataIPShortCuts::cAlphaArgs(14).empty()) {
-                    Tank.FlowRateSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(14));
+                    Tank.FlowRateSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(14));
                     if (Tank.FlowRateSchedule == 0) {
                         ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                         ":  Flow Rate Schedule not found = " + DataIPShortCuts::cAlphaArgs(14));
@@ -2910,7 +2914,7 @@ namespace WaterThermalTanks {
             }
 
             if (!DataIPShortCuts::cAlphaArgs(15).empty()) {
-                Tank.UseInletTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(15));
+                Tank.UseInletTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(15));
                 if (Tank.UseInletTempSchedule == 0) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Cold Water Supply Temperature Schedule not found = " + DataIPShortCuts::cAlphaArgs(15));
@@ -3031,7 +3035,7 @@ namespace WaterThermalTanks {
             Tank.SrcSide.loopSideNum = DataPlant::DemandSupply_No;
 
             if ((!DataIPShortCuts::cAlphaArgs(16).empty()) || (!DataIPShortCuts::cAlphaArgs(17).empty())) {
-                Tank.UseInletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(16),
+                Tank.UseInletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(16),
                                                                         ErrorsFound,
                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                         DataIPShortCuts::cAlphaArgs(1),
@@ -3040,7 +3044,7 @@ namespace WaterThermalTanks {
                                                                         1,
                                                                         DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName1 = DataIPShortCuts::cAlphaArgs(16);
-                Tank.UseOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(17),
+                Tank.UseOutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(17),
                                                                          ErrorsFound,
                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                          DataIPShortCuts::cAlphaArgs(1),
@@ -3067,7 +3071,7 @@ namespace WaterThermalTanks {
             }
 
             if ((!DataIPShortCuts::cAlphaArgs(18).empty()) || (!DataIPShortCuts::cAlphaArgs(19).empty())) {
-                Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(18),
+                Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(18),
                                                                            ErrorsFound,
                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                            DataIPShortCuts::cAlphaArgs(1),
@@ -3076,7 +3080,7 @@ namespace WaterThermalTanks {
                                                                            2,
                                                                            DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName2 = DataIPShortCuts::cAlphaArgs(18);
-                Tank.SourceOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(19),
+                Tank.SourceOutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(19),
                                                                             ErrorsFound,
                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                             DataIPShortCuts::cAlphaArgs(1),
@@ -3124,7 +3128,7 @@ namespace WaterThermalTanks {
                                  ":  More Additional Loss Coefficients were entered than the number of nodes; extra coefficients will not be used");
             }
 
-            Tank.SetupStratifiedNodes();
+            Tank.SetupStratifiedNodes(state);
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(21)) {
                 {
@@ -3146,7 +3150,7 @@ namespace WaterThermalTanks {
             }
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(22)) {
-                Tank.SourceSideAltSetpointSchedNum = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(22));
+                Tank.SourceSideAltSetpointSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(22));
                 if (Tank.SourceSideAltSetpointSchedNum == 0) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ":  " +
                                     DataIPShortCuts::cAlphaFieldNames(22) + " not found = " + DataIPShortCuts::cAlphaArgs(22));
@@ -3169,7 +3173,8 @@ namespace WaterThermalTanks {
             int NumAlphas;
             int NumNums;
             int IOStat;
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           WaterThermalTankNum - (state.dataWaterThermalTanks->numWaterHeaterMixed + state.dataWaterThermalTanks->numWaterHeaterStratified),
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -3205,7 +3210,7 @@ namespace WaterThermalTanks {
                 Tank.Volume = 0.000001; // = 1 cm3
             }
 
-            Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(2));
+            Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(2));
             if (Tank.SetPointTempSchedule == 0) {
                 ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
@@ -3251,7 +3256,7 @@ namespace WaterThermalTanks {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(3));
                 if (SELECT_CASE_var == "SCHEDULE") {
                     Tank.AmbientTempIndicator = AmbientTempEnum::Schedule;
-                    Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(4));
+                    Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(4));
                     if (Tank.AmbientTempSchedule == 0) {
                         ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + DataIPShortCuts::cAlphaArgs(4));
                         ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
@@ -3271,7 +3276,7 @@ namespace WaterThermalTanks {
 
                 } else if (SELECT_CASE_var == "OUTDOORS") {
                     Tank.AmbientTempIndicator = AmbientTempEnum::OutsideAir;
-                    Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+                    Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
                                                                                          ErrorsFound,
                                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
@@ -3280,7 +3285,7 @@ namespace WaterThermalTanks {
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
                     if (!DataIPShortCuts::lAlphaFieldBlanks(6)) {
-                        if (!OutAirNodeManager::CheckOutAirNodeNumber(Tank.AmbientTempOutsideAirNode)) {
+                        if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
                             ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + DataIPShortCuts::cAlphaArgs(6));
                             ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
                             ShowContinueError("Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
@@ -3342,7 +3347,7 @@ namespace WaterThermalTanks {
             if (DataIPShortCuts::lAlphaFieldBlanks(9)) {
                 Tank.UseSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
             } else {
-                Tank.UseSideAvailSchedNum = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(9));
+                Tank.UseSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(9));
                 if (Tank.UseSideAvailSchedNum == 0) {
                     ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(9) + " = " + DataIPShortCuts::cAlphaArgs(9));
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
@@ -3365,7 +3370,7 @@ namespace WaterThermalTanks {
             if (DataIPShortCuts::lAlphaFieldBlanks(12)) {
                 Tank.SourceSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
             } else {
-                Tank.SourceSideAvailSchedNum = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(12));
+                Tank.SourceSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(12));
                 if (Tank.SourceSideAvailSchedNum == 0) {
                     ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(12) + " = " + DataIPShortCuts::cAlphaArgs(12));
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
@@ -3380,7 +3385,7 @@ namespace WaterThermalTanks {
             }
 
             if ((!DataIPShortCuts::lAlphaFieldBlanks(7)) || (!DataIPShortCuts::lAlphaFieldBlanks(8))) {
-                Tank.UseInletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(7),
+                Tank.UseInletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
                                                                         ErrorsFound,
                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                         DataIPShortCuts::cAlphaArgs(1),
@@ -3389,7 +3394,7 @@ namespace WaterThermalTanks {
                                                                         1,
                                                                         DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName1 = DataIPShortCuts::cAlphaArgs(7);
-                Tank.UseOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(8),
+                Tank.UseOutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(8),
                                                                          ErrorsFound,
                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                          DataIPShortCuts::cAlphaArgs(1),
@@ -3401,7 +3406,7 @@ namespace WaterThermalTanks {
             }
 
             if ((!DataIPShortCuts::lAlphaFieldBlanks(10)) || (!DataIPShortCuts::lAlphaFieldBlanks(11))) {
-                Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(10),
+                Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(10),
                                                                            ErrorsFound,
                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                            DataIPShortCuts::cAlphaArgs(1),
@@ -3410,7 +3415,7 @@ namespace WaterThermalTanks {
                                                                            2,
                                                                            DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName2 = DataIPShortCuts::cAlphaArgs(10);
-                Tank.SourceOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(11),
+                Tank.SourceOutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(11),
                                                                             ErrorsFound,
                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                             DataIPShortCuts::cAlphaArgs(1),
@@ -3443,7 +3448,8 @@ namespace WaterThermalTanks {
             int NumNums;
             int NumAlphas;
             int IOStat;
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           WaterThermalTankNum - (state.dataWaterThermalTanks->numWaterHeaterMixed + state.dataWaterThermalTanks->numWaterHeaterStratified + state.dataWaterThermalTanks->numChilledWaterMixed),
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -3473,7 +3479,7 @@ namespace WaterThermalTanks {
             if (Tank.Volume == DataSizing::AutoSize) {
                 Tank.VolumeWasAutoSized = true;
             }
-            Real64 rho = FluidProperties::GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, Tank.FluidIndex, RoutineName);
+            Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, Tank.FluidIndex, RoutineName);
             Tank.Mass = Tank.Volume * rho;
             Tank.Height = DataIPShortCuts::rNumericArgs(2);
             if (Tank.Height == DataSizing::AutoSize) {
@@ -3513,7 +3519,7 @@ namespace WaterThermalTanks {
                 Tank.TankTempLimit = 1.0;
             }
 
-            Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(3));
+            Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(3));
             if (Tank.SetPointTempSchedule == 0) {
                 ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
@@ -3553,7 +3559,7 @@ namespace WaterThermalTanks {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(4));
                 if (SELECT_CASE_var == "SCHEDULE") {
                     Tank.AmbientTempIndicator = AmbientTempEnum::Schedule;
-                    Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(5));
+                    Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(5));
                     if (Tank.AmbientTempSchedule == 0) {
                         ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + DataIPShortCuts::cAlphaArgs(5));
                         ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
@@ -3574,7 +3580,7 @@ namespace WaterThermalTanks {
 
                 } else if (SELECT_CASE_var == "OUTDOORS") {
                     Tank.AmbientTempIndicator = AmbientTempEnum::OutsideAir;
-                    Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(7),
+                    Tank.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
                                                                                          ErrorsFound,
                                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
@@ -3583,7 +3589,7 @@ namespace WaterThermalTanks {
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
                     if (!DataIPShortCuts::lAlphaFieldBlanks(7)) {
-                        if (!OutAirNodeManager::CheckOutAirNodeNumber(Tank.AmbientTempOutsideAirNode)) {
+                        if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
                             ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(7) + " = " + DataIPShortCuts::cAlphaArgs(7));
                             ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
                             ShowContinueError("Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
@@ -3693,7 +3699,7 @@ namespace WaterThermalTanks {
             Tank.SrcSide.loopSideNum = DataPlant::DemandSupply_No;
 
             if ((!DataIPShortCuts::lAlphaFieldBlanks(8)) || (!DataIPShortCuts::lAlphaFieldBlanks(9))) {
-                Tank.UseInletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(8),
+                Tank.UseInletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(8),
                                                                         ErrorsFound,
                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                         DataIPShortCuts::cAlphaArgs(1),
@@ -3702,7 +3708,7 @@ namespace WaterThermalTanks {
                                                                         1,
                                                                         DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName1 = DataIPShortCuts::cAlphaArgs(8);
-                Tank.UseOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(9),
+                Tank.UseOutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(9),
                                                                          ErrorsFound,
                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                          DataIPShortCuts::cAlphaArgs(1),
@@ -3714,7 +3720,7 @@ namespace WaterThermalTanks {
             }
 
             if ((!DataIPShortCuts::lAlphaFieldBlanks(11)) || (!DataIPShortCuts::lAlphaFieldBlanks(12))) {
-                Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(11),
+                Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(11),
                                                                            ErrorsFound,
                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                            DataIPShortCuts::cAlphaArgs(1),
@@ -3723,7 +3729,7 @@ namespace WaterThermalTanks {
                                                                            2,
                                                                            DataLoopNode::ObjectIsNotParent);
                 Tank.InletNodeName2 = DataIPShortCuts::cAlphaArgs(11);
-                Tank.SourceOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(12),
+                Tank.SourceOutletNode = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(12),
                                                                             ErrorsFound,
                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                             DataIPShortCuts::cAlphaArgs(1),
@@ -3737,7 +3743,7 @@ namespace WaterThermalTanks {
             if (DataIPShortCuts::lAlphaFieldBlanks(10)) {
                 Tank.UseSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
             } else {
-                Tank.UseSideAvailSchedNum = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(10));
+                Tank.UseSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(10));
                 if (Tank.UseSideAvailSchedNum == 0) {
                     ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(10) + " = " + DataIPShortCuts::cAlphaArgs(10));
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
@@ -3753,7 +3759,7 @@ namespace WaterThermalTanks {
             if (DataIPShortCuts::lAlphaFieldBlanks(13)) {
                 Tank.SourceSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
             } else {
-                Tank.SourceSideAvailSchedNum = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(13));
+                Tank.SourceSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(13));
                 if (Tank.SourceSideAvailSchedNum == 0) {
                     ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(13) + " = " + DataIPShortCuts::cAlphaArgs(13));
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
@@ -3791,7 +3797,7 @@ namespace WaterThermalTanks {
                                  ":  More Additional Loss Coefficients were entered than the number of nodes; extra coefficients will not be used");
             }
 
-            Tank.SetupStratifiedNodes();
+            Tank.SetupStratifiedNodes(state);
         }
 
         return ErrorsFound;
@@ -4037,7 +4043,7 @@ namespace WaterThermalTanks {
                                 ShowContinueError("Please leave the source side inlet and outlet fields blank.");
                                 ErrorsFound = true;
                             } else {
-                                Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(HPWH.OutletNodeName1,
+                                Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(state, HPWH.OutletNodeName1,
                                                                                            ErrorsFound,
                                                                                            Tank.Type,
                                                                                            Tank.Name,
@@ -4046,7 +4052,7 @@ namespace WaterThermalTanks {
                                                                                            2,
                                                                                            DataLoopNode::ObjectIsNotParent);
                                 Tank.InletNodeName2 = HPWH.OutletNodeName1;
-                                Tank.SourceOutletNode = NodeInputManager::GetOnlySingleNode(HPWH.InletNodeName1,
+                                Tank.SourceOutletNode = NodeInputManager::GetOnlySingleNode(state, HPWH.InletNodeName1,
                                                                                             ErrorsFound,
                                                                                             Tank.Type,
                                                                                             Tank.Name,
@@ -4313,7 +4319,8 @@ namespace WaterThermalTanks {
                     int NumAlphas;
                     int NumNums;
                     int IOStat;
-                    inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  DataIPShortCuts::cCurrentModuleObject,
                                                   WHsizingNum,
                                                   DataIPShortCuts::cAlphaArgs,
                                                   NumAlphas,
@@ -4546,87 +4553,87 @@ namespace WaterThermalTanks {
         return ErrorsFound;
     }
 
-    void WaterThermalTankData::setupOutputVars(EnergyPlusData &state, IOFiles &ioFiles)
+    void WaterThermalTankData::setupOutputVars(EnergyPlusData &state)
     {
         if ((this->TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed) || (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
-            this->setupChilledWaterTankOutputVars(ioFiles);
+            this->setupChilledWaterTankOutputVars(state);
         } else {
             // moving setupWaterHeaterOutputVars to here causes big table diffs...
-            this->setupWaterHeaterOutputVars(state, ioFiles);
+            this->setupWaterHeaterOutputVars(state);
         }
         // moving setupZoneInternalGains to here causes math and table diffs...
         // this->setupZoneInternalGains();
     }
 
-    void WaterThermalTankData::setupChilledWaterTankOutputVars(IOFiles &ioFiles)
+    void WaterThermalTankData::setupChilledWaterTankOutputVars(EnergyPlusData &state)
     {
 
         // CurrentModuleObject='ThermalStorage:ChilledWater:Mixed/ThermalStorage:ChilledWater:Stratified'
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chilled Water Thermal Storage Tank Temperature", OutputProcessor::Unit::C, this->TankTempAvg, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chilled Water Thermal Storage Final Tank Temperature", OutputProcessor::Unit::C, this->TankTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chilled Water Thermal Storage Tank Heat Gain Rate", OutputProcessor::Unit::W, this->LossRate, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chilled Water Thermal Storage Tank Heat Gain Energy", OutputProcessor::Unit::J, this->LossEnergy, "System", "Sum", this->Name);
 
-        SetupOutputVariable("Chilled Water Thermal Storage Use Side Mass Flow Rate",
+        SetupOutputVariable(state, "Chilled Water Thermal Storage Use Side Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             this->UseMassFlowRate,
                             "System",
                             "Average",
                             this->Name);
 
-        SetupOutputVariable("Chilled Water Thermal Storage Use Side Inlet Temperature",
+        SetupOutputVariable(state, "Chilled Water Thermal Storage Use Side Inlet Temperature",
                             OutputProcessor::Unit::C,
                             this->UseInletTemp,
                             "System",
                             "Average",
                             this->Name);
 
-        SetupOutputVariable("Chilled Water Thermal Storage Use Side Outlet Temperature",
+        SetupOutputVariable(state, "Chilled Water Thermal Storage Use Side Outlet Temperature",
                             OutputProcessor::Unit::C,
                             this->UseOutletTemp,
                             "System",
                             "Average",
                             this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chilled Water Thermal Storage Use Side Heat Transfer Rate", OutputProcessor::Unit::W, this->UseRate, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chilled Water Thermal Storage Use Side Heat Transfer Energy", OutputProcessor::Unit::J, this->UseEnergy, "System", "Sum", this->Name);
 
-        SetupOutputVariable("Chilled Water Thermal Storage Source Side Mass Flow Rate",
+        SetupOutputVariable(state, "Chilled Water Thermal Storage Source Side Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             this->SourceMassFlowRate,
                             "System",
                             "Average",
                             this->Name);
 
-        SetupOutputVariable("Chilled Water Thermal Storage Source Side Inlet Temperature",
+        SetupOutputVariable(state, "Chilled Water Thermal Storage Source Side Inlet Temperature",
                             OutputProcessor::Unit::C,
                             this->SourceInletTemp,
                             "System",
                             "Average",
                             this->Name);
 
-        SetupOutputVariable("Chilled Water Thermal Storage Source Side Outlet Temperature",
+        SetupOutputVariable(state, "Chilled Water Thermal Storage Source Side Outlet Temperature",
                             OutputProcessor::Unit::C,
                             this->SourceOutletTemp,
                             "System",
                             "Average",
                             this->Name);
 
-        SetupOutputVariable("Chilled Water Thermal Storage Source Side Heat Transfer Rate",
+        SetupOutputVariable(state, "Chilled Water Thermal Storage Source Side Heat Transfer Rate",
                             OutputProcessor::Unit::W,
                             this->SourceRate,
                             "System",
                             "Average",
                             this->Name);
-        SetupOutputVariable("Chilled Water Thermal Storage Source Side Heat Transfer Energy",
+        SetupOutputVariable(state, "Chilled Water Thermal Storage Source Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->SourceEnergy,
                             "System",
@@ -4636,7 +4643,7 @@ namespace WaterThermalTanks {
         if (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified) {
 
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-                SetupOutputVariable("Chilled Water Thermal Storage Temperature Node " + General::TrimSigDigits(NodeNum) + "",
+                SetupOutputVariable(state, "Chilled Water Thermal Storage Temperature Node " + General::TrimSigDigits(NodeNum) + "",
                                     OutputProcessor::Unit::C,
                                     this->Node(NodeNum).TempAvg,
                                     "System",
@@ -4645,7 +4652,7 @@ namespace WaterThermalTanks {
             }
 
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-                SetupOutputVariable("Chilled Water Thermal Storage Final Temperature Node " + General::TrimSigDigits(NodeNum) + "",
+                SetupOutputVariable(state, "Chilled Water Thermal Storage Final Temperature Node " + General::TrimSigDigits(NodeNum) + "",
                                     OutputProcessor::Unit::C,
                                     this->Node(NodeNum).Temp,
                                     "System",
@@ -4659,7 +4666,7 @@ namespace WaterThermalTanks {
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
                 static constexpr auto Format_724("Chilled Water Tank Stratified Node Information,{},{:.4T},{:.4T},{:.4T},{},{}\n");
 
-                print(ioFiles.eio,
+                print(state.files.eio,
                       Format_724,
                       NodeNum,
                       this->Node(NodeNum).Height,
@@ -4707,41 +4714,41 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state, IOFiles &ioFiles)
+    void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
     {
 
         // Setup report variables for WaterHeater:Mixed
         // CurrentModuleObject='WaterHeater:Mixed'
-        SetupOutputVariable("Water Heater Tank Temperature", OutputProcessor::Unit::C, this->TankTempAvg, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Water Heater Tank Temperature", OutputProcessor::Unit::C, this->TankTempAvg, "System", "Average", this->Name);
 
-        SetupOutputVariable("Water Heater Final Tank Temperature", OutputProcessor::Unit::C, this->TankTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Water Heater Final Tank Temperature", OutputProcessor::Unit::C, this->TankTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable("Water Heater Heat Loss Rate", OutputProcessor::Unit::W, this->LossRate, "System", "Average", this->Name);
-        SetupOutputVariable("Water Heater Heat Loss Energy", OutputProcessor::Unit::J, this->LossEnergy, "System", "Sum", this->Name);
+        SetupOutputVariable(state, "Water Heater Heat Loss Rate", OutputProcessor::Unit::W, this->LossRate, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Water Heater Heat Loss Energy", OutputProcessor::Unit::J, this->LossEnergy, "System", "Sum", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Heater Use Side Mass Flow Rate", OutputProcessor::Unit::kg_s, this->UseMassFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable("Water Heater Use Side Inlet Temperature", OutputProcessor::Unit::C, this->UseInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Water Heater Use Side Inlet Temperature", OutputProcessor::Unit::C, this->UseInletTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Heater Use Side Outlet Temperature", OutputProcessor::Unit::C, this->UseOutletTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable("Water Heater Use Side Heat Transfer Rate", OutputProcessor::Unit::W, this->UseRate, "System", "Average", this->Name);
-        SetupOutputVariable("Water Heater Use Side Heat Transfer Energy", OutputProcessor::Unit::J, this->UseEnergy, "System", "Sum", this->Name);
+        SetupOutputVariable(state, "Water Heater Use Side Heat Transfer Rate", OutputProcessor::Unit::W, this->UseRate, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Water Heater Use Side Heat Transfer Energy", OutputProcessor::Unit::J, this->UseEnergy, "System", "Sum", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Heater Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s, this->SourceMassFlowRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Heater Source Side Inlet Temperature", OutputProcessor::Unit::C, this->SourceInletTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Heater Source Side Outlet Temperature", OutputProcessor::Unit::C, this->SourceOutletTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Heater Source Side Heat Transfer Rate", OutputProcessor::Unit::W, this->SourceRate, "System", "Average", this->Name);
-        SetupOutputVariable("Water Heater Source Side Heat Transfer Energy",
+        SetupOutputVariable(state, "Water Heater Source Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->SourceEnergy,
                             "System",
@@ -4753,59 +4760,59 @@ namespace WaterThermalTanks {
                             this->EndUseSubcategoryName,
                             "Plant");
 
-        SetupOutputVariable("Water Heater Off Cycle Parasitic Tank Heat Transfer Rate",
+        SetupOutputVariable(state, "Water Heater Off Cycle Parasitic Tank Heat Transfer Rate",
                             OutputProcessor::Unit::W,
                             this->OffCycParaRateToTank,
                             "System",
                             "Average",
                             this->Name);
-        SetupOutputVariable("Water Heater Off Cycle Parasitic Tank Heat Transfer Energy",
+        SetupOutputVariable(state, "Water Heater Off Cycle Parasitic Tank Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->OffCycParaEnergyToTank,
                             "System",
                             "Sum",
                             this->Name);
 
-        SetupOutputVariable("Water Heater On Cycle Parasitic Tank Heat Transfer Rate",
+        SetupOutputVariable(state, "Water Heater On Cycle Parasitic Tank Heat Transfer Rate",
                             OutputProcessor::Unit::W,
                             this->OnCycParaRateToTank,
                             "System",
                             "Average",
                             this->Name);
-        SetupOutputVariable("Water Heater On Cycle Parasitic Tank Heat Transfer Energy",
+        SetupOutputVariable(state, "Water Heater On Cycle Parasitic Tank Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->OnCycParaEnergyToTank,
                             "System",
                             "Sum",
                             this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Heater Total Demand Heat Transfer Rate", OutputProcessor::Unit::W, this->TotalDemandRate, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Heater Total Demand Heat Transfer Energy", OutputProcessor::Unit::J, this->TotalDemandEnergy, "System", "Sum", this->Name);
 
-        SetupOutputVariable("Water Heater Heating Rate", OutputProcessor::Unit::W, this->HeaterRate, "System", "Average", this->Name);
-        SetupOutputVariable("Water Heater Heating Energy", OutputProcessor::Unit::J, this->HeaterEnergy, "System", "Sum", this->Name);
+        SetupOutputVariable(state, "Water Heater Heating Rate", OutputProcessor::Unit::W, this->HeaterRate, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Water Heater Heating Energy", OutputProcessor::Unit::J, this->HeaterEnergy, "System", "Sum", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Heater Unmet Demand Heat Transfer Rate", OutputProcessor::Unit::W, this->UnmetRate, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Heater Unmet Demand Heat Transfer Energy", OutputProcessor::Unit::J, this->UnmetEnergy, "System", "Sum", this->Name);
 
-        SetupOutputVariable("Water Heater Venting Heat Transfer Rate", OutputProcessor::Unit::W, this->VentRate, "System", "Average", this->Name);
-        SetupOutputVariable("Water Heater Venting Heat Transfer Energy", OutputProcessor::Unit::J, this->VentEnergy, "System", "Sum", this->Name);
+        SetupOutputVariable(state, "Water Heater Venting Heat Transfer Rate", OutputProcessor::Unit::W, this->VentRate, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Water Heater Venting Heat Transfer Energy", OutputProcessor::Unit::J, this->VentEnergy, "System", "Sum", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Heater Net Heat Transfer Rate", OutputProcessor::Unit::W, this->NetHeatTransferRate, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Water Heater Net Heat Transfer Energy", OutputProcessor::Unit::J, this->NetHeatTransferEnergy, "System", "Sum", this->Name);
 
-        SetupOutputVariable("Water Heater Cycle On Count", OutputProcessor::Unit::None, this->CycleOnCount, "System", "Sum", this->Name);
-        SetupOutputVariable("Water Heater Runtime Fraction", OutputProcessor::Unit::None, this->RuntimeFraction, "System", "Average", this->Name);
-        SetupOutputVariable("Water Heater Part Load Ratio", OutputProcessor::Unit::None, this->PartLoadRatio, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Water Heater Cycle On Count", OutputProcessor::Unit::None, this->CycleOnCount, "System", "Sum", this->Name);
+        SetupOutputVariable(state, "Water Heater Runtime Fraction", OutputProcessor::Unit::None, this->RuntimeFraction, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Water Heater Part Load Ratio", OutputProcessor::Unit::None, this->PartLoadRatio, "System", "Average", this->Name);
 
-        SetupOutputVariable("Water Heater " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelRate, "System", "Average", this->Name);
-        SetupOutputVariable("Water Heater " + this->FuelType + " Energy",
+        SetupOutputVariable(state, "Water Heater " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelRate, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Water Heater " + this->FuelType + " Energy",
                             OutputProcessor::Unit::J,
                             this->FuelEnergy,
                             "System",
@@ -4817,13 +4824,13 @@ namespace WaterThermalTanks {
                             this->EndUseSubcategoryName,
                             "Plant");
 
-        SetupOutputVariable("Water Heater Off Cycle Parasitic " + this->OffCycParaFuelType + " Rate",
+        SetupOutputVariable(state, "Water Heater Off Cycle Parasitic " + this->OffCycParaFuelType + " Rate",
                             OutputProcessor::Unit::W,
                             this->OffCycParaFuelRate,
                             "System",
                             "Average",
                             this->Name);
-        SetupOutputVariable("Water Heater Off Cycle Parasitic " + this->OffCycParaFuelType + " Energy",
+        SetupOutputVariable(state, "Water Heater Off Cycle Parasitic " + this->OffCycParaFuelType + " Energy",
                             OutputProcessor::Unit::J,
                             this->OffCycParaFuelEnergy,
                             "System",
@@ -4835,13 +4842,13 @@ namespace WaterThermalTanks {
                             this->EndUseSubcategoryName,
                             "Plant");
 
-        SetupOutputVariable("Water Heater On Cycle Parasitic " + this->OnCycParaFuelType + " Rate",
+        SetupOutputVariable(state, "Water Heater On Cycle Parasitic " + this->OnCycParaFuelType + " Rate",
                             OutputProcessor::Unit::W,
                             this->OnCycParaFuelRate,
                             "System",
                             "Average",
                             this->Name);
-        SetupOutputVariable("Water Heater On Cycle Parasitic " + this->OnCycParaFuelType + " Energy",
+        SetupOutputVariable(state, "Water Heater On Cycle Parasitic " + this->OnCycParaFuelType + " Energy",
                             OutputProcessor::Unit::J,
                             this->OnCycParaFuelEnergy,
                             "System",
@@ -4853,8 +4860,8 @@ namespace WaterThermalTanks {
                             this->EndUseSubcategoryName,
                             "Plant");
 
-        SetupOutputVariable("Water Heater Water Volume Flow Rate", OutputProcessor::Unit::m3_s, this->VolFlowRate, "System", "Average", this->Name);
-        SetupOutputVariable("Water Heater Water Volume",
+        SetupOutputVariable(state, "Water Heater Water Volume Flow Rate", OutputProcessor::Unit::m3_s, this->VolFlowRate, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Water Heater Water Volume",
                             OutputProcessor::Unit::m3,
                             this->VolumeConsumed,
                             "System",
@@ -4865,7 +4872,7 @@ namespace WaterThermalTanks {
                             "DHW",
                             this->EndUseSubcategoryName,
                             "Plant");
-        SetupOutputVariable("Water Heater Mains Water Volume",
+        SetupOutputVariable(state, "Water Heater Mains Water Volume",
                             OutputProcessor::Unit::m3,
                             this->VolumeConsumed,
                             "System",
@@ -4880,15 +4887,15 @@ namespace WaterThermalTanks {
         if (this->HeatPumpNum > 0) {
             // CurrentModuleObject='WaterHeater:HeatPump:PumpedCondenser'
             HeatPumpWaterHeaterData &HPWH = state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Water Heater Compressor Part Load Ratio", OutputProcessor::Unit::None, HPWH.HeatingPLR, "System", "Average", HPWH.Name);
-            SetupOutputVariable("Water Heater Off Cycle Ancillary Electricity Rate",
+            SetupOutputVariable(state, "Water Heater Off Cycle Ancillary Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 HPWH.OffCycParaFuelRate,
                                 "System",
                                 "Average",
                                 HPWH.Name);
-            SetupOutputVariable("Water Heater Off Cycle Ancillary Electricity Energy",
+            SetupOutputVariable(state, "Water Heater Off Cycle Ancillary Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HPWH.OffCycParaFuelEnergy,
                                 "System",
@@ -4899,9 +4906,9 @@ namespace WaterThermalTanks {
                                 "DHW",
                                 "Water Heater Parasitic",
                                 "Plant");
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Water Heater On Cycle Ancillary Electricity Rate", OutputProcessor::Unit::W, HPWH.OnCycParaFuelRate, "System", "Average", HPWH.Name);
-            SetupOutputVariable("Water Heater On Cycle Ancillary Electricity Energy",
+            SetupOutputVariable(state, "Water Heater On Cycle Ancillary Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HPWH.OnCycParaFuelEnergy,
                                 "System",
@@ -4912,9 +4919,9 @@ namespace WaterThermalTanks {
                                 "DHW",
                                 "Water Heater Parasitic",
                                 "Plant");
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Water Heater Heat Pump Control Tank Temperature", OutputProcessor::Unit::C, HPWH.ControlTempAvg, "System", "Average", HPWH.Name);
-            SetupOutputVariable("Water Heater Heat Pump Control Tank Final Temperature",
+            SetupOutputVariable(state, "Water Heater Heat Pump Control Tank Final Temperature",
                                 OutputProcessor::Unit::C,
                                 HPWH.ControlTempFinal,
                                 "System",
@@ -4924,19 +4931,19 @@ namespace WaterThermalTanks {
 
         if (this->DesuperheaterNum > 0) {
             // CurrentModuleObject='Coil:WaterHeating:Desuperheater'
-            SetupOutputVariable("Water Heater Part Load Ratio",
+            SetupOutputVariable(state, "Water Heater Part Load Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).DesuperheaterPLR,
                                 "System",
                                 "Average",
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater On Cycle Parasitic Electricity Rate",
+            SetupOutputVariable(state, "Water Heater On Cycle Parasitic Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).OnCycParaFuelRate,
                                 "System",
                                 "Average",
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater On Cycle Parasitic Electricity Energy",
+            SetupOutputVariable(state, "Water Heater On Cycle Parasitic Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).OnCycParaFuelEnergy,
                                 "System",
@@ -4947,13 +4954,13 @@ namespace WaterThermalTanks {
                                 "DHW",
                                 "Water Heater Parasitic",
                                 "Plant");
-            SetupOutputVariable("Water Heater Off Cycle Parasitic Electricity Rate",
+            SetupOutputVariable(state, "Water Heater Off Cycle Parasitic Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).OffCycParaFuelRate,
                                 "System",
                                 "Average",
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater Off Cycle Parasitic Electricity Energy",
+            SetupOutputVariable(state, "Water Heater Off Cycle Parasitic Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).OffCycParaFuelEnergy,
                                 "System",
@@ -4964,19 +4971,19 @@ namespace WaterThermalTanks {
                                 "DHW",
                                 "Water Heater Parasitic",
                                 "Plant");
-            SetupOutputVariable("Water Heater Heat Reclaim Efficiency Modifier Multiplier",
+            SetupOutputVariable(state, "Water Heater Heat Reclaim Efficiency Modifier Multiplier",
                                 OutputProcessor::Unit::None,
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).HEffFTempOutput,
                                 "System",
                                 "Average",
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater Pump Electricity Rate",
+            SetupOutputVariable(state, "Water Heater Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).PumpPower,
                                 "System",
                                 "Average",
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater Pump Electricity Energy",
+            SetupOutputVariable(state, "Water Heater Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).PumpEnergy,
                                 "System",
@@ -4987,13 +4994,13 @@ namespace WaterThermalTanks {
                                 "DHW",
                                 "Desuperheater Pump",
                                 "Plant");
-            SetupOutputVariable("Water Heater Heating Rate",
+            SetupOutputVariable(state, "Water Heater Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).HeaterRate,
                                 "System",
                                 "Average",
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater Heating Energy",
+            SetupOutputVariable(state, "Water Heater Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).HeaterEnergy,
                                 "System",
@@ -5010,24 +5017,24 @@ namespace WaterThermalTanks {
         // CurrentModuleObject='WaterHeater:Stratified'
         if (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
 
-            SetupOutputVariable("Water Heater Heater 1 Heating Rate", OutputProcessor::Unit::W, this->HeaterRate1, "System", "Average", this->Name);
-            SetupOutputVariable("Water Heater Heater 2 Heating Rate", OutputProcessor::Unit::W, this->HeaterRate2, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Water Heater Heater 1 Heating Rate", OutputProcessor::Unit::W, this->HeaterRate1, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Water Heater Heater 2 Heating Rate", OutputProcessor::Unit::W, this->HeaterRate2, "System", "Average", this->Name);
 
-            SetupOutputVariable("Water Heater Heater 1 Heating Energy", OutputProcessor::Unit::J, this->HeaterEnergy1, "System", "Sum", this->Name);
-            SetupOutputVariable("Water Heater Heater 2 Heating Energy", OutputProcessor::Unit::J, this->HeaterEnergy2, "System", "Sum", this->Name);
+            SetupOutputVariable(state, "Water Heater Heater 1 Heating Energy", OutputProcessor::Unit::J, this->HeaterEnergy1, "System", "Sum", this->Name);
+            SetupOutputVariable(state, "Water Heater Heater 2 Heating Energy", OutputProcessor::Unit::J, this->HeaterEnergy2, "System", "Sum", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Water Heater Heater 1 Cycle On Count", OutputProcessor::Unit::None, this->CycleOnCount1, "System", "Sum", this->Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Water Heater Heater 2 Cycle On Count", OutputProcessor::Unit::None, this->CycleOnCount2, "System", "Sum", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Water Heater Heater 1 Runtime Fraction", OutputProcessor::Unit::None, this->RuntimeFraction1, "System", "Average", this->Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Water Heater Heater 2 Runtime Fraction", OutputProcessor::Unit::None, this->RuntimeFraction2, "System", "Average", this->Name);
 
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-                SetupOutputVariable("Water Heater Temperature Node " + General::TrimSigDigits(NodeNum),
+                SetupOutputVariable(state, "Water Heater Temperature Node " + General::TrimSigDigits(NodeNum),
                                     OutputProcessor::Unit::C,
                                     this->Node(NodeNum).TempAvg,
                                     "System",
@@ -5036,7 +5043,7 @@ namespace WaterThermalTanks {
             }
 
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-                SetupOutputVariable("Water Heater Final Temperature Node " + General::TrimSigDigits(NodeNum),
+                SetupOutputVariable(state, "Water Heater Final Temperature Node " + General::TrimSigDigits(NodeNum),
                                     OutputProcessor::Unit::C,
                                     this->Node(NodeNum).Temp,
                                     "System",
@@ -5049,7 +5056,7 @@ namespace WaterThermalTanks {
 
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
                 static constexpr auto Format_723("Water Heater Stratified Node Information,{},{:.4T},{:.4T},{:.3T},{:.4T},{:.4T},{},{}\n");
-                print(ioFiles.eio,
+                print(state.files.eio,
                       Format_723,
                       NodeNum,
                       this->Node(NodeNum).Height,
@@ -5088,7 +5095,7 @@ namespace WaterThermalTanks {
         if (CurveManager::CurveValue(state, CurveIndex, 1.0) <= 0) IsValid = false;
     }
 
-    void WaterThermalTankData::SetupStratifiedNodes()
+    void WaterThermalTankData::SetupStratifiedNodes(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5117,12 +5124,13 @@ namespace WaterThermalTanks {
         this->Node.allocate(NumNodes);
         Real64 rho;
         if ((this->UseSide.loopNum > 0) && allocated(DataPlant::PlantLoop)) {
-            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+            rho = FluidProperties::GetDensityGlycol(state,
+                                                    DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                     DataGlobals::InitConvTemp,
                                                     DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                     RoutineName);
         } else {
-            rho = FluidProperties::GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, this->FluidIndex, RoutineName);
+            rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, this->FluidIndex, RoutineName);
         }
 
         Real64 NodeMass = this->Volume * rho / NumNodes;
@@ -5398,7 +5406,7 @@ namespace WaterThermalTanks {
 
         if (this->SetLoopIndexFlag && allocated(DataPlant::PlantLoop)) {
             if ((this->UseInletNode > 0) && (this->HeatPumpNum == 0)) {
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                                DataGlobals::InitConvTemp,
                                                                DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                                GetWaterThermalTankInput);
@@ -5411,7 +5419,7 @@ namespace WaterThermalTanks {
                 }
             }
             if ((this->UseInletNode > 0) && (this->HeatPumpNum > 0)) {
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                                DataGlobals::InitConvTemp,
                                                                DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                                GetWaterThermalTankInput);
@@ -5424,7 +5432,7 @@ namespace WaterThermalTanks {
                 }
             }
             if ((this->SourceInletNode > 0) && (this->DesuperheaterNum == 0) && (this->HeatPumpNum == 0)) {
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
                                                                DataGlobals::InitConvTemp,
                                                                DataPlant::PlantLoop(this->SrcSide.loopNum).FluidIndex,
                                                                GetWaterThermalTankInput);
@@ -5440,12 +5448,12 @@ namespace WaterThermalTanks {
             }
             if (DataPlant::PlantFirstSizesOkayToFinalize) this->SetLoopIndexFlag = false;
             if (this->StandAlone) {
-                this->SizeStandAloneWaterHeater();
+                this->SizeStandAloneWaterHeater(state);
                 this->SetLoopIndexFlag = false;
             }
         } else if (this->SetLoopIndexFlag && !DataGlobals::AnyPlantInModel) {
             if (this->StandAlone) {
-                this->SizeStandAloneWaterHeater();
+                this->SizeStandAloneWaterHeater(state);
             }
             this->SetLoopIndexFlag = false;
         }
@@ -5488,7 +5496,7 @@ namespace WaterThermalTanks {
             // Clear node initial conditions
             if (this->UseInletNode > 0 && this->UseOutletNode > 0) {
                 DataLoopNode::Node(this->UseInletNode).Temp = 0.0;
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                                DataGlobals::InitConvTemp,
                                                                DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                                GetWaterThermalTankInput);
@@ -5515,7 +5523,7 @@ namespace WaterThermalTanks {
             }
 
             if ((this->SourceInletNode > 0) && (this->DesuperheaterNum == 0) && (this->HeatPumpNum == 0)) {
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
                                                                DataGlobals::InitConvTemp,
                                                                DataPlant::PlantLoop(this->SrcSide.loopNum).FluidIndex,
                                                                GetWaterThermalTankInput);
@@ -5545,7 +5553,7 @@ namespace WaterThermalTanks {
                 this->SourceOutletTemp = 0.0;
                 this->SourceMassFlowRate = 0.0;
                 this->SavedSourceOutletTemp = 0.0;
-                Real64 rho = FluidProperties::GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, this->FluidIndex, SizeTankForDemand);
+                Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, this->FluidIndex, SizeTankForDemand);
                 this->PlantSourceMassFlowRateMax = this->SourceDesignVolFlowRate * rho;
             }
 
@@ -5983,7 +5991,7 @@ namespace WaterThermalTanks {
                 // IntegratedHeatPump::SimIHP(modBlankString, HPWaterHeater(HPNum).DXCoilNum,
                 //	0, EMP1, EMP2, EMP3, 0, 0.0, 1, 0.0, 0.0, 0.0, false, 0.0); //conduct the sizing operation in the IHP
                 int VSCoilID = IntegratedHeatPump::IntegratedHeatPumps(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).SCWHCoilIndex;
-                state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed = VariableSpeedCoils::VarSpeedCoil(VSCoilID).NumOfSpeeds;
+                state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).NumOfSpeeds;
 
             } else if (UtilityRoutines::SameString(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed") &&
                        (state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed == 0)) {
@@ -6005,7 +6013,7 @@ namespace WaterThermalTanks {
                                                           0.0,
                                                           0.0); // conduct the sizing operation in the VS WSHP
                 int VSCoilID = state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum;
-                state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed = VariableSpeedCoils::VarSpeedCoil(VSCoilID).NumOfSpeeds;
+                state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).NumOfSpeeds;
                 // below pass the flow rates from the VS coil to the water heater object
             }
 
@@ -6018,11 +6026,11 @@ namespace WaterThermalTanks {
 
                 // scale air flow rates
                 Real64 MulSpeedFlowScale =
-                    VariableSpeedCoils::VarSpeedCoil(VSCoilID).RatedAirVolFlowRate /
-                    VariableSpeedCoils::VarSpeedCoil(VSCoilID).MSRatedAirVolFlowRate(VariableSpeedCoils::VarSpeedCoil(VSCoilID).NormSpedLevel);
+                    state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).RatedAirVolFlowRate /
+                    state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).NormSpedLevel);
                 for (int Iter = 1; Iter <= state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed; ++Iter) {
                     state.dataWaterThermalTanks->HPWaterHeater(HPNum).HPWHAirVolFlowRate(Iter) =
-                        VariableSpeedCoils::VarSpeedCoil(VSCoilID).MSRatedAirVolFlowRate(Iter) * MulSpeedFlowScale;
+                        state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).MSRatedAirVolFlowRate(Iter) * MulSpeedFlowScale;
                 }
 
                 // check fan flow rate, should be larger than the max flow rate of the VS coil
@@ -6065,16 +6073,16 @@ namespace WaterThermalTanks {
 
                 // scale water flow rates
                 MulSpeedFlowScale =
-                    VariableSpeedCoils::VarSpeedCoil(VSCoilID).RatedWaterVolFlowRate /
-                    VariableSpeedCoils::VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(VariableSpeedCoils::VarSpeedCoil(VSCoilID).NormSpedLevel);
+                    state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).RatedWaterVolFlowRate /
+                    state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).NormSpedLevel);
                 for (int Iter = 1; Iter <= state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed; ++Iter) {
                     state.dataWaterThermalTanks->HPWaterHeater(HPNum).HPWHWaterVolFlowRate(Iter) =
-                        VariableSpeedCoils::VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(Iter) * MulSpeedFlowScale;
+                        state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(Iter) * MulSpeedFlowScale;
                     state.dataWaterThermalTanks->HPWaterHeater(HPNum).HPWHWaterMassFlowRate(Iter) =
-                        VariableSpeedCoils::VarSpeedCoil(VSCoilID).MSRatedWaterMassFlowRate(Iter) * MulSpeedFlowScale;
+                        state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).MSRatedWaterMassFlowRate(Iter) * MulSpeedFlowScale;
                     state.dataWaterThermalTanks->HPWaterHeater(HPNum).MSWaterSpeedRatio(Iter) =
-                        VariableSpeedCoils::VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(Iter) /
-                        VariableSpeedCoils::VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed);
+                        state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(Iter) /
+                        state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).MSRatedWaterVolFlowRate(state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed);
                 }
 
                 Real64 rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, HPInletDryBulbTemp, HPInletHumRat);
@@ -6161,24 +6169,24 @@ namespace WaterThermalTanks {
 
         Real64 rho;
         if (this->UseSide.loopNum > 0) {
-            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+            rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                     TankTemp_loc,
                                                     DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                     RoutineName);
         } else {
-            rho = FluidProperties::GetDensityGlycol(fluidNameWater, TankTemp_loc, waterIndex, RoutineName);
+            rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, TankTemp_loc, waterIndex, RoutineName);
         }
 
         Real64 TankMass = rho * this->Volume;
 
         Real64 Cp;
         if (this->UseSide.loopNum > 0) {
-            Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+            Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                         TankTemp_loc,
                                                         DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                         RoutineName);
         } else {
-            Cp = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, TankTemp_loc, waterIndex, RoutineName);
+            Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, TankTemp_loc, waterIndex, RoutineName);
         }
 
         Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -7042,7 +7050,7 @@ namespace WaterThermalTanks {
             Real64 CoilTotalHeatingEnergyRate;
             if (HPWH.NumofSpeed > 0) {
                 // VSHPWH
-                VariableSpeedCoils::VariableSpeedCoilData const &Coil = VariableSpeedCoils::VarSpeedCoil(HPWH.DXCoilNum);
+                VariableSpeedCoils::VariableSpeedCoilData const &Coil = state.dataVariableSpeedCoils->VarSpeedCoil(HPWH.DXCoilNum);
                 CoilTotalHeatingEnergyRate = Coil.TotalHeatingEnergyRate;
             } else {
                 // Single speed HPWH
@@ -7059,12 +7067,12 @@ namespace WaterThermalTanks {
         // Specific Heat of water (J/kg K)
         const Real64 Cp = [&] {
             if (this->UseSide.loopNum > 0) {
-                return FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                return FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                               this->TankTemp,
                                                               DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                               RoutineName);
             } else {
-                return FluidProperties::GetSpecificHeatGlycol(fluidNameWater, this->TankTemp, waterIndex, RoutineName);
+                return FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, this->TankTemp, waterIndex, RoutineName);
             }
         }();
 
@@ -7915,7 +7923,7 @@ namespace WaterThermalTanks {
             } else if (DesupHtr.ReclaimHeatingSource == CoilObjEnum::DXVariableCooling) {
                 AverageWasteHeat = DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity -
                                    DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal;
-                DesupHtr.DXSysPLR = VariableSpeedCoils::VarSpeedCoil(SourceID).PartLoadRatio;
+                DesupHtr.DXSysPLR = state.dataVariableSpeedCoils->VarSpeedCoil(SourceID).PartLoadRatio;
             } else if (DesupHtr.ReclaimHeatingSource == CoilObjEnum::AirWaterHeatPumpEQ) {
                 AverageWasteHeat = DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -
                                    DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal;
@@ -9755,14 +9763,14 @@ namespace WaterThermalTanks {
         } else {
             assert(this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified);
             // For a stratified tank, the PLR is applied to the Coil.TotalHeatingEnergyRate
-            // whether that's a VariableSpeedCoils::VarSpeedCoil or DXCoils::DXCoil.
+            // whether that's a state.dataVariableSpeedCoils->VarSpeedCoil or DXCoils::DXCoil.
             // Here we create a pointer to the TotalHeatingEnergyRate for the appropriate coil type.
             Real64 *CoilTotalHeatingEnergyRatePtr;
             if (isVariableSpeed) {
                 if (HeatPump.bIsIHP)
                     CoilTotalHeatingEnergyRatePtr = &IntegratedHeatPump::IntegratedHeatPumps(HeatPump.DXCoilNum).TotalWaterHeatingRate;
                 else
-                    CoilTotalHeatingEnergyRatePtr = &VariableSpeedCoils::VarSpeedCoil(HeatPump.DXCoilNum).TotalHeatingEnergyRate;
+                    CoilTotalHeatingEnergyRatePtr = &state.dataVariableSpeedCoils->VarSpeedCoil(HeatPump.DXCoilNum).TotalHeatingEnergyRate;
             } else {
                 CoilTotalHeatingEnergyRatePtr = &DXCoils::DXCoil(HeatPump.DXCoilNum).TotalHeatingEnergyRate;
             }
@@ -10095,7 +10103,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::SizeSupplySidePlantConnections(Optional_int_const LoopNum)
+    void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state, Optional_int_const LoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10157,7 +10165,7 @@ namespace WaterThermalTanks {
                             PlantUtilities::RegisterPlantCompDesignFlow(this->UseInletNode, tmpUseDesignVolFlowRate);
                         }
 
-                        Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                        Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                                        DataGlobals::InitConvTemp,
                                                                        DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                                        RoutineName);
@@ -10174,12 +10182,12 @@ namespace WaterThermalTanks {
                 PlantUtilities::RegisterPlantCompDesignFlow(this->UseInletNode, this->UseDesignVolFlowRate);
                 Real64 rho;
                 if (this->UseSide.loopNum > 0) {
-                    rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                    rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                             DataGlobals::InitConvTemp,
                                                             DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                             RoutineName);
                 } else {
-                    rho = FluidProperties::GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, waterIndex, RoutineName);
+                    rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, waterIndex, RoutineName);
                 }
 
                 this->PlantUseMassFlowRateMax = this->UseDesignVolFlowRate * rho;
@@ -10218,7 +10226,7 @@ namespace WaterThermalTanks {
                         } else {
                             PlantUtilities::RegisterPlantCompDesignFlow(this->SourceInletNode, tmpSourceDesignVolFlowRate);
                         }
-                        Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
+                        Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
                                                                        DataGlobals::InitConvTemp,
                                                                        DataPlant::PlantLoop(this->SrcSide.loopNum).FluidIndex,
                                                                        RoutineName);
@@ -10236,12 +10244,12 @@ namespace WaterThermalTanks {
                     PlantUtilities::RegisterPlantCompDesignFlow(this->SourceInletNode, this->SourceDesignVolFlowRate);
                     Real64 rho;
                     if (this->SrcSide.loopNum > 0) {
-                        rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
+                        rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
                                                                 DataGlobals::InitConvTemp,
                                                                 DataPlant::PlantLoop(this->SrcSide.loopNum).FluidIndex,
                                                                 RoutineName);
                     } else {
-                        rho = FluidProperties::GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, waterIndex, RoutineName);
+                        rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, waterIndex, RoutineName);
                     }
                     this->PlantSourceMassFlowRateMax = this->SourceDesignVolFlowRate * rho;
                 }
@@ -10249,7 +10257,7 @@ namespace WaterThermalTanks {
         }     // connected to plant
     }
 
-    void WaterThermalTankData::SizeTankForDemandSide()
+    void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10448,17 +10456,17 @@ namespace WaterThermalTanks {
                     Real64 rho;
                     Real64 Cp;
                     if (this->UseSide.loopNum > 0) {
-                        rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                        rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                                 ((Tfinish + Tstart) / 2.0),
                                                                 DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                                 RoutineName);
-                        Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                        Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                                     ((Tfinish + Tstart) / 2.0),
                                                                     DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                                     RoutineName);
                     } else {
-                        rho = FluidProperties::GetDensityGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
-                        Cp = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                        rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                        Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                     }
 
                     tmpMaxCapacity = SumPeopleAllZones * this->Sizing.RecoveryCapacityPerPerson * (Tfinish - Tstart) *
@@ -10491,17 +10499,17 @@ namespace WaterThermalTanks {
                     Real64 rho;
                     Real64 Cp;
                     if (this->UseSide.loopNum > 0) {
-                        rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                        rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                                 ((Tfinish + Tstart) / 2.0),
                                                                 DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                                 RoutineName);
-                        Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                        Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                                     ((Tfinish + Tstart) / 2.0),
                                                                     DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                                     RoutineName);
                     } else {
-                        rho = FluidProperties::GetDensityGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
-                        Cp = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                        rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                        Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                     }
                     tmpMaxCapacity = SumFloorAreaAllZones * this->Sizing.RecoveryCapacityPerArea * (Tfinish - Tstart) *
                                      (1.0 / DataGlobals::SecInHour) * rho * Cp; // m2 | m3/hr/m2 | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
@@ -10532,17 +10540,17 @@ namespace WaterThermalTanks {
                     Real64 rho;
                     Real64 Cp;
                     if (this->UseSide.loopNum > 0) {
-                        rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                        rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                                 ((Tfinish + Tstart) / 2.0),
                                                                 DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                                 RoutineName);
-                        Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                        Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                                     ((Tfinish + Tstart) / 2.0),
                                                                     DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                                     RoutineName);
                     } else {
-                        rho = FluidProperties::GetDensityGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
-                        Cp = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                        rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                        Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                     }
                     tmpMaxCapacity = this->Sizing.NumberOfUnits * this->Sizing.RecoveryCapacityPerUnit * (Tfinish - Tstart) *
                                      (1.0 / DataGlobals::SecInHour) * rho * Cp; // m3/hr/ea | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
@@ -10592,7 +10600,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::SizeTankForSupplySide()
+    void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10639,17 +10647,17 @@ namespace WaterThermalTanks {
                         Real64 rho;
                         Real64 Cp;
                         if (this->SrcSide.loopNum > 0) {
-                            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
+                            rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
                                                                     ((Tfinish + Tstart) / 2.0),
                                                                     DataPlant::PlantLoop(this->SrcSide.loopNum).FluidIndex,
                                                                     RoutineName);
-                            Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
+                            Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
                                                                         ((Tfinish + Tstart) / 2.0),
                                                                         DataPlant::PlantLoop(this->SrcSide.loopNum).FluidIndex,
                                                                         RoutineName);
                         } else {
-                            rho = FluidProperties::GetDensityGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
-                            Cp = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                            rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                            Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                         }
                         tmpMaxCapacity = (this->Volume * rho * Cp * (Tfinish - Tstart)) /
                                          (this->Sizing.RecoveryTime * DataGlobals::SecInHour); // m3 | kg/m3 | J/Kg/K | K | seconds
@@ -10712,7 +10720,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::SizeDemandSidePlantConnections()
+    void WaterThermalTankData::SizeDemandSidePlantConnections(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10809,7 +10817,7 @@ namespace WaterThermalTanks {
                         } else {
                             PlantUtilities::RegisterPlantCompDesignFlow(this->UseInletNode, tmpUseDesignVolFlowRate);
                         }
-                        Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                        Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                                        DataGlobals::InitConvTemp,
                                                                        DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                                        RoutineName);
@@ -10828,12 +10836,12 @@ namespace WaterThermalTanks {
                 PlantUtilities::RegisterPlantCompDesignFlow(this->UseInletNode, this->UseDesignVolFlowRate);
                 Real64 rho;
                 if (this->UseSide.loopNum > 0) {
-                    rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                    rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
                                                             DataGlobals::InitConvTemp,
                                                             DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
                                                             RoutineName);
                 } else {
-                    rho = FluidProperties::GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, waterIndex, RoutineName);
+                    rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, waterIndex, RoutineName);
                 }
                 this->PlantUseMassFlowRateMax = this->UseDesignVolFlowRate * rho;
             } // autosizing needed.
@@ -10893,7 +10901,7 @@ namespace WaterThermalTanks {
                         } else {
                             PlantUtilities::RegisterPlantCompDesignFlow(this->SourceInletNode, tmpSourceDesignVolFlowRate);
                         }
-                        Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
+                        Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
                                                                        DataGlobals::InitConvTemp,
                                                                        DataPlant::PlantLoop(this->SrcSide.loopNum).FluidIndex,
                                                                        RoutineName);
@@ -10912,12 +10920,12 @@ namespace WaterThermalTanks {
                 PlantUtilities::RegisterPlantCompDesignFlow(this->SourceInletNode, this->SourceDesignVolFlowRate);
                 Real64 rho;
                 if (this->SrcSide.loopNum > 0) {
-                    rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
+                    rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
                                                             DataGlobals::InitConvTemp,
                                                             DataPlant::PlantLoop(this->SrcSide.loopNum).FluidIndex,
                                                             RoutineName);
                 } else {
-                    rho = FluidProperties::GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, waterIndex, RoutineName);
+                    rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, waterIndex, RoutineName);
                 }
                 this->PlantSourceMassFlowRateMax = this->SourceDesignVolFlowRate * rho;
             } // autosizing needed.
@@ -10928,7 +10936,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::SizeStandAloneWaterHeater()
+    void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10960,7 +10968,7 @@ namespace WaterThermalTanks {
 
                 if (SELECT_CASE_var == SizeEnum::PeakDraw) {
                     // get draw rate from maximum in schedule
-                    Real64 rho = FluidProperties::GetDensityGlycol(fluidNameWater, DataGlobals::InitConvTemp, waterIndex, RoutineName);
+                    Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, DataGlobals::InitConvTemp, waterIndex, RoutineName);
                     Real64 DrawDesignVolFlowRate = ScheduleManager::GetScheduleMaxValue(this->FlowRateSchedule) * this->MassFlowRateMax / rho;
 
                     if (this->VolumeWasAutoSized) {
@@ -10970,8 +10978,8 @@ namespace WaterThermalTanks {
                     }
                     if (this->MaxCapacityWasAutoSized) {
                         if (this->Sizing.RecoveryTime > 0.0) {
-                            rho = FluidProperties::GetDensityGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
-                            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                            rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
 
                             tmpMaxCapacity = (this->Volume * rho * Cp * (Tfinish - Tstart)) /
                                              (this->Sizing.RecoveryTime * DataGlobals::SecInHour); // m3 | kg/m3 | J/Kg/K | K | seconds
@@ -11131,8 +11139,8 @@ namespace WaterThermalTanks {
                         tmpTankVolume = this->Sizing.TankCapacityPerPerson * SumPeopleAllZones;
                     }
                     if (this->MaxCapacityWasAutoSized) {
-                        Real64 rho = FluidProperties::GetDensityGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
-                        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                        Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                         tmpMaxCapacity = SumPeopleAllZones * this->Sizing.RecoveryCapacityPerPerson * (Tfinish - Tstart) *
                                          (1.0 / DataGlobals::SecInHour) * rho * Cp; // m3/hr/person | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
                     }
@@ -11154,8 +11162,8 @@ namespace WaterThermalTanks {
                     }
 
                     if (this->MaxCapacityWasAutoSized) {
-                        Real64 rho = FluidProperties::GetDensityGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
-                        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                        Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                         tmpMaxCapacity = SumFloorAreaAllZones * this->Sizing.RecoveryCapacityPerArea * (Tfinish - Tstart) *
                                          (1.0 / DataGlobals::SecInHour) * rho * Cp; // m2 | m3/hr/m2 | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
                     }
@@ -11172,8 +11180,8 @@ namespace WaterThermalTanks {
                     if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TankCapacityPerUnit * this->Sizing.NumberOfUnits;
 
                     if (this->MaxCapacityWasAutoSized) {
-                        Real64 rho = FluidProperties::GetDensityGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
-                        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                        Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
+                        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), waterIndex, RoutineName);
                         tmpMaxCapacity = this->Sizing.NumberOfUnits * this->Sizing.RecoveryCapacityPerUnit * (Tfinish - Tstart) *
                                          (1.0 / DataGlobals::SecInHour) * rho * Cp; // m3/hr/ea | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
                     }
@@ -11414,7 +11422,7 @@ namespace WaterThermalTanks {
                         Real64 RhoWater = Psychrometrics::RhoH2O(this->TankTemp);
                         auto &HPWH = state.dataWaterThermalTanks->HPWaterHeater(HPNum);
                         this->SetVSHPWHFlowRates(state,
-                            HPWH, VariableSpeedCoils::VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel, 1.0, RhoWater, MdotWater, true);
+                            HPWH, state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel, 1.0, RhoWater, MdotWater, true);
                         //       simulate the HPWH coil/fan to find heating capacity
                         Real64 EMP1 = 0.0;
                         Real64 EMP2 = 0.0;
@@ -11435,7 +11443,7 @@ namespace WaterThermalTanks {
                                                                       EMP3,
                                                                       1,
                                                                       1.0,
-                                                                      VariableSpeedCoils::VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
+                                                                      state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                                                                       1.0,
                                                                       0.0,
                                                                       0.0,
@@ -11454,7 +11462,7 @@ namespace WaterThermalTanks {
                                                                       EMP3,
                                                                       1,
                                                                       1.0,
-                                                                      VariableSpeedCoils::VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
+                                                                      state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                                                                       1.0,
                                                                       0.0,
                                                                       0.0,
@@ -11470,7 +11478,7 @@ namespace WaterThermalTanks {
                                                                       EMP3,
                                                                       1,
                                                                       1.0,
-                                                                      VariableSpeedCoils::VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
+                                                                      state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                                                                       1.0,
                                                                       0.0,
                                                                       0.0,
@@ -11489,7 +11497,7 @@ namespace WaterThermalTanks {
                                                                       EMP3,
                                                                       1,
                                                                       1.0,
-                                                                      VariableSpeedCoils::VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
+                                                                      state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
                                                                       1.0,
                                                                       0.0,
                                                                       0.0,
@@ -11501,9 +11509,9 @@ namespace WaterThermalTanks {
                             }
                         }
 
-                        this->MaxCapacity = VariableSpeedCoils::VSHPWHHeatingCapacity;
-                        this->MinCapacity = VariableSpeedCoils::VSHPWHHeatingCapacity;
-                        this->Efficiency = VariableSpeedCoils::VSHPWHHeatingCOP;
+                        this->MaxCapacity = state.dataVariableSpeedCoils->VSHPWHHeatingCapacity;
+                        this->MinCapacity = state.dataVariableSpeedCoils->VSHPWHHeatingCapacity;
+                        this->Efficiency = state.dataVariableSpeedCoils->VSHPWHHeatingCOP;
                     } else {
                         bIsVSCoil = false;
                         //       simulate the HPWH coil/fan to find heating capacity
@@ -11651,7 +11659,7 @@ namespace WaterThermalTanks {
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchSWHType, equipName, state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Type);
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchSWHVol, equipName, this->Volume);
             if (bIsVSCoil) {
-                OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchSWHHeatIn, equipName, VariableSpeedCoils::VSHPWHHeatingCapacity);
+                OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchSWHHeatIn, equipName, state.dataVariableSpeedCoils->VSHPWHHeatingCapacity);
             } else {
                 OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchSWHHeatIn, equipName, DXCoils::HPWHHeatingCapacity);
             }
@@ -11691,7 +11699,7 @@ namespace WaterThermalTanks {
         this->AlreadyRated = true;
     }
 
-    void WaterThermalTankData::ReportCWTankInits(EnergyPlusData &state, IOFiles &ioFiles)
+    void WaterThermalTankData::ReportCWTankInits(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11704,7 +11712,7 @@ namespace WaterThermalTanks {
         // send chilled water tank info to EIO
 
         if (this->myOneTimeInitFlag) {
-            this->setupOutputVars(state, ioFiles);
+            this->setupOutputVars(state);
             this->myOneTimeInitFlag = false;
         }
 
@@ -11713,7 +11721,7 @@ namespace WaterThermalTanks {
         }
 
         static constexpr auto Format_728("Chilled Water Tank Information,{},{},{:.4T},{:.4T},{:.4T}\n");
-        print(ioFiles.eio, Format_728, this->Type, this->Name, this->Volume, this->UseDesignVolFlowRate, this->SourceDesignVolFlowRate);
+        print(state.files.eio, Format_728, this->Type, this->Name, this->Volume, this->UseDesignVolFlowRate, this->SourceDesignVolFlowRate);
 
         this->AlreadyReported = true;
     }

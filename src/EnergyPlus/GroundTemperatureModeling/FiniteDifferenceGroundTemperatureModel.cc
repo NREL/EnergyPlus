@@ -111,7 +111,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
-        inputProcessor->getObjectItem(cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(state, cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
         if (objectName == cAlphaArgs(1)) {
             // Read input into object here

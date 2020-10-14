@@ -74,7 +74,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->initialized = true;
     this->compType = _compType;
     this->compName = _compName;
-    this->isEpJSON = DataGlobals::isEpJSON;
+    this->isEpJSON = state.dataGlobal->isEpJSON;
     this->printWarningFlag = _printWarningFlag;
     this->callingRoutine = _callingRoutine;
     this->stdRhoAir = DataEnvironment::StdRhoAir;

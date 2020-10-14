@@ -54,7 +54,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -65,7 +64,7 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
+void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
 {
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
@@ -90,7 +89,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlusData &
     if (input_data.basin_heater_operating_shedule_name.empty()) {
         this->evapCondBasinHeatSchedulIndex = DataGlobals::ScheduleAlwaysOn;
     } else {
-        this->evapCondBasinHeatSchedulIndex = ScheduleManager::GetScheduleIndex(input_data.basin_heater_operating_shedule_name);
+        this->evapCondBasinHeatSchedulIndex = ScheduleManager::GetScheduleIndex(state, input_data.basin_heater_operating_shedule_name);
     }
     if (this->evapCondBasinHeatSchedulIndex == 0) {
         ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
@@ -123,7 +122,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlusData &
     }
 }
 
-CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlusData &state, const std::string &name_to_find)
+CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::EnergyPlusData &state, const std::string &name_to_find)
 {
     int numPerformances = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitPerformance::object_name);
     if (numPerformances <= 0) {
@@ -135,7 +134,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlusDat
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
         inputProcessor->getObjectItem(
-            CoilCoolingDXCurveFitPerformance::object_name, perfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks);
+            state, CoilCoolingDXCurveFitPerformance::object_name, perfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks);
         if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }
@@ -171,7 +170,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlusDat
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const DataLoopNode::NodeData &inletNode,
+void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &state, const DataLoopNode::NodeData &inletNode,
                                                 DataLoopNode::NodeData &outletNode,
                                                 int useAlternateMode,
                                                 Real64 &PLR,
@@ -291,7 +290,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const Dat
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::size(EnergyPlusData &state)
+void CoilCoolingDXCurveFitPerformance::size(EnergyPlus::EnergyPlusData &state)
 {
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
         this->normalMode.size(state);
@@ -306,7 +305,7 @@ void CoilCoolingDXCurveFitPerformance::size(EnergyPlusData &state)
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlusData &state,
+void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlus::EnergyPlusData &state,
                                                  CoilCoolingDXCurveFitOperatingMode &currentMode,
                                                  const DataLoopNode::NodeData &inletNode,
                                                  DataLoopNode::NodeData &outletNode,
@@ -355,8 +354,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlusData &state,
 
 }
 
-void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state, int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex,
-                                                           IOFiles &ioFiles) {
+void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlusData &state, int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex) {
 
     using TempSolveRoot::SolveRoot;
     // If fan index hasn't been set, we can't do anything
@@ -372,7 +370,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
             "Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, ','EER 100% Capacity "
             "{Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air "
             "Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')\n");
-    print(ioFiles.eio, Format_890);
+    print(state.files.eio, Format_890);
 
     std::string const RoutineName = "CoilCoolingDXCurveFitPerformance::calcStandardRatings";
 
@@ -679,7 +677,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
 
     // begin output
     if (this->oneTimeEIOHeaderWrite) {
-        print(ioFiles.eio, Format_890); // TODO: Verify this works
+        print(state.files.eio, Format_890); // TODO: Verify this works
         this->oneTimeEIOHeaderWrite = false;
         OutputReportPredefined::pdstVAVDXCoolCoil =
             OutputReportPredefined::newPreDefSubTable(OutputReportPredefined::pdrEquip, "VAV DX Cooling Standard Rating Details");
@@ -743,12 +741,12 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
 
     static constexpr auto fmt = " VAV DX Cooling Coil Standard Rating Information, {},{},{},{},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.4R},{:.4R},{:.4R},{:.4R}\n";
     if (this->unitStatic > 0) {
-        print(ioFiles.eio, fmt,"Coil:Cooling:DX", this->name,"Fan:VariableVolume",
+        print(state.files.eio, fmt,"Coil:Cooling:DX", this->name,"Fan:VariableVolume",
               supplyFanName, NetCoolingCapRated,(NetCoolingCapRated * ConvFromSIToIP), IEER,EER_TestPoint_SI[0],EER_TestPoint_SI[1],
               EER_TestPoint_SI[2],EER_TestPoint_SI[3],EER_TestPoint_IP[0],EER_TestPoint_IP[1],EER_TestPoint_IP[2],
               EER_TestPoint_IP[3],SupAirMdot_TestPoint[0],SupAirMdot_TestPoint[1],SupAirMdot_TestPoint[2],SupAirMdot_TestPoint[3]);
     } else {
-        print(ioFiles.eio, fmt,"Coil:Cooling:DX", "N/A","Fan:VariableVolume",
+        print(state.files.eio, fmt,"Coil:Cooling:DX", "N/A","Fan:VariableVolume",
               "N/A", NetCoolingCapRated,(NetCoolingCapRated * ConvFromSIToIP), IEER,EER_TestPoint_SI[0],EER_TestPoint_SI[1],
               EER_TestPoint_SI[2],EER_TestPoint_SI[3],EER_TestPoint_IP[0],EER_TestPoint_IP[1],EER_TestPoint_IP[2],
               EER_TestPoint_IP[3],SupAirMdot_TestPoint[0],SupAirMdot_TestPoint[1],SupAirMdot_TestPoint[2],SupAirMdot_TestPoint[3]);
@@ -787,7 +785,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
 }
 
 Real64
-CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlusData &state,Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlus::EnergyPlusData &state,Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                    std::vector<Real64> const &Par)
 {
     // FUNCTION INFORMATION:

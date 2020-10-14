@@ -619,7 +619,8 @@ namespace HVACControllers {
         // Now find and load all of the simple controllers.
         if (NumSimpleControllers > 0) {
             for (Num = 1; Num <= NumSimpleControllers; ++Num) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               Num,
                                               AlphArray,
                                               NumAlphas,
@@ -669,9 +670,9 @@ namespace HVACControllers {
                     ShowContinueError("...Invalid " + cAlphaFields(4) + "=\"" + AlphArray(4) + "\", only FLOW is allowed.");
                     ErrorsFound = true;
                 }
-                ControllerProps(Num).SensedNode = GetOnlySingleNode(
+                ControllerProps(Num).SensedNode = GetOnlySingleNode(state,
                     AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-                ControllerProps(Num).ActuatedNode = GetOnlySingleNode(AlphArray(6),
+                ControllerProps(Num).ActuatedNode = GetOnlySingleNode(state, AlphArray(6),
                                                                       ErrorsFound,
                                                                       CurrentModuleObject,
                                                                       AlphArray(1),
@@ -1190,7 +1191,8 @@ namespace HVACControllers {
         // Do the Begin Environment initializations
         if (BeginEnvrnFlag && MyEnvrnFlag(ControlNum)) {
 
-            rho = GetDensityGlycol(PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidName,
+            rho = GetDensityGlycol(state,
+                                   PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidName,
                                    CWInitConvTemp,
                                    PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidIndex,
                                    RoutineName);
