@@ -223,6 +223,7 @@ namespace HVACVariableRefrigerantFlow {
     Real64 CurrentEndTime;                  // end time of current time step
     Real64 CurrentEndTimeLast;              // end time of last time step
     Real64 TimeStepSysLast;                 // system time step on last time step
+    bool HasInitVRFbeenCalledFlag(false);   // To find if CurrentEndTimeLast was initialized, checks if InitVRF function has been called
 
     // Object Data
     Array1D<VRFCondenserEquipment> VRF; // AirConditioner:VariableRefrigerantFlow object
@@ -346,6 +347,7 @@ namespace HVACVariableRefrigerantFlow {
 
         // Initialize terminal unit
         InitVRF(state, VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
+        HasInitVRFbeenCalledFlag = true; // Flag for InitVRF
 
         // Simulate terminal unit
         SimVRF(state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
@@ -388,6 +390,7 @@ namespace HVACVariableRefrigerantFlow {
 
             if (VRF(VRFCondenser).CondenserType == DataHVACGlobals::WaterCooled) UpdateVRFCondenser(VRFCondenser);
         }
+        HasInitVRFbeenCalledFlag = false; // Resetting this flag to false, for unit tests to reset CurrentEndTimeLast to 0.0
     }
 
     PlantComponent *VRFCondenserEquipment::factory(EnergyPlusData &state, std::string const &objectName)
@@ -1001,6 +1004,11 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HREIRAdjustment = 1.0;
 
         if (!DoingSizing && !WarmupFlag) {
+
+            if (!HasInitVRFbeenCalledFlag) { // If the CurrentEndTimeLast has not been set yet:
+                CurrentEndTimeLast = 0.0;
+            }
+
             if (HRHeatRequestFlag && HRCoolRequestFlag) {
                 // determine operating mode change
                 if (!VRF(VRFCond).HRCoolingActive && !VRF(VRFCond).HRHeatingActive) {
@@ -11220,6 +11228,11 @@ namespace HVACVariableRefrigerantFlow {
         HRCapTC = 0.0;
         HREIRTC = 0.0;
         if (!DoingSizing && !WarmupFlag) {
+
+            if (!HasInitVRFbeenCalledFlag) { // If the CurrentEndTimeLast has not been set yet:
+                CurrentEndTimeLast = 0.0;
+            }
+
             if (HRHeatRequestFlag && HRCoolRequestFlag) { // Simultaneous Heating and Cooling operations for HR system
                 // determine operating mode change: (1) ModeChange (2) HRCoolingActive (3) HRHeatingActive
                 if (!this->HRCoolingActive && !this->HRHeatingActive) {
