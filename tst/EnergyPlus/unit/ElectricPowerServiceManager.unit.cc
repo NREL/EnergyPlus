@@ -431,7 +431,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3)
     // get availability schedule to work
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -441,7 +441,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3)
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     createFacilityElectricPowerServiceObject();
     facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(state,  1));
@@ -543,7 +543,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4)
     // get availability schedule to work
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -553,7 +553,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4)
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     // Case 4 DCBussInverterDCStorage    Inverter = 5000,
     facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::dCBussInverterDCStorage;
@@ -636,7 +636,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5)
     // get availability schedule to work
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -646,7 +646,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5)
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     createFacilityElectricPowerServiceObject();
     facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(state,  1));
@@ -790,14 +790,14 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_TransformerLossTest)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     createFacilityElectricPowerServiceObject();
     facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(state,  1));
-    facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj = std::unique_ptr<ElectricTransformer>(new ElectricTransformer("TRANSFORMER"));
+    facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj = std::unique_ptr<ElectricTransformer>(new ElectricTransformer(state, "TRANSFORMER"));
     Real64 expectedtransformerObjLossRate = facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj->getLossRateForOutputPower(2000.0);
     // check the transformer loss rate for load and no load condition
     EXPECT_EQ(expectedtransformerObjLossRate, 0.0);

@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
@@ -71,6 +70,7 @@
 #include <algorithm>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <regex>
 
 using json = nlohmann::json;
 
@@ -81,16 +81,16 @@ void EnergyPlusFixture::SetUpTestCase()
     EnergyPlus::inputProcessor = InputProcessor::factory();
 }
 
-void EnergyPlusFixture::openOutputFiles(IOFiles &ioFiles)
+void EnergyPlusFixture::openOutputFiles(EnergyPlusData &state)
 {
-    ioFiles.eio.open_as_stringstream();
-    ioFiles.mtr.open_as_stringstream();
-    ioFiles.eso.open_as_stringstream();
-    ioFiles.audit.open_as_stringstream();
-    ioFiles.bnd.open_as_stringstream();
-    ioFiles.debug.open_as_stringstream();
-    ioFiles.mtd.open_as_stringstream();
-    ioFiles.edd.open_as_stringstream();
+    state.files.eio.open_as_stringstream();
+    state.files.mtr.open_as_stringstream();
+    state.files.eso.open_as_stringstream();
+    state.files.audit.open_as_stringstream();
+    state.files.bnd.open_as_stringstream();
+    state.files.debug.open_as_stringstream();
+    state.files.mtd.open_as_stringstream();
+    state.files.edd.open_as_stringstream();
 }
 
 void EnergyPlusFixture::SetUp()
@@ -100,7 +100,7 @@ void EnergyPlusFixture::SetUp()
 
     show_message();
 
-    openOutputFiles(state.files);
+    openOutputFiles(state);
 
     this->err_stream = new std::ostringstream;
     this->json_stream = new std::ostringstream;
@@ -290,6 +290,19 @@ bool EnergyPlusFixture::has_dfs_output(bool reset_stream)
     return has_output;
 }
 
+bool EnergyPlusFixture::match_err_stream(std::string const &expected_match, bool use_regex, bool reset_stream)
+{
+    auto const stream_str = this->err_stream->str();
+    bool match_found;
+    if (use_regex) {
+        match_found = std::regex_match(stream_str,std::regex(expected_match));
+    } else {
+        match_found = stream_str.find(expected_match) != std::string::npos;
+    }
+    if (reset_stream) this->err_stream->str(std::string());
+    return match_found;
+}
+
 bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_assertions)
 {
     bool success = true;
@@ -336,7 +349,7 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
     bool hasErrors = inputProcessor->processErrors();
 
     inputProcessor->initializeMaps();
-    SimulationManager::PostIPProcessing();
+    SimulationManager::PostIPProcessing(state);
     // inputProcessor->state->printErrors();
 
     bool successful_processing = success && is_valid && !hasErrors;

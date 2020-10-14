@@ -56,8 +56,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DemandManager {
 
@@ -191,7 +192,7 @@ namespace DemandManager {
                                    bool &ResimHVAC // Flag to resimulate the HVAC simulation
     );
 
-    void GetDemandManagerListInput();
+    void GetDemandManagerListInput(EnergyPlusData &state);
 
     void GetDemandManagerInput(EnergyPlusData &state);
 

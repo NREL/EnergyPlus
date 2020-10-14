@@ -55,8 +55,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HVACManager {
 

@@ -801,92 +801,92 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     // OutputProcessor::TimeValue.allocate(2);
 
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
     ErrorsFound = false;
     GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;
-    GetFrameAndDividerData(ErrorsFound);
+    GetFrameAndDividerData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SetPreConstructionInputParameters();
+    SetPreConstructionInputParameters(state);
 
     ErrorsFound = false;
-    GetConstructData(state.files, ErrorsFound); // read construction data
+    GetConstructData(state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
     ErrorsFound = false;
-    GetZoneData(ErrorsFound);  // read zone data
+    GetZoneData(state, ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     ErrorsFound = false;
-    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
     SurfaceGeometry::SetupZoneGeometry(state,
-                                       ErrorsFound); // this calls GetSurfaceData() and SetFlagForWindowConstructionWithShadeOrBlindLayer()
+                                       ErrorsFound); // this calls GetSurfaceData() and SetFlagForWindowConstructionWithShadeOrBlindLayer(state)
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(dataConstruction.Construct(4).Name, "WIN-CON-DOUBLEPANE"); // glass, air gap, glass
-    EXPECT_EQ(dataConstruction.Construct(4).TotLayers, 3);               //  outer glass, air gap, inner glass
-    EXPECT_EQ(dataConstruction.Construct(4).TotGlassLayers, 2);          // outer glass, inner glass
-    EXPECT_EQ(dataConstruction.Construct(4).TotSolidLayers, 2);          // outer glass, inner glass
+    EXPECT_EQ(state.dataConstruction->Construct(4).Name, "WIN-CON-DOUBLEPANE"); // glass, air gap, glass
+    EXPECT_EQ(state.dataConstruction->Construct(4).TotLayers, 3);               //  outer glass, air gap, inner glass
+    EXPECT_EQ(state.dataConstruction->Construct(4).TotGlassLayers, 2);          // outer glass, inner glass
+    EXPECT_EQ(state.dataConstruction->Construct(4).TotSolidLayers, 2);          // outer glass, inner glass
 
     EXPECT_EQ(dataMaterial.Material(4).Name, "SINGLEPANE"); // single pane glass
     EXPECT_EQ(dataMaterial.Material(5).Name, "WINGAS");     // air gap
     EXPECT_EQ(dataMaterial.Material(6).Name, "BLIND");      // window blind
 
     // construction layer material pointers. this construction has no blind
-    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(1), 4); // glass, outer layer
-    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(2), 5); // air gap
-    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(3), 4); // glass, inner layer
+    EXPECT_EQ(state.dataConstruction->Construct(4).LayerPoint(1), 4); // glass, outer layer
+    EXPECT_EQ(state.dataConstruction->Construct(4).LayerPoint(2), 5); // air gap
+    EXPECT_EQ(state.dataConstruction->Construct(4).LayerPoint(3), 4); // glass, inner layer
 
     int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", DataSurfaces::Surface);
 
     EXPECT_FALSE(SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
     // check if the construction has a blind material layer
-    SetFlagForWindowConstructionWithShadeOrBlindLayer();
+    SetFlagForWindowConstructionWithShadeOrBlindLayer(state);
     EXPECT_FALSE(SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
 
-    GetEMSInput(state, state.files);
+    GetEMSInput(state);
     // check if EMS actuator is not setup because there is no blind/shade layer
-    SetupWindowShadingControlActuators();
+    SetupWindowShadingControlActuators(state);
     EXPECT_EQ(numEMSActuatorsAvailable, 0); // no EMS actuator because there is shade/blind layer
 
     // add a blind layer in between glass
-    dataConstruction.Construct(4).TotLayers = 5;
-    dataConstruction.Construct(4).TotGlassLayers = 2;
-    dataConstruction.Construct(4).TotSolidLayers = 3;
-    dataConstruction.Construct(4).LayerPoint(1) = 4; // glass
-    dataConstruction.Construct(4).LayerPoint(2) = 5; // air gap
-    dataConstruction.Construct(4).LayerPoint(3) = 6; // window blind
-    dataConstruction.Construct(4).LayerPoint(4) = 5; // air gap
-    dataConstruction.Construct(4).LayerPoint(5) = 4; // glass
+    state.dataConstruction->Construct(4).TotLayers = 5;
+    state.dataConstruction->Construct(4).TotGlassLayers = 2;
+    state.dataConstruction->Construct(4).TotSolidLayers = 3;
+    state.dataConstruction->Construct(4).LayerPoint(1) = 4; // glass
+    state.dataConstruction->Construct(4).LayerPoint(2) = 5; // air gap
+    state.dataConstruction->Construct(4).LayerPoint(3) = 6; // window blind
+    state.dataConstruction->Construct(4).LayerPoint(4) = 5; // air gap
+    state.dataConstruction->Construct(4).LayerPoint(5) = 4; // glass
     // updated contruction and material layers data
-    EXPECT_EQ(dataConstruction.Construct(4).TotLayers, 5);      // outer glass, air gap, blind, air gap, inner glass
-    EXPECT_EQ(dataConstruction.Construct(4).TotGlassLayers, 2); // outer glass, inner glass
-    EXPECT_EQ(dataConstruction.Construct(4).TotSolidLayers, 3); // glass, blind, glass
+    EXPECT_EQ(state.dataConstruction->Construct(4).TotLayers, 5);      // outer glass, air gap, blind, air gap, inner glass
+    EXPECT_EQ(state.dataConstruction->Construct(4).TotGlassLayers, 2); // outer glass, inner glass
+    EXPECT_EQ(state.dataConstruction->Construct(4).TotSolidLayers, 3); // glass, blind, glass
     // construction layer material pointers. this construction has blind
-    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(1), 4); // glass, outer layer
-    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(2), 5); // air gap
-    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(3), 6); // blind
-    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(4), 5); // air gap
-    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(5), 4); // glass, inner layer
+    EXPECT_EQ(state.dataConstruction->Construct(4).LayerPoint(1), 4); // glass, outer layer
+    EXPECT_EQ(state.dataConstruction->Construct(4).LayerPoint(2), 5); // air gap
+    EXPECT_EQ(state.dataConstruction->Construct(4).LayerPoint(3), 6); // blind
+    EXPECT_EQ(state.dataConstruction->Construct(4).LayerPoint(4), 5); // air gap
+    EXPECT_EQ(state.dataConstruction->Construct(4).LayerPoint(5), 4); // glass, inner layer
 
     // check if the construction has a blind material layer
-    SetFlagForWindowConstructionWithShadeOrBlindLayer();
+    SetFlagForWindowConstructionWithShadeOrBlindLayer(state);
     EXPECT_TRUE(SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has blind
     // set the blind to movable
     SurfWinMovableSlats(windowSurfNum) = true;
     // check if EMS actuator is available when blind layer is added
-    SetupWindowShadingControlActuators();
+    SetupWindowShadingControlActuators(state);
     EXPECT_EQ(numEMSActuatorsAvailable, 2);
     EXPECT_EQ(EMSActuatorAvailable(1).ComponentTypeName, "Window Shading Control");
     EXPECT_EQ(EMSActuatorAvailable(1).ControlTypeName, "Control Status");
@@ -903,8 +903,8 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setUserTemperatureLocationPerpendicula
     Real64 expectedReturnValue;
     Real64 actualReturnValue;
 
-    dataConstruction.Construct.allocate(1);
-    auto &thisConstruct(dataConstruction.Construct(1));
+    state.dataConstruction->Construct.allocate(1);
+    auto &thisConstruct(state.dataConstruction->Construct(1));
     thisConstruct.Name = "RadiantSystem1";
 
     // Test 1: User value is less than zero--should be reset to zero
@@ -931,8 +931,8 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setNodeSourceAndUserTemp)
 {
     int expectedNodeNumberAtSource;
     int expectedNodeNumberAtUserSpecifiedLocation;
-    dataConstruction.Construct.allocate(1);
-    auto &thisConstruct(dataConstruction.Construct(1));
+    state.dataConstruction->Construct.allocate(1);
+    auto &thisConstruct(state.dataConstruction->Construct(1));
     thisConstruct.NumOfPerpendNodes = 4;
 
     // Data common to all tests

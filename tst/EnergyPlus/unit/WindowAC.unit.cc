@@ -432,17 +432,17 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
 
     DataGlobals::NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedule data
+    ScheduleManager::ProcessScheduleInput(state); // read schedule data
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);
     // OutputProcessor::TimeValue.allocate(2);
-    DataGlobals::DDOnlySimulation = true;
+    state.dataGlobal->DDOnlySimulation = true;
 
     SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
-    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
+    HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
     DataGlobals::BeginSimFlag = true;
     DataGlobals::BeginEnvrnFlag = true;
@@ -461,9 +461,9 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     // check input processing
     EXPECT_EQ(compIndex, 1);
 
-    EXPECT_EQ(state.dataWindowAC.WindAC(1).DXCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
+    EXPECT_EQ(state.dataWindowAC->WindAC(1).DXCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
     // check Sizing
-    EXPECT_NEAR(state.dataWindowAC.WindAC(1).MaxAirVolFlow, 0.0415, 0.0001);
+    EXPECT_NEAR(state.dataWindowAC->WindAC(1).MaxAirVolFlow, 0.0415, 0.0001);
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -295.0;
     DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;

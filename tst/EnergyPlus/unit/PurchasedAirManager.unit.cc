@@ -150,7 +150,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     int PurchAirNum = 1;
     ZoneEqSizing.allocate(1);
     CurZoneEqNum = 1;
-    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
+    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in Sizer
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(24);
     CurSysNum = 0;
 
@@ -204,7 +204,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test2)
     int PurchAirNum = 1;
     ZoneEqSizing.allocate(1);
     CurZoneEqNum = 1;
-    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
+    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in Sizer
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(24);
     CurSysNum = 0;
 
@@ -289,7 +289,7 @@ TEST_F(EnergyPlusFixture, IdealLoadsAirSystem_GetInput)
 
     DataGlobals::DoWeathSim = true;
 
-    GetPurchasedAir();
+    GetPurchasedAir(state);
 
     EXPECT_EQ(PurchasedAirManager::PurchAir.size(), 1u);
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
@@ -390,7 +390,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
     DataGlobals::DoWeathSim = true;
 
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
@@ -409,13 +409,13 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
     // Ideal loads air system found the plenum it is attached to
     EXPECT_EQ(PurchAir(1).ReturnPlenumIndex, 1);
     // The ideal loads air system inlet air node is equal to the zone return plenum outlet node
-    EXPECT_EQ(PurchAir(1).PlenumExhaustAirNodeNum, state.dataZonePlenum.ZoneRetPlenCond(1).OutletNode);
+    EXPECT_EQ(PurchAir(1).PlenumExhaustAirNodeNum, state.dataZonePlenum->ZoneRetPlenCond(1).OutletNode);
     // The ideal loads air system ZoneSupplyAirNodeNum is equal to the zone air inlet node
     EXPECT_EQ(PurchAir(1).ZoneSupplyAirNodeNum, ZoneEquipConfig(1).InletNode(1));
     // The ideal loads air system ZoneExhaustAirNodeNum is equal to the zone exhaust air node num
     EXPECT_EQ(PurchAir(1).ZoneExhaustAirNodeNum, ZoneEquipConfig(1).ExhaustNode(1));
     // The zone exhaust air node is equal to the zone return plenum inlet air node
-    EXPECT_EQ(ZoneEquipConfig(1).ExhaustNode(1), state.dataZonePlenum.ZoneRetPlenCond(1).InletNode(1));
+    EXPECT_EQ(ZoneEquipConfig(1).ExhaustNode(1), state.dataZonePlenum->ZoneRetPlenCond(1).InletNode(1));
     // The ideal loads air system has a non-zero mass flow rate
     EXPECT_GT(PurchAir(1).SupplyAirMassFlowRate, 0.0);
     // The ideal loads air system mass flow rate is equal to all nodes attached to this system
@@ -500,7 +500,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
     DataGlobals::DoWeathSim = true;
 
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
@@ -630,7 +630,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     DataGlobals::DoWeathSim = true;
 
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
@@ -648,14 +648,14 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     ZoneEquipConfig(1).ExhaustNode(1) = 2;
     DataGlobals::TimeStepZone = 0.25;
 
-    EMSManager::CheckIfAnyEMS(state.files); // get EMS input
-    EMSManager::GetEMSInput(state, state.files);
+    EMSManager::CheckIfAnyEMS(state); // get EMS input
+    EMSManager::GetEMSInput(state);
     EMSManager::FinishProcessingUserInput = true;
 
     bool FirstHVACIteration(true);
 
     if (GetPurchAirInputFlag) {
-        GetPurchasedAir();
+        GetPurchasedAir(state);
         GetPurchAirInputFlag = false;
     }
 

@@ -52,9 +52,12 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
+#include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -66,15 +69,13 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HVACControllers.hh>
+#include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
@@ -220,7 +221,8 @@ namespace HeatRecovery {
         HeatExchangerUniqueNames.clear();
     }
 
-    void SimHeatRecovery(EnergyPlusData &state, std::string const &CompName,             // name of the heat exchanger unit
+    void SimHeatRecovery(EnergyPlusData &state,
+                         std::string const &CompName,             // name of the heat exchanger unit
                          bool const FirstHVACIteration,           // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                          // Pointer to Component
                          int const FanOpMode,                     // Supply air fan operating mode
@@ -255,7 +257,7 @@ namespace HeatRecovery {
         int CompanionCoilNum; // Index to companion cooling coil
 
         if (GetInputFlag) {
-            GetHeatRecoveryInput();
+            GetHeatRecoveryInput(state);
             GetInputFlag = false;
         }
 
@@ -352,7 +354,7 @@ namespace HeatRecovery {
         ReportHeatRecovery(HeatExchNum);
     }
 
-    void GetHeatRecoveryInput()
+    void GetHeatRecoveryInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -405,7 +407,8 @@ namespace HeatRecovery {
         // loop over the air to air plate heat exchangers and load their input data
         for (ExchIndex = 1; ExchIndex <= NumAirToAirPlateExchs; ++ExchIndex) {
             cCurrentModuleObject = "HeatExchanger:AirToAir:FlatPlate";
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           ExchIndex,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -429,7 +432,7 @@ namespace HeatRecovery {
             if (lAlphaFieldBlanks(2)) {
                 ExchCond(ExchNum).SchedPtr = ScheduleAlwaysOn;
             } else {
-                ExchCond(ExchNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -471,13 +474,13 @@ namespace HeatRecovery {
             ExchCond(ExchNum).NomSecAirVolFlow = rNumericArgs(5);
             ExchCond(ExchNum).NomSecAirInTemp = rNumericArgs(6);
             ExchCond(ExchNum).NomElecPower = rNumericArgs(7);
-            ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(
+            ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
                 cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(
+            ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
                 cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(
+            ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
                 cAlphaArgs(7), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
-            ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(
+            ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
                 cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
             TestCompSet(cHXTypes(ExchCond(ExchNum).ExchTypeNum), ExchCond(ExchNum).Name, cAlphaArgs(5), cAlphaArgs(6), "Process Air Nodes");
@@ -487,7 +490,8 @@ namespace HeatRecovery {
         // loop over the air to air generic heat exchangers and load their input data
         for (ExchIndex = 1; ExchIndex <= NumAirToAirGenericExchs; ++ExchIndex) {
             cCurrentModuleObject = "HeatExchanger:AirToAir:SensibleAndLatent";
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           ExchIndex,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -511,7 +515,7 @@ namespace HeatRecovery {
             if (lAlphaFieldBlanks(2)) {
                 ExchCond(ExchNum).SchedPtr = ScheduleAlwaysOn;
             } else {
-                ExchCond(ExchNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -547,13 +551,13 @@ namespace HeatRecovery {
                                  "\" latent cooling effectiveness at 75% rated flow is less than at 100% rated flow.");
                 ShowContinueError("Latent cooling effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
-            ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(
+            ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(
+            ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(
+            ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
                 cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
-            ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(
+            ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
                 cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
             ExchCond(ExchNum).NomElecPower = rNumericArgs(10);
@@ -619,7 +623,8 @@ namespace HeatRecovery {
         // loop over the desiccant balanced heat exchangers and load their input data
         for (ExchIndex = 1; ExchIndex <= NumDesiccantBalancedExchs; ++ExchIndex) {
             cCurrentModuleObject = "HeatExchanger:Desiccant:BalancedFlow";
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           ExchIndex,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -643,7 +648,7 @@ namespace HeatRecovery {
             if (lAlphaFieldBlanks(2)) {
                 ExchCond(ExchNum).SchedPtr = ScheduleAlwaysOn;
             } else {
-                ExchCond(ExchNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -653,14 +658,14 @@ namespace HeatRecovery {
             // desiccant HX's usually refer to process and regeneration air streams
             // In this module, Sup = Regeneration nodes and Sec = Process nodes
             // regeneration air inlet and outlet nodes
-            ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(
+            ExchCond(ExchNum).SupInletNode = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(
+            ExchCond(ExchNum).SupOutletNode = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             // process air inlet and outlet nodes
-            ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(
+            ExchCond(ExchNum).SecInletNode = GetOnlySingleNode(state,
                 cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
-            ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(
+            ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
                 cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
             // Set up the component set for the process side of the HX (Sec = Process)
@@ -704,7 +709,8 @@ namespace HeatRecovery {
 
         for (PerfDataIndex = 1; PerfDataIndex <= NumDesBalExchsPerfDataType1; ++PerfDataIndex) {
             cCurrentModuleObject = "HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1";
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           PerfDataIndex,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1106,37 +1112,37 @@ namespace HeatRecovery {
         for (ExchIndex = 1; ExchIndex <= NumHeatExchangers; ++ExchIndex) {
             ExchNum = ExchIndex;
             // CurrentModuleObject='HeatExchanger:AirToAir:FlatPlate/AirToAir:SensibleAndLatent/Desiccant:BalancedFlow')
-            SetupOutputVariable("Heat Exchanger Sensible Heating Rate",
+            SetupOutputVariable(state, "Heat Exchanger Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
                                 ExchCond(ExchNum).SensHeatingRate,
                                 "System",
                                 "Average",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Sensible Heating Energy",
+            SetupOutputVariable(state, "Heat Exchanger Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
                                 ExchCond(ExchNum).SensHeatingEnergy,
                                 "System",
                                 "Sum",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Latent Gain Rate",
+            SetupOutputVariable(state, "Heat Exchanger Latent Gain Rate",
                                 OutputProcessor::Unit::W,
                                 ExchCond(ExchNum).LatHeatingRate,
                                 "System",
                                 "Average",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Latent Gain Energy",
+            SetupOutputVariable(state, "Heat Exchanger Latent Gain Energy",
                                 OutputProcessor::Unit::J,
                                 ExchCond(ExchNum).LatHeatingEnergy,
                                 "System",
                                 "Sum",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Total Heating Rate",
+            SetupOutputVariable(state, "Heat Exchanger Total Heating Rate",
                                 OutputProcessor::Unit::W,
                                 ExchCond(ExchNum).TotHeatingRate,
                                 "System",
                                 "Average",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Total Heating Energy",
+            SetupOutputVariable(state, "Heat Exchanger Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 ExchCond(ExchNum).TotHeatingEnergy,
                                 "System",
@@ -1147,37 +1153,37 @@ namespace HeatRecovery {
                                 "HEAT RECOVERY FOR HEATING",
                                 _,
                                 "System");
-            SetupOutputVariable("Heat Exchanger Sensible Cooling Rate",
+            SetupOutputVariable(state, "Heat Exchanger Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 ExchCond(ExchNum).SensCoolingRate,
                                 "System",
                                 "Average",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Sensible Cooling Energy",
+            SetupOutputVariable(state, "Heat Exchanger Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 ExchCond(ExchNum).SensCoolingEnergy,
                                 "System",
                                 "Sum",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Latent Cooling Rate",
+            SetupOutputVariable(state, "Heat Exchanger Latent Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 ExchCond(ExchNum).LatCoolingRate,
                                 "System",
                                 "Average",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Latent Cooling Energy",
+            SetupOutputVariable(state, "Heat Exchanger Latent Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 ExchCond(ExchNum).LatCoolingEnergy,
                                 "System",
                                 "Sum",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Total Cooling Rate",
+            SetupOutputVariable(state, "Heat Exchanger Total Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 ExchCond(ExchNum).TotCoolingRate,
                                 "System",
                                 "Average",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Total Cooling Energy",
+            SetupOutputVariable(state, "Heat Exchanger Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 ExchCond(ExchNum).TotCoolingEnergy,
                                 "System",
@@ -1189,13 +1195,13 @@ namespace HeatRecovery {
                                 _,
                                 "System");
 
-            SetupOutputVariable("Heat Exchanger Electricity Rate",
+            SetupOutputVariable(state, "Heat Exchanger Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 ExchCond(ExchNum).ElecUseRate,
                                 "System",
                                 "Average",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Electricity Energy",
+            SetupOutputVariable(state, "Heat Exchanger Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 ExchCond(ExchNum).ElecUseEnergy,
                                 "System",
@@ -1213,31 +1219,31 @@ namespace HeatRecovery {
             // generic heat exchangers are read in after flat plate heat exchanger objects (index needs to be set correctly)
             // CurrentModuleObject=HeatExchanger:AirToAir:SensibleAndLatent
             ExchNum = ExchIndex + NumAirToAirPlateExchs;
-            SetupOutputVariable("Heat Exchanger Sensible Effectiveness",
+            SetupOutputVariable(state, "Heat Exchanger Sensible Effectiveness",
                                 OutputProcessor::Unit::None,
                                 ExchCond(ExchNum).SensEffectiveness,
                                 "System",
                                 "Average",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Latent Effectiveness",
+            SetupOutputVariable(state, "Heat Exchanger Latent Effectiveness",
                                 OutputProcessor::Unit::None,
                                 ExchCond(ExchNum).LatEffectiveness,
                                 "System",
                                 "Average",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Supply Air Bypass Mass Flow Rate",
+            SetupOutputVariable(state, "Heat Exchanger Supply Air Bypass Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 ExchCond(ExchNum).SupBypassMassFlow,
                                 "System",
                                 "Average",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Exhaust Air Bypass Mass Flow Rate",
+            SetupOutputVariable(state, "Heat Exchanger Exhaust Air Bypass Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 ExchCond(ExchNum).SecBypassMassFlow,
                                 "System",
                                 "Average",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Defrost Time Fraction",
+            SetupOutputVariable(state, "Heat Exchanger Defrost Time Fraction",
                                 OutputProcessor::Unit::None,
                                 ExchCond(ExchNum).DefrostFraction,
                                 "System",
@@ -1250,7 +1256,8 @@ namespace HeatRecovery {
         }
     }
 
-    void InitHeatRecovery(EnergyPlusData &state, int const ExchNum, // number of the current heat exchanger being simulated
+    void InitHeatRecovery(EnergyPlusData &state,
+                          int const ExchNum, // number of the current heat exchanger being simulated
                           int const CompanionCoilIndex,
                           int const CompanionCoilType_Num)
     {
@@ -1584,8 +1591,8 @@ namespace HeatRecovery {
                         }
                     } else if (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                         // how to support VS dx coil here?
-                        FullLoadOutAirTemp = VariableSpeedCoils::VarSpeedCoil(CompanionCoilIndex).OutletAirDBTemp;
-                        FullLoadOutAirHumRat = VariableSpeedCoils::VarSpeedCoil(CompanionCoilIndex).OutletAirHumRat;
+                        FullLoadOutAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirDBTemp;
+                        FullLoadOutAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirHumRat;
                     }
 
                 } else {
@@ -1619,8 +1626,6 @@ namespace HeatRecovery {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1656,7 +1661,6 @@ namespace HeatRecovery {
         } else {
             SizingString = "Nominal Supply Air Flow Rate [m3/s]"; // desiccant balanced flow does not have an input for air volume flow rate
         }
-        SizingMethod = SystemAirflowSizing;
         if (CurZoneEqNum > 0) {
             if (ExchCond(ExchNum).NomSupAirVolFlow == AutoSize) {
                 SizingMethod = AutoCalculateSizing;
@@ -1682,8 +1686,12 @@ namespace HeatRecovery {
             }
         }
         TempSize = ExchCond(ExchNum).NomSupAirVolFlow;
-        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-        ExchCond(ExchNum).NomSupAirVolFlow = TempSize;
+        bool errorsFound = false;
+        SystemAirFlowSizer sizerSystemAirFlow;
+        sizerSystemAirFlow.overrideSizingString(SizingString);
+        // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+        sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+        ExchCond(ExchNum).NomSupAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
         DataConstantUsedForSizing = 0.0;
         DataFractionUsedForSizing = 0.0;
         if (ExchCond(ExchNum).ExchTypeNum == HX_AIRTOAIR_FLATPLATE) {
@@ -1692,21 +1700,22 @@ namespace HeatRecovery {
             CompName = ExchCond(ExchNum).Name;
             CompType = cHXTypes(ExchCond(ExchNum).ExchTypeNum);
             SizingString = HeatExchCondNumericFields(ExchNum).NumericFieldNames(FieldNum) + " [m3/s]";
-            SizingMethod = SystemAirflowSizing; // used if flow is hard sized without sizing run
             if (ExchCond(ExchNum).NomSecAirVolFlow == AutoSize) {
-                SizingMethod = AutoCalculateSizing;
                 DataConstantUsedForSizing = ExchCond(ExchNum).NomSupAirVolFlow;
                 DataFractionUsedForSizing = 1.0;
             } else {
                 if (ZoneSizingRunDone || SysSizingRunDone) {
-                    SizingMethod = AutoCalculateSizing;
                     DataConstantUsedForSizing = ExchCond(ExchNum).NomSupAirVolFlow;
                     DataFractionUsedForSizing = 1.0;
                 }
             }
             TempSize = ExchCond(ExchNum).NomSecAirVolFlow;
-            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-            ExchCond(ExchNum).NomSecAirVolFlow = TempSize;
+            bool errorsFound = false;
+            SystemAirFlowSizer sizerSystemAirFlow2;
+            sizerSystemAirFlow2.overrideSizingString(SizingString);
+            // sizerSystemAirFlow2.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+            sizerSystemAirFlow2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            ExchCond(ExchNum).NomSecAirVolFlow = sizerSystemAirFlow2.size(state, TempSize, errorsFound);
             DataConstantUsedForSizing = 0.0;
             DataFractionUsedForSizing = 0.0;
         }
@@ -1720,18 +1729,21 @@ namespace HeatRecovery {
             CompName = BalDesDehumPerfData(BalDesDehumPerfIndex).Name;
             CompType = BalDesDehumPerfData(BalDesDehumPerfIndex).PerfType;
             SizingString = BalDesDehumPerfNumericFields(BalDesDehumPerfIndex).NumericFieldNames(FieldNum) + " [m3/s]";
-            SizingMethod = SystemAirflowSizing;
             TempSize = BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow;
-            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-            BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow = TempSize;
+            bool errorsFound = false;
+            SystemAirFlowSizer sizerSystemAirFlow3;
+            sizerSystemAirFlow3.overrideSizingString(SizingString);
+            // sizerSystemAirFlow3.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+            sizerSystemAirFlow3.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow = sizerSystemAirFlow3.size(state, TempSize, errorsFound);
 
-            FieldNum = 2;
-            SizingString = BalDesDehumPerfNumericFields(BalDesDehumPerfIndex).NumericFieldNames(FieldNum) + " [m/s]";
             DataAirFlowUsedForSizing = BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow;
             TempSize = BalDesDehumPerfData(BalDesDehumPerfIndex).NomProcAirFaceVel;
-            SizingMethod = DesiccantDehumidifierBFPerfDataFaceVelocitySizing;
-            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-            BalDesDehumPerfData(BalDesDehumPerfIndex).NomProcAirFaceVel = TempSize;
+            bool ErrorsFound = false;
+            DesiccantDehumidifierBFPerfDataFaceVelocitySizer sizerDesDehumBFFaceVel;
+            sizerDesDehumBFFaceVel.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            BalDesDehumPerfData(BalDesDehumPerfIndex).NomProcAirFaceVel = sizerDesDehumBFFaceVel.size(state, TempSize, ErrorsFound);
+
             DataAirFlowUsedForSizing = 0.0;
         }
     }
@@ -2329,18 +2341,18 @@ namespace HeatRecovery {
                             ExchCond(ExNum).SensEffectiveness = 0.0;
                             if (!ExchCond(ExNum).SensEffectivenessFlag) {
                                 ShowWarningError("HeatExchanger:AirToAir:SensibleAndLatent =\"" + ExchCond(ExNum).Name + "\"" +
-                                    " sensible effectiveness is less than zero. Check the following inputs.");
+                                                 " sensible effectiveness is less than zero. Check the following inputs.");
                                 if (ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SecInTemp) {
                                     ShowContinueError("...Sensible Effectiveness at 100% Heating Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).HeatEffectSensible100, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).HeatEffectSensible100, 2));
                                     ShowContinueError("...Sensible Effectiveness at 75% Heating Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).HeatEffectSensible75, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).HeatEffectSensible75, 2));
                                     ShowContinueError("...Sensible effectiveness reset to zero and the simulation continues.");
                                 } else {
                                     ShowContinueError("...Sensible Effectiveness at 100% Cooling Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).CoolEffectSensible100, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).CoolEffectSensible100, 2));
                                     ShowContinueError("...Sensible Effectiveness at 75% Cooling Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).CoolEffectSensible75, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).CoolEffectSensible75, 2));
                                     ShowContinueError("...Sensible effectiveness reset to zero and the simulation continues.");
                                 }
                                 ShowContinueError("...Heat Exchanger Air Volume Flow Ratio = " + RoundSigDigits(HXAirVolFlowRatio, 2));
@@ -2352,18 +2364,18 @@ namespace HeatRecovery {
                             ExchCond(ExNum).LatEffectiveness = 0.0;
                             if (!ExchCond(ExNum).LatEffectivenessFlag) {
                                 ShowWarningError("HeatExchanger:AirToAir:SensibleAndLatent =\"" + ExchCond(ExNum).Name + "\"" +
-                                    " latent effectiveness is less than zero. Check the following inputs.");
+                                                 " latent effectiveness is less than zero. Check the following inputs.");
                                 if (ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SecInTemp) {
                                     ShowContinueError("...Latent Effectiveness at 100% Heating Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).HeatEffectLatent100, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).HeatEffectLatent100, 2));
                                     ShowContinueError("...Latent Effectiveness at 75% Heating Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).HeatEffectLatent75, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).HeatEffectLatent75, 2));
                                     ShowContinueError("...Latent effectiveness reset to zero and the simulation continues.");
                                 } else {
                                     ShowContinueError("...Latent Effectiveness at 100% Cooling Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).CoolEffectLatent100, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).CoolEffectLatent100, 2));
                                     ShowContinueError("...Latent Effectiveness at 75% Cooling Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).CoolEffectLatent75, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).CoolEffectLatent75, 2));
                                     ShowContinueError("...Latent effectiveness reset to zero and the simulation continues.");
                                 }
                                 ShowContinueError("...Heat Exchanger Air Volume Flow Ratio = " + RoundSigDigits(HXAirVolFlowRatio, 2));
@@ -5174,7 +5186,8 @@ namespace HeatRecovery {
         }
     }
 
-    int GetSupplyInletNode(std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSupplyInletNode(EnergyPlusData &state,
+                           std::string const &HXName, // must match HX names for the ExchCond type
                            bool &ErrorsFound          // set to true if problem
     )
     {
@@ -5197,7 +5210,7 @@ namespace HeatRecovery {
 
         // Obtains and Allocates heat exchanger related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
-            GetHeatRecoveryInput();
+            GetHeatRecoveryInput(state);
             GetInputFlag = false;
         }
 
@@ -5213,7 +5226,8 @@ namespace HeatRecovery {
         return GetSupplyInletNode;
     }
 
-    int GetSupplyOutletNode(std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSupplyOutletNode(EnergyPlusData &state,
+                            std::string const &HXName, // must match HX names for the ExchCond type
                             bool &ErrorsFound          // set to true if problem
     )
     {
@@ -5236,7 +5250,7 @@ namespace HeatRecovery {
 
         // Obtains and Allocates heat exchanger related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
-            GetHeatRecoveryInput();
+            GetHeatRecoveryInput(state);
             GetInputFlag = false;
         }
 
@@ -5252,7 +5266,8 @@ namespace HeatRecovery {
         return GetSupplyOutletNode;
     }
 
-    int GetSecondaryInletNode(std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSecondaryInletNode(EnergyPlusData &state,
+                              std::string const &HXName, // must match HX names for the ExchCond type
                               bool &ErrorsFound          // set to true if problem
     )
     {
@@ -5275,7 +5290,7 @@ namespace HeatRecovery {
 
         // Obtains and Allocates heat exchanger related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
-            GetHeatRecoveryInput();
+            GetHeatRecoveryInput(state);
             GetInputFlag = false;
         }
 
@@ -5291,7 +5306,8 @@ namespace HeatRecovery {
         return GetSecondaryInletNode;
     }
 
-    int GetSecondaryOutletNode(std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSecondaryOutletNode(EnergyPlusData &state,
+                               std::string const &HXName, // must match HX names for the ExchCond type
                                bool &ErrorsFound          // set to true if problem
     )
     {
@@ -5314,7 +5330,7 @@ namespace HeatRecovery {
 
         // Obtains and Allocates heat exchanger related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
-            GetHeatRecoveryInput();
+            GetHeatRecoveryInput(state);
             GetInputFlag = false;
         }
 
@@ -5330,7 +5346,8 @@ namespace HeatRecovery {
         return GetSecondaryOutletNode;
     }
 
-    Real64 GetSupplyAirFlowRate(std::string const &HXName, // must match HX names for the ExchCond type
+    Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
+                                std::string const &HXName, // must match HX names for the ExchCond type
                                 bool &ErrorsFound          // set to true if problem
     )
     {
@@ -5353,7 +5370,7 @@ namespace HeatRecovery {
 
         // Obtains and Allocates heat exchanger related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
-            GetHeatRecoveryInput();
+            GetHeatRecoveryInput(state);
             GetInputFlag = false;
         }
 
@@ -5370,7 +5387,8 @@ namespace HeatRecovery {
         return GetSupplyAirFlowRate;
     }
 
-    int GetHeatExchangerObjectTypeNum(std::string const &HXName, // must match HX names for the ExchCond type
+    int GetHeatExchangerObjectTypeNum(EnergyPlusData &state,
+                                      std::string const &HXName, // must match HX names for the ExchCond type
                                       bool &ErrorsFound          // set to true if problem
     )
     {
@@ -5393,7 +5411,7 @@ namespace HeatRecovery {
 
         // Obtains and Allocates heat exchanger related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
-            GetHeatRecoveryInput();
+            GetHeatRecoveryInput(state);
             GetInputFlag = false;
         }
 
@@ -5409,7 +5427,8 @@ namespace HeatRecovery {
         return GetHeatExchangerObjectTypeNum;
     }
 
-    void SetHeatExchangerData(int const HXNum,                     // Index of HX
+    void SetHeatExchangerData(EnergyPlusData &state,
+                              int const HXNum,                     // Index of HX
                               bool &ErrorsFound,                   // Set to true if certain errors found
                               std::string const &HXName,           // Name of HX
                               Optional<Real64> SupplyAirVolFlow,   // HX supply air flow rate    [m3/s]
@@ -5454,7 +5473,7 @@ namespace HeatRecovery {
 
         // Obtains and Allocates heat exchanger related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
-            GetHeatRecoveryInput();
+            GetHeatRecoveryInput(state);
             GetInputFlag = false;
         }
 

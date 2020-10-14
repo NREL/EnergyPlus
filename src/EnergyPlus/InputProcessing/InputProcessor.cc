@@ -55,9 +55,9 @@
 #include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -250,7 +250,7 @@ void cleanEPJSON(json &epjson)
     }
 }
 
-void InputProcessor::processInput()
+void InputProcessor::processInput(EnergyPlusData &state)
 {
     std::ifstream input_stream(DataStringGlobals::inputFileName, std::ifstream::in | std::ifstream::binary);
     if (!input_stream.is_open()) {
@@ -279,11 +279,11 @@ void InputProcessor::processInput()
     // }
 
     try {
-        if (!DataGlobals::isEpJSON) {
+        if (!state.dataGlobal->isEpJSON) {
             std::string input_file;
             std::string line;
             while (std::getline(input_stream, line)) {
-                input_file.append(line + DataStringGlobals::NL);
+                input_file.append(line + '\n');
             }
             if (input_file.empty()) {
                 ShowFatalError("Failed to read input file: " + DataStringGlobals::inputFileName);
@@ -298,7 +298,7 @@ void InputProcessor::processInput()
             //              ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
             //          }
 
-            if (DataGlobals::outputEpJSONConversion || DataGlobals::outputEpJSONConversionOnly) {
+            if (state.dataGlobal->outputEpJSONConversion || state.dataGlobal->outputEpJSONConversionOnly) {
                 json epJSONClean = epJSON;
                 cleanEPJSON(epJSONClean);
                 input_file = epJSONClean.dump(4, ' ', false, json::error_handler_t::replace);
@@ -308,13 +308,13 @@ void InputProcessor::processInput()
                 std::ofstream convertedFS(convertedIDF, std::ofstream::out);
                 convertedFS << input_file << std::endl;
             }
-        } else if (DataGlobals::isCBOR) {
+        } else if (state.dataGlobal->isCBOR) {
             epJSON = json::from_cbor(input_stream);
-        } else if (DataGlobals::isMsgPack) {
+        } else if (state.dataGlobal->isMsgPack) {
             epJSON = json::from_msgpack(input_stream);
-        } else if (DataGlobals::isUBJSON) {
+        } else if (state.dataGlobal->isUBJSON) {
             epJSON = json::from_ubjson(input_stream);
-        } else if (DataGlobals::isBSON) {
+        } else if (state.dataGlobal->isBSON) {
             epJSON = json::from_bson(input_stream);
         } else {
             epJSON = json::parse(input_stream);
@@ -332,7 +332,7 @@ void InputProcessor::processInput()
         ShowFatalError("Errors occurred on processing input file. Preceding condition(s) cause termination.");
     }
 
-    if (DataGlobals::isEpJSON && (DataGlobals::outputEpJSONConversion || DataGlobals::outputEpJSONConversionOnly)) {
+    if (state.dataGlobal->isEpJSON && (state.dataGlobal->outputEpJSONConversion || state.dataGlobal->outputEpJSONConversionOnly)) {
         if (versionMatch) {
             std::string const encoded = idf_parser->encode(epJSON, schema);
             std::string convertedEpJSON(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".idf");
@@ -568,10 +568,10 @@ const json &InputProcessor::getObjectInstances(std::string const &ObjType)
     return epJSON.find(ObjType).value();
 }
 
-InputProcessor::MaxFields InputProcessor::findMaxFields(json const &ep_object, std::string const &extension_key, json const &legacy_idd)
+InputProcessor::MaxFields InputProcessor::findMaxFields(EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd)
 {
     InputProcessor::MaxFields maxFields;
-    if (!DataGlobals::isEpJSON) {
+    if (!state.dataGlobal->isEpJSON) {
         auto found_idf_max_fields = ep_object.find("idf_max_fields");
         if (found_idf_max_fields != ep_object.end()) {
             maxFields.max_fields = *found_idf_max_fields;
@@ -617,7 +617,8 @@ InputProcessor::MaxFields InputProcessor::findMaxFields(json const &ep_object, s
     return maxFields;
 }
 
-void InputProcessor::setObjectItemValue(json const &ep_object,
+void InputProcessor::setObjectItemValue(EnergyPlusData &state,
+                                        json const &ep_object,
                                         json const &ep_schema_object,
                                         std::string const &field,
                                         json const &legacy_field_info,
@@ -697,19 +698,20 @@ void InputProcessor::setObjectItemValue(json const &ep_object,
     if (field_type == "a") {
         if (within_max_fields) NumAlphas++;
         if (is_AlphaFieldNames) {
-            AlphaFieldNames()(alpha_index) = (DataGlobals::isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
+            AlphaFieldNames()(alpha_index) = (state.dataGlobal->isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
         }
         alpha_index++;
     } else if (field_type == "n") {
         if (within_max_fields) NumNumbers++;
         if (is_NumericFieldNames) {
-            NumericFieldNames()(numeric_index) = (DataGlobals::isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
+            NumericFieldNames()(numeric_index) = (state.dataGlobal->isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
         }
         numeric_index++;
     }
 }
 
-void InputProcessor::getObjectItem(std::string const &Object,
+void InputProcessor::getObjectItem(EnergyPlusData &state,
+                                   std::string const &Object,
                                    int const Number,
                                    Array1S_string Alphas,
                                    int &NumAlphas,
@@ -730,7 +732,7 @@ void InputProcessor::getObjectItem(std::string const &Object,
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine gets the 'number' 'object' from the IDFRecord data structure.
 
-    int adjustedNumber = getJSONObjNum(Object, Number); // if incoming input is idf, then use idf object order
+    int adjustedNumber = getJSONObjNum(state, Object, Number); // if incoming input is idf, then use idf object order
 
     auto objectInfo = ObjectInfo();
     objectInfo.objectType = Object;
@@ -780,7 +782,7 @@ void InputProcessor::getObjectItem(std::string const &Object,
 
     int alpha_index = 1;
     int numeric_index = 1;
-    auto maxFields = findMaxFields(obj_val, extension_key, legacy_idd);
+    auto maxFields = findMaxFields(state, obj_val, extension_key, legacy_idd);
 
     Alphas = "";
     Numbers = 0;
@@ -821,14 +823,15 @@ void InputProcessor::getObjectItem(std::string const &Object,
             }
             if (is_AlphaBlank) AlphaBlank()(alpha_index) = objectInfo.objectName.empty();
             if (is_AlphaFieldNames) {
-                AlphaFieldNames()(alpha_index) = (DataGlobals::isEpJSON) ? field : field_info_val.at("field_name").get<std::string>();
+                AlphaFieldNames()(alpha_index) = (state.dataGlobal->isEpJSON) ? field : field_info_val.at("field_name").get<std::string>();
             }
             NumAlphas++;
             alpha_index++;
             continue;
         }
 
-        setObjectItemValue(obj_val,
+        setObjectItemValue(state,
+                           obj_val,
                            schema_obj_props,
                            field,
                            field_info_val,
@@ -867,7 +870,8 @@ void InputProcessor::getObjectItem(std::string const &Object,
 
                     bool within_idf_extensible_fields = (extensible_count < maxFields.max_extensible_fields);
 
-                    setObjectItemValue(epJSON_extension_obj,
+                    setObjectItemValue(state,
+                                       epJSON_extension_obj,
                                        schema_extension_fields,
                                        field_name,
                                        field_info_val,
@@ -890,13 +894,13 @@ void InputProcessor::getObjectItem(std::string const &Object,
     Status = 1;
 }
 
-int InputProcessor::getIDFObjNum(std::string const &Object, int const Number)
+int InputProcessor::getIDFObjNum(EnergyPlusData &state, std::string const &Object, int const Number)
 {
     // Given the number (index) of an object in JSON order, return it's number in original idf order
 
     // Only applicable if the incoming file was idf
     int idfOrderNumber = Number;
-    if (DataGlobals::isEpJSON || !DataGlobals::preserveIDFOrder) return idfOrderNumber;
+    if (state.dataGlobal->isEpJSON || !state.dataGlobal->preserveIDFOrder) return idfOrderNumber;
 
     json *obj;
     auto obj_iter = epJSON.find(Object);
@@ -933,13 +937,13 @@ int InputProcessor::getIDFObjNum(std::string const &Object, int const Number)
     return idfOrderNumber;
 }
 
-int InputProcessor::getJSONObjNum(std::string const &Object, int const Number)
+int InputProcessor::getJSONObjNum(EnergyPlusData &state, std::string const &Object, int const Number)
 {
     // Given the number (index) of an object in original idf order, return it's number in JSON order
 
     // Only applicable if the incoming file was idf
     int jSONOrderNumber = Number;
-    if (DataGlobals::isEpJSON || !DataGlobals::preserveIDFOrder) return jSONOrderNumber;
+    if (state.dataGlobal->isEpJSON || !state.dataGlobal->preserveIDFOrder) return jSONOrderNumber;
 
     json *obj;
     auto obj_iter = epJSON.find(Object);
@@ -976,7 +980,8 @@ int InputProcessor::getJSONObjNum(std::string const &Object, int const Number)
     return jSONOrderNumber;
 }
 
-int InputProcessor::getObjectItemNum(std::string const &ObjType, // Object Type (ref: IDD Objects)
+int InputProcessor::getObjectItemNum(EnergyPlusData &state,
+                                     std::string const &ObjType, // Object Type (ref: IDD Objects)
                                      std::string const &ObjName  // Name of the object type
 )
 {
@@ -1009,10 +1014,11 @@ int InputProcessor::getObjectItemNum(std::string const &ObjType, // Object Type 
     if (!found) {
         return 0; // indicates object name not found, see function GeneralRoutines::ValidateComponent
     }
-    return getIDFObjNum(ObjType, object_item_num); // if incoming input is idf, then return idf object order
+    return getIDFObjNum(state, ObjType, object_item_num); // if incoming input is idf, then return idf object order
 }
 
-int InputProcessor::getObjectItemNum(std::string const &ObjType,     // Object Type (ref: IDD Objects)
+int InputProcessor::getObjectItemNum(EnergyPlusData &state,
+                                     std::string const &ObjType,     // Object Type (ref: IDD Objects)
                                      std::string const &NameTypeVal, // Object "name" field type ( used as search key )
                                      std::string const &ObjName      // Name of the object type
 )
@@ -1048,7 +1054,7 @@ int InputProcessor::getObjectItemNum(std::string const &ObjType,     // Object T
     if (!found) {
         return 0; // indicates object field name or value not found
     }
-    return getIDFObjNum(ObjType, object_item_num); // if incoming input is idf, then return idf object order
+    return getIDFObjNum(state, ObjType, object_item_num); // if incoming input is idf, then return idf object order
 }
 
 void InputProcessor::rangeCheck(bool &ErrorsFound,                       // Set to true if error detected
@@ -1508,7 +1514,7 @@ void InputProcessor::reportOrphanRecordObjects()
     }
 }
 
-void InputProcessor::preProcessorCheck(bool &PreP_Fatal) // True if a preprocessor flags a fatal error
+void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) // True if a preprocessor flags a fatal error
 {
 
     // SUBROUTINE INFORMATION:
@@ -1561,7 +1567,8 @@ void InputProcessor::preProcessorCheck(bool &PreP_Fatal) // True if a preprocess
         getObjectDefMaxArgs(DataIPShortCuts::cCurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         DataIPShortCuts::cAlphaArgs({1, NumAlphas}) = BlankString;
         for (CountP = 1; CountP <= NumPrePM; ++CountP) {
-            getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            getObjectItem(state,
+                          DataIPShortCuts::cCurrentModuleObject,
                           CountP,
                           DataIPShortCuts::cAlphaArgs,
                           NumAlphas,
@@ -1638,7 +1645,6 @@ void InputProcessor::preScanReportingVariables()
     // Output:Variable
     // Meter:Custom
     // Meter:CustomDecrement
-    // Meter:CustomDifference
     // Output:Table:Monthly
     // Output:Table:TimeBins
     // Output:Table:SummaryReports
@@ -1649,7 +1655,6 @@ void InputProcessor::preScanReportingVariables()
     static std::string const OutputVariable("Output:Variable");
     static std::string const MeterCustom("Meter:Custom");
     static std::string const MeterCustomDecrement("Meter:CustomDecrement");
-    //      static std::string const MeterCustomDifference( "METER:CUSTOMDIFFERENCE" );
     static std::string const OutputTableMonthly("Output:Table:Monthly");
     static std::string const OutputTableAnnual("Output:Table:Annual");
     static std::string const OutputTableTimeBins("Output:Table:TimeBins");

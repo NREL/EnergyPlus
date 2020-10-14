@@ -203,7 +203,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
@@ -3761,7 +3763,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    Chiller Electricity Rate,  !- Variable Name
+    Chiller Electricity Rate,!- Variable Name
     0,                       !- Interval Start
     1000,                    !- Interval Size
     10,                      !- Interval Count
@@ -3769,7 +3771,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    Chiller Electricity Rate,  !- Variable Name
+    Chiller Electricity Rate,!- Variable Name
     0,                       !- Interval Start
     1000,                    !- Interval Size
     10,                      !- Interval Count
@@ -3785,9 +3787,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Electricity:Facility,    !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    NaturalGas:Facility,            !- Variable or Meter 3 Name
+    NaturalGas:Facility,     !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    NaturalGas:Facility,            !- Variable or Meter 4 Name
+    NaturalGas:Facility,     !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Schedule:Compact,

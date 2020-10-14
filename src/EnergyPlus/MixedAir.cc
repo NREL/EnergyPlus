@@ -55,6 +55,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -89,7 +90,6 @@
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Humidifiers.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -99,7 +99,6 @@
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -613,8 +612,6 @@ namespace MixedAir {
         using SteamCoils::SimulateSteamCoilComponents;
         using TranspiredCollector::SimTranspiredCollector;
         using UserDefinedComponents::SimCoilUserDefined;
-        using WaterCoils::SimulateWaterCoilComponents;
-        using WaterCoils::WaterCoil;
         // Locals
         // SUBROUTINE ARGUMENTS:
 
@@ -637,7 +634,7 @@ namespace MixedAir {
 
             if (SELECT_CASE_var == OAMixer_Num) { // 'OutdoorAir:Mixer'
                 if (Sim) {
-                    SimOAMixer(CompName, FirstHVACIteration, CompIndex);
+                    SimOAMixer(state, CompName, FirstHVACIteration, CompIndex);
                 }
 
                 // Fan Types
@@ -667,35 +664,35 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == WaterCoil_Cooling) { // 'Coil:Cooling:Water'
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
+                    if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                     // iterate on OA sys controller and water coil at the same time
                     SolveWaterCoilController(state,
                                              FirstHVACIteration,
                                              AirLoopNum,
                                              CompName,
                                              CompIndex,
-                                             WaterCoil(CompIndex).ControllerName,
-                                             WaterCoil(CompIndex).ControllerIndex,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerName,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
                                              false);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
+                    if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                     // iterate on OA sys controller and water coil at the same time
                     SolveWaterCoilController(state,
                                              FirstHVACIteration,
                                              AirLoopNum,
                                              CompName,
                                              CompIndex,
-                                             WaterCoil(CompIndex).ControllerName,
-                                             WaterCoil(CompIndex).ControllerIndex,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerName,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
                                              false);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OAHeatingCoil = true;
             } else if (SELECT_CASE_var == SteamCoil_AirHeat) { // 'Coil:Heating:Steam'
@@ -706,18 +703,18 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == WaterCoil_DetailedCool) { // 'Coil:Cooling:Water:DetailedGeometry'
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
+                    if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                     // iterate on OA sys controller and water coil at the same time
                     SolveWaterCoilController(state,
                                              FirstHVACIteration,
                                              AirLoopNum,
                                              CompName,
                                              CompIndex,
-                                             WaterCoil(CompIndex).ControllerName,
-                                             WaterCoil(CompIndex).ControllerIndex,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerName,
+                                             state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
                                              false);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == Coil_ElectricHeat) { // 'Coil:Heating:Electric'
@@ -848,14 +845,14 @@ namespace MixedAir {
                 // Unglazed Transpired Solar Collector
             } else if (SELECT_CASE_var == Unglazed_SolarCollector) { // 'SolarCollector:UnglazedTranspired'
                 if (Sim) {
-                    SimTranspiredCollector(state, state.dataConvectionCoefficients, state.files, CompName, CompIndex);
+                    SimTranspiredCollector(state, CompName, CompIndex);
                 }
 
                 // Air-based Photovoltaic-thermal flat plate collector
             } else if (SELECT_CASE_var == PVT_AirBased) { // 'SolarCollector:FlatPlate:PhotovoltaicThermal'
                 if (Sim) {
                     if (CompIndex == 0) {
-                        CompIndex = PhotovoltaicThermalCollectors::getPVTindexFromName(CompName);
+                        CompIndex = PhotovoltaicThermalCollectors::getPVTindexFromName(state, CompName);
                     }
                     PhotovoltaicThermalCollectors::simPVTfromOASys(state, CompIndex, FirstHVACIteration);
                 }
@@ -899,7 +896,7 @@ namespace MixedAir {
         }
     }
 
-    void SimOAMixer(std::string const &CompName, bool const FirstHVACIteration, int &CompIndex)
+    void SimOAMixer(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -915,7 +912,7 @@ namespace MixedAir {
         int OAMixerNum;
 
         if (GetOAMixerInputFlag) {
-            GetOAMixerInputs();
+            GetOAMixerInputs(state);
             GetOAMixerInputFlag = false;
         }
 
@@ -1063,7 +1060,8 @@ namespace MixedAir {
 
             // create a reference for convenience
             auto &thisControllerList(ControllerLists(Item));
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Item,
                                           AlphArray,
                                           NumAlphas,
@@ -1122,7 +1120,8 @@ namespace MixedAir {
 
         for (OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           OASysNum,
                                           AlphArray,
                                           NumAlphas,
@@ -1147,9 +1146,10 @@ namespace MixedAir {
             TestCompSet(CurrentModuleObject, AlphArray(1), "UNDEFINED", "UNDEFINED", "Air Nodes");
 
             if (!lAlphaBlanks(3)) {
-                ListNum = inputProcessor->getObjectItemNum(CurrentModuleObjects(CMO_AirLoopEqList), ComponentListName);
+                ListNum = inputProcessor->getObjectItemNum(state,
+CurrentModuleObjects(CMO_AirLoopEqList), ComponentListName);
                 if (ListNum > 0) {
-                    inputProcessor->getObjectItem(CurrentModuleObjects(CMO_AirLoopEqList), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
+                    inputProcessor->getObjectItem(state, CurrentModuleObjects(CMO_AirLoopEqList), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
                     NumInList = (NumAlphas - 1) / 2;
                     state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents = NumInList;
                     state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName.allocate(NumInList);
@@ -1184,9 +1184,10 @@ namespace MixedAir {
             ListNum = 0;
             NumSimpControllers = 0;
             if (!lAlphaBlanks(2)) {
-                ListNum = inputProcessor->getObjectItemNum(CurrentModuleObjects(CMO_ControllerList), ControllerListName);
+                ListNum = inputProcessor->getObjectItemNum(state,
+CurrentModuleObjects(CMO_ControllerList), ControllerListName);
                 if (ListNum > 0) {
-                    inputProcessor->getObjectItem(CurrentModuleObjects(CMO_ControllerList), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
+                    inputProcessor->getObjectItem(state, CurrentModuleObjects(CMO_ControllerList), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
                     NumInList = (NumAlphas - 1) / 2;
                     state.dataAirLoop->OutsideAirSys(OASysNum).NumControllers = NumInList;
                     state.dataAirLoop->OutsideAirSys(OASysNum).ControllerName.allocate(NumInList);
@@ -1218,7 +1219,8 @@ namespace MixedAir {
             state.dataAirLoop->OutsideAirSys(OASysNum).NumSimpleControllers = NumSimpControllers;
 
             if (!lAlphaBlanks(4)) {
-                ListNum = inputProcessor->getObjectItemNum(CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
+                ListNum = inputProcessor->getObjectItemNum(state,
+CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 if (ListNum <= 0) {
                     ShowSevereError(CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid " + cAlphaFields(4) + "=\"" + AlphArray(4) +
                                     "\" not found.");
@@ -1430,7 +1432,7 @@ namespace MixedAir {
             GetOASysInputFlag = false;
         }
         if (GetOAMixerInputFlag) { // Gets input for object  first time Sim routine is called
-            GetOAMixerInputs();
+            GetOAMixerInputs(state);
             GetOAMixerInputFlag = false;
         }
 
@@ -1462,7 +1464,8 @@ namespace MixedAir {
             int currentOAControllerNum = 0;
             for (OutAirNum = NumERVControllers + 1; OutAirNum <= NumOAControllers; ++OutAirNum) {
                 ++currentOAControllerNum;
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               currentOAControllerNum,
                                               AlphArray,
                                               NumAlphas,
@@ -1529,7 +1532,8 @@ namespace MixedAir {
             VentilationMechanical.allocate(NumVentMechControllers);
             for (VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum) {
                 auto &thisVentilationMechanical(VentilationMechanical(VentMechNum));
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               VentMechNum,
                                               AlphArray,
                                               NumAlphas,
@@ -1553,7 +1557,7 @@ namespace MixedAir {
                 if (lAlphaBlanks(2)) {
                     thisVentilationMechanical.SchPtr = ScheduleAlwaysOn;
                 } else {
-                    thisVentilationMechanical.SchPtr = GetScheduleIndex(AlphArray(2)); // convert schedule name to pointer
+                    thisVentilationMechanical.SchPtr = GetScheduleIndex(state, AlphArray(2)); // convert schedule name to pointer
                     if (thisVentilationMechanical.SchPtr == 0) {
                         ShowSevereError(CurrentModuleObject + "=\"" + AlphArray(1) + "\" invalid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                         "\" not found.");
@@ -2021,10 +2025,9 @@ namespace MixedAir {
             }
 
             // write to .eio file
-            static constexpr auto Format_700(
-                "!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
-                "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
-                "Name,DSZAD Name");
+            static constexpr auto Format_700("!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
+                                             "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
+                                             "Name,DSZAD Name");
             print(state.files.eio, "{}\n", Format_700);
             for (VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum) {
                 print(state.files.eio,
@@ -2108,7 +2111,7 @@ namespace MixedAir {
         }
     }
 
-    void GetOAMixerInputs()
+    void GetOAMixerInputs(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2167,7 +2170,8 @@ namespace MixedAir {
             OAMixer.allocate(NumOAMixers);
 
             for (OutAirNum = 1; OutAirNum <= NumOAMixers; ++OutAirNum) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               OutAirNum,
                                               AlphArray,
                                               NumAlphas,
@@ -2181,15 +2185,15 @@ namespace MixedAir {
                 UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
 
                 OAMixer(OutAirNum).Name = AlphArray(1);
-                OAMixer(OutAirNum).MixNode = GetOnlySingleNode(
+                OAMixer(OutAirNum).MixNode = GetOnlySingleNode(state,
                     AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
                 //  Set connection type to 'Inlet', because this is not necessarily directly from
                 //  outside air.  Outside Air Inlet Node List will set the connection to outside air
-                OAMixer(OutAirNum).InletNode = GetOnlySingleNode(
+                OAMixer(OutAirNum).InletNode = GetOnlySingleNode(state,
                     AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-                OAMixer(OutAirNum).RelNode = GetOnlySingleNode(
+                OAMixer(OutAirNum).RelNode = GetOnlySingleNode(state,
                     AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent);
-                OAMixer(OutAirNum).RetNode = GetOnlySingleNode(
+                OAMixer(OutAirNum).RetNode = GetOnlySingleNode(state,
                     AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
                 // Check for dupes in the four nodes.
                 if (OAMixer(OutAirNum).MixNode == OAMixer(OutAirNum).InletNode) {
@@ -2305,11 +2309,11 @@ namespace MixedAir {
         OAController(OutAirNum).ControllerType_Num = ControllerOutsideAir;
         OAController(OutAirNum).MaxOA = NumArray(2);
         OAController(OutAirNum).MinOA = NumArray(1);
-        OAController(OutAirNum).MixNode = GetOnlySingleNode(
+        OAController(OutAirNum).MixNode = GetOnlySingleNode(state,
             AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-        OAController(OutAirNum).OANode = GetOnlySingleNode(
+        OAController(OutAirNum).OANode = GetOnlySingleNode(state,
             AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Actuator, 1, ObjectIsNotParent);
-        if (!CheckOutAirNodeNumber(OAController(OutAirNum).OANode)) {
+        if (!CheckOutAirNodeNumber(state, OAController(OutAirNum).OANode)) {
             ShowWarningError(CurrentModuleObject + "=\"" + AlphArray(1) + "\": " + cAlphaFields(5) + "=\"" + AlphArray(5) +
                              "\" is not an OutdoorAir:Node.");
             ShowContinueError("Confirm that this is the intended source for the outdoor air stream.");
@@ -2406,12 +2410,12 @@ namespace MixedAir {
             }
         }
 
-        OAController(OutAirNum).RelNode = GetOnlySingleNode(
+        OAController(OutAirNum).RelNode = GetOnlySingleNode(state,
             AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Actuator, 1, ObjectIsNotParent);
-        OAController(OutAirNum).RetNode = GetOnlySingleNode(
+        OAController(OutAirNum).RetNode = GetOnlySingleNode(state,
             AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
         OAController(OutAirNum).MinOASch = AlphArray(11);
-        OAController(OutAirNum).MinOASchPtr = GetScheduleIndex(AlphArray(11));
+        OAController(OutAirNum).MinOASchPtr = GetScheduleIndex(state, AlphArray(11));
         if (OAController(OutAirNum).MinOASchPtr == 0 && (!lAlphaBlanks(11))) {
             ShowSevereError(CurrentModuleObject + "=\"" + AlphArray(1) + "\" invalid " + cAlphaFields(11) + "=\"" + AlphArray(11) + "\" not found.");
             ErrorsFound = true;
@@ -2419,14 +2423,14 @@ namespace MixedAir {
 
         // Changed by Amit for new feature implementation
         OAController(OutAirNum).MinOAflowSch = AlphArray(12);
-        OAController(OutAirNum).MinOAflowSchPtr = GetScheduleIndex(AlphArray(12));
+        OAController(OutAirNum).MinOAflowSchPtr = GetScheduleIndex(state, AlphArray(12));
         if (OAController(OutAirNum).MinOAflowSchPtr == 0 && (!lAlphaBlanks(12))) {
             ShowSevereError(CurrentModuleObject + "=\"" + AlphArray(1) + "\" invalid " + cAlphaFields(12) + "=\"" + AlphArray(12) + "\" not found.");
             ErrorsFound = true;
         }
 
         OAController(OutAirNum).MaxOAflowSch = AlphArray(13);
-        OAController(OutAirNum).MaxOAflowSchPtr = GetScheduleIndex(AlphArray(13));
+        OAController(OutAirNum).MaxOAflowSchPtr = GetScheduleIndex(state, AlphArray(13));
         if (OAController(OutAirNum).MaxOAflowSchPtr == 0 && (!lAlphaBlanks(13))) {
             ShowSevereError(CurrentModuleObject + "=\"" + AlphArray(1) + "\" invalid " + cAlphaFields(13) + "=\"" + AlphArray(13) + "\" not found.");
             ErrorsFound = true;
@@ -2434,7 +2438,7 @@ namespace MixedAir {
         OAController(OutAirNum).VentilationMechanicalName = AlphArray(14);
 
         //   Check for a time of day economizer control schedule
-        OAController(OutAirNum).EconomizerOASchedPtr = GetScheduleIndex(AlphArray(15));
+        OAController(OutAirNum).EconomizerOASchedPtr = GetScheduleIndex(state, AlphArray(15));
 
         //   High humidity control option can be used with any economizer flag
         if (UtilityRoutines::SameString(AlphArray(16), "Yes")) {
@@ -3027,7 +3031,7 @@ namespace MixedAir {
                     PreDefTableEntry(pdchDCVperACH, zoneName, vent_mech.ZoneOAACHRate(jZone), 6);
                     PreDefTableEntry(pdchDCVMethod, zoneName, cOAFlowMethodTypes(vent_mech.ZoneOAFlowMethod(jZone)));
                     if (vent_mech.ZoneOASchPtr(jZone) > 0) {
-                        PreDefTableEntry(pdchDCVOASchName, zoneName, GetScheduleName(vent_mech.ZoneOASchPtr(jZone)));
+                        PreDefTableEntry(pdchDCVOASchName, zoneName, GetScheduleName(state, vent_mech.ZoneOASchPtr(jZone)));
                     } else {
                         PreDefTableEntry(pdchDCVOASchName, zoneName, "");
                     }
@@ -3036,7 +3040,7 @@ namespace MixedAir {
                     if (vent_mech.ZoneADEffSchPtr(jZone) > 0) {
                         PreDefTableEntry(pdchDCVZoneADEffCooling, zoneName, "");
                         PreDefTableEntry(pdchDCVZoneADEffHeating, zoneName, "");
-                        PreDefTableEntry(pdchDCVZoneADEffSchName, zoneName, GetScheduleName(vent_mech.ZoneADEffSchPtr(jZone)));
+                        PreDefTableEntry(pdchDCVZoneADEffSchName, zoneName, GetScheduleName(state, vent_mech.ZoneADEffSchPtr(jZone)));
                     } else {
                         PreDefTableEntry(pdchDCVZoneADEffCooling, zoneName, vent_mech.ZoneADEffCooling(jZone), 2);
                         PreDefTableEntry(pdchDCVZoneADEffHeating, zoneName, vent_mech.ZoneADEffHeating(jZone), 2);
@@ -3167,83 +3171,83 @@ namespace MixedAir {
 
                     //    Note use of OAControllerLoop here to keep DO Loop index separate from InitOAController local variable
                     // CurrentModuleObject='AirLoopHVAC'
-                    SetupOutputVariable("Air System Outdoor Air Economizer Status",
+                    SetupOutputVariable(state, "Air System Outdoor Air Economizer Status",
                                         OutputProcessor::Unit::None,
                                         loopOAController.EconomizerStatus,
                                         "System",
                                         "Average",
                                         airloopName);
 
-                    SetupOutputVariable("Air System Outdoor Air Heat Recovery Bypass Status",
+                    SetupOutputVariable(state, "Air System Outdoor Air Heat Recovery Bypass Status",
                                         OutputProcessor::Unit::None,
                                         loopOAController.HeatRecoveryBypassStatus,
                                         "System",
                                         "Average",
                                         airloopName);
 
-                    SetupOutputVariable("Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status",
+                    SetupOutputVariable(state, "Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status",
                                         OutputProcessor::Unit::None,
                                         loopOAController.HRHeatingCoilActive,
                                         "System",
                                         "Average",
                                         airloopName);
-                    SetupOutputVariable("Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature",
+                    SetupOutputVariable(state, "Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature",
                                         OutputProcessor::Unit::C,
                                         loopOAController.MixedAirTempAtMinOAFlow,
                                         "System",
                                         "Average",
                                         airloopName);
 
-                    SetupOutputVariable("Air System Outdoor Air High Humidity Control Status",
+                    SetupOutputVariable(state, "Air System Outdoor Air High Humidity Control Status",
                                         OutputProcessor::Unit::None,
                                         loopOAController.HighHumCtrlStatus,
                                         "System",
                                         "Average",
                                         airloopName);
 
-                    SetupOutputVariable("Air System Outdoor Air Flow Fraction",
+                    SetupOutputVariable(state, "Air System Outdoor Air Flow Fraction",
                                         OutputProcessor::Unit::None,
                                         loopOAController.OAFractionRpt,
                                         "System",
                                         "Average",
                                         airloopName);
 
-                    SetupOutputVariable("Air System Outdoor Air Minimum Flow Fraction",
+                    SetupOutputVariable(state, "Air System Outdoor Air Minimum Flow Fraction",
                                         OutputProcessor::Unit::None,
                                         loopOAController.MinOAFracLimit,
                                         "System",
                                         "Average",
                                         airloopName);
 
-                    SetupOutputVariable("Air System Outdoor Air Mass Flow Rate",
+                    SetupOutputVariable(state, "Air System Outdoor Air Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         loopOAController.OAMassFlow,
                                         "System",
                                         "Average",
                                         airloopName);
 
-                    SetupOutputVariable("Air System Mixed Air Mass Flow Rate",
+                    SetupOutputVariable(state, "Air System Mixed Air Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         loopOAController.MixMassFlow,
                                         "System",
                                         "Average",
                                         airloopName);
 
-                    SetupOutputVariable("Air System Relief Air Heat Transfer Rate",
+                    SetupOutputVariable(state, "Air System Relief Air Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
                                         loopOAController.RelTotalLossRate,
                                         "System",
                                         "Average",
                                         airloopName);
 
-                    SetupOutputVariable("Air System Relief Air Sensible Heat Transfer Rate",
+                    SetupOutputVariable(state, "Air System Relief Air Sensible Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
                                         loopOAController.RelSensiLossRate,
                                         "System",
                                         "Average",
                                         airloopName);
 
-                    SetupOutputVariable("Air System Relief Air Latent Heat Transfer Rate",
+                    SetupOutputVariable(state, "Air System Relief Air Latent Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
                                         loopOAController.RelLatentLossRate,
                                         "System",
@@ -3251,7 +3255,7 @@ namespace MixedAir {
                                         airloopName);
 
                     if (loopOAController.MixedAirSPMNum > 0) {
-                        SetupOutputVariable("Air System Outdoor Air Maximum Flow Fraction",
+                        SetupOutputVariable(state, "Air System Outdoor Air Maximum Flow Fraction",
                                             OutputProcessor::Unit::None,
                                             loopOAController.MaxOAFracBySetPoint,
                                             "System",
@@ -3274,7 +3278,7 @@ namespace MixedAir {
 
                     VentMechObjectNum = loopOAController.VentMechObjectNum;
                     if (VentMechObjectNum > 0 && thisAirLoop > 0) {
-                        SetupOutputVariable("Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate",
+                        SetupOutputVariable(state, "Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
                                             loopOAController.MechVentOAMassFlowRequest,
                                             "System",
@@ -4914,7 +4918,6 @@ namespace MixedAir {
         using General::TrimSigDigits;
         using HVACHXAssistedCoolingCoil::GetHXCoilType;
         using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
-        using ReportSizingManager::ReportSizingOutput;
         using WaterCoils::SetCoilDesFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -4983,7 +4986,7 @@ namespace MixedAir {
                 this->MaxOA = 0.0;
             }
 
-            ReportSizingOutput(CurrentModuleObject, this->Name, "Maximum Outdoor Air Flow Rate [m3/s]", this->MaxOA);
+            BaseSizer::reportSizerOutput(CurrentModuleObject, this->Name, "Maximum Outdoor Air Flow Rate [m3/s]", this->MaxOA);
         }
 
         if (this->MinOA == AutoSize) {
@@ -4998,7 +5001,7 @@ namespace MixedAir {
                 }
             }
 
-            ReportSizingOutput(CurrentModuleObject, this->Name, "Minimum Outdoor Air Flow Rate [m3/s]", this->MinOA);
+            BaseSizer::reportSizerOutput(CurrentModuleObject, this->Name, "Minimum Outdoor Air Flow Rate [m3/s]", this->MinOA);
 
             if (this->HumidistatZoneNum > 0 && this->FixedMin) {
                 if (this->MaxOA > 0.0) {
@@ -5032,7 +5035,7 @@ namespace MixedAir {
                         CoilName = CompName;
                         CoilType = CompType;
                     }
-                    SetCoilDesFlow(CoilType, CoilName, this->MinOA, ErrorsFound);
+                    SetCoilDesFlow(state, CoilType, CoilName, this->MinOA, ErrorsFound);
                 }
             } // End of component loop
         }
@@ -5360,7 +5363,8 @@ namespace MixedAir {
         return Residuum;
     }
 
-    Array1D_int GetOAMixerNodeNumbers(std::string const &OAMixerName, // must match OA mixer names for the OA mixer type
+    Array1D_int GetOAMixerNodeNumbers(EnergyPlusData &state,
+                                      std::string const &OAMixerName, // must match OA mixer names for the OA mixer type
                                       bool &ErrorsFound               // set to true if problem
     )
     {
@@ -5384,7 +5388,7 @@ namespace MixedAir {
 
         // Obtains and Allocates OA mixer related parameters from input file
         if (GetOAMixerInputFlag) { // First time subroutine has been entered
-            GetOAMixerInputs();
+            GetOAMixerInputs(state);
             GetOAMixerInputFlag = false;
         }
 
@@ -5405,7 +5409,7 @@ namespace MixedAir {
         return OANodeNumbers;
     }
 
-    int GetNumOAMixers()
+    int GetNumOAMixers(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -5445,7 +5449,7 @@ namespace MixedAir {
         // na
 
         if (GetOAMixerInputFlag) { // First time subroutine has been entered
-            GetOAMixerInputs();
+            GetOAMixerInputs(state);
             GetOAMixerInputFlag = false;
         }
 
@@ -5503,7 +5507,7 @@ namespace MixedAir {
         return NumberOfOAControllers;
     }
 
-    int GetOAMixerReliefNodeNumber(int const OAMixerNum) // Which Mixer
+    int GetOAMixerReliefNodeNumber(EnergyPlusData &state, int const OAMixerNum) // Which Mixer
     {
 
         // FUNCTION INFORMATION:
@@ -5544,7 +5548,7 @@ namespace MixedAir {
         // na
 
         if (GetOAMixerInputFlag) { // First time subroutine has been entered
-            GetOAMixerInputs();
+            GetOAMixerInputs(state);
             GetOAMixerInputFlag = false;
         }
 
@@ -5912,7 +5916,7 @@ namespace MixedAir {
         int OACompNum;
 
         if (GetOAMixerInputFlag) {
-            GetOAMixerInputs();
+            GetOAMixerInputs(state);
             GetOAMixerInputFlag = false;
         }
 
@@ -5929,7 +5933,7 @@ namespace MixedAir {
         return OAMixerNumber;
     }
 
-    int GetOAMixerIndex(std::string const &OAMixerName) // Which Mixer
+    int GetOAMixerIndex(EnergyPlusData &state, std::string const &OAMixerName) // Which Mixer
     {
 
         // FUNCTION INFORMATION:
@@ -5946,7 +5950,7 @@ namespace MixedAir {
         int OAMixerIndex; // Mixer Index
 
         if (GetOAMixerInputFlag) {
-            GetOAMixerInputs();
+            GetOAMixerInputs(state);
             GetOAMixerInputFlag = false;
         }
 
@@ -5959,7 +5963,7 @@ namespace MixedAir {
         return OAMixerIndex;
     }
 
-    int GetOAMixerInletNodeNumber(int const OAMixerNumber) // Which Mixer
+    int GetOAMixerInletNodeNumber(EnergyPlusData &state, int const OAMixerNumber) // Which Mixer
     {
 
         // FUNCTION INFORMATION:
@@ -6000,7 +6004,7 @@ namespace MixedAir {
         // na
 
         if (GetOAMixerInputFlag) {
-            GetOAMixerInputs();
+            GetOAMixerInputs(state);
             GetOAMixerInputFlag = false;
         }
 
@@ -6012,7 +6016,7 @@ namespace MixedAir {
         return OAMixerInletNodeNumber;
     }
 
-    int GetOAMixerReturnNodeNumber(int const OAMixerNumber) // Which Mixer
+    int GetOAMixerReturnNodeNumber(EnergyPlusData &state, int const OAMixerNumber) // Which Mixer
     {
 
         // FUNCTION INFORMATION:
@@ -6053,7 +6057,7 @@ namespace MixedAir {
         // na
 
         if (GetOAMixerInputFlag) {
-            GetOAMixerInputs();
+            GetOAMixerInputs(state);
             GetOAMixerInputFlag = false;
         }
 
@@ -6065,7 +6069,7 @@ namespace MixedAir {
         return OAMixerReturnNodeNumber;
     }
 
-    int GetOAMixerMixedNodeNumber(int const OAMixerNumber) // Which Mixer
+    int GetOAMixerMixedNodeNumber(EnergyPlusData &state, int const OAMixerNumber) // Which Mixer
     {
 
         // FUNCTION INFORMATION:
@@ -6106,7 +6110,7 @@ namespace MixedAir {
         // na
 
         if (GetOAMixerInputFlag) {
-            GetOAMixerInputs();
+            GetOAMixerInputs(state);
             GetOAMixerInputFlag = false;
         }
 
@@ -6206,14 +6210,14 @@ namespace MixedAir {
 
         for (Item = 1; Item <= NumControllers; ++Item) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat);
+            inputProcessor->getObjectItem(state, CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat);
             ControllerListName = cAlphaArgs(1);
             Count = 0;
 
             // Check AirLoopHVAC -- brute force, get each AirLoopHVAC
 
             for (Loop = 1; Loop <= NumAirLoop; ++Loop) {
-                inputProcessor->getObjectItem(AirLoopObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat);
+                inputProcessor->getObjectItem(state, AirLoopObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat);
                 if (cAlphaArgs(2) != ControllerListName) continue;
                 ++Count;
                 if (Count == 1) AirLoopName = cAlphaArgs(1);
@@ -6557,7 +6561,7 @@ namespace MixedAir {
         return OACompTypeNum;
     }
 
-    int GetOAMixerNumber(std::string const &OAMixerName // must match OA mixer names for the OA mixer type
+    int GetOAMixerNumber(EnergyPlusData &state, std::string const &OAMixerName // must match OA mixer names for the OA mixer type
     )
     {
 
@@ -6573,7 +6577,7 @@ namespace MixedAir {
 
         // Obtains and Allocates OA mixer related parameters from input file
         if (GetOAMixerInputFlag) { // First time subroutine has been entered
-            GetOAMixerInputs();
+            GetOAMixerInputs(state);
             GetOAMixerInputFlag = false;
         }
 

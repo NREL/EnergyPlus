@@ -179,14 +179,14 @@ public:
         inputProcessor->preScanReportingVariables();
         for (auto &val : this->realVariablePlaceholders) {
             if (val.meterType) {
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Sum", val.varKey, _, "ELECTRICITY", "HEATING", _, "System");
             } else {
-                SetupOutputVariable(val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
+                SetupOutputVariable(state, val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
             }
         }
         for (auto &val : this->intVariablePlaceholders) {
-            SetupOutputVariable(val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
+            SetupOutputVariable(state, val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
         }
     }
 
@@ -250,7 +250,7 @@ public:
 
     void simulateTimeStepAndReport()
     {
-        UpdateMeterReporting(state.files);
+        UpdateMeterReporting(state);
         UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
     }
 };
@@ -657,8 +657,8 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_EMS_Override)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    OutAirNodeManager::SetOutAirNodes();
-    EMSManager::CheckIfAnyEMS(state.files);
+    OutAirNodeManager::SetOutAirNodes(state);
+    EMSManager::CheckIfAnyEMS(state);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     // Calls SetupNodeSetpointsAsActuator (via InitEMS, which calls GetEMSInput too)
@@ -702,8 +702,8 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_Python_Override)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    OutAirNodeManager::SetOutAirNodes();
-    EMSManager::CheckIfAnyEMS(state.files);
+    OutAirNodeManager::SetOutAirNodes(state);
+    EMSManager::CheckIfAnyEMS(state);
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     // Calls SetupNodeSetpointsAsActuator (via InitEMS, which calls GetEMSInput too)

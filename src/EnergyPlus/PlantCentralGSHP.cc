@@ -54,26 +54,26 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -162,16 +162,16 @@ namespace PlantCentralGSHP {
     void WrapperSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
         this->initialize(state, 0.0, calledFromLocation.loopNum);
-        this->SizeWrapper();
+        this->SizeWrapper(state);
     }
 
-void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void WrapperSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MinLoad = 0.0;
         MaxLoad = 0.0;
         OptLoad = 0.0;
         if (calledFromLocation.loopNum == this->CWLoopNum) { // Chilled water loop
-            if (this->ControlMode == SmartMixing) { // control mode is SmartMixing
+            if (this->ControlMode == SmartMixing) {          // control mode is SmartMixing
                 for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
                     MaxLoad += this->ChillerHeater(NumChillerHeater).RefCapCooling * this->ChillerHeater(NumChillerHeater).MaxPartLoadRatCooling;
                     OptLoad += this->ChillerHeater(NumChillerHeater).RefCapCooling * this->ChillerHeater(NumChillerHeater).OptPartLoadRatCooling;
@@ -194,7 +194,8 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         SizFac = 1.0;
     }
 
-    void WrapperSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
+    void WrapperSpecs::simulate(
+        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
     {
         if (calledFromLocation.loopNum != this->GLHELoopNum) {
 
@@ -202,7 +203,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
             this->CalcWrapperModel(state, CurLoad, calledFromLocation.loopNum);
 
         } else if (calledFromLocation.loopNum == this->GLHELoopNum) {
-            PlantUtilities::UpdateChillerComponentCondenserSide(calledFromLocation.loopNum,
+            PlantUtilities::UpdateChillerComponentCondenserSide(state, calledFromLocation.loopNum,
                                                                 this->GLHELoopSideNum,
                                                                 DataPlant::TypeOf_CentralGroundSourceHeatPump,
                                                                 this->GLHEInletNodeNum,
@@ -229,7 +230,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         }
     }
 
-    void WrapperSpecs::SizeWrapper()
+    void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Yunzhi Huang, PNNL
@@ -284,16 +285,16 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                         if (this->ChillerHeater(NumChillerHeater).EvapVolFlowRateWasAutoSized) {
                             this->ChillerHeater(NumChillerHeater).EvapVolFlowRate = tmpEvapVolFlowRate;
                             if (DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Design Size Reference Chilled Water Flow Rate [m3/s]",
-                                                                        tmpEvapVolFlowRate);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Design Size Reference Chilled Water Flow Rate [m3/s]",
+                                                             tmpEvapVolFlowRate);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Initial Design Size Reference Chilled Water Flow Rate [m3/s]",
-                                                                        tmpEvapVolFlowRate);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Initial Design Size Reference Chilled Water Flow Rate [m3/s]",
+                                                             tmpEvapVolFlowRate);
                             }
                         } else {
                             if (this->ChillerHeater(NumChillerHeater).EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0 &&
@@ -301,12 +302,12 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
 
                                 // Hardsized evaporator design volume flow rate for reporting
                                 Real64 EvapVolFlowRateUser = this->ChillerHeater(NumChillerHeater).EvapVolFlowRate;
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Design Size Reference Chilled Water Flow Rate [m3/s]",
-                                                                        tmpEvapVolFlowRate,
-                                                                        "User-Specified Reference Chilled Water Flow Rate [m3/s]",
-                                                                        EvapVolFlowRateUser);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Design Size Reference Chilled Water Flow Rate [m3/s]",
+                                                             tmpEvapVolFlowRate,
+                                                             "User-Specified Reference Chilled Water Flow Rate [m3/s]",
+                                                             EvapVolFlowRateUser);
                                 tmpEvapVolFlowRate = EvapVolFlowRateUser;
                                 if (DataGlobals::DisplayExtraWarnings) {
                                     if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
@@ -332,11 +333,12 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             ErrorsFound = true;
                         }
                     } else {
-                        if (this->ChillerHeater(NumChillerHeater).EvapVolFlowRate > 0.0 && DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
-                            ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                    this->ChillerHeater(NumChillerHeater).Name,
-                                                                    "User-Specified Reference Chilled Water Flow Rate [m3/s]",
-                                                                    this->ChillerHeater(NumChillerHeater).EvapVolFlowRate);
+                        if (this->ChillerHeater(NumChillerHeater).EvapVolFlowRate > 0.0 && DataPlant::PlantFinalSizesOkayToReport &&
+                            !this->mySizesReported) {
+                            BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                         this->ChillerHeater(NumChillerHeater).Name,
+                                                         "User-Specified Reference Chilled Water Flow Rate [m3/s]",
+                                                         this->ChillerHeater(NumChillerHeater).EvapVolFlowRate);
                         }
                     }
                 }
@@ -345,12 +347,12 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                 // each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
                 if (PltSizNum > 0) {
                     if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpEvapVolFlowRate > 0.0) {
-                        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                                                            DataGlobals::CWInitConvTemp,
                                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                            RoutineName);
 
-                        Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                        Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                                                        DataGlobals::CWInitConvTemp,
                                                                        DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                        RoutineName);
@@ -377,16 +379,16 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                 this->ChillerHeater(NumChillerHeater).RefCapClgHtg / this->ChillerHeater(NumChillerHeater).RefPowerClgHtg;
 
                             if (DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Design Size Reference Capacity [W]",
-                                                                        tmpNomCap);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Design Size Reference Capacity [W]",
+                                                             tmpNomCap);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Initial Design Size Reference Capacity [W]",
-                                                                        tmpNomCap);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Initial Design Size Reference Capacity [W]",
+                                                             tmpNomCap);
                             }
                         } else {
                             if (this->ChillerHeater(NumChillerHeater).RefCapCooling > 0.0 && tmpNomCap > 0.0 &&
@@ -394,12 +396,12 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
 
                                 // Hardsized nominal capacity cooling power for reporting
                                 Real64 NomCapUser = this->ChillerHeater(NumChillerHeater).RefCapCooling;
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Design Size Reference Capacity [W]",
-                                                                        tmpNomCap,
-                                                                        "User-Specified Reference Capacity [W]",
-                                                                        NomCapUser);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Design Size Reference Capacity [W]",
+                                                             tmpNomCap,
+                                                             "User-Specified Reference Capacity [W]",
+                                                             NomCapUser);
                                 tmpNomCap = NomCapUser;
                                 if (DataGlobals::DisplayExtraWarnings) {
                                     if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
@@ -425,11 +427,12 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             ErrorsFound = true;
                         }
                     } else {
-                        if (this->ChillerHeater(NumChillerHeater).RefCapCooling > 0.0 && DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
-                            ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                    this->ChillerHeater(NumChillerHeater).Name,
-                                                                    "User-Specified Reference Capacity [W]",
-                                                                    this->ChillerHeater(NumChillerHeater).RefCapCooling);
+                        if (this->ChillerHeater(NumChillerHeater).RefCapCooling > 0.0 && DataPlant::PlantFinalSizesOkayToReport &&
+                            !this->mySizesReported) {
+                            BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                         this->ChillerHeater(NumChillerHeater).Name,
+                                                         "User-Specified Reference Capacity [W]",
+                                                         this->ChillerHeater(NumChillerHeater).RefCapCooling);
                         }
                     }
                 }
@@ -438,12 +441,12 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                 // each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
                 if (PltSizCondNum > 0) {
                     if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                        Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->GLHELoopNum).FluidName,
+                        Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->GLHELoopNum).FluidName,
                                                                        DataGlobals::CWInitConvTemp,
                                                                        DataPlant::PlantLoop(this->GLHELoopNum).FluidIndex,
                                                                        RoutineName);
                         // TODO: JM 2018-12-06 I wonder why Cp isn't calculated at the same temp as rho...
-                        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->GLHELoopNum).FluidName,
+                        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->GLHELoopNum).FluidName,
                                                                            this->ChillerHeater(NumChillerHeater).TempRefCondInCooling,
                                                                            DataPlant::PlantLoop(this->GLHELoopNum).FluidIndex,
                                                                            RoutineName);
@@ -463,16 +466,16 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                         if (this->ChillerHeater(NumChillerHeater).CondVolFlowRateWasAutoSized) {
                             this->ChillerHeater(NumChillerHeater).CondVolFlowRate = tmpCondVolFlowRate;
                             if (DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Design Size Reference Condenser Water Flow Rate [m3/s]",
-                                                                        tmpCondVolFlowRate);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Design Size Reference Condenser Water Flow Rate [m3/s]",
+                                                             tmpCondVolFlowRate);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Initial Design Size Reference Condenser Water Flow Rate [m3/s]",
-                                                                        tmpCondVolFlowRate);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Initial Design Size Reference Condenser Water Flow Rate [m3/s]",
+                                                             tmpCondVolFlowRate);
                             }
                         } else {
                             if (this->ChillerHeater(NumChillerHeater).CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0 &&
@@ -480,12 +483,12 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
 
                                 // Hardsized condenser design volume flow rate for reporting
                                 Real64 CondVolFlowRateUser = this->ChillerHeater(NumChillerHeater).CondVolFlowRate;
-                                ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                        this->ChillerHeater(NumChillerHeater).Name,
-                                                                        "Design Size Reference Condenser Water Flow Rate [m3/s]",
-                                                                        tmpCondVolFlowRate,
-                                                                        "User-Specified Reference Condenser Water Flow Rate [m3/s]",
-                                                                        CondVolFlowRateUser);
+                                BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                             this->ChillerHeater(NumChillerHeater).Name,
+                                                             "Design Size Reference Condenser Water Flow Rate [m3/s]",
+                                                             tmpCondVolFlowRate,
+                                                             "User-Specified Reference Condenser Water Flow Rate [m3/s]",
+                                                             CondVolFlowRateUser);
                                 if (DataGlobals::DisplayExtraWarnings) {
                                     if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                         DataSizing::AutoVsHardSizingThreshold) {
@@ -512,11 +515,12 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             ErrorsFound = true;
                         }
                     } else {
-                        if (this->ChillerHeater(NumChillerHeater).CondVolFlowRate > 0.0 && DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
-                            ReportSizingManager::ReportSizingOutput("ChillerHeaterPerformance:Electric:EIR",
-                                                                    this->ChillerHeater(NumChillerHeater).Name,
-                                                                    "User-Specified Reference Condenser Water Flow Rate [m3/s]",
-                                                                    this->ChillerHeater(NumChillerHeater).CondVolFlowRate);
+                        if (this->ChillerHeater(NumChillerHeater).CondVolFlowRate > 0.0 && DataPlant::PlantFinalSizesOkayToReport &&
+                            !this->mySizesReported) {
+                            BaseSizer::reportSizerOutput("ChillerHeaterPerformance:Electric:EIR",
+                                                         this->ChillerHeater(NumChillerHeater).Name,
+                                                         "User-Specified Reference Condenser Water Flow Rate [m3/s]",
+                                                         this->ChillerHeater(NumChillerHeater).CondVolFlowRate);
                         }
                     }
                 }
@@ -586,7 +590,8 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
 
         // Load arrays with electric EIR chiller data
         for (int WrapperNum = 1; WrapperNum <= numWrappers; ++WrapperNum) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           WrapperNum,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -611,7 +616,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
             }
 
             Wrapper(WrapperNum).CHWInletNodeNum =
-                NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+                NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                     ErrorsFound,
                                                     DataIPShortCuts::cCurrentModuleObject,
                                                     DataIPShortCuts::cAlphaArgs(1),
@@ -619,7 +624,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                                     DataLoopNode::NodeConnectionType_Inlet,
                                                     1,
                                                     DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
-            Wrapper(WrapperNum).CHWOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
+            Wrapper(WrapperNum).CHWOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(4),
                                                                                        ErrorsFound,
                                                                                        DataIPShortCuts::cCurrentModuleObject,
                                                                                        DataIPShortCuts::cAlphaArgs(1),
@@ -634,7 +639,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                                "Chilled Water Nodes");
 
             Wrapper(WrapperNum).GLHEInletNodeNum =
-                NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+                NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                     ErrorsFound,
                                                     DataIPShortCuts::cCurrentModuleObject,
                                                     DataIPShortCuts::cAlphaArgs(1),
@@ -642,7 +647,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                                     DataLoopNode::NodeConnectionType_Inlet,
                                                     2,
                                                     DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
-            Wrapper(WrapperNum).GLHEOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+            Wrapper(WrapperNum).GLHEOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
                                                                                         ErrorsFound,
                                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                                         DataIPShortCuts::cAlphaArgs(1),
@@ -657,7 +662,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                                "GLHE Nodes");
 
             Wrapper(WrapperNum).HWInletNodeNum =
-                NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(7),
+                NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
                                                     ErrorsFound,
                                                     DataIPShortCuts::cCurrentModuleObject,
                                                     DataIPShortCuts::cAlphaArgs(1),
@@ -665,7 +670,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                                     DataLoopNode::NodeConnectionType_Inlet,
                                                     3,
                                                     DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
-            Wrapper(WrapperNum).HWOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(8),
+            Wrapper(WrapperNum).HWOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(8),
                                                                                       ErrorsFound,
                                                                                       DataIPShortCuts::cCurrentModuleObject,
                                                                                       DataIPShortCuts::cAlphaArgs(1),
@@ -683,7 +688,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
             if (DataIPShortCuts::lAlphaFieldBlanks(9)) {
                 Wrapper(WrapperNum).SchedPtr = 0;
             } else {
-                Wrapper(WrapperNum).SchedPtr = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(9));
+                Wrapper(WrapperNum).SchedPtr = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(9));
             }
 
             int NumberOfComp = (NumAlphas - 9) / 3;
@@ -702,7 +707,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                     if (DataIPShortCuts::lAlphaFieldBlanks(loop + 2)) {
                         Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = DataGlobals::ScheduleAlwaysOn;
                     } else {
-                        Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(loop + 2));
+                        Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(loop + 2));
                     }
                     Wrapper(WrapperNum).WrapperComp(Comp).WrapperIdenticalObjectNum = DataIPShortCuts::rNumericArgs(1 + Comp);
                     if (Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectType == "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR") {
@@ -775,9 +780,9 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         } // End of wrapper count
     }
 
-    void WrapperSpecs::setupOutputVars()
+    void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable("Chiller Heater System Cooling Electricity Energy",
+        SetupOutputVariable(state, "Chiller Heater System Cooling Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Report.TotElecCooling,
                             "System",
@@ -789,7 +794,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller Heater System Heating Electricity Energy",
+        SetupOutputVariable(state, "Chiller Heater System Heating Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Report.TotElecHeating,
                             "System",
@@ -801,21 +806,21 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller Heater System Cooling Electricity Rate",
+        SetupOutputVariable(state, "Chiller Heater System Cooling Electricity Rate",
                             OutputProcessor::Unit::W,
                             this->Report.TotElecCoolingPwr,
                             "System",
                             "Average",
                             this->Name);
 
-        SetupOutputVariable("Chiller Heater System Heating Electricity Rate",
+        SetupOutputVariable(state, "Chiller Heater System Heating Electricity Rate",
                             OutputProcessor::Unit::W,
                             this->Report.TotElecHeatingPwr,
                             "System",
                             "Average",
                             this->Name);
 
-        SetupOutputVariable("Chiller Heater System Cooling Energy",
+        SetupOutputVariable(state, "Chiller Heater System Cooling Energy",
                             OutputProcessor::Unit::J,
                             this->Report.CoolingEnergy,
                             "System",
@@ -827,7 +832,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller Heater System Heating Energy",
+        SetupOutputVariable(state, "Chiller Heater System Heating Energy",
                             OutputProcessor::Unit::J,
                             this->Report.HeatingEnergy,
                             "System",
@@ -839,7 +844,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller Heater System Source Heat Transfer Energy",
+        SetupOutputVariable(state, "Chiller Heater System Source Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->Report.GLHEEnergy,
                             "System",
@@ -851,44 +856,44 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             _,
                             "Plant");
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater System Cooling Rate", OutputProcessor::Unit::W, this->Report.CoolingRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater System Heating Rate", OutputProcessor::Unit::W, this->Report.HeatingRate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater System Source Heat Transfer Rate", OutputProcessor::Unit::W, this->Report.GLHERate, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater System Cooling Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.CHWmdot, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater System Heating Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.HWmdot, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater System Source Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.GLHEmdot, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater System Cooling Inlet Temperature", OutputProcessor::Unit::C, this->Report.CHWInletTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater System Heating Inlet Temperature", OutputProcessor::Unit::C, this->Report.HWInletTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater System Source Inlet Temperature", OutputProcessor::Unit::C, this->Report.GLHEInletTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable("Chiller Heater System Cooling Outlet Temperature",
+        SetupOutputVariable(state, "Chiller Heater System Cooling Outlet Temperature",
                             OutputProcessor::Unit::C,
                             this->Report.CHWOutletTemp,
                             "System",
                             "Average",
                             this->Name);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater System Heating Outlet Temperature", OutputProcessor::Unit::C, this->Report.HWOutletTemp, "System", "Average", this->Name);
 
-        SetupOutputVariable("Chiller Heater System Source Outlet Temperature",
+        SetupOutputVariable(state, "Chiller Heater System Source Outlet Temperature",
                             OutputProcessor::Unit::C,
                             this->Report.GLHEOutletTemp,
                             "System",
@@ -899,161 +904,161 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
 
             for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
 
-                SetupOutputVariable("Chiller Heater Operation Mode Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Operation Mode Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::None,
                                     this->ChillerHeater(ChillerHeaterNum).Report.CurrentMode,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Part Load Ratio Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Part Load Ratio Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::None,
                                     this->ChillerHeater(ChillerHeaterNum).Report.ChillerPartLoadRatio,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Cycling Ratio Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Cycling Ratio Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::None,
                                     this->ChillerHeater(ChillerHeaterNum).Report.ChillerCyclingRatio,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Cooling Electricity Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Cooling Electricity Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::W,
                                     this->ChillerHeater(ChillerHeaterNum).Report.CoolingPower,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Heating Electricity Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Heating Electricity Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::W,
                                     this->ChillerHeater(ChillerHeaterNum).Report.HeatingPower,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Cooling Electricity Energy Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Cooling Electricity Energy Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::J,
                                     this->ChillerHeater(ChillerHeaterNum).Report.CoolingEnergy,
                                     "System",
                                     "Sum",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Heating Electricity Energy Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Heating Electricity Energy Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::J,
                                     this->ChillerHeater(ChillerHeaterNum).Report.HeatingEnergy,
                                     "System",
                                     "Sum",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Cooling Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Cooling Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::W,
                                     this->ChillerHeater(ChillerHeaterNum).Report.QEvap,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Cooling Energy Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Cooling Energy Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::J,
                                     this->ChillerHeater(ChillerHeaterNum).Report.EvapEnergy,
                                     "System",
                                     "Sum",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater False Load Heat Transfer Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater False Load Heat Transfer Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::W,
                                     this->ChillerHeater(ChillerHeaterNum).Report.ChillerFalseLoadRate,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater False Load Heat Transfer Energy Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater False Load Heat Transfer Energy Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::J,
                                     this->ChillerHeater(ChillerHeaterNum).Report.ChillerFalseLoad,
                                     "System",
                                     "Sum",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Evaporator Inlet Temperature Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Evaporator Inlet Temperature Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::C,
                                     this->ChillerHeater(ChillerHeaterNum).Report.EvapInletTemp,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Evaporator Outlet Temperature Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Evaporator Outlet Temperature Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::C,
                                     this->ChillerHeater(ChillerHeaterNum).Report.EvapOutletTemp,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Evaporator Mass Flow Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Evaporator Mass Flow Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::kg_s,
                                     this->ChillerHeater(ChillerHeaterNum).Report.Evapmdot,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Condenser Heat Transfer Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Condenser Heat Transfer Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::W,
                                     this->ChillerHeater(ChillerHeaterNum).Report.QCond,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Condenser Heat Transfer Energy Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Condenser Heat Transfer Energy Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::J,
                                     this->ChillerHeater(ChillerHeaterNum).Report.CondEnergy,
                                     "System",
                                     "Sum",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater COP Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater COP Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::W_W,
                                     this->ChillerHeater(ChillerHeaterNum).Report.ActualCOP,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Capacity Temperature Modifier Multiplier Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Capacity Temperature Modifier Multiplier Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::None,
                                     this->ChillerHeater(ChillerHeaterNum).Report.ChillerCapFT,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater EIR Temperature Modifier Multiplier Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater EIR Temperature Modifier Multiplier Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::None,
                                     this->ChillerHeater(ChillerHeaterNum).Report.ChillerEIRFT,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater EIR Part Load Modifier Multiplier Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater EIR Part Load Modifier Multiplier Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::None,
                                     this->ChillerHeater(ChillerHeaterNum).Report.ChillerEIRFPLR,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Condenser Inlet Temperature Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Condenser Inlet Temperature Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::C,
                                     this->ChillerHeater(ChillerHeaterNum).Report.CondInletTemp,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Condenser Outlet Temperature Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Condenser Outlet Temperature Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::C,
                                     this->ChillerHeater(ChillerHeaterNum).Report.CondOutletTemp,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Condenser Mass Flow Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable(state, "Chiller Heater Condenser Mass Flow Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::kg_s,
                                     this->ChillerHeater(ChillerHeaterNum).Report.Condmdot,
                                     "System",
@@ -1080,7 +1085,6 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         int IOStat;                        // IO Status when calling get input subroutine
         Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
 
-
         DataIPShortCuts::cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
         numChillerHeaters = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
@@ -1095,7 +1099,8 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
 
         // Load arrays with electric EIR chiller data
         for (int ChillerHeaterNum = 1; ChillerHeaterNum <= numChillerHeaters; ++ChillerHeaterNum) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           ChillerHeaterNum,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -1416,7 +1421,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         static std::string const RoutineName("InitCGSHPHeatPump");
 
         if (this->setupOutputVarsFlag) {
-            this->setupOutputVars();
+            this->setupOutputVars(state);
             this->setupOutputVarsFlag = false;
         }
 
@@ -1562,7 +1567,8 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                     this->GLHEVolFlowRate += this->ChillerHeater(ChillerHeaterNum).CondVolFlowRate;
                 }
 
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                               DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                                                DataGlobals::CWInitConvTemp,
                                                                DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                RoutineName);
@@ -1806,14 +1812,15 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
 
                 // Calculate density ratios to adjust mass flow rates from initialized ones
                 // Hot water temperature is known, but evaporator mass flow rates will be adjusted in the following "Do" loop
-                Real64 InitDensity = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                Real64 InitDensity = FluidProperties::GetDensityGlycol(state,
+                                                                       DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                                                        DataGlobals::CWInitConvTemp,
                                                                        DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                        RoutineName);
                 Real64 EvapDensity = FluidProperties::GetDensityGlycol(
-                    DataPlant::PlantLoop(this->CWLoopNum).FluidName, EvapInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
+                    state, DataPlant::PlantLoop(this->CWLoopNum).FluidName, EvapInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
                 Real64 CondDensity = FluidProperties::GetDensityGlycol(
-                    DataPlant::PlantLoop(this->CWLoopNum).FluidName, CondInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
+                    state, DataPlant::PlantLoop(this->CWLoopNum).FluidName, CondInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
 
                 // Calculate density ratios to adjust mass flow rates from initialized ones
 
@@ -1925,7 +1932,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
 
                 // Calculate the specific heat of chilled water
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-                    DataPlant::PlantLoop(this->CWLoopNum).FluidName, EvapInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
+                    state, DataPlant::PlantLoop(this->CWLoopNum).FluidName, EvapInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
 
                 // Calculate cooling load this chiller should meet and the other chillers are demanded
                 EvapOutletTempSetPoint = DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
@@ -2055,7 +2062,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                 }
 
                 if (CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->GLHELoopNum).FluidName,
+                    Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->GLHELoopNum).FluidName,
                                                                 CondInletTemp,
                                                                 DataPlant::PlantLoop(this->GLHELoopNum).FluidIndex,
                                                                 RoutineNameElecEIRChiller);
@@ -2230,14 +2237,15 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
 
                 // Calculate density ratios to adjust mass flow rates from initialized ones
                 // Hot water temperature is known, but condenser mass flow rates will be adjusted in the following "Do" loop
-                Real64 InitDensity = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                Real64 InitDensity = FluidProperties::GetDensityGlycol(state,
+                                                                       DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                                                        DataGlobals::CWInitConvTemp,
                                                                        DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                        RoutineName);
                 Real64 EvapDensity = FluidProperties::GetDensityGlycol(
-                    DataPlant::PlantLoop(this->CWLoopNum).FluidName, EvapInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
+                    state, DataPlant::PlantLoop(this->CWLoopNum).FluidName, EvapInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
                 Real64 CondDensity = FluidProperties::GetDensityGlycol(
-                    DataPlant::PlantLoop(this->CWLoopNum).FluidName, CondInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
+                    state, DataPlant::PlantLoop(this->CWLoopNum).FluidName, CondInletTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
 
                 // Calculate density ratios to adjust mass flow rates from initialized ones
                 Real64 HWDensityRatio = CondDensity / InitDensity;
@@ -2323,7 +2331,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                 // Mode 4 uses all data from the chilled water loop due to no heating demand
                 if (this->SimulClgDominant || CurrentMode == 3) {
                     CurrentMode = 3;
-                    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->HWLoopNum).FluidName,
+                    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->HWLoopNum).FluidName,
                                                                        CondInletTemp,
                                                                        DataPlant::PlantLoop(this->HWLoopNum).FluidIndex,
                                                                        RoutineName);
@@ -2431,7 +2439,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                         PartLoadRat = 0.0;
                     }
 
-                    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->HWLoopNum).FluidName,
+                    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->HWLoopNum).FluidName,
                                                                        this->ChillerHeater(ChillerHeaterNum).EvapInletNode.Temp,
                                                                        DataPlant::PlantLoop(this->HWLoopNum).FluidIndex,
                                                                        RoutineName);
@@ -2516,7 +2524,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                     // Set load this chiller heater should meet and temperatures given
                     QCondenser = min(HeatingLoadToMeet, QCondenser);
 
-                    Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->HWLoopNum).FluidName,
+                    Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->HWLoopNum).FluidName,
                                                                 CondInletTemp,
                                                                 DataPlant::PlantLoop(this->HWLoopNum).FluidIndex,
                                                                 RoutineNameElecEIRChiller);

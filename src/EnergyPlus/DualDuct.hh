@@ -247,14 +247,14 @@ namespace DualDuct {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDualDuctInput();
+    void GetDualDuctInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the Module
     //******************************************************************************
 
-    void ReportDualDuctConnections(EnergyPlusData &state, IOFiles &ioFiles);
+    void ReportDualDuctConnections(EnergyPlusData &state);
 
-    void GetDualDuctOutdoorAirRecircUse(std::string const &CompTypeName, std::string const &CompName, bool &RecircIsUsed);
+    void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state, std::string const &CompTypeName, std::string const &CompName, bool &RecircIsUsed);
 
     //        End of Reporting subroutines for the Damper Module
     // *****************************************************************************

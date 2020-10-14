@@ -59,14 +59,16 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
     namespace PlantPipingSystemsManager {
 
@@ -582,7 +584,7 @@ namespace EnergyPlus {
                 return this->Name == a;
             }
 
-            static Segment *factory(std::string segmentName);
+            static Segment *factory(EnergyPlusData &state, std::string segmentName);
         };
 
         struct Circuit : public PlantComponent {
@@ -647,7 +649,7 @@ namespace EnergyPlus {
                 return this->Name == a;
             }
 
-            static Circuit *factory(std::string circuit, bool & errorsFound);
+            static Circuit *factory(EnergyPlusData &state, std::string circuit, bool & errorsFound);
         };
 
         struct ZoneCoupledSurfaceData {
@@ -877,13 +879,13 @@ namespace EnergyPlus {
 
             void DoEndOfIterationOperations(bool &Finished);
 
-            void DoOneTimeInitializations(Circuit * thisCircuit);
+            void DoOneTimeInitializations(EnergyPlusData &state, Circuit * thisCircuit);
 
             void DoStartOfTimeStepInitializations();
 
-            void DoStartOfTimeStepInitializations(Circuit * thisCircuit);
+            void DoStartOfTimeStepInitializations(EnergyPlusData &state, Circuit * thisCircuit);
 
-            Real64 GetFarfieldTemp(CartesianCell const &cell);
+            Real64 GetFarfieldTemp(EnergyPlusData &state, CartesianCell const &cell);
 
             void PreparePipeCircuitSimulation(Circuit * thisCircuit);
 
@@ -894,30 +896,30 @@ namespace EnergyPlus {
 
             void SimulateRadialToCartesianInterface(CartesianCell &ThisCell);
 
-            void PerformTemperatureFieldUpdate();
+            void PerformTemperatureFieldUpdate(EnergyPlusData &state);
 
             Real64 EvaluateFieldCellTemperature(CartesianCell &ThisCell);
 
-            Real64 EvaluateGroundSurfaceTemperature(CartesianCell &cell);
+            Real64 EvaluateGroundSurfaceTemperature(EnergyPlusData &state, CartesianCell &cell);
 
             Real64 EvaluateBasementCellTemperature(CartesianCell &cell);
 
             Real64 EvaluateZoneInterfaceTemperature(CartesianCell &cell);
 
-            Real64 EvaluateFarfieldBoundaryTemperature(CartesianCell &cell);
+            Real64 EvaluateFarfieldBoundaryTemperature(EnergyPlusData &state, CartesianCell &cell);
 
-            void EvaluateFarfieldCharacteristics(CartesianCell &cell, Direction direction, Real64 &neighbortemp,
+            void EvaluateFarfieldCharacteristics(EnergyPlusData &state, CartesianCell &cell, Direction direction, Real64 &neighbortemp,
                                                  Real64 &resistance, Real64 &adiabaticMultiplier);
 
-            void PerformIterationLoop();
+            void PerformIterationLoop(EnergyPlusData &state);
 
-            void PerformIterationLoop(Circuit * thisCircuit);
+            void PerformIterationLoop(EnergyPlusData &state, Circuit * thisCircuit);
 
             void InitPipingSystems(EnergyPlusData &state, Circuit * thisCircuit);
 
             void UpdatePipingSystems(Circuit * thisCircuit);
 
-            void SetupZoneCoupledOutputVariables();
+            void SetupZoneCoupledOutputVariables(EnergyPlusData &state);
 
         };
 
@@ -949,16 +951,16 @@ namespace EnergyPlus {
                                             std::string const &UserInputField,
                                             std::string const &ObjectName);
 
-        void ReadPipeCircuitInputs(bool &ErrorsFound);
+        void ReadPipeCircuitInputs(EnergyPlusData &state, bool &ErrorsFound);
 
-        void ReadPipeSegmentInputs(bool &ErrorsFound);
+        void ReadPipeSegmentInputs(EnergyPlusData &state, bool &ErrorsFound);
 
         void ReadHorizontalTrenchInputs(EnergyPlusData &state,
                                         const int StartingDomainNumForHorizontal,
                                         const int StartingCircuitNumForHorizontal,
                                         bool &ErrorsFound);
 
-        void SetupPipingSystemOutputVariables();
+        void SetupPipingSystemOutputVariables(EnergyPlusData &state);
 
         void IssueSevereInputFieldError(std::string const &RoutineName,
                                         std::string const &ObjectName,

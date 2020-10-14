@@ -56,11 +56,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
 
-    // Forward Declarations
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HighTempRadiantSystem {
 
@@ -177,7 +175,7 @@ namespace HighTempRadiantSystem {
                                   Real64 &LoadMet,               // load met by the radiant system, in Watts
                                   int &CompIndex);
 
-    void GetHighTempRadiantSystem(bool &ErrorsFound); // Error flag if problems encountered on reading user input
+    void GetHighTempRadiantSystem(EnergyPlusData &state, bool &ErrorsFound); // Error flag if problems encountered on reading user input
 
     void InitHighTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                    int const RadSysNum // Index for the low temperature radiant system under consideration within the derived types

@@ -66,9 +66,8 @@
 
 namespace EnergyPlus {
 
-    // Forward Declarations
-    struct EnergyPlusData;
-    struct WindowManagerData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DataSurfaces {
 
@@ -391,6 +390,7 @@ namespace DataSurfaces {
     extern Array1D<Real64> BmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl
     // from obstructions (W/m2)/(W/m2)
     extern Array1D<Real64> BmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
+    extern Array1D<Real64> SkyDiffReflFacGnd; // sky diffuse reflection view factors from ground
 
     extern Array2D<Real64> AWinSurf; // Time step value of factor for beam
     // absorbed in window glass layers
@@ -970,7 +970,7 @@ namespace DataSurfaces {
 
         Real64 getOutsideAirTemperature(const int t_SurfNum) const;
 
-        Real64 getOutsideIR(WindowManagerData &dataWindowManager, const int t_SurfNum) const;
+        Real64 getOutsideIR(EnergyPlusData &state, const int t_SurfNum) const;
 
         static Real64 getSWIncident(const int t_SurfNum);
 
@@ -978,7 +978,7 @@ namespace DataSurfaces {
 
         static Real64 getSWDiffuseIncident(const int t_SurfNum);
 
-        int getTotLayers() const;
+        int getTotLayers(EnergyPlusData &state) const;
 
         Real64 get_average_height() const;
 

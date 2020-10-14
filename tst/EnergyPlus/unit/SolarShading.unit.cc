@@ -118,7 +118,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     }
 
     DetailedSolarTimestepIntegration = false;
-    CalcPerSolarBeam(state.dataWindowComplexManager, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
+    CalcPerSolarBeam(state, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
     for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
@@ -138,7 +138,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
 
     DetailedSolarTimestepIntegration = true;
     HourOfDay = 23;
-    CalcPerSolarBeam(state.dataWindowComplexManager, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
+    CalcPerSolarBeam(state, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
     for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
@@ -619,22 +619,22 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
-    HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    HeatBalanceManager::SetPreConstructionInputParameters(state);
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, FoundError);
+    HeatBalanceManager::GetMaterialData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetFrameAndDividerData(FoundError);
+    HeatBalanceManager::GetFrameAndDividerData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetConstructData(state.files, FoundError);
+    HeatBalanceManager::GetConstructData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
+    HeatBalanceManager::GetZoneData(state, FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
+    SurfaceGeometry::GetGeometryParameters(state, FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
@@ -645,7 +645,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
 
     //	compare_err_stream( "" ); // just for debugging
@@ -653,8 +653,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SurfaceGeometry::SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
-    SolarShading::AllocateModuleArrays();
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::AllocateModuleArrays(state);
+    SolarShading::DetermineShadowingCombinations(state);
     DataEnvironment::DayOfYear_Schedule = 168;
     DataEnvironment::DayOfWeek = 6;
     DataGlobals::TimeStep = 4;
@@ -667,11 +667,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SolarDistribution = FullExterior;
 
     CalcSkyDifShading = true;
-    SolarShading::InitSolarCalculations(state.files);
-    SolarShading::SkyDifSolarShading();
+    SolarShading::InitSolarCalculations(state);
+    SolarShading::SkyDifSolarShading(state);
     CalcSkyDifShading = false;
 
-    FigureSolarBeamAtTimestep(DataGlobals::HourOfDay, DataGlobals::TimeStep);
+    FigureSolarBeamAtTimestep(state, DataGlobals::HourOfDay, DataGlobals::TimeStep);
 
     int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
     EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, windowSurfNum), 0.0001);
@@ -1019,22 +1019,22 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
-    HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    HeatBalanceManager::SetPreConstructionInputParameters(state);
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, FoundError);
+    HeatBalanceManager::GetMaterialData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetFrameAndDividerData(FoundError);
+    HeatBalanceManager::GetFrameAndDividerData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetConstructData(state.files, FoundError);
+    HeatBalanceManager::GetConstructData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
+    HeatBalanceManager::GetZoneData(state, FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
+    SurfaceGeometry::GetGeometryParameters(state, FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
@@ -1049,8 +1049,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     SurfaceGeometry::SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
-    SolarShading::AllocateModuleArrays();
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::AllocateModuleArrays(state);
+    SolarShading::DetermineShadowingCombinations(state);
     DataEnvironment::DayOfYear_Schedule = 168;
     DataEnvironment::DayOfWeek = 6;
     DataGlobals::TimeStep = 4;
@@ -1066,18 +1066,18 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     SolarDistribution = FullExterior;
 
     CalcSkyDifShading = true;
-    SolarShading::InitSolarCalculations(state.files);
-    SolarShading::SkyDifSolarShading();
+    SolarShading::InitSolarCalculations(state);
+    SolarShading::SkyDifSolarShading(state);
     CalcSkyDifShading = false;
 
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     DataBSDFWindow::SUNCOSTS(4, 9, 1) = 0.1;
     DataBSDFWindow::SUNCOSTS(4, 9, 2) = 0.1;
     DataBSDFWindow::SUNCOSTS(4, 9, 3) = 0.1;
-    FigureSolarBeamAtTimestep(DataGlobals::HourOfDay, DataGlobals::TimeStep);
+    FigureSolarBeamAtTimestep(state, DataGlobals::HourOfDay, DataGlobals::TimeStep);
 
     EXPECT_TRUE(DataSystemVariables::shadingMethod == DataSystemVariables::ShadingMethod::Scheduled);
-    EXPECT_DOUBLE_EQ(0.5432, ScheduleManager::LookUpScheduleValue(2, 9, 4));
+    EXPECT_DOUBLE_EQ(0.5432, ScheduleManager::LookUpScheduleValue(state, 2, 9, 4));
     EXPECT_FALSE(SolarShading::SUNCOS(3) < 0.00001);
     EXPECT_DOUBLE_EQ(0.00001, DataEnvironment::SunIsUpValue);
     ;
@@ -1430,25 +1430,25 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
-    HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    HeatBalanceManager::SetPreConstructionInputParameters(state);
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, FoundError);
+    HeatBalanceManager::GetMaterialData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetFrameAndDividerData(FoundError);
+    HeatBalanceManager::GetFrameAndDividerData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetConstructData(state.files, FoundError);
+    HeatBalanceManager::GetConstructData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
+    HeatBalanceManager::GetZoneData(state, FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
+    SurfaceGeometry::GetGeometryParameters(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    SizingManager::GetZoneSizingInput();
+    SizingManager::GetZoneSizingInput(state);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
@@ -1464,7 +1464,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 
     compare_err_stream(""); // just for debugging
 
-    SolarShading::GetShadowingInput(state.files);
+    SolarShading::GetShadowingInput(state);
 
     for (int SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
         if (Surface(SurfNum).ExtBoundCond == 0 && Surface(SurfNum).Zone != 0) {
@@ -1800,22 +1800,22 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                                                           // expect no errors
 
-    HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    HeatBalanceManager::SetPreConstructionInputParameters(state);
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, FoundError);
+    HeatBalanceManager::GetMaterialData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetFrameAndDividerData(FoundError);
+    HeatBalanceManager::GetFrameAndDividerData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetConstructData(state.files, FoundError);
+    HeatBalanceManager::GetConstructData(state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
+    HeatBalanceManager::GetZoneData(state, FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
+    SurfaceGeometry::GetGeometryParameters(state, FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
@@ -1826,7 +1826,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                                                 // expect no errors
 
     //	compare_err_stream( "" ); // just for debugging
@@ -1834,8 +1834,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SurfaceGeometry::SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
-    SolarShading::AllocateModuleArrays();
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::AllocateModuleArrays(state);
+    SolarShading::DetermineShadowingCombinations(state);
     DataEnvironment::DayOfYear_Schedule = 168;
     DataEnvironment::DayOfWeek = 6;
     DataGlobals::TimeStep = 4;
@@ -1850,11 +1850,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     DataSystemVariables::SlaterBarsky = true;
 
     CalcSkyDifShading = true;
-    SolarShading::InitSolarCalculations(state.files);
-    SolarShading::SkyDifSolarShading();
+    SolarShading::InitSolarCalculations(state);
+    SolarShading::SkyDifSolarShading(state);
     CalcSkyDifShading = false;
 
-    FigureSolarBeamAtTimestep(DataGlobals::HourOfDay, DataGlobals::TimeStep);
+    FigureSolarBeamAtTimestep(state, DataGlobals::HourOfDay, DataGlobals::TimeStep);
     int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
     EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, surfNum), 0.0001);
     EXPECT_NEAR(0.9152, DifShdgRatioHorizHRTS(4, 9, surfNum), 0.0001);
@@ -1862,15 +1862,14 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     DataSystemVariables::SlaterBarsky = false;
 }
 
-TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS)
-{
+TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS) {
     int numofsurface;
     numofsurface = 4;
     Surface.allocate(numofsurface);
-    Vector VtxA1(0.0, 0.0, 5.0); 
-    Vector VtxA2(0.0, 0.0, 0.0); 
-    Vector VtxA3(5.0, 0.0, 0.0); 
-    Vector VtxA4(5.0, 0.0, 5.0); 
+    Vector VtxA1(0.0, 0.0, 5.0);
+    Vector VtxA2(0.0, 0.0, 0.0);
+    Vector VtxA3(5.0, 0.0, 0.0);
+    Vector VtxA4(5.0, 0.0, 5.0);
 
     Vector VtxB1(0.0, -10.0, 5.0);
     Vector VtxB2(0.0, -10.0, 2.5);
@@ -1881,7 +1880,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS)
 
     Surface(1).Sides = 4;
 
-    Surface(1).Vertex.allocate(4); 
+    Surface(1).Vertex.allocate(4);
     Surface(1).Vertex(1) = VtxA1;
     Surface(1).Vertex(2) = VtxA2;
     Surface(1).Vertex(3) = VtxA3;
@@ -1891,7 +1890,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS)
     Surface(1).ZoneName = "Zone1";
 
     Surface(2).Sides = 6; // receiving
-    Surface(2).Vertex.allocate(6); 
+    Surface(2).Vertex.allocate(6);
 
     Surface(2).Vertex(1) = VtxB1;
     Surface(2).Vertex(2) = VtxB2;
@@ -1906,15 +1905,15 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS)
     CHKBKS(1, 2);
 
     EXPECT_TRUE(this->has_err_output(false));
-    
+
     std::string const error_string = delimited_string({
-        "   ** Severe  ** Problem in interior solar distribution calculation (CHKBKS)",
-        "   **   ~~~   **    Solar Distribution = FullInteriorExterior will not work in Zone=Zone1",
-        "   **   ~~~   **    because one or more of vertices, such as Vertex 3 of back surface=Surf_Back"
-        ", is in front of receiving surface=Surf_Recv",
-        "   **   ~~~   **    (Dot Product indicator=             62.5000)", 
-        "   **   ~~~   **    Check surface geometry; if OK, use Solar Distribution = FullExterior instead. Use Output:Diagnostics, DisplayExtraWarnings; for more details."
-        });
+                                                          "   ** Severe  ** Problem in interior solar distribution calculation (CHKBKS)",
+                                                          "   **   ~~~   **    Solar Distribution = FullInteriorExterior will not work in Zone=Zone1",
+                                                          "   **   ~~~   **    because one or more of vertices, such as Vertex 3 of back surface=Surf_Back"
+                                                          ", is in front of receiving surface=Surf_Recv",
+                                                          "   **   ~~~   **    (Dot Product indicator=             62.5000)",
+                                                          "   **   ~~~   **    Check surface geometry; if OK, use Solar Distribution = FullExterior instead. Use Output:Diagnostics, DisplayExtraWarnings; for more details."
+                                                      });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
@@ -1947,11 +1946,638 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS)
     EXPECT_FALSE(this->has_err_output(true));
 }
 
+TEST_F(EnergyPlusFixture, SolarShadingTest_NonConvexErrors)
+{
+    std::string const idf_objects = R"IDF(
+RunPeriod,
+  Annual,                  !- Name
+  1,                       !- Begin Month
+  1,                       !- Begin Day of Month
+  ,                        !- Begin Year
+  12,                      !- End Month
+  31,                      !- End Day of Month
+  ,                        !- End Year
+  Sunday,                  !- Day of Week for Start Day
+  No,                      !- Use Weather File Holidays and Special Days
+  No,                      !- Use Weather File Daylight Saving Period
+  No,                      !- Apply Weekend Holiday Rule
+  Yes,                     !- Use Weather File Rain Indicators
+  Yes;                     !- Use Weather File Snow Indicators
+
+ShadowCalculation,
+  PolygonClipping,  !- Calculation Method
+  Periodic,  !- Caclulation Update Frequency Method
+  20,  !- Calculation Update Frequency
+  15000;  !- Maximum Figures in Shadow Overlap Calculations
+
+Timestep,4;
+
+Building,
+  Non-convex,    !- Name
+  0,      !- North Axis {deg}
+  City,          !- Terrain
+  0.5,  !- Loads Convergence Tolerance Value
+  0.5,  !- Temperature Convergence Tolerance Value {deltaC}
+  FullInteriorAndExterior, !- Solar Distribution
+  25,  !- Maximum Number of Warmup Days
+  2;  !- Minimum Number of Warmup Days
+
+GlobalGeometryRules,
+    UpperLeftCorner,          !- Starting Vertex Position
+    Counterclockwise,         !- Vertex Entry Direction
+    Relative;                 !- Coordinate System
+
+Zone,
+    Zone A,                   !- Name
+    0,                        !- Direction of Relative North
+    0,                        !- X Origin
+    0,                        !- Y Origin
+    0,                        !- Z Origin
+    ,                         !- Type
+    1;                        !- Multiplier
+
+BuildingSurface:Detailed,
+    A48756,                   !- Name
+    Floor,                    !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    NoSun,                    !- Sun Exposure
+    NoWind,                   !- Wind Exposure
+    ,                         !- View Factor to Ground
+    4,                        !- Number of Vertices
+    6.096, 6.096, 0,                        !- Vertex 1 Zcoordinate
+    6.096, 0, 0,                        !- Vertex 2 Zcoordinate
+    0, 0, 0,                        !- Vertex 3 Zcoordinate
+    0, 6.096, 0;                        !- Vertex 4 Zcoordinate
+
+BuildingSurface:Detailed,
+    69C03D,                   !- Name
+    Wall,                     !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    SunExposed,               !- Sun Exposure
+    WindExposed,              !- Wind Exposure
+    ,                         !- View Factor to Ground
+    6,                        !- Number of Vertices
+    0, 6.096, 6.096,                    !- Vertex 1 Zcoordinate
+    0, 6.096, 0,                        !- Vertex 2 Zcoordinate
+    0, 0, 0,                        !- Vertex 3 Zcoordinate
+    0, 0, 3.048,                    !- Vertex 4 Zcoordinate
+    0, 3.048, 3.048,                    !- Vertex 5 Zcoordinate
+    0, 3.048, 6.096;                    !- Vertex 6 Zcoordinate
+
+BuildingSurface:Detailed,
+    5BB552,                   !- Name
+    Wall,                     !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    SunExposed,               !- Sun Exposure
+    WindExposed,              !- Wind Exposure
+    ,                         !- View Factor to Ground
+    6,                        !- Number of Vertices
+    6.096, 3.048, 6.096,                    !- Vertex 1 Zcoordinate
+    6.096, 3.048, 3.048,                    !- Vertex 2 Zcoordinate
+    6.096, 0, 3.048,                    !- Vertex 3 Zcoordinate
+    6.096, 0, 0,                        !- Vertex 4 Zcoordinate
+    6.096, 6.096, 0,                        !- Vertex 5 Zcoordinate
+    6.096, 6.096, 6.096;                    !- Vertex 6 Zcoordinate
+
+BuildingSurface:Detailed,
+    682F88,                   !- Name
+    Wall,                     !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    SunExposed,               !- Sun Exposure
+    WindExposed,              !- Wind Exposure
+    ,                         !- View Factor to Ground
+    4,                        !- Number of Vertices
+    6.096, 6.096, 6.096,                    !- Vertex 1 Zcoordinate
+    6.096, 6.096, 0,                        !- Vertex 2 Zcoordinate
+    0, 6.096, 0,                        !- Vertex 3 Zcoordinate
+    0, 6.096, 6.096;                    !- Vertex 4 Zcoordinate
+
+BuildingSurface:Detailed,
+    C292CF,                   !- Name
+    Wall,                     !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    SunExposed,               !- Sun Exposure
+    WindExposed,              !- Wind Exposure
+    ,                         !- View Factor to Ground
+    4,                        !- Number of Vertices
+    0, 0, 3.048,                    !- Vertex 1 Zcoordinate
+    0, 0, 0,                        !- Vertex 2 Zcoordinate
+    6.096, 0, 0,                        !- Vertex 3 Zcoordinate
+    6.096, 0, 3.048;                    !- Vertex 4 Zcoordinate
+
+BuildingSurface:Detailed,
+    319080,                   !- Name
+    Wall,                     !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    SunExposed,               !- Sun Exposure
+    WindExposed,              !- Wind Exposure
+    ,                         !- View Factor to Ground
+    4,                        !- Number of Vertices
+    0, 3.048, 6.096,                    !- Vertex 1 Zcoordinate
+    0, 3.048, 3.048,                    !- Vertex 2 Zcoordinate
+    6.096, 3.048, 3.048,                    !- Vertex 3 Zcoordinate
+    6.096, 3.048, 6.096;                    !- Vertex 4 Zcoordinate
+
+BuildingSurface:Detailed,
+    866E33,                   !- Name
+    Roof,                     !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    SunExposed,               !- Sun Exposure
+    WindExposed,              !- Wind Exposure
+    ,                         !- View Factor to Ground
+    4,                        !- Number of Vertices
+    0, 3.048, 3.048,                    !- Vertex 1 Zcoordinate
+    0, 0, 3.048,                    !- Vertex 2 Zcoordinate
+    6.096, 0, 3.048,                    !- Vertex 3 Zcoordinate
+    6.096, 3.048, 3.048;                    !- Vertex 4 Zcoordinate
+
+BuildingSurface:Detailed,
+    32CB6F,                   !- Name
+    Roof,                     !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    SunExposed,               !- Sun Exposure
+    WindExposed,              !- Wind Exposure
+    ,                         !- View Factor to Ground
+    4,                        !- Number of Vertices
+    0, 6.096, 6.096,                    !- Vertex 1 Zcoordinate
+    0, 3.048, 6.096,                    !- Vertex 2 Zcoordinate
+    6.096, 3.048, 6.096,                    !- Vertex 3 Zcoordinate
+    6.096, 6.096, 6.096;                    !- Vertex 4 Zcoordinate
+
+FenestrationSurface:Detailed,
+    DAF2B2,                   !- Name
+    Window,                   !- Surface Type
+    Exterior Window,          !- Construction Name
+    319080,                   !- Building Surface Name
+    ,                         !- Outside Boundary Condition Object
+    ,                         !- View Factor to Ground
+    ,                         !- Frame and Divider Name
+    ,                         !- Multiplier
+    4,                        !- Number of Vertices
+    0.6096, 3.048, 5.4864,                   !- Vertex 1 Zcoordinate
+    0.6096, 3.048, 3.6576,                   !- Vertex 2 Zcoordinate
+    5.4864, 3.048, 3.6576,                   !- Vertex 3 Zcoordinate
+    5.4864, 3.048, 5.4864;                   !- Vertex 4 Zcoordinate
+
+Material,
+  Wall Continuous Insulation,  !- Name
+  MediumSmooth,               !- Roughness
+  0.038037600000000005,  !- Thickness {m}
+  0.0288,  !- Conductivity {W/m-K}
+  32,                      !- Density {kg/m3}(2013 ASHRAE Handbook - Fundamentals Section 26 Table 1 - Extruded polystyrene, smooth skin - aged 180 days)
+  1465;                     !- Specific Heat {J/kg-K}(2013 ASHRAE Handbook - Fundamentals Section 26 Table 1 - Extruded polystyrene, smooth skin - aged 180 days)
+
+Material,
+  Wall Cavity Effective Insulation,  !- Name
+  VeryRough,               !- Roughness
+  0.08889999999999999,  !- Thickness {m}
+  0.08389829384297165,  !- Conductivity {W/m-K}
+  8.17,                      !- Density {kg/m3}(2013 ASHRAE Handbook - Fundamentals Section 26 Table 1 - Glass-fiber batts)
+  837;                     !- Specific Heat {J/kg-K}(2013 ASHRAE Handbook - Fundamentals Section 26 Table 1 - Glass-fiber batts)
+
+Construction,
+  Exterior Wall,           !- Name
+  Stucco,  !- Layer
+  Wall Continuous Insulation,  !- Layer
+  Wall Cavity Effective Insulation,  !- Layer
+  Gypsum 5/8in;  !- Layer
+
+Construction,
+  Exterior Window,         !- Name
+  Theoretical Glazing;     !- Outside Layer
+
+Material,
+  Gypsum 5/8in,           !- Name
+  MediumSmooth,            !- Roughness
+  0.016,                   !- Thickness {m}
+  0.1622,                  !- Conductivity {W/m-K}
+  800,                     !- Density {kg/m3}
+  1090,                    !- Specific Heat {J/kg-K}
+  0.9,                     !- Thermal Absorptance
+  0.7,                     !- Solar Absorptance
+  0.7;                     !- Visible Absorptance
+
+Material,
+  Stucco,           !- Name
+  Smooth,                  !- Roughness
+  0.01015,                 !- Thickness {m}
+  0.72,                    !- Conductivity {W/m-K}
+  1856,                    !- Density {kg/m3}
+  840,                     !- Specific Heat {J/kg-K}
+  0.9,                     !- Thermal Absorptance
+  0.7,                     !- Solar Absorptance
+  0.7;                     !- Visible Absorptance
+
+WindowMaterial:SimpleGlazingSystem,
+  Theoretical Glazing,     !- Name
+  3.1232254400908577,  !- U-Factor {W/m2-K}
+  0.4,  !- Solar Heat Gain Coefficient
+  0.4;  !- Visible Transmittance
+)IDF";
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(state);
+    bool FoundError = false;
+
+    HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
+    EXPECT_FALSE(FoundError);                              // expect no errors
+
+    HeatBalanceManager::SetPreConstructionInputParameters(state);
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
+
+    HeatBalanceManager::GetMaterialData(state, FoundError);
+    EXPECT_FALSE(FoundError);
+
+    HeatBalanceManager::GetFrameAndDividerData(state, FoundError);
+    EXPECT_FALSE(FoundError);
+
+    HeatBalanceManager::GetConstructData(state, FoundError);
+    EXPECT_FALSE(FoundError);
+
+    HeatBalanceManager::GetZoneData(state, FoundError); // Read Zone data from input file
+    EXPECT_FALSE(FoundError);
+
+    SurfaceGeometry::GetGeometryParameters(state, FoundError);
+    EXPECT_FALSE(FoundError);
+
+    SurfaceGeometry::CosZoneRelNorth.allocate(1);
+    SurfaceGeometry::SinZoneRelNorth.allocate(1);
+
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosBldgRelNorth = 1.0;
+    SurfaceGeometry::SinBldgRelNorth = 0.0;
+
+    SurfaceGeometry::GetSurfaceData(state, FoundError); // setup zone geometry and get zone data
+    EXPECT_FALSE(FoundError);                    // expect no errors
+
+    //	compare_err_stream( "" ); // just for debugging
+
+    SurfaceGeometry::SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
+    EXPECT_FALSE(FoundError);
+
+    BeginSimFlag = true;
+    HeatBalanceManager::InitHeatBalance(state);
+    EXPECT_FALSE(FoundError);
+
+    SolarShading::AllocateModuleArrays(state);
+    SolarShading::DetermineShadowingCombinations(state);
+
+    std::string error_string = delimited_string({"** Severe  ** Problem in interior solar distribution calculation (CHKBKS)"});
+
+    match_err_stream(error_string);
+
+    error_string = delimited_string({"** Severe  ** DetermineShadowingCombinations: There are 1 surfaces which are casting surfaces and are non-convex."});
+
+    match_err_stream(error_string);
+
+}
+
+TEST_F(EnergyPlusFixture, SolarShadingTest_GPUNonConvexErrors)
+{
+std::string const idf_objects = R"IDF(
+RunPeriod,
+  Annual,                  !- Name
+  1,                       !- Begin Month
+  1,                       !- Begin Day of Month
+  ,                        !- Begin Year
+  12,                      !- End Month
+  31,                      !- End Day of Month
+  ,                        !- End Year
+  Sunday,                  !- Day of Week for Start Day
+  No,                      !- Use Weather File Holidays and Special Days
+  No,                      !- Use Weather File Daylight Saving Period
+  No,                      !- Apply Weekend Holiday Rule
+  Yes,                     !- Use Weather File Rain Indicators
+  Yes;                     !- Use Weather File Snow Indicators
+
+ShadowCalculation,
+  PixelCounting,  !- Calculation Method
+  Periodic,  !- Caclulation Update Frequency Method
+  20,  !- Calculation Update Frequency
+  15000;  !- Maximum Figures in Shadow Overlap Calculations
+
+Timestep,4;
+
+Building,
+  Non-convex,    !- Name
+  0,      !- North Axis {deg}
+  City,          !- Terrain
+  0.5,  !- Loads Convergence Tolerance Value
+  0.5,  !- Temperature Convergence Tolerance Value {deltaC}
+  FullInteriorAndExterior, !- Solar Distribution
+  25,  !- Maximum Number of Warmup Days
+  2;  !- Minimum Number of Warmup Days
+
+GlobalGeometryRules,
+    UpperLeftCorner,          !- Starting Vertex Position
+    Counterclockwise,         !- Vertex Entry Direction
+    Relative;                 !- Coordinate System
+
+Zone,
+    Zone A,                   !- Name
+    0,                        !- Direction of Relative North
+    0,                        !- X Origin
+    0,                        !- Y Origin
+    0,                        !- Z Origin
+    ,                         !- Type
+    1;                        !- Multiplier
+
+BuildingSurface:Detailed,
+    A48756,                   !- Name
+    Floor,                    !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    NoSun,                    !- Sun Exposure
+    NoWind,                   !- Wind Exposure
+    ,                         !- View Factor to Ground
+    4,                        !- Number of Vertices
+    6.096, 6.096, 0,                        !- Vertex 1 Zcoordinate
+    6.096, 0, 0,                        !- Vertex 2 Zcoordinate
+    0, 0, 0,                        !- Vertex 3 Zcoordinate
+    0, 6.096, 0;                        !- Vertex 4 Zcoordinate
+
+BuildingSurface:Detailed,
+    69C03D,                   !- Name
+    Wall,                     !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    SunExposed,               !- Sun Exposure
+    WindExposed,              !- Wind Exposure
+    ,                         !- View Factor to Ground
+    6,                        !- Number of Vertices
+    0, 6.096, 6.096,                    !- Vertex 1 Zcoordinate
+    0, 6.096, 0,                        !- Vertex 2 Zcoordinate
+    0, 0, 0,                        !- Vertex 3 Zcoordinate
+    0, 0, 3.048,                    !- Vertex 4 Zcoordinate
+    0, 3.048, 3.048,                    !- Vertex 5 Zcoordinate
+    0, 3.048, 6.096;                    !- Vertex 6 Zcoordinate
+
+BuildingSurface:Detailed,
+    5BB552,                   !- Name
+    Wall,                     !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    SunExposed,               !- Sun Exposure
+    WindExposed,              !- Wind Exposure
+    ,                         !- View Factor to Ground
+    6,                        !- Number of Vertices
+    6.096, 3.048, 6.096,                    !- Vertex 1 Zcoordinate
+    6.096, 3.048, 3.048,                    !- Vertex 2 Zcoordinate
+    6.096, 0, 3.048,                    !- Vertex 3 Zcoordinate
+    6.096, 0, 0,                        !- Vertex 4 Zcoordinate
+    6.096, 6.096, 0,                        !- Vertex 5 Zcoordinate
+    6.096, 6.096, 6.096;                    !- Vertex 6 Zcoordinate
+
+BuildingSurface:Detailed,
+    682F88,                   !- Name
+    Wall,                     !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    SunExposed,               !- Sun Exposure
+    WindExposed,              !- Wind Exposure
+    ,                         !- View Factor to Ground
+    4,                        !- Number of Vertices
+    6.096, 6.096, 6.096,                    !- Vertex 1 Zcoordinate
+    6.096, 6.096, 0,                        !- Vertex 2 Zcoordinate
+    0, 6.096, 0,                        !- Vertex 3 Zcoordinate
+    0, 6.096, 6.096;                    !- Vertex 4 Zcoordinate
+
+BuildingSurface:Detailed,
+    C292CF,                   !- Name
+    Wall,                     !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    SunExposed,               !- Sun Exposure
+    WindExposed,              !- Wind Exposure
+    ,                         !- View Factor to Ground
+    4,                        !- Number of Vertices
+    0, 0, 3.048,                    !- Vertex 1 Zcoordinate
+    0, 0, 0,                        !- Vertex 2 Zcoordinate
+    6.096, 0, 0,                        !- Vertex 3 Zcoordinate
+    6.096, 0, 3.048;                    !- Vertex 4 Zcoordinate
+
+BuildingSurface:Detailed,
+    319080,                   !- Name
+    Wall,                     !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    SunExposed,               !- Sun Exposure
+    WindExposed,              !- Wind Exposure
+    ,                         !- View Factor to Ground
+    4,                        !- Number of Vertices
+    0, 3.048, 6.096,                    !- Vertex 1 Zcoordinate
+    0, 3.048, 3.048,                    !- Vertex 2 Zcoordinate
+    6.096, 3.048, 3.048,                    !- Vertex 3 Zcoordinate
+    6.096, 3.048, 6.096;                    !- Vertex 4 Zcoordinate
+
+BuildingSurface:Detailed,
+    866E33,                   !- Name
+    Roof,                     !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    SunExposed,               !- Sun Exposure
+    WindExposed,              !- Wind Exposure
+    ,                         !- View Factor to Ground
+    4,                        !- Number of Vertices
+    0, 3.048, 3.048,                    !- Vertex 1 Zcoordinate
+    0, 0, 3.048,                    !- Vertex 2 Zcoordinate
+    6.096, 0, 3.048,                    !- Vertex 3 Zcoordinate
+    6.096, 3.048, 3.048;                    !- Vertex 4 Zcoordinate
+
+BuildingSurface:Detailed,
+    32CB6F,                   !- Name
+    Roof,                     !- Surface Type
+    Exterior Wall,            !- Construction Name
+    Zone A,                   !- Zone Name
+    Outdoors,                 !- Outside Boundary Condition
+    ,                         !- Outside Boundary Condition Object
+    SunExposed,               !- Sun Exposure
+    WindExposed,              !- Wind Exposure
+    ,                         !- View Factor to Ground
+    4,                        !- Number of Vertices
+    0, 6.096, 6.096,                    !- Vertex 1 Zcoordinate
+    0, 3.048, 6.096,                    !- Vertex 2 Zcoordinate
+    6.096, 3.048, 6.096,                    !- Vertex 3 Zcoordinate
+    6.096, 6.096, 6.096;                    !- Vertex 4 Zcoordinate
+
+FenestrationSurface:Detailed,
+    DAF2B2,                   !- Name
+    Window,                   !- Surface Type
+    Exterior Window,          !- Construction Name
+    319080,                   !- Building Surface Name
+    ,                         !- Outside Boundary Condition Object
+    ,                         !- View Factor to Ground
+    ,                         !- Frame and Divider Name
+    ,                         !- Multiplier
+    4,                        !- Number of Vertices
+    0.6096, 3.048, 5.4864,                   !- Vertex 1 Zcoordinate
+    0.6096, 3.048, 3.6576,                   !- Vertex 2 Zcoordinate
+    5.4864, 3.048, 3.6576,                   !- Vertex 3 Zcoordinate
+    5.4864, 3.048, 5.4864;                   !- Vertex 4 Zcoordinate
+
+Material,
+  Wall Continuous Insulation,  !- Name
+  MediumSmooth,               !- Roughness
+  0.038037600000000005,  !- Thickness {m}
+  0.0288,  !- Conductivity {W/m-K}
+  32,                      !- Density {kg/m3}(2013 ASHRAE Handbook - Fundamentals Section 26 Table 1 - Extruded polystyrene, smooth skin - aged 180 days)
+  1465;                     !- Specific Heat {J/kg-K}(2013 ASHRAE Handbook - Fundamentals Section 26 Table 1 - Extruded polystyrene, smooth skin - aged 180 days)
+
+Material,
+  Wall Cavity Effective Insulation,  !- Name
+  VeryRough,               !- Roughness
+  0.08889999999999999,  !- Thickness {m}
+  0.08389829384297165,  !- Conductivity {W/m-K}
+  8.17,                      !- Density {kg/m3}(2013 ASHRAE Handbook - Fundamentals Section 26 Table 1 - Glass-fiber batts)
+  837;                     !- Specific Heat {J/kg-K}(2013 ASHRAE Handbook - Fundamentals Section 26 Table 1 - Glass-fiber batts)
+
+Construction,
+  Exterior Wall,           !- Name
+  Stucco,  !- Layer
+  Wall Continuous Insulation,  !- Layer
+  Wall Cavity Effective Insulation,  !- Layer
+  Gypsum 5/8in;  !- Layer
+
+Construction,
+  Exterior Window,         !- Name
+  Theoretical Glazing;     !- Outside Layer
+
+Material,
+  Gypsum 5/8in,           !- Name
+  MediumSmooth,            !- Roughness
+  0.016,                   !- Thickness {m}
+  0.1622,                  !- Conductivity {W/m-K}
+  800,                     !- Density {kg/m3}
+  1090,                    !- Specific Heat {J/kg-K}
+  0.9,                     !- Thermal Absorptance
+  0.7,                     !- Solar Absorptance
+  0.7;                     !- Visible Absorptance
+
+Material,
+  Stucco,           !- Name
+  Smooth,                  !- Roughness
+  0.01015,                 !- Thickness {m}
+  0.72,                    !- Conductivity {W/m-K}
+  1856,                    !- Density {kg/m3}
+  840,                     !- Specific Heat {J/kg-K}
+  0.9,                     !- Thermal Absorptance
+  0.7,                     !- Solar Absorptance
+  0.7;                     !- Visible Absorptance
+
+WindowMaterial:SimpleGlazingSystem,
+  Theoretical Glazing,     !- Name
+  3.1232254400908577,  !- U-Factor {W/m2-K}
+  0.4,  !- Solar Heat Gain Coefficient
+  0.4;  !- Visible Transmittance
+)IDF";
+
+ASSERT_TRUE(process_idf(idf_objects));
+
+SimulationManager::GetProjectData(state);
+bool FoundError = false;
+
+HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
+EXPECT_FALSE(FoundError);                              // expect no errors
+
+HeatBalanceManager::SetPreConstructionInputParameters(state);
+ScheduleManager::ProcessScheduleInput(state); // read schedules
+
+HeatBalanceManager::GetMaterialData(state, FoundError);
+EXPECT_FALSE(FoundError);
+
+HeatBalanceManager::GetFrameAndDividerData(state, FoundError);
+EXPECT_FALSE(FoundError);
+
+HeatBalanceManager::GetConstructData(state, FoundError);
+EXPECT_FALSE(FoundError);
+
+HeatBalanceManager::GetZoneData(state, FoundError); // Read Zone data from input file
+EXPECT_FALSE(FoundError);
+
+SurfaceGeometry::GetGeometryParameters(state, FoundError);
+EXPECT_FALSE(FoundError);
+
+SurfaceGeometry::CosZoneRelNorth.allocate(1);
+SurfaceGeometry::SinZoneRelNorth.allocate(1);
+
+SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
+SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+SurfaceGeometry::CosBldgRelNorth = 1.0;
+SurfaceGeometry::SinBldgRelNorth = 0.0;
+
+SurfaceGeometry::GetSurfaceData(state, FoundError); // setup zone geometry and get zone data
+EXPECT_FALSE(FoundError);                    // expect no errors
+
+//	compare_err_stream( "" ); // just for debugging
+
+SurfaceGeometry::SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
+EXPECT_FALSE(FoundError);
+
+BeginSimFlag = true;
+HeatBalanceManager::InitHeatBalance(state);
+EXPECT_FALSE(FoundError);
+
+if (SolarShading::penumbra) {
+    SolarShading::AllocateModuleArrays(state);
+    SolarShading::DetermineShadowingCombinations(state);
+
+    std::string error_string = delimited_string({"** Severe  ** Problem in interior solar distribution calculation (CHKBKS)"});
+
+    EXPECT_FALSE(match_err_stream(error_string));
+
+    error_string = delimited_string({"** Severe  ** DetermineShadowingCombinations: There are 1 surfaces which are casting surfaces and are non-convex."});
+
+    EXPECT_FALSE(match_err_stream(error_string));
+} else {
+    EXPECT_FALSE(false) << "Machine cannot create a valid OpenGL instance.";  // Replace with GTEST_SKIP() when it's released?
+}
+}
+
 TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
 {
     TotSurfaces = 2;
     Surface.allocate(TotSurfaces);
-    
+
     int curSurface = 1;
     Surface(curSurface).windowShadingControlList.push_back(57);
 
@@ -1994,4 +2620,3 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 1);
 }
-

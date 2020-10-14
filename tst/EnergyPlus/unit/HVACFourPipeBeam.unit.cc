@@ -224,7 +224,7 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
 
     DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 3;
     bool ErrorsFound = false;
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = NodeInputManager::GetOnlySingleNode("Zone 1 Node",
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = NodeInputManager::GetOnlySingleNode(state, "Zone 1 Node",
                                                                                          ErrorsFound,
                                                                                          "Zone",
                                                                                          "BeamTest",
@@ -1714,7 +1714,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    SimulationManager::PostIPProcessing();
+    SimulationManager::PostIPProcessing(state);
 
     bool ErrorsFound = false;
 
@@ -1722,7 +1722,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
-    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
+    HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
@@ -1734,8 +1734,8 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
-    TestAirPathIntegrity(state, state.files, ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
+    WeatherManager::ResetEnvironmentCounter(state);
+    TestAirPathIntegrity(state, ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
     SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
@@ -3288,7 +3288,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    SimulationManager::PostIPProcessing();
+    SimulationManager::PostIPProcessing(state);
 
     bool ErrorsFound = false;
 
@@ -3296,7 +3296,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
-    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
+    HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
@@ -3308,7 +3308,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state);
 
     ASSERT_ANY_THROW(SimulationManager::SetupSimulation(state, ErrorsFound));
 }

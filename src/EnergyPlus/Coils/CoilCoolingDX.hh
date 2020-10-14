@@ -55,8 +55,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 struct CoilCoolingDXInputSpecification
 {
@@ -79,7 +80,7 @@ struct CoilCoolingDX
     static void getInput(EnergyPlusData &state);
     static void clear_state();
     void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXInputSpecification &input_data);
-    void oneTimeInit();
+    void oneTimeInit(EnergyPlusData &state);
     void simulate(EnergyPlusData &state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR = -1.0);
     void setData(int fanIndex, int fanType, std::string const &fanName, int airLoopNum);
     void getFixedData(int &evapInletNodeIndex,

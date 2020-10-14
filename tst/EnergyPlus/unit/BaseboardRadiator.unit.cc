@@ -327,21 +327,21 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(state, errorsFound); // read construction data
     EXPECT_FALSE(errorsFound);                         // expect no errors
 
-    HeatBalanceManager::GetZoneData(errorsFound);
+    HeatBalanceManager::GetZoneData(state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(3);
@@ -356,7 +356,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errorsFound);
+    SurfaceGeometry::GetSurfaceData(state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
     ZoneSizingInput.allocate(3);

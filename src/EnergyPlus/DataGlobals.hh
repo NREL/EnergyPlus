@@ -60,7 +60,8 @@
 
 namespace EnergyPlus {
 
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DataGlobals {
 
@@ -68,17 +69,17 @@ namespace DataGlobals {
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
-    extern bool runReadVars;
-    extern bool DDOnlySimulation;
-    extern bool outputEpJSONConversion;
-    extern bool outputEpJSONConversionOnly;
-    extern bool isEpJSON;
-    extern bool isCBOR;
-    extern bool isMsgPack;
-    extern bool isUBJSON;
-    extern bool isBSON;
-    extern bool preserveIDFOrder;
-    extern bool stopSimulation;
+//    extern bool runReadVars;
+//    extern bool DDOnlySimulation;
+//    extern bool outputEpJSONConversion;
+//    extern bool outputEpJSONConversionOnly;
+//    extern bool isEpJSON;
+//    extern bool isCBOR;
+//    extern bool isMsgPack;
+//    extern bool isUBJSON;
+//    extern bool isBSON;
+//    extern bool preserveIDFOrder;
+//    extern bool stopSimulation;
     extern std::function<void (void *)> externalHVACManager;
     extern bool externalHVACManagerInitialized;
 
@@ -240,7 +241,6 @@ namespace DataGlobals {
     extern std::function<void(const std::string &)> messageCallback;
     extern std::function<void(EnergyPlus::Error, const std::string &)> errorCallback;
     extern bool eplusRunningViaAPI; // a flag for capturing whether we are running via API - if so we can't do python plugins
-
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
     void clear_state(EnergyPlus::IOFiles &ioFiles);
@@ -248,18 +248,36 @@ namespace DataGlobals {
 } // namespace DataGlobals
 
     struct DataGlobal : BaseGlobalStruct {
-        // Data
         bool AnnualSimulation = false;
-
-        // MODULE VARIABLE DECLARATIONS:
         std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
+        bool runReadVars= false;
+        bool DDOnlySimulation= false;
+        bool outputEpJSONConversion = false;
+        bool outputEpJSONConversionOnly = false;
+        bool isEpJSON= false;
+        bool isCBOR= false;
+        bool isMsgPack= false;
+        bool isUBJSON= false;
+        bool isBSON= false;
+        bool preserveIDFOrder = true;
+        bool stopSimulation= false;
 
-        // MODULE PARAMETER DEFINITIONS
         static constexpr int EndZoneSizingCalc = 4;
 
         void clear_state() override {
-            AnnualSimulation = false;
-            DayOfSimChr = "0";
+            this->AnnualSimulation = false;
+            this->DayOfSimChr = "0";
+            this->runReadVars = false;
+            this->DDOnlySimulation = false;
+            this->outputEpJSONConversion = false;
+            this->outputEpJSONConversionOnly = false;
+            this->isEpJSON = false;
+            this->isCBOR = false;
+            this->isMsgPack = false;
+            this->isUBJSON = false;
+            this->isBSON = false;
+            this->preserveIDFOrder = true;
+            this->stopSimulation= false;
         }
     };
 

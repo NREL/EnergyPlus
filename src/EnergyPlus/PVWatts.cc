@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -155,11 +156,11 @@ namespace PVWatts {
 
     }
 
-    void PVWattsGenerator::setupOutputVariables()
+    void PVWattsGenerator::setupOutputVariables(EnergyPlusData &state)
     {
         // Set up output variables
-        SetupOutputVariable("Generator Produced DC Electricity Rate", OutputProcessor::Unit::W, m_outputDCPower, "System", "Average", m_name);
-        SetupOutputVariable("Generator Produced DC Electricity Energy",
+        SetupOutputVariable(state, "Generator Produced DC Electricity Rate", OutputProcessor::Unit::W, m_outputDCPower, "System", "Average", m_name);
+        SetupOutputVariable(state, "Generator Produced DC Electricity Energy",
                             OutputProcessor::Unit::J,
                             m_outputDCEnergy,
                             "System",
@@ -170,11 +171,11 @@ namespace PVWatts {
                             "Photovoltaics",
                             _,
                             "Plant");
-        SetupOutputVariable("Generator PV Cell Temperature", OutputProcessor::Unit::C, m_cellTemperature, "System", "Average", m_name);
-        SetupOutputVariable("Plane of Array Irradiance", OutputProcessor::Unit::W_m2, m_planeOfArrayIrradiance, "System", "Average", m_name);
+        SetupOutputVariable(state, "Generator PV Cell Temperature", OutputProcessor::Unit::C, m_cellTemperature, "System", "Average", m_name);
+        SetupOutputVariable(state, "Plane of Array Irradiance", OutputProcessor::Unit::W_m2, m_planeOfArrayIrradiance, "System", "Average", m_name);
     }
 
-    PVWattsGenerator PVWattsGenerator::createFromIdfObj(int objNum)
+    PVWattsGenerator PVWattsGenerator::createFromIdfObj(EnergyPlusData &state, int objNum)
     {
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
@@ -195,7 +196,8 @@ namespace PVWatts {
         int IOStat;
         bool errorsFound = false;
 
-        inputProcessor->getObjectItem("Generator:PVWatts",
+        inputProcessor->getObjectItem(state,
+                                      "Generator:PVWatts",
                                       objNum,
                                       cAlphaArgs,
                                       NumAlphas,
@@ -343,7 +345,7 @@ namespace PVWatts {
         m_inverterEfficiency = inverterEfficiency;
     }
 
-    void PVWattsGenerator::calc()
+    void PVWattsGenerator::calc(EnergyPlusData& state)
     {
         using DataGlobals::HourOfDay;
         using DataGlobals::SecInHour;
@@ -368,16 +370,16 @@ namespace PVWatts {
         ssc_data_set_number(pvwattsData, "day", DataEnvironment::DayOfMonth);
         ssc_data_set_number(pvwattsData, "hour", DataGlobals::HourOfDay - 1);
         ssc_data_set_number(pvwattsData, "minute", (TimeStep - 0.5) * DataGlobals::MinutesPerTimeStep);
-        ssc_data_set_number(pvwattsData, "lat", WeatherManager::WeatherFileLatitude);
-        ssc_data_set_number(pvwattsData, "lon", WeatherManager::WeatherFileLongitude);
-        ssc_data_set_number(pvwattsData, "tz", WeatherManager::WeatherFileTimeZone);
+        ssc_data_set_number(pvwattsData, "lat", state.dataWeatherManager->WeatherFileLatitude);
+        ssc_data_set_number(pvwattsData, "lon", state.dataWeatherManager->WeatherFileLongitude);
+        ssc_data_set_number(pvwattsData, "tz", state.dataWeatherManager->WeatherFileTimeZone);
 
         // Weather Conditions
         ssc_data_set_number(pvwattsData, "beam", DataEnvironment::BeamSolarRad);
         ssc_data_set_number(pvwattsData, "diffuse", DataEnvironment::DifSolarRad);
         ssc_data_set_number(pvwattsData, "tamb", DataEnvironment::OutDryBulbTemp);
         ssc_data_set_number(pvwattsData, "wspd", DataEnvironment::WindSpeed);
-        Real64 albedo = WeatherManager::TodayAlbedo(TimeStep, HourOfDay);
+        Real64 albedo = state.dataWeatherManager->TodayAlbedo(TimeStep, HourOfDay);
         if (!(std::isfinite(albedo) && albedo > 0.0 && albedo < 1)) {
             albedo = 0.2;
         }
@@ -448,10 +450,10 @@ namespace PVWatts {
         ThermalEnergy = 0.0;
     }
 
-    PVWattsGenerator &GetOrCreatePVWattsGenerator(std::string const &GeneratorName)
+    PVWattsGenerator &GetOrCreatePVWattsGenerator(EnergyPlusData &state, std::string const &GeneratorName)
     {
         // Find the generator, and create a new one if it hasn't been loaded yet.
-        int ObjNum = inputProcessor->getObjectItemNum("Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
+        int ObjNum = inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
         assert(ObjNum >= 0);
         if (ObjNum == 0) {
             ShowFatalError("Cannot find Generator:PVWatts " + GeneratorName);
@@ -459,9 +461,9 @@ namespace PVWatts {
         auto it = PVWattsGenerators.find(ObjNum);
         if (it == PVWattsGenerators.end()) {
             // It's not in the map, add it.
-            PVWattsGenerators.insert(std::make_pair(ObjNum, PVWattsGenerator::createFromIdfObj(ObjNum)));
+            PVWattsGenerators.insert(std::make_pair(ObjNum, PVWattsGenerator::createFromIdfObj(state, ObjNum)));
             PVWattsGenerator &pvw(PVWattsGenerators.find(ObjNum)->second);
-            pvw.setupOutputVariables();
+            pvw.setupOutputVariables(state);
             return pvw;
         } else {
             return it->second;

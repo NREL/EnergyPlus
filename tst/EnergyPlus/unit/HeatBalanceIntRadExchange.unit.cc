@@ -293,7 +293,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     bool DidMIChange;
     int SurfNum;
 
-    dataConstruction.Construct.allocate(1);
+    state.dataConstruction->Construct.allocate(1);
     dataMaterial.Material.allocate(1);
     DataSurfaces::Surface.allocate(1);
 
@@ -303,7 +303,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     DataSurfaces::Surface(1).MovInsulIntPresentPrevTS = false;
     DataSurfaces::Surface(1).Construction = 1;
     DataSurfaces::Surface(1).MaterialMovInsulInt = 1;
-    dataConstruction.Construct(1).InsideAbsorpThermal = 0.9;
+    state.dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
     dataMaterial.Material(1).AbsorpThermal = 0.5;
     dataMaterial.Material(1).Resistance = 1.25;
     DataSurfaces::Surface(1).SchedMovInsulInt = -1;
@@ -311,19 +311,19 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
 
     // Test 1: Movable insulation present but wasn't in previous time step, also movable insulation emissivity different than base construction
     //         This should result in a true value from the algorithm which will cause interior radiant exchange matrices to be recalculated
-    HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(DidMIChange, SurfNum);
+    HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(state, DidMIChange, SurfNum);
     EXPECT_TRUE(DidMIChange);
 
     // Test 2: Movable insulation present and was also present in previous time step.  This should result in a false value since nothing has changed.
     DataSurfaces::Surface(1).MovInsulIntPresentPrevTS = true;
-    HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(DidMIChange, SurfNum);
+    HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(state, DidMIChange, SurfNum);
     EXPECT_TRUE(!DidMIChange);
 
     // Test 2: Movable insulation present but wasn't in previous time step.  However, the emissivity of the movable insulation and that of the
     // 		   construction are the same so nothing has actually changed.  This should result in a false value.
     DataSurfaces::Surface(1).MovInsulIntPresentPrevTS = false;
-    dataMaterial.Material(1).AbsorpThermal = dataConstruction.Construct(1).InsideAbsorpThermal;
-    HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(DidMIChange, SurfNum);
+    dataMaterial.Material(1).AbsorpThermal = state.dataConstruction->Construct(1).InsideAbsorpThermal;
+    HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(state, DidMIChange, SurfNum);
     EXPECT_TRUE(!DidMIChange);
 }
 
@@ -374,7 +374,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest)
         });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataViewFactorInformation::NumOfRadiantEnclosures = 3;
@@ -454,7 +454,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest2)
         });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataViewFactorInformation::NumOfSolarEnclosures = 3;
@@ -533,7 +533,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest3)
         });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataViewFactorInformation::NumOfSolarEnclosures = 3;
@@ -613,7 +613,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest4)
         });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataViewFactorInformation::NumOfRadiantEnclosures = 3;

@@ -127,7 +127,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -138,13 +138,13 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
     SingleDuct::GetSysInput(state);
     EXPECT_TRUE(compare_err_stream(""));
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -298,7 +298,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -309,13 +309,13 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
     SingleDuct::GetSysInput(state);
     EXPECT_TRUE(compare_err_stream(""));
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -2691,13 +2691,13 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
     DataSizing::TermUnitFinalZoneSizing.allocate(1);
     DataSizing::TermUnitSizing.allocate(1);
     DataSizing::FinalZoneSizing.allocate(1);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
     SingleDuct::GetSysInput(state);
     EXPECT_TRUE(compare_err_stream(""));
 
@@ -2708,7 +2708,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
     CurZoneEqNum = 1;
     CurTermUnitSizingNum = 1;
     DataSizing::TermUnitFinalZoneSizing(1).DesCoolVolFlowMin = 0.5;
-    SingleDuct::sd_airterminal(SysNum).SizeSys();
+    SingleDuct::sd_airterminal(SysNum).SizeSys(state);
     EXPECT_EQ(0.5, SingleDuct::sd_airterminal(SysNum).ZoneMinAirFracDes);
 
     // Second test -  design min flow > max flow
@@ -2717,7 +2717,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
     CurTermUnitSizingNum = 1;
     SingleDuct::sd_airterminal(SysNum).ZoneMinAirFracDes = AutoSize; // need to reset this so it sizes again
     DataSizing::TermUnitFinalZoneSizing(1).DesCoolVolFlowMin = 1.5;
-    SingleDuct::sd_airterminal(SysNum).SizeSys();
+    SingleDuct::sd_airterminal(SysNum).SizeSys(state);
     EXPECT_EQ(1.0, SingleDuct::sd_airterminal(SysNum).ZoneMinAirFracDes);
 }
 TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)

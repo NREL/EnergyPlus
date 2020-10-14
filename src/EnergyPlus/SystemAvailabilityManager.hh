@@ -57,8 +57,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace SystemAvailabilityManager {
 
@@ -457,11 +458,12 @@ namespace SystemAvailabilityManager {
 
     void ManageSystemAvailability(EnergyPlusData &state);
 
-    void GetSysAvailManagerInputs();
+    void GetSysAvailManagerInputs(EnergyPlusData &state);
 
-    void GetSysAvailManagerListInputs();
+    void GetSysAvailManagerListInputs(EnergyPlusData &state);
 
-    void GetPlantAvailabilityManager(std::string const &AvailabilityListName, // name that should be an Availability Manager List Name
+    void GetPlantAvailabilityManager(EnergyPlusData &state,
+                                     std::string const &AvailabilityListName, // name that should be an Availability Manager List Name
                                      int const Loop,                          // which loop this is
                                      int const NumPlantLoops,                 // Total number of plant loops
                                      bool &ErrorsFound                        // true if certain errors are detected here
@@ -474,7 +476,8 @@ namespace SystemAvailabilityManager {
                                        bool &ErrorsFound                        // true if certain errors are detected here
     );
 
-    void GetZoneEqAvailabilityManager(int const ZoneEquipType, // Type of ZoneHVAC:* component
+    void GetZoneEqAvailabilityManager(EnergyPlusData &state,
+                                      int const ZoneEquipType, // Type of ZoneHVAC:* component
                                       int const CompNum,       // Index of a particular ZoneHVAC:* component
                                       bool &ErrorsFound        // true if certain errors are detected here
     );

@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -118,7 +119,7 @@ namespace ZoneAirLoopEquipmentManager {
 
         // Beginning of Code
 
-        GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+        GetZoneAirLoopEquipment(state);
 
         // Find the correct Zone Air Distribution Unit Equipment
         if (CompIndex == 0) {
@@ -139,7 +140,7 @@ namespace ZoneAirLoopEquipmentManager {
             }
         }
         DataSizing::CurTermUnitSizingNum = AirDistUnit(AirDistUnitNum).TermUnitSizingNum;
-        InitZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
+        InitZoneAirLoopEquipment(state, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
         InitZoneAirLoopEquipmentTimeStep(AirDistUnitNum);
 
         SimZoneAirLoopEquipment(state,
@@ -147,10 +148,10 @@ namespace ZoneAirLoopEquipmentManager {
 
         // Call one-time init to fill termunit sizing and other data for the ADU - can't do this until the actual terminal unit nodes have been
         // matched to zone euqip config nodes
-        InitZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
+        InitZoneAirLoopEquipment(state, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
     }
 
-    void GetZoneAirLoopEquipment(EnergyPlusData &state, ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager)
+    void GetZoneAirLoopEquipment(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -205,22 +206,23 @@ namespace ZoneAirLoopEquipmentManager {
         static Array1D_bool lNumericBlanks(2);   // Logical array, numeric field input BLANK = .TRUE. //Tuned Made static
         bool DualDuctRecircIsUsed;               // local temporary for deciding if recirc side used by dual duct terminal
         // make sure the input data is read in only once
-        if (!dataZoneAirLoopEquipmentManager.GetAirDistUnitsFlag) {
+        if (!state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag) {
             return;
         } else {
-            dataZoneAirLoopEquipmentManager.GetAirDistUnitsFlag = false;
+            state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
         }
 
         NumAirDistUnits = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
         AirDistUnit.allocate(NumAirDistUnits);
-        dataZoneAirLoopEquipmentManager.EachOnceFlag.allocate(NumAirDistUnits);
-        dataZoneAirLoopEquipmentManager.EachOnceFlag = true;
+        state.dataZoneAirLoopEquipmentManager->EachOnceFlag.allocate(NumAirDistUnits);
+        state.dataZoneAirLoopEquipmentManager->EachOnceFlag = true;
 
         if (NumAirDistUnits > 0) {
 
             for (AirDistUnitNum = 1; AirDistUnitNum <= NumAirDistUnits; ++AirDistUnitNum) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               AirDistUnitNum,
                                               AlphArray,
                                               NumAlphas,
@@ -235,7 +237,7 @@ namespace ZoneAirLoopEquipmentManager {
 
                 AirDistUnit(AirDistUnitNum).Name = AlphArray(1);
                 // Input Outlet Node Num
-                AirDistUnit(AirDistUnitNum).OutletNodeNum = GetOnlySingleNode(
+                AirDistUnit(AirDistUnitNum).OutletNodeNum = GetOnlySingleNode(state,
                     AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
                 AirDistUnit(AirDistUnitNum).InletNodeNum = 0;
                 AirDistUnit(AirDistUnitNum).NumComponents = 1;
@@ -243,7 +245,7 @@ namespace ZoneAirLoopEquipmentManager {
                 // Load the air Distribution Unit Equip and Name
                 AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum) = AlphArray(3);
                 AirDistUnit(AirDistUnitNum).EquipName(AirDistCompUnitNum) = AlphArray(4);
-                ValidateComponent(AlphArray(3), AlphArray(4), IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, AlphArray(3), AlphArray(4), IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("In " + CurrentModuleObject + " = " + AlphArray(1));
                     ErrorsFound = true;
@@ -423,7 +425,8 @@ namespace ZoneAirLoopEquipmentManager {
                                   AirDistUnit(AirDistUnitNum).EquipName(AirDistCompUnitNum),
                                   "UNDEFINED",
                                   AlphArray(2));
-                    GetDualDuctOutdoorAirRecircUse(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
+                    GetDualDuctOutdoorAirRecircUse(state,
+                                                   AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                    AirDistUnit(AirDistUnitNum).EquipName(AirDistCompUnitNum),
                                                    DualDuctRecircIsUsed);
                     if (DualDuctRecircIsUsed) {
@@ -445,25 +448,25 @@ namespace ZoneAirLoopEquipmentManager {
 
             } // End of Air Dist Do Loop
             for (AirDistUnitNum = 1; AirDistUnitNum <= NumAirDistUnits; ++AirDistUnitNum) {
-                SetupOutputVariable("Zone Air Terminal Sensible Heating Energy",
+                SetupOutputVariable(state, "Zone Air Terminal Sensible Heating Energy",
                                     OutputProcessor::Unit::J,
                                     AirDistUnit(AirDistUnitNum).HeatGain,
                                     "System",
                                     "Sum",
                                     AirDistUnit(AirDistUnitNum).Name);
-                SetupOutputVariable("Zone Air Terminal Sensible Cooling Energy",
+                SetupOutputVariable(state, "Zone Air Terminal Sensible Cooling Energy",
                                     OutputProcessor::Unit::J,
                                     AirDistUnit(AirDistUnitNum).CoolGain,
                                     "System",
                                     "Sum",
                                     AirDistUnit(AirDistUnitNum).Name);
-                SetupOutputVariable("Zone Air Terminal Sensible Heating Rate",
+                SetupOutputVariable(state, "Zone Air Terminal Sensible Heating Rate",
                                     OutputProcessor::Unit::W,
                                     AirDistUnit(AirDistUnitNum).HeatRate,
                                     "System",
                                     "Average",
                                     AirDistUnit(AirDistUnitNum).Name);
-                SetupOutputVariable("Zone Air Terminal Sensible Cooling Rate",
+                SetupOutputVariable(state, "Zone Air Terminal Sensible Cooling Rate",
                                     OutputProcessor::Unit::W,
                                     AirDistUnit(AirDistUnitNum).CoolRate,
                                     "System",
@@ -476,7 +479,7 @@ namespace ZoneAirLoopEquipmentManager {
         }
     }
 
-    void InitZoneAirLoopEquipment(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum)
+    void InitZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -486,10 +489,10 @@ namespace ZoneAirLoopEquipmentManager {
         // This subroutine is left for Module format consistency -- not needed in this module.
 
         // Do the Begin Simulation initializations
-        if (!dataZoneAirLoopEquipmentManager.InitAirDistUnitsFlag) {
+        if (!state.dataZoneAirLoopEquipmentManager->InitAirDistUnitsFlag) {
             return;
         }
-        if (dataZoneAirLoopEquipmentManager.EachOnceFlag(AirDistUnitNum) && (AirDistUnit(AirDistUnitNum).TermUnitSizingNum > 0)) {
+        if (state.dataZoneAirLoopEquipmentManager->EachOnceFlag(AirDistUnitNum) && (AirDistUnit(AirDistUnitNum).TermUnitSizingNum > 0)) {
 
             {
                 auto &thisADU(AirDistUnit(AirDistUnitNum));
@@ -529,11 +532,11 @@ namespace ZoneAirLoopEquipmentManager {
                     }
                 }
             }
-            dataZoneAirLoopEquipmentManager.EachOnceFlag(AirDistUnitNum) = false;
-            ++dataZoneAirLoopEquipmentManager.numADUInitialized;
-            if (dataZoneAirLoopEquipmentManager.numADUInitialized == NumAirDistUnits) {
+            state.dataZoneAirLoopEquipmentManager->EachOnceFlag(AirDistUnitNum) = false;
+            ++state.dataZoneAirLoopEquipmentManager->numADUInitialized;
+            if (state.dataZoneAirLoopEquipmentManager->numADUInitialized == NumAirDistUnits) {
                 // If all ADUs are initialized, set InitAirDistUnitsFlag to false
-                dataZoneAirLoopEquipmentManager.InitAirDistUnitsFlag = false;
+                state.dataZoneAirLoopEquipmentManager->InitAirDistUnitsFlag = false;
             }
         }
     }
@@ -740,7 +743,7 @@ namespace ZoneAirLoopEquipmentManager {
                                               AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == SingleDuctATMixer) {
-                    GetATMixers(state, state.dataZoneAirLoopEquipmentManager); // Needed here if mixer used only with unitarysystem which gets its input late
+                    GetATMixers(state); // Needed here if mixer used only with unitarysystem which gets its input late
                     ProvideSysOutput = false;
 
                 } else {

@@ -249,33 +249,33 @@ namespace EvaporativeFluidCoolers {
         {
         }
 
-        static PlantComponent *factory(int objectType, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
         void getSizingFactor(Real64 &_SizFac) override;
 
-        void getDesignCapacities(const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitEvapFluidCooler(EnergyPlusData &state);
 
-        void SizeEvapFluidCooler();
+        void SizeEvapFluidCooler(EnergyPlusData &state);
 
-        void CalculateWaterUsage();
+        void CalculateWaterUsage(EnergyPlusData &state);
 
         void UpdateEvapFluidCooler();
 
         void ReportEvapFluidCooler(bool RunFlag);
 
-        void CalcSingleSpeedEvapFluidCooler();
+        void CalcSingleSpeedEvapFluidCooler(EnergyPlusData &state);
 
-        void CalcTwoSpeedEvapFluidCooler();
+        void CalcTwoSpeedEvapFluidCooler(EnergyPlusData &state);
 
-        Real64 SimpleEvapFluidCoolerUAResidual(Real64 UA, Array1D<Real64> const &Par);
+        Real64 SimpleEvapFluidCoolerUAResidual(EnergyPlusData &state, Real64 UA, Array1D<Real64> const &Par);
 
-        void SimSimpleEvapFluidCooler(Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
+        void SimSimpleEvapFluidCooler(EnergyPlusData &state, Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
     };
@@ -283,7 +283,7 @@ namespace EvaporativeFluidCoolers {
     // Object Data
     extern Array1D<EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
 
-    void GetEvapFluidCoolerInput();
+    void GetEvapFluidCoolerInput(EnergyPlusData &state);
 
     void clear_state();
 

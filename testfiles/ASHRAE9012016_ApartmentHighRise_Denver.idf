@@ -241,7 +241,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    YES;                     !- Run Simulation for Weather File Run Periods
+    YES,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -31995,7 +31997,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32025,7 +32027,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32055,7 +32057,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32085,7 +32087,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32115,7 +32117,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32145,7 +32147,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32175,7 +32177,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32205,7 +32207,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32235,7 +32237,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32265,7 +32267,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32295,7 +32297,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32325,7 +32327,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32355,7 +32357,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32385,7 +32387,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32415,7 +32417,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32445,7 +32447,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32475,7 +32477,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32505,7 +32507,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32535,7 +32537,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32565,7 +32567,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32595,7 +32597,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32625,7 +32627,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32655,7 +32657,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32685,7 +32687,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32715,7 +32717,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32745,7 +32747,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32775,7 +32777,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32805,7 +32807,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32835,7 +32837,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32865,7 +32867,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32895,7 +32897,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32925,7 +32927,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32955,7 +32957,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -32985,7 +32987,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33015,7 +33017,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33045,7 +33047,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33075,7 +33077,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33105,7 +33107,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33135,7 +33137,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33165,7 +33167,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33195,7 +33197,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33225,7 +33227,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33255,7 +33257,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33285,7 +33287,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33315,7 +33317,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33345,7 +33347,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33375,7 +33377,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33405,7 +33407,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33435,7 +33437,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33465,7 +33467,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33495,7 +33497,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33525,7 +33527,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33555,7 +33557,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33585,7 +33587,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33615,7 +33617,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33645,7 +33647,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33675,7 +33677,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33705,7 +33707,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33735,7 +33737,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33765,7 +33767,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33795,7 +33797,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33825,7 +33827,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33855,7 +33857,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33885,7 +33887,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33915,7 +33917,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33945,7 +33947,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -33975,7 +33977,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -34005,7 +34007,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -34035,7 +34037,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -34065,7 +34067,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -34095,7 +34097,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -34125,7 +34127,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -34155,7 +34157,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -34185,7 +34187,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -34215,7 +34217,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -34245,7 +34247,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -34275,7 +34277,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -34305,7 +34307,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -34335,7 +34337,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -34365,7 +34367,7 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-    4.19837253282902,        !- Gross Rated Cooling COP
+    4.19837253282902,        !- Gross Rated Cooling COP {W/W}
     -4.30266987344639,       !- Total Cooling Capacity Coefficient 1
     7.18536990534372,        !- Total Cooling Capacity Coefficient 2
     -2.23946714486189,       !- Total Cooling Capacity Coefficient 3
@@ -34396,7 +34398,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34417,7 +34419,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34438,7 +34440,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34459,7 +34461,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34480,7 +34482,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34501,7 +34503,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34522,7 +34524,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34543,7 +34545,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34564,7 +34566,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34585,7 +34587,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34606,7 +34608,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34627,7 +34629,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34648,7 +34650,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34669,7 +34671,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34690,7 +34692,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34711,7 +34713,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34732,7 +34734,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34753,7 +34755,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34774,7 +34776,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34795,7 +34797,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34816,7 +34818,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34837,7 +34839,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34858,7 +34860,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34879,7 +34881,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34900,7 +34902,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34921,7 +34923,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34942,7 +34944,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34963,7 +34965,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -34984,7 +34986,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35005,7 +35007,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35026,7 +35028,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35047,7 +35049,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35068,7 +35070,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35089,7 +35091,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35110,7 +35112,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35131,7 +35133,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35152,7 +35154,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35173,7 +35175,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35194,7 +35196,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35215,7 +35217,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35236,7 +35238,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35257,7 +35259,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35278,7 +35280,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35299,7 +35301,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35320,7 +35322,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35341,7 +35343,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35362,7 +35364,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35383,7 +35385,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35404,7 +35406,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35425,7 +35427,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35446,7 +35448,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35467,7 +35469,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35488,7 +35490,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35509,7 +35511,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35530,7 +35532,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35551,7 +35553,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35572,7 +35574,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35593,7 +35595,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35614,7 +35616,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35635,7 +35637,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35656,7 +35658,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35677,7 +35679,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35698,7 +35700,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35719,7 +35721,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35740,7 +35742,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35761,7 +35763,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35782,7 +35784,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35803,7 +35805,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35824,7 +35826,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35845,7 +35847,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35866,7 +35868,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35887,7 +35889,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35908,7 +35910,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35929,7 +35931,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35950,7 +35952,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35971,7 +35973,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -35992,7 +35994,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -36013,7 +36015,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -36034,7 +36036,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -36055,7 +36057,7 @@
     autosize,                !- Rated Air Flow Rate {m3/s}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
-    4.3,                     !- Gross Rated Heating COP
+    4.3,                     !- Gross Rated Heating COP {W/W}
     0.237847462869254,       !- Heating Capacity Coefficient 1
     -3.35823796081626,       !- Heating Capacity Coefficient 2
     3.80640467406376,        !- Heating Capacity Coefficient 3
@@ -52258,23 +52260,23 @@
   Output:Table:Monthly,
     Components of Peak Gas Demand,  !- Name
     3,                       !- Digits After Decimal
-    NaturalGas:Facility,            !- Variable or Meter 1 Name
+    NaturalGas:Facility,     !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    NaturalGas:Facility,            !- Variable or Meter 2 Name
+    NaturalGas:Facility,     !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    NaturalGas:HVAC,                !- Variable or Meter 3 Name
+    NaturalGas:HVAC,         !- Variable or Meter 3 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 3
-    InteriorEquipment:NaturalGas,   !- Variable or Meter 4 Name
+    InteriorEquipment:NaturalGas,  !- Variable or Meter 4 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 4
     MiscPlugGas:InteriorEquipment:NaturalGas,  !- Variable or Meter 5 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 5
-    NaturalGas:Plant,               !- Variable or Meter 6 Name
+    NaturalGas:Plant,        !- Variable or Meter 6 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 6
-    WaterSystems:NaturalGas,        !- Variable or Meter 7 Name
+    WaterSystems:NaturalGas, !- Variable or Meter 7 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 7
     Water Heater:WaterSystems:NaturalGas,  !- Variable or Meter 8 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 8
-    Heating:NaturalGas,             !- Variable or Meter 9 Name
+    Heating:NaturalGas,      !- Variable or Meter 9 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 9
 
   EnergyManagementSystem:Sensor,

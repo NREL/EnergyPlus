@@ -294,8 +294,8 @@ TEST_F(EnergyPlusFixture, MicroCHPTest_InitGeneratorDynamics)
     MicroCHP2.TypeOf = "GENERATOR:MICROCHP";
     MicroCHP2.TypeOf_Num = DataPlant::TypeOf_Generator_MicroCHP;
     MicroCHP2.Name = "MICROCOGEN2";
-    MicroCHP1.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, state.files, "MICROCOGEN1");
-    MicroCHP2.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, state.files, "MICROCOGEN2");
+    MicroCHP1.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, "MICROCOGEN1");
+    MicroCHP2.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, "MICROCOGEN2");
     EXPECT_EQ(MicroCHPElectricGenerator::NumMicroCHPs, 2);
 
     bool FirstHVACIteration = true;

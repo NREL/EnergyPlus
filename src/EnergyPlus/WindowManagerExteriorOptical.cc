@@ -49,6 +49,7 @@
 
 // EnergyPlus headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -75,7 +76,7 @@ using namespace DataGlobals;
 
 namespace WindowManager {
 
-    std::shared_ptr<CBSDFLayer> getBSDFLayer(WindowManagerData &dataWindowManager, const Material::MaterialProperties & t_Material, const WavelengthRange t_Range )
+    std::shared_ptr<CBSDFLayer> getBSDFLayer(EnergyPlusData &state, const Material::MaterialProperties & t_Material, const WavelengthRange t_Range )
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -96,10 +97,10 @@ namespace WindowManager {
         } else if (t_Material.Group == Shade) {
             aFactory = std::make_shared<CWCEDiffuseShadeLayerFactory>(t_Material, t_Range);
         }
-        return aFactory->getBSDFLayer(dataWindowManager);
+        return aFactory->getBSDFLayer(state);
     }
 
-    std::shared_ptr<CScatteringLayer> getScatteringLayer(WindowManagerData &dataWindowManager, const Material::MaterialProperties & t_Material, const WavelengthRange t_Range )
+    std::shared_ptr<CScatteringLayer> getScatteringLayer(EnergyPlusData &state, const Material::MaterialProperties & t_Material, const WavelengthRange t_Range )
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -120,7 +121,7 @@ namespace WindowManager {
         } else if (t_Material.Group == Shade) {
             aFactory = std::make_shared<CWCEDiffuseShadeLayerFactory>(t_Material, t_Range);
         }
-        return aFactory->getLayer(dataWindowManager);
+        return aFactory->getLayer(state);
     }
 
     // void InitWCE_BSDFOpticalData() {
@@ -163,7 +164,7 @@ namespace WindowManager {
     // 	}
     // }
 
-    void InitWCE_SimplifiedOpticalData(WindowManagerData &dataWindowManager, IOFiles &ioFiles)
+    void InitWCE_SimplifiedOpticalData(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -181,11 +182,11 @@ namespace WindowManager {
 
         // Initialize SurfaceScreen structure
         NumSurfaceScreens = TotScreens;
-        if (NumSurfaceScreens > 0) CalcWindowScreenProperties(ioFiles);
+        if (NumSurfaceScreens > 0) CalcWindowScreenProperties(state);
 
         auto & aWinConstSimp = CWindowConstructionsSimplified::instance();
         for (auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
-            auto &construction(dataConstruction.Construct(ConstrNum));
+            auto &construction(state.dataConstruction->Construct(ConstrNum));
             if (construction.isGlazingConstruction()) {
                 for (auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum) {
                     auto &material(dataMaterial.Material(construction.LayerPoint(LayNum)));
@@ -197,11 +198,11 @@ namespace WindowManager {
                         construction.TransDiff = 0.1;
 
                         auto aRange = WavelengthRange::Solar;
-                        auto aSolarLayer = getScatteringLayer(dataWindowManager, material, aRange);
+                        auto aSolarLayer = getScatteringLayer(state, material, aRange);
                         aWinConstSimp.pushLayer(aRange, ConstrNum, aSolarLayer);
 
                         aRange = WavelengthRange::Visible;
-                        auto aVisibleLayer = getScatteringLayer(dataWindowManager, material, aRange);
+                        auto aVisibleLayer = getScatteringLayer(state, material, aRange);
                         aWinConstSimp.pushLayer(aRange, ConstrNum, aVisibleLayer);
                     }
                 }
@@ -214,23 +215,23 @@ namespace WindowManager {
 
         for (auto SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue;
-            if (!dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
+            if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
             if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) continue; // Irrelevant for Complex Fen
-            if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;    // not required
+            if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;    // not required
             auto ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
             if (ConstrNumSh == 0) continue;
-            auto TotLay = dataConstruction.Construct(ConstrNumSh).TotLayers;
+            auto TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
             auto IntShade = false;
             auto IntBlind = false;
             auto ShadeLayPtr = 0;
             auto BlNum = 0;
-            if (dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay)).Group == Shade) {
+            if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).Group == Shade) {
                 IntShade = true;
-                ShadeLayPtr = dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay);
+                ShadeLayPtr = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay);
             }
-            if (dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay)).Group == WindowBlind) {
+            if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).Group == WindowBlind) {
                 IntBlind = true;
-                BlNum = dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay)).BlindDataPtr;
+                BlNum = dataMaterial.Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).BlindDataPtr;
             }
 
             if (IntShade || IntBlind) {
@@ -238,7 +239,7 @@ namespace WindowManager {
                     auto EpsGlIR = 0.0;
                     auto RhoGlIR = 0.0;
                     if (IntShade || IntBlind) {
-                        EpsGlIR = dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay - 1)).AbsorpThermalBack;
+                        EpsGlIR = dataMaterial.Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1)).AbsorpThermalBack;
                         RhoGlIR = 1 - EpsGlIR;
                     }
                     if (IntShade) {
@@ -274,10 +275,10 @@ namespace WindowManager {
     {
     }
 
-    std::shared_ptr<CMaterial> CWCEMaterialFactory::getMaterial(WindowManagerData &dataWindowManager)
+    std::shared_ptr<CMaterial> CWCEMaterialFactory::getMaterial(EnergyPlusData &state)
     {
         if (!m_Initialized) {
-            init(dataWindowManager);
+            init(state);
             m_Initialized = true;
         }
         return m_Material;
@@ -291,9 +292,9 @@ namespace WindowManager {
     {
     }
 
-    void CWCESpecularMaterialsFactory::init(WindowManagerData &dataWindowManager)
+    void CWCESpecularMaterialsFactory::init(EnergyPlusData &state)
     {
-        auto aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(dataWindowManager);
+        auto aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(state);
         std::shared_ptr<CSpectralSampleData> aSampleData = nullptr;
         if (m_MaterialProperties.GlassSpectralDataPtr > 0) {
             aSampleData = CWCESpecturmProperties::getSpectralSample(m_MaterialProperties.GlassSpectralDataPtr);
@@ -309,7 +310,7 @@ namespace WindowManager {
         auto highLambda = aRange.maxLambda();
 
         if (m_Range == WavelengthRange::Visible) {
-            auto aPhotopicResponse = CWCESpecturmProperties::getDefaultVisiblePhotopicResponse(dataWindowManager);
+            auto aPhotopicResponse = CWCESpecturmProperties::getDefaultVisiblePhotopicResponse(state);
             aSample->setDetectorData(aPhotopicResponse);
         }
 
@@ -326,7 +327,7 @@ namespace WindowManager {
     {
     }
 
-    void CWCEMaterialDualBandFactory::init(WindowManagerData &EP_UNUSED(dataWindowManager))
+    void CWCEMaterialDualBandFactory::init(EnergyPlusData &EP_UNUSED(state))
     {
         if (m_Range == WavelengthRange::Visible) {
             m_Material = createVisibleRangeMaterial();
@@ -539,10 +540,10 @@ namespace WindowManager {
     {
     }
 
-    std::pair<std::shared_ptr<CMaterial>, std::shared_ptr<ICellDescription>> CWCELayerFactory::init(WindowManagerData &dataWindowManager)
+    std::pair<std::shared_ptr<CMaterial>, std::shared_ptr<ICellDescription>> CWCELayerFactory::init(EnergyPlusData &state)
     {
         createMaterialFactory();
-        auto aMaterial = m_MaterialFactory->getMaterial(dataWindowManager);
+        auto aMaterial = m_MaterialFactory->getMaterial(state);
         assert(aMaterial != nullptr);
         auto aCellDescription = getCellDescription();
         assert(aCellDescription != nullptr);
@@ -550,10 +551,10 @@ namespace WindowManager {
         return std::make_pair(aMaterial, aCellDescription);
     }
 
-    std::shared_ptr<CBSDFLayer> CWCELayerFactory::getBSDFLayer(WindowManagerData &dataWindowManager)
+    std::shared_ptr<CBSDFLayer> CWCELayerFactory::getBSDFLayer(EnergyPlusData &state)
     {
         if (!m_BSDFInitialized) {
-            auto res = init(dataWindowManager);
+            auto res = init(state);
             auto aBSDF = std::make_shared<CBSDFHemisphere>(BSDFBasis::Full);
 
             auto aMaker = CBSDFLayerMaker(res.first, aBSDF, res.second);
@@ -563,10 +564,10 @@ namespace WindowManager {
         return m_BSDFLayer;
     }
 
-    std::shared_ptr<CScatteringLayer> CWCELayerFactory::getLayer(WindowManagerData &dataWindowManager)
+    std::shared_ptr<CScatteringLayer> CWCELayerFactory::getLayer(EnergyPlusData &state)
     {
         if (!m_SimpleInitialized) {
-            auto res = init(dataWindowManager);
+            auto res = init(state);
 
             m_ScatteringLayer = std::make_shared<CScatteringLayer>(res.first, res.second);
             m_SimpleInitialized = true;

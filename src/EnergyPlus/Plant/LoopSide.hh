@@ -183,11 +183,12 @@ namespace DataPlant {
 
         void DoFlowAndLoadSolutionPass(EnergyPlusData &state, int OtherSide, int ThisSideInletNode, bool FirstHVACIteration);
 
-        Real64 CalcOtherSideDemand(Real64 ThisLoopSideFlow);
+        Real64 CalcOtherSideDemand(EnergyPlusData &state, Real64 ThisLoopSideFlow);
 
         Real64 SetupLoopFlowRequest(int OtherSide);
 
-        Real64 EvaluateLoopSetPointLoad(int FirstBranchNum,
+        Real64 EvaluateLoopSetPointLoad(EnergyPlusData &state,
+                                        int FirstBranchNum,
                                         int LastBranchNum,
                                         Real64 ThisLoopSideFlow);
 
@@ -195,7 +196,7 @@ namespace DataPlant {
 
         void SimulateSinglePump(EnergyPlusData &state, PlantLocation SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
 
-        void UpdateAnyLoopDemandAlterations(int BranchNum, int CompNum);
+        void UpdateAnyLoopDemandAlterations(EnergyPlusData &state, int BranchNum, int CompNum);
 
         void SimulateAllLoopSidePumps(EnergyPlusData &state,
                                       Optional<PlantLocation const> SpecificPumpLocation = _,

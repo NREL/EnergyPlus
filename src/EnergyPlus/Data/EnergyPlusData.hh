@@ -55,41 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-
-#include <EnergyPlus/Boilers.hh>
-#include <EnergyPlus/BoilerSteam.hh>
-#include <EnergyPlus/Boilers.hh>
-#include <EnergyPlus/BranchInputManager.hh>
-#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
-#include <EnergyPlus/ChillerAbsorption.hh>
-#include <EnergyPlus/ChillerElectricEIR.hh>
-#include <EnergyPlus/ChillerExhaustAbsorption.hh>
-#include <EnergyPlus/ChillerGasAbsorption.hh>
-#include <EnergyPlus/ChillerIndirectAbsorption.hh>
-#include <EnergyPlus/ChillerReformulatedEIR.hh>
-#include <EnergyPlus/ConvectionCoefficients.hh>
-#include <EnergyPlus/CondenserLoopTowers.hh>
-#include <EnergyPlus/CostEstimateManager.hh>
-#include <EnergyPlus/CoolTower.hh>
-#include <EnergyPlus/CTElectricGenerator.hh>
-#include <EnergyPlus/CrossVentMgr.hh>
-#include <EnergyPlus/ExteriorEnergyUse.hh>
-#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/Pipes.hh>
-#include <EnergyPlus/PlantChillers.hh>
-#include <EnergyPlus/WaterUse.hh>
-#include <EnergyPlus/WindowAC.hh>
-#include <EnergyPlus/WindowComplexManager.hh>
-#include <EnergyPlus/WindowEquivalentLayer.hh>
-#include <EnergyPlus/WindowManager.hh>
-#include <EnergyPlus/WindTurbine.hh>
-#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
-#include <EnergyPlus/ZoneDehumidifier.hh>
-#include <EnergyPlus/ZoneEquipmentManager.hh>
-#include <EnergyPlus/ZonePlenum.hh>
-#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include <unordered_map>
 #include <memory>
@@ -98,70 +64,120 @@
 
 namespace EnergyPlus {
 
-    // forward declare all structs
-    struct AirLoopHVACDOASData;
-    struct BaseboardRadiatorData;
-    struct BaseboardElectricData;
-    struct CurveManagerData;
-    struct DataAirLoopData;
+// forward declare all structs
+struct AirflowNetworkBalanceManagerData;
+struct AirLoopHVACDOASData;
+struct BaseboardElectricData;
+struct BaseboardRadiatorData;
+struct BoilersData;
+struct BoilerSteamData;
+struct BranchInputManagerData;
+struct ChilledCeilingPanelSimpleData;
+struct ChillerAbsorberData;
+struct ChillerElectricEIRData;
+struct ChillerExhaustAbsorptionData;
+struct ChillerGasAbsorptionData;
+struct ChillerIndirectAbsoprtionData;
+struct ChillerReformulatedEIRData;
+struct CondenserLoopTowersData;
+struct ConstructionData;
+struct ConvectionCoefficientsData;
+struct CoolTowerData;
+struct CostEstimateManagerData;
+struct CrossVentMgrData;
+struct CTElectricGeneratorData;
+struct CurveManagerData;
+struct DataAirLoopData;
+struct DataGlobal;
+struct ExteriorEnergyUseData;
+struct FansData;
+struct PipesData;
+struct PlantChillersData;
+struct VariableSpeedCoilsData;
+struct VentilatedSlabData;
+struct WaterCoilsData;
+struct WaterManagerData;
+struct WaterThermalTanksData;
+struct WaterToAirHeatPumpData;
+struct WaterToAirHeatPumpSimpleData;
+struct WaterUseData;
+struct WeatherManagerData;
+struct WindowACData;
+struct WindowComplexManagerData;
+struct WindowEquivalentLayerData;
+struct WindowManagerData;
+struct WindTurbineData;
+struct ZoneAirLoopEquipmentManagerData;
+struct ZoneContaminantPredictorCorrectorData;
+struct ZoneDehumidifierData;
+struct ZoneEquipmentManagerData;
+struct ZonePlenumData;
+struct ZoneTempPredictorCorrectorData;
 
-    struct EnergyPlusData : BaseGlobalStruct {
-        // module globals
+struct EnergyPlusData : BaseGlobalStruct {
 
-        std::unique_ptr<AirLoopHVACDOASData> dataAirLoopHVACDOAS;
-        std::unique_ptr<BaseboardRadiatorData> dataBaseboardRadiator;
-        std::unique_ptr<BaseboardElectricData> dataBaseboardElectric;
-        std::unique_ptr<CurveManagerData> dataCurveManager;
-        std::unique_ptr<DataAirLoopData> dataAirLoop;
-        BoilersData dataBoilers;
-        BoilerSteamData dataSteamBoilers;
-        BranchInputManagerData dataBranchInputManager;
-        ChilledCeilingPanelSimpleData dataChilledCeilingPanelSimple;
-        ChillerAbsorberData dataChillerAbsorbers;
-        ChillerElectricEIRData dataChillerElectricEIR;
-        ChillerExhaustAbsorptionData dataChillerExhaustAbsorption;
-        ChillerIndirectAbsoprtionData dataChillerIndirectAbsorption;
-        ChillerGasAbsorptionData dataChillerGasAbsorption;
-        ChillerReformulatedEIRData dataChillerReformulatedEIR;
-        ConvectionCoefficientsData dataConvectionCoefficients;
-        CondenserLoopTowersData dataCondenserLoopTowers;
-        CostEstimateManagerData dataCostEstimateManager;
-        CoolTowerData dataCoolTower;
-        CTElectricGeneratorData dataCTElectricGenerator;
-        CrossVentMgrData dataCrossVentMgr;
-        DataGlobal dataGlobals;
-        ExteriorEnergyUseData exteriorEnergyUse;
-        FansData fans;
-        PipesData pipes;
+    IOFiles files;
 
-        PlantChillersData dataPlantChillers;
-        //OutputReportTabular outputReportTabular;
+    // module globals
+    std::unique_ptr<AirflowNetworkBalanceManagerData> dataAirflowNetworkBalanceManager;
+    std::unique_ptr<AirLoopHVACDOASData> dataAirLoopHVACDOAS;
+    std::unique_ptr<BaseboardElectricData> dataBaseboardElectric;
+    std::unique_ptr<BaseboardRadiatorData> dataBaseboardRadiator;
+    std::unique_ptr<BoilersData> dataBoilers;
+    std::unique_ptr<BoilerSteamData> dataBoilerSteam;
+    std::unique_ptr<BranchInputManagerData> dataBranchInputManager;
+    std::unique_ptr<ChilledCeilingPanelSimpleData> dataChilledCeilingPanelSimple;
+    std::unique_ptr<ChillerAbsorberData> dataChillerAbsorber;
+    std::unique_ptr<ChillerElectricEIRData> dataChillerElectricEIR;
+    std::unique_ptr<ChillerExhaustAbsorptionData> dataChillerExhaustAbsorption;
+    std::unique_ptr<ChillerGasAbsorptionData> dataChillerGasAbsorption;
+    std::unique_ptr<ChillerIndirectAbsoprtionData> dataChillerIndirectAbsorption;
+    std::unique_ptr<ChillerReformulatedEIRData> dataChillerReformulatedEIR;
+    std::unique_ptr<CondenserLoopTowersData> dataCondenserLoopTowers;
+    std::unique_ptr<ConstructionData> dataConstruction;
+    std::unique_ptr<ConvectionCoefficientsData> dataConvectionCoefficient;
+    std::unique_ptr<CoolTowerData> dataCoolTower;
+    std::unique_ptr<CostEstimateManagerData> dataCostEstimateManager;
+    std::unique_ptr<CrossVentMgrData> dataCrossVentMgr;
+    std::unique_ptr<CTElectricGeneratorData> dataCTElectricGenerator;
+    std::unique_ptr<CurveManagerData> dataCurveManager;
+    std::unique_ptr<DataAirLoopData> dataAirLoop;
+    std::unique_ptr<DataGlobal> dataGlobal;
+    std::unique_ptr<ExteriorEnergyUseData> dataExteriorEnergyUse;
+    std::unique_ptr<FansData> dataFans;
+    std::unique_ptr<PipesData> dataPipes;
+    std::unique_ptr<PlantChillersData> dataPlantChillers;
+    std::unique_ptr<VariableSpeedCoilsData> dataVariableSpeedCoils;
+    std::unique_ptr<VentilatedSlabData> dataVentilatedSlab;
+    std::unique_ptr<WaterCoilsData> dataWaterCoils;
+    std::unique_ptr<WaterManagerData> dataWaterManager;
+    std::unique_ptr<WaterThermalTanksData> dataWaterThermalTanks;
+    std::unique_ptr<WaterToAirHeatPumpData> dataWaterToAirHeatPump;
+    std::unique_ptr<WaterToAirHeatPumpSimpleData> dataWaterToAirHeatPumpSimple;
+    std::unique_ptr<WaterUseData> dataWaterUse;
+    std::unique_ptr<WeatherManagerData> dataWeatherManager;
+    std::unique_ptr<WindowACData> dataWindowAC;
+    std::unique_ptr<WindowComplexManagerData> dataWindowComplexManager;
+    std::unique_ptr<WindowEquivalentLayerData> dataWindowEquivalentLayer;
+    std::unique_ptr<WindowManagerData> dataWindowManager;
+    std::unique_ptr<WindTurbineData> dataWindTurbine;
+    std::unique_ptr<ZoneAirLoopEquipmentManagerData> dataZoneAirLoopEquipmentManager;
+    std::unique_ptr<ZoneContaminantPredictorCorrectorData> dataZoneContaminantPredictorCorrector;
+    std::unique_ptr<ZoneDehumidifierData> dataZoneDehumidifier;
+    std::unique_ptr<ZoneEquipmentManagerData> dataZoneEquipmentManager;
+    std::unique_ptr<ZonePlenumData> dataZonePlenum;
+    std::unique_ptr<ZoneTempPredictorCorrectorData> dataZoneTempPredictorCorrector;
 
-        IOFiles files;
+    EnergyPlusData();
 
-        WaterUseData dataWaterUse;
-        WindowACData dataWindowAC;
-        WindowComplexManagerData dataWindowComplexManager;
-        WindowEquivalentLayerData dataWindowEquivalentLayer;
-        WindowManagerData dataWindowManager;
-        WindTurbineData dataWindTurbine;
-        ZoneAirLoopEquipmentManagerData dataZoneAirLoopEquipmentManager;
-        ZoneContaminantPredictorCorrectorData dataZoneContaminantPredictorCorrector;
-        ZoneDehumidifierData dataZoneDehumidifier;
-        ZoneEquipmentManagerData dataZoneEquipmentManager;
-        ZonePlenumData dataZonePlenum;
-        ZoneTempPredictorCorrectorData dataZoneTempPredictorCorrector;
+    // Cannot safely copy or delete this until we eradicate all remaining
+    // calls to IOFiles::getSingleton and IOFiles::setSingleton
+    EnergyPlusData(const EnergyPlusData &) = delete;
+    EnergyPlusData(EnergyPlusData &&) = delete;
 
-        EnergyPlusData();
+    void clear_state() override;
 
-        // Cannot safely copy or delete this until we eradicate all remaining
-        // calls to IOFiles::getSingleton and IOFiles::setSingleton
-        EnergyPlusData(const EnergyPlusData &) = delete;
-        EnergyPlusData(EnergyPlusData &&) = delete;
-
-        void clear_state() override;
-
-    };
+};
 
 }
 #endif

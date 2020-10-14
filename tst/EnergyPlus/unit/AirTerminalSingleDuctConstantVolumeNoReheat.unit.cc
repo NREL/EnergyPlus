@@ -154,13 +154,13 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_GetInput)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.files);  // read schedules
+    ProcessScheduleInput(state);  // read schedules
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetSysInput(state);
 
     EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:NoReheat", sd_airterminal(1).SysType);      // AT SD constant volume no reheat object type
@@ -234,13 +234,13 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.files);  // read schedules
+    ProcessScheduleInput(state);  // read schedules
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetSysInput(state);
     DataEnvironment::StdRhoAir = 1.0;
     int const SysNum(1);
@@ -317,13 +317,13 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.files);  // read schedules
+    ProcessScheduleInput(state);  // read schedules
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetSysInput(state);
 
     DataGlobals::SysSizingCalc = true;
@@ -491,15 +491,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.files);  // read schedules
+    ProcessScheduleInput(state);  // read schedules
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    SizingManager::GetOARequirements();
+    SizingManager::GetOARequirements(state);
     InternalHeatGains::GetInternalHeatGainsInput(state);
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetSysInput(state);
 
     DataGlobals::SysSizingCalc = true;
@@ -556,7 +556,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
 
     // Full occupancy 3 people, OA/person = 0.1, OA/zone = 0.5, OA Sched = 1.0
     DataGlobals::HourOfDay = 12;
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 3.0;
     Real64 expectedMassFlow = 1.0 * ((3.0 * 0.1) + 0.5);
@@ -569,7 +569,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
 
     // 50% occupancy 1.5 people, OA/person = 0.1, OA/zone = 0.5, OA Sched = 1.0
     DataGlobals::HourOfDay = 12;
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
     expectedMassFlow = 1.0 * ((1.5 * 0.1) + 0.5);
@@ -580,7 +580,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
 
     // Nighttime OA Sched = 0.0
     DataGlobals::HourOfDay = 24;
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
     expectedMassFlow = 0.0 * ((1.5 * 0.1) + 0.5);
@@ -654,13 +654,13 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.files);  // read schedules
+    ProcessScheduleInput(state);  // read schedules
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetSysInput(state);
 
     DataGlobals::SysSizingCalc = true;
@@ -826,15 +826,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.files);  // read schedules
+    ProcessScheduleInput(state);  // read schedules
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    SizingManager::GetOARequirements();
+    SizingManager::GetOARequirements(state);
     InternalHeatGains::GetInternalHeatGainsInput(state);
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetSysInput(state);
 
     DataGlobals::SysSizingCalc = true;
@@ -899,7 +899,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
 
     // Full occupancy 3 people, OA/person = 0.1, OA/zone = 0.5, OA Sched = 1.0
     DataGlobals::HourOfDay = 12;
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 3.0;
     Real64 expectedMassFlow = 1.0 * ((3.0 * 0.1) + 0.5);
@@ -914,7 +914,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
 
     // 50% occupancy 1.5 people, OA/person = 0.1, OA/zone = 0.5, OA Sched = 1.0
     DataGlobals::HourOfDay = 12;
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
     expectedMassFlow = 1.0 * ((1.5 * 0.1) + 0.5);
@@ -927,7 +927,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
 
     // Nighttime OA Sched = 0.0
     DataGlobals::HourOfDay = 24;
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
     expectedMassFlow = 0.0 * ((1.5 * 0.1) + 0.5);
@@ -1003,13 +1003,13 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.files);  // read schedules
+    ProcessScheduleInput(state);  // read schedules
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state);
     GetSysInput(state);
 
     DataGlobals::SysSizingCalc = true;

@@ -52,7 +52,6 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -1065,7 +1064,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
-    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
+    HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
@@ -1075,7 +1074,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
@@ -1097,7 +1096,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
         DataGlobals::DayOfSim = 0;
-        state.dataGlobals.DayOfSimChr = "0";
+        state.dataGlobal->DayOfSimChr = "0";
 
         while ((DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 
@@ -2156,7 +2155,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
-    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
+    HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
@@ -2166,7 +2165,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
@@ -2188,7 +2187,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
         DataGlobals::DayOfSim = 0;
-        state.dataGlobals.DayOfSimChr = "0";
+        state.dataGlobal->DayOfSimChr = "0";
 
         while ((DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 
@@ -2267,7 +2266,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     // get availability schedule to work
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -2277,7 +2276,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     PlantHeatExchangerFluidToFluid::FluidHX(1).AvailSchedNum = -1;
 
     // setup four plant nodes for HX
@@ -2346,13 +2345,13 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
 
     // when FirstHVACIteration is true, mass flow should match design max
     bool testFirstHVACIteration = true;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).control(1, -1000.0, testFirstHVACIteration);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).control(state, 1, -1000.0, testFirstHVACIteration);
 
     EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.MassFlowRateMax, 0.001);
 
     // when FirstHVACIteration is false, mass flow should be zero
     testFirstHVACIteration = false;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).control(1, -1000.0, testFirstHVACIteration);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).control(state, 1, -1000.0, testFirstHVACIteration);
     EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, 0.0, 0.001);
 }
 
@@ -2366,7 +2365,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     // get availability schedule to work
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -2376,7 +2375,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     PlantHeatExchangerFluidToFluid::FluidHX(1).AvailSchedNum = -1;
 
     // setup four plant nodes for HX

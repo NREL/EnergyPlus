@@ -54,10 +54,53 @@
 // here in this one file.  Basically, when a header inclusion is removed from EnergyPlusData.hh, put it here.
 
 // these are needed so that we don't have incomplete types when we manage the EnergyPlusData instance
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
+#include <EnergyPlus/Boilers.hh>
+#include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
+#include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/ChillerExhaustAbsorption.hh>
+#include <EnergyPlus/ChillerGasAbsorption.hh>
+#include <EnergyPlus/ChillerIndirectAbsorption.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
+#include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/CoolTower.hh>
+#include <EnergyPlus/CostEstimateManager.hh>
+#include <EnergyPlus/CrossVentMgr.hh>
+#include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/Pipes.hh>
+#include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/VentilatedSlab.hh>
+#include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/WaterManager.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WaterToAirHeatPump.hh>
+#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/WaterUse.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/WindowAC.hh>
+#include <EnergyPlus/WindowComplexManager.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
+#include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindTurbine.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
+#include <EnergyPlus/ZoneDehumidifier.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #endif

@@ -56,6 +56,7 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -68,6 +69,9 @@
 
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace PVWatts {
 
@@ -162,7 +166,7 @@ namespace PVWatts {
         Real64 m_planeOfArrayIrradiance;
 
     public:
-        static PVWattsGenerator createFromIdfObj(int objNum);
+        static PVWattsGenerator createFromIdfObj(EnergyPlusData &state, int objNum);
 
         PVWattsGenerator(const std::string &name,
                          const Real64 dcSystemCapacity,
@@ -175,7 +179,7 @@ namespace PVWatts {
                          size_t surfaceNum = 0,
                          Real64 groundCoverageRatio = 0.4);
 
-        void setupOutputVariables();
+        void setupOutputVariables(EnergyPlusData &state);
 
         Real64 getDCSystemCapacity();
         ModuleType getModuleType();
@@ -196,14 +200,13 @@ namespace PVWatts {
         void setDCtoACRatio(Real64 dc2ac);
         void setInverterEfficiency(Real64 inverterEfficiency);
 
-        void calc();
-
+        void calc(EnergyPlusData& state);
         void getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy);
     };
 
     extern std::map<int, PVWattsGenerator> PVWattsGenerators;
 
-    PVWattsGenerator &GetOrCreatePVWattsGenerator(std::string const &GeneratorName);
+    PVWattsGenerator &GetOrCreatePVWattsGenerator(EnergyPlusData &state, std::string const &GeneratorName);
 
     void clear_state();
 

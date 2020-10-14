@@ -58,8 +58,9 @@
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace PondGroundHeatExchanger {
 
@@ -119,29 +120,30 @@ namespace PondGroundHeatExchanger {
         {
         }
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void InitPondGroundHeatExchanger(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
-        void CalcPondGroundHeatExchanger();
+        void CalcPondGroundHeatExchanger(EnergyPlusData &state);
 
-        Real64 CalcTotalFLux(Real64 PondBulkTemp // pond temp for this flux calculation
+        Real64 CalcTotalFLux(EnergyPlusData &state, Real64 PondBulkTemp // pond temp for this flux calculation
         );
 
-        Real64 CalcEffectiveness(Real64 InsideTemperature, // Temperature of fluid in pipe circuit, in C
+        Real64 CalcEffectiveness(EnergyPlusData &state,
+                                 Real64 InsideTemperature, // Temperature of fluid in pipe circuit, in C
                                  Real64 PondTemperature,   // Temperature of pond water (i.e. outside the pipe), in C
                                  Real64 massFlowRate       // Mass flow rate, in kg/s
         );
 
         Real64 CalcSolarFlux() const;
 
-        void UpdatePondGroundHeatExchanger();
+        void UpdatePondGroundHeatExchanger(EnergyPlusData &state);
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
@@ -152,7 +154,7 @@ namespace PondGroundHeatExchanger {
 
     void clear_state();
 
-    void GetPondGroundHeatExchanger();
+    void GetPondGroundHeatExchanger(EnergyPlusData &state);
 
 } // namespace PondGroundHeatExchanger
 

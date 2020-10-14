@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EconomicTariff.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -318,7 +319,7 @@ namespace EconomicTariff {
 
     // Functions
 
-    void UpdateUtilityBills(CostEstimateManagerData &dataCostEstimateManager)
+    void UpdateUtilityBills(EnergyPlusData &state)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   September 2003
@@ -335,18 +336,18 @@ namespace EconomicTariff {
         bool ErrorsFound(false);
 
         if (Update_GetInput) {
-            GetInputEconomicsTariff(ErrorsFound);
+            GetInputEconomicsTariff(state, ErrorsFound);
             // do rest of GetInput only if at least one tariff is defined.
-            GetInputEconomicsCurrencyType(dataCostEstimateManager, ErrorsFound);
+            GetInputEconomicsCurrencyType(state, ErrorsFound);
             if (numTariff >= 1) {
                 if (!ErrorsFound && displayEconomicResultSummary) AddTOCEntry("Economics Results Summary Report", "Entire Facility");
                 CreateCategoryNativeVariables();
-                GetInputEconomicsQualify(ErrorsFound);
-                GetInputEconomicsChargeSimple(ErrorsFound);
-                GetInputEconomicsChargeBlock(ErrorsFound);
-                GetInputEconomicsRatchet(ErrorsFound);
-                GetInputEconomicsVariable(ErrorsFound);
-                GetInputEconomicsComputation(ErrorsFound);
+                GetInputEconomicsQualify(state, ErrorsFound);
+                GetInputEconomicsChargeSimple(state, ErrorsFound);
+                GetInputEconomicsChargeBlock(state, ErrorsFound);
+                GetInputEconomicsRatchet(state, ErrorsFound);
+                GetInputEconomicsVariable(state, ErrorsFound);
+                GetInputEconomicsComputation(state, ErrorsFound);
                 CreateDefaultComputation();
             }
             Update_GetInput = false;
@@ -365,7 +366,7 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputEconomicsTariff(bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -410,7 +411,8 @@ namespace EconomicTariff {
         numTariff = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         tariff.allocate(numTariff);
         for (iInObj = 1; iInObj <= numTariff; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -447,7 +449,7 @@ namespace EconomicTariff {
             // name of the report meter
             tariff(iInObj).reportMeter = cAlphaArgs(2);
             // call the key count function but only need count during this pass
-            GetVariableKeyCountandType(tariff(iInObj).reportMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
+            GetVariableKeyCountandType(state, tariff(iInObj).reportMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
             // if no meters found for that name
             if (KeyCount == 0) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" missing meter");
@@ -457,7 +459,7 @@ namespace EconomicTariff {
             } else {
                 NamesOfKeys.allocate(KeyCount);
                 IndexesForKeyVar.allocate(KeyCount);
-                GetVariableKeys(tariff(iInObj).reportMeter, TypeVar, NamesOfKeys, IndexesForKeyVar);
+                GetVariableKeys(state, tariff(iInObj).reportMeter, TypeVar, NamesOfKeys, IndexesForKeyVar);
                 // although this retrieves all keys for a variable, we only need one so the first one is chosen
                 if (KeyCount > 1) {
                     ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" multiple keys");
@@ -676,7 +678,7 @@ namespace EconomicTariff {
             // period schedule
             if (len(cAlphaArgs(4)) > 0) {
                 tariff(iInObj).periodSchedule = cAlphaArgs(4);                   // name of the period schedule (time of day)
-                tariff(iInObj).periodSchIndex = GetScheduleIndex(cAlphaArgs(4)); // index to the period schedule
+                tariff(iInObj).periodSchIndex = GetScheduleIndex(state, cAlphaArgs(4)); // index to the period schedule
                 if (tariff(iInObj).periodSchIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError(" not found " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
@@ -688,7 +690,7 @@ namespace EconomicTariff {
             // season schedule
             if (len(cAlphaArgs(5)) > 0) {
                 tariff(iInObj).seasonSchedule = cAlphaArgs(5);                   // name of the season schedule (winter/summer)
-                tariff(iInObj).seasonSchIndex = GetScheduleIndex(cAlphaArgs(5)); // index to the season schedule
+                tariff(iInObj).seasonSchIndex = GetScheduleIndex(state, cAlphaArgs(5)); // index to the season schedule
                 if (tariff(iInObj).seasonSchIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError(" not found " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
@@ -700,7 +702,7 @@ namespace EconomicTariff {
             // month schedule
             if (len(cAlphaArgs(6)) > 0) {
                 tariff(iInObj).monthSchedule = cAlphaArgs(6);                   // name of month schedule (when months end)
-                tariff(iInObj).monthSchIndex = GetScheduleIndex(cAlphaArgs(6)); // index to the month schedule
+                tariff(iInObj).monthSchIndex = GetScheduleIndex(state, cAlphaArgs(6)); // index to the month schedule
                 if (tariff(iInObj).monthSchIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError(" not found " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
@@ -786,9 +788,9 @@ namespace EconomicTariff {
             tariff(iInObj).minMonthChgPt = AssignVariablePt(cAlphaArgs(9), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, iInObj);
             // real time pricing
             tariff(iInObj).chargeSchedule = cAlphaArgs(10);
-            tariff(iInObj).chargeSchIndex = GetScheduleIndex(cAlphaArgs(10));
+            tariff(iInObj).chargeSchIndex = GetScheduleIndex(state, cAlphaArgs(10));
             tariff(iInObj).baseUseSchedule = cAlphaArgs(11);
-            tariff(iInObj).baseUseSchIndex = GetScheduleIndex(cAlphaArgs(11));
+            tariff(iInObj).baseUseSchIndex = GetScheduleIndex(state, cAlphaArgs(11));
             // group name for separate distribution and transmission rates
             tariff(iInObj).groupName = cAlphaArgs(12);
             // buy or sell option
@@ -847,7 +849,7 @@ namespace EconomicTariff {
         }
     }
 
-    void GetInputEconomicsQualify(bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
@@ -870,7 +872,8 @@ namespace EconomicTariff {
         numQualify = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         qualify.allocate(numQualify);
         for (iInObj = 1; iInObj <= numQualify; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -929,7 +932,7 @@ namespace EconomicTariff {
         }
     }
 
-    void GetInputEconomicsChargeSimple(bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
@@ -953,7 +956,8 @@ namespace EconomicTariff {
         numChargeSimple = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         chargeSimple.allocate(numChargeSimple);
         for (iInObj = 1; iInObj <= numChargeSimple; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1001,7 +1005,7 @@ namespace EconomicTariff {
         }
     }
 
-    void GetInputEconomicsChargeBlock(bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
@@ -1029,7 +1033,8 @@ namespace EconomicTariff {
         numChargeBlock = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         chargeBlock.allocate(numChargeBlock);
         for (iInObj = 1; iInObj <= numChargeBlock; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1105,7 +1110,7 @@ namespace EconomicTariff {
         }
     }
 
-    void GetInputEconomicsRatchet(bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsRatchet(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
@@ -1129,7 +1134,8 @@ namespace EconomicTariff {
         numRatchet = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         ratchet.allocate(numRatchet);
         for (iInObj = 1; iInObj <= numRatchet; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1172,7 +1178,7 @@ namespace EconomicTariff {
         }
     }
 
-    void GetInputEconomicsVariable(bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
@@ -1199,7 +1205,8 @@ namespace EconomicTariff {
         CurrentModuleObject = "UtilityCost:Variable";
         numEconVarObj = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         for (iInObj = 1; iInObj <= numEconVarObj; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1248,7 +1255,7 @@ namespace EconomicTariff {
         }
     }
 
-    void GetInputEconomicsComputation(bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsComputation(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
@@ -1282,7 +1289,8 @@ namespace EconomicTariff {
             e.isUserDef = false;
         }
         for (iInObj = 1; iInObj <= numComputation; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1330,7 +1338,7 @@ namespace EconomicTariff {
         }
     }
 
-    void GetInputEconomicsCurrencyType(CostEstimateManagerData &dataCostEstimateManager, bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsCurrencyType(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2008
@@ -1346,18 +1354,17 @@ namespace EconomicTariff {
         int NumCurrencyType;
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(5) :: cAlphaArgs !character string data - should be 1
-        // REAL(r64),                   DIMENSION(5) :: rNumericArgs  !numeric data          - should be 0
         int IOStat; // IO Status when calling get input subroutine
         int i;
 
-        initializeMonetaryUnit(dataCostEstimateManager);
+        initializeMonetaryUnit(state);
         NumCurrencyType = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        dataCostEstimateManager.selectedMonetaryUnit = 0; // invalid
+        state.dataCostEstimateManager->selectedMonetaryUnit = 0; // invalid
         if (NumCurrencyType == 0) {
-            dataCostEstimateManager.selectedMonetaryUnit = 1; // USD - U.S. Dollar
+            state.dataCostEstimateManager->selectedMonetaryUnit = 1; // USD - U.S. Dollar
         } else if (NumCurrencyType == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1369,20 +1376,20 @@ namespace EconomicTariff {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             // Monetary Unit
-            for (i = 1; i <= dataCostEstimateManager.numMonetaryUnit; ++i) {
-                if (UtilityRoutines::SameString(cAlphaArgs(1), dataCostEstimateManager.monetaryUnit(i).code)) {
-                    dataCostEstimateManager.selectedMonetaryUnit = i;
+            for (i = 1; i <= state.dataCostEstimateManager->numMonetaryUnit; ++i) {
+                if (UtilityRoutines::SameString(cAlphaArgs(1), state.dataCostEstimateManager->monetaryUnit(i).code)) {
+                    state.dataCostEstimateManager->selectedMonetaryUnit = i;
                     break;
                 }
             }
-            if (dataCostEstimateManager.selectedMonetaryUnit == 0) {
+            if (state.dataCostEstimateManager->selectedMonetaryUnit == 0) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data.");
                 ShowContinueError("... invalid " + cAlphaFieldNames(1) + '.');
                 ErrorsFound = true;
             }
         } else if (NumCurrencyType > 1) {
             ShowWarningError(RoutineName + CurrentModuleObject + " Only one instance of this object is allowed. USD will be used.");
-            dataCostEstimateManager.selectedMonetaryUnit = 1; // USD - U.S. Dollar
+            state.dataCostEstimateManager->selectedMonetaryUnit = 1; // USD - U.S. Dollar
         }
     }
 
@@ -1503,7 +1510,7 @@ namespace EconomicTariff {
         }
     }
 
-    void initializeMonetaryUnit(CostEstimateManagerData &dataCostEstimateManager)
+    void initializeMonetaryUnit(EnergyPlusData &state)
     {
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2008
@@ -1515,343 +1522,343 @@ namespace EconomicTariff {
 
         //   www.xe.com/symbols.php
 
-        dataCostEstimateManager.numMonetaryUnit = 111;
-        dataCostEstimateManager.monetaryUnit.allocate(dataCostEstimateManager.numMonetaryUnit);
-        dataCostEstimateManager.monetaryUnit(1).code = "USD";
-        dataCostEstimateManager.monetaryUnit(2).code = "AFN";
-        dataCostEstimateManager.monetaryUnit(3).code = "ALL";
-        dataCostEstimateManager.monetaryUnit(4).code = "ANG";
-        dataCostEstimateManager.monetaryUnit(5).code = "ARS";
-        dataCostEstimateManager.monetaryUnit(6).code = "AUD";
-        dataCostEstimateManager.monetaryUnit(7).code = "AWG";
-        dataCostEstimateManager.monetaryUnit(8).code = "AZN";
-        dataCostEstimateManager.monetaryUnit(9).code = "BAM";
-        dataCostEstimateManager.monetaryUnit(10).code = "BBD";
-        dataCostEstimateManager.monetaryUnit(11).code = "BGN";
-        dataCostEstimateManager.monetaryUnit(12).code = "BMD";
-        dataCostEstimateManager.monetaryUnit(13).code = "BND";
-        dataCostEstimateManager.monetaryUnit(14).code = "BOB";
-        dataCostEstimateManager.monetaryUnit(15).code = "BRL";
-        dataCostEstimateManager.monetaryUnit(16).code = "BSD";
-        dataCostEstimateManager.monetaryUnit(17).code = "BWP";
-        dataCostEstimateManager.monetaryUnit(18).code = "BYR";
-        dataCostEstimateManager.monetaryUnit(19).code = "BZD";
-        dataCostEstimateManager.monetaryUnit(20).code = "CAD";
-        dataCostEstimateManager.monetaryUnit(21).code = "CHF";
-        dataCostEstimateManager.monetaryUnit(22).code = "CLP";
-        dataCostEstimateManager.monetaryUnit(23).code = "CNY";
-        dataCostEstimateManager.monetaryUnit(24).code = "COP";
-        dataCostEstimateManager.monetaryUnit(25).code = "CRC";
-        dataCostEstimateManager.monetaryUnit(26).code = "CUP";
-        dataCostEstimateManager.monetaryUnit(27).code = "CZK";
-        dataCostEstimateManager.monetaryUnit(28).code = "DKK";
-        dataCostEstimateManager.monetaryUnit(29).code = "DOP";
-        dataCostEstimateManager.monetaryUnit(30).code = "EEK";
-        dataCostEstimateManager.monetaryUnit(31).code = "EGP";
-        dataCostEstimateManager.monetaryUnit(32).code = "EUR";
-        dataCostEstimateManager.monetaryUnit(33).code = "FJD";
-        dataCostEstimateManager.monetaryUnit(34).code = "GBP";
-        dataCostEstimateManager.monetaryUnit(35).code = "GHC";
-        dataCostEstimateManager.monetaryUnit(36).code = "GIP";
-        dataCostEstimateManager.monetaryUnit(37).code = "GTQ";
-        dataCostEstimateManager.monetaryUnit(38).code = "GYD";
-        dataCostEstimateManager.monetaryUnit(39).code = "HKD";
-        dataCostEstimateManager.monetaryUnit(40).code = "HNL";
-        dataCostEstimateManager.monetaryUnit(41).code = "HRK";
-        dataCostEstimateManager.monetaryUnit(42).code = "HUF";
-        dataCostEstimateManager.monetaryUnit(43).code = "IDR";
-        dataCostEstimateManager.monetaryUnit(44).code = "ILS";
-        dataCostEstimateManager.monetaryUnit(45).code = "IMP";
-        dataCostEstimateManager.monetaryUnit(46).code = "INR";
-        dataCostEstimateManager.monetaryUnit(47).code = "IRR";
-        dataCostEstimateManager.monetaryUnit(48).code = "ISK";
-        dataCostEstimateManager.monetaryUnit(49).code = "JEP";
-        dataCostEstimateManager.monetaryUnit(50).code = "JMD";
-        dataCostEstimateManager.monetaryUnit(51).code = "JPY";
-        dataCostEstimateManager.monetaryUnit(52).code = "KGS";
-        dataCostEstimateManager.monetaryUnit(53).code = "KHR";
-        dataCostEstimateManager.monetaryUnit(54).code = "KPW";
-        dataCostEstimateManager.monetaryUnit(55).code = "KRW";
-        dataCostEstimateManager.monetaryUnit(56).code = "KYD";
-        dataCostEstimateManager.monetaryUnit(57).code = "KZT";
-        dataCostEstimateManager.monetaryUnit(58).code = "LAK";
-        dataCostEstimateManager.monetaryUnit(59).code = "LBP";
-        dataCostEstimateManager.monetaryUnit(60).code = "LKR";
-        dataCostEstimateManager.monetaryUnit(61).code = "LRD";
-        dataCostEstimateManager.monetaryUnit(62).code = "LTL";
-        dataCostEstimateManager.monetaryUnit(63).code = "LVL";
-        dataCostEstimateManager.monetaryUnit(64).code = "MKD";
-        dataCostEstimateManager.monetaryUnit(65).code = "MNT";
-        dataCostEstimateManager.monetaryUnit(66).code = "MUR";
-        dataCostEstimateManager.monetaryUnit(67).code = "MXN";
-        dataCostEstimateManager.monetaryUnit(68).code = "MYR";
-        dataCostEstimateManager.monetaryUnit(69).code = "MZN";
-        dataCostEstimateManager.monetaryUnit(70).code = "NAD";
-        dataCostEstimateManager.monetaryUnit(71).code = "NGN";
-        dataCostEstimateManager.monetaryUnit(72).code = "NIO";
-        dataCostEstimateManager.monetaryUnit(73).code = "NOK";
-        dataCostEstimateManager.monetaryUnit(74).code = "NPR";
-        dataCostEstimateManager.monetaryUnit(75).code = "NZD";
-        dataCostEstimateManager.monetaryUnit(76).code = "OMR";
-        dataCostEstimateManager.monetaryUnit(77).code = "PAB";
-        dataCostEstimateManager.monetaryUnit(78).code = "PEN";
-        dataCostEstimateManager.monetaryUnit(79).code = "PHP";
-        dataCostEstimateManager.monetaryUnit(80).code = "PKR";
-        dataCostEstimateManager.monetaryUnit(81).code = "PLN";
-        dataCostEstimateManager.monetaryUnit(82).code = "PYG";
-        dataCostEstimateManager.monetaryUnit(83).code = "QAR";
-        dataCostEstimateManager.monetaryUnit(84).code = "RON";
-        dataCostEstimateManager.monetaryUnit(85).code = "RSD";
-        dataCostEstimateManager.monetaryUnit(86).code = "RUB";
-        dataCostEstimateManager.monetaryUnit(87).code = "SAR";
-        dataCostEstimateManager.monetaryUnit(88).code = "SBD";
-        dataCostEstimateManager.monetaryUnit(89).code = "SCR";
-        dataCostEstimateManager.monetaryUnit(90).code = "SEK";
-        dataCostEstimateManager.monetaryUnit(91).code = "SGD";
-        dataCostEstimateManager.monetaryUnit(92).code = "SHP";
-        dataCostEstimateManager.monetaryUnit(93).code = "SOS";
-        dataCostEstimateManager.monetaryUnit(94).code = "SRD";
-        dataCostEstimateManager.monetaryUnit(95).code = "SVC";
-        dataCostEstimateManager.monetaryUnit(96).code = "SYP";
-        dataCostEstimateManager.monetaryUnit(97).code = "THB";
-        dataCostEstimateManager.monetaryUnit(98).code = "TRL";
-        dataCostEstimateManager.monetaryUnit(99).code = "TRY";
-        dataCostEstimateManager.monetaryUnit(100).code = "TTD";
-        dataCostEstimateManager.monetaryUnit(101).code = "TVD";
-        dataCostEstimateManager.monetaryUnit(102).code = "TWD";
-        dataCostEstimateManager.monetaryUnit(103).code = "UAH";
-        dataCostEstimateManager.monetaryUnit(104).code = "UYU";
-        dataCostEstimateManager.monetaryUnit(105).code = "UZS";
-        dataCostEstimateManager.monetaryUnit(106).code = "VEF";
-        dataCostEstimateManager.monetaryUnit(107).code = "VND";
-        dataCostEstimateManager.monetaryUnit(108).code = "XCD";
-        dataCostEstimateManager.monetaryUnit(109).code = "YER";
-        dataCostEstimateManager.monetaryUnit(110).code = "ZAR";
-        dataCostEstimateManager.monetaryUnit(111).code = "ZWD";
+        state.dataCostEstimateManager->numMonetaryUnit = 111;
+        state.dataCostEstimateManager->monetaryUnit.allocate(state.dataCostEstimateManager->numMonetaryUnit);
+        state.dataCostEstimateManager->monetaryUnit(1).code = "USD";
+        state.dataCostEstimateManager->monetaryUnit(2).code = "AFN";
+        state.dataCostEstimateManager->monetaryUnit(3).code = "ALL";
+        state.dataCostEstimateManager->monetaryUnit(4).code = "ANG";
+        state.dataCostEstimateManager->monetaryUnit(5).code = "ARS";
+        state.dataCostEstimateManager->monetaryUnit(6).code = "AUD";
+        state.dataCostEstimateManager->monetaryUnit(7).code = "AWG";
+        state.dataCostEstimateManager->monetaryUnit(8).code = "AZN";
+        state.dataCostEstimateManager->monetaryUnit(9).code = "BAM";
+        state.dataCostEstimateManager->monetaryUnit(10).code = "BBD";
+        state.dataCostEstimateManager->monetaryUnit(11).code = "BGN";
+        state.dataCostEstimateManager->monetaryUnit(12).code = "BMD";
+        state.dataCostEstimateManager->monetaryUnit(13).code = "BND";
+        state.dataCostEstimateManager->monetaryUnit(14).code = "BOB";
+        state.dataCostEstimateManager->monetaryUnit(15).code = "BRL";
+        state.dataCostEstimateManager->monetaryUnit(16).code = "BSD";
+        state.dataCostEstimateManager->monetaryUnit(17).code = "BWP";
+        state.dataCostEstimateManager->monetaryUnit(18).code = "BYR";
+        state.dataCostEstimateManager->monetaryUnit(19).code = "BZD";
+        state.dataCostEstimateManager->monetaryUnit(20).code = "CAD";
+        state.dataCostEstimateManager->monetaryUnit(21).code = "CHF";
+        state.dataCostEstimateManager->monetaryUnit(22).code = "CLP";
+        state.dataCostEstimateManager->monetaryUnit(23).code = "CNY";
+        state.dataCostEstimateManager->monetaryUnit(24).code = "COP";
+        state.dataCostEstimateManager->monetaryUnit(25).code = "CRC";
+        state.dataCostEstimateManager->monetaryUnit(26).code = "CUP";
+        state.dataCostEstimateManager->monetaryUnit(27).code = "CZK";
+        state.dataCostEstimateManager->monetaryUnit(28).code = "DKK";
+        state.dataCostEstimateManager->monetaryUnit(29).code = "DOP";
+        state.dataCostEstimateManager->monetaryUnit(30).code = "EEK";
+        state.dataCostEstimateManager->monetaryUnit(31).code = "EGP";
+        state.dataCostEstimateManager->monetaryUnit(32).code = "EUR";
+        state.dataCostEstimateManager->monetaryUnit(33).code = "FJD";
+        state.dataCostEstimateManager->monetaryUnit(34).code = "GBP";
+        state.dataCostEstimateManager->monetaryUnit(35).code = "GHC";
+        state.dataCostEstimateManager->monetaryUnit(36).code = "GIP";
+        state.dataCostEstimateManager->monetaryUnit(37).code = "GTQ";
+        state.dataCostEstimateManager->monetaryUnit(38).code = "GYD";
+        state.dataCostEstimateManager->monetaryUnit(39).code = "HKD";
+        state.dataCostEstimateManager->monetaryUnit(40).code = "HNL";
+        state.dataCostEstimateManager->monetaryUnit(41).code = "HRK";
+        state.dataCostEstimateManager->monetaryUnit(42).code = "HUF";
+        state.dataCostEstimateManager->monetaryUnit(43).code = "IDR";
+        state.dataCostEstimateManager->monetaryUnit(44).code = "ILS";
+        state.dataCostEstimateManager->monetaryUnit(45).code = "IMP";
+        state.dataCostEstimateManager->monetaryUnit(46).code = "INR";
+        state.dataCostEstimateManager->monetaryUnit(47).code = "IRR";
+        state.dataCostEstimateManager->monetaryUnit(48).code = "ISK";
+        state.dataCostEstimateManager->monetaryUnit(49).code = "JEP";
+        state.dataCostEstimateManager->monetaryUnit(50).code = "JMD";
+        state.dataCostEstimateManager->monetaryUnit(51).code = "JPY";
+        state.dataCostEstimateManager->monetaryUnit(52).code = "KGS";
+        state.dataCostEstimateManager->monetaryUnit(53).code = "KHR";
+        state.dataCostEstimateManager->monetaryUnit(54).code = "KPW";
+        state.dataCostEstimateManager->monetaryUnit(55).code = "KRW";
+        state.dataCostEstimateManager->monetaryUnit(56).code = "KYD";
+        state.dataCostEstimateManager->monetaryUnit(57).code = "KZT";
+        state.dataCostEstimateManager->monetaryUnit(58).code = "LAK";
+        state.dataCostEstimateManager->monetaryUnit(59).code = "LBP";
+        state.dataCostEstimateManager->monetaryUnit(60).code = "LKR";
+        state.dataCostEstimateManager->monetaryUnit(61).code = "LRD";
+        state.dataCostEstimateManager->monetaryUnit(62).code = "LTL";
+        state.dataCostEstimateManager->monetaryUnit(63).code = "LVL";
+        state.dataCostEstimateManager->monetaryUnit(64).code = "MKD";
+        state.dataCostEstimateManager->monetaryUnit(65).code = "MNT";
+        state.dataCostEstimateManager->monetaryUnit(66).code = "MUR";
+        state.dataCostEstimateManager->monetaryUnit(67).code = "MXN";
+        state.dataCostEstimateManager->monetaryUnit(68).code = "MYR";
+        state.dataCostEstimateManager->monetaryUnit(69).code = "MZN";
+        state.dataCostEstimateManager->monetaryUnit(70).code = "NAD";
+        state.dataCostEstimateManager->monetaryUnit(71).code = "NGN";
+        state.dataCostEstimateManager->monetaryUnit(72).code = "NIO";
+        state.dataCostEstimateManager->monetaryUnit(73).code = "NOK";
+        state.dataCostEstimateManager->monetaryUnit(74).code = "NPR";
+        state.dataCostEstimateManager->monetaryUnit(75).code = "NZD";
+        state.dataCostEstimateManager->monetaryUnit(76).code = "OMR";
+        state.dataCostEstimateManager->monetaryUnit(77).code = "PAB";
+        state.dataCostEstimateManager->monetaryUnit(78).code = "PEN";
+        state.dataCostEstimateManager->monetaryUnit(79).code = "PHP";
+        state.dataCostEstimateManager->monetaryUnit(80).code = "PKR";
+        state.dataCostEstimateManager->monetaryUnit(81).code = "PLN";
+        state.dataCostEstimateManager->monetaryUnit(82).code = "PYG";
+        state.dataCostEstimateManager->monetaryUnit(83).code = "QAR";
+        state.dataCostEstimateManager->monetaryUnit(84).code = "RON";
+        state.dataCostEstimateManager->monetaryUnit(85).code = "RSD";
+        state.dataCostEstimateManager->monetaryUnit(86).code = "RUB";
+        state.dataCostEstimateManager->monetaryUnit(87).code = "SAR";
+        state.dataCostEstimateManager->monetaryUnit(88).code = "SBD";
+        state.dataCostEstimateManager->monetaryUnit(89).code = "SCR";
+        state.dataCostEstimateManager->monetaryUnit(90).code = "SEK";
+        state.dataCostEstimateManager->monetaryUnit(91).code = "SGD";
+        state.dataCostEstimateManager->monetaryUnit(92).code = "SHP";
+        state.dataCostEstimateManager->monetaryUnit(93).code = "SOS";
+        state.dataCostEstimateManager->monetaryUnit(94).code = "SRD";
+        state.dataCostEstimateManager->monetaryUnit(95).code = "SVC";
+        state.dataCostEstimateManager->monetaryUnit(96).code = "SYP";
+        state.dataCostEstimateManager->monetaryUnit(97).code = "THB";
+        state.dataCostEstimateManager->monetaryUnit(98).code = "TRL";
+        state.dataCostEstimateManager->monetaryUnit(99).code = "TRY";
+        state.dataCostEstimateManager->monetaryUnit(100).code = "TTD";
+        state.dataCostEstimateManager->monetaryUnit(101).code = "TVD";
+        state.dataCostEstimateManager->monetaryUnit(102).code = "TWD";
+        state.dataCostEstimateManager->monetaryUnit(103).code = "UAH";
+        state.dataCostEstimateManager->monetaryUnit(104).code = "UYU";
+        state.dataCostEstimateManager->monetaryUnit(105).code = "UZS";
+        state.dataCostEstimateManager->monetaryUnit(106).code = "VEF";
+        state.dataCostEstimateManager->monetaryUnit(107).code = "VND";
+        state.dataCostEstimateManager->monetaryUnit(108).code = "XCD";
+        state.dataCostEstimateManager->monetaryUnit(109).code = "YER";
+        state.dataCostEstimateManager->monetaryUnit(110).code = "ZAR";
+        state.dataCostEstimateManager->monetaryUnit(111).code = "ZWD";
 
-        dataCostEstimateManager.monetaryUnit(1).txt = "$";
-        dataCostEstimateManager.monetaryUnit(2).txt = "AFN";
-        dataCostEstimateManager.monetaryUnit(3).txt = "Lek";
-        dataCostEstimateManager.monetaryUnit(4).txt = "ANG";
-        dataCostEstimateManager.monetaryUnit(5).txt = "$";
-        dataCostEstimateManager.monetaryUnit(6).txt = "$";
-        dataCostEstimateManager.monetaryUnit(7).txt = "AWG";
-        dataCostEstimateManager.monetaryUnit(8).txt = "AZN";
-        dataCostEstimateManager.monetaryUnit(9).txt = "KM";
-        dataCostEstimateManager.monetaryUnit(10).txt = "$";
-        dataCostEstimateManager.monetaryUnit(11).txt = "BGN";
-        dataCostEstimateManager.monetaryUnit(12).txt = "$";
-        dataCostEstimateManager.monetaryUnit(13).txt = "$";
-        dataCostEstimateManager.monetaryUnit(14).txt = "$b";
-        dataCostEstimateManager.monetaryUnit(15).txt = "R$";
-        dataCostEstimateManager.monetaryUnit(16).txt = "$";
-        dataCostEstimateManager.monetaryUnit(17).txt = "P";
-        dataCostEstimateManager.monetaryUnit(18).txt = "p.";
-        dataCostEstimateManager.monetaryUnit(19).txt = "BZ$";
-        dataCostEstimateManager.monetaryUnit(20).txt = "$";
-        dataCostEstimateManager.monetaryUnit(21).txt = "CHF";
-        dataCostEstimateManager.monetaryUnit(22).txt = "$";
-        dataCostEstimateManager.monetaryUnit(23).txt = "CNY";
-        dataCostEstimateManager.monetaryUnit(24).txt = "$";
-        dataCostEstimateManager.monetaryUnit(25).txt = "CRC";
-        dataCostEstimateManager.monetaryUnit(26).txt = "CUP";
-        dataCostEstimateManager.monetaryUnit(27).txt = "CZK";
-        dataCostEstimateManager.monetaryUnit(28).txt = "kr";
-        dataCostEstimateManager.monetaryUnit(29).txt = "RD$";
-        dataCostEstimateManager.monetaryUnit(30).txt = "kr";
-        dataCostEstimateManager.monetaryUnit(31).txt = "£";
-        dataCostEstimateManager.monetaryUnit(32).txt = "EUR";
-        dataCostEstimateManager.monetaryUnit(33).txt = "$";
-        dataCostEstimateManager.monetaryUnit(34).txt = "£";
-        dataCostEstimateManager.monetaryUnit(35).txt = "¢";
-        dataCostEstimateManager.monetaryUnit(36).txt = "£";
-        dataCostEstimateManager.monetaryUnit(37).txt = "Q";
-        dataCostEstimateManager.monetaryUnit(38).txt = "$";
-        dataCostEstimateManager.monetaryUnit(39).txt = "HK$";
-        dataCostEstimateManager.monetaryUnit(40).txt = "L";
-        dataCostEstimateManager.monetaryUnit(41).txt = "kn";
-        dataCostEstimateManager.monetaryUnit(42).txt = "Ft";
-        dataCostEstimateManager.monetaryUnit(43).txt = "Rp";
-        dataCostEstimateManager.monetaryUnit(44).txt = "ILS";
-        dataCostEstimateManager.monetaryUnit(45).txt = "£";
-        dataCostEstimateManager.monetaryUnit(46).txt = "INR";
-        dataCostEstimateManager.monetaryUnit(47).txt = "IRR";
-        dataCostEstimateManager.monetaryUnit(48).txt = "kr";
-        dataCostEstimateManager.monetaryUnit(49).txt = "£";
-        dataCostEstimateManager.monetaryUnit(50).txt = "J$";
-        dataCostEstimateManager.monetaryUnit(51).txt = "¥";
-        dataCostEstimateManager.monetaryUnit(52).txt = "KGS";
-        dataCostEstimateManager.monetaryUnit(53).txt = "KHR";
-        dataCostEstimateManager.monetaryUnit(54).txt = "KPW";
-        dataCostEstimateManager.monetaryUnit(55).txt = "KRW";
-        dataCostEstimateManager.monetaryUnit(56).txt = "$";
-        dataCostEstimateManager.monetaryUnit(57).txt = "KZT";
-        dataCostEstimateManager.monetaryUnit(58).txt = "LAK";
-        dataCostEstimateManager.monetaryUnit(59).txt = "£";
-        dataCostEstimateManager.monetaryUnit(60).txt = "LKR";
-        dataCostEstimateManager.monetaryUnit(61).txt = "$";
-        dataCostEstimateManager.monetaryUnit(62).txt = "Lt";
-        dataCostEstimateManager.monetaryUnit(63).txt = "Ls";
-        dataCostEstimateManager.monetaryUnit(64).txt = "MKD";
-        dataCostEstimateManager.monetaryUnit(65).txt = "MNT";
-        dataCostEstimateManager.monetaryUnit(66).txt = "MUR";
-        dataCostEstimateManager.monetaryUnit(67).txt = "$";
-        dataCostEstimateManager.monetaryUnit(68).txt = "RM";
-        dataCostEstimateManager.monetaryUnit(69).txt = "MT";
-        dataCostEstimateManager.monetaryUnit(70).txt = "$";
-        dataCostEstimateManager.monetaryUnit(71).txt = "NGN";
-        dataCostEstimateManager.monetaryUnit(72).txt = "C$";
-        dataCostEstimateManager.monetaryUnit(73).txt = "kr";
-        dataCostEstimateManager.monetaryUnit(74).txt = "NPR";
-        dataCostEstimateManager.monetaryUnit(75).txt = "$";
-        dataCostEstimateManager.monetaryUnit(76).txt = "OMR";
-        dataCostEstimateManager.monetaryUnit(77).txt = "B/.";
-        dataCostEstimateManager.monetaryUnit(78).txt = "S/.";
-        dataCostEstimateManager.monetaryUnit(79).txt = "Php";
-        dataCostEstimateManager.monetaryUnit(80).txt = "PKR";
-        dataCostEstimateManager.monetaryUnit(81).txt = "PLN";
-        dataCostEstimateManager.monetaryUnit(82).txt = "Gs";
-        dataCostEstimateManager.monetaryUnit(83).txt = "QAR";
-        dataCostEstimateManager.monetaryUnit(84).txt = "lei";
-        dataCostEstimateManager.monetaryUnit(85).txt = "RSD";
-        dataCostEstimateManager.monetaryUnit(86).txt = "RUB";
-        dataCostEstimateManager.monetaryUnit(87).txt = "SAR";
-        dataCostEstimateManager.monetaryUnit(88).txt = "$";
-        dataCostEstimateManager.monetaryUnit(89).txt = "SCR";
-        dataCostEstimateManager.monetaryUnit(90).txt = "kr";
-        dataCostEstimateManager.monetaryUnit(91).txt = "$";
-        dataCostEstimateManager.monetaryUnit(92).txt = "£";
-        dataCostEstimateManager.monetaryUnit(93).txt = "S";
-        dataCostEstimateManager.monetaryUnit(94).txt = "$";
-        dataCostEstimateManager.monetaryUnit(95).txt = "$";
-        dataCostEstimateManager.monetaryUnit(96).txt = "£";
-        dataCostEstimateManager.monetaryUnit(97).txt = "THB";
-        dataCostEstimateManager.monetaryUnit(98).txt = "TRL";
-        dataCostEstimateManager.monetaryUnit(99).txt = "YTL";
-        dataCostEstimateManager.monetaryUnit(100).txt = "TT$";
-        dataCostEstimateManager.monetaryUnit(101).txt = "$";
-        dataCostEstimateManager.monetaryUnit(102).txt = "NT$";
-        dataCostEstimateManager.monetaryUnit(103).txt = "UAH";
-        dataCostEstimateManager.monetaryUnit(104).txt = "$U";
-        dataCostEstimateManager.monetaryUnit(105).txt = "UZS";
-        dataCostEstimateManager.monetaryUnit(106).txt = "Bs";
-        dataCostEstimateManager.monetaryUnit(107).txt = "VND";
-        dataCostEstimateManager.monetaryUnit(108).txt = "$";
-        dataCostEstimateManager.monetaryUnit(109).txt = "YER";
-        dataCostEstimateManager.monetaryUnit(110).txt = "R";
-        dataCostEstimateManager.monetaryUnit(111).txt = "Z$";
+        state.dataCostEstimateManager->monetaryUnit(1).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(2).txt = "AFN";
+        state.dataCostEstimateManager->monetaryUnit(3).txt = "Lek";
+        state.dataCostEstimateManager->monetaryUnit(4).txt = "ANG";
+        state.dataCostEstimateManager->monetaryUnit(5).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(6).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(7).txt = "AWG";
+        state.dataCostEstimateManager->monetaryUnit(8).txt = "AZN";
+        state.dataCostEstimateManager->monetaryUnit(9).txt = "KM";
+        state.dataCostEstimateManager->monetaryUnit(10).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(11).txt = "BGN";
+        state.dataCostEstimateManager->monetaryUnit(12).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(13).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(14).txt = "$b";
+        state.dataCostEstimateManager->monetaryUnit(15).txt = "R$";
+        state.dataCostEstimateManager->monetaryUnit(16).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(17).txt = "P";
+        state.dataCostEstimateManager->monetaryUnit(18).txt = "p.";
+        state.dataCostEstimateManager->monetaryUnit(19).txt = "BZ$";
+        state.dataCostEstimateManager->monetaryUnit(20).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(21).txt = "CHF";
+        state.dataCostEstimateManager->monetaryUnit(22).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(23).txt = "CNY";
+        state.dataCostEstimateManager->monetaryUnit(24).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(25).txt = "CRC";
+        state.dataCostEstimateManager->monetaryUnit(26).txt = "CUP";
+        state.dataCostEstimateManager->monetaryUnit(27).txt = "CZK";
+        state.dataCostEstimateManager->monetaryUnit(28).txt = "kr";
+        state.dataCostEstimateManager->monetaryUnit(29).txt = "RD$";
+        state.dataCostEstimateManager->monetaryUnit(30).txt = "kr";
+        state.dataCostEstimateManager->monetaryUnit(31).txt = "£";
+        state.dataCostEstimateManager->monetaryUnit(32).txt = "EUR";
+        state.dataCostEstimateManager->monetaryUnit(33).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(34).txt = "£";
+        state.dataCostEstimateManager->monetaryUnit(35).txt = "¢";
+        state.dataCostEstimateManager->monetaryUnit(36).txt = "£";
+        state.dataCostEstimateManager->monetaryUnit(37).txt = "Q";
+        state.dataCostEstimateManager->monetaryUnit(38).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(39).txt = "HK$";
+        state.dataCostEstimateManager->monetaryUnit(40).txt = "L";
+        state.dataCostEstimateManager->monetaryUnit(41).txt = "kn";
+        state.dataCostEstimateManager->monetaryUnit(42).txt = "Ft";
+        state.dataCostEstimateManager->monetaryUnit(43).txt = "Rp";
+        state.dataCostEstimateManager->monetaryUnit(44).txt = "ILS";
+        state.dataCostEstimateManager->monetaryUnit(45).txt = "£";
+        state.dataCostEstimateManager->monetaryUnit(46).txt = "INR";
+        state.dataCostEstimateManager->monetaryUnit(47).txt = "IRR";
+        state.dataCostEstimateManager->monetaryUnit(48).txt = "kr";
+        state.dataCostEstimateManager->monetaryUnit(49).txt = "£";
+        state.dataCostEstimateManager->monetaryUnit(50).txt = "J$";
+        state.dataCostEstimateManager->monetaryUnit(51).txt = "¥";
+        state.dataCostEstimateManager->monetaryUnit(52).txt = "KGS";
+        state.dataCostEstimateManager->monetaryUnit(53).txt = "KHR";
+        state.dataCostEstimateManager->monetaryUnit(54).txt = "KPW";
+        state.dataCostEstimateManager->monetaryUnit(55).txt = "KRW";
+        state.dataCostEstimateManager->monetaryUnit(56).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(57).txt = "KZT";
+        state.dataCostEstimateManager->monetaryUnit(58).txt = "LAK";
+        state.dataCostEstimateManager->monetaryUnit(59).txt = "£";
+        state.dataCostEstimateManager->monetaryUnit(60).txt = "LKR";
+        state.dataCostEstimateManager->monetaryUnit(61).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(62).txt = "Lt";
+        state.dataCostEstimateManager->monetaryUnit(63).txt = "Ls";
+        state.dataCostEstimateManager->monetaryUnit(64).txt = "MKD";
+        state.dataCostEstimateManager->monetaryUnit(65).txt = "MNT";
+        state.dataCostEstimateManager->monetaryUnit(66).txt = "MUR";
+        state.dataCostEstimateManager->monetaryUnit(67).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(68).txt = "RM";
+        state.dataCostEstimateManager->monetaryUnit(69).txt = "MT";
+        state.dataCostEstimateManager->monetaryUnit(70).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(71).txt = "NGN";
+        state.dataCostEstimateManager->monetaryUnit(72).txt = "C$";
+        state.dataCostEstimateManager->monetaryUnit(73).txt = "kr";
+        state.dataCostEstimateManager->monetaryUnit(74).txt = "NPR";
+        state.dataCostEstimateManager->monetaryUnit(75).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(76).txt = "OMR";
+        state.dataCostEstimateManager->monetaryUnit(77).txt = "B/.";
+        state.dataCostEstimateManager->monetaryUnit(78).txt = "S/.";
+        state.dataCostEstimateManager->monetaryUnit(79).txt = "Php";
+        state.dataCostEstimateManager->monetaryUnit(80).txt = "PKR";
+        state.dataCostEstimateManager->monetaryUnit(81).txt = "PLN";
+        state.dataCostEstimateManager->monetaryUnit(82).txt = "Gs";
+        state.dataCostEstimateManager->monetaryUnit(83).txt = "QAR";
+        state.dataCostEstimateManager->monetaryUnit(84).txt = "lei";
+        state.dataCostEstimateManager->monetaryUnit(85).txt = "RSD";
+        state.dataCostEstimateManager->monetaryUnit(86).txt = "RUB";
+        state.dataCostEstimateManager->monetaryUnit(87).txt = "SAR";
+        state.dataCostEstimateManager->monetaryUnit(88).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(89).txt = "SCR";
+        state.dataCostEstimateManager->monetaryUnit(90).txt = "kr";
+        state.dataCostEstimateManager->monetaryUnit(91).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(92).txt = "£";
+        state.dataCostEstimateManager->monetaryUnit(93).txt = "S";
+        state.dataCostEstimateManager->monetaryUnit(94).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(95).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(96).txt = "£";
+        state.dataCostEstimateManager->monetaryUnit(97).txt = "THB";
+        state.dataCostEstimateManager->monetaryUnit(98).txt = "TRL";
+        state.dataCostEstimateManager->monetaryUnit(99).txt = "YTL";
+        state.dataCostEstimateManager->monetaryUnit(100).txt = "TT$";
+        state.dataCostEstimateManager->monetaryUnit(101).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(102).txt = "NT$";
+        state.dataCostEstimateManager->monetaryUnit(103).txt = "UAH";
+        state.dataCostEstimateManager->monetaryUnit(104).txt = "$U";
+        state.dataCostEstimateManager->monetaryUnit(105).txt = "UZS";
+        state.dataCostEstimateManager->monetaryUnit(106).txt = "Bs";
+        state.dataCostEstimateManager->monetaryUnit(107).txt = "VND";
+        state.dataCostEstimateManager->monetaryUnit(108).txt = "$";
+        state.dataCostEstimateManager->monetaryUnit(109).txt = "YER";
+        state.dataCostEstimateManager->monetaryUnit(110).txt = "R";
+        state.dataCostEstimateManager->monetaryUnit(111).txt = "Z$";
 
-        dataCostEstimateManager.monetaryUnit(1).html = "$";
-        dataCostEstimateManager.monetaryUnit(2).html = "&#x060b;";
-        dataCostEstimateManager.monetaryUnit(3).html = "Lek";
-        dataCostEstimateManager.monetaryUnit(4).html = "&#x0192;";
-        dataCostEstimateManager.monetaryUnit(5).html = "$";
-        dataCostEstimateManager.monetaryUnit(6).html = "$";
-        dataCostEstimateManager.monetaryUnit(7).html = "&#x0192;";
-        dataCostEstimateManager.monetaryUnit(8).html = "&#x043c;&#x0430;&#x043d;";
-        dataCostEstimateManager.monetaryUnit(9).html = "KM";
-        dataCostEstimateManager.monetaryUnit(10).html = "$";
-        dataCostEstimateManager.monetaryUnit(11).html = "&#x043b;&#x0432;";
-        dataCostEstimateManager.monetaryUnit(12).html = "$";
-        dataCostEstimateManager.monetaryUnit(13).html = "$";
-        dataCostEstimateManager.monetaryUnit(14).html = "$b";
-        dataCostEstimateManager.monetaryUnit(15).html = "R$";
-        dataCostEstimateManager.monetaryUnit(16).html = "$";
-        dataCostEstimateManager.monetaryUnit(17).html = "P";
-        dataCostEstimateManager.monetaryUnit(18).html = "p.";
-        dataCostEstimateManager.monetaryUnit(19).html = "BZ$";
-        dataCostEstimateManager.monetaryUnit(20).html = "$";
-        dataCostEstimateManager.monetaryUnit(21).html = "CHF";
-        dataCostEstimateManager.monetaryUnit(22).html = "$";
-        dataCostEstimateManager.monetaryUnit(23).html = "&#x5143;";
-        dataCostEstimateManager.monetaryUnit(24).html = "$";
-        dataCostEstimateManager.monetaryUnit(25).html = "&#x20a1;";
-        dataCostEstimateManager.monetaryUnit(26).html = "&#x20b1;";
-        dataCostEstimateManager.monetaryUnit(27).html = "&#x004b;&#x010d;";
-        dataCostEstimateManager.monetaryUnit(28).html = "kr";
-        dataCostEstimateManager.monetaryUnit(29).html = "RD$";
-        dataCostEstimateManager.monetaryUnit(30).html = "kr";
-        dataCostEstimateManager.monetaryUnit(31).html = "£";
-        dataCostEstimateManager.monetaryUnit(32).html = "&#x20ac;";
-        dataCostEstimateManager.monetaryUnit(33).html = "$";
-        dataCostEstimateManager.monetaryUnit(34).html = "£";
-        dataCostEstimateManager.monetaryUnit(35).html = "¢";
-        dataCostEstimateManager.monetaryUnit(36).html = "£";
-        dataCostEstimateManager.monetaryUnit(37).html = "Q";
-        dataCostEstimateManager.monetaryUnit(38).html = "$";
-        dataCostEstimateManager.monetaryUnit(39).html = "HK$";
-        dataCostEstimateManager.monetaryUnit(40).html = "L";
-        dataCostEstimateManager.monetaryUnit(41).html = "kn";
-        dataCostEstimateManager.monetaryUnit(42).html = "Ft";
-        dataCostEstimateManager.monetaryUnit(43).html = "Rp";
-        dataCostEstimateManager.monetaryUnit(44).html = "&#x20aa;";
-        dataCostEstimateManager.monetaryUnit(45).html = "£";
-        dataCostEstimateManager.monetaryUnit(46).html = "&#x20a8;";
-        dataCostEstimateManager.monetaryUnit(47).html = "&#xfdfc;";
-        dataCostEstimateManager.monetaryUnit(48).html = "kr";
-        dataCostEstimateManager.monetaryUnit(49).html = "£";
-        dataCostEstimateManager.monetaryUnit(50).html = "J$";
-        dataCostEstimateManager.monetaryUnit(51).html = "¥";
-        dataCostEstimateManager.monetaryUnit(52).html = "&#x043b;&#x0432;";
-        dataCostEstimateManager.monetaryUnit(53).html = "&#x17db;";
-        dataCostEstimateManager.monetaryUnit(54).html = "&#x20a9;";
-        dataCostEstimateManager.monetaryUnit(55).html = "&#x20a9;";
-        dataCostEstimateManager.monetaryUnit(56).html = "$";
-        dataCostEstimateManager.monetaryUnit(57).html = "&#x043b;&#x0432;";
-        dataCostEstimateManager.monetaryUnit(58).html = "&#x20ad;";
-        dataCostEstimateManager.monetaryUnit(59).html = "£";
-        dataCostEstimateManager.monetaryUnit(60).html = "&#x20a8;";
-        dataCostEstimateManager.monetaryUnit(61).html = "$";
-        dataCostEstimateManager.monetaryUnit(62).html = "Lt";
-        dataCostEstimateManager.monetaryUnit(63).html = "Ls";
-        dataCostEstimateManager.monetaryUnit(64).html = "&#x0434;&#x0435;&#x043d;";
-        dataCostEstimateManager.monetaryUnit(65).html = "&#x20ae;";
-        dataCostEstimateManager.monetaryUnit(66).html = "&#x20a8;";
-        dataCostEstimateManager.monetaryUnit(67).html = "$";
-        dataCostEstimateManager.monetaryUnit(68).html = "RM";
-        dataCostEstimateManager.monetaryUnit(69).html = "MT";
-        dataCostEstimateManager.monetaryUnit(70).html = "$";
-        dataCostEstimateManager.monetaryUnit(71).html = "&#x20a6;";
-        dataCostEstimateManager.monetaryUnit(72).html = "C$";
-        dataCostEstimateManager.monetaryUnit(73).html = "kr";
-        dataCostEstimateManager.monetaryUnit(74).html = "&#x20a8;";
-        dataCostEstimateManager.monetaryUnit(75).html = "$";
-        dataCostEstimateManager.monetaryUnit(76).html = "&#xfdfc;";
-        dataCostEstimateManager.monetaryUnit(77).html = "B/.";
-        dataCostEstimateManager.monetaryUnit(78).html = "S/.";
-        dataCostEstimateManager.monetaryUnit(79).html = "Php";
-        dataCostEstimateManager.monetaryUnit(80).html = "&#x20a8;";
-        dataCostEstimateManager.monetaryUnit(81).html = "&#x007a;&#x0142;";
-        dataCostEstimateManager.monetaryUnit(82).html = "Gs";
-        dataCostEstimateManager.monetaryUnit(83).html = "&#xfdfc;";
-        dataCostEstimateManager.monetaryUnit(84).html = "lei";
-        dataCostEstimateManager.monetaryUnit(85).html = "&#x0414;&#x0438;&#x043d;&#x002e;";
-        dataCostEstimateManager.monetaryUnit(86).html = "&#x0440;&#x0443;&#x0431;";
-        dataCostEstimateManager.monetaryUnit(87).html = "&#xfdfc;";
-        dataCostEstimateManager.monetaryUnit(88).html = "$";
-        dataCostEstimateManager.monetaryUnit(89).html = "&#x20a8;";
-        dataCostEstimateManager.monetaryUnit(90).html = "kr";
-        dataCostEstimateManager.monetaryUnit(91).html = "$";
-        dataCostEstimateManager.monetaryUnit(92).html = "£";
-        dataCostEstimateManager.monetaryUnit(93).html = "S";
-        dataCostEstimateManager.monetaryUnit(94).html = "$";
-        dataCostEstimateManager.monetaryUnit(95).html = "$";
-        dataCostEstimateManager.monetaryUnit(96).html = "£";
-        dataCostEstimateManager.monetaryUnit(97).html = "&#x0e3f;";
-        dataCostEstimateManager.monetaryUnit(98).html = "&#x20a4;";
-        dataCostEstimateManager.monetaryUnit(99).html = "YTL";
-        dataCostEstimateManager.monetaryUnit(100).html = "TT$";
-        dataCostEstimateManager.monetaryUnit(101).html = "$";
-        dataCostEstimateManager.monetaryUnit(102).html = "NT$";
-        dataCostEstimateManager.monetaryUnit(103).html = "&#x20b4;";
-        dataCostEstimateManager.monetaryUnit(104).html = "$U";
-        dataCostEstimateManager.monetaryUnit(105).html = "&#x043b;&#x0432;";
-        dataCostEstimateManager.monetaryUnit(106).html = "Bs";
-        dataCostEstimateManager.monetaryUnit(107).html = "&#x20ab;";
-        dataCostEstimateManager.monetaryUnit(108).html = "$";
-        dataCostEstimateManager.monetaryUnit(109).html = "&#xfdfc;";
-        dataCostEstimateManager.monetaryUnit(110).html = "R";
-        dataCostEstimateManager.monetaryUnit(111).html = "Z$";
+        state.dataCostEstimateManager->monetaryUnit(1).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(2).html = "&#x060b;";
+        state.dataCostEstimateManager->monetaryUnit(3).html = "Lek";
+        state.dataCostEstimateManager->monetaryUnit(4).html = "&#x0192;";
+        state.dataCostEstimateManager->monetaryUnit(5).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(6).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(7).html = "&#x0192;";
+        state.dataCostEstimateManager->monetaryUnit(8).html = "&#x043c;&#x0430;&#x043d;";
+        state.dataCostEstimateManager->monetaryUnit(9).html = "KM";
+        state.dataCostEstimateManager->monetaryUnit(10).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(11).html = "&#x043b;&#x0432;";
+        state.dataCostEstimateManager->monetaryUnit(12).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(13).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(14).html = "$b";
+        state.dataCostEstimateManager->monetaryUnit(15).html = "R$";
+        state.dataCostEstimateManager->monetaryUnit(16).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(17).html = "P";
+        state.dataCostEstimateManager->monetaryUnit(18).html = "p.";
+        state.dataCostEstimateManager->monetaryUnit(19).html = "BZ$";
+        state.dataCostEstimateManager->monetaryUnit(20).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(21).html = "CHF";
+        state.dataCostEstimateManager->monetaryUnit(22).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(23).html = "&#x5143;";
+        state.dataCostEstimateManager->monetaryUnit(24).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(25).html = "&#x20a1;";
+        state.dataCostEstimateManager->monetaryUnit(26).html = "&#x20b1;";
+        state.dataCostEstimateManager->monetaryUnit(27).html = "&#x004b;&#x010d;";
+        state.dataCostEstimateManager->monetaryUnit(28).html = "kr";
+        state.dataCostEstimateManager->monetaryUnit(29).html = "RD$";
+        state.dataCostEstimateManager->monetaryUnit(30).html = "kr";
+        state.dataCostEstimateManager->monetaryUnit(31).html = "£";
+        state.dataCostEstimateManager->monetaryUnit(32).html = "&#x20ac;";
+        state.dataCostEstimateManager->monetaryUnit(33).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(34).html = "£";
+        state.dataCostEstimateManager->monetaryUnit(35).html = "¢";
+        state.dataCostEstimateManager->monetaryUnit(36).html = "£";
+        state.dataCostEstimateManager->monetaryUnit(37).html = "Q";
+        state.dataCostEstimateManager->monetaryUnit(38).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(39).html = "HK$";
+        state.dataCostEstimateManager->monetaryUnit(40).html = "L";
+        state.dataCostEstimateManager->monetaryUnit(41).html = "kn";
+        state.dataCostEstimateManager->monetaryUnit(42).html = "Ft";
+        state.dataCostEstimateManager->monetaryUnit(43).html = "Rp";
+        state.dataCostEstimateManager->monetaryUnit(44).html = "&#x20aa;";
+        state.dataCostEstimateManager->monetaryUnit(45).html = "£";
+        state.dataCostEstimateManager->monetaryUnit(46).html = "&#x20a8;";
+        state.dataCostEstimateManager->monetaryUnit(47).html = "&#xfdfc;";
+        state.dataCostEstimateManager->monetaryUnit(48).html = "kr";
+        state.dataCostEstimateManager->monetaryUnit(49).html = "£";
+        state.dataCostEstimateManager->monetaryUnit(50).html = "J$";
+        state.dataCostEstimateManager->monetaryUnit(51).html = "¥";
+        state.dataCostEstimateManager->monetaryUnit(52).html = "&#x043b;&#x0432;";
+        state.dataCostEstimateManager->monetaryUnit(53).html = "&#x17db;";
+        state.dataCostEstimateManager->monetaryUnit(54).html = "&#x20a9;";
+        state.dataCostEstimateManager->monetaryUnit(55).html = "&#x20a9;";
+        state.dataCostEstimateManager->monetaryUnit(56).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(57).html = "&#x043b;&#x0432;";
+        state.dataCostEstimateManager->monetaryUnit(58).html = "&#x20ad;";
+        state.dataCostEstimateManager->monetaryUnit(59).html = "£";
+        state.dataCostEstimateManager->monetaryUnit(60).html = "&#x20a8;";
+        state.dataCostEstimateManager->monetaryUnit(61).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(62).html = "Lt";
+        state.dataCostEstimateManager->monetaryUnit(63).html = "Ls";
+        state.dataCostEstimateManager->monetaryUnit(64).html = "&#x0434;&#x0435;&#x043d;";
+        state.dataCostEstimateManager->monetaryUnit(65).html = "&#x20ae;";
+        state.dataCostEstimateManager->monetaryUnit(66).html = "&#x20a8;";
+        state.dataCostEstimateManager->monetaryUnit(67).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(68).html = "RM";
+        state.dataCostEstimateManager->monetaryUnit(69).html = "MT";
+        state.dataCostEstimateManager->monetaryUnit(70).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(71).html = "&#x20a6;";
+        state.dataCostEstimateManager->monetaryUnit(72).html = "C$";
+        state.dataCostEstimateManager->monetaryUnit(73).html = "kr";
+        state.dataCostEstimateManager->monetaryUnit(74).html = "&#x20a8;";
+        state.dataCostEstimateManager->monetaryUnit(75).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(76).html = "&#xfdfc;";
+        state.dataCostEstimateManager->monetaryUnit(77).html = "B/.";
+        state.dataCostEstimateManager->monetaryUnit(78).html = "S/.";
+        state.dataCostEstimateManager->monetaryUnit(79).html = "Php";
+        state.dataCostEstimateManager->monetaryUnit(80).html = "&#x20a8;";
+        state.dataCostEstimateManager->monetaryUnit(81).html = "&#x007a;&#x0142;";
+        state.dataCostEstimateManager->monetaryUnit(82).html = "Gs";
+        state.dataCostEstimateManager->monetaryUnit(83).html = "&#xfdfc;";
+        state.dataCostEstimateManager->monetaryUnit(84).html = "lei";
+        state.dataCostEstimateManager->monetaryUnit(85).html = "&#x0414;&#x0438;&#x043d;&#x002e;";
+        state.dataCostEstimateManager->monetaryUnit(86).html = "&#x0440;&#x0443;&#x0431;";
+        state.dataCostEstimateManager->monetaryUnit(87).html = "&#xfdfc;";
+        state.dataCostEstimateManager->monetaryUnit(88).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(89).html = "&#x20a8;";
+        state.dataCostEstimateManager->monetaryUnit(90).html = "kr";
+        state.dataCostEstimateManager->monetaryUnit(91).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(92).html = "£";
+        state.dataCostEstimateManager->monetaryUnit(93).html = "S";
+        state.dataCostEstimateManager->monetaryUnit(94).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(95).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(96).html = "£";
+        state.dataCostEstimateManager->monetaryUnit(97).html = "&#x0e3f;";
+        state.dataCostEstimateManager->monetaryUnit(98).html = "&#x20a4;";
+        state.dataCostEstimateManager->monetaryUnit(99).html = "YTL";
+        state.dataCostEstimateManager->monetaryUnit(100).html = "TT$";
+        state.dataCostEstimateManager->monetaryUnit(101).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(102).html = "NT$";
+        state.dataCostEstimateManager->monetaryUnit(103).html = "&#x20b4;";
+        state.dataCostEstimateManager->monetaryUnit(104).html = "$U";
+        state.dataCostEstimateManager->monetaryUnit(105).html = "&#x043b;&#x0432;";
+        state.dataCostEstimateManager->monetaryUnit(106).html = "Bs";
+        state.dataCostEstimateManager->monetaryUnit(107).html = "&#x20ab;";
+        state.dataCostEstimateManager->monetaryUnit(108).html = "$";
+        state.dataCostEstimateManager->monetaryUnit(109).html = "&#xfdfc;";
+        state.dataCostEstimateManager->monetaryUnit(110).html = "R";
+        state.dataCostEstimateManager->monetaryUnit(111).html = "Z$";
     }
 
     int LookUpSeason(std::string const &nameOfSeason, std::string const &nameOfReferingObj)
@@ -2866,7 +2873,7 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ComputeTariff(IOFiles &ioFiles)
+    void ComputeTariff(EnergyPlusData &state)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
@@ -2898,7 +2905,7 @@ namespace EconomicTariff {
         Real64 annualAggregate;
         int annualCnt;
 
-        if (!ioFiles.outputControl.tabular) {
+        if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
             WriteTabularFiles = false;
             return;
         }
@@ -4178,7 +4185,7 @@ namespace EconomicTariff {
         }
     }
 
-    void WriteTabularTariffReports(CostEstimateManagerData &dataCostEstimateManager)
+    void WriteTabularTariffReports(EnergyPlusData &state)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
@@ -4299,7 +4306,7 @@ namespace EconomicTariff {
                 }
                 columnWidth = 14; // array assignment - same for all columns
                 WriteSubtitle("Annual Cost");
-                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost");
@@ -4356,7 +4363,7 @@ namespace EconomicTariff {
                 }
                 columnWidth = 14; // array assignment - same for all columns
                 WriteSubtitle("Tariff Summary");
-                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
@@ -4437,7 +4444,7 @@ namespace EconomicTariff {
                     }
                     columnWidth = 14; // array assignment - same for all columns
                     WriteSubtitle("General");
-                    WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "Tariff Report", tariff(iTariff).tariffName, "General");
@@ -4462,7 +4469,7 @@ namespace EconomicTariff {
                     econVar(tariff(iTariff).ptSubtotal).activeNow = true;
                     econVar(tariff(iTariff).ptTaxes).activeNow = true;
                     econVar(tariff(iTariff).ptTotal).activeNow = true;
-                    ReportEconomicVariable(dataCostEstimateManager, "Categories", false, true, tariff(iTariff).tariffName);
+                    ReportEconomicVariable(state, "Categories", false, true, tariff(iTariff).tariffName);
                     //---- Charges
                     for (auto &e : econVar)
                         e.activeNow = false;
@@ -4473,7 +4480,7 @@ namespace EconomicTariff {
                             }
                         }
                     }
-                    ReportEconomicVariable(dataCostEstimateManager, "Charges", true, true, tariff(iTariff).tariffName);
+                    ReportEconomicVariable(state, "Charges", true, true, tariff(iTariff).tariffName);
                     //---- Sources for Charges
                     for (auto &e : econVar)
                         e.activeNow = false;
@@ -4491,7 +4498,7 @@ namespace EconomicTariff {
                             }
                         }
                     }
-                    ReportEconomicVariable(dataCostEstimateManager, "Corresponding Sources for Charges", false, false, tariff(iTariff).tariffName);
+                    ReportEconomicVariable(state, "Corresponding Sources for Charges", false, false, tariff(iTariff).tariffName);
                     //---- Rachets
                     for (auto &e : econVar)
                         e.activeNow = false;
@@ -4502,7 +4509,7 @@ namespace EconomicTariff {
                             }
                         }
                     }
-                    ReportEconomicVariable(dataCostEstimateManager, "Ratchets", false, false, tariff(iTariff).tariffName);
+                    ReportEconomicVariable(state, "Ratchets", false, false, tariff(iTariff).tariffName);
                     //---- Qualifies
                     for (auto &e : econVar)
                         e.activeNow = false;
@@ -4513,14 +4520,14 @@ namespace EconomicTariff {
                             }
                         }
                     }
-                    ReportEconomicVariable(dataCostEstimateManager, "Qualifies", false, false, tariff(iTariff).tariffName);
+                    ReportEconomicVariable(state, "Qualifies", false, false, tariff(iTariff).tariffName);
                     //---- Native Variables
                     for (auto &e : econVar)
                         e.activeNow = false;
                     for (kVar = tariff(iTariff).firstNative; kVar <= tariff(iTariff).lastNative; ++kVar) {
                         econVar(kVar).activeNow = true;
                     }
-                    ReportEconomicVariable(dataCostEstimateManager, "Native Variables", false, false, tariff(iTariff).tariffName);
+                    ReportEconomicVariable(state, "Native Variables", false, false, tariff(iTariff).tariffName);
                     //---- Other Variables
                     for (auto &e : econVar)
                         e.activeNow = false;
@@ -4531,7 +4538,7 @@ namespace EconomicTariff {
                             }
                         }
                     }
-                    ReportEconomicVariable(dataCostEstimateManager, "Other Variables", false, false, tariff(iTariff).tariffName);
+                    ReportEconomicVariable(state, "Other Variables", false, false, tariff(iTariff).tariffName);
                     //---- Computation
                     if (computation(iTariff).isUserDef) {
                         WriteTextLine("Computation -  User Defined", true);
@@ -4674,7 +4681,7 @@ namespace EconomicTariff {
     }
 
     void
-    ReportEconomicVariable(CostEstimateManagerData &dataCostEstimateManager, std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString)
+    ReportEconomicVariable(EnergyPlusData &state, std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
@@ -4817,7 +4824,7 @@ namespace EconomicTariff {
         }
         columnWidth = 14; // array assignment - same for all columns
         WriteSubtitle(titleString);
-        WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (sqlite) {
             sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);
         }

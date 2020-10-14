@@ -1781,7 +1781,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     Real64 AbsChillEvapLoad;
     bool AbsChillRunFlag = true;
     // check chiller inputs
-    auto &thisChiller = state.dataChillerAbsorbers.absorptionChillers(AbsChillNum);
+    auto &thisChiller = state.dataChillerAbsorber->absorptionChillers(AbsChillNum);
     EXPECT_EQ(thisChiller.NomCap, 100000.0);
     EXPECT_EQ(thisChiller.FlowMode, DataPlant::FlowMode::LEAVINGSETPOINTMODULATED);
     // define local var
@@ -1817,7 +1817,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     PlantLoop(GenLoopNum).LoopSide(GenLoopSideNum).FlowLock = 0;
     // run CalcBLASTAbsorberModel
     thisChiller.EquipFlowCtrl = EquipFlowCtrl;
-    thisChiller.calculate(AbsChillEvapLoad, AbsChillRunFlag);
+    thisChiller.calculate(state, AbsChillEvapLoad, AbsChillRunFlag);
     // check generator hot water mass flow rate is proportional to the chilled water flow rate
     EXPECT_EQ(DataLoopNode::Node(GeneratorInletNode).MassFlowRate, GenMassFlowRateTestResult);
     EXPECT_EQ(DataLoopNode::Node(GeneratorOutletNode).MassFlowRate, GenMassFlowRateTestResult);

@@ -433,15 +433,16 @@ namespace PollutionModule {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void SetupPollutionCalculations(IOFiles &ioFiles);
+    void SetupPollutionCalculations(EnergyPlusData &state);
 
-    void GetPollutionFactorInput();
+    void GetPollutionFactorInput(EnergyPlusData &state);
 
-    void SetupPollutionMeterReporting();
+    void SetupPollutionMeterReporting(EnergyPlusData &state);
 
     void CheckPollutionMeterReporting();
 
-    void CheckFFSchedule(std::string const &currentModuleObject, // the module Object
+    void CheckFFSchedule(EnergyPlusData &state,
+                         std::string const &currentModuleObject, // the module Object
                          std::string const &resourceType,        // resource type (Natural Gas, etc)
                          std::string const &fieldName,           // Actual field name
                          std::string const &ScheduleName,        // Schedule Name as input
@@ -460,14 +461,16 @@ namespace PollutionModule {
     // Utility Routines to allow access to data inside this module.
     // *****************************************************************************
 
-    void GetFuelFactorInfo(std::string const &fuelName,  // input fuel name  (standard from Tabular reports)
+    void GetFuelFactorInfo(EnergyPlusData &state,
+                           std::string const &fuelName,  // input fuel name  (standard from Tabular reports)
                            bool &fuelFactorUsed,         // return value true if user has entered this fuel
                            Real64 &fuelSourceFactor,     // if used, the source factor
                            bool &fuelFactorScheduleUsed, // if true, schedules for this fuel are used
                            int &ffScheduleIndex          // if schedules for this fuel are used, return schedule index
     );
 
-    void GetEnvironmentalImpactFactorInfo(Real64 &efficiencyDistrictHeating, // if entered, the efficiency of District Heating
+    void GetEnvironmentalImpactFactorInfo(EnergyPlusData &state,
+                                          Real64 &efficiencyDistrictHeating, // if entered, the efficiency of District Heating
                                           Real64 &efficiencyDistrictCooling, // if entered, the efficiency of District Cooling
                                           Real64 &sourceFactorSteam          // if entered, the source factor for Steam
     );

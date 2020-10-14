@@ -47,10 +47,7 @@
 
 // C++ Headers
 #include <cmath>
-#include <fstream>
-#include <iostream>
 #include <ostream>
-#include <random>
 #include <string>
 #include <vector>
 #include <map>
@@ -63,38 +60,25 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/Reference.fwd.hh>
-#include <ObjexxFCL/environment.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-#include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/ResultsFramework.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
 namespace ResultsFramework {
 
-    using namespace DataHVACGlobals;
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::InitConvTemp;
     using DataGlobals::SecInHour;
-    using General::RoundSigDigits;
-    using General::TrimSigDigits;
     using OutputProcessor::RealVariableType;
     using OutputProcessor::RealVariables;
 
@@ -879,7 +863,7 @@ namespace ResultsFramework {
             print(outputFile, "{}{}", sep, *it);
             if (sep.empty()) sep = ",";
         }
-        print(outputFile, "{}", DataStringGlobals::NL);
+        print(outputFile, "{}", '\n');
 
         for (auto & item : outputs) {
             std::string datetime = item.first;
@@ -897,20 +881,20 @@ namespace ResultsFramework {
                 last = (result + 1).base();
             }
             print(item.second.begin(), last, outputFile, ",");
-            print(outputFile, "{}{}", *last, DataStringGlobals::NL);
+            print(outputFile, "{}{}", *last, '\n');
         }
 
         outputFile.close();
     }
 
-    void ResultsFramework::setupOutputOptions(IOFiles &ioFiles)
+    void ResultsFramework::setupOutputOptions(EnergyPlusData &state)
     {
-        if (ioFiles.outputControl.csv) {
+        if (state.files.outputControl.csv) {
             tsEnabled = true;
             tsAndTabularEnabled = true;
         }
 
-        if (!ioFiles.outputControl.json) {
+        if (!state.files.outputControl.json) {
             return;
         }
 
@@ -924,7 +908,7 @@ namespace ResultsFramework {
         Array1D<Real64> numbers(2);
         int numNumbers;
         int status;
-        inputProcessor->getObjectItem("Output:JSON", 1, alphas, numAlphas, numbers, numNumbers, status);
+        inputProcessor->getObjectItem(state, "Output:JSON", 1, alphas, numAlphas, numbers, numNumbers, status);
 
         if (numAlphas > 0) {
             std::string option = alphas(1);
@@ -1273,22 +1257,22 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsFramework::writeOutputs(IOFiles & ioFiles)
+    void ResultsFramework::writeOutputs(EnergyPlusData &state)
     {
-        if (ioFiles.outputControl.csv) {
-            writeCSVOutput(ioFiles);
+        if (state.files.outputControl.csv) {
+            writeCSVOutput(state);
         }
 
         if (timeSeriesEnabled() && (outputJSON || outputCBOR || outputMsgPack)) {
-            writeTimeSeriesReports(ioFiles.json);
+            writeTimeSeriesReports(state.files.json);
         }
 
         if (timeSeriesAndTabularEnabled() && (outputJSON || outputCBOR || outputMsgPack)) {
-            writeReport(ioFiles.json);
+            writeReport(state.files.json);
         }
     }
 
-    void ResultsFramework::writeCSVOutput(IOFiles & ioFiles)
+    void ResultsFramework::writeCSVOutput(EnergyPlusData &state)
     {
         if (!hasOutputData()) {
             return;
@@ -1366,9 +1350,9 @@ namespace ResultsFramework {
             csv.parseTSOutputs(RIDetailedZoneTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::EachCall);
         }
 
-        csv.writeOutput(outputVariables, ioFiles.csv, ioFiles.outputControl.csv);
+        csv.writeOutput(outputVariables, state.files.csv, state.files.outputControl.csv);
         if (hasMeterData()) {
-            mtr_csv.writeOutput(outputVariables, ioFiles.mtr_csv, ioFiles.outputControl.csv);
+            mtr_csv.writeOutput(outputVariables, state.files.mtr_csv, state.files.outputControl.csv);
         }
     }
 

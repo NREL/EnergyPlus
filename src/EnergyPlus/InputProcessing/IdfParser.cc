@@ -49,12 +49,6 @@
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
 
-#ifdef _WIN32
-std::string const NL("\r\n"); // Platform newline
-#else
-std::string const NL("\n"); // Platform newline
-#endif
-
 using json = nlohmann::json;
 
 auto const icompare = [](std::string const &a, std::string const &b) {

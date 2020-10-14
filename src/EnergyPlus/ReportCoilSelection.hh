@@ -57,6 +57,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -273,7 +274,8 @@ public: // methods
                         bool const isAutoSized       // true if air flow was autosized
     );
 
-    void setCoilWaterFlowNodeNums(std::string const &coilName, // user-defined name of the coil
+    void setCoilWaterFlowNodeNums(EnergyPlusData &state,
+                                  std::string const &coilName, // user-defined name of the coil
                                   std::string const &coilType, // idf input object class name of coil
                                   Real64 const waterVdot,      // water flow rate in m3/s
                                   bool const isAutoSized,      // true if water flow was autosized
@@ -282,7 +284,8 @@ public: // methods
                                   int const DataWaterLoopNum   // plant loop structure index
     );
 
-    void setCoilWaterFlowPltSizNum(std::string const &coilName, // user-defined name of the coil
+    void setCoilWaterFlowPltSizNum(EnergyPlusData &state,
+                                   std::string const &coilName, // user-defined name of the coil
                                    std::string const &coilType, // idf input object class name of coil
                                    Real64 const waterVdot,      // water flow rate in m3/s
                                    bool const isAutoSized,      // true if water flow was autosized

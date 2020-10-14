@@ -53,6 +53,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace EcoRoofManager {
 
     extern Real64 CumRunoff; // Cumulative runoff, updated each time step (m) mult by roof area to get volume
@@ -71,15 +74,14 @@ namespace EcoRoofManager {
     // Functions
 
     void CalcEcoRoof(EnergyPlusData &state,
-                     ConvectionCoefficientsData &dataConvectionCoefficients,
-                     IOFiles &ioFiles,
                      int const SurfNum, // Indicator of Surface Number for the current surface
                      int const ZoneNum, // Indicator for zone number where the current surface
                      int &ConstrNum,    // Indicator for construction index for the current surface
                      Real64 &TempExt    // Exterior temperature boundary condition
     );
 
-    void UpdateSoilProps(Real64 &Moisture,
+    void UpdateSoilProps(EnergyPlusData &state,
+                         Real64 &Moisture,
                          Real64 &MeanRootMoisture,
                          Real64 const MoistureMax,
                          Real64 const MoistureResidual,

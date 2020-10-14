@@ -60,7 +60,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct ConvectionCoefficientsData;
 
 namespace TranspiredCollector {
 
@@ -177,19 +176,17 @@ namespace TranspiredCollector {
     void clear_state();
 
     void SimTranspiredCollector(EnergyPlusData &state,
-                                ConvectionCoefficientsData &dataConvectionCoefficients,
-                                IOFiles &ioFiles,
                                 std::string const &CompName, // component name
                                 int &CompIndex               // component index (to reduce string compares during simulation)
     );
 
-    void GetTranspiredCollectorInput();
+    void GetTranspiredCollectorInput(EnergyPlusData &state);
 
     void InitTranspiredCollector(int const UTSCNum); // compindex already checked in calling routine
 
-    void CalcActiveTranspiredCollector(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const UTSCNum);
+    void CalcActiveTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
 
-    void CalcPassiveTranspiredCollector(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const UTSCNum);
+    void CalcPassiveTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
 
     void UpdateTranspiredCollector(int const UTSCNum);
 
@@ -197,16 +194,14 @@ namespace TranspiredCollector {
                            Real64 const QSource // source term in Watts
     );
 
-    void GetTranspiredCollectorIndex(int const SurfacePtr, int &UTSCIndex);
+    void GetTranspiredCollectorIndex(EnergyPlusData &state, int const SurfacePtr, int &UTSCIndex);
 
     void GetUTSCTsColl(int const UTSCNum, Real64 &TsColl);
 
-    int GetAirInletNodeNum(std::string const &UTSCName,
-        bool &ErrorsFound
+    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound
     );
 
-    int GetAirOutletNodeNum(std::string const &UTSCName,
-        bool &ErrorsFound
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound
     );
 
 } // namespace TranspiredCollector

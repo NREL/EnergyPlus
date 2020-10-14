@@ -52,10 +52,14 @@
 #include <memory>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 class XingGroundTempsModel : public BaseGroundTempsModel
 {
@@ -69,13 +73,13 @@ public:
     Real64 surfTempAmplitude_2;
     Real64 phaseShift_2;
 
-    static std::shared_ptr<XingGroundTempsModel> XingGTMFactory(int objectType, std::string objectName);
+    static std::shared_ptr<XingGroundTempsModel> XingGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
 
-    Real64 getGroundTemp() override;
+    Real64 getGroundTemp(EnergyPlusData &state) override;
 
-    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim) override;
+    Real64 getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim) override;
+    Real64 getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const depth, int const monthOfSim) override;
 };
 
 } // namespace EnergyPlus

@@ -204,21 +204,21 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
 
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
 
     GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     GetZoneEquipmentData(state);
 
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
-    GetConstructData(state.files, ErrorsFound); // read construction data
+    GetConstructData(state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
+    GetZoneData(state, ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     CosZoneRelNorth.allocate(1);
@@ -229,7 +229,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     DataEnvironment::OutDryBulbTemp = 20.0;
@@ -239,7 +239,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
 
     InitializePsychRoutines();
 
-    GetTranspiredCollectorInput();
+    GetTranspiredCollectorInput(state);
     EXPECT_FALSE(ErrorsFound);
 
     BeginEnvrnFlag = true;

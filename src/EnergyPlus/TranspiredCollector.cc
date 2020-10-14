@@ -115,7 +115,7 @@ namespace TranspiredCollector {
     using DataGlobals::DegToRadians;
     using DataGlobals::KelvinConv;
     using DataGlobals::SecInHour;
-    using DataHeatBalance::QRadSWOutIncident;
+    using DataHeatBalance::SurfQRadSWOutIncident;
     using DataVectorTypes::Vector;
 
     // Data
@@ -152,8 +152,6 @@ namespace TranspiredCollector {
     }
 
     void SimTranspiredCollector(EnergyPlusData &state,
-                                ConvectionCoefficientsData &dataConvectionCoefficients,
-                                IOFiles &ioFiles,
                                 std::string const &CompName, // component name
                                 int &CompIndex               // component index (to reduce string compares during simulation)
     )
@@ -182,7 +180,7 @@ namespace TranspiredCollector {
         static int UTSCNum(0); // local number index for UTSC
 
         if (GetInputFlag) {
-            GetTranspiredCollectorInput();
+            GetTranspiredCollectorInput(state);
             GetInputFlag = false;
         }
 
@@ -233,15 +231,15 @@ namespace TranspiredCollector {
         }
 
         if (UTSC(UTSCNum).IsOn) {
-            CalcActiveTranspiredCollector(state, dataConvectionCoefficients, ioFiles, UTSCNum);
+            CalcActiveTranspiredCollector(state, UTSCNum);
         } else {
-            CalcPassiveTranspiredCollector(state, dataConvectionCoefficients, ioFiles, UTSCNum);
+            CalcPassiveTranspiredCollector(state, UTSCNum);
         }
 
         UpdateTranspiredCollector(UTSCNum);
     }
 
-    void GetTranspiredCollectorInput()
+    void GetTranspiredCollectorInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -341,7 +339,8 @@ namespace TranspiredCollector {
         SplitterNameOK.dimension(NumUTSCSplitter, false);
 
         for (Item = 1; Item <= NumUTSC; ++Item) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           Item,
                                           Alphas,
                                           NumAlphas,
@@ -370,7 +369,7 @@ namespace TranspiredCollector {
                 AlphasSplit = "";
                 for (ItemSplit = 1; ItemSplit <= NumUTSCSplitter; ++ItemSplit) {
                     inputProcessor->getObjectItem(
-                        CurrentModuleMultiObject, ItemSplit, AlphasSplit, NumAlphasSplit, NumbersSplit, NumNumbersSplit, IOStatusSplit);
+                        state, CurrentModuleMultiObject, ItemSplit, AlphasSplit, NumAlphasSplit, NumbersSplit, NumNumbersSplit, IOStatusSplit);
                     if (!(UtilityRoutines::SameString(AlphasSplit(1), Alphas(1)))) continue;
                     SplitterNameOK(ItemSplit) = true;
                     UTSC(Item).NumOASysAttached = std::floor(NumAlphasSplit / 4.0);
@@ -389,7 +388,7 @@ namespace TranspiredCollector {
                     UTSC(Item).ZoneNode = 0;
                     for (NumOASys = 1; NumOASys <= UTSC(Item).NumOASysAttached; ++NumOASys) {
                         ACountBase = (NumOASys - 1) * 4 + 2;
-                        UTSC(Item).InletNode(NumOASys) = GetOnlySingleNode(AlphasSplit(ACountBase),
+                        UTSC(Item).InletNode(NumOASys) = GetOnlySingleNode(state, AlphasSplit(ACountBase),
                                                                            ErrorsFound,
                                                                            CurrentModuleObject,
                                                                            AlphasSplit(1),
@@ -398,7 +397,7 @@ namespace TranspiredCollector {
                                                                            NumOASys,
                                                                            ObjectIsNotParent);
 
-                        UTSC(Item).OutletNode(NumOASys) = GetOnlySingleNode(AlphasSplit(ACountBase + 1),
+                        UTSC(Item).OutletNode(NumOASys) = GetOnlySingleNode(state, AlphasSplit(ACountBase + 1),
                                                                             ErrorsFound,
                                                                             CurrentModuleObject,
                                                                             AlphasSplit(1),
@@ -411,7 +410,7 @@ namespace TranspiredCollector {
                                     AlphasSplit(ACountBase),
                                     AlphasSplit(ACountBase + 1),
                                     "Transpired Collector Air Nodes"); // appears that test fails by design??
-                        UTSC(Item).ControlNode(NumOASys) = GetOnlySingleNode(AlphasSplit(ACountBase + 2),
+                        UTSC(Item).ControlNode(NumOASys) = GetOnlySingleNode(state, AlphasSplit(ACountBase + 2),
                                                                              ErrorsFound,
                                                                              CurrentModuleObject,
                                                                              AlphasSplit(1),
@@ -420,7 +419,7 @@ namespace TranspiredCollector {
                                                                              1,
                                                                              ObjectIsNotParent);
 
-                        UTSC(Item).ZoneNode(NumOASys) = GetOnlySingleNode(AlphasSplit(ACountBase + 3),
+                        UTSC(Item).ZoneNode(NumOASys) = GetOnlySingleNode(state, AlphasSplit(ACountBase + 3),
                                                                           ErrorsFound,
                                                                           CurrentModuleObject,
                                                                           AlphasSplit(1),
@@ -444,7 +443,7 @@ namespace TranspiredCollector {
             if (lAlphaFieldBlanks(3)) {
                 UTSC(Item).SchedPtr = ScheduleAlwaysOn;
             } else {
-                UTSC(Item).SchedPtr = GetScheduleIndex(Alphas(3));
+                UTSC(Item).SchedPtr = GetScheduleIndex(state, Alphas(3));
                 if (UTSC(Item).SchedPtr == 0) {
                     ShowSevereError(cAlphaFieldNames(3) + "not found=" + Alphas(3) + " in " + CurrentModuleObject + " =" + UTSC(Item).Name);
                     ErrorsFound = true;
@@ -464,19 +463,19 @@ namespace TranspiredCollector {
                 UTSC(Item).ZoneNode.allocate(1);
                 UTSC(Item).ZoneNode(1) = 0;
 
-                UTSC(Item).InletNode(1) = GetOnlySingleNode(
+                UTSC(Item).InletNode(1) = GetOnlySingleNode(state,
                     Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-                UTSC(Item).OutletNode(1) = GetOnlySingleNode(
+                UTSC(Item).OutletNode(1) = GetOnlySingleNode(state,
                     Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
                 TestCompSet(CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Transpired Collector Air Nodes");
 
-                UTSC(Item).ControlNode(1) = GetOnlySingleNode(
+                UTSC(Item).ControlNode(1) = GetOnlySingleNode(state,
                     Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-                UTSC(Item).ZoneNode(1) = GetOnlySingleNode(
+                UTSC(Item).ZoneNode(1) = GetOnlySingleNode(state,
                     Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             } // no splitter
 
-            UTSC(Item).FreeHeatSetPointSchedPtr = GetScheduleIndex(Alphas(8));
+            UTSC(Item).FreeHeatSetPointSchedPtr = GetScheduleIndex(state, Alphas(8));
             if (UTSC(Item).FreeHeatSetPointSchedPtr == 0) {
                 ShowSevereError(cAlphaFieldNames(8) + " not found=" + Alphas(8) + " in " + CurrentModuleObject + " =" + UTSC(Item).Name);
                 ErrorsFound = true;
@@ -660,23 +659,23 @@ namespace TranspiredCollector {
             tempHdeltaNPL = std::sin(TiltRads) * UTSC(Item).Height / 4.0;
             UTSC(Item).HdeltaNPL = max(tempHdeltaNPL, UTSC(Item).PlenGapThick);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Solar Collector Heat Exchanger Effectiveness", OutputProcessor::Unit::None, UTSC(Item).HXeff, "System", "Average", UTSC(Item).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Solar Collector Leaving Air Temperature", OutputProcessor::Unit::C, UTSC(Item).TairHX, "System", "Average", UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Outside Face Suction Velocity",
+            SetupOutputVariable(state, "Solar Collector Outside Face Suction Velocity",
                                 OutputProcessor::Unit::m_s,
                                 UTSC(Item).Vsuction,
                                 "System",
                                 "Average",
                                 UTSC(Item).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Solar Collector Surface Temperature", OutputProcessor::Unit::C, UTSC(Item).Tcoll, "System", "Average", UTSC(Item).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Solar Collector Plenum Air Temperature", OutputProcessor::Unit::C, UTSC(Item).Tplen, "System", "Average", UTSC(Item).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Solar Collector Sensible Heating Rate", OutputProcessor::Unit::W, UTSC(Item).SensHeatingRate, "System", "Average", UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Sensible Heating Energy",
+            SetupOutputVariable(state, "Solar Collector Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
                                 UTSC(Item).SensHeatingEnergy,
                                 "System",
@@ -688,35 +687,35 @@ namespace TranspiredCollector {
                                 _,
                                 "System");
 
-            SetupOutputVariable("Solar Collector Natural Ventilation Air Change Rate",
+            SetupOutputVariable(state, "Solar Collector Natural Ventilation Air Change Rate",
                                 OutputProcessor::Unit::ach,
                                 UTSC(Item).PassiveACH,
                                 "System",
                                 "Average",
                                 UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Natural Ventilation Mass Flow Rate",
+            SetupOutputVariable(state, "Solar Collector Natural Ventilation Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 UTSC(Item).PassiveMdotVent,
                                 "System",
                                 "Average",
                                 UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Wind Natural Ventilation Mass Flow Rate",
+            SetupOutputVariable(state, "Solar Collector Wind Natural Ventilation Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 UTSC(Item).PassiveMdotWind,
                                 "System",
                                 "Average",
                                 UTSC(Item).Name);
-            SetupOutputVariable("Solar Collector Buoyancy Natural Ventilation Mass Flow Rate",
+            SetupOutputVariable(state, "Solar Collector Buoyancy Natural Ventilation Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 UTSC(Item).PassiveMdotTherm,
                                 "System",
                                 "Average",
                                 UTSC(Item).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Solar Collector Incident Solar Radiation", OutputProcessor::Unit::W_m2, UTSC(Item).Isc, "System", "Average", UTSC(Item).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Solar Collector System Efficiency", OutputProcessor::Unit::None, UTSC(Item).UTSCEfficiency, "System", "Average", UTSC(Item).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Solar Collector Surface Efficiency", OutputProcessor::Unit::None, UTSC(Item).UTSCCollEff, "System", "Average", UTSC(Item).Name);
         }
 
@@ -874,7 +873,7 @@ namespace TranspiredCollector {
         UTSC(UTSCNum).UTSCCollEff = 0.0;
     }
 
-    void CalcActiveTranspiredCollector(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const UTSCNum)
+    void CalcActiveTranspiredCollector(EnergyPlusData &state, int const UTSCNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1079,10 +1078,9 @@ namespace TranspiredCollector {
             HMovInsul = 0.0;
             HExt = 0.0;
             LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
-            InitExteriorConvectionCoeff(state, dataConvectionCoefficients, ioFiles,
-                SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
+            InitExteriorConvectionCoeff(state, SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = Surface(SurfPtr).Construction;
-            AbsThermSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+            AbsThermSurf = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
             TsoK = TH(1, 1, SurfPtr) + KelvinConv;
             TscollK = UTSC(UTSCNum).TcollLast + KelvinConv;
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TscollK) - pow_4(TsoK)) / (TscollK - TsoK);
@@ -1117,7 +1115,7 @@ namespace TranspiredCollector {
 
         //		Isc = sum( QRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum;
         ////Autodesk:F2C++ Array subscript usage: Replaced by below
-        Isc = sum_product_sub(QRadSWOutIncident, Surface, &SurfaceData::Area, UTSC(UTSCNum).SurfPtrs) /
+        Isc = sum_product_sub(SurfQRadSWOutIncident, Surface, &SurfaceData::Area, UTSC(UTSCNum).SurfPtrs) /
               AreaSum; // Autodesk:F2C++ Functions handle array subscript usage
         //		Tso = sum( TH( UTSC( UTSCNum ).SurfPtrs, 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array
         // subscript usage: Replaced by below
@@ -1220,7 +1218,7 @@ namespace TranspiredCollector {
         }
     }
 
-    void CalcPassiveTranspiredCollector(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const UTSCNum)
+    void CalcPassiveTranspiredCollector(EnergyPlusData &state, int const UTSCNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1295,8 +1293,6 @@ namespace TranspiredCollector {
         // all the work is done in this routine located in GeneralRoutines.cc
 
         CalcPassiveExteriorBaffleGap(state,
-                                     dataConvectionCoefficients,
-                                     ioFiles,
                                      UTSC(UTSCNum).SurfPtrs,
                                      holeArea,
                                      UTSC(UTSCNum).Cv,
@@ -1474,7 +1470,7 @@ namespace TranspiredCollector {
         UTSC(UTSCNum).QdotSource = QSource / UTSC(UTSCNum).ProjArea;
     }
 
-    void GetTranspiredCollectorIndex(int const SurfacePtr, int &UTSCIndex)
+    void GetTranspiredCollectorIndex(EnergyPlusData &state, int const SurfacePtr, int &UTSCIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1500,7 +1496,7 @@ namespace TranspiredCollector {
         bool Found;
 
         if (GetInputFlag) {
-            GetTranspiredCollectorInput();
+            GetTranspiredCollectorInput(state);
             GetInputFlag = false;
         }
 
@@ -1564,7 +1560,7 @@ namespace TranspiredCollector {
         TsColl = UTSC(UTSCNum).Tcoll;
     }
 
-    int GetAirInletNodeNum(std::string const &UTSCName, bool &ErrorsFound)
+    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -1583,7 +1579,7 @@ namespace TranspiredCollector {
         int WhichUTSC;
 
         if (GetInputFlag) {
-            GetTranspiredCollectorInput();
+            GetTranspiredCollectorInput(state);
             GetInputFlag = false;
         }
 
@@ -1599,7 +1595,7 @@ namespace TranspiredCollector {
         return NodeNum;
     }
 
-    int GetAirOutletNodeNum(std::string const &UTSCName, bool &ErrorsFound)
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -1618,7 +1614,7 @@ namespace TranspiredCollector {
         int WhichUTSC;
 
         if (GetInputFlag) {
-            GetTranspiredCollectorInput();
+            GetTranspiredCollectorInput(state);
             GetInputFlag = false;
         }
 

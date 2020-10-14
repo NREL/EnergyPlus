@@ -59,7 +59,7 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct CostEstimateManagerData;
+struct EnergyPlusData;
 
 namespace EconomicTariff {
 
@@ -557,7 +557,7 @@ namespace EconomicTariff {
 
     // Functions
 
-    void UpdateUtilityBills(CostEstimateManagerData &dataCostEstimateManager);
+    void UpdateUtilityBills(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -567,27 +567,27 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputEconomicsTariff(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsQualify(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsChargeSimple(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsChargeBlock(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsRatchet(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsRatchet(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsVariable(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsComputation(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsComputation(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsCurrencyType(CostEstimateManagerData &dataCostEstimateManager, bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsCurrencyType(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
     void parseComputeLine(std::string const &lineOfCompute, int const fromTariff);
 
     void GetLastWord(std::string const &lineOfText, std::string::size_type &endOfScan, std::string &aWord);
 
-    void initializeMonetaryUnit(CostEstimateManagerData &dataCostEstimateManager);
+    void initializeMonetaryUnit(EnergyPlusData &state);
 
     int LookUpSeason(std::string const &nameOfSeason, std::string const &nameOfReferingObj);
 
@@ -647,7 +647,7 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ComputeTariff(IOFiles &ioFiles);
+    void ComputeTariff(EnergyPlusData &state);
 
     void pushStack(Array1A<Real64> const monthlyArray, int const variablePointer);
 
@@ -669,14 +669,14 @@ namespace EconomicTariff {
 
     void LEEDtariffReporting();
 
-    void WriteTabularTariffReports(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteTabularTariffReports(EnergyPlusData &state);
 
     void showWarningsBasedOnTotal();
 
     void getMaxAndSum(int const varPointer, Real64 &sumResult, Real64 &maxResult);
 
     void
-    ReportEconomicVariable(CostEstimateManagerData &dataCostEstimateManager, std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString);
+    ReportEconomicVariable(EnergyPlusData &state, std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString);
 
     void selectTariff();
 

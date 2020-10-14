@@ -59,8 +59,9 @@
 #include <EnergyPlus/WaterToWaterHeatPumps.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace EIRPlantLoopHeatPumps {
 
@@ -146,16 +147,17 @@ namespace EIRPlantLoopHeatPumps {
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+        void getDesignCapacities(EnergyPlusData &state,
+                                 const PlantLocation &EP_UNUSED(calledFromLocation),
                                  Real64 &EP_UNUSED(MaxLoad),
                                  Real64 &EP_UNUSED(MinLoad),
                                  Real64 &EP_UNUSED(OptLoad)) override;
 
         void doPhysics(EnergyPlusData &state, Real64 currentLoad);
 
-        void sizeLoadSide();
+        void sizeLoadSide(EnergyPlusData &state);
 
-        void sizeSrcSideWSHP();
+        void sizeSrcSideWSHP(EnergyPlusData &state);
 
         void sizeSrcSideASHP();
 

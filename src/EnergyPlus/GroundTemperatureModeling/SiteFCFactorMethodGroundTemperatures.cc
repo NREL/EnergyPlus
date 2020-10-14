@@ -52,12 +52,12 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -68,7 +68,7 @@ namespace EnergyPlus {
 
 // Site:GroundTemperature:FCFactorMethod factory
 std::shared_ptr<SiteFCFactorMethodGroundTemps>
-SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(IOFiles &ioFiles, int objectType, std::string objectName)
+SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -81,8 +81,6 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(IOFiles &ioFiles, int objectTy
 
     // USE STATEMENTS:
     using DataEnvironment::FCGroundTemps;
-    using WeatherManager::GroundTempsFCFromEPWHeader;
-    using WeatherManager::wthFCGroundTemps;
     using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
     using namespace ObjexxFCL::gio;
@@ -106,7 +104,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(IOFiles &ioFiles, int objectTy
     if (numCurrObjects == 1) {
 
         // Get the object names for each construction from the input processor
-        inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+        inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
             ShowSevereError(cCurrentModuleObject + ": Less than 12 values entered.");
@@ -125,10 +123,10 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(IOFiles &ioFiles, int objectTy
         ShowSevereError(cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
         thisModel->errorsFound = true;
 
-    } else if (wthFCGroundTemps) {
+    } else if (state.dataWeatherManager->wthFCGroundTemps) {
 
         for (int i = 1; i <= 12; ++i) {
-            thisModel->fcFactorGroundTemps(i) = GroundTempsFCFromEPWHeader(i);
+            thisModel->fcFactorGroundTemps(i) = state.dataWeatherManager->GroundTempsFCFromEPWHeader(i);
         }
 
         FCGroundTemps = true;
@@ -141,7 +139,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(IOFiles &ioFiles, int objectTy
 
     // Write Final Ground Temp Information to the initialization output file
     if (FCGroundTemps) {
-        write_ground_temps(ioFiles.eio, "FCfactorMethod", thisModel->fcFactorGroundTemps);
+        write_ground_temps(state.files.eio, "FCfactorMethod", thisModel->fcFactorGroundTemps);
     }
 
     if (found && !thisModel->errorsFound) {
@@ -155,7 +153,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(IOFiles &ioFiles, int objectTy
 
 //******************************************************************************
 
-Real64 SiteFCFactorMethodGroundTemps::getGroundTemp()
+Real64 SiteFCFactorMethodGroundTemps::getGroundTemp(EnergyPlusData &EP_UNUSED(state))
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -171,7 +169,7 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTemp()
 
 //******************************************************************************
 
-Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInSeconds(Real64 const EP_UNUSED(_depth), Real64 const _seconds)
+Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const EP_UNUSED(_depth), Real64 const _seconds)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -184,10 +182,9 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInSeconds(Real64 const 
 
     // USE STATEMENTS:
     using DataGlobals::SecsInDay;
-    using WeatherManager::NumDaysInYear;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secPerMonth = NumDaysInYear * SecsInDay / 12;
+    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * SecsInDay / 12;
 
     // Convert secs to months
     int month = ceil(_seconds / secPerMonth);
@@ -199,12 +196,12 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInSeconds(Real64 const 
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************
 
-Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInMonths(Real64 const EP_UNUSED(_depth), int const _month)
+Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const EP_UNUSED(_depth), int const _month)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -223,7 +220,7 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInMonths(Real64 const E
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************
