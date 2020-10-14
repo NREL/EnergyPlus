@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -62,13 +63,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace SurfaceGroundHeatExchanger {
-
-    namespace loc {
-        extern int const MaxCTFTerms; // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms
-                                      // to avoid static initialization order bug: Keep them in sync
-    }                                 // namespace loc
-
-    void clear_state();
 
     struct SurfaceGroundHeatExchangerData : PlantComponent
     {
@@ -165,12 +159,12 @@ namespace SurfaceGroundHeatExchanger {
               LoopSideNum(0), BranchNum(0), CompNum(0),
 
               TsrcConstCoef(0.0), TsrcVarCoef(0.0), QbtmConstCoef(0.0), QbtmVarCoef(0.0), QtopConstCoef(0.0), QtopVarCoef(0.0), NumCTFTerms(0),
-              CTFin({0, loc::MaxCTFTerms - 1}, 0.0), CTFout({0, loc::MaxCTFTerms - 1}, 0.0), CTFcross({0, loc::MaxCTFTerms - 1}, 0.0),
-              CTFflux({0, loc::MaxCTFTerms - 1}, 0.0), CTFSourceIn({0, loc::MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, loc::MaxCTFTerms - 1}, 0.0),
-              CTFTSourceOut({0, loc::MaxCTFTerms - 1}, 0.0), CTFTSourceIn({0, loc::MaxCTFTerms - 1}, 0.0),
-              CTFTSourceQ({0, loc::MaxCTFTerms - 1}, 0.0), TbtmHistory({0, loc::MaxCTFTerms - 1}, 0.0), TtopHistory({0, loc::MaxCTFTerms - 1}, 0.0),
-              TsrcHistory({0, loc::MaxCTFTerms - 1}, 0.0), QbtmHistory({0, loc::MaxCTFTerms - 1}, 0.0), QtopHistory({0, loc::MaxCTFTerms - 1}, 0.0),
-              QsrcHistory({0, loc::MaxCTFTerms - 1}, 0.0), QSrc(0.0), QSrcAvg(0.0), LastQSrc(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0),
+              CTFin({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFout({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFcross({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              CTFflux({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFSourceIn({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              CTFTSourceOut({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFTSourceIn({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              CTFTSourceQ({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              TsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              QsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QSrc(0.0), QSrcAvg(0.0), LastQSrc(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0),
 
               InletTemp(0.0), OutletTemp(0.0), MassFlowRate(0.0), TopSurfaceTemp(0.0), BtmSurfaceTemp(0.0), TopSurfaceFlux(0.0), BtmSurfaceFlux(0.0),
               HeatTransferRate(0.0), SurfHeatTransferRate(0.0), Energy(0.0), SurfEnergy(0.0), SourceTemp(0.0),
@@ -257,11 +251,8 @@ namespace SurfaceGroundHeatExchanger {
 
         //==============================================================================
 
-        void ReportSurfaceGroundHeatExchngr(); // Index for the surface under consideration
+        void ReportSurfaceGroundHeatExchngr(EnergyPlusData &state); // Index for the surface under consideration
     };
-
-    // Object Data
-    extern Array1D<SurfaceGroundHeatExchangerData> SurfaceGHE;
 
     void GetSurfaceGroundHeatExchanger(EnergyPlusData &state);
 
@@ -269,6 +260,71 @@ namespace SurfaceGroundHeatExchanger {
 
 } // namespace SurfaceGroundHeatExchanger
 
+struct SurfaceGroundHeatExchangersData : BaseGlobalStruct {     
+
+    // utility variables initialized once
+    bool NoSurfaceGroundTempObjWarning = true; // This will cause a warning to be issued if no "surface" ground
+    Real64 FlowRate = 0.0;       // water mass flow rate
+    Real64 TopSurfTemp = 0.0;    // Top  surface temperature
+    Real64 BtmSurfTemp = 0.0;    // Bottom  surface temperature
+    Real64 TopSurfFlux = 0.0;    // Top  surface heat flux
+    Real64 BtmSurfFlux = 0.0;    // Bottom  surface heat flux
+    Real64 SourceFlux = 0.0;     // total heat transfer rate, Watts
+    Array1D_bool CheckEquipName;
+
+    // weather data records updated every zone time step
+    Real64 PastBeamSolarRad = 0.0;    // Previous beam normal solar irradiance
+    Real64 PastSolarDirCosVert = 0.0; // Previous vertical component of solar normal
+    Real64 PastDifSolarRad = 0.0;     // Previous sky diffuse solar horizontal irradiance
+    Real64 PastGroundTemp = 0.0;      // Previous ground temperature
+    bool PastIsRain = false;          // Previous Surfaces are wet for this time interval
+    bool PastIsSnow = false;          // Previous Snow on the ground for this time interval
+    Real64 PastOutDryBulbTemp = 0.0;  // Previous outdoor air dry bulb temperature
+    Real64 PastOutWetBulbTemp = 0.0;  // Previous outdoor air wet bulb temperature
+    Real64 PastSkyTemp = 0.0;         // Previous sky temperature
+    Real64 PastWindSpeed = 0.0;       // Previous outdoor air wind speed
+
+    bool GetInputFlag = true;
+
+    // time keeping variables used for keeping track of average flux over each time step
+    Array1D<Real64> QRadSysSrcAvg;      // Average source over the time step
+    Array1D<Real64> LastSysTimeElapsed; // record of system time
+    Array1D<Real64> LastTimeStepSys;    // previous time step size
+    bool InitializeTempTop = false;
+
+    Array1D<SurfaceGroundHeatExchanger::SurfaceGroundHeatExchangerData> SurfaceGHE;
+
+    void clear_state() override
+    {
+        NoSurfaceGroundTempObjWarning = true;
+        FlowRate = 0.0;
+        TopSurfTemp = 0.0;
+        BtmSurfTemp = 0.0;
+        TopSurfFlux = 0.0;
+        BtmSurfFlux = 0.0;
+        SourceFlux = 0.0;
+        CheckEquipName.clear();
+        PastBeamSolarRad = 0.0;
+        PastSolarDirCosVert = 0.0;
+        PastDifSolarRad = 0.0;
+        PastGroundTemp = 0.0;
+        PastIsRain = false;
+        PastIsSnow = false;
+        PastOutDryBulbTemp = 0.0;
+        PastOutWetBulbTemp = 0.0;
+        PastSkyTemp = 0.0;
+        PastWindSpeed = 0.0;
+        GetInputFlag = true;
+        QRadSysSrcAvg.clear();
+        LastSysTimeElapsed.clear();
+        LastTimeStepSys.clear();
+        InitializeTempTop = false;
+        SurfaceGHE.clear();
+    }
+
+    // Default Constructor
+    SurfaceGroundHeatExchangersData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

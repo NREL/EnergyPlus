@@ -310,6 +310,7 @@ namespace DataGlobalConstants {
     int const iEvapCoolerDirectResearchSpecial(1005);
 
     int const MaxSpedLevels(10); // Maximum number of speed that supports
+    int const MaxCTFTerms(19); // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms
     
     // DERIVED TYPE DEFINITIONS:
     // na

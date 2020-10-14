@@ -240,6 +240,7 @@ namespace DataGlobalConstants {
     extern int const iEvapCoolerDirectResearchSpecial;
 
     extern int const MaxSpedLevels; // Maximum number of speed that supports
+    extern int const MaxCTFTerms; // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms
 
     // DERIVED TYPE DEFINITIONS:
     // na
