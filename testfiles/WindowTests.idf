@@ -2473,37 +2473,17 @@
 
   Schedule:Constant,On,Integer,1.0;
 
-  Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
-
-  Output:Variable,*,Site Direct Solar Radiation Rate per Area,timestep;
-
-  Output:Variable,*,Site Diffuse Solar Radiation Rate per Area,timestep;
-
-  Output:Variable,*,Site Ground Reflected Solar Radiation Rate per Area,timestep;
-
   Output:Variable,*,Zone Mean Air Temperature,timestep;
 
-  Output:Variable,*,Zone Mean Radiant Temperature,timestep;
+Output:Variable,*,Zone Windows Total Heat Gain Energy,hourly; !- Zone Sum [J]
+Output:Variable,*,Zone Windows Total Heat Loss Energy,hourly; !- Zone Sum [J]
 
-  Output:Variable,*,Surface Outside Face Incident Solar Radiation Rate per Area,timestep;
+Output:Variable,*,Surface Window Front Face Temperature Layer 1,hourly; !- Zone Average [C]
+Output:Variable,*,Surface Window Back Face Temperature Layer 1,hourly; !- Zone Average [C]
 
-  Output:Variable,*,Surface Shading Device Is On Time Fraction,timestep;
+Output:Variable,*,Surface Window Net Heat Transfer Energy,hourly; !- Zone Sum [J]
 
-  Output:Variable,*,Surface Window Transmitted Solar Radiation Rate,timestep;
-
-  Output:Variable,*,Surface Window Total Glazing Layers Absorbed Solar Radiation Rate,timestep;
-
-  Output:Variable,*,Surface Window Screen Beam to Beam Solar Transmittance,timestep;
-
-  Output:Variable,*,Surface Window Screen Beam to Diffuse Solar Transmittance,timestep;
-
-  Output:Variable,*,Surface Window Switchable Glazing Switching Factor,timestep;
-
-  Output:Variable,*,Surface Window Switchable Glazing Visible Transmittance,timestep;
-
-  Output:Variable,*,Daylighting Reference Point 1 Illuminance,timestep;
-
-  Output:VariableDictionary,Regular;
+  Output:VariableDictionary,IDF;
 
   Output:Surfaces:Drawing,dxf;
 

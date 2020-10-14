@@ -2948,9 +2948,13 @@ namespace HeatBalanceSurfaceManager {
 
                                         if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn ||
                                             ShadeFlag == ExtScreenOn) { // Shade/screen on
+                                            for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
+                                                AbsDiffWin(Lay) = state.dataConstruction->Construct(ConstrNumSh).AbsDiff(Lay);
+                                            }
                                             SurfWinExtDiffAbsByShade(SurfNum) =
                                                     state.dataConstruction->Construct(ConstrNumSh).AbsDiffShade *
                                                     (SkySolarInc + GndSolarInc);
+
                                         }
 
                                         if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn ||
