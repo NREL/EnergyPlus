@@ -121,7 +121,6 @@ namespace VentilatedSlab {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataGlobals::BeginTimeStepFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SysSizingCalc;
     using DataGlobals::WarmupFlag;
@@ -1610,7 +1609,7 @@ namespace VentilatedSlab {
         Node(OutNode).Enthalpy = Node(InNode).Enthalpy;
 
         // These initializations only need to be done once at the start of the iterations...
-        if (BeginTimeStepFlag && FirstHVACIteration) {
+        if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
             // Initialize the outside air conditions...
             Node(OutsideAirNode).Temp = Node(OutsideAirNode).OutAirDryBulb;
             Node(OutsideAirNode).HumRat = OutHumRat;

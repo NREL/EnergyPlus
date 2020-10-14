@@ -209,7 +209,7 @@ namespace HeatBalanceManager {
 
     void RecKeepHeatBalance(EnergyPlusData &state);
 
-    void CheckWarmupConvergence();
+    void CheckWarmupConvergence(EnergyPlusData &state);
 
     void ReportWarmupConvergence(EnergyPlusData &state);
 

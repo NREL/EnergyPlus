@@ -370,7 +370,7 @@ namespace ThermalComfort {
             }
         }
 
-        if (DayOfSim == 1) {
+        if (state.dataGlobal->DayOfSim == 1) {
             if (HourOfDay < 7) {
                 TemporarySixAMTemperature = 1.868132;
             } else if (HourOfDay == 7) {
@@ -2304,8 +2304,8 @@ namespace ThermalComfort {
         TotalAnyZoneTimeNotSimpleASH55Summer += AnyZoneTimeNotSimpleASH55Summer;
         TotalAnyZoneTimeNotSimpleASH55Winter += AnyZoneTimeNotSimpleASH55Winter;
         TotalAnyZoneTimeNotSimpleASH55Either += AnyZoneTimeNotSimpleASH55Either;
-        // was EndEnvrnsFlag prior to CR7562
-        if (EndDesignDayEnvrnsFlag) {
+
+        if (state.dataGlobal->EndDesignDayEnvrnsFlag) {
             allowedHours = double(NumOfDayInEnvrn) * 24.0 * 0.04;
             // first check if warning should be printed
             showWarning = false;
@@ -2512,7 +2512,7 @@ namespace ThermalComfort {
         TotalAnyZoneNotMetOccupied += AnyZoneNotMetOccupied;
 
         // was EndEnvrnsFlag prior to CR7562
-        if (EndDesignDayEnvrnsFlag) {
+        if (state.dataGlobal->EndDesignDayEnvrnsFlag) {
             for (iZone = 1; iZone <= NumOfZones; ++iZone) {
                 PreDefTableEntry(pdchULnotMetHeat, Zone(iZone).Name, ThermalComfortSetPoint(iZone).totalNotMetHeating);
                 PreDefTableEntry(pdchULnotMetCool, Zone(iZone).Name, ThermalComfortSetPoint(iZone).totalNotMetCooling);

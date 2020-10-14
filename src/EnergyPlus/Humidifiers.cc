@@ -230,7 +230,7 @@ namespace Humidifiers {
             }
         }
 
-        thisHum.UpdateReportWaterSystem();
+        thisHum.UpdateReportWaterSystem(state);
 
         thisHum.UpdateHumidifier();
 
@@ -1282,7 +1282,7 @@ namespace Humidifiers {
         AirOutMassFlowRate = AirInMassFlowRate;
     }
 
-    void HumidifierData::UpdateReportWaterSystem() // number of the current humidifier being simulated
+    void HumidifierData::UpdateReportWaterSystem(EnergyPlusData &state) // number of the current humidifier being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -1301,7 +1301,6 @@ namespace Humidifiers {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginTimeStepFlag;
         using DataHVACGlobals::TimeStepSys;
         using DataWater::WaterStorage;
 
@@ -1330,7 +1329,7 @@ namespace Humidifiers {
 
             StarvedVdot = 0.0;
             TankSupplyVdot = WaterConsRate;                                  // init
-            if ((AvailTankVdot < WaterConsRate) && (!(BeginTimeStepFlag))) { // calculate starved flow
+            if ((AvailTankVdot < WaterConsRate) && (!(state.dataGlobal->BeginTimeStepFlag))) { // calculate starved flow
                 StarvedVdot = WaterConsRate - AvailTankVdot;
                 TankSupplyVdot = AvailTankVdot;
             }

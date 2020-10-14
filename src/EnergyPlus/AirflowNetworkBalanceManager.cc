@@ -139,7 +139,6 @@ namespace AirflowNetworkBalanceManager {
     using DataEnvironment::WindDir;
     using DataEnvironment::WindSpeedAt;
     using DataGlobals::CurrentTime;
-    using DataGlobals::DayOfSim;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::NumOfZones;
     using DataGlobals::TimeStepZone;

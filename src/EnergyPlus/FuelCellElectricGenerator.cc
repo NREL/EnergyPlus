@@ -1377,7 +1377,7 @@ namespace FuelCellElectricGenerator {
 
                 // set Day and Time of Last Shut Down
                 this->FCPM.FractionalDayofLastShutDown =
-                    double(DataGlobals::DayOfSim) +
+                    double(state.dataGlobal->DayOfSim) +
                     (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) /
                         DataGlobalConstants::HoursInDay();
                 this->FCPM.HasBeenOn = false;
@@ -1397,7 +1397,7 @@ namespace FuelCellElectricGenerator {
             // set Day and Time of Last STart Up
 
             this->FCPM.FractionalDayofLastStartUp =
-                double(DataGlobals::DayOfSim) +
+                double(state.dataGlobal->DayOfSim) +
                 (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) /
                     DataGlobalConstants::HoursInDay();
 
@@ -1446,7 +1446,7 @@ namespace FuelCellElectricGenerator {
 
             Real64 PelDiff;
             bool ConstrainedFCPMTrans = false;
-            this->FigureTransientConstraints(Pel, ConstrainedFCPMTrans, PelDiff);
+            this->FigureTransientConstraints(state, Pel, ConstrainedFCPMTrans, PelDiff);
 
             // Control step 3: adjust for max and min limits on Pel
 
@@ -2754,7 +2754,8 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    void FCDataStruct::FigureTransientConstraints(Real64 &Pel,       // DC power control setting for power module
+    void FCDataStruct::FigureTransientConstraints(EnergyPlusData &state,
+                                                  Real64 &Pel,       // DC power control setting for power module
                                                   bool &Constrained, // true if transient constraints kick in
                                                   Real64 &PelDiff    // if constrained then this is the difference, positive
     )
@@ -2769,7 +2770,7 @@ namespace FuelCellElectricGenerator {
         Real64 PelInput = Pel; // hold initial value of inout var
 
         Real64 CurrentFractionalDay =
-            double(DataGlobals::DayOfSim) +
+            double(state.dataGlobal->DayOfSim) +
             (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) /
                 DataGlobalConstants::HoursInDay();
 

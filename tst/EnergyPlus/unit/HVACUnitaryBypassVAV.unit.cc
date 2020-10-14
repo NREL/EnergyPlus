@@ -95,7 +95,7 @@ protected:
     {
         EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         DataGlobals::HourOfDay = 1;
 
         DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize StdRhoAir
@@ -702,14 +702,14 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     EXPECT_EQ(0.023, cbvav.FanVolFlow);
 
     // set time so that time is greater than CBVAV.changeOverTimer (-1.0) and GetZoneLoads executes
-    // First time through GetZoneLoads CBVAV.HeatCoolMode gets set and won't exectute again until the simulation time increases
+    // First time through GetZoneLoads CBVAV.HeatCoolMode gets set and won't execute again until the simulation time increases
     // If Init or GetZoneLoads is called again, with a different load (i.e., was cooling and now is heating) then changeOverTimer must be reset
     // if the loads do not change then there is no need to reset the timer, resetting here as an example.
     cbvav.changeOverTimer = -1.0; // reset timer so GetZoneLoads executes
-    DataGlobals::DayOfSim = 1;
+    state.dataGlobal->DayOfSim = 1;
     DataGlobals::HourOfDay = 1;
     // test zone indexing for loads
-    HVACUnitaryBypassVAV::GetZoneLoads(CBVAVNum);
+    HVACUnitaryBypassVAV::GetZoneLoads(state, CBVAVNum);
     // only 1 conditioned zone
     EXPECT_EQ(1, cbvav.NumZonesCooled);
     EXPECT_EQ(HVACUnitaryBypassVAV::CoolingMode, cbvav.HeatCoolMode);

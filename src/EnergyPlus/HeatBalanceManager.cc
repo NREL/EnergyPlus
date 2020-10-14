@@ -390,16 +390,16 @@ namespace HeatBalanceManager {
 
         if (WarmupFlag && EndDayFlag) {
 
-            CheckWarmupConvergence();
+            CheckWarmupConvergence(state);
             if (!WarmupFlag) {
-                DayOfSim = 0; // Reset DayOfSim if Warmup converged
+                state.dataGlobal->DayOfSim = 0; // Reset DayOfSim if Warmup converged
                 state.dataGlobal->DayOfSimChr = "0";
 
                 ManageEMS(state, EMSManager::EMSCallFrom::BeginNewEnvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const()); // calling point
             }
         }
 
-        if (!WarmupFlag && EndDayFlag && DayOfSim == 1 && !DoingSizing) {
+        if (!WarmupFlag && EndDayFlag && state.dataGlobal->DayOfSim == 1 && !DoingSizing) {
             ReportWarmupConvergence(state);
         }
     }
@@ -5293,7 +5293,7 @@ namespace HeatBalanceManager {
 
         if (state.dataGlobal->BeginDayFlag) {
             if (!WarmupFlag) {
-                if (DayOfSim == 1) {
+                if (state.dataGlobal->DayOfSim == 1) {
                     MaxHeatLoadZone = -9999.0;
                     MaxCoolLoadZone = -9999.0;
                     MaxTempZone = -9999.0;
@@ -5593,7 +5593,7 @@ namespace HeatBalanceManager {
             LoadZone(ZoneNum) = max(SNLoadHeatRate(ZoneNum), std::abs(SNLoadCoolRate(ZoneNum)));
 
             // Calculate differences in temperature and load for the last two warmup days
-            if (!WarmupFlag && DayOfSim == 1 && !DoingSizing) {
+            if (!WarmupFlag && state.dataGlobal->DayOfSim == 1 && !DoingSizing) {
                 WarmupTempDiff(ZoneNum) = std::abs(TempZoneSecPrevDay(ZoneNum) - TempZonePrevDay(ZoneNum));
                 WarmupLoadDiff(ZoneNum) = std::abs(LoadZoneSecPrevDay(ZoneNum) - LoadZonePrevDay(ZoneNum));
                 if (ZoneNum == 1) ++CountWarmupDayPoints;
@@ -5624,7 +5624,7 @@ namespace HeatBalanceManager {
         UpdateWindowFaceTempsNonBSDFWin(state);
     }
 
-    void CheckWarmupConvergence()
+    void CheckWarmupConvergence(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5720,7 +5720,7 @@ namespace HeatBalanceManager {
                     WarmupConvergenceValues(ZoneNum).PassFlag(4) = 2;
                 }
 
-                if (DayOfSim >= MaxNumberOfWarmupDays && WarmupFlag) {
+                if (state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays && WarmupFlag) {
                     // Check convergence for individual zone
                     if (sum(WarmupConvergenceValues(ZoneNum).PassFlag) != 8) { // pass=2 * 4 values for convergence
                         ShowSevereError("CheckWarmupConvergence: Loads Initialization, Zone=\"" + Zone(ZoneNum).Name + "\" did not converge after " +
@@ -5771,7 +5771,7 @@ namespace HeatBalanceManager {
             // experience with the (I)BLAST program.  If too many warmup days were
             // required, notify the program user.
 
-            if ((DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag && ConvergenceChecksFailed) {
+            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag && ConvergenceChecksFailed) {
                 if (MaxNumberOfWarmupDays < DefaultMaxNumberOfWarmupDays) {
                     ShowSevereError("CheckWarmupConvergence: User supplied maximum warmup days=" + RoundSigDigits(MaxNumberOfWarmupDays) +
                                     " is insufficient.");
@@ -5782,15 +5782,15 @@ namespace HeatBalanceManager {
 
             // Set warmup flag to true depending on value of ConvergenceChecksFailed (true=fail)
             // and minimum number of warmup days
-            if (!ConvergenceChecksFailed && DayOfSim >= MinNumberOfWarmupDays) {
+            if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim >= MinNumberOfWarmupDays) {
                 WarmupFlag = false;
-            } else if (!ConvergenceChecksFailed && DayOfSim < MinNumberOfWarmupDays) {
+            } else if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim < MinNumberOfWarmupDays) {
                 WarmupFlag = true;
             }
 
             // If max warmup days reached and still WarmupFlag, then go to non-warmup state.
             // prior messages will have been displayed
-            if ((DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag) {
+            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag) {
                 WarmupFlag = false;
             }
         }

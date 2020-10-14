@@ -10112,7 +10112,7 @@ namespace DaylightingManager {
 
                     // We need DataGlobals::CalendarYear, and not DataEnvironment::Year because
                     // otherwise if you run a TMY file, you'll get for eg 1977, 1981, etc
-                    SQYear = DataGlobals::CalendarYear;
+                    SQYear = state.dataGlobal->CalendarYear;
                     SQMonth = Month;
                     SQDayOfMonth = DayOfMonth;
 

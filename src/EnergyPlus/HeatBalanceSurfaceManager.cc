@@ -5899,7 +5899,7 @@ namespace HeatBalanceSurfaceManager {
 
                         int OPtr = Surface(SurfNum).OSCPtr;
                         // Set surface temp from previous timestep
-                        if (BeginTimeStepFlag) {
+                        if (state.dataGlobal->BeginTimeStepFlag) {
                             OSC(OPtr).TOutsideSurfPast = TH(1, 1, SurfNum);
                         }
 
@@ -5962,7 +5962,7 @@ namespace HeatBalanceSurfaceManager {
                         // boundary condition for the surface
                         int OPtr = Surface(SurfNum).OSCPtr;
                         // Set surface temp from previous timestep
-                        if (BeginTimeStepFlag) {
+                        if (state.dataGlobal->BeginTimeStepFlag) {
                             OSC(OPtr).TOutsideSurfPast = TH(1, 1, SurfNum);
                         }
 

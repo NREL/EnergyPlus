@@ -6565,7 +6565,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     }
 
     // set up environment
-    DataGlobals::DayOfSim = 1;
+    state.dataGlobal->DayOfSim = 1;
     DataGlobals::CurrentTime = 0.25;
     DataGlobals::TimeStepZone = 0.25;
     DataHVACGlobals::SysTimeElapsed = 0.0;
@@ -13109,7 +13109,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     }
 
     // set up environment
-    DataGlobals::DayOfSim = 2; // user a higher day than previous unit test to get around static timer variables problem
+    state.dataGlobal->DayOfSim = 2; // user a higher day than previous unit test to get around static timer variables problem
     DataGlobals::CurrentTime = 0.25;
     DataGlobals::TimeStepZone = 0.25;
     DataHVACGlobals::TimeStepSys = 0.25;

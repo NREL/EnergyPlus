@@ -744,15 +744,15 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
         ++EnvCount;
 
         state.dataGlobal->BeginEnvrnFlag = true;
-        DataGlobals::EndEnvrnFlag = false;
+        state.dataGlobal->EndEnvrnFlag = false;
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
-        DataGlobals::DayOfSim = 0;
+        state.dataGlobal->DayOfSim = 0;
         state.dataGlobal->DayOfSimChr = "0";
 
-        while ((DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
+        while ((state.dataGlobal->DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 
-            ++DataGlobals::DayOfSim;
+            ++state.dataGlobal->DayOfSim;
 
             if (!DataGlobals::WarmupFlag) {
                 ++DataEnvironment::CurrentOverallSimDay;
@@ -767,7 +767,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
                 for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= DataGlobals::NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
 
-                    DataGlobals::BeginTimeStepFlag = true;
+                    state.dataGlobal->BeginTimeStepFlag = true;
 
                     // Set the End__Flag variables to true if necessary.  Note that
                     // each flag builds on the previous level.  EndDayFlag cannot be
@@ -780,8 +780,8 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                         DataGlobals::EndHourFlag = true;
                         if (DataGlobals::HourOfDay == 24) {
                             DataGlobals::EndDayFlag = true;
-                            if ((!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
-                                DataGlobals::EndEnvrnFlag = true;
+                            if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                                state.dataGlobal->EndEnvrnFlag = true;
                             }
                         }
                     }

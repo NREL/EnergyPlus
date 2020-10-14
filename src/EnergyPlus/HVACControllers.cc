@@ -2752,8 +2752,12 @@ namespace HVACControllers {
         print(TraceFile, "\n");
     }
 
-    void TraceAirLoopControllers(
-        bool const FirstHVACIteration, int const AirLoopNum, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls)
+    void TraceAirLoopControllers(EnergyPlusData &state,
+                                 bool const FirstHVACIteration,
+                                 int const AirLoopNum,
+                                 int const AirLoopPass,
+                                 bool const AirLoopConverged,
+                                 int const AirLoopNumCalls)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2810,7 +2814,7 @@ namespace HVACControllers {
         if (!TraceFile.good()) return;
 
         // Write iteration stamp first
-        TraceIterationStamp(TraceFile, FirstHVACIteration, AirLoopPass, AirLoopConverged, AirLoopNumCalls);
+        TraceIterationStamp(state, TraceFile, FirstHVACIteration, AirLoopPass, AirLoopConverged, AirLoopNumCalls);
 
         // Loop over the air sys controllers and write diagnostic to trace file
         for (ControllerNum = 1; ControllerNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++ControllerNum) {
@@ -2821,8 +2825,12 @@ namespace HVACControllers {
         print(TraceFile, "\n");
     }
 
-    void TraceIterationStamp(
-        InputOutputFile &TraceFile, bool const FirstHVACIteration, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls)
+    void TraceIterationStamp(EnergyPlusData &state,
+                             InputOutputFile &TraceFile,
+                             bool const FirstHVACIteration,
+                             int const AirLoopPass,
+                             bool const AirLoopConverged,
+                             int const AirLoopNumCalls)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2843,7 +2851,6 @@ namespace HVACControllers {
         // Using/Aliasing
         using DataEnvironment::CurEnvirNum;
         using DataEnvironment::CurMnDy;
-        using DataGlobals::BeginTimeStepFlag;
         using DataGlobals::SysSizingCalc;
         using DataGlobals::WarmupFlag;
         using DataGlobals::ZoneSizingCalc;
@@ -2878,7 +2885,7 @@ namespace HVACControllers {
               LogicalToInteger(WarmupFlag),
               CreateHVACTimeString(),
               MakeHVACTimeIntervalString(),
-              LogicalToInteger(BeginTimeStepFlag),
+              LogicalToInteger(state.dataGlobal->BeginTimeStepFlag),
               LogicalToInteger(FirstTimeStepSysFlag),
               LogicalToInteger(FirstHVACIteration),
               AirLoopPass,

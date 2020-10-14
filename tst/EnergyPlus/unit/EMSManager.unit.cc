@@ -1750,7 +1750,7 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
     // Initialize all sorts of weather stuff
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 1;
-    DataGlobals::DayOfSim = 1;
+    state.dataGlobal->DayOfSim = 1;
     state.dataGlobal->BeginEnvrnFlag = true;
     state.dataGlobal->BeginDayFlag = true;
     WeatherManager::ManageWeather(state);
@@ -1765,7 +1765,7 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
 
     DataGlobals::TimeStep = 3;
     DataGlobals::HourOfDay = 8;
-    DataGlobals::DayOfSim = 1;
+    state.dataGlobal->DayOfSim = 1;
     state.dataGlobal->BeginEnvrnFlag = false;
     state.dataGlobal->BeginDayFlag = false;
     WeatherManager::ManageWeather(state);
@@ -1878,7 +1878,7 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
     // Initialize all sorts of weather stuff
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 1;
-    DataGlobals::DayOfSim = 1;
+    state.dataGlobal->DayOfSim = 1;
     state.dataGlobal->BeginEnvrnFlag = true;
     state.dataGlobal->BeginDayFlag = true;
     WeatherManager::ManageWeather(state);

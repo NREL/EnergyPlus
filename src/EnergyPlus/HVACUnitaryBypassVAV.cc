@@ -1748,7 +1748,7 @@ namespace HVACUnitaryBypassVAV {
 
         // Returns load only for zones requesting cooling (heating). If in deadband, Qzoneload = 0.
         if (FirstHVACIteration) CBVAV(CBVAVNum).modeChanged = false;
-        GetZoneLoads(CBVAVNum);
+        GetZoneLoads(state, CBVAVNum);
 
         if (CBVAV(CBVAVNum).OutAirSchPtr > 0) {
             OutsideAirMultiplier = ScheduleManager::GetCurrentScheduleValue(CBVAV(CBVAVNum).OutAirSchPtr);
@@ -3477,7 +3477,8 @@ namespace HVACUnitaryBypassVAV {
         }
     }
 
-    void GetZoneLoads(int const CBVAVNum // Index to CBVAV unit being simulated
+    void GetZoneLoads(EnergyPlusData &state,
+                      int const CBVAVNum // Index to CBVAV unit being simulated
     )
     {
 
@@ -3493,7 +3494,7 @@ namespace HVACUnitaryBypassVAV {
         int lastDayOfSim(0);   // used during warmup to reset changeOverTimer since need to do same thing next warmup day
         Real64 ZoneLoad = 0.0; // Total load in controlled zone [W]
 
-        int dayOfSim = DataGlobals::DayOfSim; // DayOfSim increments during Warmup when it actually simulates the same day
+        int dayOfSim = state.dataGlobal->DayOfSim; // DayOfSim increments during Warmup when it actually simulates the same day
         if (DataGlobals::WarmupFlag) {
             // when warmupday increments then reset timer
             if (lastDayOfSim != dayOfSim) CBVAV(CBVAVNum).changeOverTimer = -1.0; // reset to default (thisTime always > -1)

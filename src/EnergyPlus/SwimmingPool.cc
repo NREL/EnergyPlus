@@ -534,7 +534,7 @@ namespace SwimmingPool {
             initSwimmingPoolPlantNodeFlow(this->MyPlantScanFlagPool);
         }
 
-        if (DataGlobals::BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
+        if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
 
             int ZoneNum = this->ZonePtr;
             this->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets

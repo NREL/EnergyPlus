@@ -131,7 +131,7 @@ namespace WaterManager {
         // first call all the water storage tanks
         //    (these called first to make control decisions)
         for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
-            CalcWaterStorageTank(TankNum);
+            CalcWaterStorageTank(state, TankNum);
         } // tank loop
 
         for (RainColNum = 1; RainColNum <= NumRainCollectors; ++RainColNum) {
@@ -144,7 +144,7 @@ namespace WaterManager {
 
         // call the tanks again to get updated rain and well activity
         for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {
-            CalcWaterStorageTank(TankNum);
+            CalcWaterStorageTank(state, TankNum);
         } // tank loop
 
         ReportWaterManager();
@@ -1054,7 +1054,7 @@ namespace WaterManager {
         // na
     }
 
-    void CalcWaterStorageTank(int const TankNum) // Index of storage tank
+    void CalcWaterStorageTank(EnergyPlusData &state, int const TankNum) // Index of storage tank
     {
 
         // SUBROUTINE INFORMATION:
@@ -1074,7 +1074,6 @@ namespace WaterManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginTimeStepFlag;
         using DataHVACGlobals::TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -1111,7 +1110,7 @@ namespace WaterManager {
         static Real64 VolumePredict(0.0);
         static Real64 OverFillVolume(0.0);
 
-        if (BeginTimeStepFlag) {
+        if (state.dataGlobal->BeginTimeStepFlag) {
             // initializations are done in UpdateWaterManager
         }
 
@@ -1573,7 +1572,6 @@ namespace WaterManager {
 
         // Using/Aliasing
         using DataEnvironment::GroundTemp_Deep;
-        using DataGlobals::BeginTimeStepFlag;
         using DataHVACGlobals::TimeStepSys;
 
         // Locals
@@ -1590,13 +1588,7 @@ namespace WaterManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 VdotDelivered;
-        //  REAL(r64) :: VdotRequest
         Real64 PumpPower;
-
-        if (BeginTimeStepFlag) {
-            // do any updating needed
-            // GroundwaterWell(WellNum)%VdotRequest = 0.0
-        }
 
         VdotDelivered = 0.0;
         PumpPower = 0.0;

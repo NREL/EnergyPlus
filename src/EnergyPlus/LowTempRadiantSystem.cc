@@ -136,7 +136,6 @@ namespace LowTempRadiantSystem {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataGlobals::BeginTimeStepFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SysSizingCalc;
     using DataGlobals::WarmupFlag;
@@ -2054,7 +2053,7 @@ namespace LowTempRadiantSystem {
         // If we are at the beginning of a new environment OR the warmup period is done and the simulation is starting,
         // then the various changeover variables need to be reset so that we are starting from scratch.
         if ((state.dataGlobal->BeginEnvrnFlag && FirstHVACIteration) ||
-            (!WarmupFlag && state.dataGlobal->BeginDayFlag && FirstHVACIteration && DataGlobals::DayOfSim == 1)) {
+            (!WarmupFlag && state.dataGlobal->BeginDayFlag && FirstHVACIteration && state.dataGlobal->DayOfSim == 1)) {
             // Reset values related to changeover
             if (SystemType == HydronicSystem) {
                 HydrRadSys(RadSysNum).lastOperatingMode = NotOperating;
@@ -2191,7 +2190,7 @@ namespace LowTempRadiantSystem {
             }
         }
 
-        if (BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
+        if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
 
             {
                 auto const SELECT_CASE_var(SystemType);
@@ -2341,7 +2340,7 @@ namespace LowTempRadiantSystem {
             // This also means that the previous time step was the last time step of yesterday.
             // So, the day should be the previous day, the hour should bethe last hour of the
             // day, and the time step should be the last time step.
-            this->lastDayOfSim = DataGlobals::DayOfSim - 1;
+            this->lastDayOfSim = state.dataGlobal->DayOfSim - 1;
             this->lastHourOfDay = int(DataGlobalConstants::HoursInDay());
             this->lastTimeStep = DataGlobals::NumOfTimeStepInHour;
         } else if (state.dataGlobal->BeginHourFlag) {
@@ -2349,22 +2348,22 @@ namespace LowTempRadiantSystem {
             // the first hour.  This means that the previous time step was the previous hour of
             // today in the last time step.  So, the day should be the current day, the hour should
             // be the previous hour, and the time step should be the last time step.
-            this->lastDayOfSim = DataGlobals::DayOfSim;
+            this->lastDayOfSim = state.dataGlobal->DayOfSim;
             this->lastHourOfDay = DataGlobals::HourOfDay - 1;
             this->lastTimeStep = DataGlobals::NumOfTimeStepInHour;
-        } else if (DataGlobals::BeginTimeStepFlag) {
+        } else if (state.dataGlobal->BeginTimeStepFlag) {
             // It's neither the beginning of the day nor the beginning of an hour but it is the start
             // of a time step other than the first time step in the hour.  So, the day should be the
             // current day, the hour should be the current hour, and the time step should be the
             // previous time step.
-            this->lastDayOfSim = DataGlobals::DayOfSim;
+            this->lastDayOfSim = state.dataGlobal->DayOfSim;
             this->lastHourOfDay = DataGlobals::HourOfDay;
             this->lastTimeStep = DataGlobals::TimeStep - 1;
         } else {
             // It's not the beginning of the day, hour, or time step so the "last" value is simply the
             // same as the current value.  Note that these parameters only track down to the zone time
             // step level and will make decisions based on that.
-            this->lastDayOfSim = DataGlobals::DayOfSim;
+            this->lastDayOfSim = state.dataGlobal->DayOfSim;
             this->lastHourOfDay = DataGlobals::HourOfDay;
             this->lastTimeStep = DataGlobals::TimeStep;
         }
@@ -2373,7 +2372,7 @@ namespace LowTempRadiantSystem {
         this->OperatingMode = NotOperating;
     }
 
-    void HydronicSystemBaseData::setOperatingModeBasedOnChangeoverDelay()
+    void HydronicSystemBaseData::setOperatingModeBasedOnChangeoverDelay(EnergyPlusData &state)
     {
         if (this->lastOperatingMode == NotOperating) return; // this should only happen at the beginning of a simulation (at the start of warmup and the actual simulation)
                                                              // so let things proceed with whatever the system wants to do
@@ -2389,7 +2388,7 @@ namespace LowTempRadiantSystem {
 
         // At this point, the radiant system is trying to switch modes from the previous time step, the user is requesting a delay in the changeover,
         // and the requested delay is greater than zero.  Calculate what the current time is in hours from the start of the simulation
-        Real64 timeCurrent = 24.0 * float(DataGlobals::DayOfSim - 1) + float(DataGlobals::HourOfDay - 1) +
+        Real64 timeCurrent = 24.0 * float(state.dataGlobal->DayOfSim - 1) + float(DataGlobals::HourOfDay - 1) +
                              float(DataGlobals::TimeStep - 1) / float(DataGlobals::NumOfTimeStepInHour);
         Real64 timeLast = 24.0 * float(this->lastDayOfSim - 1) + float(this->lastHourOfDay - 1) +
                           float(this->lastTimeStep - 1) / float(DataGlobals::NumOfTimeStepInHour);
@@ -3294,7 +3293,7 @@ namespace LowTempRadiantSystem {
                     this->OperatingMode = CoolingMode;
                 }
 
-                this->setOperatingModeBasedOnChangeoverDelay();
+                this->setOperatingModeBasedOnChangeoverDelay(state);
 
                 if (this->OperatingMode == HeatingMode) {
                     ControlNode = this->HotWaterInNode;
@@ -3946,7 +3945,7 @@ namespace LowTempRadiantSystem {
                 this->OperatingMode = CoolingMode;
             }
 
-            this->setOperatingModeBasedOnChangeoverDelay();
+            this->setOperatingModeBasedOnChangeoverDelay(state);
 
             // Now actually decide what to do based on the setpoint temperature in relation to the control temperatures
             if (this->OperatingMode == HeatingMode) { // HEATING MODE
@@ -4867,7 +4866,7 @@ namespace LowTempRadiantSystem {
         // that the formula that calculates the running mean average (dry-bulb) temperature uses the values from "yesterday".  So, today's
         // values are calculated and then shifted at the beginning of the next day to the tomorrow variables.  It is these tomorrow variables
         // that are then used in the formula.  So, that is why some of the assignments are done in the order that they are in below.
-        if (DataGlobals::DayOfSim == 1 && DataGlobals::WarmupFlag) {
+        if (state.dataGlobal->DayOfSim == 1 && DataGlobals::WarmupFlag) {
             // there is no "history" here--assume everything that came before was the same (this applies to design days also--weather is always the same
             this->todayAverageOutdoorDryBulbTemperature = this->calculateCurrentDailyAverageODB(state);
             this->yesterdayAverageOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;

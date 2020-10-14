@@ -115,7 +115,6 @@ namespace Photovoltaics {
 
     // Using/Aliasing
     using namespace DataPhotovoltaics;
-    using DataGlobals::EndEnvrnFlag;
     using DataHVACGlobals::TimeStepSys;
 
     // Data

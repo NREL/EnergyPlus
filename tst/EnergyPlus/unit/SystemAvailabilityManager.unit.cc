@@ -255,7 +255,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     DataEnvironment::DayOfMonth = 1;
     DataGlobals::HourOfDay = 1;
     DataGlobals::TimeStep = 1;
-    DataGlobals::DayOfSim = 1;
+    state.dataGlobal->DayOfSim = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfWeekTomorrow = 2;

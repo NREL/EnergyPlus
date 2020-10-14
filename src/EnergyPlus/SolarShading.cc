@@ -9247,8 +9247,8 @@ namespace SolarShading {
             if (!DetailedSolarTimestepIntegration) {
                 //  Perform calculations.
                 ShadowingDaysLeft = ShadowingCalcFrequency;
-                if (DayOfSim + ShadowingDaysLeft > NumOfDayInEnvrn) {
-                    ShadowingDaysLeft = NumOfDayInEnvrn - DayOfSim + 1;
+                if (state.dataGlobal->DayOfSim + ShadowingDaysLeft > NumOfDayInEnvrn) {
+                    ShadowingDaysLeft = NumOfDayInEnvrn - state.dataGlobal->DayOfSim + 1;
                 }
 
                 //  Calculate average Equation of Time, Declination Angle for this period
@@ -9280,7 +9280,7 @@ namespace SolarShading {
                 SUN3(DayOfYear, AvgSinSolarDeclin, AvgEqOfTime);
                 AvgCosSolarDeclin = std::sqrt(1.0 - pow_2(AvgSinSolarDeclin));
                 // trigger display of progress in the simulation every two weeks
-                if (!WarmupFlag && state.dataGlobal->BeginDayFlag && (DayOfSim % 14 == 0)) {
+                if (!WarmupFlag && state.dataGlobal->BeginDayFlag && (state.dataGlobal->DayOfSim % 14 == 0)) {
                     DisplayPerfSimulationFlag = true;
                 }
             }
