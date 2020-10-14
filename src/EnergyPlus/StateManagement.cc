@@ -216,7 +216,6 @@
 #include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
-#include <EnergyPlus/ThermalChimney.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -387,7 +386,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     SurfaceGroundHeatExchanger::clear_state();
     SystemAvailabilityManager::clear_state();
     SwimmingPool::clear_state();
-    ThermalChimney::clear_state();
     UtilityRoutines::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();
