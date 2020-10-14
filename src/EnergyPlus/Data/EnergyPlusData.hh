@@ -93,8 +93,6 @@ struct ExteriorEnergyUseData;
 struct FansData;
 struct PipesData;
 struct PlantChillersData;
-struct UFADManagerData;
-struct UnitarySystemsData;
 struct UnitHeatersData;
 struct UnitVentilatorsData;
 struct UserDefinedComponentsData;
@@ -152,8 +150,6 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<FansData> dataFans;
     std::unique_ptr<PipesData> dataPipes;
     std::unique_ptr<PlantChillersData> dataPlantChillers;
-    std::unique_ptr<UFADManagerData> dataUFADManager;
-    std::unique_ptr<UnitarySystemsData> dataUnitarySystems;
     std::unique_ptr<UnitHeatersData> dataUnitHeaters;
     std::unique_ptr<UnitVentilatorsData> dataUnitVentilators;
     std::unique_ptr<UserDefinedComponentsData> dataUserDefinedComponents;

@@ -125,8 +125,8 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     TH.allocate(NumOfSurf, 1, 2);
     TH(SurfNum, 1, 1) = 22.0;
     // allocate solar incident radiation variable data
-    SurfQRadSWOutIncident.allocate(1);
-    SurfQRadSWOutIncident(1) = 0.0;
+    QRadSWOutIncident.allocate(1);
+    QRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
     state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
 
@@ -170,5 +170,5 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     ExtVentedCavity.deallocate();
     Zone.deallocate();
     TH.deallocate();
-    SurfQRadSWOutIncident.deallocate();
+    QRadSWOutIncident.deallocate();
 }
