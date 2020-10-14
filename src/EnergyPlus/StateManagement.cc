@@ -213,7 +213,6 @@
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/SystemAvailabilityManager.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -381,7 +380,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     SplitterComponent::clear_state();
     SteamCoils::clear_state();
     SurfaceGeometry::clear_state();
-    SystemAvailabilityManager::clear_state();
     UtilityRoutines::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();

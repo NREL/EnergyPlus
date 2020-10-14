@@ -84,6 +84,7 @@
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
 #include <EnergyPlus/SwimmingPool.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/ThermalChimney.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/TranspiredCollector.hh>
