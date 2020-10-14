@@ -14107,11 +14107,18 @@ namespace UnitarySystems {
                         this->CoilSHR = coilCoolingDXs[this->m_CoolingCoilIndex].performance.NormalSHR;
                     }
                 }
+                Real64 CompPartLoadFrac = this->m_CompPartLoadRatio;
+                if (CoolingLoad) {
+                    this->m_TotalAuxElecPower = this->m_AncillaryOnPower * CompPartLoadFrac + this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac);
+                    this->m_CoolingAuxElecConsumption = this->m_AncillaryOnPower * CompPartLoadFrac * ReportingConstant;
+                }
+                if (this->m_LastMode == CoolingMode) {
+                    this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac) * ReportingConstant;
+                }
                 elecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_UserDefined || SELECT_CASE_var == DataHVACGlobals::CoilWater_CoolingHXAssisted ||
                        SELECT_CASE_var == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling) {
                 if (CoolingLoad) {
-                    // if discrete, the coil cycles on and off
                     this->m_TotalAuxElecPower =
                         this->m_AncillaryOnPower * this->m_PartLoadFrac + this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac);
                     this->m_CoolingAuxElecConsumption = this->m_AncillaryOnPower * this->m_PartLoadFrac * ReportingConstant;

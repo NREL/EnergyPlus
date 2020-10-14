@@ -9955,6 +9955,7 @@ namespace Furnaces {
         DXElecCoolingPower = 0.0;
         SaveCompressorPLR = 0.0;
         ElecHeatingCoilPower = 0.0;
+        SuppHeatingCoilPower = 0.0;
 
         SystemSensibleLoad = QZnReq;
         TotalZoneSensibleLoad = QZnReq;

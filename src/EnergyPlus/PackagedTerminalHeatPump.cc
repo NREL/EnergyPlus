@@ -378,25 +378,8 @@ namespace PackagedTerminalHeatPump {
         // METHODOLOGY EMPLOYED:
         // Calls ControlPTUnitOutput to obtain the desired unit output
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
         // Using/Aliasing
         using Psychrometrics::PsyHFnTdbW;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 PartLoadFrac;      // compressor part load fraction
@@ -419,6 +402,7 @@ namespace PackagedTerminalHeatPump {
         DXElecCoolingPower = 0.0;
         DXElecHeatingPower = 0.0;
         ElecHeatingCoilPower = 0.0;
+        SuppHeatingCoilPower = 0.0;
         SaveCompressorPLR = 0.0;
         QLatReq = 0.0;
 
@@ -529,21 +513,7 @@ namespace PackagedTerminalHeatPump {
         } else {
             locFanElecPower = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->fanPower();
         }
-
-        if (PTUnit(PTUnitNum).UnitType_Num == PTACUnit) {
-            {
-                auto const SELECT_CASE_var(PTUnit(PTUnitNum).ACHeatCoilType_Num);
-                if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                    PTUnit(PTUnitNum).ElecPower = locFanElecPower + DXElecCoolingPower + ElecHeatingCoilPower;
-
-                } else if ((SELECT_CASE_var == Coil_HeatingWater) || (SELECT_CASE_var == Coil_HeatingSteam)) {
-                    PTUnit(PTUnitNum).ElecPower = locFanElecPower + DXElecCoolingPower;
-                } else {
-                }
-            }
-        } else {
-            PTUnit(PTUnitNum).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + SuppHeatingCoilPower;
-        }
+        PTUnit(PTUnitNum).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower + SuppHeatingCoilPower;
     }
 
     void GetPTUnit(EnergyPlusData &state)
@@ -7262,6 +7232,7 @@ namespace PackagedTerminalHeatPump {
         DXElecCoolingPower = 0.0;
         SaveCompressorPLR = 0.0;
         ElecHeatingCoilPower = 0.0;
+        SuppHeatingCoilPower = 0.0;
 
         // initialize local variables
         UnitOn = true;

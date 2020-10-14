@@ -333,9 +333,6 @@ namespace HVACMultiSpeedHeatPump {
         // METHODOLOGY EMPLOYED:
         // Calls ControlMSHPOutput to obtain the desired unit output
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         using DataHVACGlobals::SmallLoad;
@@ -343,17 +340,6 @@ namespace HVACMultiSpeedHeatPump {
 
         // Locals
         Real64 SupHeaterLoad;
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 PartLoadFrac; // compressor part load fraction
