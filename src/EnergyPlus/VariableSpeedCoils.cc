@@ -4264,9 +4264,9 @@ namespace VariableSpeedCoils {
             rhoA = PsyRhoAirFnPbTdbW(OutBaroPress, state.dataVariableSpeedCoils->RatedInletAirTemp, state.dataVariableSpeedCoils->RatedInletAirHumRat, RoutineName);
             // HPWH, the mass flow rate will be updated by a revised entering air density
 
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex > -1 && UnitarySystems::designSpecMSHP.size() > 0) {
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex > -1 && state.dataUnitarySystems->designSpecMSHP.size() > 0) {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType == "COOLING") {
-                    if (UnitarySystems::designSpecMSHP[state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].numOfSpeedCooling !=
+                    if (state.dataUnitarySystems->designSpecMSHP[state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].numOfSpeedCooling !=
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds) {
                         ShowFatalError("COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix + " = " + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
                                        " number of speeds not equal to number of speed specified in UnitarySystemPerformance:Multispeed object.");
@@ -4274,7 +4274,7 @@ namespace VariableSpeedCoils {
                         for (Mode = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds; Mode >= 1; --Mode) {
                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) =
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate *
-                                UnitarySystems::designSpecMSHP[state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].coolingVolFlowRatio[Mode - 1];
+                                state.dataUnitarySystems->designSpecMSHP[state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].coolingVolFlowRatio[Mode - 1];
                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) =
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowPerRatedTotCap(Mode);
                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode) = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) * rhoA;
@@ -4284,7 +4284,7 @@ namespace VariableSpeedCoils {
                         }
                     }
                 } else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType == "HEATING") {
-                    if (UnitarySystems::designSpecMSHP[state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].numOfSpeedHeating !=
+                    if (state.dataUnitarySystems->designSpecMSHP[state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].numOfSpeedHeating !=
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds) {
                         ShowFatalError("COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix + " = " + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
                                        " number of speeds not equal to number of speed specified in UnitarySystemPerformance:Multispeed object.");
@@ -4292,7 +4292,7 @@ namespace VariableSpeedCoils {
                         for (Mode = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds; Mode >= 1; --Mode) {
                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) =
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate *
-                                UnitarySystems::designSpecMSHP[state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].heatingVolFlowRatio[Mode - 1];
+                                state.dataUnitarySystems->designSpecMSHP[state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].heatingVolFlowRatio[Mode - 1];
                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) =
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowPerRatedTotCap(Mode);
                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode) = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) * rhoA;

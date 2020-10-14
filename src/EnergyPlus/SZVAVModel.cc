@@ -951,7 +951,7 @@ namespace SZVAVModel {
                         int const &CompressorONFlag)
     {
 
-        UnitarySystems::UnitarySys &thisSys = UnitarySystems::unitarySys[SysIndex];
+        UnitarySystems::UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[SysIndex];
 
         int const MaxIter(100);    // maximum number of iterations
         int SolFlag(0);            // return flag from RegulaFalsi for sensible load
