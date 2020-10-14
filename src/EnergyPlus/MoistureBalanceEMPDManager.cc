@@ -116,7 +116,6 @@ namespace MoistureBalanceEMPDManager {
     using namespace DataGlobals;
     using DataHeatBalFanSys::ZoneAirHumRat;
     using DataSurfaces::Surface;
-//    using DataSurfaces::SurfaceClass::Window;
     using DataSurfaces::TotSurfaces;
     using namespace DataMoistureBalanceEMPD;
     using DataMoistureBalance::HConvInFD;

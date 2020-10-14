@@ -12571,7 +12571,6 @@ namespace OutputReportTabular {
         using DataGlobals::NumOfTimeStepInHour;
         using DataSizing::CurOverallSimDay;
         using DataSurfaces::Surface;
-//        using DataSurfaces::SurfaceClass::Window;
         using DataSurfaces::TotSurfaces;
         using DataSurfaces::SurfWinGainConvGlazShadGapToZoneRep;
         using DataSurfaces::SurfWinGainConvGlazToZoneRep;
@@ -13350,7 +13349,6 @@ namespace OutputReportTabular {
         using DataGlobals::NumOfTimeStepInHour;
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
-//        using DataSurfaces::SurfaceClass::Window;
 
         // static bool initAdjFenDone(false); moved to anonymous namespace for unit testing
         static Array3D_bool adjFenDone;

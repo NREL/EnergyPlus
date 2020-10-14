@@ -1709,7 +1709,6 @@ namespace CoolingPanelSimple {
         using DataSurfaces::IntBlindOn;
         using DataSurfaces::IntShadeOn;
         using DataSurfaces::Surface;
-//        using DataSurfaces::SurfaceClass::Window;
         using DataSurfaces::SurfWinShadingFlag;
         using DataSurfaces::SurfWinFrameArea;
         using DataSurfaces::SurfWinProjCorrFrIn;

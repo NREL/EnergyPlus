@@ -3487,38 +3487,10 @@ namespace HeatBalanceSurfaceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-//        Real64 AbsExt;          // Solar absorptance of outermost layer (or movable insulation if present)
-//        Real64 AbsInt;          // Inside opaque surface solar absorptance
-//        Real64 AbsIntSurf;      // Inside opaque surface solar absorptance
-//        Real64 AbsIntSurfVis;   // Inside opaque surface visible absorptance
-//        Real64 HMovInsul;       // Resistance or "h" value of movable insulation (from EvalOutsideMovableInsulation, not used)
-//        int RoughIndexMovInsul; // Roughness index of movable insulation
-//        int ConstrNum;          // Construction number
-//        int ConstrNumSh;        // Shaded construction number
-//        int SurfNumAdjZone;     // Surface number in adjacent zone for interzone surfaces
-//        int IGlass;             // Glass layer counter
-//        int ShadeFlag;          // Shading flag
-//        Real64 DividerThermAbs; // Window divider thermal absorptance
-//        Real64 DividerSolAbs;   // Window divider solar absorptance
-//        Real64 DividerSolRefl;  // Window divider solar reflectance
-//        int MatNumGl;           // Glass layer material number
-//        int MatNumSh;           // Shade layer material number
-//        Real64 TransGl;         // Glass layer solar transmittance, reflectance, absorptance
-//        Real64 ReflGl;
-//        Real64 AbsGl;
-//        int BlNum;                // Blind number
-//        int TotGlassLayers;       // Number of glass layers in a window construction
-//        Real64 BlAbsDiffBk;       // Glass layer back diffuse solar absorptance when blind in place
-//        Real64 AbsDiffBkBl;       // Blind diffuse back solar absorptance as part of glazing system
-//        Real64 EffBlEmiss;        // Blind emissivity (thermal absorptance) as part of glazing system
-//        Real64 pulseMultipler;    // use to create a pulse for the load component report computations
         static Real64 curQL(0.0); // radiant value prior to adjustment for pulse for load component report
         static Real64 adjQL(0.0); // radiant value including adjustment for pulse for load component report
-//        int EQLNum;               // equivalent layer fenestration index
-//        int Lay;                  // equivalent layer fenestration layer index
 
         // FLOW:
-
         if (!allocated(QS)) QS.allocate(DataViewFactorInformation::NumOfSolarEnclosures);
         if (!allocated(QSLights)) QSLights.allocate(DataViewFactorInformation::NumOfSolarEnclosures);
 
@@ -3600,11 +3572,12 @@ namespace HeatBalanceSurfaceManager {
                 if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::TDD_Dome) continue; // Skip tubular daylighting device domes
                 int ConstrNum = Surface(SurfNum).Construction;
 
-                Real64 AbsIntSurf = state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar;
-                Real64 AbsIntSurfVis = state.dataConstruction->Construct(
-                        ConstrNum).InsideAbsorpSolar; // to fix CR 8695 change to this = Construct(ConstrNum)%InsideAbsorpVis
-                Real64 HMovInsul = 0.0;
-                Real64 AbsInt, AbsExt;
+                Real64 AbsIntSurf = state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar; // Inside opaque surface solar absorptance
+                Real64 AbsIntSurfVis = state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar; // Inside opaque surface visible absorptance to fix CR 8695 change to this = Construct(ConstrNum)%InsideAbsorpVis
+                Real64 HMovInsul = 0.0; // Solar absorptance of outermost layer (or movable insulation if present)
+                Real64 AbsInt;          // Inside opaque surface solar absorptance
+                Real64 AbsExt;          // Solar absorptance of outermost layer (or movable insulation if present)
+                Real64 AbsInt;          // Inside opaque surface solar absorptance
                 int RoughIndexMovInsul; // Roughness index of movable insulation
                 if (Surface(SurfNum).MaterialMovInsulInt > 0)
                     EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
@@ -3654,7 +3627,7 @@ namespace HeatBalanceSurfaceManager {
                     int ShadeFlag = SurfWinShadingFlag(SurfNum);
 
                     // These calculations are repeated from InitInternalHeatGains for the Zone Component Loads Report
-                    Real64 pulseMultipler = 0.01; // the W/sqft pulse for the zone
+                    Real64 pulseMultipler = 0.01; // use to create a pulse for the load component report computations, the W/sqft pulse for the zone
                     if (!doLoadComponentPulseNow) {
                         SurfQRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                     } else {
@@ -3684,8 +3657,7 @@ namespace HeatBalanceSurfaceManager {
                                                                          IGlass);
                             if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn) {
                                 Real64 BlAbsDiffBk = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum),
-                                                            state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffBack(_,
-                                                                                                                  IGlass));
+                                        state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffBack(_, IGlass)); // Glass layer back diffuse solar absorptance when blind in place
                                 SurfWinQRadSWwinAbs(IGlass, SurfNum) += QS(solEnclosureNum) * BlAbsDiffBk;
                             }
                         }
@@ -3695,7 +3667,7 @@ namespace HeatBalanceSurfaceManager {
                                     TMULT(radEnclosureNum);
                         if (ShadeFlag == IntBlindOn) {
                             Real64 EffBlEmiss = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum),
-                                                       SurfaceWindow(SurfNum).EffShBlindEmiss);
+                                                       SurfaceWindow(SurfNum).EffShBlindEmiss); // Blind emissivity (thermal absorptance) as part of glazing system
                             SurfWinIntLWAbsByShade(SurfNum) = QL(radEnclosureNum) * EffBlEmiss * TMULT(radEnclosureNum);
                         }
                         if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn ||
@@ -3704,7 +3676,7 @@ namespace HeatBalanceSurfaceManager {
                                     QS(solEnclosureNum) * state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackShade;
                         if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
                             Real64 AbsDiffBkBl = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum),
-                                                        state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind);
+                                    state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind); // Blind diffuse back solar absorptance as part of glazing system
                             SurfWinIntSWAbsByShade(SurfNum) = QS(solEnclosureNum) * AbsDiffBkBl;
 
                         }
@@ -3734,15 +3706,15 @@ namespace HeatBalanceSurfaceManager {
                                                           (1.0 +
                                                            0.5 * SurfWinProjCorrFrIn(SurfNum)); // Window has a frame
                     if (SurfWinDividerArea(SurfNum) > 0.0) {            // Window has dividers
-                        Real64 DividerThermAbs = SurfWinDividerEmis(SurfNum);
-                        Real64 DividerSolAbs = SurfWinDividerSolAbsorp(SurfNum);
+                        Real64 DividerThermAbs = SurfWinDividerEmis(SurfNum); // Window divider thermal absorptance
+                        Real64 DividerSolAbs = SurfWinDividerSolAbsorp(SurfNum); // Window divider solar absorptance
                         if (SurfWinDividerType(SurfNum) == Suspended) { // Suspended divider; account for inside glass
                             Real64 MatNumGl = state.dataConstruction->Construct(ConstrNum).LayerPoint(
-                                    state.dataConstruction->Construct(ConstrNum).TotLayers);
-                            Real64 TransGl = dataMaterial.Material(MatNumGl).Trans;
+                                    state.dataConstruction->Construct(ConstrNum).TotLayers); // Glass layer material number
+                            Real64 TransGl = dataMaterial.Material(MatNumGl).Trans; // Glass layer solar transmittance, reflectance, absorptance
                             Real64 ReflGl = dataMaterial.Material(MatNumGl).ReflectSolBeamBack;
                             Real64 AbsGl = 1.0 - TransGl - ReflGl;
-                            Real64 DividerSolRefl = 1.0 - DividerSolAbs;
+                            Real64 DividerSolRefl = 1.0 - DividerSolAbs; // Window divider solar reflectance
                             DividerSolAbs = AbsGl + TransGl * (DividerSolAbs + DividerSolRefl * AbsGl) /
                                                     (1.0 - DividerSolRefl * ReflGl);
                             DividerThermAbs = dataMaterial.Material(MatNumGl).AbsorpThermalBack;
@@ -3750,7 +3722,7 @@ namespace HeatBalanceSurfaceManager {
                         // Correct for interior shade transmittance
                         if (ShadeFlag == IntShadeOn) {
                             int MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(
-                                    state.dataConstruction->Construct(ConstrNumSh).TotLayers);
+                                    state.dataConstruction->Construct(ConstrNumSh).TotLayers); // Shade layer material number
                             DividerSolAbs *= dataMaterial.Material(MatNumSh).Trans;
                             DividerThermAbs *= dataMaterial.Material(MatNumSh).TransThermal;
                         } else if (ShadeFlag == IntBlindOn) {
@@ -3798,8 +3770,7 @@ namespace HeatBalanceSurfaceManager {
 
                 if (Surface(SurfNum).ExtBoundCond > 0) { // Interzone surface
                     // Short-wave radiation absorbed in panes of corresponding window in adjacent zone
-                    int SurfNumAdjZone = Surface(SurfNum).ExtBoundCond;
-
+                    int SurfNumAdjZone = Surface(SurfNum).ExtBoundCond; // Surface number in adjacent zone for interzone surfaces
                     if (SurfWinWindowModelType(SurfNumAdjZone) != WindowEQLModel) {
                         int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                         for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
