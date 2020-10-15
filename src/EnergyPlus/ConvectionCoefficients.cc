@@ -4670,7 +4670,7 @@ namespace ConvectionCoefficients {
             } else if (SELECT_CASE_var == HcExt_UserCurve) {
                 CalcUserDefinedOutsideHcModel(state, SurfNum, Surface(SurfNum).OutConvHnUserCurveIndex, Hn);
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    HnFn = [=](double Tsurf, double Tamb, double HfTerm, double Roughness, double CosTilt) -> double {
+                    HnFn = [=, &state](double Tsurf, double Tamb, double HfTerm, double Roughness, double CosTilt) -> double {
                         // Remove Hfterm since this is only used for the natural convection portion
                         return state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out(Tsurf, Tamb, HfTerm, Roughness, CosTilt) - HfTerm;
                     };
