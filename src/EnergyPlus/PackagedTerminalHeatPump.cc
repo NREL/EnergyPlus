@@ -158,7 +158,6 @@ namespace PackagedTerminalHeatPump {
         bool MyOneTimeFlag(true);               // initialization flag
         bool ZoneEquipmentListNotChecked(true); // False after the Zone Equipment List has been checked for items
     }                                           // namespace
-
     // Data
     // MODULE PARAMETER DEFINITIONS
     // Compressor operation

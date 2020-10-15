@@ -239,6 +239,8 @@ namespace DataGlobalConstants {
     extern int const iEvapCoolerInDirectRDDSpecial;
     extern int const iEvapCoolerDirectResearchSpecial;
 
+    extern int const MaxSpedLevels; // Maximum number of speed that supports
+
     // DERIVED TYPE DEFINITIONS:
     // na
 
@@ -246,8 +248,6 @@ namespace DataGlobalConstants {
     // na
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataGlobalConstants
-
-    // Functions
 
     int AssignResourceTypeNum(std::string const &ResourceTypeChar);
 
