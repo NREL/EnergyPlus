@@ -458,14 +458,14 @@ namespace ConvectionCoefficients {
 
     Real64 CalcASHRAESimpleIntConvCoeff(Real64 Tsurf, Real64 Tamb, Real64 cosTilt);
 
-    void CalcASHRAESimpleIntConvCoeff(int SurfNum,                  // surface number for which coefficients are being calculated
+    void CalcASHRAESimpleIntConvCoeff(EnergyPlusData &state, int SurfNum,                  // surface number for which coefficients are being calculated
                                       Real64 SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
                                       Real64 ZoneMeanAirTemperature // Mean Air Temperature of Zone
     );
 
     Real64 CalcASHRAETARPNatural(Real64 Tsurf, Real64 Tamb, Real64 cosTilt);
 
-    void CalcASHRAEDetailedIntConvCoeff(int SurfNum,                  // surface number for which coefficients are being calculated
+    void CalcASHRAEDetailedIntConvCoeff(EnergyPlusData &state, int SurfNum,                  // surface number for which coefficients are being calculated
                                         Real64 SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
                                         Real64 ZoneMeanAirTemperature // Mean Air Temperature of Zone
     );
@@ -553,7 +553,7 @@ namespace ConvectionCoefficients {
 
     void EvaluateExtHcModels(EnergyPlusData &state, int SurfNum, int NaturalConvModelEqNum, int ForcedConvModelEqNum, Real64 &Hc);
 
-    void DynamicExtConvSurfaceClassification(int SurfNum); // surface number
+    void DynamicExtConvSurfaceClassification(EnergyPlusData &state, int SurfNum); // surface number
 
     void MapExtConvClassificationToHcModels(EnergyPlusData &state, int SurfNum); // surface number
 

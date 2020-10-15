@@ -684,7 +684,7 @@ namespace HeatBalanceKivaManager {
                 bool useDetailedExposedPerimeter = false;
                 Real64 exposedFraction = 0.0;
 
-                auto &expPerimMap = SurfaceGeometry::exposedFoundationPerimeter.surfaceMap;
+                auto &expPerimMap = state.dataSurfaceGeometry->exposedFoundationPerimeter.surfaceMap;
                 if (expPerimMap.count(surfNum) == 1) {
                     userSetExposedPerimeter = true;
                     useDetailedExposedPerimeter = expPerimMap[surfNum].useDetailedExposedPerimeter;
@@ -1094,7 +1094,7 @@ namespace HeatBalanceKivaManager {
             // Start with steady-state solution
             kv.initGround(state, kivaWeather);
         }
-        calcKivaSurfaceResults();
+        calcKivaSurfaceResults(state);
     }
 
     void KivaManager::calcKivaInstances(EnergyPlusData &state)
@@ -1109,7 +1109,7 @@ namespace HeatBalanceKivaManager {
             }
         }
 
-        calcKivaSurfaceResults();
+        calcKivaSurfaceResults(state);
     }
 
     void KivaInstanceMap::plotDomain()
@@ -1195,14 +1195,14 @@ namespace HeatBalanceKivaManager {
 #endif
     }
 
-    void KivaManager::calcKivaSurfaceResults()
+    void KivaManager::calcKivaSurfaceResults(EnergyPlusData &state)
     {
         for (int surfNum = 1; surfNum <= (int)DataSurfaces::Surface.size(); ++surfNum) {
             if (DataSurfaces::Surface(surfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 std::string contextStr = "Surface=\"" + DataSurfaces::Surface(surfNum).Name + "\"";
                 Kiva::setMessageCallback(kivaErrorCallback, &contextStr);
                 surfaceMap[surfNum].calc_weighted_results();
-                DataHeatBalance::HConvIn(surfNum) = SurfaceGeometry::kivaManager.surfaceMap[surfNum].results.hconv;
+                DataHeatBalance::HConvIn(surfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[surfNum].results.hconv;
             }
         }
         Kiva::setMessageCallback(kivaErrorCallback, nullptr);

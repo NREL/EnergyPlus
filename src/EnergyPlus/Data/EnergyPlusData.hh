@@ -93,6 +93,7 @@ struct ExteriorEnergyUseData;
 struct FansData;
 struct PipesData;
 struct PlantChillersData;
+struct SurfaceGeometryData;
 struct SurfaceGroundHeatExchangersData;
 struct SwimmingPoolsData;
 struct SystemAvailabilityManagerData;
@@ -158,6 +159,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<FansData> dataFans;
     std::unique_ptr<PipesData> dataPipes;
     std::unique_ptr<PlantChillersData> dataPlantChillers;
+    std::unique_ptr<SurfaceGeometryData> dataSurfaceGeometry;
     std::unique_ptr<SurfaceGroundHeatExchangersData> dataSurfaceGroundHeatExchangers;
     std::unique_ptr<SwimmingPoolsData> dataSwimmingPools;
     std::unique_ptr<SystemAvailabilityManagerData> dataSystemAvailabilityManager;

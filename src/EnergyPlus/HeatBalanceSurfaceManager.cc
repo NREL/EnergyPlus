@@ -2271,9 +2271,9 @@ namespace HeatBalanceSurfaceManager {
 
             // Initialize Kiva convection algorithms
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
-                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
-                SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
+                state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
+                state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_DEF;
+                state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
             }
 
             // Initialize the flux histories
@@ -6372,7 +6372,7 @@ namespace HeatBalanceSurfaceManager {
 
             // Initialize Kiva instances ground temperatures
             if (DataHeatBalance::AnyKiva) {
-                SurfaceGeometry::kivaManager.initKivaInstances(state);
+                state.dataSurfaceGeometry->kivaManager.initKivaInstances(state);
             }
         }
         if (!BeginEnvrnFlag) {
@@ -6569,10 +6569,10 @@ namespace HeatBalanceSurfaceManager {
 
         // Calculate Kiva instances
         if (DataHeatBalance::AnyKiva) {
-            if (((SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
-                 SurfaceGeometry::kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
+            if (((state.dataSurfaceGeometry->kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && TimeStep == 1) ||
+                 state.dataSurfaceGeometry->kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
                 !WarmupFlag) {
-                SurfaceGeometry::kivaManager.calcKivaInstances(state);
+                state.dataSurfaceGeometry->kivaManager.calcKivaInstances(state);
             }
         }
 
@@ -6582,7 +6582,7 @@ namespace HeatBalanceSurfaceManager {
             TempInsOld = TempSurfIn; // Keep track of last iteration's temperature values
 
             if (DataHeatBalance::AnyKiva) {
-                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
+                for (auto &kivaSurf : state.dataSurfaceGeometry->kivaManager.surfaceMap) {
                     TempSurfIn(kivaSurf.first) = kivaSurf.second.results.Tavg - DataGlobalConstants::KelvinConv(); // TODO: Use average radiant temp? Trad?
                 }
             }
@@ -6591,7 +6591,7 @@ namespace HeatBalanceSurfaceManager {
                 state, TempSurfIn, InsideSurfIterations, SurfNetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
 
             if (DataHeatBalance::AnyKiva) {
-                for (auto &kivaSurf : SurfaceGeometry::kivaManager.surfaceMap) {
+                for (auto &kivaSurf : state.dataSurfaceGeometry->kivaManager.surfaceMap) {
                     TempSurfIn(kivaSurf.first) = TempInsOld(kivaSurf.first);
                 }
             }
@@ -6874,8 +6874,8 @@ namespace HeatBalanceSurfaceManager {
 
                         } else if (surface.HeatTransferAlgorithm == HeatTransferModel_Kiva) {
                             // Read Kiva results for each surface
-                            TempSurfInTmp(SurfNum) = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobalConstants::KelvinConv();
-                            SurfOpaqInsFaceConductionFlux(SurfNum) = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].results.qtot;
+                            TempSurfInTmp(SurfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobalConstants::KelvinConv();
+                            SurfOpaqInsFaceConductionFlux(SurfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.qtot;
                             SurfOpaqInsFaceConduction(SurfNum) = SurfOpaqInsFaceConductionFlux(SurfNum) * DataSurfaces::Surface(SurfNum).Area;
 
                             TH11 = 0.0;

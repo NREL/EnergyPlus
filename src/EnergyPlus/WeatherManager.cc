@@ -274,7 +274,7 @@ namespace WeatherManager {
         DataEnvironment::varyingOrientationSchedIndex = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(3));
     }
 
-    void UpdateLocationAndOrientation()
+    void UpdateLocationAndOrientation(EnergyPlusData &state)
     {
         if (DataEnvironment::varyingLocationSchedIndexLat > 0) {
             DataEnvironment::Latitude = ScheduleManager::GetCurrentScheduleValue(DataEnvironment::varyingLocationSchedIndexLat);
@@ -285,16 +285,16 @@ namespace WeatherManager {
         CheckLocationValidity();
         if (DataEnvironment::varyingOrientationSchedIndex > 0) {
             DataHeatBalance::BuildingAzimuth = mod(ScheduleManager::GetCurrentScheduleValue(DataEnvironment::varyingOrientationSchedIndex), 360.0);
-            SurfaceGeometry::CosBldgRelNorth =
+            state.dataSurfaceGeometry->CosBldgRelNorth =
                 std::cos(-(DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians());
-            SurfaceGeometry::SinBldgRelNorth =
+            state.dataSurfaceGeometry->SinBldgRelNorth =
                 std::sin(-(DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians());
             for (size_t SurfNum = 1; SurfNum < DataSurfaces::Surface.size(); ++SurfNum) {
                 for (int n = 1; n <= DataSurfaces::Surface(SurfNum).Sides; ++n) {
                     Real64 Xb = DataSurfaces::Surface(SurfNum).Vertex(n).x;
                     Real64 Yb = DataSurfaces::Surface(SurfNum).Vertex(n).y;
-                    DataSurfaces::Surface(SurfNum).NewVertex(n).x = Xb * SurfaceGeometry::CosBldgRelNorth - Yb * SurfaceGeometry::SinBldgRelNorth;
-                    DataSurfaces::Surface(SurfNum).NewVertex(n).y = Xb * SurfaceGeometry::SinBldgRelNorth + Yb * SurfaceGeometry::CosBldgRelNorth;
+                    DataSurfaces::Surface(SurfNum).NewVertex(n).x = Xb * state.dataSurfaceGeometry->CosBldgRelNorth - Yb * state.dataSurfaceGeometry->SinBldgRelNorth;
+                    DataSurfaces::Surface(SurfNum).NewVertex(n).y = Xb * state.dataSurfaceGeometry->SinBldgRelNorth + Yb * state.dataSurfaceGeometry->CosBldgRelNorth;
                     DataSurfaces::Surface(SurfNum).NewVertex(n).z = DataSurfaces::Surface(SurfNum).Vertex(n).z;
                 }
                 Vectors::CreateNewellSurfaceNormalVector(DataSurfaces::Surface(SurfNum).NewVertex,

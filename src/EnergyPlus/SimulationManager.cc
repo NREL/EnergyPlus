@@ -606,7 +606,7 @@ namespace SimulationManager {
 
                         if (DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0 ||
                             DataEnvironment::varyingOrientationSchedIndex > 0) {
-                            WeatherManager::UpdateLocationAndOrientation();
+                            WeatherManager::UpdateLocationAndOrientation(state);
                         }
 
                         BeginTimeStepFlag = true;

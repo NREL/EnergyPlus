@@ -136,7 +136,7 @@ namespace HeatBalanceKivaManager {
         void defineDefaultFoundation();
         void addDefaultFoundation();
         int findFoundation(std::string const &name);
-        void calcKivaSurfaceResults();
+        void calcKivaSurfaceResults(EnergyPlusData &state);
 
         KivaWeatherData kivaWeather;
         FoundationKiva defaultFoundation;
