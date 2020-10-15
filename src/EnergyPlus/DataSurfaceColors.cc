@@ -48,7 +48,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaceColors.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -80,8 +79,6 @@ namespace DataSurfaceColors {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // MODULE PARAMETER DEFINITIONS:
     int const NumColors(15);

@@ -62,7 +62,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -109,7 +108,6 @@ namespace HVACSingleDuctInduc {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::BeginEnvrnFlag;
@@ -665,7 +663,7 @@ namespace HVACSingleDuctInduc {
 
                 rho = GetDensityGlycol(state,
                                        PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
-                                       DataGlobals::HWInitConvTemp,
+                                       DataGlobalConstants::HWInitConvTemp(),
                                        PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
                                        RoutineName);
                 IndUnit(IUNum).MaxHotWaterFlow = rho * IndUnit(IUNum).MaxVolHotWaterFlow;
@@ -690,7 +688,7 @@ namespace HVACSingleDuctInduc {
             if (ColdConNode > 0) {
                 rho = GetDensityGlycol(state,
                                        PlantLoop(IndUnit(IUNum).CWLoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
+                                       DataGlobalConstants::CWInitConvTemp(),
                                        PlantLoop(IndUnit(IUNum).CWLoopNum).FluidIndex,
                                        RoutineName);
                 IndUnit(IUNum).MaxColdWaterFlow = rho * IndUnit(IUNum).MaxVolColdWaterFlow;
@@ -909,13 +907,13 @@ namespace HVACSingleDuctInduc {
                                 }
                                 IndUnit(IUNum).DesHeatingLoad = DesCoilLoad;
                                 Cp = GetSpecificHeatGlycol(state, PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
-                                                           DataGlobals::HWInitConvTemp,
+                                                           DataGlobalConstants::HWInitConvTemp(),
                                                            PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
 
                                 rho = GetDensityGlycol(state,
                                                        PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
-                                                       DataGlobals::HWInitConvTemp,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
 

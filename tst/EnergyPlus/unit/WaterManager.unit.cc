@@ -83,7 +83,7 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
     WaterManager::UpdatePrecipitation();
 
     Real64 ExpectedNomAnnualRain = 0.80771;
-    Real64 ExpectedCurrentRate = 1.0 * (0.75 / 0.80771) / DataGlobals::SecInHour;
+    Real64 ExpectedCurrentRate = 1.0 * (0.75 / 0.80771) / DataGlobalConstants::SecInHour();
 
     Real64 NomAnnualRain = DataWater::RainFall.NomAnnualRain;
     EXPECT_NEAR(NomAnnualRain, ExpectedNomAnnualRain, 0.000001);

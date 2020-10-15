@@ -132,14 +132,14 @@ void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &sta
 
     // retrieve data from meters for demand and production
     totalBldgElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec;
-    totalHVACElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+    totalHVACElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     totalElectricDemand_ = totalBldgElecDemand_ + totalHVACElecDemand_;
-    elecProducedPVRate_ = GetInstantMeterValue(elecProducedPVIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-    elecProducedWTRate_ = GetInstantMeterValue(elecProducedWTIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-    elecProducedStorageRate_ = GetInstantMeterValue(elecProducedStorageIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-    elecProducedCoGenRate_ = GetInstantMeterValue(elecProducedCoGenIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+    elecProducedPVRate_ = GetInstantMeterValue(elecProducedPVIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+    elecProducedWTRate_ = GetInstantMeterValue(elecProducedWTIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+    elecProducedStorageRate_ = GetInstantMeterValue(elecProducedStorageIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+    elecProducedCoGenRate_ = GetInstantMeterValue(elecProducedCoGenIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     elecProducedPowerConversionRate_ =
-        GetInstantMeterValue(elecProducedPowerConversionIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        GetInstantMeterValue(elecProducedPowerConversionIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
 
     wholeBldgRemainingLoad_ = totalElectricDemand_;
 
@@ -427,17 +427,17 @@ void ElectricPowerServiceManager::updateWholeBuildingRecords()
 
     // main panel balancing.
     totalBldgElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec;
-    totalHVACElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+    totalHVACElecDemand_ = GetInstantMeterValue(elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     totalElectricDemand_ = totalBldgElecDemand_ + totalHVACElecDemand_;
-    elecProducedPVRate_ = GetInstantMeterValue(elecProducedPVIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-    elecProducedWTRate_ = GetInstantMeterValue(elecProducedWTIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-    elecProducedStorageRate_ = GetInstantMeterValue(elecProducedStorageIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-    elecProducedCoGenRate_ = GetInstantMeterValue(elecProducedCoGenIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+    elecProducedPVRate_ = GetInstantMeterValue(elecProducedPVIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+    elecProducedWTRate_ = GetInstantMeterValue(elecProducedWTIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+    elecProducedStorageRate_ = GetInstantMeterValue(elecProducedStorageIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+    elecProducedCoGenRate_ = GetInstantMeterValue(elecProducedCoGenIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     elecProducedPowerConversionRate_ =
-        GetInstantMeterValue(elecProducedPowerConversionIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        GetInstantMeterValue(elecProducedPowerConversionIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
 
     electProdRate_ = elecProducedCoGenRate_ + elecProducedPVRate_ + elecProducedWTRate_ + elecProducedStorageRate_ + elecProducedPowerConversionRate_;
-    electricityProd_ = electProdRate_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // whole building
+    electricityProd_ = electProdRate_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour(); // whole building
 
     // Report the Total Electric Power Purchased [W], If negative then there is extra power to be sold or stored.
     electPurchRate_ = totalElectricDemand_ - electProdRate_;
@@ -446,19 +446,19 @@ void ElectricPowerServiceManager::updateWholeBuildingRecords()
     if (electPurchRate_ < 0.0) electPurchRate_ = 0.0; // don't want negative purchased...
 
     // Report the Total Electric Energy Purchased [J]
-    electricityPurch_ = electPurchRate_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    electricityPurch_ = electPurchRate_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
     // report the total electric surplus....
     electSurplusRate_ = electProdRate_ - totalElectricDemand_;
     if (std::abs(electSurplusRate_) < 0.0001) electSurplusRate_ = 0.0;
     if (electSurplusRate_ < 0.0) electSurplusRate_ = 0.0; // don't want negative surplus
 
-    electricitySurplus_ = electSurplusRate_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    electricitySurplus_ = electSurplusRate_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
     // report the net electricity , + is purchased, - is surplus
     electricityNetRate_ = totalElectricDemand_ - electProdRate_;
 
-    electricityNet_ = electricityNetRate_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    electricityNet_ = electricityNetRate_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 }
 
 void ElectricPowerServiceManager::reportPVandWindCapacity()
@@ -469,10 +469,10 @@ void ElectricPowerServiceManager::reportPVandWindCapacity()
     for (auto &lc : elecLoadCenterObjs) {
         if (lc->numGenerators > 0) {
             for (auto &g : lc->elecGenCntrlObj) {
-                if (g->compGenTypeOf_Num == DataGlobalConstants::iGeneratorPV) {
+                if (g->compGenTypeOf_Num == GeneratorType::PV) {
                     pvTotalCapacity_ += g->maxPowerOut;
                 }
-                if (g->compGenTypeOf_Num == DataGlobalConstants::iGeneratorWindTurbine) {
+                if (g->compGenTypeOf_Num == GeneratorType::WindTurbine) {
                     windTotalCapacity_ += g->maxPowerOut;
                 }
             }
@@ -937,7 +937,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         if (inverterObj->modelType() == DCtoACInverter::InverterModelType::pvWatts) {
             Real64 totalDCCapacity = 0.0;
             for (const auto &generatorController : elecGenCntrlObj) {
-                if (generatorController->generatorType != GeneratorController::GeneratorType::pvWatts) {
+                if (generatorController->generatorType != GeneratorType::PVWatts) {
                     errorsFound = true;
                     ShowSevereError(routineName + "ElectricLoadCenter:Distribution=\"" + name_ + "\",");
                     ShowContinueError("ElectricLoadCenter:Inverter:PVWatts can only be used with Generator:PVWatts");
@@ -1274,7 +1274,7 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state, bool const 
         //   electrical demand from a meter, it can also be a user-defined Custom Meter
         //   and PV is ignored.
         customMeterDemand = GetInstantMeterValue(demandMeterPtr_, OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec +
-                            GetInstantMeterValue(demandMeterPtr_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+                            GetInstantMeterValue(demandMeterPtr_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
 
         remainingLoad = customMeterDemand;
         loadCenterElectricLoad = remainingLoad;
@@ -1463,7 +1463,7 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state, bool const 
     genElectricProd = 0.0;
     for (auto &g : elecGenCntrlObj) {
         genElectProdRate += g->electProdRate;
-        g->electricityProd = g->electProdRate * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        g->electricityProd = g->electProdRate * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
         genElectricProd += g->electricityProd;
     }
 }
@@ -1511,7 +1511,7 @@ void ElectPowerLoadCenter::dispatchStorage(EnergyPlusData &state, Real64 const o
     case StorageOpScheme::meterDemandStoreExcessOnSite: {
         // Get meter rate
         subpanelFeedInRequest = GetInstantMeterValue(trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec +
-                                GetInstantMeterValue(trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+                                GetInstantMeterValue(trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
         subpanelDrawRequest = 0.0;
         break;
     }
@@ -1977,7 +1977,8 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
                                          Real64 ratedElecPowerOutput,
                                          std::string const &availSchedName,
                                          Real64 thermalToElectRatio)
-    : compGenTypeOf_Num(0), compPlantTypeOf_Num(0), generatorType(GeneratorType::notYetSet), generatorIndex(0), maxPowerOut(0.0), availSchedPtr(0),
+    : compGenTypeOf_Num(GeneratorType::Unassigned), compPlantTypeOf_Num(0), generatorType(GeneratorType::Unassigned),
+      generatorIndex(0), maxPowerOut(0.0), availSchedPtr(0),
       powerRequestThisTimestep(0.0), onThisTimestep(false), eMSPowerRequest(0.0), eMSRequestOn(false), plantInfoFound(false),
       cogenLocation(PlantLocation(0, 0, 0, 0)), nominalThermElectRatio(0.0), dCElectricityProd(0.0), dCElectProdRate(0.0), electricityProd(0.0),
       electProdRate(0.0), thermalProd(0.0), thermProdRate(0.0), errCountNegElectProd_(0)
@@ -1988,32 +1989,32 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     name = objectName;
     typeOfName = objectType;
     if (UtilityRoutines::SameString(objectType, "Generator:InternalCombustionEngine")) {
-        generatorType = GeneratorType::iCEngine;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorICEngine;
+        generatorType = GeneratorType::ICEngine;
+        compGenTypeOf_Num = GeneratorType::ICEngine;
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_ICEngine;
         compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:CombustionTurbine")) {
-        generatorType = GeneratorType::combTurbine;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorCombTurbine;
+        generatorType = GeneratorType::CombTurbine;
+        compGenTypeOf_Num = GeneratorType::CombTurbine;
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_CTurbine;
         compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:MicroTurbine")) {
-        generatorType = GeneratorType::microturbine;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorMicroturbine;
+        generatorType = GeneratorType::Microturbine;
+        compGenTypeOf_Num = GeneratorType::Microturbine;
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_MicroTurbine;
         compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:Photovoltaic")) {
-        generatorType = GeneratorType::pV;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorPV;
+        generatorType = GeneratorType::PV;
+        compGenTypeOf_Num = GeneratorType::PV;
         compPlantTypeOf_Num = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
         compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:PVWatts")) {
-        generatorType = GeneratorType::pvWatts;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorPVWatts;
+        generatorType = GeneratorType::PVWatts;
+        compGenTypeOf_Num = GeneratorType::PVWatts;
         compPlantTypeOf_Num = DataPlant::TypeOf_Other;
     } else if (UtilityRoutines::SameString(objectType, "Generator:FuelCell")) {
-        generatorType = GeneratorType::fuelCell;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorFuelCell;
+        generatorType = GeneratorType::FuelCell;
+        compGenTypeOf_Num = GeneratorType::FuelCell;
         // fuel cell has two possible plant component types, stack cooler and exhaust gas HX.
         // exhaust gas HX is required and it assumed that it has more thermal capacity and is used for control
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_FCExhaust;
@@ -2021,13 +2022,13 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
         auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
         compPlantName = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->ExhaustHX.Name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:MicroCHP")) {
-        generatorType = GeneratorType::microCHP;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorMicroCHP;
+        generatorType = GeneratorType::MicroCHP;
+        compGenTypeOf_Num = GeneratorType::MicroCHP;
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_MicroCHP;
         compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:WindTurbine")) {
-        generatorType = GeneratorType::windTurbine;
-        compGenTypeOf_Num = DataGlobalConstants::iGeneratorWindTurbine;
+        generatorType = GeneratorType::WindTurbine;
+        compGenTypeOf_Num = GeneratorType::WindTurbine;
         compPlantTypeOf_Num = DataPlant::TypeOf_Other;
     } else {
         ShowSevereError(routineName + DataIPShortCuts::cCurrentModuleObject + " invalid entry.");
@@ -2044,9 +2045,9 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
             ShowContinueError("Invalid availability schedule = " + availSchedName);
             ShowContinueError("Schedule was not found ");
         } else {
-            if (generatorType == GeneratorType::pvWatts) {
+            if (generatorType == GeneratorType::PVWatts) {
                 ShowWarningError(routineName + DataIPShortCuts::cCurrentModuleObject + ", Availability Schedule for Generator:PVWatts '" + objectName +  "' will be be ignored (runs all the time).");
-            } else if (generatorType == GeneratorType::pV) {
+            } else if (generatorType == GeneratorType::PV) {
                 // It should only warn if Performance type is SimplePV (DataPhotovoltaics::iSimplePVModel).
                 // Except you need GetPVInput to have run already etc
                 // Note: you can't use DataIPShortCuts::cAlphaArgs etc or it'll override what will still need to be processed in
@@ -2104,7 +2105,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
 {
     // Select and call models and also collect results for load center power conditioning and reporting
     switch (generatorType) {
-    case GeneratorType::iCEngine: {
+    case GeneratorType::ICEngine: {
 
         auto thisICE = ICEngineElectricGenerator::ICEngineGeneratorSpecs::factory(state, name);
 
@@ -2124,7 +2125,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::combTurbine: {
+    case GeneratorType::CombTurbine: {
 
         auto thisCTE = CTElectricGenerator::CTGeneratorData::factory(state, name);
         // dummy vars
@@ -2143,15 +2144,15 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::pV: {
-        Photovoltaics::SimPVGenerator(state, DataGlobalConstants::iGeneratorPV, name, generatorIndex, runFlag, myElecLoadRequest);
+    case GeneratorType::PV: {
+        Photovoltaics::SimPVGenerator(state, GeneratorType::PV, name, generatorIndex, runFlag, myElecLoadRequest);
         Photovoltaics::GetPVGeneratorResults(
-            DataGlobalConstants::iGeneratorPV, generatorIndex, dCElectProdRate, dCElectricityProd, thermProdRate, thermalProd);
+            GeneratorType::PV, generatorIndex, dCElectProdRate, dCElectricityProd, thermProdRate, thermalProd);
         electricPowerOutput = dCElectProdRate;
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::pvWatts: {
+    case GeneratorType::PVWatts: {
         PVWatts::PVWattsGenerator &pvwattsGenerator(PVWatts::GetOrCreatePVWattsGenerator(state, name));
         pvwattsGenerator.calc(state);
         pvwattsGenerator.getResults(dCElectProdRate, dCElectricityProd, thermProdRate, thermalProd);
@@ -2159,7 +2160,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::fuelCell: {
+    case GeneratorType::FuelCell: {
         auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
         dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->SimFuelCellGenerator(state, runFlag, myElecLoadRequest, FirstHVACIteration);
         electProdRate = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.ACPowerGen;
@@ -2170,7 +2171,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::microCHP: {
+    case GeneratorType::MicroCHP: {
         auto thisMCHP = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, name);
 
         // simulate
@@ -2195,7 +2196,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::microturbine: {
+    case GeneratorType::Microturbine: {
         auto thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, name);
 
         // dummy vars
@@ -2214,15 +2215,15 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::windTurbine: {
-        WindTurbine::SimWindTurbine(state, DataGlobalConstants::iGeneratorWindTurbine, name, generatorIndex, runFlag, myElecLoadRequest);
+    case GeneratorType::WindTurbine: {
+        WindTurbine::SimWindTurbine(state, GeneratorType::WindTurbine, name, generatorIndex, runFlag, myElecLoadRequest);
         WindTurbine::GetWTGeneratorResults(state,
-            DataGlobalConstants::iGeneratorWindTurbine, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd);
+            GeneratorType::WindTurbine, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd);
         electricPowerOutput = electProdRate;
         thermalPowerOutput = thermProdRate;
         break;
     }
-    case GeneratorType::notYetSet: {
+    case GeneratorType::Unassigned: {
         // do nothing
         break;
     }
@@ -2635,17 +2636,17 @@ void DCtoACInverter::calcEfficiency(EnergyPlusData &state)
 void DCtoACInverter::simulate(EnergyPlusData &state, Real64 const powerIntoInverter)
 {
     dCPowerIn_ = powerIntoInverter;
-    dCEnergyIn_ = dCPowerIn_ * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+    dCEnergyIn_ = dCPowerIn_ * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     // check availability schedule
     if (ScheduleManager::GetCurrentScheduleValue(availSchedPtr_) > 0.0) {
 
         // now calculate Inverter based on model type
         calcEfficiency(state);
         aCPowerOut_ = efficiency_ * dCPowerIn_;
-        aCEnergyOut_ = aCPowerOut_ * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        aCEnergyOut_ = aCPowerOut_ * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
 
         if (aCPowerOut_ == 0.0) {
-            ancillACuseEnergy_ = standbyPower_ * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+            ancillACuseEnergy_ = standbyPower_ * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
             ancillACuseRate_ = standbyPower_;
         } else {
             ancillACuseRate_ = 0.0;
@@ -2660,10 +2661,10 @@ void DCtoACInverter::simulate(EnergyPlusData &state, Real64 const powerIntoInver
     }
     // update report variables
     conversionLossPower_ = dCPowerIn_ - aCPowerOut_;
-    conversionLossEnergy_ = conversionLossPower_ * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+    conversionLossEnergy_ = conversionLossPower_ * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     conversionLossEnergyDecrement_ = -1.0 * conversionLossEnergy_;
     thermLossRate_ = dCPowerIn_ - aCPowerOut_ + ancillACuseRate_;
-    thermLossEnergy_ = thermLossRate_ * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+    thermLossEnergy_ = thermLossRate_ * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     qdotConvZone_ = thermLossRate_ * (1.0 - zoneRadFract_);
     qdotRadZone_ = thermLossRate_ * zoneRadFract_;
 }
@@ -2891,7 +2892,7 @@ void ACtoDCConverter::simulate(EnergyPlusData &state, Real64 const powerOutFromC
             dCPowerOut_ = aCPowerIn_ * efficiency_;
 
         if (dCPowerOut_ == 0.0) {
-            ancillACuseEnergy_ = standbyPower_ * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+            ancillACuseEnergy_ = standbyPower_ * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
             ancillACuseRate_ = standbyPower_;
         } else {
             ancillACuseRate_ = 0.0;
@@ -2906,13 +2907,13 @@ void ACtoDCConverter::simulate(EnergyPlusData &state, Real64 const powerOutFromC
     }
 
     // update and report
-    aCEnergyIn_ = aCPowerIn_ * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-    dCEnergyOut_ = dCPowerOut_ * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+    aCEnergyIn_ = aCPowerIn_ * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
+    dCEnergyOut_ = dCPowerOut_ * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     conversionLossPower_ = aCPowerIn_ - dCPowerOut_;
-    conversionLossEnergy_ = conversionLossPower_ * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+    conversionLossEnergy_ = conversionLossPower_ * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     conversionLossEnergyDecrement_ = -1.0 * conversionLossEnergy_;
     thermLossRate_ = aCPowerIn_ - dCPowerOut_ + ancillACuseRate_;
-    thermLossEnergy_ = thermLossRate_ * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+    thermLossEnergy_ = thermLossRate_ * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     qdotConvZone_ = thermLossRate_ * (1.0 - zoneRadFract_);
     qdotRadZone_ = thermLossRate_ * zoneRadFract_;
 }
@@ -3405,10 +3406,10 @@ void ElectricStorage::simulateSimpleBucketModel(Real64 &powerCharge,
         }
 
         // now check to see if charge would exceed capacity, and modify to just fill physical storage cap
-        if ((lastTimeStepStateOfCharge_ + powerCharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * energeticEfficCharge_) >=
+        if ((lastTimeStepStateOfCharge_ + powerCharge * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour() * energeticEfficCharge_) >=
             (maxEnergyCapacity_ * controlSOCMaxFracLimit)) {
             powerCharge = ((maxEnergyCapacity_ * controlSOCMaxFracLimit) - lastTimeStepStateOfCharge_) /
-                          (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * energeticEfficCharge_);
+                          (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour() * energeticEfficCharge_);
         }
     } // charging
 
@@ -3423,10 +3424,10 @@ void ElectricStorage::simulateSimpleBucketModel(Real64 &powerCharge,
             powerDischarge = maxPowerDraw_;
         }
         // now check if will empty this timestep, power draw is amplified by energetic effic
-        if ((lastTimeStepStateOfCharge_ - powerDischarge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / energeticEfficDischarge_) <=
+        if ((lastTimeStepStateOfCharge_ - powerDischarge * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour() / energeticEfficDischarge_) <=
             (maxEnergyCapacity_ * controlSOCMinFracLimit)) {
             powerDischarge = (lastTimeStepStateOfCharge_ - (maxEnergyCapacity_ * controlSOCMinFracLimit)) * energeticEfficDischarge_ /
-                             (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+                             (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
         }
     }
 
@@ -3439,25 +3440,25 @@ void ElectricStorage::simulateSimpleBucketModel(Real64 &powerCharge,
         pelIntoStorage_ = powerCharge;
         pelFromStorage_ = 0.0;
         thisTimeStepStateOfCharge_ =
-            lastTimeStepStateOfCharge_ + powerCharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * energeticEfficCharge_;
+            lastTimeStepStateOfCharge_ + powerCharge * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour() * energeticEfficCharge_;
     }
     if (discharging) {
         pelIntoStorage_ = 0.0;
         pelFromStorage_ = powerDischarge;
         thisTimeStepStateOfCharge_ =
-            lastTimeStepStateOfCharge_ - powerDischarge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / energeticEfficDischarge_;
+            lastTimeStepStateOfCharge_ - powerDischarge * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour() / energeticEfficDischarge_;
         thisTimeStepStateOfCharge_ = max(thisTimeStepStateOfCharge_, 0.0);
     }
 
     // updates and reports
     electEnergyinStorage_ = thisTimeStepStateOfCharge_; //[J]
     storedPower_ = pelIntoStorage_;
-    storedEnergy_ = pelIntoStorage_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    storedEnergy_ = pelIntoStorage_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
     decrementedEnergyStored_ = -1.0 * storedEnergy_;
     drawnPower_ = pelFromStorage_;
-    drawnEnergy_ = pelFromStorage_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    drawnEnergy_ = pelFromStorage_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
     thermLossRate_ = max(storedPower_ * (1.0 - energeticEfficCharge_), drawnPower_ * (1.0 - energeticEfficDischarge_));
-    thermLossEnergy_ = thermLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    thermLossEnergy_ = thermLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
     if (zoneNum_ > 0) { // set values for zone heat gains
         qdotConvZone_ = (1.0 - zoneRadFract_) * thermLossRate_;
@@ -3649,7 +3650,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
     if (TotalSOC > q0) {
         storageMode_ = 2;
         storedPower_ = -1.0 * Volt * I0 * numBattery_; // Issue #5303, fix sign issue
-        storedEnergy_ = -1.0 * Volt * I0 * numBattery_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        storedEnergy_ = -1.0 * Volt * I0 * numBattery_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         decrementedEnergyStored_ = -1.0 * storedEnergy_;
         drawnPower_ = 0.0;
         drawnEnergy_ = 0.0;
@@ -3660,7 +3661,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
         storedEnergy_ = 0.0;
         decrementedEnergyStored_ = 0.0;
         drawnPower_ = Volt * I0 * numBattery_;
-        drawnEnergy_ = Volt * I0 * numBattery_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        drawnEnergy_ = Volt * I0 * numBattery_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
     } else {
         storageMode_ = 0;
@@ -3676,7 +3677,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
     batteryCurrent_ = I0 * parallelNum_;
     batteryVoltage_ = Volt * seriesNum_;
     thermLossRate_ = internalR_ * pow_2(I0) * numBattery_;
-    thermLossEnergy_ = internalR_ * pow_2(I0) * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * numBattery_;
+    thermLossEnergy_ = internalR_ * pow_2(I0) * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour() * numBattery_;
 
     if (zoneNum_ > 0) { // set values for zone heat gains
         qdotConvZone_ = ((1.0 - zoneRadFract_) * thermLossRate_) * numBattery_;
@@ -4184,7 +4185,7 @@ void ElectricTransformer::manageTransformers(Real64 const surplusPowerOutFromLoa
             if (DataGlobals::MetersHaveBeenInitialized) {
 
                 elecLoad += GetInstantMeterValue(wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::TimeStepZone) / DataGlobals::TimeStepZoneSec +
-                            GetInstantMeterValue(wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+                            GetInstantMeterValue(wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::TimeStepSystem) / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
                 // PastElecLoad store the metered value in the previous time step. This value will be used to check whether
                 // a transformer is overloaded or not.
                 pastElecLoad += GetCurrentMeterValue(wiredMeterPtrs_[meterNum]) / DataGlobals::TimeStepZoneSec;
@@ -4274,14 +4275,14 @@ void ElectricTransformer::manageTransformers(Real64 const surplusPowerOutFromLoa
         // are considered in utility cost. If transformer losses are not considered in utility cost, 0 is assigned
         // to the variable "%ElecUseUtility".
         if (considerLosses_) {
-            elecUseMeteredUtilityLosses_ = totalLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            elecUseMeteredUtilityLosses_ = totalLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         } else {
             elecUseMeteredUtilityLosses_ = 0.0;
         }
 
         // Transformer has two modes.If it works in one mode, the variable for meter output in the other mode
         // is assigned 0
-        totalLossEnergy_ = totalLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        totalLossEnergy_ = totalLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         break;
     }
@@ -4292,7 +4293,7 @@ void ElectricTransformer::manageTransformers(Real64 const surplusPowerOutFromLoa
 
         if (powerOut_ < 0) powerOut_ = 0.0;
 
-        powerConversionMeteredLosses_ = -1.0 * totalLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        powerConversionMeteredLosses_ = -1.0 * totalLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         // Transformer has two modes.If it works in one mode, the variable for meter output in the other mode
         // is assigned 0
@@ -4311,16 +4312,16 @@ void ElectricTransformer::manageTransformers(Real64 const surplusPowerOutFromLoa
     } else {
         efficiency_ = powerOut_ / powerIn_;
     }
-    noLoadLossEnergy_ = noLoadLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-    loadLossEnergy_ = loadLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    noLoadLossEnergy_ = noLoadLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+    loadLossEnergy_ = loadLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
-    energyIn_ = powerIn_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-    energyOut_ = powerOut_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    energyIn_ = powerIn_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+    energyOut_ = powerOut_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
     //   Thermal loss rate may not be equal to Total loss rate. This is the case when surplus power is less than the
     //    calculated total loss rate for a cogeneration transformer. That is why "PowerIn - PowerOut" is used below.
     thermalLossRate_ = powerIn_ - powerOut_;
-    thermalLossEnergy_ = thermalLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    thermalLossEnergy_ = thermalLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
     if (zoneNum_ > 0) { // set values for zone heat gains
         qdotConvZone_ = (1.0 - zoneRadFrac_) * thermalLossRate_;

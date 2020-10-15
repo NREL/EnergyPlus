@@ -56,6 +56,7 @@
 // EnergyPlus Headers
 #include "IOFiles.hh"
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -65,98 +66,7 @@ struct EnergyPlusData;
 
 namespace DataGlobals {
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-//    extern bool runReadVars;
-//    extern bool DDOnlySimulation;
-//    extern bool outputEpJSONConversion;
-//    extern bool outputEpJSONConversionOnly;
-//    extern bool isEpJSON;
-//    extern bool isCBOR;
-//    extern bool isMsgPack;
-//    extern bool isUBJSON;
-//    extern bool isBSON;
-//    extern bool preserveIDFOrder;
-//    extern bool stopSimulation;
-    extern std::function<void (void *)> externalHVACManager;
-    extern bool externalHVACManagerInitialized;
-
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const BeginDay;
-    extern int const DuringDay;
-    extern int const EndDay;
-    extern int const EndSysSizingCalc;
-
-    // Parameters for KindOfSim
-    extern int const ksDesignDay;
-    extern int const ksRunPeriodDesign;
-    extern int const ksRunPeriodWeather;
-    extern int const ksHVACSizeDesignDay;       // a regular design day run during HVAC Sizing Simulation
-    extern int const ksHVACSizeRunPeriodDesign; // a weather period design day run during HVAC Sizing Simulation
-    extern int const ksReadAllWeatherData;      // a weather period for reading all weather data prior to the simulation
-
-    extern Real64 const MaxEXPArg; // maximum exponent in EXP() function
-    extern Real64 const Pi;        // Pi 3.1415926535897932384626435
-    extern Real64 const PiOvr2;    // Pi/2
-    extern Real64 const TwoPi;     // 2*Pi 6.2831853071795864769252868
-    extern Real64 const GravityConstant;
-    extern Real64 const DegToRadians;                  // Conversion for Degrees to Radians
-    extern Real64 const RadToDeg;                      // Conversion for Radians to Degrees
-    extern Real64 const SecInHour;                     // Conversion for hours to seconds
-    extern Real64 const HoursInDay;                    // Number of Hours in Day
-    extern Real64 const SecsInDay;                     // Number of seconds in Day
-    extern Real64 const BigNumber;                     // Max Number real used for initializations
-    extern Real64 const rTinyValue;                    // Tiny value to replace use of TINY(x)
-    extern std::string::size_type const MaxNameLength; // Maximum Name Length in Characters -- should be the same
-    // as MaxAlphaArgLength in InputProcessor module
-
-    extern Real64 const KelvinConv;        // Conversion factor for C to K and K to C
-    extern Real64 const InitConvTemp;      // [deg C], standard init vol to mass flow conversion temp
-    extern Real64 const AutoCalculate;     // automatically calculate some fields.
-    extern Real64 const CWInitConvTemp;    // [deg C], standard init chilled water vol to mass flow conversion temp
-    extern Real64 const HWInitConvTemp;    // [deg C], standard init hot water vol to mass flow conversion temp
-    extern Real64 const SteamInitConvTemp; // [deg C], standard init steam vol to mass flow conversion temp
-
-    extern Real64 const StefanBoltzmann;   // Stefan-Boltzmann constant in W/(m2*K4)
-    extern Real64 const UniversalGasConst; // (J/mol*K)
-
-    extern Real64 const convertJtoGJ; // Conversion factor for J to GJ
-
-    // Parameters for EMS Calling Points
-    extern int const emsCallFromZoneSizing;                           // Identity where EMS called from
-    extern int const emsCallFromSystemSizing;                         // Identity where EMS called from
-    extern int const emsCallFromBeginNewEvironment;                   // Identity where EMS called from
-    extern int const emsCallFromBeginNewEvironmentAfterWarmUp;        // Identity where EMS called from
-    extern int const emsCallFromBeginTimestepBeforePredictor;         // Identity where EMS called from
-    extern int const emsCallFromBeforeHVACManagers;                   // Identity where EMS called from
-    extern int const emsCallFromAfterHVACManagers;                    // Identity where EMS called from
-    extern int const emsCallFromHVACIterationLoop;                    // Identity where EMS called from
-    extern int const emsCallFromEndSystemTimestepBeforeHVACReporting; // Identity where EMS called from
-    extern int const emsCallFromEndSystemTimestepAfterHVACReporting;  // Identity where EMS called from
-    extern int const emsCallFromEndZoneTimestepBeforeZoneReporting;   // Identity where EMS called from
-    extern int const emsCallFromEndZoneTimestepAfterZoneReporting;    // Identity where EMS called from
-    extern int const emsCallFromSetupSimulation;                      // identify where EMS called from,
-    // this is for input processing only
-    extern int const emsCallFromExternalInterface;                        // Identity where EMS called from
-    extern int const emsCallFromComponentGetInput;                        // EMS called from end of get input for a component
-    extern int const emsCallFromUserDefinedComponentModel;                // EMS called from inside a custom user component model
-    extern int const emsCallFromUnitarySystemSizing;                      // EMS called from unitary system compound component
-    extern int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance;   // Identity where EMS called from
-    extern int const emsCallFromBeginZoneTimestepAfterInitHeatBalance;    // Identity where EMS called from
-    extern int const emsCallFromBeginZoneTimestepBeforeSetCurrentWeather; // Identity where EMS called from
-
     extern int const ScheduleAlwaysOn; // Value when passed to schedule routines gives back 1.0 (on)
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // see DataOmterfaces fpr global interface statements
-
-    // MODULE VARIABLE DECLARATIONS:
-
 
     extern bool BeginDayFlag;           // True at the start of each day, False after first time step in day
     extern bool BeginEnvrnFlag;         // True at the start of each environment, False after first time step in environ
@@ -196,7 +106,6 @@ namespace DataGlobals {
     extern bool DoHVACSizingSimulation;              // User input in SimulationControl object
     extern int HVACSizingSimMaxIterations;           // User input in SimulationControl object
     extern bool WeathSimReq;                         // Input has a RunPeriod request
-    extern int KindOfSim;                            // See parameters. (ksDesignDay, ksRunPeriodDesign, ksRunPeriodWeather)
     extern bool DoOutputReporting;                   // TRUE if variables to be written out
     extern bool DoingSizing;                         // TRUE when "sizing" is being performed (some error messages won't be displayed)
     extern bool DoingHVACSizingSimulations;          // true when HVAC Sizing Simulations are being performed.
@@ -263,8 +172,9 @@ namespace DataGlobals {
         bool isBSON= false;
         bool preserveIDFOrder = true;
         bool stopSimulation= false;
-
-        static constexpr int EndZoneSizingCalc = 4;
+        std::function<void (void *)> externalHVACManager;
+        bool externalHVACManagerInitialized = false;
+        DataGlobalConstants::KindOfSim KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
 
         void clear_state() override {
             this->AnnualSimulation = false;
@@ -280,6 +190,9 @@ namespace DataGlobals {
             this->isBSON = false;
             this->preserveIDFOrder = true;
             this->stopSimulation= false;
+            this->externalHVACManager = nullptr;
+            this->externalHVACManagerInitialized = false;
+            KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
         }
     };
 

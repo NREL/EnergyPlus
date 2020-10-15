@@ -2420,9 +2420,9 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     auto &thisCFloSys (CFloRadSys(1));
 
     NumOfTimeStepInHour = 1;
-    state.dataWeatherManager->TodayOutDryBulbTemp.allocate(NumOfTimeStepInHour, DataGlobals::HoursInDay);
+    state.dataWeatherManager->TodayOutDryBulbTemp.allocate(NumOfTimeStepInHour, DataGlobalConstants::HoursInDay());
     state.dataWeatherManager->TodayOutDryBulbTemp = 0.0;
-    for (int hourNumber = 1; hourNumber <= DataGlobals::HoursInDay; ++hourNumber) {
+    for (int hourNumber = 1; hourNumber <= DataGlobalConstants::HoursInDay(); ++hourNumber) {
         state.dataWeatherManager->TodayOutDryBulbTemp(NumOfTimeStepInHour,hourNumber) = double(hourNumber);
     }
 
@@ -2518,7 +2518,7 @@ TEST_F(LowTempRadiantSystemTest, updateOperatingModeHistoryTest)
     thisRadSys.updateOperatingModeHistory();
     expectedResult = 1;
     EXPECT_EQ(thisRadSys.lastDayOfSim, expectedResult);
-    expectedResult = DataGlobals::HoursInDay;
+    expectedResult = DataGlobalConstants::HoursInDay();
     EXPECT_EQ(thisRadSys.lastHourOfDay, expectedResult);
     expectedResult = DataGlobals::NumOfTimeStepInHour;
     EXPECT_EQ(thisRadSys.lastTimeStep, expectedResult);

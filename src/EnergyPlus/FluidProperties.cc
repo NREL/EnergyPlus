@@ -57,7 +57,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -110,7 +109,6 @@ namespace FluidProperties {
 
     // USE STATEMENTS
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::WarmupFlag;
     using General::RoundSigDigits;
 

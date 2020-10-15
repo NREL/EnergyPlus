@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -1402,7 +1403,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void UpdateZoneSizing(EnergyPlusData &state, int const CallIndicator)
+    void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1424,10 +1425,6 @@ namespace ZoneEquipmentManager {
         using DataEnvironment::StdBaroPress;
         using DataEnvironment::StdRhoAir;
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::BeginDay;
-        using DataGlobals::DuringDay;
-        using DataGlobals::emsCallFromZoneSizing;
-        using DataGlobals::EndDay;
         using DataGlobals::HourOfDay;
         using DataGlobals::isPulseZoneSizing;
         using DataGlobals::MinutesPerTimeStep;
@@ -1473,7 +1470,7 @@ namespace ZoneEquipmentManager {
         {
             auto const SELECT_CASE_var(CallIndicator);
 
-            if (SELECT_CASE_var == BeginDay) {
+            if (SELECT_CASE_var == DataGlobalConstants::CallIndicator::BeginDay) {
 
                 for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
 
@@ -1487,7 +1484,7 @@ namespace ZoneEquipmentManager {
                     CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolDDNum = CurOverallSimDay;
                 }
 
-            } else if (SELECT_CASE_var == DuringDay) {
+            } else if (SELECT_CASE_var == DataGlobalConstants::CallIndicator::DuringDay) {
 
                 TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
 
@@ -1552,7 +1549,7 @@ namespace ZoneEquipmentManager {
                         CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DOASTotCoolLoad * FracTimeStepZone;
                 }
 
-            } else if (SELECT_CASE_var == EndDay) {
+            } else if (SELECT_CASE_var == DataGlobalConstants::CallIndicator::EndDay) {
                 // average some of the zone sequences to reduce peakiness
                 for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
                     if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
@@ -1784,11 +1781,11 @@ namespace ZoneEquipmentManager {
                     }
                 }
 
-            } else if (SELECT_CASE_var == state.dataGlobal->EndZoneSizingCalc) {
+            } else if (SELECT_CASE_var == DataGlobalConstants::CallIndicator::EndZoneSizingCalc) {
 
                 // candidate EMS calling point to customize CalcFinalZoneSizing
                 bool anyEMSRan;
-                ManageEMS(state, emsCallFromZoneSizing, anyEMSRan, ObjexxFCL::Optional_int_const());
+                ManageEMS(state, EMSManager::EMSCallFrom::ZoneSizing, anyEMSRan, ObjexxFCL::Optional_int_const());
 
                 // now apply EMS overrides (if any)
 
@@ -4608,7 +4605,6 @@ namespace ZoneEquipmentManager {
         using DataContaminantBalance::ZoneAirGC;
         using DataGlobals::HourOfDay;
         using DataGlobals::KickOffSimulation;
-        using DataGlobals::SecInHour;
         using DataHeatBalance::Ventilation;
         using DataHVACGlobals::CycleOn;
         using DataHVACGlobals::CycleOnZoneFansOnly;
@@ -4921,12 +4917,12 @@ namespace ZoneEquipmentManager {
                         if (!KickOffSimulation) {
                             if (!(ZoneEquipAvail(NZ) == CycleOn || ZoneEquipAvail(NZ) == CycleOnZoneFansOnly) ||
                                 !AirflowNetwork::AirflowNetworkZoneFlag(NZ))
-                                ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * SecInHour;
+                                ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour();
                         } else if (!AirflowNetwork::AirflowNetworkZoneFlag(NZ)) {
-                            ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * SecInHour;
+                            ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour();
                         }
                     } else {
-                        ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * SecInHour;
+                        ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour();
                     }
                 }
                 // Intake fans will add some heat to the air, raising the temperature for an intake fan...
@@ -4952,7 +4948,7 @@ namespace ZoneEquipmentManager {
             }
 
             if (Ventilation(j).ModelType == VentilationWindAndStack) {
-                if (Ventilation(j).OpenEff != AutoCalculate) {
+                if (Ventilation(j).OpenEff != DataGlobalConstants::AutoCalculate()) {
                     Cw = Ventilation(j).OpenEff;
                 } else {
                     // linear interpolation between effective angle and wind direction
@@ -4960,7 +4956,7 @@ namespace ZoneEquipmentManager {
                     if (angle > 180.0) angle -= 180.0;
                     Cw = 0.55 + angle / 180.0 * (0.3 - 0.55);
                 }
-                if (Ventilation(j).DiscCoef != AutoCalculate) {
+                if (Ventilation(j).DiscCoef != DataGlobalConstants::AutoCalculate()) {
                     Cd = Ventilation(j).DiscCoef;
                 } else {
                     Cd = 0.40 + 0.0045 * std::abs(TempExt - ZMAT(NZ));

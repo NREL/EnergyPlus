@@ -213,8 +213,6 @@ namespace ThermalChimney {
         Real64 const FlowFractionTolerance(0.0001); // Smallest deviation from unity for the sum of all fractions
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //    CHARACTER(len=MaxNameLength), DIMENSION(23) :: AlphaName
-        //    REAL(r64) , DIMENSION(63)              :: IHGNumbers
         int NumAlpha;
         int NumNumber;
         Real64 AllRatiosSummed;
@@ -223,13 +221,6 @@ namespace ThermalChimney {
         int IOStat;
         int Loop;
         int Loop1;
-
-        //  ALLOCATE(MCPTThermChim(NumOfZones))
-        //  MCPTThermChim=0.0
-        //  ALLOCATE(MCPThermChim(NumOfZones))
-        //  MCPThermChim=0.0
-        //  ALLOCATE(ThermChimAMFL(NumOfZones))
-        //  ThermChimAMFL=0.0
 
         // Following used for reporting
         ZnRptThermChim.allocate(NumOfZones);
@@ -727,7 +718,7 @@ namespace ThermalChimney {
                     if (TempSurfIn(SurfNum) > TemporaryWallSurfTemp) {
                         TemporaryWallSurfTemp = TempSurfIn(SurfNum);
                         ConvTransCoeffWallFluid = HConvIn(SurfNum);
-                        SurfTempAbsorberWall = TempSurfIn(SurfNum) + KelvinConv;
+                        SurfTempAbsorberWall = TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv();
                     }
                 }
             }
@@ -741,7 +732,7 @@ namespace ThermalChimney {
                     if (Surface(SurfNum).Width > TempmajorW) {
                         TempmajorW = Surface(SurfNum).Width;
                         ConvTransCoeffGlassFluid = HConvIn(SurfNum);
-                        SurfTempGlassCover = TempSurfIn(SurfNum) + KelvinConv;
+                        SurfTempGlassCover = TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv();
                     }
                 }
             }
@@ -766,7 +757,7 @@ namespace ThermalChimney {
                 TCZoneNumCounter = ThermalChimneySys(Loop).ZonePtr(TCZoneNum);
                 RoomAirTemp += ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum) * MAT(TCZoneNumCounter);
             }
-            RoomAirTemp += KelvinConv;
+            RoomAirTemp += DataGlobalConstants::KelvinConv();
 
             Process1 = 0.0;
             Process2 = 0.0;
@@ -896,7 +887,7 @@ namespace ThermalChimney {
             if (ThermalChimneyReport(Loop).OverallTCMassFlow != (TCVolumeAirFlowRate * AirDensityThermalChim)) {
                 ThermalChimneyReport(Loop).OverallTCMassFlow = ThermalChimneyReport(Loop).OverallTCVolumeFlow * AirDensityThermalChim;
             }
-            ThermalChimneyReport(Loop).OutletAirTempThermalChim = ThermChimSubTemp(NTC) - KelvinConv;
+            ThermalChimneyReport(Loop).OutletAirTempThermalChim = ThermChimSubTemp(NTC) - DataGlobalConstants::KelvinConv();
 
             if (GetCurrentScheduleValue(ThermalChimneySys(Loop).SchedPtr) <= 0.0) {
                 for (TCZoneNum = 1; TCZoneNum <= ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
@@ -957,7 +948,7 @@ namespace ThermalChimney {
         Real64 CpAir;
         Real64 TSMult;
 
-        TSMult = TimeStepSys * SecInHour;
+        TSMult = TimeStepSys * DataGlobalConstants::SecInHour();
 
         for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
 

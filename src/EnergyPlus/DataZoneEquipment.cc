@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
@@ -83,7 +82,6 @@ namespace DataZoneEquipment {
     // This module contains variable declarations for zone equipment configuration data
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::NumOfZones;
 
     // Data

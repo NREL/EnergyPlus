@@ -60,7 +60,7 @@ namespace PVWatts {
 
     const Real64 AOI_MIN(0.5);
     const Real64 AOI_MAX(89.5);
-    const Real64 DTOR(DataGlobals::DegToRadians);
+    const Real64 DTOR(DataGlobalConstants::DegToRadians());
     enum RADMODE
     {
         DN_DF,

@@ -96,6 +96,15 @@ namespace EvaporativeCoolers {
     extern int const WetModulated;    // the evaporative cooler Research Special is modulated in wet Mode
     extern int const WetFull;         // the evaporative cooler Research Special is run in full capacity in Wet Mode
 
+    enum class EvapCoolerType {
+        Unassigned,
+        DirectCELDEKPAD,
+        IndirectCELDEKPAD,
+        IndirectWETCOIL,
+        IndirectRDDSpecial,
+        DirectResearchSpecial
+    };
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE EvapCoolers
 
     // Types
@@ -105,7 +114,7 @@ namespace EvaporativeCoolers {
         // Members
         std::string EvapCoolerName; // Name of the EvapCooler
         int EquipIndex;
-        int EvapCoolerType;          // Type of the EvapCooler (parameters in DataGlobalConstants.cc
+        EvapCoolerType evapCoolerType; // Type of the EvapCooler
         std::string EvapControlType; // Type of Control for the EvapCooler
         std::string Schedule;        // HeatingCoil Operation Schedule
         int SchedPtr;                // Pointer to the correct schedule
@@ -204,7 +213,8 @@ namespace EvaporativeCoolers {
 
         // Default Constructor
         EvapConditions()
-            : EquipIndex(0), EvapCoolerType(0), SchedPtr(0), VolFlowRate(0.0), DesVolFlowRate(0.0), OutletTemp(0.0), OuletWetBulbTemp(0.0),
+            : EquipIndex(0), evapCoolerType(EvapCoolerType::Unassigned), SchedPtr(0), VolFlowRate(0.0), DesVolFlowRate(0.0),
+              OutletTemp(0.0), OuletWetBulbTemp(0.0),
               OutletHumRat(0.0), OutletEnthalpy(0.0), OutletPressure(0.0), OutletMassFlowRate(0.0), OutletMassFlowRateMaxAvail(0.0),
               OutletMassFlowRateMinAvail(0.0), InitFlag(false), InletNode(0), OutletNode(0), SecondaryInletNode(0), SecondaryOutletNode(0),
               TertiaryInletNode(0), InletMassFlowRate(0.0), InletMassFlowRateMaxAvail(0.0), InletMassFlowRateMinAvail(0.0), InletTemp(0.0),
@@ -260,12 +270,12 @@ namespace EvaporativeCoolers {
         Real64 ThresholdCoolingLoad;
         std::string EvapCooler_1_ObjectClassName;
         std::string EvapCooler_1_Name;
-        int EvapCooler_1_Type_Num;
+        EvapCoolerType EvapCooler_1_Type_Num;
         int EvapCooler_1_Index;
         bool EvapCooler_1_AvailStatus;
         std::string EvapCooler_2_ObjectClassName;
         std::string EvapCooler_2_Name;
-        int EvapCooler_2_Type_Num;
+        EvapCoolerType EvapCooler_2_Type_Num;
         int EvapCooler_2_Index;
         bool EvapCooler_2_AvailStatus;
         Real64 OAInletRho;                    // fills internal variable, current inlet air density [kg/m3]
@@ -306,7 +316,8 @@ namespace EvaporativeCoolers {
               UnitReliefNodeNum(0), FanType_Num(0), FanIndex(0), ActualFanVolFlowRate(0.0), FanAvailSchedPtr(0), FanInletNodeNum(0),
               FanOutletNodeNum(0), OpMode(0), DesignAirVolumeFlowRate(0.0), DesignAirMassFlowRate(0.0), DesignFanSpeedRatio(0.0), FanSpeedRatio(0.0),
               FanLocation(0), ControlSchemeType(0), TimeElapsed(0.0), ThrottlingRange(0.0), IsOnThisTimestep(false), WasOnLastTimestep(false),
-              ThresholdCoolingLoad(0.0), EvapCooler_1_Type_Num(0), EvapCooler_1_Index(0), EvapCooler_1_AvailStatus(false), EvapCooler_2_Type_Num(0),
+              ThresholdCoolingLoad(0.0), EvapCooler_1_Type_Num(EvapCoolerType::Unassigned), EvapCooler_1_Index(0),
+              EvapCooler_1_AvailStatus(false), EvapCooler_2_Type_Num(EvapCoolerType::Unassigned),
               EvapCooler_2_Index(0), EvapCooler_2_AvailStatus(false), OAInletRho(0.0), OAInletCp(0.0), OAInletTemp(0.0), OAInletHumRat(0.0),
               OAInletMassFlowRate(0.0), UnitOutletTemp(0.0), UnitOutletHumRat(0.0), UnitOutletMassFlowRate(0.0), UnitReliefTemp(0.0),
               UnitReliefHumRat(0.0), UnitReliefMassFlowRate(0.0), UnitTotalCoolingRate(0.0), UnitTotalCoolingEnergy(0.0),
@@ -324,9 +335,7 @@ namespace EvaporativeCoolers {
         Array1D_string FieldNames;
 
         // Default Constructor
-        ZoneEvapCoolerUnitFieldData()
-        {
-        }
+        ZoneEvapCoolerUnitFieldData() = default;
     };
 
     // Object Data
@@ -336,7 +345,7 @@ namespace EvaporativeCoolers {
 
     // Functions
 
-    void SimEvapCooler(EnergyPlusData &state, std::string const &CompName, int &CompIndex, Real64 const PartLoadRatio = 1.0);
+    void SimEvapCooler(EnergyPlusData &state, std::string const &CompName, int &CompIndex, Real64 PartLoadRatio = 1.0);
 
     // Get Input Section of the Module
     //******************************************************************************
@@ -349,9 +358,9 @@ namespace EvaporativeCoolers {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitEvapCooler(int const EvapCoolNum);
+    void InitEvapCooler(int EvapCoolNum);
 
-    void SizeEvapCooler(int const EvapCoolNum);
+    void SizeEvapCooler(int EvapCoolNum);
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -359,58 +368,58 @@ namespace EvaporativeCoolers {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void CalcDirectEvapCooler(int &EvapCoolNum, Real64 const PartLoadRatio);
+    void CalcDirectEvapCooler(int &EvapCoolNum, Real64 PartLoadRatio);
 
-    void CalcDryIndirectEvapCooler(int &EvapCoolNum, Real64 const PartLoadRatio);
+    void CalcDryIndirectEvapCooler(int &EvapCoolNum, Real64 PartLoadRatio);
 
-    void CalcWetIndirectEvapCooler(int &EvapCoolNum, Real64 const PartLoadRatio);
+    void CalcWetIndirectEvapCooler(int &EvapCoolNum, Real64 PartLoadRatio);
 
     void CalcResearchSpecialPartLoad(EnergyPlusData &state, int &EvapCoolNum);
 
     void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
-                                                       int const EvapCoolNum,
-                                                       Real64 const InletDryBulbTempSec,
-                                                       Real64 const InletWetBulbTempSec,
-                                                       Real64 const InletDewPointTempSec,
-                                                       Real64 const InletHumRatioSec);
+                                                       int EvapCoolNum,
+                                                       Real64 InletDryBulbTempSec,
+                                                       Real64 InletWetBulbTempSec,
+                                                       Real64 InletDewPointTempSec,
+                                                       Real64 InletHumRatioSec);
 
-    int IndirectResearchSpecialEvapCoolerOperatingMode(int const EvapCoolNum,
-                                                       Real64 const InletDryBulbTempSec,
-                                                       Real64 const InletWetBulbTempSec,
-                                                       Real64 const TdbOutSysWetMin,
-                                                       Real64 const TdbOutSysDryMin);
+    int IndirectResearchSpecialEvapCoolerOperatingMode(int EvapCoolNum,
+                                                       Real64 InletDryBulbTempSec,
+                                                       Real64 InletWetBulbTempSec,
+                                                       Real64 TdbOutSysWetMin,
+                                                       Real64 TdbOutSysDryMin);
 
-    void CalcSecondaryAirOutletCondition(int const EvapCoolNum,
-                                         int const OperatingMode,
-                                         Real64 const AirMassFlowSec,
-                                         Real64 const EDBTSec,
-                                         Real64 const EWBTSec,
-                                         Real64 const EHumRatSec,
-                                         Real64 const QHXTotal,
+    void CalcSecondaryAirOutletCondition(int EvapCoolNum,
+                                         int OperatingMode,
+                                         Real64 AirMassFlowSec,
+                                         Real64 EDBTSec,
+                                         Real64 EWBTSec,
+                                         Real64 EHumRatSec,
+                                         Real64 QHXTotal,
                                          Real64 &QHXLatent);
 
     void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,
-                                             int const EvapCoolNum,
-                                             int const DryOrWetOperatingMode,
-                                             Real64 const AirMassFlowSec,
-                                             Real64 const EDBTSec,
-                                             Real64 const EWBTSec,
-                                             Real64 const EHumRatSec);
+                                             int EvapCoolNum,
+                                             int DryOrWetOperatingMode,
+                                             Real64 AirMassFlowSec,
+                                             Real64 EDBTSec,
+                                             Real64 EWBTSec,
+                                             Real64 EHumRatSec);
 
     Real64 CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state,
-                                          Real64 const AirMassFlowSec,
+                                          Real64 AirMassFlowSec,
                                           Array1D<Real64> const &Par // Par( 6 ) is desired temperature C
     );
 
     Real64 IndEvapCoolerPower(EnergyPlusData &state,
-                              int const EvapCoolIndex, // Unit index
-                              int const DryWetMode,    // dry or wet operating mode of evaporator cooler
-                              Real64 const FlowRatio   // secondary air flow fraction
+                              int EvapCoolIndex, // Unit index
+                              int DryWetMode,    // dry or wet operating mode of evaporator cooler
+                              Real64 FlowRatio   // secondary air flow fraction
     );
 
-    void CalcIndirectResearchSpecialEvapCooler(EnergyPlusData &state, int const EvapCoolNum, Real64 const FanPLR = 1.0);
+    void CalcIndirectResearchSpecialEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 FanPLR = 1.0);
 
-    void CalcDirectResearchSpecialEvapCooler(EnergyPlusData &state, int const EvapCoolNum, Real64 const FanPLR = 1.0);
+    void CalcDirectResearchSpecialEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 FanPLR = 1.0);
 
     // End Algorithm Section of the Module
     // *****************************************************************************
@@ -418,7 +427,7 @@ namespace EvaporativeCoolers {
     // Beginning of Update subroutines for the EvapCooler Module
     // *****************************************************************************
 
-    void UpdateEvapCooler(int const EvapCoolNum);
+    void UpdateEvapCooler(int EvapCoolNum);
 
     //        End of Update subroutines for the EvapCooler Module
     // *****************************************************************************
@@ -426,7 +435,7 @@ namespace EvaporativeCoolers {
     // Beginning of Reporting subroutines for the EvapCooler Module
     // *****************************************************************************
 
-    void ReportEvapCooler(int const EvapCoolNum);
+    void ReportEvapCooler(int EvapCoolNum);
 
     //***************
     // Begin routines for zone HVAC Evaporative cooler unit
@@ -434,7 +443,7 @@ namespace EvaporativeCoolers {
     //***************
 
     void SimZoneEvaporativeCoolerUnit(EnergyPlusData &state, std::string const &CompName,    // name of the packaged terminal heat pump
-                                      int const ZoneNum,              // number of zone being served
+                                      int ZoneNum,              // number of zone being served
                                       Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                       Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
                                       int &CompIndex                  // index to zone hvac unit
@@ -442,42 +451,42 @@ namespace EvaporativeCoolers {
 
     void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state);
 
-    void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum, // unit number
-                                       int const ZoneNum  // number of zone being served
+    void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state, int UnitNum, // unit number
+                                       int ZoneNum  // number of zone being served
     );
 
-    void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum); // unit number
+    void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int UnitNum); // unit number
 
-    void CalcZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum,              // unit number
-                                       int const ZoneNum,              // number of zone being served
+    void CalcZoneEvaporativeCoolerUnit(EnergyPlusData &state, int UnitNum,              // unit number
+                                       int ZoneNum,              // number of zone being served
                                        Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                        Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
     );
 
-    void CalcZoneEvapUnitOutput(EnergyPlusData &state, int const UnitNum,              // unit number
-                                Real64 const PartLoadRatio,     // zone evap unit part load ratiod
+    void CalcZoneEvapUnitOutput(EnergyPlusData &state, int UnitNum,              // unit number
+                                Real64 PartLoadRatio,     // zone evap unit part load ratiod
                                 Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                 Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
     );
 
-    void ControlZoneEvapUnitOutput(EnergyPlusData &state, int const UnitNum,           // unit number
-                                   Real64 const ZoneCoolingLoad // target cooling load
+    void ControlZoneEvapUnitOutput(EnergyPlusData &state, int UnitNum,           // unit number
+                                   Real64 ZoneCoolingLoad // target cooling load
     );
 
-    Real64 ZoneEvapUnitLoadResidual(EnergyPlusData &state, Real64 const PartLoadRatio,  // zone evap unit part load ratiod
+    Real64 ZoneEvapUnitLoadResidual(EnergyPlusData &state, Real64 PartLoadRatio,  // zone evap unit part load ratiod
                                     Array1D<Real64> const &Par   // parameters
     );
 
-    void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state, int const UnitNum,           // unit number
-                                     int const ZoneNum,           // number of zone being served
-                                     Real64 const ZoneCoolingLoad // target cooling load
+    void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state, int UnitNum,           // unit number
+                                     int ZoneNum,           // number of zone being served
+                                     Real64 ZoneCoolingLoad // target cooling load
     );
 
-    Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 const FanSpeedRatio,
+    Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 FanSpeedRatio,
                                   Array1D<Real64> const &Par // parameters
     );
 
-    void ReportZoneEvaporativeCoolerUnit(int const UnitNum); // unit number
+    void ReportZoneEvaporativeCoolerUnit(int UnitNum); // unit number
 
     //        End of Reporting subroutines for the EvaporativeCoolers Module
     // *****************************************************************************

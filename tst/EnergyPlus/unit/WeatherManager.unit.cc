@@ -690,7 +690,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_EQ(1, state.dataWeatherManager->NumOfEnvrn);
-    EXPECT_EQ(state.dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobals::ksDesignDay);
+    EXPECT_EQ(state.dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobalConstants::KindOfSim::DesignDay);
 }
 
 // Test for https://github.com/NREL/EnergyPlus/issues/7550
