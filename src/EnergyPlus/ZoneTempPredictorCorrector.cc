@@ -4259,7 +4259,7 @@ namespace ZoneTempPredictorCorrector {
         CurDeadBandOrSetback(ZoneNum) = DeadBandOrSetback(ZoneNum);
 
         // Apply the Zone Multiplier and Load Correction factor as needed
-        ReportSensibleLoadsZoneMultiplier(ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired,
+        ReportSensibleLoaEnclSolDSMultiplier(ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired,
                                           ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP,
                                           ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP,
                                           SNLoadPredictedRate(ZoneNum),SNLoadPredictedHSPRate(ZoneNum),SNLoadPredictedCSPRate(ZoneNum),
@@ -4277,7 +4277,7 @@ namespace ZoneTempPredictorCorrector {
                 ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP; // array assignment
     }
 
-    void ReportSensibleLoadsZoneMultiplier(Real64 &TotalLoad,
+    void ReportSensibleLoaEnclSolDSMultiplier(Real64 &TotalLoad,
                                     Real64 &TotalHeatLoad,
                                     Real64 &TotalCoolLoad,
                                     Real64 &SensLoadSingleZone,
@@ -4633,7 +4633,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // Apply zone multipliers as needed
-        ReportMoistLoadsZoneMultiplier(ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired,
+        ReportMoistLoaEnclSolDSMultiplier(ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired,
                                        ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP,
                                        ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP,
                                        MoisturePredictedRate(ZoneNum),MoisturePredictedHumSPRate(ZoneNum),MoisturePredictedDehumSPRate(ZoneNum),
@@ -4650,7 +4650,7 @@ namespace ZoneTempPredictorCorrector {
                 ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP; // array assignment
     }
 
-    void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
+    void ReportMoistLoaEnclSolDSMultiplier(Real64 &TotalLoad,
                                         Real64 &TotalHumidLoad,
                                         Real64 &TotalDehumidLoad,
                                         Real64 &MoistLoadSingleZone,

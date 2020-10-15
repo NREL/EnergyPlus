@@ -393,32 +393,25 @@ namespace DataSurfaces {
     extern Array1D<Real64> X0;     // X-component of translation vector
     extern Array1D<Real64> Y0;     // Y-component of translation vector
     extern Array1D<Real64> Z0;     // Z-component of translation vector
-    extern Array1D<Real64> DSZone; // Factor for sky diffuse solar radiation into a zone
+    extern Array1D<Real64> EnclSolDS; // Factor for sky diffuse solar radiation into a zone
+    extern Array1D<Real64> EnclSolDBSSG; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
     extern Array1D<Real64> DGZone; // Factor for ground diffuse solar radiation into a zone
-    extern Array1D<Real64> DBZone; // Factor for diffuse radiation in a zone from
-                                   // beam reflecting from inside surfaces
-    extern Array1D<Real64>
-        DBZoneSSG; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
-    extern Array1D<Real64> CBZone; // Factor for beam solar absorbed by interior shades
-    extern Array1D<Real64> AISurf; // Time step value of factor for beam
-    // absorbed on inside of opaque surface
-    extern Array1D<Real64> AOSurf; // Time step value of factor for beam
-    // absorbed on outside of opaque surface
-    extern Array1D<Real64> BmToBmReflFacObs; // Factor for incident solar from specular beam refl
-    // from obstructions (W/m2)/(W/m2)
-    extern Array1D<Real64> BmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl
-    // from obstructions (W/m2)/(W/m2)
-    extern Array1D<Real64> BmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
-    extern Array1D<Real64> SkyDiffReflFacGnd; // sky diffuse reflection view factors from ground
+    extern Array1D<Real64> DBZone; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces
+    extern Array1D<Real64> SurfOpaqAI; // Time step value of factor for beam absorbed on inside of opaque surface
+    extern Array1D<Real64> SurfOpaqAO; // Time step value of factor for beam absorbed on outside of opaque surface
+    extern Array1D<Real64> SurfBmToBmReflFacObs; // Factor for incident solar from specular beam refl from obstructions (W/m2)/(W/m2)
+    extern Array1D<Real64> SurfBmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl from obstructions (W/m2)/(W/m2)
+    extern Array1D<Real64> SurfBmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
+    extern Array1D<Real64> SurfSkyDiffReflFacGnd; // sky diffuse reflection view factors from ground
 
-    extern Array2D<Real64> AWinSurf; // Time step value of factor for beam
+    extern Array2D<Real64> SurfWinA; // Time step value of factor for beam
     // absorbed in window glass layers
 
     // Time step value of factor for diffuse absorbed in window layers
-    extern Array2D<Real64> AWinSurfDiffFront;
-    extern Array2D<Real64> AWinSurfDiffBack;
+    extern Array2D<Real64> SurfWinADiffFront;
+    extern Array2D<Real64> SurfWinADiffBack;
 
-    extern Array2D<Real64> AWinCFOverlap; // Time step value of factor for beam
+    extern Array2D<Real64> SurfWinACFOverlap; // Time step value of factor for beam
     // absorbed in window glass layers which comes from other windows
     // It happens sometimes that beam enters one window and hits back of
     // second window. It is used in complex fenestration only
@@ -435,7 +428,7 @@ namespace DataSurfaces {
     extern Array1D<Real64> ReflFacSkySolObs;
     extern Array1D<Real64> ReflFacSkySolGnd;
     extern Array2D<Real64> CosIncAveBmToBmSolObs;
-    extern Array1D<Real64> DBZoneIntWin; // Value of factor for beam solar entering a zone through interior windows
+    extern Array1D<Real64> EnclSolDBIntWin; // Value of factor for beam solar entering a zone through interior windows
     // (considered to contribute to diffuse in zone)
     extern Array1D<Real64> SurfSunlitArea; // Sunlit area by surface number
     extern Array1D<Real64> SurfSunlitFrac; // Sunlit fraction by surface number

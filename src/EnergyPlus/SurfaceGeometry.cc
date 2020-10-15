@@ -920,22 +920,22 @@ namespace SurfaceGeometry {
         Y0.dimension(TotSurfaces, 0.0);
         Z0.dimension(TotSurfaces, 0.0);
 
-        CBZone.dimension(NumOfZones, 0.0);
-        DSZone.dimension(NumOfZones, 0.0);
+//        CBZone.dimension(NumOfZones, 0.0);
+        EnclSolDS.dimension(NumOfZones, 0.0);
         DGZone.dimension(NumOfZones, 0.0);
         DBZone.dimension(NumOfZones, 0.0);
-        DBZoneSSG.dimension(NumOfZones, 0.0);
+        EnclSolDBSSG.dimension(NumOfZones, 0.0);
         QSDifSol.dimension(NumOfZones, 0.0);
-        AISurf.dimension(TotSurfaces, 0.0);
-        AOSurf.dimension(TotSurfaces, 0.0);
-        BmToBmReflFacObs.dimension(TotSurfaces, 0.0);
-        BmToDiffReflFacObs.dimension(TotSurfaces, 0.0);
-        BmToDiffReflFacGnd.dimension(TotSurfaces, 0.0);
-        SkyDiffReflFacGnd.dimension(TotSurfaces, 0.0);
-        AWinSurf.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
-        AWinSurfDiffFront.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
-        AWinSurfDiffBack.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
-        AWinCFOverlap.dimension(DataHeatBalance::MaxSolidWinLayers, TotSurfaces, 0.0);
+        SurfOpaqAI.dimension(TotSurfaces, 0.0);
+        SurfOpaqAO.dimension(TotSurfaces, 0.0);
+        SurfBmToBmReflFacObs.dimension(TotSurfaces, 0.0);
+        SurfBmToDiffReflFacObs.dimension(TotSurfaces, 0.0);
+        SurfBmToDiffReflFacGnd.dimension(TotSurfaces, 0.0);
+        SurfSkyDiffReflFacGnd.dimension(TotSurfaces, 0.0);
+        SurfWinA.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
+        SurfWinADiffFront.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
+        SurfWinADiffBack.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
+        SurfWinACFOverlap.dimension(DataHeatBalance::MaxSolidWinLayers, TotSurfaces, 0.0);
     }
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input

@@ -198,7 +198,7 @@ namespace ZoneTempPredictorCorrector {
 
     void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RAFNFrac);
 
-    void ReportSensibleLoadsZoneMultiplier(Real64 &TotalLoad,
+    void ReportSensibleLoaEnclSolDSMultiplier(Real64 &TotalLoad,
                                            Real64 &TotalHeatLoad,
                                            Real64 &TotalCoolLoad,
                                            Real64 &SensLoadSingleZone,
@@ -214,7 +214,7 @@ namespace ZoneTempPredictorCorrector {
 
     void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64 RAFNFrac);
 
-    void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
+    void ReportMoistLoaEnclSolDSMultiplier(Real64 &TotalLoad,
                                         Real64 &TotalHumidLoad,
                                         Real64 &TotalDehumidLoad,
                                         Real64 &MoistLoadSingleZone,
