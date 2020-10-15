@@ -56,8 +56,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    //forward declarations
-    struct ZoneTempPredictorCorrectorData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace ThermalComfort {
 
@@ -286,19 +287,19 @@ namespace ThermalComfort {
     void clear_state();
 
     void ManageThermalComfort(EnergyPlusData &state,
-                              IOFiles &ioFiles,
                               bool const InitializeOnly); // when called from ZTPC and calculations aren't needed
 
-    void InitThermalComfort();
+    void InitThermalComfort(EnergyPlusData &state);
 
-    void CalcThermalComfortFanger(Optional_int_const PNum = _,     // People number for thermal comfort control
+    void CalcThermalComfortFanger(EnergyPlusData &state,
+                                  Optional_int_const PNum = _,     // People number for thermal comfort control
                                   Optional<Real64 const> Tset = _, // Temperature setpoint for thermal comfort control
                                   Optional<Real64> PMVResult = _   // PMV value for thermal comfort control
     );
 
-    void CalcThermalComfortPierce();
+    void CalcThermalComfortPierce(EnergyPlusData &state);
 
-    void CalcThermalComfortKSU();
+    void CalcThermalComfortKSU(EnergyPlusData &state);
 
     void DERIV(int &TempIndiceNum,         // Number of temperature indices  unused1208
                Array1D<Real64> &Temp,      // Temperature unused1208
@@ -307,17 +308,17 @@ namespace ThermalComfort {
 
     void RKG(int &NEQ, Real64 &H, Real64 &X, Array1D<Real64> &Y, Array1D<Real64> &DY, Array1D<Real64> &C);
 
-    void GetAngleFactorList();
+    void GetAngleFactorList(EnergyPlusData &state);
 
-    Real64 CalcAngleFactorMRT(int const AngleFacNum);
+    Real64 CalcAngleFactorMRT(EnergyPlusData &state, int const AngleFacNum);
 
-    Real64 CalcSurfaceWeightedMRT(int const ZoneNum, int const SurfNum);
+    Real64 CalcSurfaceWeightedMRT(EnergyPlusData &state, int const ZoneNum, int const SurfNum);
 
     Real64 CalcSatVapPressFromTemp(Real64 const Temp);
 
-    Real64 CalcRadTemp(int const PeopleListNum); // Type of MRT calculation (zone averaged or surface weighted)
+    Real64 CalcRadTemp(EnergyPlusData &state, int const PeopleListNum); // Type of MRT calculation (zone averaged or surface weighted)
 
-    void CalcThermalComfortSimpleASH55();
+    void CalcThermalComfortSimpleASH55(EnergyPlusData &state);
 
     void ResetThermalComfortSimpleASH55();
 
@@ -326,14 +327,14 @@ namespace ThermalComfort {
     void ResetSetPointMet();
 
     void CalcThermalComfortAdaptiveASH55(
-        IOFiles &ioFiles,
+        EnergyPlusData &state,
         bool const initiate,                  // true if supposed to initiate
         Optional_bool_const wthrsim = _,      // true if this is a weather simulation
         Optional<Real64 const> avgdrybulb = _ // approximate avg drybulb for design day.  will be used as previous period in design day
     );
 
     void CalcThermalComfortAdaptiveCEN15251(
-        IOFiles &ioFiles,
+        EnergyPlusData &state,
         bool const initiate,                  // true if supposed to initiate
         Optional_bool_const wthrsim = _,      // true if this is a weather simulation
         Optional<Real64 const> avgdrybulb = _ // approximate avg drybulb for design day.  will be used as previous period in design day

@@ -136,7 +136,7 @@ TEST_F(EnergyPlusFixture, TestOutOfRangeAlphaFields)
         "  J;"
     });
     ASSERT_TRUE(process_idf(idf_objects));
-    RuntimeLanguageProcessor::GetRuntimeLanguageUserInput(state, state.files);
+    RuntimeLanguageProcessor::GetRuntimeLanguageUserInput(state);
 
 
 }

@@ -161,13 +161,13 @@ namespace PhotovoltaicThermalCollectors {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void setupReportVars();
+        void setupReportVars(EnergyPlusData &state);
 
         void initialize(EnergyPlusData &state, bool FirstHVACIteration);
 
@@ -175,7 +175,7 @@ namespace PhotovoltaicThermalCollectors {
 
         void control();
 
-        void calculate(EnergyPlusData &state, IOFiles &ioFiles);
+        void calculate(EnergyPlusData &state);
 
         void update();
     };
@@ -184,17 +184,17 @@ namespace PhotovoltaicThermalCollectors {
 
     void clear_state();
 
-    void GetPVTcollectorsInput();
+    void GetPVTcollectorsInput(EnergyPlusData &state);
 
     void simPVTfromOASys(EnergyPlusData &state, int index, bool FirstHVACIteration);
 
-    int getPVTindexFromName(std::string const &name);
+    int getPVTindexFromName(EnergyPlusData &state, std::string const &name);
 
     void GetPVTThermalPowerProduction(int PVindex, Real64 &ThermalPower, Real64 &ThermalEnergy);
 
-    int GetAirInletNodeNum(std::string const &PVTName, bool &ErrorsFound);
+    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &PVTName, bool &ErrorsFound);
 
-    int GetAirOutletNodeNum(std::string const &PVTName, bool &ErrorsFound);
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &PVTName, bool &ErrorsFound);
 
 } // namespace PhotovoltaicThermalCollectors
 

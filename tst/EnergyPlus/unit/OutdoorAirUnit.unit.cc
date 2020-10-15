@@ -304,9 +304,9 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
 
     ZoneSysEnergyDemand.allocate(1);
 
-    ProcessScheduleInput(state.files);   // read schedules
+    ProcessScheduleInput(state);   // read schedules
     GetCurveInput(state);          // read curves
-    GetZoneData(ErrorsFound); // read zone data
+    GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData(state); // read equipment list and connections
@@ -558,12 +558,12 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     InitializePsychRoutines();
 
     bool ErrorsFound(false);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("THERMAL ZONE 1", Zone(1).Name);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
     Fans::GetFanInput(state);
 
@@ -625,7 +625,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, HourOfDay);
 
-    UpdateScheduleValues();
+    UpdateScheduleValues(state);
 
     ZoneEqSizing.allocate(1);
     CurDeadBandOrSetback.allocate(1);
@@ -674,8 +674,8 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
 
     Real64 DesWaterCoolingCoilLoad = DesAirMassFlow * (EnthalpyAirIn - EnthalpyAirOut) + FanCoolLoad;
     Real64 CoilDesWaterDeltaT = PlantSizData(1).DeltaT;
-    Real64 Cp = GetSpecificHeatGlycol(PlantLoop(1).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(1).FluidIndex, " ");
-    Real64 rho = GetDensityGlycol(PlantLoop(1).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(1).FluidIndex, " ");
+    Real64 Cp = GetSpecificHeatGlycol(state, PlantLoop(1).FluidName, DataGlobalConstants::CWInitConvTemp(), PlantLoop(1).FluidIndex, " ");
+    Real64 rho = GetDensityGlycol(state, PlantLoop(1).FluidName, DataGlobalConstants::CWInitConvTemp(), PlantLoop(1).FluidIndex, " ");
     Real64 DesCoolingCoilWaterVolFlowRate = DesWaterCoolingCoilLoad / (CoilDesWaterDeltaT * Cp * rho);
     // check water coil water flow rate calc
     EXPECT_EQ(DesWaterCoolingCoilLoad, state.dataWaterCoils->WaterCoil(1).DesWaterCoolingCoilRate);
@@ -864,12 +864,12 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     InitializePsychRoutines();
 
     bool ErrorsFound(false);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("THERMAL ZONE 1", Zone(1).Name);
 
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
     Fans::GetFanInput(state);
 
@@ -931,7 +931,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, HourOfDay);
 
-    UpdateScheduleValues();
+    UpdateScheduleValues(state);
 
     ZoneEqSizing.allocate(1);
     CurDeadBandOrSetback.allocate(1);
@@ -975,10 +975,10 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     Real64 DesSteamCoilLoad = DesAirMassFlow * CpAirAvg * (DesCoilOutTemp - DesCoilInTemp);
 
     // do steam flow rate sizing calculation
-    Real64 EnthSteamIn = GetSatEnthalpyRefrig("STEAM", DataGlobals::SteamInitConvTemp, 1.0, SteamCoil(1).FluidIndex, "");
-    Real64 EnthSteamOut = GetSatEnthalpyRefrig("STEAM", DataGlobals::SteamInitConvTemp, 0.0, SteamCoil(1).FluidIndex, "");
-    Real64 SteamDensity = GetSatDensityRefrig("STEAM", DataGlobals::SteamInitConvTemp, 1.0, SteamCoil(1).FluidIndex, "");
-    Real64 CpOfCondensate = GetSatSpecificHeatRefrig("STEAM", DataGlobals::SteamInitConvTemp, 0.0, SteamCoil(1).FluidIndex, "");
+    Real64 EnthSteamIn = GetSatEnthalpyRefrig(state, "STEAM", DataGlobalConstants::SteamInitConvTemp(), 1.0, SteamCoil(1).FluidIndex, "");
+    Real64 EnthSteamOut = GetSatEnthalpyRefrig(state, "STEAM", DataGlobalConstants::SteamInitConvTemp(), 0.0, SteamCoil(1).FluidIndex, "");
+    Real64 SteamDensity = GetSatDensityRefrig(state, "STEAM", DataGlobalConstants::SteamInitConvTemp(), 1.0, SteamCoil(1).FluidIndex, "");
+    Real64 CpOfCondensate = GetSatSpecificHeatRefrig(state, "STEAM", DataGlobalConstants::SteamInitConvTemp(), 0.0, SteamCoil(1).FluidIndex, "");
     Real64 LatentHeatChange = EnthSteamIn - EnthSteamOut;
     Real64 DesMaxSteamVolFlowRate = DesSteamCoilLoad / (SteamDensity * (LatentHeatChange + SteamCoil(1).DegOfSubcooling * CpOfCondensate));
 

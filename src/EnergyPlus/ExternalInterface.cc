@@ -61,7 +61,6 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -236,8 +235,6 @@ namespace ExternalInterface {
         // Exchanges variables between EnergyPlus and the BCVTB socket.
 
         // Using/Aliasing
-        using DataGlobals::KindOfSim;
-        using DataGlobals::ksRunPeriodWeather;
         using DataGlobals::WarmupFlag;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -245,16 +242,16 @@ namespace ExternalInterface {
         int retValErrMsg;
 
         if (GetInputFlag) {
-            GetExternalInterfaceInput();
+            GetExternalInterfaceInput(state);
             GetInputFlag = false;
         }
 
         if (haveExternalInterfaceBCVTB || haveExternalInterfaceFMUExport) {
-            InitExternalInterface();
+            InitExternalInterface(state);
             // Exchange data only after sizing and after warm-up.
             // Note that checking for ZoneSizingCalc SysSizingCalc does not work here, hence we
             // use the KindOfSim flag
-            if (!WarmupFlag && (KindOfSim == ksRunPeriodWeather)) {
+            if (!WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
                 CalcExternalInterface(state);
             }
         }
@@ -268,14 +265,14 @@ namespace ExternalInterface {
                 StopExternalInterfaceIfError();
             }
             // initialize the FunctionalMockupUnitImport interface
-            InitExternalInterfaceFMUImport(state.files);
+            InitExternalInterfaceFMUImport(state);
             // No Data exchange during design days
             // Data Exchange data during warmup and after warmup
             CalcExternalInterfaceFMUImport(state);
         }
     }
 
-    void GetExternalInterfaceInput()
+    void GetExternalInterfaceInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -308,7 +305,7 @@ namespace ExternalInterface {
 
         for (Loop = 1; Loop <= NumExternalInterfaces; ++Loop) { // This loop determines whether the external interface is for FMU or BCVTB
             inputProcessor->getObjectItem(
-                cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames);
+                state, cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames);
             if (UtilityRoutines::SameString(cAlphaArgs(1), "PtolemyServer")) { // The BCVTB interface is activated.
                 ++NumExternalInterfacesBCVTB;
             } else if (UtilityRoutines::SameString(cAlphaArgs(1),
@@ -348,7 +345,7 @@ namespace ExternalInterface {
             varNames.allocate(maxVar);        // Names of report variables used for data exchange
             inpVarTypes.dimension(maxVar, 0); // Names of report variables used for data exchange
             inpVarNames.allocate(maxVar);     // Names of report variables used for data exchange
-            VerifyExternalInterfaceObject();
+            VerifyExternalInterfaceObject(state);
         } else if ((NumExternalInterfacesBCVTB == 0) && (NumExternalInterfacesFMUExport == 1)) {
             haveExternalInterfaceFMUExport = true;
             FMUExportActivate = 1;
@@ -357,7 +354,7 @@ namespace ExternalInterface {
             varNames.allocate(maxVar);        // Names of report variables used for data exchange
             inpVarTypes.dimension(maxVar, 0); // Names of report variables used for data exchange
             inpVarNames.allocate(maxVar);     // Names of report variables used for data exchange
-            VerifyExternalInterfaceObject();
+            VerifyExternalInterfaceObject(state);
         } else if ((NumExternalInterfacesBCVTB == 1) && (NumExternalInterfacesFMUExport != 0)) {
             ShowSevereError("GetExternalInterfaceInput: Cannot have Ptolemy and FMU-Export interface simultaneously.");
             ErrorsFound = true;
@@ -368,7 +365,7 @@ namespace ExternalInterface {
             DisplayString("Instantiating FunctionalMockupUnitImport interface");
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport";
             NumFMUObjects = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-            VerifyExternalInterfaceObject();
+            VerifyExternalInterfaceObject(state);
         } else if ((NumExternalInterfacesFMUImport == 1) && (NumExternalInterfacesFMUExport != 0)) {
             ShowSevereError("GetExternalInterfaceInput: Cannot have FMU-Import and FMU-Export interface simultaneously.");
             ErrorsFound = true;
@@ -511,7 +508,7 @@ namespace ExternalInterface {
         }
     }
 
-    void InitExternalInterface()
+    void InitExternalInterface(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
@@ -573,12 +570,12 @@ namespace ExternalInterface {
 
             // Make sure that idf file specified a run period other than
             // design day and system sizing.
-            ValidateRunControl();
+            ValidateRunControl(state);
 
             StopExternalInterfaceIfError();
 
             // make a single length here for all strings to be passed to getepvariables
-            size_t lenXmlStr(maxVar * DataGlobals::MaxNameLength); // Length of strings being passed to getepvariables
+            size_t lenXmlStr(maxVar * DataGlobalConstants::MaxNameLength()); // Length of strings being passed to getepvariables
 
             // initialize all the strings to this length with blanks
             xmlStrOut = std::string(lenXmlStr, ' ');
@@ -682,11 +679,11 @@ namespace ExternalInterface {
         } else if (!configuredControlPoints) {
             keyVarIndexes.allocate(nOutVal);
             varTypes.allocate(nOutVal);
-            GetReportVariableKey(varKeys, nOutVal, varNames, keyVarIndexes, varTypes);
+            GetReportVariableKey(state, varKeys, nOutVal, varNames, keyVarIndexes, varTypes);
             varInd.allocate(nInpVar);
             for (i = 1; i <= nInpVar; ++i) {
                 if (inpVarTypes(i) == indexSchedule) {
-                    varInd(i) = GetDayScheduleIndex(inpVarNames(i));
+                    varInd(i) = GetDayScheduleIndex(state, inpVarNames(i));
                 } else if (inpVarTypes(i) == indexVariable) {
                     varInd(i) = FindEMSVariable(inpVarNames(i), 0);
                 } else if (inpVarTypes(i) == indexActuator) {
@@ -736,9 +733,6 @@ namespace ExternalInterface {
         // This routine gets, sets and does the time integration in FMUs.
 
         // Using/Aliasing
-        using DataGlobals::emsCallFromExternalInterface;
-        using DataGlobals::KindOfSim;
-        using DataGlobals::ksRunPeriodWeather;
         using DataGlobals::WarmupFlag;
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
@@ -948,7 +942,7 @@ namespace ExternalInterface {
         // If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
         if (useEMS) {
             bool anyRan;
-            ManageEMS(state, emsCallFromExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
+            ManageEMS(state, EMSManager::EMSCallFrom::ExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
         }
 
         FirstCallGetSetDoStep = false;
@@ -1074,7 +1068,7 @@ namespace ExternalInterface {
         }
     }
 
-    void InitExternalInterfaceFMUImport(IOFiles &ioFiles)
+    void InitExternalInterfaceFMUImport(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1127,7 +1121,7 @@ namespace ExternalInterface {
         if (FirstCallIni) {
             DisplayString("Initializing FunctionalMockupUnitImport interface");
             // do one time initializations
-            ValidateRunControl();
+            ValidateRunControl(state);
             FMU.allocate(NumFMUObjects);
 
             // there used to be code in here to apply the root working folder to create an absolute path
@@ -1143,7 +1137,8 @@ namespace ExternalInterface {
             fullFileName.allocate(NumFMUObjects);
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport";
             for (Loop = 1; Loop <= NumFMUObjects; ++Loop) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               Loop,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -1156,7 +1151,7 @@ namespace ExternalInterface {
                                               cNumericFieldNames);
                 // Get the FMU name
                 FMU(Loop).Name = cAlphaArgs(1);
-                CheckForActualFileName(ioFiles, cAlphaArgs(1), fileExist, tempFullFileName);
+                CheckForActualFileName(state, cAlphaArgs(1), fileExist, tempFullFileName);
                 if (fileExist) {
                     pos = index(FMU(Loop).Name, pathChar, true); // look backwards
                     if (pos != std::string::npos) {
@@ -1217,7 +1212,8 @@ namespace ExternalInterface {
                 FMU(i).Instance.allocate(NumFMUInputVariables);
                 checkInstanceName.allocate(NumFMUInputVariables);
                 for (l = 1; l <= NumFMUInputVariables; ++l) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   l,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -1393,7 +1389,8 @@ namespace ExternalInterface {
                     FMU(i).Instance(j).eplusOutputVariable.allocate(NumFMUInputVariables);
                     k = 1;
                     for (l = 1; l <= NumFMUInputVariables; ++l) {
-                        inputProcessor->getObjectItem(cCurrentModuleObject,
+                        inputProcessor->getObjectItem(state,
+                                                      cCurrentModuleObject,
                                                       l,
                                                       cAlphaArgs,
                                                       NumAlphas,
@@ -1469,7 +1466,7 @@ namespace ExternalInterface {
                             Array1D_string tempSingleStringB(1, FMU(i).Instance(j).eplusOutputVariable(k).Name);
 
                             // Make the call with arrays
-                            GetReportVariableKey(tempSingleStringA, 1, tempSingleStringB, keyIndexes, varTypes);
+                            GetReportVariableKey(state, tempSingleStringA, 1, tempSingleStringB, keyIndexes, varTypes);
 
                             // Then postprocess the array items back in case they changed
                             FMU(i).Instance(j).eplusOutputVariable(k).VarKey = tempSingleStringA(1);
@@ -1522,7 +1519,8 @@ namespace ExternalInterface {
             for (i = 1; i <= NumFMUObjects; ++i) {
                 j = 1;
                 for (k = 1; k <= NumFMUInputVariables; ++k) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   k,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -1546,7 +1544,8 @@ namespace ExternalInterface {
                     FMU(i).Instance(j).eplusInputVariableSchedule.allocate(NumFMUInputVariables);
                     k = 1;
                     for (l = 1; l <= NumFMUInputVariables; ++l) {
-                        inputProcessor->getObjectItem(cCurrentModuleObject,
+                        inputProcessor->getObjectItem(state,
+                                                      cCurrentModuleObject,
                                                       l,
                                                       cAlphaArgs,
                                                       NumAlphas,
@@ -1601,7 +1600,7 @@ namespace ExternalInterface {
                             }
 
                             FMU(i).Instance(j).eplusInputVariableSchedule(k).VarIndex =
-                                GetDayScheduleIndex(FMU(i).Instance(j).eplusInputVariableSchedule(k).Name);
+                                GetDayScheduleIndex(state, FMU(i).Instance(j).eplusInputVariableSchedule(k).Name);
                             FMU(i).Instance(j).NumOutputVariablesSchedule = k;
                             if (FMU(i).Instance(j).eplusInputVariableSchedule(k).VarIndex <= 0) {
                                 ShowSevereError("ExternalInterface/InitExternalInterfaceFMUImport:declares variable \"" +
@@ -1624,7 +1623,8 @@ namespace ExternalInterface {
             for (i = 1; i <= NumFMUObjects; ++i) {
                 j = 1;
                 for (k = 1; k <= NumFMUInputVariables; ++k) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   k,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -1648,7 +1648,8 @@ namespace ExternalInterface {
                     FMU(i).Instance(j).eplusInputVariableVariable.allocate(NumFMUInputVariables);
                     k = 1;
                     for (l = 1; l <= NumFMUInputVariables; ++l) {
-                        inputProcessor->getObjectItem(cCurrentModuleObject,
+                        inputProcessor->getObjectItem(state,
+                                                      cCurrentModuleObject,
                                                       l,
                                                       cAlphaArgs,
                                                       NumAlphas,
@@ -1721,7 +1722,8 @@ namespace ExternalInterface {
             for (i = 1; i <= NumFMUObjects; ++i) {
                 j = 1;
                 for (k = 1; k <= NumFMUInputVariables; ++k) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   k,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -1745,7 +1747,8 @@ namespace ExternalInterface {
                     FMU(i).Instance(j).eplusInputVariableActuator.allocate(NumFMUInputVariables);
                     k = 1;
                     for (l = 1; l <= NumFMUInputVariables; ++l) {
-                        inputProcessor->getObjectItem(cCurrentModuleObject,
+                        inputProcessor->getObjectItem(state,
+                                                      cCurrentModuleObject,
                                                       l,
                                                       cAlphaArgs,
                                                       NumAlphas,
@@ -1959,7 +1962,7 @@ namespace ExternalInterface {
             }
         }
 
-        simtime = 24 * (simtime + (DayOfMonth - 1)); // day of month does not need to be substracted??
+        simtime = 24 * (simtime + (DayOfMonth - 1)); // day of month does not need to be stubtracted??
         simtime = 60 * (simtime + (HourOfDay - 1));  // hours to minutes
         simtime = 60 * (simtime);                    // minutes to seconds
 
@@ -1981,9 +1984,6 @@ namespace ExternalInterface {
         // Using/Aliasing
         using DataEnvironment::TotalOverallSimDays;
         using DataEnvironment::TotDesDays;
-        using DataGlobals::emsCallFromExternalInterface;
-        using DataGlobals::KindOfSim;
-        using DataGlobals::ksRunPeriodWeather;
         using DataGlobals::TimeStepZone;
         using DataGlobals::WarmupFlag;
         using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
@@ -2004,13 +2004,13 @@ namespace ExternalInterface {
         Array1D_int keyIndexes(1);     // Array index for
         Array1D_string NamesOfKeys(1); // Specific key name
 
-        if (WarmupFlag && (KindOfSim != ksRunPeriodWeather)) { // No data exchange during design days
+        if (WarmupFlag && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // No data exchange during design days
             if (FirstCallDesignDays) {
                 ShowWarningError("ExternalInterface/CalcExternalInterfaceFMUImport: ExternalInterface does not exchange data during design days.");
             }
             FirstCallDesignDays = false;
         }
-        if (WarmupFlag && (KindOfSim == ksRunPeriodWeather)) { // Data exchange after design days
+        if (WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // Data exchange after design days
             if (FirstCallWUp) {
                 // set the report during warmup to true so that variables are also updated during the warmup
                 UpdateDataDuringWarmupExternalInterface = true;
@@ -2134,7 +2134,7 @@ namespace ExternalInterface {
             }
         }
         // BeginSimulation
-        if (!WarmupFlag && (KindOfSim == ksRunPeriodWeather)) {
+        if (!WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
 
             if (FirstCallTStep) {
                 // reset the UpdateDataDuringWarmupExternalInterface to be false.
@@ -2235,7 +2235,7 @@ namespace ExternalInterface {
         }
     }
 
-    void ValidateRunControl()
+    void ValidateRunControl(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
@@ -2265,7 +2265,7 @@ namespace ExternalInterface {
         int const NumRunControl = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (NumRunControl > 0) {
             inputProcessor->getObjectItem(
-                cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames);
+                state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames);
             if (cAlphaArgs(5) == "NO") { // This run does not have a weather file simulation.
                 ShowSevereError("ExternalInterface: Error in idf file, section SimulationControl:");
                 ShowContinueError("When using the ExternalInterface, a run period from the weather file must be specified");
@@ -2285,7 +2285,6 @@ namespace ExternalInterface {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataGlobals::emsCallFromExternalInterface;
         using DataGlobals::MinutesPerTimeStep;
         using DataGlobals::SimTimeSteps;
         using EMSManager::ManageEMS;
@@ -2409,13 +2408,14 @@ namespace ExternalInterface {
         // If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
         if (useEMS) {
             bool anyRan;
-            ManageEMS(state, emsCallFromExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
+            ManageEMS(state, EMSManager::EMSCallFrom::ExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
         }
 
         firstCall = false; // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
     }
 
-    void GetReportVariableKey(const Array1D_string &varKeys,  // Standard variable name
+    void GetReportVariableKey(EnergyPlusData &state,
+                              const Array1D_string &varKeys,  // Standard variable name
                               int const numberOfKeys,        // Number of keys=size(varKeys)
                               const Array1D_string &varNames, // Standard variable name
                               Array1D_int &keyVarIndexes,     // Array index
@@ -2443,11 +2443,11 @@ namespace ExternalInterface {
 
         // Get pointers for variables to be sent to Ptolemy
         for (Loop = 1; Loop <= numberOfKeys; ++Loop) {
-            GetVariableKeyCountandType(varNames(Loop), numKeys, varType, varAvgSum, varStepType, varUnits);
+            GetVariableKeyCountandType(state, varNames(Loop), numKeys, varType, varAvgSum, varStepType, varUnits);
             if (varType != 0) {
                 NamesOfKeys.allocate(numKeys);
                 keyIndexes.allocate(numKeys);
-                GetVariableKeys(varNames(Loop), varType, NamesOfKeys, keyIndexes);
+                GetVariableKeys(state, varNames(Loop), varType, NamesOfKeys, keyIndexes);
                 // Find key index whose keyName is equal to keyNames(Loop)
                 int max(NamesOfKeys.size());
                 for (iKey = 1; iKey <= max; ++iKey) {
@@ -2486,7 +2486,7 @@ namespace ExternalInterface {
         }
     }
 
-    void VerifyExternalInterfaceObject()
+    void VerifyExternalInterfaceObject(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
@@ -2512,7 +2512,7 @@ namespace ExternalInterface {
 
         cCurrentModuleObject = "ExternalInterface";
         inputProcessor->getObjectItem(
-            cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames);
+            state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames);
         if ((!UtilityRoutines::SameString(cAlphaArgs(1), "PtolemyServer")) &&
             (!UtilityRoutines::SameString(cAlphaArgs(1), "FunctionalMockupUnitImport")) &&
             (!UtilityRoutines::SameString(cAlphaArgs(1), "FunctionalMockupUnitExport"))) {

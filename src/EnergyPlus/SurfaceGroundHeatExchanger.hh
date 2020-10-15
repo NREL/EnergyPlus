@@ -181,13 +181,13 @@ namespace SurfaceGroundHeatExchanger {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        static PlantComponent *factory(int objectType, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
 
         void InitSurfaceGroundHeatExchanger(EnergyPlusData &state);
 
         //==============================================================================
 
-        void CalcSurfaceGroundHeatExchanger(bool FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
+        void CalcSurfaceGroundHeatExchanger(EnergyPlusData &state, bool FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
         );
 
         //==============================================================================
@@ -210,7 +210,7 @@ namespace SurfaceGroundHeatExchanger {
 
         //==============================================================================
 
-        Real64 CalcSourceFlux(); // component number
+        Real64 CalcSourceFlux(EnergyPlusData &state); // component number
 
         //==============================================================================
 
@@ -222,7 +222,8 @@ namespace SurfaceGroundHeatExchanger {
 
         //==============================================================================
 
-        Real64 CalcHXEffectTerm(Real64 Temperature,  // Temperature of water entering the surface, in C
+        Real64 CalcHXEffectTerm(EnergyPlusData &state,
+                                Real64 Temperature,  // Temperature of water entering the surface, in C
                                 Real64 WaterMassFlow // Mass flow rate, in kg/s
         );
 
@@ -252,7 +253,7 @@ namespace SurfaceGroundHeatExchanger {
 
         //==============================================================================
 
-        void UpdateSurfaceGroundHeatExchngr(); // Index for the surface
+        void UpdateSurfaceGroundHeatExchngr(EnergyPlusData &state); // Index for the surface
 
         //==============================================================================
 
@@ -262,7 +263,7 @@ namespace SurfaceGroundHeatExchanger {
     // Object Data
     extern Array1D<SurfaceGroundHeatExchangerData> SurfaceGHE;
 
-    void GetSurfaceGroundHeatExchanger();
+    void GetSurfaceGroundHeatExchanger(EnergyPlusData &state);
 
     //==============================================================================
 

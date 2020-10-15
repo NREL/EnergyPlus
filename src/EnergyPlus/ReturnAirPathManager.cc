@@ -56,7 +56,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -90,7 +89,6 @@ namespace ReturnAirPathManager {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::BeginDayFlag;
     using DataGlobals::BeginEnvrnFlag;
     using DataZoneEquipment::NumReturnAirPaths;
@@ -147,7 +145,7 @@ namespace ReturnAirPathManager {
 
         // Obtains and Allocates Mixer related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
-            GetReturnAirPathInput();
+            GetReturnAirPathInput(state);
             GetInputFlag = false;
         }
 
@@ -157,7 +155,7 @@ namespace ReturnAirPathManager {
         }
     }
 
-    void GetReturnAirPathInput()
+    void GetReturnAirPathInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Russ Taylor
@@ -194,13 +192,13 @@ namespace ReturnAirPathManager {
 
             for (PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject, PathNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+                inputProcessor->getObjectItem(state, cCurrentModuleObject, PathNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 ReturnAirPath(PathNum).Name = cAlphaArgs(1);
                 ReturnAirPath(PathNum).NumOfComponents = nint((NumAlphas - 2.0) / 2.0);
 
-                ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(
+                ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(state,
                     cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
 
                 ReturnAirPath(PathNum).ComponentType.allocate(ReturnAirPath(PathNum).NumOfComponents);
@@ -220,7 +218,7 @@ namespace ReturnAirPathManager {
 
                         ReturnAirPath(PathNum).ComponentType(CompNum) = cAlphaArgs(Counter);
                         ReturnAirPath(PathNum).ComponentName(CompNum) = cAlphaArgs(Counter + 1);
-                        ValidateComponent(ReturnAirPath(PathNum).ComponentType(CompNum),
+                        ValidateComponent(state, ReturnAirPath(PathNum).ComponentType(CompNum),
                                           ReturnAirPath(PathNum).ComponentName(CompNum),
                                           IsNotOK,
                                           "AirLoopHVAC:ReturnPath");
@@ -294,7 +292,7 @@ namespace ReturnAirPathManager {
 
                     if (!(AirflowNetwork::AirflowNetworkFanActivated &&
                           AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
-                        SimAirMixer(ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
+                        SimAirMixer(state, ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
                                     ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
                     }
 

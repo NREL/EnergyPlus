@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
@@ -83,7 +82,6 @@ namespace DataZoneEquipment {
     // This module contains variable declarations for zone equipment configuration data
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::NumOfZones;
 
     // Data
@@ -417,7 +415,7 @@ namespace DataZoneEquipment {
             ShowFatalError(RoutineName + "Too many ZoneHVAC:EquipmentConnections objects.");
         }
 
-        InitUniqueNodeCheck("ZoneHVAC:EquipmentConnections");
+        InitUniqueNodeCheck(state, "ZoneHVAC:EquipmentConnections");
 
         overallEquipCount = 0;
         int locTermUnitSizingCounter = 0; // will increment for every zone inlet node
@@ -426,7 +424,8 @@ namespace DataZoneEquipment {
 
             CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           ControlledZoneLoop,
                                           AlphArray,
                                           NumAlphas,
@@ -469,7 +468,7 @@ namespace DataZoneEquipment {
             ZoneEquipConfig(ControlledZoneNum).EquipListName = AlphArray(2); // the name of the list containing all the zone eq.
             InletNodeListName = AlphArray(3);
             ExhaustNodeListName = AlphArray(4);
-            ZoneEquipConfig(ControlledZoneNum).ZoneNode = GetOnlySingleNode(AlphArray(5),
+            ZoneEquipConfig(ControlledZoneNum).ZoneNode = GetOnlySingleNode(state, AlphArray(5),
                                                                             GetZoneEquipmentDataErrorsFound,
                                                                             CurrentModuleObject,
                                                                             AlphArray(1),
@@ -498,7 +497,7 @@ namespace DataZoneEquipment {
             if (lAlphaBlanks(7)) {
                 ZoneEquipConfig(ControlledZoneNum).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
             } else {
-                ZoneEquipConfig(ControlledZoneNum).ReturnFlowSchedPtrNum = GetScheduleIndex(AlphArray(7));
+                ZoneEquipConfig(ControlledZoneNum).ReturnFlowSchedPtrNum = GetScheduleIndex(state, AlphArray(7));
                 if (ZoneEquipConfig(ControlledZoneNum).ReturnFlowSchedPtrNum == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(7) + " entered =" + AlphArray(7) + " for " +
                                     cAlphaFields(1) + '=' + AlphArray(1));
@@ -512,12 +511,13 @@ namespace DataZoneEquipment {
 
             CurrentModuleObject = "ZoneHVAC:EquipmentList";
 
-            ZoneEquipListNum = inputProcessor->getObjectItemNum(CurrentModuleObject, ZoneEquipConfig(ControlledZoneNum).EquipListName);
+            ZoneEquipListNum = inputProcessor->getObjectItemNum(state, CurrentModuleObject, ZoneEquipConfig(ControlledZoneNum).EquipListName);
             if (ZoneEquipListNum > 0) {
 
                 EquipList &thisZoneEquipList = ZoneEquipList(ControlledZoneNum);
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               ZoneEquipListNum,
                                               AlphArray,
                                               NumAlphas,
@@ -593,7 +593,7 @@ namespace DataZoneEquipment {
                     const int ZoneEquipTypeIdx = ZoneEquipTypeNum - 1;
                     thisZoneEquipList.EquipType(ZoneEquipTypeNum) = AlphArray(nAlphasInExtensible * ZoneEquipTypeIdx + nAlphasBeforeExtensible + 1);
                     thisZoneEquipList.EquipName(ZoneEquipTypeNum) = AlphArray(nAlphasInExtensible * ZoneEquipTypeIdx + nAlphasBeforeExtensible + 2);
-                    ValidateComponent(thisZoneEquipList.EquipType(ZoneEquipTypeNum),
+                    ValidateComponent(state, thisZoneEquipList.EquipType(ZoneEquipTypeNum),
                                       thisZoneEquipList.EquipName(ZoneEquipTypeNum),
                                       IsNotOK,
                                       CurrentModuleObject);
@@ -629,7 +629,7 @@ namespace DataZoneEquipment {
                     if (lAlphaBlanks(coolingFractionArrayIdx)) {
                         thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) = ScheduleAlwaysOn;
                     } else {
-                        thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) = GetScheduleIndex(AlphArray(coolingFractionArrayIdx));
+                        thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) = GetScheduleIndex(state, AlphArray(coolingFractionArrayIdx));
                         if (thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) == 0) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                             ShowContinueError("invalid " + cAlphaFields(coolingFractionArrayIdx)  + "=[" + AlphArray(coolingFractionArrayIdx) + "].");
@@ -642,7 +642,7 @@ namespace DataZoneEquipment {
                     if (lAlphaBlanks(heatingFractionArrayIdx)) {
                         thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) = ScheduleAlwaysOn;
                     } else {
-                        thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) = GetScheduleIndex(AlphArray(heatingFractionArrayIdx));
+                        thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) = GetScheduleIndex(state, AlphArray(heatingFractionArrayIdx));
                         if (thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) == 0) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                             ShowContinueError("invalid " + cAlphaFields(heatingFractionArrayIdx)  + "=[" + AlphArray(heatingFractionArrayIdx) + "].");
@@ -673,7 +673,7 @@ namespace DataZoneEquipment {
                         } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") { // Unitary System
                             thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = ZoneUnitarySys_Num;
                             UnitarySystems::UnitarySys thisSys;
-                            thisZoneEquipList.compPointer[ZoneEquipTypeNum] = thisSys.factory(state, 
+                            thisZoneEquipList.compPointer[ZoneEquipTypeNum] = thisSys.factory(state,
                                 DataHVACGlobals::UnitarySys_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
 
                         } else if (SELECT_CASE_var == "ZONEHVAC:DEHUMIDIFIER:DX") { // Zone dehumidifier
@@ -803,7 +803,8 @@ namespace DataZoneEquipment {
             // End ZoneHVAC:EquipmentList
 
             NodeListError = false;
-            GetNodeNums(InletNodeListName,
+            GetNodeNums(state,
+                        InletNodeListName,
                         NumNodes,
                         NodeNums,
                         NodeListError,
@@ -848,7 +849,8 @@ namespace DataZoneEquipment {
             }
 
             NodeListError = false;
-            GetNodeNums(ExhaustNodeListName,
+            GetNodeNums(state,
+                        ExhaustNodeListName,
                         NumNodes,
                         NodeNums,
                         NodeListError,
@@ -881,7 +883,8 @@ namespace DataZoneEquipment {
             }
 
             NodeListError = false;
-            GetNodeNums(ReturnNodeListName,
+            GetNodeNums(state,
+                        ReturnNodeListName,
                         NumNodes,
                         NodeNums,
                         NodeListError,
@@ -923,7 +926,8 @@ namespace DataZoneEquipment {
             }
 
             NodeListError = false;
-            GetNodeNums(ReturnFlowBasisNodeListName,
+            GetNodeNums(state,
+                        ReturnFlowBasisNodeListName,
                         NumNodes,
                         NodeNums,
                         NodeListError,
@@ -1009,7 +1013,8 @@ namespace DataZoneEquipment {
         CurrentModuleObject = "AirLoopHVAC:SupplyPath";
         for (PathNum = 1; PathNum <= NumSupplyAirPaths; ++PathNum) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           PathNum,
                                           AlphArray,
                                           NumAlphas,
@@ -1024,7 +1029,7 @@ namespace DataZoneEquipment {
             SupplyAirPath(PathNum).Name = AlphArray(1);
             SupplyAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 
-            SupplyAirPath(PathNum).InletNodeNum = GetOnlySingleNode(AlphArray(2),
+            SupplyAirPath(PathNum).InletNodeNum = GetOnlySingleNode(state, AlphArray(2),
                                                                     GetZoneEquipmentDataErrorsFound,
                                                                     CurrentModuleObject,
                                                                     AlphArray(1),
@@ -1049,7 +1054,7 @@ namespace DataZoneEquipment {
 
                     SupplyAirPath(PathNum).ComponentType(CompNum) = AlphArray(Counter);
                     SupplyAirPath(PathNum).ComponentName(CompNum) = AlphArray(Counter + 1);
-                    ValidateComponent(
+                    ValidateComponent(state,
                         SupplyAirPath(PathNum).ComponentType(CompNum), SupplyAirPath(PathNum).ComponentName(CompNum), IsNotOK, CurrentModuleObject);
                     SupplyAirPath(PathNum).ComponentIndex(CompNum) = 0;
                     SupplyAirPath(PathNum).SplitterIndex(CompNum) = 0;
@@ -1075,7 +1080,8 @@ namespace DataZoneEquipment {
         CurrentModuleObject = "AirLoopHVAC:ReturnPath";
         for (PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           PathNum,
                                           AlphArray,
                                           NumAlphas,
@@ -1090,7 +1096,7 @@ namespace DataZoneEquipment {
             ReturnAirPath(PathNum).Name = AlphArray(1);
             ReturnAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 
-            ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(AlphArray(2),
+            ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(state, AlphArray(2),
                                                                      GetZoneEquipmentDataErrorsFound,
                                                                      CurrentModuleObject,
                                                                      AlphArray(1),
@@ -1114,7 +1120,7 @@ namespace DataZoneEquipment {
                     ReturnAirPath(PathNum).ComponentType(CompNum) = AlphArray(Counter);
                     ReturnAirPath(PathNum).ComponentName(CompNum) = AlphArray(Counter + 1);
                     ReturnAirPath(PathNum).ComponentIndex(CompNum) = 0;
-                    ValidateComponent(
+                    ValidateComponent(state,
                         ReturnAirPath(PathNum).ComponentType(CompNum), ReturnAirPath(PathNum).ComponentName(CompNum), IsNotOK, CurrentModuleObject);
                     if (IsNotOK) {
                         ShowContinueError("In " + CurrentModuleObject + " = " + ReturnAirPath(PathNum).Name);

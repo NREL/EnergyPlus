@@ -117,7 +117,7 @@ namespace DataPlant {
         if (this->compPtr != nullptr) {
             if (InitLoopEquip) {
                 this->compPtr->onInitLoopEquip(state, this->location);
-                this->compPtr->getDesignCapacities(this->location, this->MaxLoad, this->MinLoad, this->OptLoad);
+                this->compPtr->getDesignCapacities(state, this->location, this->MaxLoad, this->MinLoad, this->OptLoad);
                 this->compPtr->getDesignTemperatures(this->TempDesCondIn, this->TempDesEvapOut);
 
                 if (GetCompSizFac) {

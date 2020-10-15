@@ -54,7 +54,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -92,7 +91,6 @@ namespace Pipes {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataHVACGlobals;
     using namespace DataLoopNode;
     using DataPlant::TypeOf_Pipe;
@@ -216,14 +214,14 @@ namespace Pipes {
         cCurrentModuleObject = "Pipe:Adiabatic";
         for (PipeWaterNum = 1; PipeWaterNum <= NumWaterPipes; ++PipeWaterNum) {
             PipeNum = PipeWaterNum;
-            inputProcessor->getObjectItem(cCurrentModuleObject, PipeWaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+            inputProcessor->getObjectItem(state, cCurrentModuleObject, PipeWaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
             GlobalNames::VerifyUniqueInterObjectName(LocalPipeUniqueNames, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             LocalPipe(PipeNum).Name = cAlphaArgs(1);
             LocalPipe(PipeNum).TypeOf = TypeOf_Pipe;
 
-            LocalPipe(PipeNum).InletNodeNum = GetOnlySingleNode(
+            LocalPipe(PipeNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            LocalPipe(PipeNum).OutletNodeNum = GetOnlySingleNode(
+            LocalPipe(PipeNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Pipe Nodes");
         }
@@ -233,13 +231,13 @@ namespace Pipes {
 
         for (PipeSteamNum = 1; PipeSteamNum <= NumSteamPipes; ++PipeSteamNum) {
             ++PipeNum;
-            inputProcessor->getObjectItem(cCurrentModuleObject, PipeSteamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+            inputProcessor->getObjectItem(state, cCurrentModuleObject, PipeSteamNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
             GlobalNames::VerifyUniqueInterObjectName(LocalPipeUniqueNames, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             LocalPipe(PipeNum).Name = cAlphaArgs(1);
             LocalPipe(PipeNum).TypeOf = TypeOf_PipeSteam;
-            LocalPipe(PipeNum).InletNodeNum = GetOnlySingleNode(
+            LocalPipe(PipeNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            LocalPipe(PipeNum).OutletNodeNum = GetOnlySingleNode(
+            LocalPipe(PipeNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Pipe Nodes");
         }

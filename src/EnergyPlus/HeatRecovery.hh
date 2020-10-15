@@ -539,7 +539,7 @@ namespace HeatRecovery {
                          Optional_int_const CompanionCoilType_Num = _ // cooling coil type of coil
     );
 
-    void GetHeatRecoveryInput();
+    void GetHeatRecoveryInput(EnergyPlusData &state);
 
     void InitHeatRecovery(EnergyPlusData &state, int const ExchNum, // number of the current heat exchanger being simulated
                           int const CompanionCoilIndex,
@@ -654,31 +654,38 @@ namespace HeatRecovery {
                               bool const FirstHVACIteration   // first HVAC iteration flag
     );
 
-    int GetSupplyInletNode(std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSupplyInletNode(EnergyPlusData &state,
+                           std::string const &HXName, // must match HX names for the ExchCond type
                            bool &ErrorsFound          // set to true if problem
     );
 
-    int GetSupplyOutletNode(std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSupplyOutletNode(EnergyPlusData &state,
+                            std::string const &HXName, // must match HX names for the ExchCond type
                             bool &ErrorsFound          // set to true if problem
     );
 
-    int GetSecondaryInletNode(std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSecondaryInletNode(EnergyPlusData &state,
+                              std::string const &HXName, // must match HX names for the ExchCond type
                               bool &ErrorsFound          // set to true if problem
     );
 
-    int GetSecondaryOutletNode(std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSecondaryOutletNode(EnergyPlusData &state,
+                               std::string const &HXName, // must match HX names for the ExchCond type
                                bool &ErrorsFound          // set to true if problem
     );
 
-    Real64 GetSupplyAirFlowRate(std::string const &HXName, // must match HX names for the ExchCond type
+    Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
+                                std::string const &HXName, // must match HX names for the ExchCond type
                                 bool &ErrorsFound          // set to true if problem
     );
 
-    int GetHeatExchangerObjectTypeNum(std::string const &HXName, // must match HX names for the ExchCond type
+    int GetHeatExchangerObjectTypeNum(EnergyPlusData &state,
+                                      std::string const &HXName, // must match HX names for the ExchCond type
                                       bool &ErrorsFound          // set to true if problem
     );
 
-    void SetHeatExchangerData(int const HXNum,                         // Index of HX
+    void SetHeatExchangerData(EnergyPlusData &state,
+                              int const HXNum,                         // Index of HX
                               bool &ErrorsFound,                       // Set to true if certain errors found
                               std::string const &HXName,               // Name of HX
                               Optional<Real64> SupplyAirVolFlow = _,   // HX supply air flow rate    [m3/s]

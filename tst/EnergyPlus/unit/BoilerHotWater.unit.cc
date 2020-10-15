@@ -91,7 +91,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
     DataSizing::PlantSizData(1).DeltaT = 10.0;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     // now call sizing routine
-    state.dataBoilers->Boiler(1).SizeBoiler();
+    state.dataBoilers->Boiler(1).SizeBoiler(state);
     // see if boiler volume flow rate returned is hard-sized value
     EXPECT_DOUBLE_EQ(state.dataBoilers->Boiler(1).VolFlowRate, 1.0);
     // see if boiler nominal capacity returned is hard-sized value
@@ -103,7 +103,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
     state.dataBoilers->Boiler(1).NomCap = DataSizing::AutoSize;
     state.dataBoilers->Boiler(1).VolFlowRate = DataSizing::AutoSize;
     // now call sizing routine
-    state.dataBoilers->Boiler(1).SizeBoiler();
+    state.dataBoilers->Boiler(1).SizeBoiler(state);
     // see if boiler volume flow rate returned is autosized value
     EXPECT_NEAR(state.dataBoilers->Boiler(1).VolFlowRate, 1.2, 0.000001);
     // see if boiler nominal capacity returned is autosized value
@@ -137,11 +137,13 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterAutoSizeTempTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // calculate nominal capacity at 60.0 C hot water temperature
-    Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(state.dataBoilers->Boiler(1).LoopNum).FluidName,
+    Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                   DataPlant::PlantLoop(state.dataBoilers->Boiler(1).LoopNum).FluidName,
                                                    60.0,
                                                    DataPlant::PlantLoop(state.dataBoilers->Boiler(1).LoopNum).FluidIndex,
                                                    "Boiler_HotWaterAutoSizeTempTest");
-    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(state.dataBoilers->Boiler(1).LoopNum).FluidName,
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                       DataPlant::PlantLoop(state.dataBoilers->Boiler(1).LoopNum).FluidName,
                                                        60.0,
                                                        DataPlant::PlantLoop(state.dataBoilers->Boiler(1).LoopNum).FluidIndex,
                                                        "Boiler_HotWaterAutoSizeTempTest");
@@ -149,7 +151,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterAutoSizeTempTest)
     Real64 NomCapBoilerExpected = rho * PlantSizData(1).DesVolFlowRate * Cp * PlantSizData(1).DeltaT * state.dataBoilers->Boiler(1).SizFac;
 
     // now call sizing routine
-    state.dataBoilers->Boiler(1).SizeBoiler();
+    state.dataBoilers->Boiler(1).SizeBoiler(state);
     // see if boiler volume flow rate returned is autosized value
     EXPECT_DOUBLE_EQ(state.dataBoilers->Boiler(1).VolFlowRate, 1.2);
     // see if boiler nominal capacity returned is autosized value
@@ -269,7 +271,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
     DataPlant::PlantFinalSizesOkayToReport = true;
 
     thisBoiler.InitBoiler(state);
-    thisBoiler.SizeBoiler();
+    thisBoiler.SizeBoiler(state);
 
     // run through init again after sizing is complete to set mass flow rate and run calc function
     DataGlobals::BeginEnvrnFlag = true;

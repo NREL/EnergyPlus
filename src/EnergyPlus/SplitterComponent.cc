@@ -52,7 +52,6 @@
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -84,7 +83,6 @@ namespace SplitterComponent {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataLoopNode;
 
@@ -133,7 +131,7 @@ namespace SplitterComponent {
     }
 
     void
-    SimAirLoopSplitter(std::string const &CompName, bool const FirstHVACIteration, bool const FirstCall, bool &SplitterInletChanged, int &CompIndex)
+    SimAirLoopSplitter(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, bool const FirstCall, bool &SplitterInletChanged, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -157,7 +155,7 @@ namespace SplitterComponent {
 
         // Obtains and Allocates Splitter related parameters from input file
         if (GetSplitterInputFlag) { // First time subroutine has been entered
-            GetSplitterInput();
+            GetSplitterInput(state);
         }
 
         // Find the correct SplitterNumber
@@ -198,7 +196,7 @@ namespace SplitterComponent {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetSplitterInput()
+    void GetSplitterInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -259,7 +257,8 @@ namespace SplitterComponent {
         NumArray.dimension(NumNums, 0.0);
 
         for (SplitterNum = 1; SplitterNum <= NumSplitters; ++SplitterNum) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           SplitterNum,
                                           AlphArray,
                                           NumAlphas,
@@ -273,7 +272,7 @@ namespace SplitterComponent {
             UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             SplitterCond(SplitterNum).SplitterName = AlphArray(1);
-            SplitterCond(SplitterNum).InletNode = GetOnlySingleNode(
+            SplitterCond(SplitterNum).InletNode = GetOnlySingleNode(state,
                 AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             SplitterCond(SplitterNum).NumOutletNodes = NumAlphas - 2;
 
@@ -292,7 +291,7 @@ namespace SplitterComponent {
 
             for (NodeNum = 1; NodeNum <= SplitterCond(SplitterNum).NumOutletNodes; ++NodeNum) {
 
-                SplitterCond(SplitterNum).OutletNode(NodeNum) = GetOnlySingleNode(AlphArray(2 + NodeNum),
+                SplitterCond(SplitterNum).OutletNode(NodeNum) = GetOnlySingleNode(state, AlphArray(2 + NodeNum),
                                                                                   ErrorsFound,
                                                                                   CurrentModuleObject,
                                                                                   AlphArray(1),
@@ -703,7 +702,8 @@ namespace SplitterComponent {
         // Write(*,*)=SplitterCond(SplitterNum)%SplitterPower    Still needs to report the Splitter power from this component
     }
 
-    int GetSplitterOutletNumber(std::string const &SplitterName, // must match Splitter names for the Splitter type
+    int GetSplitterOutletNumber(EnergyPlusData &state,
+                                std::string const &SplitterName, // must match Splitter names for the Splitter type
                                 int const SplitterNum,           // Index of Splitters
                                 bool &ErrorsFound                // set to true if problem
     )
@@ -728,7 +728,7 @@ namespace SplitterComponent {
 
         // Obtains and Allocates AirLoopHVAC:ZoneSplitter related parameters from input file
         if (GetSplitterInputFlag) { // First time subroutine has been entered
-            GetSplitterInput();
+            GetSplitterInput(state);
             GetSplitterInputFlag = false;
         }
 
@@ -751,7 +751,8 @@ namespace SplitterComponent {
         return SplitterOutletNumber;
     }
 
-    Array1D_int GetSplitterNodeNumbers(std::string const &SplitterName, // must match Splitter names for the Splitter type
+    Array1D_int GetSplitterNodeNumbers(EnergyPlusData &state,
+                                       std::string const &SplitterName, // must match Splitter names for the Splitter type
                                        int const SplitterNum,           // Index of Splitters
                                        bool &ErrorsFound                // set to true if problem
     )
@@ -777,7 +778,7 @@ namespace SplitterComponent {
 
         // Obtains and Allocates AirLoopHVAC:ZoneSplitter related parameters from input file
         if (GetSplitterInputFlag) { // First time subroutine has been entered
-            GetSplitterInput();
+            GetSplitterInput(state);
             GetSplitterInputFlag = false;
         }
 

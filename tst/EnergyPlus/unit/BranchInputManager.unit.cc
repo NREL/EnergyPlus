@@ -117,7 +117,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
         int BCount = 0;
         for (int Count = 1; Count <= NumOfBranches; ++Count) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks,
+            inputProcessor->getObjectItem(state, CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks,
                                           cAlphaFields, cNumericFields);
             IsNotOK = false;
             IsBlank = false;
@@ -273,7 +273,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
         int BCount = 0;
         for (int Count = 1; Count <= NumOfBranches; ++Count) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks,
+            inputProcessor->getObjectItem(state, CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks,
                                           cAlphaFields, cNumericFields);
             IsNotOK = false;
             IsBlank = false;
@@ -374,7 +374,7 @@ TEST_F(EnergyPlusFixture, BranchInputManager_FindAirLoopBranchConnection)
     FoundLoopVolFlowRate = 0.0;
     MatchedLoop = false;
 
-    FindAirLoopBranchConnection(BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop);
+    FindAirLoopBranchConnection(state, BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop);
 
     EXPECT_EQ("AIR LOOP 1", FoundLoopName);
     EXPECT_EQ(2, FoundLoopNum);
@@ -390,7 +390,7 @@ TEST_F(EnergyPlusFixture, BranchInputManager_FindAirLoopBranchConnection)
     FoundLoopVolFlowRate = 0.0;
     MatchedLoop = false;
 
-    FindAirLoopBranchConnection(BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop);
+    FindAirLoopBranchConnection(state, BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop);
 
     EXPECT_EQ("DOAS", FoundLoopName);
     EXPECT_EQ(1, FoundLoopNum);
@@ -406,7 +406,7 @@ TEST_F(EnergyPlusFixture, BranchInputManager_FindAirLoopBranchConnection)
     FoundLoopVolFlowRate = 0.0;
     MatchedLoop = false;
 
-    FindAirLoopBranchConnection(BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop);
+    FindAirLoopBranchConnection(state, BranchListName, FoundLoopName, FoundLoopNum, LoopType, FoundLoopVolFlowRate, MatchedLoop);
 
     EXPECT_EQ("None", FoundLoopName);
     EXPECT_EQ(0, FoundLoopNum);

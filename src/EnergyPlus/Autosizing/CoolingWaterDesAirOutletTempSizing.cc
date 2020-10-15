@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletTempSizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -54,7 +55,7 @@
 
 namespace EnergyPlus {
 
-Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalValue, bool &errorsFound)
+Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
     if (!this->checkInitialized(errorsFound)) {
         return 0.0;
@@ -65,12 +66,14 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &EP_UNUSED(state),
             this->autoSizedValue = _originalValue;
         } else {
             if (this->termUnitIU) {
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                   DataGlobals::CWInitConvTemp,
+                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                   DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
+                                                                   DataGlobalConstants::CWInitConvTemp(),
                                                                    DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                    this->callingRoutine);
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                               DataGlobals::CWInitConvTemp,
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                               DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
+                                                               DataGlobalConstants::CWInitConvTemp(),
                                                                DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                this->callingRoutine);
                 Real64 DesCoilLoad = this->dataWaterFlowUsedForSizing * this->dataWaterCoilSizCoolDeltaT * Cp * rho;

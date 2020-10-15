@@ -143,16 +143,16 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
 {
     DataStringGlobals::outputPerfLogFileName = "eplusout_1_perflog.csv";
 
-    // start with no file 
+    // start with no file
     std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
 
     // make sure the static variables are cleared
-    UtilityRoutines::appendPerfLog(state.files, "RESET", "RESET");
+    UtilityRoutines::appendPerfLog(state, "RESET", "RESET");
 
     // add headers and values
-    UtilityRoutines::appendPerfLog(state.files, "header1", "value1-1");
-    UtilityRoutines::appendPerfLog(state.files, "header2", "value1-2");
-    UtilityRoutines::appendPerfLog(state.files, "header3", "value1-3", true);
+    UtilityRoutines::appendPerfLog(state, "header1", "value1-1");
+    UtilityRoutines::appendPerfLog(state, "header2", "value1-2");
+    UtilityRoutines::appendPerfLog(state, "header3", "value1-3", true);
 
     std::ifstream perfLogFile;
     std::stringstream perfLogStrSteam;
@@ -175,7 +175,7 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
 TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
 {
     // make sure the static variables are cleared
-    UtilityRoutines::appendPerfLog(state.files, "RESET", "RESET");
+    UtilityRoutines::appendPerfLog(state, "RESET", "RESET");
 
     DataStringGlobals::outputPerfLogFileName = "eplusout_2_perflog.csv";
 
@@ -187,9 +187,9 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
     initPerfLogFile.close();
 
     // without deleting file add headers and values again
-    UtilityRoutines::appendPerfLog(state.files, "ignored1", "value2-1");
-    UtilityRoutines::appendPerfLog(state.files, "ignored2", "value2-2");
-    UtilityRoutines::appendPerfLog(state.files, "ignored3", "value2-3", true);
+    UtilityRoutines::appendPerfLog(state, "ignored1", "value2-1");
+    UtilityRoutines::appendPerfLog(state, "ignored2", "value2-2");
+    UtilityRoutines::appendPerfLog(state, "ignored3", "value2-3", true);
 
     std::ifstream perfLogFile;
     std::stringstream perfLogStrSteam;

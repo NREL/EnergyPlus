@@ -52,6 +52,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 struct CoolingWaterflowSizer : BaseSizerWithFanHeatInputs
 {
     CoolingWaterflowSizer()
@@ -61,7 +64,7 @@ struct CoolingWaterflowSizer : BaseSizerWithFanHeatInputs
     }
     ~CoolingWaterflowSizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 
     void clearState();
 };

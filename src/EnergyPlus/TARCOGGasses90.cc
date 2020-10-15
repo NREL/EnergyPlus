@@ -156,7 +156,7 @@ namespace TARCOGGasses90 {
         fvis(1) = xgvis(1, iprop(1)) + xgvis(2, iprop(1)) * tmean + xgvis(3, iprop(1)) * tmean_2;
         fcp(1) = xgcp(1, iprop(1)) + xgcp(2, iprop(1)) * tmean + xgcp(3, iprop(1)) * tmean_2;
         // Density using ideal gas law: rho=(presure*mol. weight)/(gas const*Tmean)
-        fdens(1) = pres * xwght(iprop(1)) / (UniversalGasConst * tmean);
+        fdens(1) = pres * xwght(iprop(1)) / (DataGlobalConstants::UniversalGasConst() * tmean);
         // Mollecular weights in kg/kmol
         if ((standard == EN673) || (standard == EN673Design)) {
             // fdens( 1 ) = xgrho( iprop( 1 ), 1 ) + xgrho( iprop( 1 ), 2 ) * tmean + xgrho( iprop( 1 ), 3 ) * pow_2( tmean ); //Autodesk:Uninit xgrho
@@ -175,7 +175,7 @@ namespace TARCOGGasses90 {
             if (stdISO15099) {
                 molmix = frct(1) * xwght(iprop(1));                               // initialize equation 56
                 cpmixm = molmix * fcp(1);                                         // initialize equation 58
-                kprime(1) = 3.75 * UniversalGasConst / xwght(iprop(1)) * fvis(1); // equation 67
+                kprime(1) = 3.75 * DataGlobalConstants::UniversalGasConst() / xwght(iprop(1)) * fvis(1); // equation 67
                 kdblprm(1) = fcon(1) - kprime(1);                                 // equation 67
                 // initialize sumations for eqns 60-66:
                 mukpdwn(1) = 1.0;
@@ -200,7 +200,7 @@ namespace TARCOGGasses90 {
                 if (stdISO15099) {
                     molmix += frct(i) * xwght(iprop(i));                              // equation 56
                     cpmixm += frct(i) * fcp(i) * xwght(iprop(i));                     // equation 58-59
-                    kprime(i) = 3.75 * UniversalGasConst / xwght(iprop(i)) * fvis(i); // equation 67
+                    kprime(i) = 3.75 * DataGlobalConstants::UniversalGasConst() / xwght(iprop(i)) * fvis(i); // equation 67
                     kdblprm(i) = fcon(i) - kprime(i);                                 // equation 68
                     mukpdwn(i) = 1.0;                                                 // initialize denominator of equation 60
                     kpdown(i) = 1.0;                                                  // initialize denominator of equation 63
@@ -248,7 +248,7 @@ namespace TARCOGGasses90 {
                 }
 
                 // calculate the density of the mixture assuming an ideal gas:
-                Real64 const rhomix = pres * molmix / (UniversalGasConst * tmean); // equation 57
+                Real64 const rhomix = pres * molmix / (DataGlobalConstants::UniversalGasConst() * tmean); // equation 57
                 Real64 const kmix = kpmix + kdpmix;                                // equation 68-a
 
                 // final mixture properties:
@@ -296,7 +296,7 @@ namespace TARCOGGasses90 {
             return;
         }
 
-        B = alpha * (gama + 1) / (gama - 1) * std::sqrt(UniversalGasConst / (8 * Pi * mwght * tmean));
+        B = alpha * (gama + 1) / (gama - 1) * std::sqrt(DataGlobalConstants::UniversalGasConst() / (8 * DataGlobalConstants::Pi() * mwght * tmean));
 
         cond = B * pressure;
     }

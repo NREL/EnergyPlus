@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -138,7 +139,7 @@ namespace ThermalChimney {
         ThermalChimneyReport.deallocate();
     }
 
-    void ManageThermalChimney()
+    void ManageThermalChimney(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -179,7 +180,7 @@ namespace ThermalChimney {
 
         // Obtains and Allocates heat balance related parameters from input file
         if (ThermalChimneyGetInputFlag) {
-            GetThermalChimney(ErrorsFound);
+            GetThermalChimney(state, ErrorsFound);
             ThermalChimneyGetInputFlag = false;
         }
 
@@ -190,7 +191,7 @@ namespace ThermalChimney {
         ReportThermalChimney();
     }
 
-    void GetThermalChimney(bool &ErrorsFound) // If errors found in input
+    void GetThermalChimney(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -212,8 +213,6 @@ namespace ThermalChimney {
         Real64 const FlowFractionTolerance(0.0001); // Smallest deviation from unity for the sum of all fractions
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //    CHARACTER(len=MaxNameLength), DIMENSION(23) :: AlphaName
-        //    REAL(r64) , DIMENSION(63)              :: IHGNumbers
         int NumAlpha;
         int NumNumber;
         Real64 AllRatiosSummed;
@@ -222,13 +221,6 @@ namespace ThermalChimney {
         int IOStat;
         int Loop;
         int Loop1;
-
-        //  ALLOCATE(MCPTThermChim(NumOfZones))
-        //  MCPTThermChim=0.0
-        //  ALLOCATE(MCPThermChim(NumOfZones))
-        //  MCPThermChim=0.0
-        //  ALLOCATE(ThermChimAMFL(NumOfZones))
-        //  ThermChimAMFL=0.0
 
         // Following used for reporting
         ZnRptThermChim.allocate(NumOfZones);
@@ -241,7 +233,8 @@ namespace ThermalChimney {
 
         for (Loop = 1; Loop <= TotThermalChimney; ++Loop) {
 
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Loop,
                                           cAlphaArgs,
                                           NumAlpha,
@@ -277,7 +270,7 @@ namespace ThermalChimney {
             if (lAlphaFieldBlanks(3)) {
                 ThermalChimneySys(Loop).SchedPtr = ScheduleAlwaysOn;
             } else {
-                ThermalChimneySys(Loop).SchedPtr = GetScheduleIndex(cAlphaArgs(3));
+                ThermalChimneySys(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (ThermalChimneySys(Loop).SchedPtr == 0) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid data");
                     ShowContinueError("Invalid-not found " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
@@ -379,25 +372,25 @@ namespace ThermalChimney {
         }
         // Set up the output variables for thermal chimneys
         for (Loop = 1; Loop <= TotThermalChimney; ++Loop) {
-            SetupOutputVariable("Zone Thermal Chimney Current Density Air Volume Flow Rate",
+            SetupOutputVariable(state, "Zone Thermal Chimney Current Density Air Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 ThermalChimneyReport(Loop).OverallTCVolumeFlow,
                                 "System",
                                 "Average",
                                 ThermalChimneySys(Loop).Name);
-            SetupOutputVariable("Zone Thermal Chimney Standard Density Air Volume Flow Rate",
+            SetupOutputVariable(state, "Zone Thermal Chimney Standard Density Air Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 ThermalChimneyReport(Loop).OverallTCVolumeFlowStd,
                                 "System",
                                 "Average",
                                 ThermalChimneySys(Loop).Name);
-            SetupOutputVariable("Zone Thermal Chimney Mass Flow Rate",
+            SetupOutputVariable(state, "Zone Thermal Chimney Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 ThermalChimneyReport(Loop).OverallTCMassFlow,
                                 "System",
                                 "Average",
                                 ThermalChimneySys(Loop).Name);
-            SetupOutputVariable("Zone Thermal Chimney Outlet Temperature",
+            SetupOutputVariable(state, "Zone Thermal Chimney Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 ThermalChimneyReport(Loop).OutletAirTempThermalChim,
                                 "System",
@@ -414,104 +407,104 @@ namespace ThermalChimney {
             }
 
             for (TCZoneNum = 1; TCZoneNum <= ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
-                SetupOutputVariable("Zone Thermal Chimney Heat Loss Energy",
+                SetupOutputVariable(state, "Zone Thermal Chimney Heat Loss Energy",
                                     OutputProcessor::Unit::J,
                                     ZnRptThermChim(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).ThermalChimneyHeatLoss,
                                     "System",
                                     "Sum",
                                     Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
-                SetupOutputVariable("Zone Thermal Chimney Heat Gain Energy",
+                SetupOutputVariable(state, "Zone Thermal Chimney Heat Gain Energy",
                                     OutputProcessor::Unit::J,
                                     ZnRptThermChim(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).ThermalChimneyHeatGain,
                                     "System",
                                     "Sum",
                                     Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
-                SetupOutputVariable("Zone Thermal Chimney Volume",
+                SetupOutputVariable(state, "Zone Thermal Chimney Volume",
                                     OutputProcessor::Unit::m3,
                                     ZnRptThermChim(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).ThermalChimneyVolume,
                                     "System",
                                     "Sum",
                                     Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
-                SetupOutputVariable("Zone Thermal Chimney Mass",
+                SetupOutputVariable(state, "Zone Thermal Chimney Mass",
                                     OutputProcessor::Unit::kg,
                                     ZnRptThermChim(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).ThermalChimneyMass,
                                     "System",
                                     "Sum",
                                     Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
                 if (RepVarSet(ThermalChimneySys(Loop).ZonePtr(TCZoneNum))) {
-                    SetupOutputVariable("Zone Infiltration Sensible Heat Loss Energy",
+                    SetupOutputVariable(state, "Zone Infiltration Sensible Heat Loss Energy",
                                         OutputProcessor::Unit::J,
                                         ZnAirRpt(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilHeatLoss,
                                         "System",
                                         "Sum",
                                         Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
-                    SetupOutputVariable("Zone Infiltration Sensible Heat Gain Energy",
+                    SetupOutputVariable(state, "Zone Infiltration Sensible Heat Gain Energy",
                                         OutputProcessor::Unit::J,
                                         ZnAirRpt(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilHeatGain,
                                         "System",
                                         "Sum",
                                         Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
-                    SetupOutputVariable("Zone Infiltration Latent Heat Loss Energy",
+                    SetupOutputVariable(state, "Zone Infiltration Latent Heat Loss Energy",
                                         OutputProcessor::Unit::J,
                                         ZnAirRpt(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilLatentLoss,
                                         "System",
                                         "Sum",
                                         Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
-                    SetupOutputVariable("Zone Infiltration Latent Heat Gain Energy",
+                    SetupOutputVariable(state, "Zone Infiltration Latent Heat Gain Energy",
                                         OutputProcessor::Unit::J,
                                         ZnAirRpt(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilLatentGain,
                                         "System",
                                         "Sum",
                                         Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
-                    SetupOutputVariable("Zone Infiltration Total Heat Loss Energy",
+                    SetupOutputVariable(state, "Zone Infiltration Total Heat Loss Energy",
                                         OutputProcessor::Unit::J,
                                         ZnAirRpt(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilTotalLoss,
                                         "System",
                                         "Sum",
                                         Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
-                    SetupOutputVariable("Zone Infiltration Total Heat Gain Energy",
+                    SetupOutputVariable(state, "Zone Infiltration Total Heat Gain Energy",
                                         OutputProcessor::Unit::J,
                                         ZnAirRpt(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilTotalGain,
                                         "System",
                                         "Sum",
                                         Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
-                    SetupOutputVariable("Zone Infiltration Current Density Volume Flow Rate",
+                    SetupOutputVariable(state, "Zone Infiltration Current Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
                                         ZnAirRpt(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilVdotCurDensity,
                                         "System",
                                         "Average",
                                         Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
-                    SetupOutputVariable("Zone Infiltration Standard Density Volume Flow Rate",
+                    SetupOutputVariable(state, "Zone Infiltration Standard Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
                                         ZnAirRpt(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilVdotStdDensity,
                                         "System",
                                         "Average",
                                         Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
-                    SetupOutputVariable("Zone Infiltration Current Density Volume",
+                    SetupOutputVariable(state, "Zone Infiltration Current Density Volume",
                                         OutputProcessor::Unit::m3,
                                         ZnAirRpt(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilVolumeCurDensity,
                                         "System",
                                         "Sum",
                                         Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
-                    SetupOutputVariable("Zone Infiltration Standard Density Volume",
+                    SetupOutputVariable(state, "Zone Infiltration Standard Density Volume",
                                         OutputProcessor::Unit::m3,
                                         ZnAirRpt(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilVolumeStdDensity,
                                         "System",
                                         "Sum",
                                         Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
-                    SetupOutputVariable("Zone Infiltration Mass",
+                    SetupOutputVariable(state, "Zone Infiltration Mass",
                                         OutputProcessor::Unit::kg,
                                         ZnAirRpt(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilMass,
                                         "System",
                                         "Sum",
                                         Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
-                    SetupOutputVariable("Zone Infiltration Mass Flow Rate",
+                    SetupOutputVariable(state, "Zone Infiltration Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         ZnAirRpt(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilMdot,
                                         "System",
                                         "Average",
                                         Zone(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
-                    SetupOutputVariable("Zone Infiltration Air Change Rate",
+                    SetupOutputVariable(state, "Zone Infiltration Air Change Rate",
                                         OutputProcessor::Unit::ach,
                                         ZnAirRpt(ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilAirChangeRate,
                                         "System",
@@ -725,7 +718,7 @@ namespace ThermalChimney {
                     if (TempSurfIn(SurfNum) > TemporaryWallSurfTemp) {
                         TemporaryWallSurfTemp = TempSurfIn(SurfNum);
                         ConvTransCoeffWallFluid = HConvIn(SurfNum);
-                        SurfTempAbsorberWall = TempSurfIn(SurfNum) + KelvinConv;
+                        SurfTempAbsorberWall = TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv();
                     }
                 }
             }
@@ -739,7 +732,7 @@ namespace ThermalChimney {
                     if (Surface(SurfNum).Width > TempmajorW) {
                         TempmajorW = Surface(SurfNum).Width;
                         ConvTransCoeffGlassFluid = HConvIn(SurfNum);
-                        SurfTempGlassCover = TempSurfIn(SurfNum) + KelvinConv;
+                        SurfTempGlassCover = TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv();
                     }
                 }
             }
@@ -764,7 +757,7 @@ namespace ThermalChimney {
                 TCZoneNumCounter = ThermalChimneySys(Loop).ZonePtr(TCZoneNum);
                 RoomAirTemp += ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum) * MAT(TCZoneNumCounter);
             }
-            RoomAirTemp += KelvinConv;
+            RoomAirTemp += DataGlobalConstants::KelvinConv();
 
             Process1 = 0.0;
             Process2 = 0.0;
@@ -894,7 +887,7 @@ namespace ThermalChimney {
             if (ThermalChimneyReport(Loop).OverallTCMassFlow != (TCVolumeAirFlowRate * AirDensityThermalChim)) {
                 ThermalChimneyReport(Loop).OverallTCMassFlow = ThermalChimneyReport(Loop).OverallTCVolumeFlow * AirDensityThermalChim;
             }
-            ThermalChimneyReport(Loop).OutletAirTempThermalChim = ThermChimSubTemp(NTC) - KelvinConv;
+            ThermalChimneyReport(Loop).OutletAirTempThermalChim = ThermChimSubTemp(NTC) - DataGlobalConstants::KelvinConv();
 
             if (GetCurrentScheduleValue(ThermalChimneySys(Loop).SchedPtr) <= 0.0) {
                 for (TCZoneNum = 1; TCZoneNum <= ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
@@ -955,7 +948,7 @@ namespace ThermalChimney {
         Real64 CpAir;
         Real64 TSMult;
 
-        TSMult = TimeStepSys * SecInHour;
+        TSMult = TimeStepSys * DataGlobalConstants::SecInHour();
 
         for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
 

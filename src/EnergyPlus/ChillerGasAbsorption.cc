@@ -64,7 +64,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -156,7 +155,8 @@ namespace ChillerGasAbsorption {
             this->updateHeatRecords(CurLoad, RunFlag);
         } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
             if (this->CDLoopNum > 0) {
-                PlantUtilities::UpdateChillerComponentCondenserSide(this->CDLoopNum,
+                PlantUtilities::UpdateChillerComponentCondenserSide(state,
+                                                                    this->CDLoopNum,
                                                                     this->CDLoopSideNum,
                                                                     DataPlant::TypeOf_Chiller_DFAbsorption,
                                                                     this->CondReturnNodeNum,
@@ -174,7 +174,7 @@ namespace ChillerGasAbsorption {
         }
     }
 
-    void GasAbsorberSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void GasAbsorberSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int BranchInletNodeNum =
@@ -214,7 +214,7 @@ namespace ChillerGasAbsorption {
             DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
 
         if (BranchInletNodeNum == this->ChillReturnNodeNum) {       // Operate as chiller
-            this->size();                                           // only call from chilled water loop
+            this->size(state);                                      // only call from chilled water loop
         } else if (BranchInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
             // don't do anything here
         } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
@@ -273,7 +273,8 @@ namespace ChillerGasAbsorption {
         // LOAD ARRAYS
 
         for (AbsorberNum = 1; AbsorberNum <= NumGasAbsorbers; ++AbsorberNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           AbsorberNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -306,7 +307,7 @@ namespace ChillerGasAbsorption {
             thisChiller.ElecHeatRatio = rNumericArgs(6);
 
             // Assign Node Numbers to specified nodes
-            thisChiller.ChillReturnNodeNum = GetOnlySingleNode(cAlphaArgs(2),
+            thisChiller.ChillReturnNodeNum = GetOnlySingleNode(state, cAlphaArgs(2),
                                                                             Get_ErrorsFound,
                                                                             cCurrentModuleObject,
                                                                             cAlphaArgs(1),
@@ -314,7 +315,7 @@ namespace ChillerGasAbsorption {
                                                                             DataLoopNode::NodeConnectionType_Inlet,
                                                                             1,
                                                                             DataLoopNode::ObjectIsNotParent);
-            thisChiller.ChillSupplyNodeNum = GetOnlySingleNode(cAlphaArgs(3),
+            thisChiller.ChillSupplyNodeNum = GetOnlySingleNode(state, cAlphaArgs(3),
                                                                             Get_ErrorsFound,
                                                                             cCurrentModuleObject,
                                                                             cAlphaArgs(1),
@@ -324,7 +325,7 @@ namespace ChillerGasAbsorption {
                                                                             DataLoopNode::ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Chilled Water Nodes");
             // Condenser node processing depends on condenser type, see below
-            thisChiller.HeatReturnNodeNum = GetOnlySingleNode(cAlphaArgs(6),
+            thisChiller.HeatReturnNodeNum = GetOnlySingleNode(state, cAlphaArgs(6),
                                                                            Get_ErrorsFound,
                                                                            cCurrentModuleObject,
                                                                            cAlphaArgs(1),
@@ -332,7 +333,7 @@ namespace ChillerGasAbsorption {
                                                                            DataLoopNode::NodeConnectionType_Inlet,
                                                                            3,
                                                                            DataLoopNode::ObjectIsNotParent);
-            thisChiller.HeatSupplyNodeNum = GetOnlySingleNode(cAlphaArgs(7),
+            thisChiller.HeatSupplyNodeNum = GetOnlySingleNode(state, cAlphaArgs(7),
                                                                            Get_ErrorsFound,
                                                                            cCurrentModuleObject,
                                                                            cAlphaArgs(1),
@@ -414,7 +415,7 @@ namespace ChillerGasAbsorption {
                     ShowContinueError("For WaterCooled chiller the condenser outlet node is required.");
                     Get_ErrorsFound = true;
                 }
-                thisChiller.CondReturnNodeNum = GetOnlySingleNode(cAlphaArgs(4),
+                thisChiller.CondReturnNodeNum = GetOnlySingleNode(state, cAlphaArgs(4),
                                                                                Get_ErrorsFound,
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
@@ -422,7 +423,7 @@ namespace ChillerGasAbsorption {
                                                                                DataLoopNode::NodeConnectionType_Inlet,
                                                                                2,
                                                                                DataLoopNode::ObjectIsNotParent);
-                thisChiller.CondSupplyNodeNum = GetOnlySingleNode(cAlphaArgs(5),
+                thisChiller.CondSupplyNodeNum = GetOnlySingleNode(state, cAlphaArgs(5),
                                                                                Get_ErrorsFound,
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
@@ -432,7 +433,7 @@ namespace ChillerGasAbsorption {
                                                                                DataLoopNode::ObjectIsNotParent);
                 TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Condenser Water Nodes");
             } else {
-                thisChiller.CondReturnNodeNum = GetOnlySingleNode(cAlphaArgs(4),
+                thisChiller.CondReturnNodeNum = GetOnlySingleNode(state, cAlphaArgs(4),
                                                                                Get_ErrorsFound,
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
@@ -442,7 +443,7 @@ namespace ChillerGasAbsorption {
                                                                                DataLoopNode::ObjectIsNotParent);
                 // Condenser outlet node not used for air or evap cooled condenser so ingore cAlphaArgs( 5 )
                 // Connection not required for air or evap cooled condenser so no call to TestCompSet here
-                CheckAndAddAirNodeNumber(thisChiller.CondReturnNodeNum, Okay);
+                CheckAndAddAirNodeNumber(state, thisChiller.CondReturnNodeNum, Okay);
                 if (!Okay) {
                     ShowWarningError(cCurrentModuleObject + ", Adding OutdoorAir:Node=" + cAlphaArgs(4));
                 }
@@ -469,12 +470,12 @@ namespace ChillerGasAbsorption {
         }
     }
 
-    void GasAbsorberSpecs::setupOutputVariables()
+    void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
     {
         std::string &ChillerName = this->Name;
 
-        SetupOutputVariable("Chiller Heater Evaporator Cooling Rate", OutputProcessor::Unit::W, this->CoolingLoad, "System", "Average", ChillerName);
-        SetupOutputVariable("Chiller Heater Evaporator Cooling Energy",
+        SetupOutputVariable(state, "Chiller Heater Evaporator Cooling Rate", OutputProcessor::Unit::W, this->CoolingLoad, "System", "Average", ChillerName);
+        SetupOutputVariable(state, "Chiller Heater Evaporator Cooling Energy",
                             OutputProcessor::Unit::J,
                             this->CoolingEnergy,
                             "System",
@@ -486,8 +487,8 @@ namespace ChillerGasAbsorption {
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller Heater Heating Rate", OutputProcessor::Unit::W, this->HeatingLoad, "System", "Average", ChillerName);
-        SetupOutputVariable("Chiller Heater Heating Energy",
+        SetupOutputVariable(state, "Chiller Heater Heating Rate", OutputProcessor::Unit::W, this->HeatingLoad, "System", "Average", ChillerName);
+        SetupOutputVariable(state, "Chiller Heater Heating Energy",
                             OutputProcessor::Unit::J,
                             this->HeatingEnergy,
                             "System",
@@ -499,9 +500,9 @@ namespace ChillerGasAbsorption {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->TowerLoad, "System", "Average", ChillerName);
-        SetupOutputVariable("Chiller Heater Condenser Heat Transfer Energy",
+        SetupOutputVariable(state, "Chiller Heater Condenser Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->TowerEnergy,
                             "System",
@@ -513,14 +514,14 @@ namespace ChillerGasAbsorption {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelUseRate, "System", "Average", ChillerName);
         // Do not include this on meters, this would duplicate the cool fuel and heat fuel
-        SetupOutputVariable("Chiller Heater " + this->FuelType + " Energy", OutputProcessor::Unit::J, this->FuelEnergy, "System", "Sum", ChillerName);
+        SetupOutputVariable(state, "Chiller Heater " + this->FuelType + " Energy", OutputProcessor::Unit::J, this->FuelEnergy, "System", "Sum", ChillerName);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater Cooling " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->CoolFuelUseRate, "System", "Average", ChillerName);
-        SetupOutputVariable("Chiller Heater Cooling " + this->FuelType + " Energy",
+        SetupOutputVariable(state, "Chiller Heater Cooling " + this->FuelType + " Energy",
                             OutputProcessor::Unit::J,
                             this->CoolFuelEnergy,
                             "System",
@@ -532,11 +533,11 @@ namespace ChillerGasAbsorption {
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller Heater Cooling COP", OutputProcessor::Unit::W_W, this->FuelCOP, "System", "Average", ChillerName);
+        SetupOutputVariable(state, "Chiller Heater Cooling COP", OutputProcessor::Unit::W_W, this->FuelCOP, "System", "Average", ChillerName);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater Heating " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->HeatFuelUseRate, "System", "Average", ChillerName);
-        SetupOutputVariable("Chiller Heater Heating " + this->FuelType + " Energy",
+        SetupOutputVariable(state, "Chiller Heater Heating " + this->FuelType + " Energy",
                             OutputProcessor::Unit::J,
                             this->HeatFuelEnergy,
                             "System",
@@ -548,13 +549,13 @@ namespace ChillerGasAbsorption {
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller Heater Electricity Rate", OutputProcessor::Unit::W, this->ElectricPower, "System", "Average", ChillerName);
+        SetupOutputVariable(state, "Chiller Heater Electricity Rate", OutputProcessor::Unit::W, this->ElectricPower, "System", "Average", ChillerName);
         // Do not include this on meters, this would duplicate the cool electric and heat electric
-        SetupOutputVariable("Chiller Heater Electricity Energy", OutputProcessor::Unit::J, this->ElectricEnergy, "System", "Sum", ChillerName);
+        SetupOutputVariable(state, "Chiller Heater Electricity Energy", OutputProcessor::Unit::J, this->ElectricEnergy, "System", "Sum", ChillerName);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater Cooling Electricity Rate", OutputProcessor::Unit::W, this->CoolElectricPower, "System", "Average", ChillerName);
-        SetupOutputVariable("Chiller Heater Cooling Electricity Energy",
+        SetupOutputVariable(state, "Chiller Heater Cooling Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->CoolElectricEnergy,
                             "System",
@@ -566,9 +567,9 @@ namespace ChillerGasAbsorption {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater Heating Electricity Rate", OutputProcessor::Unit::W, this->HeatElectricPower, "System", "Average", ChillerName);
-        SetupOutputVariable("Chiller Heater Heating Electricity Energy",
+        SetupOutputVariable(state, "Chiller Heater Heating Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->HeatElectricEnergy,
                             "System",
@@ -580,40 +581,40 @@ namespace ChillerGasAbsorption {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->ChillReturnTemp, "System", "Average", ChillerName);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->ChillSupplyTemp, "System", "Average", ChillerName);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->ChillWaterFlowRate, "System", "Average", ChillerName);
 
         if (this->isWaterCooled) {
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Heater Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondReturnTemp, "System", "Average", ChillerName);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Heater Condenser Outlet Temperature", OutputProcessor::Unit::C, this->CondSupplyTemp, "System", "Average", ChillerName);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Heater Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->CondWaterFlowRate, "System", "Average", ChillerName);
         } else {
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Heater Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondReturnTemp, "System", "Average", ChillerName);
         }
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater Heating Inlet Temperature", OutputProcessor::Unit::C, this->HotWaterReturnTemp, "System", "Average", ChillerName);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater Heating Outlet Temperature", OutputProcessor::Unit::C, this->HotWaterSupplyTemp, "System", "Average", ChillerName);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater Heating Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HotWaterFlowRate, "System", "Average", ChillerName);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater Cooling Part Load Ratio", OutputProcessor::Unit::None, this->CoolPartLoadRatio, "System", "Average", ChillerName);
-        SetupOutputVariable("Chiller Heater Maximum Cooling Rate", OutputProcessor::Unit::W, this->CoolingCapacity, "System", "Average", ChillerName);
-        SetupOutputVariable(
+        SetupOutputVariable(state, "Chiller Heater Maximum Cooling Rate", OutputProcessor::Unit::W, this->CoolingCapacity, "System", "Average", ChillerName);
+        SetupOutputVariable(state,
             "Chiller Heater Heating Part Load Ratio", OutputProcessor::Unit::None, this->HeatPartLoadRatio, "System", "Average", ChillerName);
-        SetupOutputVariable("Chiller Heater Maximum Heating Rate", OutputProcessor::Unit::W, this->HeatingCapacity, "System", "Average", ChillerName);
+        SetupOutputVariable(state, "Chiller Heater Maximum Heating Rate", OutputProcessor::Unit::W, this->HeatingCapacity, "System", "Average", ChillerName);
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heater Runtime Fraction", OutputProcessor::Unit::None, this->FractionOfPeriodRunning, "System", "Average", ChillerName);
     }
 
@@ -638,7 +639,7 @@ namespace ChillerGasAbsorption {
         Real64 mdot; // lcoal fluid mass flow rate
 
         if (this->oneTimeFlag) {
-            this->setupOutputVariables();
+            this->setupOutputVariables(state);
             this->oneTimeFlag = false;
         }
 
@@ -784,12 +785,13 @@ namespace ChillerGasAbsorption {
             if (this->isWaterCooled) {
                 // init max available condenser water flow rate
                 if (this->CDLoopNum > 0) {
-                    rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
-                                                            DataGlobals::CWInitConvTemp,
+                    rho = FluidProperties::GetDensityGlycol(state,
+                                                            DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                                                            DataGlobalConstants::CWInitConvTemp(),
                                                             DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                             RoutineName);
                 } else {
-                    rho = Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+                    rho = Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
                 }
 
                 this->DesCondMassFlowRate = rho * this->CondVolFlowRate;
@@ -804,12 +806,13 @@ namespace ChillerGasAbsorption {
             }
 
             if (this->HWLoopNum > 0) {
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HWLoopNum).FluidName,
-                                                        DataGlobals::HWInitConvTemp,
+                rho = FluidProperties::GetDensityGlycol(state,
+                                                        DataPlant::PlantLoop(this->HWLoopNum).FluidName,
+                                                        DataGlobalConstants::HWInitConvTemp(),
                                                         DataPlant::PlantLoop(this->HWLoopNum).FluidIndex,
                                                         RoutineName);
             } else {
-                rho = Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+                rho = Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
             }
             this->DesHeatMassFlowRate = rho * this->HeatVolFlowRate;
             // init available hot water flow rate
@@ -823,12 +826,13 @@ namespace ChillerGasAbsorption {
                                                this->HWCompNum);
 
             if (this->CWLoopNum > 0) {
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                        DataGlobals::CWInitConvTemp,
+                rho = FluidProperties::GetDensityGlycol(state,
+                                                        DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                        DataGlobalConstants::CWInitConvTemp(),
                                                         DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                         RoutineName);
             } else {
-                rho = Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+                rho = Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
             }
             this->DesEvapMassFlowRate = rho * this->EvapVolFlowRate;
             // init available hot water flow rate
@@ -880,7 +884,7 @@ namespace ChillerGasAbsorption {
         }
     }
 
-    void GasAbsorberSpecs::size()
+    void GasAbsorberSpecs::size(EnergyPlusData &state)
     {
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 2003
@@ -926,12 +930,14 @@ namespace ChillerGasAbsorption {
 
         if (PltSizCoolNum > 0) {
             if (DataSizing::PlantSizData(PltSizCoolNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                            DataGlobals::CWInitConvTemp,
+                Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                            DataGlobalConstants::CWInitConvTemp(),
                                                             DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                             RoutineName);
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                        DataGlobals::CWInitConvTemp,
+                rho = FluidProperties::GetDensityGlycol(state,
+                                                        DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                        DataGlobalConstants::CWInitConvTemp(),
                                                         DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                         RoutineName);
                 tmpNomCap =
@@ -1140,11 +1146,13 @@ namespace ChillerGasAbsorption {
         if (PltSizCondNum > 0 && PltSizCoolNum > 0) {
             if (DataSizing::PlantSizData(PltSizCoolNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
 
-                Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                            DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                                             this->TempDesCondReturn,
                                                             DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                             RoutineName);
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                rho = FluidProperties::GetDensityGlycol(state,
+                                                        DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                                         this->TempDesCondReturn,
                                                         DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                         RoutineName);
@@ -1352,11 +1360,11 @@ namespace ChillerGasAbsorption {
         ChillDeltaTemp = std::abs(lChillReturnTemp - ChillSupplySetPointTemp);
 
         Cp_CW = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->CWLoopNum).FluidName, lChillReturnTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
+            state, DataPlant::PlantLoop(this->CWLoopNum).FluidName, lChillReturnTemp, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
         Cp_CD = 0; // putting this here as a dummy initialization to hush the compiler warning, in real runs this value should never be used
         if (this->CDLoopNum > 0) {
             Cp_CD = FluidProperties::GetSpecificHeatGlycol(
-                DataPlant::PlantLoop(this->CDLoopNum).FluidName, lChillReturnTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
+                state, DataPlant::PlantLoop(this->CDLoopNum).FluidName, lChillReturnTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
         }
 
         // If no loop demand or Absorber OFF, return
@@ -1680,7 +1688,7 @@ namespace ChillerGasAbsorption {
         LoopSideNum = this->HWLoopSideNum;
 
         Cp_HW = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(LoopNum).FluidName, lHotWaterReturnTemp, DataPlant::PlantLoop(LoopNum).FluidIndex, RoutineName);
+            state, DataPlant::PlantLoop(LoopNum).FluidName, lHotWaterReturnTemp, DataPlant::PlantLoop(LoopNum).FluidIndex, RoutineName);
 
         lCoolElectricPower = this->CoolElectricPower;
         lCoolFuelUseRate = this->CoolFuelUseRate;
@@ -1855,12 +1863,12 @@ namespace ChillerGasAbsorption {
         }
 
         // convert power to energy and instantaneous use to use over the time step
-        this->CoolingEnergy = this->CoolingLoad * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->TowerEnergy = this->TowerLoad * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->FuelEnergy = this->FuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->CoolFuelEnergy = this->CoolFuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->ElectricEnergy = this->ElectricPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->CoolElectricEnergy = this->CoolElectricPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->CoolingEnergy = this->CoolingLoad * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->TowerEnergy = this->TowerLoad * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->FuelEnergy = this->FuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->CoolFuelEnergy = this->CoolFuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->ElectricEnergy = this->ElectricPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->CoolElectricEnergy = this->CoolElectricPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         if (this->CoolFuelUseRate != 0.0) {
             this->FuelCOP = this->CoolingLoad / this->CoolFuelUseRate;
         } else {
@@ -1885,11 +1893,11 @@ namespace ChillerGasAbsorption {
         }
 
         // convert power to energy and instantaneous use to use over the time step
-        this->HeatingEnergy = this->HeatingLoad * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->FuelEnergy = this->FuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->HeatFuelEnergy = this->HeatFuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->ElectricEnergy = this->ElectricPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->HeatElectricEnergy = this->HeatElectricPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->HeatingEnergy = this->HeatingLoad * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->FuelEnergy = this->FuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->HeatFuelEnergy = this->HeatFuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->ElectricEnergy = this->ElectricPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->HeatElectricEnergy = this->HeatElectricPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
 } // namespace ChillerGasAbsorption

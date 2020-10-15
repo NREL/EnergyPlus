@@ -51,8 +51,6 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -158,7 +156,7 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
 
     ControllerNum = 1;
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   ControllerNum,
                                   AlphArray,
                                   NumAlphas,
@@ -185,10 +183,10 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
 
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(2, OAController(1).OANode);
-    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
+    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(state, OAController(1).OANode));
 
     ControllerNum = 2;
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   ControllerNum,
                                   AlphArray,
                                   NumAlphas,
@@ -215,7 +213,7 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
                               ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(6, OAController(2).OANode);
-    EXPECT_FALSE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(2).OANode));
+    EXPECT_FALSE(OutAirNodeManager::CheckOutAirNodeNumber(state, OAController(2).OANode));
 }
 
 TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
@@ -491,10 +489,10 @@ TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
     ASSERT_TRUE(process_idf(idf_objects));
     GetOAControllerInputs(state);
     EXPECT_EQ(2, OAController(1).OANode);
-    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
+    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(state, OAController(1).OANode));
 
     EXPECT_EQ(6, OAController(2).OANode);
-    EXPECT_FALSE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(2).OANode));
+    EXPECT_FALSE(OutAirNodeManager::CheckOutAirNodeNumber(state, OAController(2).OANode));
 
     int OAControllerNum;
     int AirLoopNum;
@@ -758,7 +756,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     GetOAControllerInputs(state);
 
     EXPECT_EQ(7, VentilationMechanical(1).SystemOAMethod);
-    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
+    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(state, OAController(1).OANode));
     EXPECT_NEAR(0.00314899, VentilationMechanical(1).ZoneOAPeopleRate(1), 0.00001);
     EXPECT_NEAR(0.000407, VentilationMechanical(1).ZoneOAAreaRate(1), 0.00001);
 
@@ -956,10 +954,10 @@ TEST_F(EnergyPlusFixture, MissingDesignOccupancyTest)
     state.dataAirLoop->AirLoopFlow(1).OAFrac = 0.01;    // DataAirLoop variable (AirloopHVAC)
     state.dataAirLoop->AirLoopFlow(1).OAMinFrac = 0.01; // DataAirLoop variable (AirloopHVAC)
 
-    GetZoneData(ErrorsFound);  // read zone data
+    GetZoneData(state, ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
-    GetZoneAirDistribution();
-    GetZoneSizingInput();
+    GetZoneAirDistribution(state);
+    GetZoneSizingInput(state);
     DataGlobals::DoZoneSizing = true;
     GetOAControllerInputs(state);
 
@@ -1215,7 +1213,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
     DataGlobals::HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 1;
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     GetOASysInputFlag = true;
     DataGlobals::BeginEnvrnFlag = true;
@@ -1490,7 +1488,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
     HumidityControlZone(1).ActualZoneNum = 1;
     NumHumidityControlZones = 1;
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   ControllerNum,
                                   AlphArray,
                                   NumAlphas,
@@ -1623,7 +1621,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     HumidityControlZone(1).ActualZoneNum = 1;
     NumHumidityControlZones = 1;
 
-    inputProcessor->getObjectItem(CurrentModuleObject,
+    inputProcessor->getObjectItem(state, CurrentModuleObject,
                                   ControllerNum,
                                   AlphArray,
                                   NumAlphas,
@@ -1887,10 +1885,10 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart1)
     ASSERT_TRUE(process_idf(idf_objects));
     GetOAControllerInputs(state);
 
-    EXPECT_EQ(1, GetNumOAMixers());
+    EXPECT_EQ(1, GetNumOAMixers(state));
     EXPECT_EQ(1, GetNumOAControllers());
-    EXPECT_EQ(3, GetOAMixerReliefNodeNumber(1));
-    EXPECT_EQ(1, GetOAMixerIndex("OA Mixer"));
+    EXPECT_EQ(3, GetOAMixerReliefNodeNumber(state, 1));
+    EXPECT_EQ(1, GetOAMixerIndex(state, "OA Mixer"));
 }
 
 TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
@@ -5215,17 +5213,17 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
     ASSERT_TRUE(process_idf(idf_objects));
     GetOAControllerInputs(state);
 
-    EXPECT_EQ(6, GetNumOAMixers());
+    EXPECT_EQ(6, GetNumOAMixers(state));
     EXPECT_EQ(1, GetNumOAControllers());
-    EXPECT_EQ(18, GetOAMixerReliefNodeNumber(1));
+    EXPECT_EQ(18, GetOAMixerReliefNodeNumber(state, 1));
 
     // indexes can be found in  OAMixer array for these feild names
-    EXPECT_EQ(1, GetOAMixerIndex("SPACE1-1 OA Mixing Box"));
-    EXPECT_EQ(2, GetOAMixerIndex("SPACE2-1 OA Mixing Box"));
-    EXPECT_EQ(3, GetOAMixerIndex("SPACE3-1 OA Mixing Box"));
-    EXPECT_EQ(4, GetOAMixerIndex("SPACE4-1 OA Mixing Box"));
-    EXPECT_EQ(5, GetOAMixerIndex("SPACE5-1 OA Mixing Box"));
-    EXPECT_EQ(6, GetOAMixerIndex("DOAS OA Mixing Box"));
+    EXPECT_EQ(1, GetOAMixerIndex(state, "SPACE1-1 OA Mixing Box"));
+    EXPECT_EQ(2, GetOAMixerIndex(state, "SPACE2-1 OA Mixing Box"));
+    EXPECT_EQ(3, GetOAMixerIndex(state, "SPACE3-1 OA Mixing Box"));
+    EXPECT_EQ(4, GetOAMixerIndex(state, "SPACE4-1 OA Mixing Box"));
+    EXPECT_EQ(5, GetOAMixerIndex(state, "SPACE5-1 OA Mixing Box"));
+    EXPECT_EQ(6, GetOAMixerIndex(state, "DOAS OA Mixing Box"));
 }
 
 TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
@@ -5251,7 +5249,7 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     int NumZones(2);
@@ -5440,7 +5438,7 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Initialize schedule values
@@ -5450,7 +5448,7 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
     DataGlobals::HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 100;
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     // Initialize zone areas and volumes - too many other things need to be set up to do these in the normal routines
     int NumZones(6);
@@ -5470,7 +5468,7 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
     DataHeatBalance::ZoneIntGain(5).NOFOCC = 20;
     DataHeatBalance::ZoneIntGain(6).NOFOCC = 6;
 
-    SizingManager::GetOARequirements();
+    SizingManager::GetOARequirements(state);
     GetOAControllerInputs(state);
     EXPECT_EQ(SOAM_ZoneSum, VentilationMechanical(1).SystemOAMethod);
 
@@ -5622,7 +5620,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     GetOAControllerInputs(state);
 
     EXPECT_EQ(8, VentilationMechanical(1).SystemOAMethod);
-    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
+    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(state, OAController(1).OANode));
     EXPECT_NEAR(0.00314899, VentilationMechanical(1).ZoneOAPeopleRate(1), 0.00001);
     EXPECT_NEAR(0.000407, VentilationMechanical(1).ZoneOAAreaRate(1), 0.00001);
 
@@ -6008,7 +6006,7 @@ TEST_F(EnergyPlusFixture, OAController_ProportionalMinimum_HXBypassTest)
     ASSERT_TRUE(process_idf(idf_objects));
     GetOAControllerInputs(state);
     EXPECT_EQ(2, OAController(1).OANode);
-    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
+    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(state, OAController(1).OANode));
 
     int OAControllerNum(1);
     int AirLoopNum(1);
@@ -6202,7 +6200,7 @@ TEST_F(EnergyPlusFixture, OAController_FixedMinimum_MinimumLimitTypeTest)
 
     GetOAControllerInputs(state);
     EXPECT_EQ(5, OAController(1).OANode);
-    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
+    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(state, OAController(1).OANode));
 
     int OAControllerNum(1);
     int AirLoopNum(1);
@@ -6410,7 +6408,7 @@ TEST_F(EnergyPlusFixture, OAController_HighExhaustMassFlowTest)
 
     GetOAControllerInputs(state);
     EXPECT_EQ(5, OAController(1).OANode);
-    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
+    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(state, OAController(1).OANode));
 
     int OAControllerNum(1);
     int AirLoopNum(1);
@@ -6661,7 +6659,7 @@ TEST_F(EnergyPlusFixture, OAController_LowExhaustMassFlowTest)
 
     GetOAControllerInputs(state);
     EXPECT_EQ(5, OAController(1).OANode);
-    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
+    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(state, OAController(1).OANode));
 
     int OAControllerNum(1);
     int AirLoopNum(1);

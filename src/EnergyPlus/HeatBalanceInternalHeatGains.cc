@@ -50,7 +50,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -86,7 +85,6 @@ void SetupZoneInternalGain(int const ZoneNum,
     // and HVAC components with skin loss models like thermal tanks, and power conditioning.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataHeatBalance;
 
     // SUBROUTINE PARAMETER DEFINITIONS:

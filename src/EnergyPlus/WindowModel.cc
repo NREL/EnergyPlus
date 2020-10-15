@@ -45,6 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/WindowModel.hh>
@@ -67,7 +68,7 @@ namespace WindowManager {
     {
     }
 
-    std::unique_ptr<CWindowModel> CWindowModel::WindowModelFactory(std::string const &objectName)
+    std::unique_ptr<CWindowModel> CWindowModel::WindowModelFactory(EnergyPlusData &state, std::string const &objectName)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -86,7 +87,7 @@ namespace WindowManager {
         std::unique_ptr<CWindowModel> aModel = std::unique_ptr<CWindowModel>(new CWindowModel());
         int numCurrModels = inputProcessor->getNumObjectsFound(objectName);
         if (numCurrModels > 0) {
-            inputProcessor->getObjectItem(objectName, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
+            inputProcessor->getObjectItem(state, objectName, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
             EnumParser<WindowsModel> aParser;
             aModel->m_Model = aParser.StringToEnum(cAlphaArgs(1));
         }
