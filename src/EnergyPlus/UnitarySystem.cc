@@ -991,21 +991,21 @@ namespace UnitarySystems {
             DataLoopNode::Node(this->m_HeatRecoveryInletNodeNum).MassFlowRate = mdotHR;
         }
 
-        if (this->m_FanOpModeSchedPtr > 0) {
-            if (ScheduleManager::GetCurrentScheduleValue(this->m_FanOpModeSchedPtr) == 0.0) {
-                this->m_FanOpMode = DataHVACGlobals::CycFanCycCoil;
-            } else {
-                this->m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
-                DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
-            }
-        }
-
         // get operating capacity of water and steam coil
         if (FirstHVACIteration || this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
             if (FirstHVACIteration) {
                 this->m_IterationCounter = 0;
                 for (auto &val : this->m_IterationMode) {
                     val = 0;
+                }
+
+                if (this->m_FanOpModeSchedPtr > 0) {
+                    if (ScheduleManager::GetCurrentScheduleValue(this->m_FanOpModeSchedPtr) == 0.0) {
+                        this->m_FanOpMode = DataHVACGlobals::CycFanCycCoil;
+                    } else {
+                        this->m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
+                        DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
+                    }
                 }
 
                 if (this->m_ControlType == ControlType::Setpoint) {
