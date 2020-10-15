@@ -90,8 +90,6 @@ namespace DemandManager {
     // Using/Aliasing
     using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::ScheduleAlwaysOn;
-    using DataGlobals::SecInHour;
-
     // Data
     // MODULE PARAMETER DEFINITIONS:
     int const ManagerTypeExtLights(1);
@@ -285,7 +283,6 @@ namespace DemandManager {
         // METHODOLOGY EMPLOYED:
 
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStepZoneSec;
         using DataHVACGlobals::TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -305,7 +302,7 @@ namespace DemandManager {
         DemandManagerList(ListNum).DemandLimit = DemandManagerList(ListNum).ScheduledLimit * DemandManagerList(ListNum).SafetyFraction;
 
         DemandManagerList(ListNum).MeterDemand = GetInstantMeterValue(DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::TimeStepZone) / TimeStepZoneSec +
-                                                 GetInstantMeterValue(DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::TimeStepSystem) / (TimeStepSys * SecInHour);
+                                                 GetInstantMeterValue(DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::TimeStepSystem) / (TimeStepSys * DataGlobalConstants::SecInHour());
 
         // Calculate average demand over the averaging window including the current timestep meter demand
         AverageDemand = DemandManagerList(ListNum).AverageDemand +

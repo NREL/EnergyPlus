@@ -55,6 +55,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -76,14 +77,14 @@ namespace Photovoltaics {
     void clear_state();
 
     void SimPVGenerator(EnergyPlusData &state,
-                        int const GeneratorType,          // type of Generator !unused1208
+                        GeneratorType const GeneratorType,          // type of Generator
                         std::string const &GeneratorName, // user specified name of Generator
                         int &GeneratorIndex,
                         bool const RunFlag, // is PV ON or OFF as determined by schedules in ElecLoadCenter
-                        Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on" !unused1208
+                        Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on"
     );
 
-    void GetPVGeneratorResults(int const GeneratorType, // type of Generator !unused1208
+    void GetPVGeneratorResults(GeneratorType const GeneratorType, // type of Generator
                                int const GeneratorIndex,
                                Real64 &GeneratorPower,  // electrical power
                                Real64 &GeneratorEnergy, // electrical energy

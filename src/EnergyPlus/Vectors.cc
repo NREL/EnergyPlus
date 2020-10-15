@@ -102,7 +102,6 @@ namespace Vectors {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using DataGlobals::DegToRadians;
     using namespace DataVectorTypes;
 
     // MODULE PARAMETER DEFINITIONS
@@ -414,11 +413,11 @@ namespace Vectors {
         }
 
         tlt = std::acos(NewellSurfaceNormalVector.z);
-        tlt /= DegToRadians;
+        tlt /= DataGlobalConstants::DegToRadians();
 
         az = rotang_0;
 
-        az /= DegToRadians;
+        az /= DataGlobalConstants::DegToRadians();
         az = mod(450.0 - az, 360.0);
         az += 90.0;
         if (az < 0.0) az += 360.0;

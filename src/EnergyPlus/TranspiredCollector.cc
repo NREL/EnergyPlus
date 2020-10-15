@@ -112,9 +112,6 @@ namespace TranspiredCollector {
     //   See EngineeringReference for details
 
     // Using/Aliasing
-    using DataGlobals::DegToRadians;
-    using DataGlobals::KelvinConv;
-    using DataGlobals::SecInHour;
     using DataHeatBalance::SurfQRadSWOutIncident;
     using DataVectorTypes::Vector;
 
@@ -227,7 +224,6 @@ namespace TranspiredCollector {
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
-        using DataGlobals::Pi;
         using DataGlobals::ScheduleAlwaysOn;
         using DataHeatBalance::MediumRough;
         using DataHeatBalance::MediumSmooth;
@@ -621,10 +617,10 @@ namespace TranspiredCollector {
                 if (SELECT_CASE_var == state.dataTranspiredCollector->Layout_Triangle) {                                                   // 'TRIANGLE'
                     state.dataTranspiredCollector->UTSC(Item).Porosity = 0.907 * pow_2(state.dataTranspiredCollector->UTSC(Item).HoleDia / state.dataTranspiredCollector->UTSC(Item).Pitch);             // Kutscher equation, Triangle layout
                 } else if (SELECT_CASE_var == state.dataTranspiredCollector->Layout_Square) {                                              // 'SQUARE'
-                    state.dataTranspiredCollector->UTSC(Item).Porosity = (Pi / 4.0) * pow_2(state.dataTranspiredCollector->UTSC(Item).HoleDia) / pow_2(state.dataTranspiredCollector->UTSC(Item).Pitch); // Waterloo equation, square layout
+                    state.dataTranspiredCollector->UTSC(Item).Porosity = (DataGlobalConstants::Pi() / 4.0) * pow_2(state.dataTranspiredCollector->UTSC(Item).HoleDia) / pow_2(state.dataTranspiredCollector->UTSC(Item).Pitch); // Waterloo equation, square layout
                 }
             }
-            TiltRads = std::abs(AvgTilt) * DegToRadians;
+            TiltRads = std::abs(AvgTilt) * DataGlobalConstants::DegToRadians();
             tempHdeltaNPL = std::sin(TiltRads) * state.dataTranspiredCollector->UTSC(Item).Height / 4.0;
             state.dataTranspiredCollector->UTSC(Item).HdeltaNPL = max(tempHdeltaNPL, state.dataTranspiredCollector->UTSC(Item).PlenGapThick);
 
@@ -872,9 +868,6 @@ namespace TranspiredCollector {
         Real64 const k(0.0267); // thermal conductivity (W/m K) for air at 300 K
         // (Mills 1999 Heat Transfer)
         Real64 const Sigma(5.6697e-08); // Stefan-Boltzmann constant
-        //  REAL(r64), PARAMETER  :: KelvinConv = KelvinConv         ! Conversion from Celsius to Kelvin
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
 
         // DERIVED TYPE DEFINITIONS:
         // na
@@ -941,8 +934,6 @@ namespace TranspiredCollector {
         Real64 TaHX;            // leaving air temperature from heat exchanger (entering plenum)
         Real64 Taplen;          // Air temperature in plen and outlet node.
         Real64 SensHeatingRate; // Rate at which the system is heating outdoor air
-        //  INTEGER, SAVE    :: VsucErrCount=0 !  warning message counter
-        //  CHARACTER(len=MaxNameLength) :: VsucErrString !  warning message counter string
         Real64 AlessHoles; // Area for Kutscher's relation
 
         // Active UTSC calculation
@@ -1037,8 +1028,8 @@ namespace TranspiredCollector {
             InitExteriorConvectionCoeff(state, SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = Surface(SurfPtr).Construction;
             AbsThermSurf = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
-            TsoK = TH(1, 1, SurfPtr) + KelvinConv;
-            TscollK = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast + KelvinConv;
+            TsoK = TH(1, 1, SurfPtr) + DataGlobalConstants::KelvinConv();
+            TscollK = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast + DataGlobalConstants::KelvinConv();
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TscollK) - pow_4(TsoK)) / (TscollK - TsoK);
         }
         //		AreaSum = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
@@ -1156,7 +1147,7 @@ namespace TranspiredCollector {
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutEnth = PsyHFnTdbW(state.dataTranspiredCollector->UTSC(UTSCNum).SupOutTemp, state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat);
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutMassFlow = Mdot;
         state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingRate = SensHeatingRate;
-        state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingEnergy = SensHeatingRate * TimeStepSys * SecInHour;
+        state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingEnergy = SensHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour();
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveACH = 0.0;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveMdotVent = 0.0;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveMdotWind = 0.0;
@@ -1287,7 +1278,7 @@ namespace TranspiredCollector {
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutMassFlow = 0.0;
         state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingRate = 0.0;
         state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingEnergy = 0.0;
-        state.dataTranspiredCollector->UTSC(UTSCNum).PassiveACH = (MdotVent / RhoAir) * (1.0 / (state.dataTranspiredCollector->UTSC(UTSCNum).ProjArea * state.dataTranspiredCollector->UTSC(UTSCNum).PlenGapThick)) * SecInHour;
+        state.dataTranspiredCollector->UTSC(UTSCNum).PassiveACH = (MdotVent / RhoAir) * (1.0 / (state.dataTranspiredCollector->UTSC(UTSCNum).ProjArea * state.dataTranspiredCollector->UTSC(UTSCNum).PlenGapThick)) * DataGlobalConstants::SecInHour();
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveMdotVent = MdotVent;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveMdotWind = VdotWind * RhoAir;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveMdotTherm = VdotThermal * RhoAir;

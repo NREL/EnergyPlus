@@ -90,7 +90,6 @@ namespace ZoneAirLoopEquipmentManager {
     using DataGlobals::BeginHourFlag;
     using DataGlobals::BeginTimeStepFlag;
     using DataGlobals::NumOfZones;
-    using DataGlobals::SecInHour;
     using DataHVACGlobals::FirstTimeStepSysFlag;
     using namespace DataDefineEquip;
 

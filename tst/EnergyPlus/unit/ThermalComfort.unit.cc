@@ -970,7 +970,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     Zone(People(1).ZonePtr).TotOccupants = People(1).NumberOfPeople;
     People(1).FractionRadiant = 0.3;
     People(1).FractionConvected = 1.0 - People(1).FractionRadiant;
-    People(1).UserSpecSensFrac = AutoCalculate;
+    People(1).UserSpecSensFrac = DataGlobalConstants::AutoCalculate();
     People(1).CO2RateFactor = 3.82e-8;
     People(1).ActivityLevelPtr = -1;
     People(1).Show55Warning = true;

@@ -415,7 +415,6 @@ namespace DataHVACGlobals {
     struct ComponentSetPtData
     {
         // Members
-        // CHARACTER(len=MaxNameLength) :: EquipOperListName
         std::string EquipmentType;
         std::string EquipmentName;
         int NodeNumIn;

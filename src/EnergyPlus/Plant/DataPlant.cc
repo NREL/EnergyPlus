@@ -50,7 +50,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/Plant/PlantConvergencePoint.hh>
 
 namespace EnergyPlus {
@@ -62,7 +61,6 @@ namespace DataPlant {
     // Condenser Loops.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::DoingSizing;
     using DataLoopNode::NodeID;
     using DataLoopNode::SensedNodeFlagValue;

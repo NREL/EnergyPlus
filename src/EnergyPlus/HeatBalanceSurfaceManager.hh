@@ -138,9 +138,9 @@ namespace HeatBalanceSurfaceManager {
 
     void ReportThermalResilience(EnergyPlusData &state);
 
-    void ReportCO2Resilience();
+    void ReportCO2Resilience(EnergyPlusData &state);
 
-    void ReportVisualResilience();
+    void ReportVisualResilience(EnergyPlusData &state);
 
     // End of Reporting subroutines for the HB Module
 

@@ -63,7 +63,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -113,7 +112,6 @@ namespace SteamBaseboardRadiator {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SysTimeElapsed;
@@ -1472,10 +1470,10 @@ namespace SteamBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        SteamBaseboard(BaseboardNum).TotEnergy = SteamBaseboard(BaseboardNum).TotPower * TimeStepSys * SecInHour;
-        SteamBaseboard(BaseboardNum).Energy = SteamBaseboard(BaseboardNum).Power * TimeStepSys * SecInHour;
-        SteamBaseboard(BaseboardNum).ConvEnergy = SteamBaseboard(BaseboardNum).ConvPower * TimeStepSys * SecInHour;
-        SteamBaseboard(BaseboardNum).RadEnergy = SteamBaseboard(BaseboardNum).RadPower * TimeStepSys * SecInHour;
+        SteamBaseboard(BaseboardNum).TotEnergy = SteamBaseboard(BaseboardNum).TotPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        SteamBaseboard(BaseboardNum).Energy = SteamBaseboard(BaseboardNum).Power * TimeStepSys * DataGlobalConstants::SecInHour();
+        SteamBaseboard(BaseboardNum).ConvEnergy = SteamBaseboard(BaseboardNum).ConvPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        SteamBaseboard(BaseboardNum).RadEnergy = SteamBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     Real64 SumHATsurf(int const ZoneNum) // Zone number

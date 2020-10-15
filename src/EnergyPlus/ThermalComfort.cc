@@ -101,7 +101,6 @@ namespace ThermalComfort {
     // the people statements and perform the requested thermal comfort evaluations
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutDryBulbTemp;
@@ -700,7 +699,7 @@ namespace ThermalComfort {
             // Calculate the Fanger PPD (Predicted Percentage of Dissatisfied), as a %
 
             Real64 expTest1 = -0.03353 * pow_4(PMV) - 0.2179 * pow_2(PMV);
-            if (expTest1 > EXP_LowerLimit) {
+            if (expTest1 > DataPrecisionGlobals::EXP_LowerLimit) {
                 PPD = 100.0 - 95.0 * std::exp(expTest1);
             } else {
                 PPD = 100.0;
@@ -1762,9 +1761,6 @@ namespace ThermalComfort {
         // Locals
         Real64 SurfaceTemp;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const KelvinConv(273.15); // Conversion from Celsius to Kelvin
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;
         Real64 SurfTempEmissAngleFacSummed;
@@ -1778,13 +1774,13 @@ namespace ThermalComfort {
         auto &thisAngFacList(state.dataThermalComforts->AngleFactorList(AngleFacNum));
 
         for (SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
-            SurfaceTemp = TH(2, 1, thisAngFacList.SurfacePtr(SurfNum)) + KelvinConv;
+            SurfaceTemp = TH(2, 1, thisAngFacList.SurfacePtr(SurfNum)) + DataGlobalConstants::KelvinConv();
             SurfEAF = state.dataConstruction->Construct(Surface(thisAngFacList.SurfacePtr(SurfNum)).Construction).InsideAbsorpThermal * thisAngFacList.AngleFactor(SurfNum);
             SurfTempEmissAngleFacSummed += SurfEAF * pow_4(SurfaceTemp);
             SumSurfaceEmissAngleFactor += SurfEAF;
         }
 
-        CalcAngleFactorMRT = root_4(SurfTempEmissAngleFacSummed / SumSurfaceEmissAngleFactor) - KelvinConv;
+        CalcAngleFactorMRT = root_4(SurfTempEmissAngleFacSummed / SumSurfaceEmissAngleFactor) - DataGlobalConstants::KelvinConv();
 
         return CalcAngleFactorMRT;
     }
@@ -1957,11 +1953,11 @@ namespace ThermalComfort {
         // If high temperature radiant heater present and on, then must account for this in MRT calculation
         if (QHTRadSysToPerson(state.dataThermalComforts->ZoneNum) > 0.0 || QCoolingPanelToPerson(state.dataThermalComforts->ZoneNum) > 0.0 || QHWBaseboardToPerson(state.dataThermalComforts->ZoneNum) > 0.0 ||
             QSteamBaseboardToPerson(state.dataThermalComforts->ZoneNum) > 0.0 || QElecBaseboardToPerson(state.dataThermalComforts->ZoneNum) > 0.0) {
-            state.dataThermalComforts->RadTemp += KelvinConv; // Convert to Kelvin
+            state.dataThermalComforts->RadTemp += DataGlobalConstants::KelvinConv(); // Convert to Kelvin
             state.dataThermalComforts->RadTemp = root_4(pow_4(state.dataThermalComforts->RadTemp) + ((QHTRadSysToPerson(state.dataThermalComforts->ZoneNum) + QCoolingPanelToPerson(state.dataThermalComforts->ZoneNum) + QHWBaseboardToPerson(state.dataThermalComforts->ZoneNum) +
                                                 QSteamBaseboardToPerson(state.dataThermalComforts->ZoneNum) + QElecBaseboardToPerson(state.dataThermalComforts->ZoneNum)) /
                                                AreaEff / StefanBoltzmannConst));
-            state.dataThermalComforts->RadTemp -= KelvinConv; // Convert back to Celsius
+            state.dataThermalComforts->RadTemp -= DataGlobalConstants::KelvinConv(); // Convert back to Celsius
         }
 
         CalcRadTemp = state.dataThermalComforts->RadTemp;
@@ -2143,12 +2139,12 @@ namespace ThermalComfort {
             state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
             // report how the aggregation is conducted
             {
-                auto const SELECT_CASE_var(KindOfSim);
-                if (SELECT_CASE_var == ksDesignDay) {
+                auto const SELECT_CASE_var(state.dataGlobal->KindOfSim);
+                if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::DesignDay) {
                     addFootNoteSubTable(pdstSimpleComfort, "Aggregated over the Design Days");
-                } else if (SELECT_CASE_var == ksRunPeriodDesign) {
+                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
                     addFootNoteSubTable(pdstSimpleComfort, "Aggregated over the RunPeriods for Design");
-                } else if (SELECT_CASE_var == ksRunPeriodWeather) {
+                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                     addFootNoteSubTable(pdstSimpleComfort, "Aggregated over the RunPeriods for Weather");
                 }
             }
@@ -2312,12 +2308,12 @@ namespace ThermalComfort {
             state.dataThermalComforts->TotalAnyZoneNotMetOccupied = 0.0;
             // report how the aggregation is conducted
             {
-                auto const SELECT_CASE_var(KindOfSim);
-                if (SELECT_CASE_var == ksDesignDay) {
+                auto const SELECT_CASE_var(state.dataGlobal->KindOfSim);
+                if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::DesignDay) {
                     addFootNoteSubTable(pdstUnmetLoads, "Aggregated over the Design Days");
-                } else if (SELECT_CASE_var == ksRunPeriodDesign) {
+                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
                     addFootNoteSubTable(pdstUnmetLoads, "Aggregated over the RunPeriods for Design");
-                } else if (SELECT_CASE_var == ksRunPeriodWeather) {
+                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                     addFootNoteSubTable(pdstUnmetLoads, "Aggregated over the RunPeriods for Weather");
                 }
             }
