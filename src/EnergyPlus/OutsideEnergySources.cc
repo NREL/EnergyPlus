@@ -62,7 +62,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -114,11 +113,11 @@ namespace OutsideEnergySources {
         EnergySourceUniqueNames.clear();
     }
 
-    PlantComponent *OutsideEnergySourceSpecs::factory(int objectType, std::string objectName)
+    PlantComponent *OutsideEnergySourceSpecs::factory(EnergyPlusData &state, int objectType, std::string objectName)
     {
         // Process the input data for outside energy sources if it hasn't been done already
         if (SimOutsideEnergyGetInputFlag) {
-            GetOutsideEnergySourcesInput();
+            GetOutsideEnergySourcesInput(state);
             SimOutsideEnergyGetInputFlag = false;
         }
         // Now look for this particular pipe in the list
@@ -137,16 +136,17 @@ namespace OutsideEnergySources {
         EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &CurLoad, bool RunFlag)
     {
         this->initialize(state, CurLoad);
-        this->calculate(RunFlag, CurLoad);
+        this->calculate(state, RunFlag, CurLoad);
     }
 
     void OutsideEnergySourceSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &)
     {
         this->initialize(state, 0.0);
-        this->size();
+        this->size(state);
     }
 
-    void OutsideEnergySourceSpecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void OutsideEnergySourceSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
+                                                       const PlantLocation &EP_UNUSED(calledFromLocation),
                                                        Real64 &MaxLoad,
                                                        Real64 &MinLoad,
                                                        Real64 &OptLoad)
@@ -156,7 +156,7 @@ namespace OutsideEnergySources {
         OptLoad = this->NomCap;
     }
 
-    void GetOutsideEnergySourcesInput()
+    void GetOutsideEnergySourcesInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -206,7 +206,8 @@ namespace OutsideEnergySources {
             }
 
             int NumAlphas = 0, NumNums = 0, IOStat = 0;
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           thisIndex,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -225,7 +226,7 @@ namespace OutsideEnergySources {
                                                          ErrorsFound);
             }
             EnergySource(EnergySourceNum).Name = DataIPShortCuts::cAlphaArgs(1);
-            EnergySource(EnergySourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2),
+            EnergySource(EnergySourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(2),
                                                                                              ErrorsFound,
                                                                                              DataIPShortCuts::cCurrentModuleObject,
                                                                                              DataIPShortCuts::cAlphaArgs(1),
@@ -233,7 +234,7 @@ namespace OutsideEnergySources {
                                                                                              DataLoopNode::NodeConnectionType_Inlet,
                                                                                              1,
                                                                                              DataLoopNode::ObjectIsNotParent);
-            EnergySource(EnergySourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+            EnergySource(EnergySourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                                                               ErrorsFound,
                                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                                               DataIPShortCuts::cAlphaArgs(1),
@@ -254,7 +255,7 @@ namespace OutsideEnergySources {
             EnergySource(EnergySourceNum).EnergyRate = 0.0;
             EnergySource(EnergySourceNum).EnergyType = typeOf;
             if (!DataIPShortCuts::lAlphaFieldBlanks(4)) {
-                EnergySource(EnergySourceNum).CapFractionSchedNum = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(4));
+                EnergySource(EnergySourceNum).CapFractionSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(4));
                 if (EnergySource(EnergySourceNum).CapFractionSchedNum == 0) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + EnergySource(EnergySourceNum).Name + "\", is not valid");
                     ShowContinueError(DataIPShortCuts::cAlphaFieldNames(4) + "=\"" + DataIPShortCuts::cAlphaArgs(4) + "\" was not found.");
@@ -340,7 +341,7 @@ namespace OutsideEnergySources {
                 typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchChilledWater);
             }
 
-            SetupOutputVariable(reportVarPrefix + hotOrChilled + "Water Energy",
+            SetupOutputVariable(state, reportVarPrefix + hotOrChilled + "Water Energy",
                                 OutputProcessor::Unit::J,
                                 this->EnergyTransfer,
                                 "System",
@@ -351,13 +352,13 @@ namespace OutsideEnergySources {
                                 heatingOrCooling,
                                 _,
                                 "Plant");
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 reportVarPrefix + hotOrChilled + "Water Rate", OutputProcessor::Unit::W, this->EnergyRate, "System", "Average", this->Name);
 
-            SetupOutputVariable(reportVarPrefix + "Rate", OutputProcessor::Unit::W, this->EnergyRate, "System", "Average", this->Name);
-            SetupOutputVariable(reportVarPrefix + "Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "System", "Average", this->Name);
-            SetupOutputVariable(reportVarPrefix + "Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "System", "Average", this->Name);
-            SetupOutputVariable(reportVarPrefix + "Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "System", "Average", this->Name);
+            SetupOutputVariable(state, reportVarPrefix + "Rate", OutputProcessor::Unit::W, this->EnergyRate, "System", "Average", this->Name);
+            SetupOutputVariable(state, reportVarPrefix + "Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "System", "Average", this->Name);
+            SetupOutputVariable(state, reportVarPrefix + "Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "System", "Average", this->Name);
+            SetupOutputVariable(state, reportVarPrefix + "Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "System", "Average", this->Name);
         }
 
         //}
@@ -390,7 +391,7 @@ namespace OutsideEnergySources {
         this->MassFlowRate = TempPlantMassFlow;
     }
 
-    void OutsideEnergySourceSpecs::size()
+    void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -414,12 +415,14 @@ namespace OutsideEnergySources {
 
         int const PltSizNum = DataPlant::PlantLoop(this->LoopNum).PlantSizNum;
         if (PltSizNum > 0) {
-            Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                 DataGlobals::InitConvTemp,
+            Real64 const rho = FluidProperties::GetDensityGlycol(state,
+                                                                 DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                                                 DataGlobalConstants::InitConvTemp(),
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                  "SizeDistrict" + typeName);
-            Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                     DataGlobals::InitConvTemp,
+            Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                     DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                                                     DataGlobalConstants::InitConvTemp(),
                                                                      DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                      "SizeDistrict" + typeName);
             Real64 const NomCapDes = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate;
@@ -471,7 +474,7 @@ namespace OutsideEnergySources {
         }
     }
 
-    void OutsideEnergySourceSpecs::calculate(bool runFlag, Real64 MyLoad)
+    void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Real64 MyLoad)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -488,7 +491,7 @@ namespace OutsideEnergySources {
         Real64 const LoopMaxTemp = DataPlant::PlantLoop(LoopNum).MaxTemp;
 
         Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(LoopNum).FluidName, this->InletTemp, DataPlant::PlantLoop(LoopNum).FluidIndex, RoutineName);
+            state, DataPlant::PlantLoop(LoopNum).FluidName, this->InletTemp, DataPlant::PlantLoop(LoopNum).FluidIndex, RoutineName);
 
         //  apply power limit from input
         Real64 CapFraction = ScheduleManager::GetCurrentScheduleValue(this->CapFractionSchedNum);
@@ -523,7 +526,7 @@ namespace OutsideEnergySources {
         int const OutletNode = this->OutletNodeNum;
         DataLoopNode::Node(OutletNode).Temp = this->OutletTemp;
         this->EnergyRate = std::abs(MyLoad);
-        this->EnergyTransfer = this->EnergyRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->EnergyTransfer = this->EnergyRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
 } // namespace OutsideEnergySources

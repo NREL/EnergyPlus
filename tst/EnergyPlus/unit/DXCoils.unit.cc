@@ -454,7 +454,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
     Coil.FuelType = "Electricity";
-    Coil.FuelTypeNum = DataGlobalConstants::iRT_Electricity;
+    Coil.FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
     Coil.RegionNum = 4;
     Coil.MSRatedTotCap(1) = 2202.5268975202675;
     Coil.MSRatedCOP(1) = 4.200635910578916;
@@ -810,7 +810,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
     Coil.FuelType = "Electricity";
-    Coil.FuelTypeNum = DataGlobalConstants::iRT_Electricity;
+    Coil.FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
     Coil.RegionNum = 4;
 
     state.dataCurveManager->NumCurves = 5;
@@ -1063,7 +1063,7 @@ TEST_F(EnergyPlusFixture, DXCoilEvapCondPumpSizingTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     GetCurveInput(state);
     GetDXCoils(state);
 
@@ -1112,14 +1112,14 @@ TEST_F(EnergyPlusFixture, TestDXCoilIndoorOrOutdoor)
     // Run
     DXCoilNum = 1;
     DXCoil(DXCoilNum).AirInNode = 1; // "Outside Air Inlet Node 1"
-    DXCoil(DXCoilNum).IsDXCoilInZone = !CheckOutAirNodeNumber(DXCoil(DXCoilNum).AirInNode);
+    DXCoil(DXCoilNum).IsDXCoilInZone = !CheckOutAirNodeNumber(state, DXCoil(DXCoilNum).AirInNode);
 
     DXCoilNum = 2;
     DXCoil(DXCoilNum).AirInNode = 2; // "Outside Air Inlet Node 2"
-    DXCoil(DXCoilNum).IsDXCoilInZone = !CheckOutAirNodeNumber(DXCoil(DXCoilNum).AirInNode);
+    DXCoil(DXCoilNum).IsDXCoilInZone = !CheckOutAirNodeNumber(state, DXCoil(DXCoilNum).AirInNode);
 
     DXCoilNum = 3; // "Inside Air Inlet Node"
-    DXCoil(DXCoilNum).IsDXCoilInZone = !CheckOutAirNodeNumber(DXCoil(DXCoilNum).AirInNode);
+    DXCoil(DXCoilNum).IsDXCoilInZone = !CheckOutAirNodeNumber(state, DXCoil(DXCoilNum).AirInNode);
 
     // Check
     EXPECT_FALSE(DXCoil(1).IsDXCoilInZone);
@@ -1304,14 +1304,14 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     GetDXCoils(state);
 
     EXPECT_EQ("Electricity", DXCoil(1).FuelType); // it also covers a test for fuel type input
-    EXPECT_EQ(DataGlobalConstants::iRT_Electricity, DXCoil(1).FuelTypeNum);
+    EXPECT_EQ(DataGlobalConstants::ResourceType::Electricity, DXCoil(1).FuelTypeNum);
     EXPECT_EQ(0, DXCoil(1).MSWasteHeat(2));
 
     // Test calculations of the waste heat function #5162
 
     // Case 2 test waste heat is zero when the parent has not heat recovery inputs
     DXCoil(1).FuelType = "NaturalGas";
-    DXCoil(1).FuelTypeNum = DataGlobalConstants::iRT_Natural_Gas;
+    DXCoil(1).FuelTypeNum = DataGlobalConstants::ResourceType::Natural_Gas;
     DXCoil(1).MSHPHeatRecActive = false;
 
     OutDryBulbTemp = 35;
@@ -1447,7 +1447,7 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     GetCurveInput(state);
     GetDXCoils(state);
     SetPredefinedTables();
@@ -1777,7 +1777,7 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     GetCurveInput(state);
     GetDXCoils(state);
 
@@ -1844,7 +1844,7 @@ TEST_F(EnergyPlusFixture, CurveOutputLimitWarning)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     GetCurveInput(state);
     GetDXCoils(state);
 
@@ -1949,7 +1949,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     GetDXCoils(state);
 
     ASSERT_EQ("HEATING COIL SINGLESPEED", DXCoil(1).Name); // Heating Coil Single Speed
@@ -2058,7 +2058,7 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     GetDXCoils(state);
 
     ASSERT_EQ("MAIN COOLING COIL 1", DXCoil(1).Name); // Cooling Coil Two Speed
@@ -2179,7 +2179,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     DXCoils::GetDXCoils(state);
     EXPECT_EQ(1, DXCoils::NumDXCoils);
 
@@ -2404,7 +2404,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     DXCoils::GetDXCoils(state);
     EXPECT_EQ(1, DXCoils::NumDXCoils);
 

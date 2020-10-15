@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -229,9 +230,9 @@ namespace SystemReports {
 
     // Functions
 
-    void InitEnergyReports(EnergyPlusData &state, IOFiles &ioFiles);
+    void InitEnergyReports(EnergyPlusData &state);
 
-    void FindFirstLastPtr(IOFiles &ioFiles, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
+    void FindFirstLastPtr(EnergyPlusData &state, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
 
     void UpdateZoneCompPtrArray(int &Idx,
                                 int const ListNum,
@@ -290,7 +291,7 @@ namespace SystemReports {
                                         int const PlantBranch,
                                         int const PlantComp);
 
-    void AllocateAndSetUpVentReports();
+    void AllocateAndSetUpVentReports(EnergyPlusData &state);
 
     void CreateEnergyReportStructure();
 
@@ -305,7 +306,7 @@ namespace SystemReports {
     void CalcSystemEnergyUse(bool const CompLoadFlag,
                              int const AirLoopNum,
                              std::string const &CompType,
-                             int const EnergyType,
+                             DataGlobalConstants::ResourceType const EnergyType,
                              Real64 const CompLoad,
                              Real64 const CompEnergy);
 
@@ -324,7 +325,7 @@ namespace SystemReports {
                              int &MatchComp               // Component number of the match
     );
 
-    void ReportAirLoopConnections(EnergyPlusData &state, IOFiles &ioFiles);
+    void ReportAirLoopConnections(EnergyPlusData &state);
 
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************

@@ -47,8 +47,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-
 namespace EnergyPlus {
 
 namespace DataLoopNode {
@@ -73,8 +71,6 @@ namespace DataLoopNode {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // MODULE PARAMETER DEFINITIONS:
     // Valid Fluid Types for Nodes

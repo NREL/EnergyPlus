@@ -48,8 +48,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-
 namespace EnergyPlus {
 
 namespace DataBSDFWindow {
@@ -80,7 +78,6 @@ namespace DataBSDFWindow {
     // USE STATEMENTS:
     // <use statements for data only modules>
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataVectorTypes;
 
     // <use statements for access to subroutines in other modules>

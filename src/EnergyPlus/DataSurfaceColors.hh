@@ -57,6 +57,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace DataSurfaceColors {
 
     // Data
@@ -101,7 +104,7 @@ namespace DataSurfaceColors {
                                     Optional_string_const ColorType = _ // for now, must be DXF
     );
 
-    void SetUpSchemeColors(std::string const &SchemeName, Optional_string_const ColorType = _);
+    void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, Optional_string_const ColorType = _);
 
 } // namespace DataSurfaceColors
 

@@ -51,22 +51,10 @@
 #include <gtest/gtest.h>
 
 // ObjexxFCL Headers
-//#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/RootFinder.hh>
 #include <EnergyPlus/DataRootFinder.hh>
-//#include <EnergyPlus/DataConvergParams.hh>
-//#include <EnergyPlus/DataHVACGlobals.hh>
-//#include <EnergyPlus/DataSizing.hh>
-//#include <EnergyPlus/Data/EnergyPlusData.hh>
-//#include <EnergyPlus/HVACControllers.hh>
-//#include <EnergyPlus/MixedAir.hh>
-//#include <EnergyPlus/OutputReportPredefined.hh>
-//#include <EnergyPlus/ScheduleManager.hh>
-//#include <EnergyPlus/SetPointManager.hh>
-//#include <EnergyPlus/SimAirServingZones.hh>
-//#include <EnergyPlus/WaterCoils.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

@@ -81,7 +81,7 @@ TEST_F(DataSetFixture, California_Title_24_2008)
 }
 TEST_F(DataSetFixture, Chillers)
 {
-    DataGlobals::preserveIDFOrder = false;
+    state.dataGlobal->preserveIDFOrder = false;
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/Chillers.idf"))));
 }
 TEST_F(DataSetFixture, CompositeWallConstructions)
@@ -112,7 +112,7 @@ TEST_F(DataSetFixture, ExhaustFiredChiller)
 }
 TEST_F(DataSetFixture, FluidPropertiesRefData)
 {
-    DataGlobals::preserveIDFOrder = false;
+    state.dataGlobal->preserveIDFOrder = false;
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/FluidPropertiesRefData.idf"))));
 }
 TEST_F(DataSetFixture, FossilFuelEnvironmentalImpactFactors)
@@ -170,16 +170,16 @@ TEST_F(DataSetFixture, PerfCurves)
 }
 TEST_F(DataSetFixture, PrecipitationSchedulesUSA)
 {
-    DataGlobals::preserveIDFOrder = false;
+    state.dataGlobal->preserveIDFOrder = false;
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/PrecipitationSchedulesUSA.idf"))));
 }
 TEST_F(DataSetFixture, RefrigerationCasesDataSet)
 {
-    DataGlobals::preserveIDFOrder = false;
+    state.dataGlobal->preserveIDFOrder = false;
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf"))));
 }
 // TEST_F( DataSetFixture, RefrigerationCompressorCurves ) {
-//	DataGlobals::preserveIDFOrder = false;
+//	state.dataGlobal->preserveIDFOrder = false;
 //	ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf"
 //) ) ) );
 //}

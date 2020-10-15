@@ -54,13 +54,13 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/EcoRoofManager.hh>
@@ -96,7 +96,6 @@ namespace EcoRoofManager {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataSurfaces;
     using namespace DataGlobals;
     using namespace DataLoopNode;
@@ -143,7 +142,6 @@ namespace EcoRoofManager {
     // Functions
 
     void CalcEcoRoof(EnergyPlusData &state,
-                     IOFiles &ioFiles,
                      int const SurfNum, // Indicator of Surface Number for the current surface
                      int const ZoneNum, // Indicator for zone number where the current surface
                      int &ConstrNum,    // Indicator for construction index for the current surface
@@ -323,13 +321,12 @@ namespace EcoRoofManager {
         }
 
         if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
-        RoughSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Roughness;
-        AbsThermSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+        RoughSurf = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
+        AbsThermSurf = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
         HMovInsul = 0.0;
 
         if (Surface(SurfNum).ExtWind) {
             InitExteriorConvectionCoeff(state,
-                                        ioFiles,
                                         SurfNum,
                                         HMovInsul,
                                         RoughSurf,
@@ -352,19 +349,19 @@ namespace EcoRoofManager {
                 ShowSevereError("CalcEcoRoof: EcoRoof simulation but HeatBalanceAlgorithm is not ConductionTransferFunction(CTF). EcoRoof model "
                                 "currently works only with CTF heat balance solution algorithm.");
             // ONLY READ ECOROOF PROPERTIES IN THE FIRST TIME
-            Zf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).HeightOfPlants;              // Plant height (m)
-            LAI = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).LAI;                        // Leaf Area Index
-            Alphag = 1.0 - dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;       // albedo rather than absorptivity
-            Alphaf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Lreflectivity;           // Leaf Reflectivity
-            epsilonf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).LEmissitivity;         // Leaf Emisivity
-            StomatalResistanceMin = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).RStomata; // Leaf min stomatal resistance
-            epsilong = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;         // Soil Emisivity
-            MoistureMax = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Porosity;           // Max moisture content in soil
-            MoistureResidual = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).MinMoisture;   // Min moisture content in soil
-            Moisture = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).InitMoisture;          // Initial moisture content in soil
+            Zf = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).HeightOfPlants;              // Plant height (m)
+            LAI = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).LAI;                        // Leaf Area Index
+            Alphag = 1.0 - dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;       // albedo rather than absorptivity
+            Alphaf = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Lreflectivity;           // Leaf Reflectivity
+            epsilonf = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).LEmissitivity;         // Leaf Emisivity
+            StomatalResistanceMin = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).RStomata; // Leaf min stomatal resistance
+            epsilong = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;         // Soil Emisivity
+            MoistureMax = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Porosity;           // Max moisture content in soil
+            MoistureResidual = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).MinMoisture;   // Min moisture content in soil
+            Moisture = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).InitMoisture;          // Initial moisture content in soil
             MeanRootMoisture = Moisture; // DJS Oct 2007 Release --> all soil at same initial moisture for Reverse DD fix
 
-            SoilThickness = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Thickness; // Total thickness of soil layer (m)
+            SoilThickness = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Thickness; // Total thickness of soil layer (m)
 
             // DJS - This set of statements and the corresponding write statement in the UpdateSoilProps subroutine should
             //      be removed (or commented out) prior to deployment in a working version of EnergyPlus
@@ -381,30 +378,30 @@ namespace EcoRoofManager {
 
             // DJS NOVEMBER 2010 - Make calls to SetupOutput Variable to allow for reporting of ecoroof variables
 
-            SetupOutputVariable("Green Roof Soil Temperature", OutputProcessor::Unit::C, Tg, "Zone", "State", "Environment");
-            SetupOutputVariable("Green Roof Vegetation Temperature", OutputProcessor::Unit::C, Tf, "Zone", "State", "Environment");
-            SetupOutputVariable("Green Roof Soil Root Moisture Ratio", OutputProcessor::Unit::None, MeanRootMoisture, "Zone", "State", "Environment");
-            SetupOutputVariable("Green Roof Soil Near Surface Moisture Ratio", OutputProcessor::Unit::None, Moisture, "Zone", "State", "Environment");
-            SetupOutputVariable(
+            SetupOutputVariable(state, "Green Roof Soil Temperature", OutputProcessor::Unit::C, Tg, "Zone", "State", "Environment");
+            SetupOutputVariable(state, "Green Roof Vegetation Temperature", OutputProcessor::Unit::C, Tf, "Zone", "State", "Environment");
+            SetupOutputVariable(state, "Green Roof Soil Root Moisture Ratio", OutputProcessor::Unit::None, MeanRootMoisture, "Zone", "State", "Environment");
+            SetupOutputVariable(state, "Green Roof Soil Near Surface Moisture Ratio", OutputProcessor::Unit::None, Moisture, "Zone", "State", "Environment");
+            SetupOutputVariable(state,
                 "Green Roof Soil Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensibleg, "Zone", "State", "Environment");
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Green Roof Vegetation Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensiblef, "Zone", "State", "Environment");
-            SetupOutputVariable("Green Roof Vegetation Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxf, "Zone", "State", "Environment");
-            SetupOutputVariable("Green Roof Soil Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxg, "Zone", "State", "Environment");
-            SetupOutputVariable(
+            SetupOutputVariable(state, "Green Roof Vegetation Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxf, "Zone", "State", "Environment");
+            SetupOutputVariable(state, "Green Roof Soil Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxg, "Zone", "State", "Environment");
+            SetupOutputVariable(state,
                 "Green Roof Vegetation Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lf, "Zone", "State", "Environment");
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Green Roof Soil Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lg, "Zone", "State", "Environment");
 
-            SetupOutputVariable("Green Roof Cumulative Precipitation Depth", OutputProcessor::Unit::m, CumPrecip, "Zone", "Sum", "Environment");
-            SetupOutputVariable("Green Roof Cumulative Irrigation Depth", OutputProcessor::Unit::m, CumIrrigation, "Zone", "Sum", "Environment");
-            SetupOutputVariable("Green Roof Cumulative Runoff Depth", OutputProcessor::Unit::m, CumRunoff, "Zone", "Sum", "Environment");
-            SetupOutputVariable("Green Roof Cumulative Evapotranspiration Depth", OutputProcessor::Unit::m, CumET, "Zone", "Sum", "Environment");
-            SetupOutputVariable(
+            SetupOutputVariable(state, "Green Roof Cumulative Precipitation Depth", OutputProcessor::Unit::m, CumPrecip, "Zone", "Sum", "Environment");
+            SetupOutputVariable(state, "Green Roof Cumulative Irrigation Depth", OutputProcessor::Unit::m, CumIrrigation, "Zone", "Sum", "Environment");
+            SetupOutputVariable(state, "Green Roof Cumulative Runoff Depth", OutputProcessor::Unit::m, CumRunoff, "Zone", "Sum", "Environment");
+            SetupOutputVariable(state, "Green Roof Cumulative Evapotranspiration Depth", OutputProcessor::Unit::m, CumET, "Zone", "Sum", "Environment");
+            SetupOutputVariable(state,
                 "Green Roof Current Precipitation Depth", OutputProcessor::Unit::m, CurrentPrecipitation, "Zone", "Sum", "Environment");
-            SetupOutputVariable("Green Roof Current Irrigation Depth", OutputProcessor::Unit::m, CurrentIrrigation, "Zone", "Sum", "Environment");
-            SetupOutputVariable("Green Roof Current Runoff Depth", OutputProcessor::Unit::m, CurrentRunoff, "Zone", "Sum", "Environment");
-            SetupOutputVariable("Green Roof Current Evapotranspiration Depth", OutputProcessor::Unit::m, CurrentET, "Zone", "Sum", "Environment");
+            SetupOutputVariable(state, "Green Roof Current Irrigation Depth", OutputProcessor::Unit::m, CurrentIrrigation, "Zone", "Sum", "Environment");
+            SetupOutputVariable(state, "Green Roof Current Runoff Depth", OutputProcessor::Unit::m, CurrentRunoff, "Zone", "Sum", "Environment");
+            SetupOutputVariable(state, "Green Roof Current Evapotranspiration Depth", OutputProcessor::Unit::m, CurrentET, "Zone", "Sum", "Environment");
 
             // DJS NOVEMBER 2010 - end of calls to setup output of ecoroof variables
 
@@ -415,9 +412,9 @@ namespace EcoRoofManager {
         // for Reverse DD testing
 
         if (BeginEnvrnFlag || WarmupFlag) {
-            Moisture = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).InitMoisture;    // Initial moisture content in soil
+            Moisture = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).InitMoisture;    // Initial moisture content in soil
             MeanRootMoisture = Moisture;                                             // Start the root zone moisture at the same value as the surface.
-            Alphag = 1.0 - dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar; // albedo rather than absorptivity
+            Alphag = 1.0 - dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar; // albedo rather than absorptivity
         }
         // DJS July 2007
 
@@ -446,28 +443,28 @@ namespace EcoRoofManager {
         // If current surface is = FirstEcoSurf then for this time step we need to update the soil moisture
         if (SurfNum == FirstEcoSurf) {
             UpdateSoilProps(
-                Moisture, MeanRootMoisture, MoistureMax, MoistureResidual, SoilThickness, Vfluxf, Vfluxg, ConstrNum, Alphag, unit, Tg, Tf, Qsoil);
+                state, Moisture, MeanRootMoisture, MoistureMax, MoistureResidual, SoilThickness, Vfluxf, Vfluxg, ConstrNum, Alphag, unit, Tg, Tf, Qsoil);
 
             Ta = OutDryBulbTempAt(Surface(SurfNum).Centroid.z); // temperature outdoor - Surface is dry, use normal correlation
             Tg = Tgold;
             Tf = Tfold;
 
-            if (dataConstruction.Construct(ConstrNum).CTFCross(0) > 0.01) {
+            if (state.dataConstruction->Construct(ConstrNum).CTFCross(0) > 0.01) {
                 QuickConductionSurf = true;
-                F1temp = dataConstruction.Construct(ConstrNum).CTFCross(0) / (dataConstruction.Construct(ConstrNum).CTFInside(0) + HConvIn(SurfNum));
-                Qsoilpart1 = -CTFConstOutPart(SurfNum) + F1temp * (CTFConstInPart(SurfNum) + QRadSWInAbs(SurfNum) + QRadThermInAbs(SurfNum) +
-                                                                   dataConstruction.Construct(ConstrNum).CTFSourceIn(0) * QsrcHist(SurfNum, 1) +
-                                                                   HConvIn(SurfNum) * MAT(ZoneNum) + NetLWRadToSurf(SurfNum));
+                F1temp = state.dataConstruction->Construct(ConstrNum).CTFCross(0) / (state.dataConstruction->Construct(ConstrNum).CTFInside(0) + HConvIn(SurfNum));
+                Qsoilpart1 = -CTFConstOutPart(SurfNum) + F1temp * (CTFConstInPart(SurfNum) + SurfOpaqQRadSWInAbs(SurfNum) + SurfQRadThermInAbs(SurfNum) +
+                                                                   state.dataConstruction->Construct(ConstrNum).CTFSourceIn(0) * QsrcHist(SurfNum, 1) +
+                                                                   HConvIn(SurfNum) * MAT(ZoneNum) + SurfNetLWRadToSurf(SurfNum));
             } else {
-                Qsoilpart1 = -CTFConstOutPart(SurfNum) + dataConstruction.Construct(ConstrNum).CTFCross(0) * TempSurfIn(SurfNum);
+                Qsoilpart1 = -CTFConstOutPart(SurfNum) + state.dataConstruction->Construct(ConstrNum).CTFCross(0) * TempSurfIn(SurfNum);
                 F1temp = 0.0;
             }
 
-            Qsoilpart2 = dataConstruction.Construct(ConstrNum).CTFOutside(0) - F1temp * dataConstruction.Construct(ConstrNum).CTFCross(0);
+            Qsoilpart2 = state.dataConstruction->Construct(ConstrNum).CTFOutside(0) - F1temp * state.dataConstruction->Construct(ConstrNum).CTFCross(0);
 
             Pa = StdBaroPress; // standard atmospheric pressure (apparently in Pascals)
-            Tgk = Tg + KelvinConv;
-            Tak = Ta + KelvinConv;
+            Tgk = Tg + DataGlobalConstants::KelvinConv();
+            Tak = Ta + DataGlobalConstants::KelvinConv();
 
             sigmaf = 0.9 - 0.7 * std::exp(-0.75 * LAI); // Fractional veg cover based on (2) from FASST TR-04-25
             // Formula for grasses modified to incorporate limits from
@@ -482,9 +479,9 @@ namespace EcoRoofManager {
 
             // Air Temperature within the canopy is given as
             // (Deardorff (1987)). Kelvin. based of the previous temperatures
-            Tafk = (1.0 - sigmaf) * Tak + sigmaf * (0.3 * Tak + 0.6 * (Tif + KelvinConv) + 0.1 * Tgk);
+            Tafk = (1.0 - sigmaf) * Tak + sigmaf * (0.3 * Tak + 0.6 * (Tif + DataGlobalConstants::KelvinConv()) + 0.1 * Tgk);
 
-            Taf = Tafk - KelvinConv;          // Air Temperature within canopy in Celcius (C).
+            Taf = Tafk - DataGlobalConstants::KelvinConv();          // Air Temperature within canopy in Celcius (C).
             Rhof = Pa / (Rair * Tafk);        // Density of air at the leaf temperature
             Rhoaf = (Rhoa + Rhof) / 2.0;      // Average of air density
             Zd = 0.701 * std::pow(Zf, 0.979); // Zero displacement height
@@ -503,9 +500,9 @@ namespace EcoRoofManager {
             // These parameters were taken from "The Atm Boundary Layer", By J.R. Garratt
             // NOTE the Garratt eqn. (A21) gives esf in units of hPA so we have multiplied
             // the constant 6.112 by a factor of 100.
-            esf = 611.2 * std::exp(17.67 * Tif / (Tif + KelvinConv - 29.65));
+            esf = 611.2 * std::exp(17.67 * Tif / (Tif + DataGlobalConstants::KelvinConv() - 29.65));
 
-            // From Garratt - eqn. A21, p284. Note that Tif and Tif+KelvinConv usage is correct.
+            // From Garratt - eqn. A21, p284. Note that Tif and Tif+DataGlobalConstants::KelvinConv() usage is correct.
             // Saturation specific humidity at leaf temperature again based on previous temperatures
 
             qsf = 0.622 * esf / (Pa - 1.000 * esf); // "The Atm Boundary Layer", J.R Garrat for Saturation mixing ratio
@@ -539,19 +536,19 @@ namespace EcoRoofManager {
 
             // Latent heat of vaporation at leaf surface temperature. The source of this
             // equation is Henderson-Sellers (1984)
-            Lef = 1.91846e6 * pow_2((Tif + KelvinConv) / (Tif + KelvinConv - 33.91));
+            Lef = 1.91846e6 * pow_2((Tif + DataGlobalConstants::KelvinConv()) / (Tif + DataGlobalConstants::KelvinConv() - 33.91));
             // Check to see if ice is sublimating or frost is forming.
             if (Tfold < 0.0) Lef = 2.838e6; // per FASST documentation p.15 after eqn. 37.
 
             // Derivative of Saturation vapor pressure, which is used in the calculation of
             // derivative of saturation specific humidity.
 
-            Desf = 611.2 * std::exp(17.67 * (Tf / (Tf + KelvinConv - 29.65))) *
-                   (17.67 * Tf * (-1.0) * std::pow(Tf + KelvinConv - 29.65, -2) + 17.67 / (KelvinConv - 29.65 + Tf));
+            Desf = 611.2 * std::exp(17.67 * (Tf / (Tf + DataGlobalConstants::KelvinConv() - 29.65))) *
+                   (17.67 * Tf * (-1.0) * std::pow(Tf + DataGlobalConstants::KelvinConv() - 29.65, -2) + 17.67 / (DataGlobalConstants::KelvinConv() - 29.65 + Tf));
             dqf = ((0.622 * Pa) / pow_2(Pa - esf)) * Desf;                      // Derivative of saturation specific humidity
-            esg = 611.2 * std::exp(17.67 * (Tg / ((Tg + KelvinConv) - 29.65))); // Pa saturation vapor pressure
+            esg = 611.2 * std::exp(17.67 * (Tg / ((Tg + DataGlobalConstants::KelvinConv()) - 29.65))); // Pa saturation vapor pressure
             // From Garratt - eqn. A21, p284.
-            // Note that Tg and Tg+KelvinConv usage is correct.
+            // Note that Tg and Tg+DataGlobalConstants::KelvinConv() usage is correct.
             qsg = 0.622 * esg / (Pa - esg); // Saturation mixing ratio at ground surface temperature.
 
             // Latent heat vaporization  at the ground temperature
@@ -559,8 +556,8 @@ namespace EcoRoofManager {
             // Check to see if ice is sublimating or frost is forming.
             if (Tgold < 0.0) Leg = 2.838e6; // per FASST documentation p.15 after eqn. 37.
 
-            Desg = 611.2 * std::exp(17.67 * (Tg / (Tg + KelvinConv - 29.65))) *
-                   (17.67 * Tg * (-1.0) * std::pow(Tg + KelvinConv - 29.65, -2) + 17.67 / (KelvinConv - 29.65 + Tg));
+            Desg = 611.2 * std::exp(17.67 * (Tg / (Tg + DataGlobalConstants::KelvinConv() - 29.65))) *
+                   (17.67 * Tg * (-1.0) * std::pow(Tg + DataGlobalConstants::KelvinConv() - 29.65, -2) + 17.67 / (DataGlobalConstants::KelvinConv() - 29.65 + Tg));
             dqg = (0.622 * Pa / pow_2(Pa - esg)) * Desg;
 
             // Final Ground Atmosphere Energy Balance
@@ -631,13 +628,13 @@ namespace EcoRoofManager {
             //   revisit this issue later.
             //   Implement an iterative solution scheme to solve the simultaneous equations for Leaf and Soil temperature.
             //   Prior experience suggests that no more than 3 iterations are likely needed
-            LeafTK = Tf + KelvinConv;
-            SoilTK = Tg + KelvinConv;
+            LeafTK = Tf + DataGlobalConstants::KelvinConv();
+            SoilTK = Tg + DataGlobalConstants::KelvinConv();
 
             for (EcoLoop = 1; EcoLoop <= 3; ++EcoLoop) {
                 P1 = sigmaf * (RS * (1.0 - Alphaf) + epsilonf * Latm) - 3.0 * sigmaf * epsilonf * epsilong * Sigma * pow_4(SoilTK) / EpsilonOne -
                      3.0 * (-sigmaf * epsilonf * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne) * pow_4(LeafTK) +
-                     sheatf * (1.0 - 0.7 * sigmaf) * (Ta + KelvinConv) + LAI * Rhoaf * Cf * Lef * Waf * rn * ((1.0 - 0.7 * sigmaf) / dOne) * qa +
+                     sheatf * (1.0 - 0.7 * sigmaf) * (Ta + DataGlobalConstants::KelvinConv()) + LAI * Rhoaf * Cf * Lef * Waf * rn * ((1.0 - 0.7 * sigmaf) / dOne) * qa +
                      LAI * Rhoaf * Cf * Lef * Waf * rn * (((0.6 * sigmaf * rn) / dOne) - 1.0) * (qsf - LeafTK * dqf) +
                      LAI * Rhoaf * Cf * Lef * Waf * rn * ((0.1 * sigmaf * Mg) / dOne) * (qsg - SoilTK * dqg);
                 P2 = 4.0 * (sigmaf * epsilonf * epsilong * Sigma) * pow_3(SoilTK) / EpsilonOne + 0.1 * sigmaf * sheatf +
@@ -653,10 +650,10 @@ namespace EcoRoofManager {
                 T1G = (1.0 - sigmaf) * (RS * (1.0 - Alphag) + epsilong * Latm) -
                       (3.0 * (sigmaf * epsilonf * epsilong * Sigma) / EpsilonOne) * pow_4(LeafTK) -
                       3.0 * (-(1.0 - sigmaf) * epsilong * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne) * pow_4(SoilTK) +
-                      sheatg * (1.0 - 0.7 * sigmaf) * (Ta + KelvinConv) + Rhoag * Ce * Leg * Waf * Mg * ((1.0 - 0.7 * sigmaf) / dOne) * qa +
+                      sheatg * (1.0 - 0.7 * sigmaf) * (Ta + DataGlobalConstants::KelvinConv()) + Rhoag * Ce * Leg * Waf * Mg * ((1.0 - 0.7 * sigmaf) / dOne) * qa +
                       Rhoag * Ce * Leg * Waf * Mg * (0.1 * sigmaf * Mg / dOne - Mg) * (qsg - SoilTK * dqg) +
                       Rhoag * Ce * Leg * Waf * Mg * (0.6 * sigmaf * rn / dOne) * (qsf - LeafTK * dqf) + Qsoilpart1 +
-                      Qsoilpart2 * (KelvinConv); // finished by T1G
+                      Qsoilpart2 * (DataGlobalConstants::KelvinConv()); // finished by T1G
 
                 T2G = 4.0 * (-(1.0 - sigmaf) * epsilong * Sigma - sigmaf * epsilonf * epsilong * Sigma / EpsilonOne) * pow_3(SoilTK) +
                       (0.1 * sigmaf - 1.0) * sheatg + Rhoag * Ce * Leg * Waf * Mg * (0.1 * sigmaf * Mg / dOne - Mg) * dqg - Qsoilpart2;
@@ -674,9 +671,9 @@ namespace EcoRoofManager {
                 // difference scheme this loop structure should be removed.
 
             }                                                                 // This loop does an iterative solution of the simultaneous equations
-            Qsoil = -1.0 * (Qsoilpart1 - Qsoilpart2 * (SoilTK - KelvinConv)); // This is heat flux INTO top of the soil
-            Tfold = LeafTK - KelvinConv;
-            Tgold = SoilTK - KelvinConv;
+            Qsoil = -1.0 * (Qsoilpart1 - Qsoilpart2 * (SoilTK - DataGlobalConstants::KelvinConv())); // This is heat flux INTO top of the soil
+            Tfold = LeafTK - DataGlobalConstants::KelvinConv();
+            Tgold = SoilTK - DataGlobalConstants::KelvinConv();
 
         } // if firstecosurface (if not we do NOT need to recalculate ecoroof energybalance as all ecoroof surfaces MUST be the same
         // this endif was moved here from the if statement regarding whether we are looking at the first ecoroof surface or not.
@@ -685,7 +682,8 @@ namespace EcoRoofManager {
         TempExt = Tgold;
     }
 
-    void UpdateSoilProps(Real64 &Moisture,
+    void UpdateSoilProps(EnergyPlusData &state,
+                         Real64 &Moisture,
                          Real64 &MeanRootMoisture,
                          Real64 const MoistureMax,
                          Real64 const MoistureResidual,
@@ -802,10 +800,10 @@ namespace EcoRoofManager {
         if (UpdatebeginFlag) {
 
             // SET dry values that NEVER CHANGE
-            DryCond = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Conductivity;
-            DryDens = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Density;
-            DryAbsorp = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
-            DrySpecHeat = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SpecHeat;
+            DryCond = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity;
+            DryDens = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density;
+            DryAbsorp = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
+            DrySpecHeat = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat;
 
             // DETERMINE RELATIVE THICKNESS OF TWO LAYERS OF SOIL (also unchanging)
             if (SoilThickness > 0.12) {
@@ -815,7 +813,7 @@ namespace EcoRoofManager {
             }
             // This loop outputs the minimum number of time steps needed to keep the solution stable
             // The equation is minimum timestep in seconds=161240*((number of layers)**(-2.3))*(Total thickness of the soil)**2.07
-            if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).EcoRoofCalculationMethod == 2) {
+            if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).EcoRoofCalculationMethod == 2) {
                 Real64 const depth_limit(depth_fac * std::pow(TopDepth + RootDepth, 2.07));
                 for (index1 = 1; index1 <= 20; ++index1) {
                     if (double(MinutesPerTimeStep / index1) <= depth_limit) break;
@@ -915,7 +913,7 @@ namespace EcoRoofManager {
             Moisture = MoistureMax;
         }
 
-        if (dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).EcoRoofCalculationMethod == 1) {
+        if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).EcoRoofCalculationMethod == 1) {
 
             // THE SECTION BELOW WAS THE INITIAL MOISTURE DISTRIBUTION MODEL.
             // Any line with "!-" was code.  A line with "!" was just a comment.  This is done in case this code needs to be resurected in the future.
@@ -1102,23 +1100,23 @@ namespace EcoRoofManager {
         // TestRatio variable is available just in case there are stability issues. If so, we can limit the amount
         // by which soil properties are allowed to vary in one time step (10% in example below).
 
-        TestRatio = SoilConductivity / dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Conductivity;
+        TestRatio = SoilConductivity / dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity;
         if (TestRatio > RatioMax) TestRatio = RatioMax;
         if (TestRatio < RatioMin) TestRatio = RatioMin;
-        dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Conductivity *= TestRatio;
-        SoilConductivity = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Conductivity;
+        dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity *= TestRatio;
+        SoilConductivity = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Conductivity;
 
-        TestRatio = SoilDensity / dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Density;
+        TestRatio = SoilDensity / dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density;
         if (TestRatio > RatioMax) TestRatio = RatioMax;
         if (TestRatio < RatioMin) TestRatio = RatioMin;
-        dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Density *= TestRatio;
-        SoilDensity = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Density;
+        dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density *= TestRatio;
+        SoilDensity = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Density;
 
-        TestRatio = SoilSpecHeat / dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SpecHeat;
+        TestRatio = SoilSpecHeat / dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat;
         if (TestRatio > RatioMax) TestRatio = RatioMax;
         if (TestRatio < RatioMin) TestRatio = RatioMin;
-        dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SpecHeat *= TestRatio;
-        SoilSpecHeat = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).SpecHeat;
+        dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat *= TestRatio;
+        SoilSpecHeat = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SpecHeat;
 
         // Now call InitConductionTransferFunction with the ConstrNum as the argument. As long as the argument is
         // non-zero InitConductionTransferFunction will ONLY update this construction. If the argument is 0 it will

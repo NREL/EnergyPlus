@@ -124,7 +124,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     AllocateHeatBalArrays();
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
@@ -378,8 +378,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    ScheduleManager::ProcessScheduleInput(state.files);
-    GetZoneData(ErrorsFound);
+    ScheduleManager::ProcessScheduleInput(state);
+    GetZoneData(state, ErrorsFound);
     DataHeatBalFanSys::ZoneReOrder.allocate(NumOfZones);
 
     GetSimpleAirModelInputs(state, ErrorsFound);
@@ -410,12 +410,12 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     DataHeatBalFanSys::ZoneAirHumRat(5) = 0.001;
 
     DataHeatBalance::AirFlowFlag = 1;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("MIXINGAVAILSCHED")).CurrentValue = 1.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("MININDOORTEMP")).CurrentValue = 18.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("MAXINDOORTEMP")).CurrentValue = 100.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("DELTATEMP")).CurrentValue = 2.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("MINOUTDOORTEMP")).CurrentValue = -100.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("MAXOUTDOORTEMP")).CurrentValue = 100.0;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(state, "MIXINGAVAILSCHED")).CurrentValue = 1.0;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(state, "MININDOORTEMP")).CurrentValue = 18.0;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(state, "MAXINDOORTEMP")).CurrentValue = 100.0;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(state, "DELTATEMP")).CurrentValue = 2.0;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(state, "MINOUTDOORTEMP")).CurrentValue = -100.0;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(state, "MAXOUTDOORTEMP")).CurrentValue = 100.0;
     DataEnvironment::OutBaroPress = 101325.0;
 
     InitSimpleMixingConvectiveHeatGains();
@@ -510,7 +510,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     AllocateHeatBalArrays();
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
@@ -644,7 +644,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     AllocateHeatBalArrays();
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
@@ -744,7 +744,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     AllocateHeatBalArrays();
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
@@ -937,7 +937,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     AllocateHeatBalArrays();
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
@@ -1112,7 +1112,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     AllocateHeatBalArrays();
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
@@ -1298,7 +1298,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     AllocateHeatBalArrays();
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
@@ -1516,7 +1516,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     AllocateHeatBalArrays();
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
@@ -1842,7 +1842,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     AllocateHeatBalArrays();
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
@@ -2068,7 +2068,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     AllocateHeatBalArrays();
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
@@ -2093,10 +2093,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
     state.dataZoneEquipmentManager->PrioritySimOrder.allocate(NumEquip);
 
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("AIR TERMINAL 1 ADU COOLING FRACTION")).CurrentValue = 0.3;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("AIR TERMINAL 1 ADU HEATING FRACTION")).CurrentValue = 0.4;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("IDEAL SYSTEM A COOLING FRACTION")).CurrentValue = 0.5;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("IDEAL SYSTEM A HEATING FRACTION")).CurrentValue = 0.6;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(state, "AIR TERMINAL 1 ADU COOLING FRACTION")).CurrentValue = 0.3;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(state, "AIR TERMINAL 1 ADU HEATING FRACTION")).CurrentValue = 0.4;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(state, "IDEAL SYSTEM A COOLING FRACTION")).CurrentValue = 0.5;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(state, "IDEAL SYSTEM A HEATING FRACTION")).CurrentValue = 0.6;
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;

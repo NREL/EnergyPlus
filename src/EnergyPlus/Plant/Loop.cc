@@ -56,6 +56,7 @@ namespace EnergyPlus {
 namespace DataPlant {
 
     void PlantLoopData::UpdateLoopSideReportVars(
+        EnergyPlusData &state,
         Real64 const OtherSideDemand,   // This is the 'other side' demand, based on other side flow
         Real64 const LocalRemLoopDemand // Unmet Demand after equipment has been simulated (report variable)
     ) {
@@ -85,11 +86,11 @@ namespace DataPlant {
             this->DemandNotDispatched = LocalRemLoopDemand; //  Setting sign based on old logic for now
         }
 
-        this->CalcUnmetPlantDemand();
+        this->CalcUnmetPlantDemand(state);
     }
 
 
-    void PlantLoopData::CalcUnmetPlantDemand() {
+    void PlantLoopData::CalcUnmetPlantDemand(EnergyPlusData &state) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -142,7 +143,7 @@ namespace DataPlant {
 
         if (this->FluidType == NodeType_Water) {
 
-            Cp = GetSpecificHeatGlycol(this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
+            Cp = GetSpecificHeatGlycol(state, this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
 
             {
                 auto const SELECT_CASE_var(this->LoopDemandCalcScheme);
@@ -188,7 +189,7 @@ namespace DataPlant {
 
         } else if (this->FluidType == NodeType_Steam) {
 
-            Cp = GetSpecificHeatGlycol(this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
+            Cp = GetSpecificHeatGlycol(state, this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
 
             {
                 auto const SELECT_CASE_var(this->LoopDemandCalcScheme);
@@ -201,9 +202,9 @@ namespace DataPlant {
                     // Calculate the delta temperature
                     DeltaTemp = LoopSetPointTemperature - TargetTemp;
 
-                    EnthalpySteamSatVapor = GetSatEnthalpyRefrig(this->FluidName, LoopSetPointTemperature, 1.0,
+                    EnthalpySteamSatVapor = GetSatEnthalpyRefrig(state, this->FluidName, LoopSetPointTemperature, 1.0,
                                                                  this->FluidIndex, RoutineNameAlt);
-                    EnthalpySteamSatLiquid = GetSatEnthalpyRefrig(this->FluidName, LoopSetPointTemperature, 0.0,
+                    EnthalpySteamSatLiquid = GetSatEnthalpyRefrig(state, this->FluidName, LoopSetPointTemperature, 0.0,
                                                                   this->FluidIndex, RoutineNameAlt);
 
                     LatentHeatSteam = EnthalpySteamSatVapor - EnthalpySteamSatLiquid;

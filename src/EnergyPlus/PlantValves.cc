@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -85,7 +84,6 @@ namespace PlantValves {
     // PURPOSE OF THIS MODULE:
     // Collect "valve" type models for Plant loops
 
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using General::TrimSigDigits;
 
@@ -97,10 +95,10 @@ namespace PlantValves {
     // Object Data
     Array1D<TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
 
-    PlantComponent *TemperValveData::factory(std::string objectName) {
+    PlantComponent *TemperValveData::factory(EnergyPlusData &state, std::string objectName) {
         // Process the input data for valves if it hasn't been done already
         if (GetTemperingValves) {
-            GetPlantValvesInput();
+            GetPlantValvesInput(state);
             GetTemperingValves = false;
         }
         // Now look for this particular pipe in the list
@@ -141,14 +139,18 @@ namespace PlantValves {
         }
     }
 
-    void TemperValveData::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad,
-                                              Real64 &OptLoad) {
+    void TemperValveData::getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
+                                              const PlantLocation &EP_UNUSED(calledFromLocation),
+                                              Real64 &MaxLoad,
+                                              Real64 &MinLoad,
+                                              Real64 &OptLoad)
+    {
         MaxLoad = 0.0;
         MinLoad = 0.0;
         OptLoad = 0.0;
     }
 
-    void GetPlantValvesInput()
+    void GetPlantValvesInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -185,26 +187,26 @@ namespace PlantValves {
 
         for (Item = 1; Item <= NumTemperingValves; ++Item) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus);
+            inputProcessor->getObjectItem(state, CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus);
             //  <process, noting errors>
             TemperValve(Item).Name = Alphas(1);
             // Get Plant Inlet Node
             TemperValve(Item).PltInletNodeNum = GetOnlySingleNode(
-                Alphas(2), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                state, Alphas(2), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             // Get Plant Outlet Node
             TemperValve(Item).PltOutletNodeNum = GetOnlySingleNode(
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             // Get Stream 2 Source Node
             TemperValve(Item).PltStream2NodeNum = GetOnlySingleNode(
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             // Get Mixed water Setpoint
             TemperValve(Item).PltSetPointNodeNum = GetOnlySingleNode(
-                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_SetPoint, 1, ObjectIsNotParent);
+                state, Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_SetPoint, 1, ObjectIsNotParent);
 
             // Get Pump outlet
             TemperValve(Item).PltPumpOutletNodeNum = GetOnlySingleNode(
-                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                state, Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
 
             // Note most checks on user input are made in second pass thru init routine
 
@@ -213,7 +215,7 @@ namespace PlantValves {
 
         for (Item = 1; Item <= NumTemperingValves; ++Item) {
 
-            SetupOutputVariable("Tempering Valve Flow Fraction",
+            SetupOutputVariable(state, "Tempering Valve Flow Fraction",
                                 OutputProcessor::Unit::None,
                                 TemperValve(Item).FlowDivFract,
                                 "System",

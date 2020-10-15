@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -94,8 +93,6 @@ namespace PlantUtilities {
     // <use statements for data only modules>
     // <use statements for access to subroutines in other modules>
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     namespace {
         struct CriteriaData
         {
@@ -1054,7 +1051,8 @@ namespace PlantUtilities {
         CriteriaChecks(UniqueCriteriaCheckIndex).ThisCriteriaCheckValue = CriteriaValue;
     }
 
-    void UpdateChillerComponentCondenserSide(int const LoopNum,                   // component's loop index
+    void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
+                                             int const LoopNum,                   // component's loop index
                                              int const LoopSide,                  // component's loop side number
                                              int const EP_UNUSED(TypeOfNum),      // Component's type index
                                              int const InletNodeNum,              // Component's inlet node pointer
@@ -1118,7 +1116,7 @@ namespace PlantUtilities {
             // use current mass flow rate and inlet temp from Node and recalculate outlet temp
             if (Node(InletNodeNum).MassFlowRate > MassFlowTolerance) {
                 // update node outlet conditions
-                Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, ModelInletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
+                Cp = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, ModelInletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
                 Node(OutletNodeNum).Temp = Node(InletNodeNum).Temp + ModelCondenserHeatRate / (Node(InletNodeNum).MassFlowRate * Cp);
             }
 
@@ -1141,7 +1139,8 @@ namespace PlantUtilities {
         }
     }
 
-    void UpdateComponentHeatRecoverySide(int const LoopNum,                  // component's loop index
+    void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
+                                         int const LoopNum,                  // component's loop index
                                          int const LoopSide,                 // component's loop side number
                                          int const EP_UNUSED(TypeOfNum),     // Component's type index
                                          int const InletNodeNum,             // Component's inlet node pointer
@@ -1204,7 +1203,7 @@ namespace PlantUtilities {
             // use current mass flow rate and inlet temp from Node and recalculate outlet temp
             if (Node(InletNodeNum).MassFlowRate > MassFlowTolerance) {
                 // update node outlet conditions
-                Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, ModelInletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
+                Cp = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, ModelInletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
                 Node(OutletNodeNum).Temp = Node(InletNodeNum).Temp + ModelRecoveryHeatRate / (Node(InletNodeNum).MassFlowRate * Cp);
             }
 

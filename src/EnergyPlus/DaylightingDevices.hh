@@ -52,7 +52,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DaylightingDevices {
 
@@ -68,26 +70,28 @@ namespace DaylightingDevices {
 
     // Functions
 
-    void InitDaylightingDevices(IOFiles &ioFiles);
+    void InitDaylightingDevices(EnergyPlusData &state);
 
-    void GetTDDInput();
+    void GetTDDInput(EnergyPlusData &state);
 
-    void GetShelfInput();
+    void GetShelfInput(EnergyPlusData &state);
 
     Real64 CalcPipeTransBeam(Real64 const R,    // Reflectance of surface, constant (can be made R = f(theta) later)
                              Real64 const A,    // Aspect ratio, L / d
                              Real64 const Theta // Angle of entry in radians
     );
 
-    Real64 CalcTDDTransSolIso(int const PipeNum); // TDD pipe object number
+    Real64 CalcTDDTransSolIso(EnergyPlusData &state, int const PipeNum); // TDD pipe object number
 
-    Real64 CalcTDDTransSolHorizon(int const PipeNum); // TDD pipe object number
+    Real64 CalcTDDTransSolHorizon(EnergyPlusData &state, int const PipeNum); // TDD pipe object number
 
-    Real64 CalcTDDTransSolAniso(int const PipeNum, // TDD pipe object number
+    Real64 CalcTDDTransSolAniso(EnergyPlusData &state,
+                                int const PipeNum, // TDD pipe object number
                                 Real64 const COSI  // Cosine of the incident angle
     );
 
-    Real64 TransTDD(int const PipeNum,      // TDD pipe object number
+    Real64 TransTDD(EnergyPlusData &state,
+                    int const PipeNum,      // TDD pipe object number
                     Real64 const COSI,      // Cosine of the incident angle
                     int const RadiationType // Radiation type flag
     );
@@ -98,7 +102,7 @@ namespace DaylightingDevices {
 
     int FindTDDPipe(int const WinNum);
 
-    void DistributeTDDAbsorbedSolar();
+    void DistributeTDDAbsorbedSolar(EnergyPlusData &state);
 
     void CalcViewFactorToShelf(int const ShelfNum); // Daylighting shelf object number
 

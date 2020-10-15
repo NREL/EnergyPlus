@@ -180,7 +180,6 @@ namespace HVACControllers {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using DataHVACGlobals::SetPointErrorFlag;
@@ -412,7 +411,7 @@ namespace HVACControllers {
                     HVACControllers::ControllerProps(ControlNum).HumRatCtrlOverride = false;
                     // Put the controller tolerance (offset) back to it's original value
                     RootFinder::SetupRootFinder(
-                        RootFinders(ControlNum), iSlopeDecreasing, iMethodBrent, constant_zero, 1.0e-6, ControllerProps(ControlNum).Offset);
+                        RootFinders(ControlNum), iSlopeDecreasing, iMethodBrent, DataPrecisionGlobals::constant_zero, 1.0e-6, ControllerProps(ControlNum).Offset);
                 }
 
                 // If a iControllerOpColdStart call, reset the actuator inlet flows
@@ -619,7 +618,8 @@ namespace HVACControllers {
         // Now find and load all of the simple controllers.
         if (NumSimpleControllers > 0) {
             for (Num = 1; Num <= NumSimpleControllers; ++Num) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               Num,
                                               AlphArray,
                                               NumAlphas,
@@ -669,9 +669,9 @@ namespace HVACControllers {
                     ShowContinueError("...Invalid " + cAlphaFields(4) + "=\"" + AlphArray(4) + "\", only FLOW is allowed.");
                     ErrorsFound = true;
                 }
-                ControllerProps(Num).SensedNode = GetOnlySingleNode(
+                ControllerProps(Num).SensedNode = GetOnlySingleNode(state,
                     AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-                ControllerProps(Num).ActuatedNode = GetOnlySingleNode(AlphArray(6),
+                ControllerProps(Num).ActuatedNode = GetOnlySingleNode(state, AlphArray(6),
                                                                       ErrorsFound,
                                                                       CurrentModuleObject,
                                                                       AlphArray(1),
@@ -1160,7 +1160,7 @@ namespace HVACControllers {
                     SetupRootFinder(RootFinders(ControlNum),
                                     iSlopeIncreasing,
                                     iMethodBrent,
-                                    constant_zero,
+                                    DataPrecisionGlobals::constant_zero,
                                     1.0e-6,
                                     ControllerProps(ControlNum).Offset); // Slope type | Method type | TolX: no relative tolerance for X variables |
                                                                          // ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for
@@ -1170,7 +1170,7 @@ namespace HVACControllers {
                     SetupRootFinder(RootFinders(ControlNum),
                                     iSlopeDecreasing,
                                     iMethodBrent,
-                                    constant_zero,
+                                    DataPrecisionGlobals::constant_zero,
                                     1.0e-6,
                                     ControllerProps(ControlNum).Offset); // Slope type | Method type | TolX: no relative tolerance for X variables |
                                                                          // ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for
@@ -1190,8 +1190,9 @@ namespace HVACControllers {
         // Do the Begin Environment initializations
         if (BeginEnvrnFlag && MyEnvrnFlag(ControlNum)) {
 
-            rho = GetDensityGlycol(PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidName,
-                                   CWInitConvTemp,
+            rho = GetDensityGlycol(state,
+                                   PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidName,
+                                   DataGlobalConstants::CWInitConvTemp(),
                                    PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidIndex,
                                    RoutineName);
 
@@ -1493,7 +1494,7 @@ namespace HVACControllers {
         // Check to see if the component is running; if not converged and return.  This check will be done
         // by looking at the component mass flow rate at the sensed node.
         if (Node(SensedNode).MassFlowRate == 0.0) {
-            ExitCalcController(ControlNum, constant_zero, iModeOff, IsConvergedFlag, IsUpToDateFlag);
+            ExitCalcController(ControlNum, DataPrecisionGlobals::constant_zero, iModeOff, IsConvergedFlag, IsUpToDateFlag);
             return;
         }
 
@@ -2249,7 +2250,7 @@ namespace HVACControllers {
                             if (thisController.Action == iReverseAction) {
                                 // Cooling coil controller should always be ReverseAction, but skip this if not
                                 RootFinder::SetupRootFinder(
-                                    RootFinders(ControlNum), iSlopeDecreasing, iMethodFalsePosition, constant_zero, 1.0e-6, 1.0e-5);
+                                    RootFinders(ControlNum), iSlopeDecreasing, iMethodFalsePosition, DataPrecisionGlobals::constant_zero, 1.0e-6, 1.0e-5);
                             }
                             // Do a cold start reset, same as iControllerOpColdStart
                             ResetController(ControlNum, false, IsConvergedFlag);

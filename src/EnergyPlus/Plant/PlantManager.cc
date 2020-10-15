@@ -374,7 +374,8 @@ namespace EnergyPlus {
                     PlantLoopNum = LoopNum;
                     this_loop.TypeOfLoop = Plant;
                     CurrentModuleObject = "PlantLoop";
-                    inputProcessor->getObjectItem(CurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  CurrentModuleObject,
                                                   PlantLoopNum,
                                                   Alpha,
                                                   NumAlphas,
@@ -389,7 +390,8 @@ namespace EnergyPlus {
                     CondLoopNum = LoopNum - NumPlantLoops;
                     this_loop.TypeOfLoop = Condenser;
                     CurrentModuleObject = "CondenserLoop";
-                    inputProcessor->getObjectItem(CurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  CurrentModuleObject,
                                                   CondLoopNum,
                                                   Alpha,
                                                   NumAlphas,
@@ -410,18 +412,18 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(Alpha(2), "WATER")) {
                     this_loop.FluidType = NodeType_Water;
                     this_loop.FluidName = Alpha(2);
-                    this_loop.FluidIndex = FindGlycol(Alpha(2));
+                    this_loop.FluidIndex = FindGlycol(state, Alpha(2));
                 } else if (UtilityRoutines::SameString(Alpha(2), "USERDEFINEDFLUIDTYPE")) {
                     this_loop.FluidType = NodeType_Water;
                     this_loop.FluidName = Alpha(3);
                     // check for valid fluid name
-                    NumFluids = CheckFluidPropertyName(Alpha(3));
+                    NumFluids = CheckFluidPropertyName(state, Alpha(3));
                     if (NumFluids == 0) {
                         ShowSevereError(
                                 CurrentModuleObject + "=\"" + Alpha(1) + "\", missing fluid data for Plant loop.");
                         ErrorsFound = true;
                     } else {
-                        this_loop.FluidIndex = FindGlycol(Alpha(3));
+                        this_loop.FluidIndex = FindGlycol(state, Alpha(3));
                         if (this_loop.FluidIndex == 0) {
                             ShowSevereError(CurrentModuleObject + "=\"" + Alpha(1) +
                                             "\", invalid glycol fluid data for Plant loop.");
@@ -435,7 +437,7 @@ namespace EnergyPlus {
 
                     this_loop.FluidType = NodeType_Water;
                     this_loop.FluidName = "WATER";
-                    this_loop.FluidIndex = FindGlycol("WATER");
+                    this_loop.FluidIndex = FindGlycol(state, "WATER");
                 }
 
                 this_loop.OperationScheme = Alpha(4); // Load the Plant Control Scheme Priority List
@@ -453,8 +455,8 @@ namespace EnergyPlus {
                 // correct loop temperature step.  Loop data is read in supply side, but the volume is not used in
                 // a calculation there.
                 this_loop.Volume = Num(5);
-                if (lNumericFieldBlanks(5)) this_loop.Volume = AutoCalculate;
-                if (this_loop.Volume == AutoCalculate) {
+                if (lNumericFieldBlanks(5)) this_loop.Volume = DataGlobalConstants::AutoCalculate();
+                if (this_loop.Volume == DataGlobalConstants::AutoCalculate()) {
                     this_loop.VolumeWasAutoSized = true;
                 }
                 // circulation time used to autocalculate loop volume
@@ -474,16 +476,16 @@ namespace EnergyPlus {
                 this_demand_side.BranchList = Alpha(12);
                 this_demand_side.ConnectList = Alpha(13);
 
-                this_supply_side.NodeNumIn = GetOnlySingleNode(
+                this_supply_side.NodeNumIn = GetOnlySingleNode(state,
                         Alpha(6), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
                         NodeConnectionType_Inlet, 1, ObjectIsParent);
-                this_supply_side.NodeNumOut = GetOnlySingleNode(
+                this_supply_side.NodeNumOut = GetOnlySingleNode(state,
                         Alpha(7), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
                         NodeConnectionType_Outlet, 1, ObjectIsParent);
-                this_demand_side.NodeNumIn = GetOnlySingleNode(
+                this_demand_side.NodeNumIn = GetOnlySingleNode(state,
                         Alpha(10), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
                         NodeConnectionType_Inlet, 1, ObjectIsParent);
-                this_demand_side.NodeNumOut = GetOnlySingleNode(
+                this_demand_side.NodeNumOut = GetOnlySingleNode(state,
                         Alpha(11), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
                         NodeConnectionType_Outlet, 1, ObjectIsParent);
 
@@ -491,7 +493,7 @@ namespace EnergyPlus {
                 this_demand_side.OutletNodeSetPt = IsNodeOnSetPtManager(state, this_demand_side.NodeNumOut, localTempSetPt);
                 this_supply_side.InletNodeSetPt = IsNodeOnSetPtManager(state, this_supply_side.NodeNumIn, localTempSetPt);
                 this_supply_side.OutletNodeSetPt = IsNodeOnSetPtManager(state, this_supply_side.NodeNumOut, localTempSetPt);
-                this_loop.TempSetPointNodeNum = GetOnlySingleNode(
+                this_loop.TempSetPointNodeNum = GetOnlySingleNode(state,
                         Alpha(5), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
                         NodeConnectionType_Sensor, 1, ObjectIsParent);
 
@@ -647,7 +649,7 @@ namespace EnergyPlus {
                 ErrFound = false;
 
                 if (this_loop.TypeOfLoop == Plant) {
-                    GetPlantAvailabilityManager(Alpha(15), LoopNum, TotNumLoops, ErrFound);
+                    GetPlantAvailabilityManager(state, Alpha(15), LoopNum, TotNumLoops, ErrFound);
                 }
 
                 if (ErrFound) {
@@ -726,7 +728,8 @@ namespace EnergyPlus {
             // outside the IF statement.
             for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
 
-                SetupOutputVariable("Plant System Cycle On Off Status",
+                SetupOutputVariable(state,
+                                    "Plant System Cycle On Off Status",
                                     OutputProcessor::Unit::None,
                                     PlantAvailMgr(LoopNum).AvailStatus,
                                     "Plant",
@@ -995,7 +998,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
                                 }
-                                this_comp.compPtr = SolarCollectors::CollectorData::factory(CompNames(CompNum));
+                                this_comp.compPtr = SolarCollectors::CollectorData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "SolarCollector:IntegralCollectorStorage")) {
                                 this_comp.TypeOf_Num = TypeOf_SolarCollectorICS;
@@ -1004,11 +1007,11 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
                                 }
-                                this_comp.compPtr = SolarCollectors::CollectorData::factory(CompNames(CompNum));
+                                this_comp.compPtr = SolarCollectors::CollectorData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "LoadProfile:Plant")) {
                                 this_comp.TypeOf_Num = TypeOf_PlantLoadProfile;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
-                                this_comp.compPtr = PlantLoadProfile::PlantProfileData::factory(CompNames(CompNum));
+                                this_comp.compPtr = PlantLoadProfile::PlantProfileData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "GroundHeatExchanger:System")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgSystem;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
@@ -1019,12 +1022,12 @@ namespace EnergyPlus {
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
                                 this_comp.compPtr =
                                         SurfaceGroundHeatExchanger::SurfaceGroundHeatExchangerData::factory(
-                                                TypeOf_GrndHtExchgSurface, CompNames(CompNum));
+                                                state, TypeOf_GrndHtExchgSurface, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "GroundHeatExchanger:Pond")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgPond;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
                                 this_comp.compPtr =
-                                        PondGroundHeatExchanger::PondGroundHeatExchangerData::factory(CompNames(CompNum));
+                                        PondGroundHeatExchanger::PondGroundHeatExchangerData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "GroundHeatExchanger:Slinky")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgSlinky;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
@@ -1138,7 +1141,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "HeatPump:WatertoWater:EquationFit:Cooling")) {
                                 this_comp.compPtr = HeatPumpWaterToWaterSimple::GshpSpecs::factory(
-                                        TypeOf_HPWaterEFCooling, CompNames(CompNum));
+                                        state, TypeOf_HPWaterEFCooling, CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HPWaterEFCooling;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
@@ -1148,7 +1151,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "HeatPump:WatertoWater:EquationFit:Heating")) {
                                 this_comp.compPtr = HeatPumpWaterToWaterSimple::GshpSpecs::factory(
-                                        TypeOf_HPWaterEFHeating, CompNames(CompNum));
+                                        state, TypeOf_HPWaterEFHeating, CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HPWaterEFHeating;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
@@ -1157,7 +1160,7 @@ namespace EnergyPlus {
                                 }
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "HeatPump:WaterToWater:ParameterEstimation:Heating")) {
-                                this_comp.compPtr = HeatPumpWaterToWaterHEATING::GshpPeHeatingSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = HeatPumpWaterToWaterHEATING::GshpPeHeatingSpecs::factory(state, CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HPWaterPEHeating;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
@@ -1166,7 +1169,7 @@ namespace EnergyPlus {
                                 }
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "HeatPump:WaterToWater:ParameterEstimation:Cooling")) {
-                                this_comp.compPtr = HeatPumpWaterToWaterCOOLING::GshpPeCoolingSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = HeatPumpWaterToWaterCOOLING::GshpPeCoolingSpecs::factory(state, CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HPWaterPECooling;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
@@ -1202,10 +1205,10 @@ namespace EnergyPlus {
                                 this_comp.compPtr = HVACVariableRefrigerantFlow::VRFCondenserEquipment::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "DistrictCooling")) {
                                 this_comp.TypeOf_Num = TypeOf_PurchChilledWater;
-                                this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(TypeOf_PurchChilledWater, CompNames(CompNum));
+                                this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, TypeOf_PurchChilledWater, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "DistrictHeating")) {
                                 this_comp.TypeOf_Num = TypeOf_PurchHotWater;
-                                this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(TypeOf_PurchHotWater, CompNames(CompNum));
+                                this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, TypeOf_PurchHotWater, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Simple")) {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceSimple;
                                 this_comp.compPtr = IceThermalStorage::SimpleIceStorageData::factory(state, CompNames(CompNum));
@@ -1213,7 +1216,7 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceDetailed;
                                 this_comp.compPtr = IceThermalStorage::DetailedIceStorageData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "TemperingValve")) {
-                                this_comp.compPtr = PlantValves::TemperValveData::factory(CompNames(CompNum));
+                                this_comp.compPtr = PlantValves::TemperValveData::factory(state, CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_ValveTempering;
                             } else if (UtilityRoutines::SameString(this_comp_type, "HeatExchanger:FluidToFluid")) {
                                 this_comp.TypeOf_Num = TypeOf_FluidToFluidPlantHtExchg;
@@ -1222,7 +1225,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = FreeRejectionOpSchemeType;
                                 }
-                                this_comp.compPtr = PlantHeatExchangerFluidToFluid::HeatExchangerStruct::factory(CompNames(CompNum));
+                                this_comp.compPtr = PlantHeatExchangerFluidToFluid::HeatExchangerStruct::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroTurbine")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_MicroTurbine;
                                 if (LoopSideNum == DemandSide) {
@@ -1256,7 +1259,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, state.files, CompNames(CompNum));
+                                this_comp.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:FuelCell:StackCooler")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_FCStackCooler;
                                 this_comp.compPtr = FuelCellElectricGenerator::FCDataStruct::factory(state, CompNames(CompNum));
@@ -1268,11 +1271,11 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "FluidCooler:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_FluidCooler_SingleSpd;
                                 this_comp.compPtr = FluidCoolers::FluidCoolerspecs::factory(
-                                        TypeOf_FluidCooler_SingleSpd, CompNames(CompNum));
+                                        state, TypeOf_FluidCooler_SingleSpd, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "FluidCooler:TwoSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_FluidCooler_TwoSpd;
                                 this_comp.compPtr = FluidCoolers::FluidCoolerspecs::factory(
-                                        TypeOf_FluidCooler_TwoSpd, CompNames(CompNum));
+                                        state, TypeOf_FluidCooler_TwoSpd, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "EvaporativeFluidCooler:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_EvapFluidCooler_SingleSpd;
                                 this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(state,
@@ -1289,7 +1292,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = PhotovoltaicThermalCollectors::PVTCollectorStruct::factory(CompNames(CompNum));
+                                this_comp.compPtr = PhotovoltaicThermalCollectors::PVTCollectorStruct::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CentralHeatPumpSystem")) {
                                 this_comp.TypeOf_Num = TypeOf_CentralGroundSourceHeatPump;
                                 this_comp.compPtr = PlantCentralGSHP::WrapperSpecs::factory(state, CompNames(CompNum));
@@ -1383,7 +1386,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type,"PlantComponent:TemperatureSource")) {
                                 this_comp.TypeOf_Num = TypeOf_WaterSource;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
-                                this_comp.compPtr = PlantComponentTemperatureSources::WaterSourceSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = PlantComponentTemperatureSources::WaterSourceSpecs::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "GroundHeatExchanger:HorizontalTrench")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgHorizTrench;
@@ -1863,7 +1866,7 @@ namespace EnergyPlus {
             } // loop over plant supply loops (ventilation report data)
         }
 
-        void SetupReports() {
+        void SetupReports(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Rick Strand
@@ -1916,57 +1919,57 @@ namespace EnergyPlus {
                     CurrentModuleObject = "Cond Loop";
                 }
                 // CurrentModuleObject='Plant/Condenser Loop'
-                SetupOutputVariable("Plant Supply Side Cooling Demand Rate",
+                SetupOutputVariable(state, "Plant Supply Side Cooling Demand Rate",
                                     OutputProcessor::Unit::W,
                                     loop.CoolingDemand,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
-                SetupOutputVariable("Plant Supply Side Heating Demand Rate",
+                SetupOutputVariable(state, "Plant Supply Side Heating Demand Rate",
                                     OutputProcessor::Unit::W,
                                     loop.HeatingDemand,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
-                SetupOutputVariable("Plant Supply Side Inlet Mass Flow Rate",
+                SetupOutputVariable(state, "Plant Supply Side Inlet Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     loop.InletNodeFlowrate,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
 
-                SetupOutputVariable("Plant Supply Side Inlet Temperature",
+                SetupOutputVariable(state, "Plant Supply Side Inlet Temperature",
                                     OutputProcessor::Unit::C,
                                     loop.InletNodeTemperature,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
-                SetupOutputVariable("Plant Supply Side Outlet Temperature",
+                SetupOutputVariable(state, "Plant Supply Side Outlet Temperature",
                                     OutputProcessor::Unit::C,
                                     loop.OutletNodeTemperature,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
 
-                SetupOutputVariable("Plant Supply Side Not Distributed Demand Rate",
+                SetupOutputVariable(state, "Plant Supply Side Not Distributed Demand Rate",
                                     OutputProcessor::Unit::W,
                                     loop.DemandNotDispatched,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
-                SetupOutputVariable("Plant Supply Side Unmet Demand Rate",
+                SetupOutputVariable(state, "Plant Supply Side Unmet Demand Rate",
                                     OutputProcessor::Unit::W,
                                     loop.UnmetDemand,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
-                SetupOutputVariable("Debug Plant Loop Bypass Fraction",
+                SetupOutputVariable(state, "Debug Plant Loop Bypass Fraction",
                                     OutputProcessor::Unit::None,
                                     loop.BypassFrac,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
-                SetupOutputVariable("Debug Plant Last Simulated Loop Side",
+                SetupOutputVariable(state, "Debug Plant Last Simulated Loop Side",
                                     OutputProcessor::Unit::None,
                                     loop.LastLoopSideSimulated,
                                     "System",
@@ -1978,50 +1981,50 @@ namespace EnergyPlus {
             // CurrentModuleObject='Plant/Condenser Loop(Advanced)'
             if (DisplayAdvancedReportVariables) {
                 for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
-                    SetupOutputVariable("Plant Demand Side Lumped Capacitance Temperature",
+                    SetupOutputVariable(state, "Plant Demand Side Lumped Capacitance Temperature",
                                         OutputProcessor::Unit::C,
                                         PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TankTemp,
                                         "System",
                                         "Average",
                                         PlantLoop(LoopNum).Name);
-                    SetupOutputVariable("Plant Supply Side Lumped Capacitance Temperature",
+                    SetupOutputVariable(state, "Plant Supply Side Lumped Capacitance Temperature",
                                         OutputProcessor::Unit::C,
                                         PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_TankTemp,
                                         "System",
                                         "Average",
                                         PlantLoop(LoopNum).Name);
-                    SetupOutputVariable("Plant Demand Side Lumped Capacitance Heat Transport Rate",
+                    SetupOutputVariable(state, "Plant Demand Side Lumped Capacitance Heat Transport Rate",
                                         OutputProcessor::Unit::W,
                                         PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_MdotCpDeltaT,
                                         "System",
                                         "Average",
                                         PlantLoop(LoopNum).Name);
-                    SetupOutputVariable("Plant Supply Side Lumped Capacitance Heat Transport Rate",
+                    SetupOutputVariable(state, "Plant Supply Side Lumped Capacitance Heat Transport Rate",
                                         OutputProcessor::Unit::W,
                                         PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_MdotCpDeltaT,
                                         "System",
                                         "Average",
                                         PlantLoop(LoopNum).Name);
-                    SetupOutputVariable("Plant Demand Side Lumped Capacitance Heat Storage Rate",
+                    SetupOutputVariable(state, "Plant Demand Side Lumped Capacitance Heat Storage Rate",
                                         OutputProcessor::Unit::W,
                                         PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_McpDTdt,
                                         "System",
                                         "Average",
                                         PlantLoop(LoopNum).Name);
-                    SetupOutputVariable("Plant Supply Side Lumped Capacitance Heat Storage Rate",
+                    SetupOutputVariable(state, "Plant Supply Side Lumped Capacitance Heat Storage Rate",
                                         OutputProcessor::Unit::W,
                                         PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_McpDTdt,
                                         "System",
                                         "Average",
                                         PlantLoop(LoopNum).Name);
-                    SetupOutputVariable("Plant Demand Side Lumped Capacitance Excessive Storage Time",
+                    SetupOutputVariable(state, "Plant Demand Side Lumped Capacitance Excessive Storage Time",
                                         OutputProcessor::Unit::hr,
                                         PlantLoop(LoopNum).LoopSide(
                                                 DemandSide).LoopSideInlet_CapExcessStorageTimeReport,
                                         "System",
                                         "Sum",
                                         PlantLoop(LoopNum).Name);
-                    SetupOutputVariable("Plant Supply Side Lumped Capacitance Excessive Storage Time",
+                    SetupOutputVariable(state, "Plant Supply Side Lumped Capacitance Excessive Storage Time",
                                         OutputProcessor::Unit::hr,
                                         PlantLoop(LoopNum).LoopSide(
                                                 SupplySide).LoopSideInlet_CapExcessStorageTimeReport,
@@ -2035,7 +2038,7 @@ namespace EnergyPlus {
                                     BranchNum).TotalComponents; ++CompNum) {
                                 if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
                                         CompNum).CurOpSchemeType != DemandOpSchemeType) {
-                                    SetupOutputVariable("Plant Component Distributed Demand Rate",
+                                    SetupOutputVariable(state, "Plant Component Distributed Demand Rate",
                                                         OutputProcessor::Unit::W,
                                                         PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
                                                                 CompNum).MyLoad,
@@ -2290,7 +2293,7 @@ namespace EnergyPlus {
                 // reset loop level
                 PlantFinalSizesOkayToReport = true;
                 for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
-                    ResizePlantLoopLevelSizes(LoopNum);
+                    ResizePlantLoopLevelSizes(state, LoopNum);
                 }
 
                 InitLoopEquip = true;
@@ -2408,7 +2411,7 @@ namespace EnergyPlus {
             if (ErrorsFound) ShowFatalError("Preceding errors caused termination");
         }
 
-        void ReInitPlantLoopsAtFirstHVACIteration() {
+        void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
@@ -2520,13 +2523,13 @@ namespace EnergyPlus {
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).OutletNode.MassFlowRateHistory = 0.0;
 
                         if (PlantLoop(LoopNum).FluidType != NodeType_Steam) {
-                            Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, LoopSetPointTemp,
+                            Cp = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, LoopSetPointTemp,
                                                        PlantLoop(LoopNum).FluidIndex, RoutineNameAlt);
                             StartEnthalpy = Cp * LoopSetPointTemp;
                         }
                         // Use Min/Max flow rates to initialize loop
                         if (PlantLoop(LoopNum).FluidType == NodeType_Water) {
-                            rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, LoopSetPointTemp,
+                            rho = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, LoopSetPointTemp,
                                                    PlantLoop(LoopNum).FluidIndex, RoutineNameAlt);
 
                             LoopMaxMassFlowRate = PlantLoop(LoopNum).MaxVolFlowRate * rho;
@@ -2535,10 +2538,10 @@ namespace EnergyPlus {
                         // use saturated liquid of steam at the loop setpoint temp as the starting enthalpy for a water loop
                         if (PlantLoop(LoopNum).FluidType == NodeType_Steam) {
                             SteamTemp = 100.0;
-                            SteamDensity = GetSatDensityRefrig(fluidNameSteam, SteamTemp, 1.0,
+                            SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, SteamTemp, 1.0,
                                                                PlantLoop(LoopNum).FluidIndex, RoutineName);
                             LoopMaxMassFlowRate = PlantLoop(LoopNum).MaxVolFlowRate * SteamDensity;
-                            StartEnthalpy = GetSatEnthalpyRefrig(fluidNameSteam, LoopSetPointTemp, 0.0,
+                            StartEnthalpy = GetSatEnthalpyRefrig(state, fluidNameSteam, LoopSetPointTemp, 0.0,
                                                                  PlantLoop(LoopNum).FluidIndex, RoutineName);
                             LoopMinMassFlowRate = PlantLoop(LoopNum).MinVolFlowRate * SteamDensity;
                         }
@@ -3201,10 +3204,10 @@ namespace EnergyPlus {
 
             // should now have plant volume, calculate plant volume's mass for fluid type
             if (PlantLoop(LoopNum).FluidType == NodeType_Water) {
-                FluidDensity = GetDensityGlycol(PlantLoop(LoopNum).FluidName, InitConvTemp,
+                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp(),
                                                 PlantLoop(LoopNum).FluidIndex, RoutineName);
             } else if (PlantLoop(LoopNum).FluidType == NodeType_Steam) {
-                FluidDensity = GetSatDensityRefrig(fluidNameSteam, 100.0, 1.0, PlantLoop(LoopNum).FluidIndex,
+                FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, PlantLoop(LoopNum).FluidIndex,
                                                    RoutineName);
             } else {
                 assert(false);
@@ -3220,7 +3223,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ResizePlantLoopLevelSizes(int const LoopNum // Supply side loop being simulated
+        void ResizePlantLoopLevelSizes(EnergyPlusData &state, int const LoopNum // Supply side loop being simulated
         ) {
 
             // SUBROUTINE INFORMATION:
@@ -3331,10 +3334,10 @@ namespace EnergyPlus {
 
             // should now have plant volume, calculate plant volume's mass for fluid type
             if (PlantLoop(LoopNum).FluidType == NodeType_Water) {
-                FluidDensity = GetDensityGlycol(PlantLoop(LoopNum).FluidName, InitConvTemp,
+                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp(),
                                                 PlantLoop(LoopNum).FluidIndex, RoutineName);
             } else if (PlantLoop(LoopNum).FluidType == NodeType_Steam) {
-                FluidDensity = GetSatDensityRefrig(fluidNameSteam, 100.0, 1.0, PlantLoop(LoopNum).FluidIndex,
+                FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, PlantLoop(LoopNum).FluidIndex,
                                                    RoutineName);
             } else {
                 assert(false);

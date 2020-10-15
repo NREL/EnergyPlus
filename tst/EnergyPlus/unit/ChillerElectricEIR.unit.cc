@@ -344,7 +344,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     // set load and run flag
     bool RunFlag(true);
     Real64 MyLoad(-18000.0);
-    openOutputFiles(state.files);
+    openOutputFiles(state);
 
     DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
     DataLoopNode::Node(thisEIRChiller.EvapOutletNodeNum).TempSetPoint = 6.67;
@@ -366,7 +366,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     thisEIRChiller.calculate(state, MyLoad, RunFlag);
     // calc evap-cooler water consumption rate
     Real64 EvapCondWaterVolFlowRate = thisEIRChiller.CondMassFlowRate * (thisEIRChiller.CondOutletHumRat - DataEnvironment::OutHumRat) /
-                                      Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+                                      Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
     // check evap-cooled condenser water consumption rate
     EXPECT_NEAR(2.31460814, thisEIRChiller.CondMassFlowRate, 0.0000001);
     EXPECT_NEAR(6.22019725E-06, EvapCondWaterVolFlowRate, 0.000000001);

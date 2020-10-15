@@ -72,6 +72,7 @@ namespace EnergyPlus {
         this->dataChillerIndirectAbsorption = std::unique_ptr<ChillerIndirectAbsoprtionData>(new ChillerIndirectAbsoprtionData);
         this->dataChillerReformulatedEIR = std::unique_ptr<ChillerReformulatedEIRData>(new ChillerReformulatedEIRData);
         this->dataCondenserLoopTowers = std::unique_ptr<CondenserLoopTowersData>(new CondenserLoopTowersData);
+        this->dataConstruction = std::unique_ptr<ConstructionData>(new ConstructionData);
         this->dataConvectionCoefficient = std::unique_ptr<ConvectionCoefficientsData>(new ConvectionCoefficientsData);
         this->dataCoolTower = std::unique_ptr<CoolTowerData>(new CoolTowerData);
         this->dataCostEstimateManager = std::unique_ptr<CostEstimateManagerData>(new CostEstimateManagerData);
@@ -83,6 +84,13 @@ namespace EnergyPlus {
         this->dataGlobal = std::unique_ptr<DataGlobal>(new DataGlobal);
         this->dataPipes = std::unique_ptr<PipesData>(new PipesData);
         this->dataPlantChillers = std::unique_ptr<PlantChillersData>(new PlantChillersData);
+        this->dataUFADManager = std::unique_ptr<UFADManagerData>(new UFADManagerData);
+        this->dataUnitarySystems = std::unique_ptr<UnitarySystemsData>(new UnitarySystemsData);
+        this->dataUnitHeaters = std::unique_ptr<UnitHeatersData>(new UnitHeatersData);
+        this->dataUnitVentilators = std::unique_ptr<UnitVentilatorsData>(new UnitVentilatorsData);
+        this->dataUserDefinedComponents = std::unique_ptr<UserDefinedComponentsData>(new UserDefinedComponentsData);
+        this->dataVariableSpeedCoils = std::unique_ptr<VariableSpeedCoilsData>(new VariableSpeedCoilsData);
+        this->dataVentilatedSlab = std::unique_ptr<VentilatedSlabData>(new VentilatedSlabData);
         this->dataWaterCoils = std::unique_ptr<WaterCoilsData>(new WaterCoilsData);
         this->dataWaterManager = std::unique_ptr<WaterManagerData>(new WaterManagerData);
         this->dataWaterThermalTanks = std::unique_ptr<WaterThermalTanksData>(new WaterThermalTanksData);
@@ -120,6 +128,7 @@ namespace EnergyPlus {
         this->dataChillerIndirectAbsorption->clear_state();
         this->dataChillerReformulatedEIR->clear_state();
         this->dataCondenserLoopTowers->clear_state();
+        this->dataConstruction->clear_state();
         this->dataConvectionCoefficient->clear_state();
         this->dataCoolTower->clear_state();
         this->dataCostEstimateManager->clear_state();
@@ -131,6 +140,13 @@ namespace EnergyPlus {
         this->dataGlobal->clear_state();
         this->dataPipes->clear_state();
         this->dataPlantChillers->clear_state();
+        this->dataUFADManager->clear_state();
+        this->dataUnitarySystems->clear_state();
+        this->dataUnitHeaters->clear_state();
+        this->dataUnitVentilators->clear_state();
+        this->dataUserDefinedComponents->clear_state();
+        this->dataVariableSpeedCoils->clear_state();
+        this->dataVentilatedSlab->clear_state();
         this->dataWaterCoils->clear_state();
         this->dataWaterManager->clear_state();
         this->dataWaterThermalTanks->clear_state();

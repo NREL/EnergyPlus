@@ -205,11 +205,11 @@ namespace SolarShading {
     // Functions
     void clear_state();
 
-    void InitSolarCalculations(IOFiles &ioFiles);
+    void InitSolarCalculations(EnergyPlusData &state);
 
-    void GetShadowingInput(IOFiles &ioFiles);
+    void GetShadowingInput(EnergyPlusData &state);
 
-    void AllocateModuleArrays();
+    void AllocateModuleArrays(EnergyPlusData &state);
 
     void AnisoSkyViewFactors();
 
@@ -235,7 +235,7 @@ namespace SolarShading {
                                 bool const ignorey,
                                 bool const ignorez);
 
-    void ComputeIntSolarAbsorpFactors();
+    void ComputeIntSolarAbsorpFactors(EnergyPlusData &state);
 
     void CLIP(int const NVT, Array1D<Real64> &XVT, Array1D<Real64> &YVT, Array1D<Real64> &ZVT);
 
@@ -308,11 +308,12 @@ namespace SolarShading {
                           Real64 const CosSolarDeclin  // value of Cosine of Solar Declination for period
     );
 
-    void FigureSolarBeamAtTimestep(int const iHour, int const iTimeStep);
+    void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const iTimeStep);
 
-    void DetermineShadowingCombinations();
+    void DetermineShadowingCombinations(EnergyPlusData &state);
 
-    void SHADOW(int const iHour, // Hour index
+    void SHADOW(EnergyPlusData &state,
+                int const iHour, // Hour index
                 int const TS     // Time Step
     );
 
@@ -322,7 +323,8 @@ namespace SolarShading {
                 int const HTS   // Heat transfer surface number of the general receiving surf
     );
 
-    void SHDGSS(int const NGRS,
+    void SHDGSS(EnergyPlusData &state,
+                int const NGRS,
                 int const iHour,   // Hour Counter
                 int const TS,      // TimeStep
                 int const CurSurf, // Current Surface
@@ -339,7 +341,7 @@ namespace SolarShading {
 
     void CalcInteriorSolarDistribution(EnergyPlusData &state);
 
-    void CalcAborbedOnExteriorOpaqueSurfaces();
+    void CalcAbsorbedOnExteriorOpaqueSurfaces(EnergyPlusData &state);
 
     void CalcInteriorSolarDistributionWCE(EnergyPlusData &state);
 
@@ -353,14 +355,15 @@ namespace SolarShading {
                                  int const ConstNum // Construction number
     );
 
-    void PerformSolarCalculations(EnergyPlusData &state, IOFiles &ioFiles);
+    void PerformSolarCalculations(EnergyPlusData &state);
 
     void SHDRVL(int const HTSS,  // Heat transfer surface number of the subsurface
                 int const SBSNR, // Subsurface number
                 int const Hour,
                 int const TS);
 
-    void SHDSBS(int const iHour, // Hour Index
+    void SHDSBS(EnergyPlusData &state,
+                int const iHour, // Hour Index
                 int const CurSurf,
                 int const NBKS, // Number of back surfaces
                 int const NSBS, // Number of subsurfaces
@@ -385,7 +388,7 @@ namespace SolarShading {
 
     void WindowGapAirflowControl();
 
-    void SkyDifSolarShading();
+    void SkyDifSolarShading(EnergyPlusData &state);
 
     void CalcWindowProfileAngles();
 
@@ -394,23 +397,25 @@ namespace SolarShading {
                                 int const HourNum   // Hour number
     );
 
-    void CalcBeamSolarOnWinRevealSurface();
+    void CalcBeamSolarOnWinRevealSurface(EnergyPlusData &state);
 
     void ReportSurfaceShading();
 
     void ReportSurfaceErrors();
 
-    void ComputeWinShadeAbsorpFactors();
+    void ComputeWinShadeAbsorpFactors(EnergyPlusData &state);
 
     void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state);
 
     void CalcInteriorWinTransDifSolInitialDistribution(
+        EnergyPlusData &state,
         int const IntWinEnclosureNum,     // Interior Window Enclosure index number
         int const IntWinSurfNum,          // Interior Window Surface number
         Real64 const IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent enclosure [W]
     );
 
-    void CalcComplexWindowOverlap(BSDFGeomDescr &Geom,               // State Geometry
+    void CalcComplexWindowOverlap(EnergyPlusData &state,
+                                  BSDFGeomDescr &Geom,               // State Geometry
                                   BSDFWindowGeomDescr const &Window, // Window Geometry
                                   int const ISurf                    // Surface number of the complex fenestration
     );

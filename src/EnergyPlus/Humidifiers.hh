@@ -97,7 +97,6 @@ namespace Humidifiers {
     public:
         // Members
         std::string Name; // unique name of component
-        //    CHARACTER(len=MaxNameLength) :: HumType           =' ' ! Type of humidifier
         int HumType_Code;           // Pointer to Humidifier in list of humidifiers
         int EquipIndex;             // Pointer to Humidifier in list of humidifiers
         std::string Sched;          // name of availability schedule
@@ -157,9 +156,9 @@ namespace Humidifiers {
         {
         }
 
-        void InitHumidifier(); // number of the current humidifier being simulated
+        void InitHumidifier(EnergyPlusData &state); // number of the current humidifier being simulated
 
-        void SizeHumidifier(); // number of the current humidifier being sized
+        void SizeHumidifier(EnergyPlusData &state); // number of the current humidifier being sized
 
         void ControlHumidifier(Real64 &WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
         );

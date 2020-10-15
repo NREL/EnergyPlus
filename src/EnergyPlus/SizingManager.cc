@@ -52,10 +52,10 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -69,7 +69,6 @@
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -218,14 +217,14 @@ namespace SizingManager {
         SysSizingRunDone = false;
         ZoneSizingRunDone = false;
         curName = "Unknown";
-        GetOARequirements();          // get the OA requirements object
-        GetZoneAirDistribution();     // get zone air distribution objects
-        GetZoneHVACSizing();          // get zone HVAC sizing object
-        GetAirTerminalSizing();       // get air terminal sizing object
-        GetSizingParams(state.files); // get the building level sizing paramets
-        GetZoneSizingInput();         // get the Zone Sizing input
-        GetSystemSizingInput();       // get the System Sizing input
-        GetPlantSizingInput();        // get the Plant Sizing input
+        GetOARequirements(state);          // get the OA requirements object
+        GetZoneAirDistribution(state);     // get zone air distribution objects
+        GetZoneHVACSizing(state);          // get zone HVAC sizing object
+        GetAirTerminalSizing(state);       // get air terminal sizing object
+        GetSizingParams(state); // get the building level sizing paramets
+        GetZoneSizingInput(state);         // get the Zone Sizing input
+        GetSystemSizingInput(state);       // get the System Sizing input
+        GetPlantSizingInput(state);        // get the Plant Sizing input
 
         // okay, check sizing inputs vs desires vs requirements
         if (DoZoneSizing || DoSystemSizing) {
@@ -238,7 +237,7 @@ namespace SizingManager {
 
         // determine if the second set of zone sizing calculations should be performed
         // that include a pulse for the load component reporting
-        isUserReqCompLoadReport = isCompLoadRepReq(); // check getinput structure if load component report is requested
+        isUserReqCompLoadReport = isCompLoadRepReq(state); // check getinput structure if load component report is requested
         bool fileHasSizingPeriodDays =
             hasSizingPeriodsDays(); // check getinput if SizingPeriod:DesignDays or SizingPeriod:WeatherFileDays are present
         if (DoZoneSizing && (NumZoneSizingInput > 0) && fileHasSizingPeriodDays) {
@@ -316,14 +315,14 @@ namespace SizingManager {
                     if (ErrorsFound) break;
 
                     // check that environment is one of the design days
-                    if (KindOfSim == ksRunPeriodWeather) {
+                    if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         continue;
                     }
 
                     ++NumSizingPeriodsPerformed;
 
                     BeginEnvrnFlag = true;
-                    if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
+                    if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                         // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can
                         // more easily converge fewer warmup days are allowed
                         DisplayString("Suppressing Initialization of New Environment Parameters");
@@ -361,8 +360,8 @@ namespace SizingManager {
                                     DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                                 }
                             }
-                            UpdateZoneSizing(state, BeginDay);
-                            UpdateFacilitySizing(state, BeginDay);
+                            UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::BeginDay);
+                            UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::BeginDay);
                         }
 
                         for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -393,7 +392,7 @@ namespace SizingManager {
 
                                 // set flag for pulse used in load component reporting
                                 doLoadComponentPulseNow =
-                                    CalcdoLoadComponentPulseNow(isPulseZoneSizing, WarmupFlag, HourOfDay, TimeStep, KindOfSim, DayOfSim);
+                                    CalcdoLoadComponentPulseNow(isPulseZoneSizing, WarmupFlag, HourOfDay, TimeStep, state.dataGlobal->KindOfSim, DayOfSim);
 
                                 ManageWeather(state);
 
@@ -421,8 +420,8 @@ namespace SizingManager {
                         } // ... End hour loop.
 
                         if (EndDayFlag) {
-                            UpdateZoneSizing(state, EndDay);
-                            UpdateFacilitySizing(state, EndDay);
+                            UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndDay);
+                            UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndDay);
                         }
 
                         if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
@@ -437,8 +436,8 @@ namespace SizingManager {
                 } // ... End environment loop
 
                 if (NumSizingPeriodsPerformed > 0) {
-                    UpdateZoneSizing(state, state.dataGlobal->EndZoneSizingCalc);
-                    UpdateFacilitySizing(state, state.dataGlobal->EndZoneSizingCalc);
+                    UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
+                    UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
                     ShowSevereError(RoutineName + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
@@ -454,7 +453,7 @@ namespace SizingManager {
             // both the pulse and normal zone sizing is complete so now post processing of the results is performed
             if (CompLoadReportIsReq) {
                 // call the routine that computes the decay curve
-                ComputeLoadComponentDecayCurve(state.files);
+                ComputeLoadComponentDecayCurve(state);
                 // remove some of the arrays used to derive the decay curves
                 DeallocateLoadComponentArrays();
             }
@@ -502,7 +501,7 @@ namespace SizingManager {
                 GetNextEnvironment(state, Available, ErrorsFound); // get an environment
 
                 // check that environment is one of the design days
-                if (KindOfSim == ksRunPeriodWeather) {
+                if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                     continue;
                 }
 
@@ -512,7 +511,7 @@ namespace SizingManager {
                 ++NumSizingPeriodsPerformed;
 
                 BeginEnvrnFlag = true;
-                if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
+                if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                     // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                     // easily converge fewer warmup days are allowed
                     DisplayString("Suppressing Initialization of New Environment Parameters");
@@ -544,7 +543,7 @@ namespace SizingManager {
                             DisplayString("Calculating System sizing");
                             DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                         }
-                        UpdateSysSizing(state, BeginDay);
+                        UpdateSysSizing(state, DataGlobalConstants::CallIndicator::BeginDay);
                     }
 
                     for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -573,7 +572,7 @@ namespace SizingManager {
 
                             ManageWeather(state);
 
-                            UpdateSysSizing(state, DuringDay);
+                            UpdateSysSizing(state, DataGlobalConstants::CallIndicator::DuringDay);
 
                             BeginHourFlag = false;
                             BeginDayFlag = false;
@@ -585,7 +584,7 @@ namespace SizingManager {
 
                     } // ... End hour loop.
 
-                    if (EndDayFlag) UpdateSysSizing(state, EndDay);
+                    if (EndDayFlag) UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndDay);
 
                     if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
                         ++CurOverallSimDay;
@@ -596,7 +595,7 @@ namespace SizingManager {
             } // ... End environment loop
 
             if (NumSizingPeriodsPerformed > 0) {
-                UpdateSysSizing(state, EndSysSizingCalc);
+                UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndSysSizingCalc);
                 SysSizingRunDone = true;
             } else {
                 ShowSevereError(RoutineName + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
@@ -633,7 +632,7 @@ namespace SizingManager {
                         DOASHeatGainRateAtClPk = 0.0;
                         TStatSetPtAtPk = 0.0;
                     }
-                    ReportZoneSizing(state.files,
+                    ReportZoneSizing(state,
                                      FinalZoneSizing(CtrlZoneNum).ZoneName,
                                      "Cooling",
                                      CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad,
@@ -696,7 +695,7 @@ namespace SizingManager {
                         DOASHeatGainRateAtHtPk = 0.0;
                         TStatSetPtAtPk = 0.0;
                     }
-                    ReportZoneSizing(state.files,
+                    ReportZoneSizing(state,
                                      FinalZoneSizing(CtrlZoneNum).ZoneName,
                                      "Heating",
                                      CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad,
@@ -782,7 +781,7 @@ namespace SizingManager {
                     coolCap = FinalSysSizing(AirLoopNum).TotCoolCap;
                 }
                 if (coolPeakDD > 0) {
-                    ReportSysSizing(state.files,
+                    ReportSysSizing(state,
                                     curName,
                                     "Cooling",
                                     coolPeakLoadKind,
@@ -793,7 +792,7 @@ namespace SizingManager {
                                     coolPeakDDDate,
                                     SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(coolPeakDD));
                 } else {
-                    ReportSysSizing(state.files,
+                    ReportSysSizing(state,
                                     curName,
                                     "Cooling",
                                     coolPeakLoadKind,
@@ -806,7 +805,7 @@ namespace SizingManager {
                 }
                 int heatPeakDD = SysSizPeakDDNum(AirLoopNum).HeatPeakDD;
                 if (heatPeakDD > 0) {
-                    ReportSysSizing(state.files,
+                    ReportSysSizing(state,
                                     curName,
                                     "Heating",
                                     "Sensible",
@@ -817,7 +816,7 @@ namespace SizingManager {
                                     SysSizPeakDDNum(AirLoopNum).cHeatPeakDDDate,
                                     SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(heatPeakDD));
                 } else {
-                    ReportSysSizing(state.files,
+                    ReportSysSizing(state,
                                     curName,
                                     "Heating",
                                     "Sensible",
@@ -851,7 +850,12 @@ namespace SizingManager {
     }
 
     bool CalcdoLoadComponentPulseNow(
-        bool const isPulseZoneSizing, bool const WarmupFlag, int const HourOfDay, int const TimeStep, int const KindOfSim, int const DayOfSim)
+        bool const isPulseZoneSizing,
+        bool const WarmupFlag,
+        int const HourOfDay,
+        int const TimeStep,
+        DataGlobalConstants::KindOfSim const KindOfSim,
+        int const DayOfSim)
     {
         // This routine decides whether or not to do a Load Component Pulse.  True when yes it should, false when in shouldn't
         // This check looks to do the pulse at the first time step of the 10th hour of the day while not in warmup mode.
@@ -862,7 +866,7 @@ namespace SizingManager {
         int const TimeStepToPulse(1);
 
         if ((isPulseZoneSizing) && (!WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) &&
-            ((KindOfSim == ksRunPeriodDesign) || (DayOfSim == 1))) {
+            ((KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodDesign) || (DayOfSim == 1))) {
             return true;
         } else {
             return false;
@@ -1996,7 +2000,7 @@ namespace SizingManager {
                                                                DataHeatBalance::Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).Multiplier *
                                                                DataHeatBalance::Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).ListMultiplier);
                                         Real64 schMultiplier =
-                                            ScheduleManager::LookUpScheduleValue(DataHeatBalance::People(PeopleNum).NumberOfPeoplePtr, hrOfDay, TS);
+                                            ScheduleManager::LookUpScheduleValue(state, DataHeatBalance::People(PeopleNum).NumberOfPeoplePtr, hrOfDay, TS);
                                         PeopleInZone = PeopleInZone * schMultiplier;
                                         TotConcurrentPeopleOnSys += PeopleInZone;
                                     }
@@ -2041,7 +2045,7 @@ namespace SizingManager {
         }
     }
 
-    void GetOARequirements()
+    void GetOARequirements(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2103,7 +2107,8 @@ namespace SizingManager {
             // Start Loading the System Input
             for (OAIndex = 1; OAIndex <= NumOARequirements; ++OAIndex) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               OAIndex,
                                               Alphas,
                                               NumAlphas,
@@ -2118,7 +2123,8 @@ namespace SizingManager {
 
                 OARequirements(OAIndex).Name = Alphas(1);
 
-                ProcessInputOARequirements(CurrentModuleObject,
+                ProcessInputOARequirements(state,
+                                           CurrentModuleObject,
                                            OAIndex,
                                            Alphas,
                                            NumAlphas,
@@ -2144,7 +2150,8 @@ namespace SizingManager {
         }
     }
 
-    void ProcessInputOARequirements(std::string const &CurrentModuleObject,
+    void ProcessInputOARequirements(EnergyPlusData &state,
+                                    std::string const &CurrentModuleObject,
                                     int const OAIndex,
                                     Array1D_string const &Alphas,
                                     int &NumAlphas,
@@ -2275,7 +2282,7 @@ namespace SizingManager {
         OARequirements(OAIndex).OAFlowFracSchPtr = DataGlobals::ScheduleAlwaysOn;
         if (NumAlphas > 2) {
             if (!lAlphaBlanks(3)) {
-                OARequirements(OAIndex).OAFlowFracSchPtr = GetScheduleIndex(Alphas(3));
+                OARequirements(OAIndex).OAFlowFracSchPtr = GetScheduleIndex(state, Alphas(3));
                 if (OARequirements(OAIndex).OAFlowFracSchPtr > 0) {
                     if (!CheckScheduleValueMinMax(OARequirements(OAIndex).OAFlowFracSchPtr, ">=", 0.0, "<=", 1.0)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
@@ -2293,7 +2300,7 @@ namespace SizingManager {
 
         if (NumAlphas > 3) {
             if (!lAlphaBlanks(4)) {
-                OARequirements(OAIndex).OAPropCtlMinRateSchPtr = GetScheduleIndex(Alphas(4));
+                OARequirements(OAIndex).OAPropCtlMinRateSchPtr = GetScheduleIndex(state, Alphas(4));
                 if (OARequirements(OAIndex).OAPropCtlMinRateSchPtr > 0) {
                     if (!CheckScheduleValueMinMax(OARequirements(OAIndex).OAPropCtlMinRateSchPtr, ">=", 0.0, "<=", 1.0)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
@@ -2310,7 +2317,7 @@ namespace SizingManager {
         }
     }
 
-    void GetZoneAirDistribution()
+    void GetZoneAirDistribution(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2369,7 +2376,7 @@ namespace SizingManager {
             // Start Loading the zone air distribution input
             for (ZADIndex = 1; ZADIndex <= NumZoneAirDistribution; ++ZADIndex) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state, CurrentModuleObject,
                                               ZADIndex,
                                               Alphas,
                                               NumAlphas,
@@ -2419,7 +2426,7 @@ namespace SizingManager {
                 if (NumAlphas > 1) {
                     if (!lAlphaBlanks(2)) {
                         ZoneAirDistribution(ZADIndex).ZoneADEffSchName = Alphas(2);
-                        ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr = GetScheduleIndex(Alphas(2));
+                        ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr = GetScheduleIndex(state, Alphas(2));
                         if (ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr > 0) {
                             if (!CheckScheduleValueMinMax(ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr, ">", 0.0)) {
                                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + ZoneAirDistribution(ZADIndex).Name + "\",");
@@ -2449,7 +2456,7 @@ namespace SizingManager {
         }
     }
 
-    void GetSizingParams(IOFiles &ioFiles)
+    void GetSizingParams(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2480,7 +2487,8 @@ namespace SizingManager {
         NumSizParams = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         if (NumSizParams == 1) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           1,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -2526,7 +2534,8 @@ namespace SizingManager {
             cAlphaArgs(1) = "Comma";
             SizingFileColSep = CharComma; // comma
         } else if (Temp == 1) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           1,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -2552,12 +2561,12 @@ namespace SizingManager {
                                  "\", Commas will be used to separate fields.");
                 cAlphaArgs(1) = "Comma";
             }
-            print(ioFiles.eio, "! <Sizing Output Files>,Style\n");
-            print(ioFiles.eio, "Sizing Output Files,{}\n", cAlphaArgs(1));
+            print(state.files.eio, "! <Sizing Output Files>,Style\n");
+            print(state.files.eio, "Sizing Output Files,{}\n", cAlphaArgs(1));
         }
     }
 
-    void GetZoneSizingInput()
+    void GetZoneSizingInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2623,14 +2632,15 @@ namespace SizingManager {
 
         if (NumSizingZoneStatements > 0) {
             errFlag = false;
-            GetZoneAndZoneListNames(errFlag, NumZones, ZoneNames, NumZoneLists, ZoneListNames);
+            GetZoneAndZoneListNames(state, errFlag, NumZones, ZoneNames, NumZoneLists, ZoneListNames);
         }
 
         cCurrentModuleObject = "Sizing:Zone";
         NumZoneSizingInput = 0;
         errFlag = false;
         for (Item = 1; Item <= NumSizingZoneStatements; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Item,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -2686,7 +2696,8 @@ namespace SizingManager {
             ZoneSizIndex = 0;
             for (Item = 1; Item <= NumSizingZoneStatements; ++Item) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               Item,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -3156,7 +3167,7 @@ namespace SizingManager {
         }
     }
 
-    void GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames)
+    void GetZoneAndZoneListNames(EnergyPlusData &state, bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3188,7 +3199,8 @@ namespace SizingManager {
         ZoneNames.allocate(NumZones);
 
         for (Item = 1; Item <= NumZones; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Item,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -3213,7 +3225,8 @@ namespace SizingManager {
         ZoneListNames.allocate(NumZoneLists);
 
         for (Item = 1; Item <= NumZoneLists; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Item,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -3240,7 +3253,7 @@ namespace SizingManager {
         }
     }
 
-    void GetSystemSizingInput()
+    void GetSystemSizingInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3324,7 +3337,8 @@ namespace SizingManager {
         }
 
         for (SysSizIndex = 1; SysSizIndex <= NumSysSizInput; ++SysSizIndex) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           SysSizIndex,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -3755,7 +3769,7 @@ namespace SizingManager {
         }
     }
 
-    void GetPlantSizingInput()
+    void GetPlantSizingInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3808,7 +3822,8 @@ namespace SizingManager {
         }
 
         for (PltSizIndex = 1; PltSizIndex <= NumPltSizInput; ++PltSizIndex) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           PltSizIndex,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -3920,7 +3935,7 @@ namespace SizingManager {
             if (ErrorsFound) break;
 
             // check that environment is one of the design days
-            if (KindOfSim == ksRunPeriodWeather) {
+            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                 continue;
             }
 
@@ -3974,7 +3989,7 @@ namespace SizingManager {
         } // ... End environment loop.
     }
 
-    void ReportZoneSizing(IOFiles &ioFiles,
+    void ReportZoneSizing(EnergyPlusData &state,
                           std::string const &ZoneName,   // the name of the zone
                           std::string const &LoadType,   // the description of the input variable
                           Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
@@ -4030,13 +4045,13 @@ namespace SizingManager {
                 "Rate {m3/s}, User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
                 "Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
                 "Calc DOAS Heat Addition Rate {W}");
-            print(ioFiles.eio, "{}\n", Format_990);
+            print(state.files.eio, "{}\n", Format_990);
             ReportZoneSizingMyOneTimeFlag = false;
         }
 
         static constexpr auto Format_991(
             " Zone Sizing Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
-        print(ioFiles.eio,
+        print(state.files.eio,
               Format_991,
               ZoneName,
               LoadType,
@@ -4072,7 +4087,7 @@ namespace SizingManager {
     }
 
     // Writes system sizing data to EIO file using one row per system
-    void ReportSysSizing(IOFiles &ioFiles,
+    void ReportSysSizing(EnergyPlusData &state,
                          std::string const &SysName,      // the name of the zone
                          std::string const &LoadType,     // either "Cooling" or "Heating"
                          std::string const &PeakLoadKind, // either "Sensible" or "Total"
@@ -4087,14 +4102,14 @@ namespace SizingManager {
         using General::RoundSigDigits;
 
         if (ReportSysSizingMyOneTimeFlag) {
-            print(ioFiles.eio,
+            print(state.files.eio,
                   "{}\n",
                   "! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity, Calc Des Air "
                   "Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak");
             ReportSysSizingMyOneTimeFlag = false;
         }
         std::string dateHrMin = DesDayDate + " " + TimeIndexToHrMinString(TimeStepIndex);
-        print(ioFiles.eio,
+        print(state.files.eio,
               " System Sizing Information, {}, {}, {}, {:.2R}, {:.5R}, {:.5R}, {}, {}\n",
               SysName,
               LoadType,
@@ -4120,7 +4135,7 @@ namespace SizingManager {
         return format(PeakHrMinFmt, tHr, tMin);
     }
 
-    void GetZoneHVACSizing()
+    void GetZoneHVACSizing(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Nigusse - FSEC
@@ -4243,7 +4258,8 @@ namespace SizingManager {
                 lAlphaBlanks = true;
                 lNumericBlanks = true;
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              CurrentModuleObject,
                                               zSIndex,
                                               Alphas,
                                               NumAlphas,
@@ -4726,7 +4742,7 @@ namespace SizingManager {
         }
     }
 
-    void GetAirTerminalSizing()
+    void GetAirTerminalSizing(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         M.J. Witte
@@ -4758,7 +4774,8 @@ namespace SizingManager {
             // Start Loading the System Input
             for (int zSIndex = 1; zSIndex <= DataSizing::NumAirTerminalSizingSpec; ++zSIndex) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               zSIndex,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -4788,7 +4805,7 @@ namespace SizingManager {
     }
 
     // Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
-    void UpdateFacilitySizing(EnergyPlusData &state, int const CallIndicator)
+    void UpdateFacilitySizing(EnergyPlusData &EP_UNUSED(state), DataGlobalConstants::CallIndicator const CallIndicator)
     {
         int NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 
@@ -4842,10 +4859,10 @@ namespace SizingManager {
             CalcFinalFacilitySizing.HeatZoneTempSeq = 0.;
             CalcFinalFacilitySizing.HeatLoadSeq = 0.;
         }
-        if (CallIndicator == BeginDay) {
+        if (CallIndicator == DataGlobalConstants::CallIndicator::BeginDay) {
             CalcFacilitySizing(CurOverallSimDay).HeatDDNum = CurOverallSimDay;
             CalcFacilitySizing(CurOverallSimDay).CoolDDNum = CurOverallSimDay;
-        } else if (CallIndicator == DuringDay) {
+        } else if (CallIndicator == DataGlobalConstants::CallIndicator::DuringDay) {
             int TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
             // save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
             Real64 sumCoolLoad = 0.;
@@ -4888,7 +4905,7 @@ namespace SizingManager {
                 CalcFacilitySizing(CurOverallSimDay).HeatOutHumRatSeq(TimeStepInDay) = wghtdHeatHumRat / sumHeatLoad;
             }
 
-        } else if (CallIndicator == EndDay) {
+        } else if (CallIndicator == DataGlobalConstants::CallIndicator::EndDay) {
             for (int TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex) {
                 if (CalcFacilitySizing(CurOverallSimDay).CoolLoadSeq(TimeStepIndex) > CalcFacilitySizing(CurOverallSimDay).DesCoolLoad) {
                     CalcFacilitySizing(CurOverallSimDay).DesCoolLoad = CalcFacilitySizing(CurOverallSimDay).CoolLoadSeq(TimeStepIndex);
@@ -4900,7 +4917,7 @@ namespace SizingManager {
                 }
             }
 
-        } else if (CallIndicator == state.dataGlobal->EndZoneSizingCalc) {
+        } else if (CallIndicator == DataGlobalConstants::CallIndicator::EndZoneSizingCalc) {
             for (int DDNum = 1; DDNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DDNum) {
                 if (CalcFacilitySizing(DDNum).DesCoolLoad > CalcFinalFacilitySizing.DesCoolLoad) {
                     CalcFinalFacilitySizing.DesCoolLoad = CalcFacilitySizing(DDNum).DesCoolLoad;
