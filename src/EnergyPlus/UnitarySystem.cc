@@ -14016,8 +14016,6 @@ namespace UnitarySystems {
         if (this->m_FanExists && OutletNode > 0) {
             if (CompOnMassFlow > 0.0) {
                 this->FanPartLoadRatio = DataLoopNode::Node(OutletNode).MassFlowRate / CompOnMassFlow;
-            } else {
-                this->FanPartLoadRatio = 0.0;
             }
             if (AirLoopNum > 0) {
                 if (this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil) {
