@@ -139,17 +139,17 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
 
     // Calculate expected values
     Real64 rho_evap = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(PltSizNum).FluidName,
-                                                        DataGlobals::CWInitConvTemp,
+                                                        DataGlobalConstants::CWInitConvTemp(),
                                                         DataPlant::PlantLoop(PltSizNum).FluidIndex,
                                                         "ChillerHeater_Autosize_TEST");
 
     Real64 Cp_evap = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(PltSizNum).FluidName,
-                                                            DataGlobals::CWInitConvTemp,
+                                                            DataGlobalConstants::CWInitConvTemp(),
                                                             DataPlant::PlantLoop(PltSizNum).FluidIndex,
                                                             "ChillerHeater_Autosize_TEST");
 
     Real64 rho_cond = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(PltSizCondNum).FluidName,
-                                                        DataGlobals::CWInitConvTemp,
+                                                        DataGlobalConstants::CWInitConvTemp(),
                                                         DataPlant::PlantLoop(PltSizCondNum).FluidIndex,
                                                         "ChillerHeater_Autosize_TEST");
 

@@ -2863,8 +2863,6 @@ namespace CurveManager {
         // DP = [f*(L/D) + K] * (rho * V^2) / 2
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-
         // Return value
         Real64 PressureCurveValue;
 
@@ -2889,7 +2887,7 @@ namespace CurveManager {
         ConstantF = DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).ConstantF;
 
         // Intermediate calculations
-        CrossSectArea = (Pi / 4.0) * pow_2(Diameter);
+        CrossSectArea = (DataGlobalConstants::Pi() / 4.0) * pow_2(Diameter);
         Velocity = MassFlow / (Density * CrossSectArea);
         ReynoldsNumber = Density * Diameter * Velocity / Viscosity; // assuming mu here
         RoughnessRatio = Roughness / Diameter;

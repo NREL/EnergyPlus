@@ -50,7 +50,6 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -657,7 +656,7 @@ namespace HVACFan {
         isNumericFieldBlank.deallocate();
 
         bool anyEMSRan = false;
-        EMSManager::ManageEMS(state, DataGlobals::emsCallFromComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
+        EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
     }
 
     void
@@ -1082,7 +1081,7 @@ namespace HVACFan {
 
     void FanSystem::report()
     {
-        m_fanEnergy = m_fanPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        m_fanEnergy = m_fanPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         m_deltaTemp = m_outletAirTemp - m_inletAirTemp;
     }
 

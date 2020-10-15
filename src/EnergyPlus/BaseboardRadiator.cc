@@ -96,7 +96,6 @@ namespace BaseboardRadiator {
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using DataHVACGlobals::SmallLoad;
     using DataPlant::PlantLoop;
@@ -237,7 +236,7 @@ namespace BaseboardRadiator {
         }
 
         UpdateBaseboard(state, BaseboardNum);
-        baseboard->Baseboard(BaseboardNum).Energy = baseboard->Baseboard(BaseboardNum).Power * DataHVACGlobals::TimeStepSys * SecInHour;
+        baseboard->Baseboard(BaseboardNum).Energy = baseboard->Baseboard(BaseboardNum).Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     void GetBaseboardInput(EnergyPlusData &state)
@@ -576,7 +575,7 @@ namespace BaseboardRadiator {
             WaterInletNode = baseboard->Baseboard(BaseboardNum).WaterInletNode;
             rho = GetDensityGlycol(state,
                                    PlantLoop(baseboard->Baseboard(BaseboardNum).LoopNum).FluidName,
-                                   DataGlobals::HWInitConvTemp,
+                                   DataGlobalConstants::HWInitConvTemp(),
                                    PlantLoop(baseboard->Baseboard(BaseboardNum).LoopNum).FluidIndex,
                                    RoutineName);
             baseboard->Baseboard(BaseboardNum).WaterMassFlowRateMax = rho * baseboard->Baseboard(BaseboardNum).WaterVolFlowRateMax;
@@ -588,7 +587,7 @@ namespace BaseboardRadiator {
                                baseboard->Baseboard(BaseboardNum).LoopSideNum,
                                baseboard->Baseboard(BaseboardNum).BranchNum,
                                baseboard->Baseboard(BaseboardNum).CompNum);
-            Node(WaterInletNode).Temp = DataGlobals::HWInitConvTemp;
+            Node(WaterInletNode).Temp = DataGlobalConstants::HWInitConvTemp();
             Cp = GetSpecificHeatGlycol(state,
                                        PlantLoop(baseboard->Baseboard(BaseboardNum).LoopNum).FluidName,
                                        Node(WaterInletNode).Temp,
@@ -752,12 +751,12 @@ namespace BaseboardRadiator {
                     if (DesCoilLoad >= SmallLoad) {
                         Cp = GetSpecificHeatGlycol(state,
                                                    PlantLoop(baseboard->Baseboard(BaseboardNum).LoopNum).FluidName,
-                                                   HWInitConvTemp,
+                                                   DataGlobalConstants::HWInitConvTemp(),
                                                    PlantLoop(baseboard->Baseboard(BaseboardNum).LoopNum).FluidIndex,
                                                    RoutineName);
                         rho = GetDensityGlycol(state,
                                                PlantLoop(baseboard->Baseboard(BaseboardNum).LoopNum).FluidName,
-                                               DataGlobals::HWInitConvTemp,
+                                               DataGlobalConstants::HWInitConvTemp(),
                                                PlantLoop(baseboard->Baseboard(BaseboardNum).LoopNum).FluidIndex,
                                                RoutineName);
                         WaterVolFlowRateMaxDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
@@ -820,7 +819,7 @@ namespace BaseboardRadiator {
                     WaterInletNode = baseboard->Baseboard(BaseboardNum).WaterInletNode;
                     rho = GetDensityGlycol(state,
                                             PlantLoop(baseboard->Baseboard(BaseboardNum).LoopNum).FluidName,
-                                           DataGlobals::HWInitConvTemp,
+                                           DataGlobalConstants::HWInitConvTemp(),
                                            PlantLoop(baseboard->Baseboard(BaseboardNum).LoopNum).FluidIndex,
                                            RoutineName);
                     Node(WaterInletNode).MassFlowRate = rho * baseboard->Baseboard(BaseboardNum).WaterVolFlowRateMax;
@@ -1087,13 +1086,13 @@ namespace BaseboardRadiator {
             // To prevent possible underflows (numbers smaller than the computer can handle) we must break
             // the calculation up into steps and check the size of the exponential arguments.
             AA = -CapacityRatio * std::pow(NTU, 0.78);
-            if (AA < EXP_LowerLimit) {
+            if (AA < DataPrecisionGlobals::EXP_LowerLimit) {
                 BB = 0.0;
             } else {
                 BB = std::exp(AA);
             }
             CC = (1.0 / CapacityRatio) * std::pow(NTU, 0.22) * (BB - 1.0);
-            if (CC < EXP_LowerLimit) {
+            if (CC < DataPrecisionGlobals::EXP_LowerLimit) {
                 Effectiveness = 1.0;
             } else {
                 Effectiveness = 1.0 - std::exp(CC);

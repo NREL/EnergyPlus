@@ -92,18 +92,12 @@ namespace WindTurbine {
     // Mazharul Islam, David S.K. Ting, and Amir Fartaj. 2008. Aerodynamic Models for Darrieus-type sSraight-bladed
     //     Vertical Axis Wind Turbines. Renewable & Sustainable Energy Reviews, Volume 12, pp.1087-1109
 
-  //  using namespace DataPrecisionGlobals;
-  //  using namespace DataGenerators;
     using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::DegToRadians;
-    using DataGlobals::Pi;
     using DataGlobals::ScheduleAlwaysOn;
-    using DataGlobals::SecInHour;
-
     static std::string const BlankString;
 
     void SimWindTurbine(EnergyPlusData &state,
-                        int const EP_UNUSED(GeneratorType), // Type of Generator
+                        GeneratorType const EP_UNUSED(GeneratorType), // Type of Generator
                         std::string const &GeneratorName,   // User specified name of Generator
                         int &GeneratorIndex,                // Generator index
                         bool const RunFlag,                 // ON or OFF
@@ -159,7 +153,7 @@ namespace WindTurbine {
     }
 
     void GetWTGeneratorResults(EnergyPlusData &state,
-                               int const EP_UNUSED(GeneratorType), // Type of Generator
+                               GeneratorType const EP_UNUSED(GeneratorType), // Type of Generator
                                int const GeneratorIndex,           // Generator number
                                Real64 &GeneratorPower,             // Electrical power
                                Real64 &GeneratorEnergy,            // Electrical energy
@@ -818,9 +812,9 @@ namespace WindTurbine {
             LocalWindSpeed < state.dataWindTurbine->WindTurbineSys(WindTurbineNum).CutOutSpeed) {
 
             // System is on
-            Period = 2.0 * Pi;
+            Period = 2.0 * DataGlobalConstants::Pi();
             Omega = (RotorSpeed * Period) / SecInMin;
-            SweptArea = (Pi * pow_2(RotorD)) / 4;
+            SweptArea = (DataGlobalConstants::Pi() * pow_2(RotorD)) / 4;
             TipSpeedRatio = (Omega * (RotorD / 2.0)) / LocalWindSpeed;
 
             // Limit maximum tip speed ratio
@@ -888,8 +882,8 @@ namespace WindTurbine {
 
                     InducedVel = LocalWindSpeed * 2.0 / 3.0;
                     // Velocity components
-                    Real64 const sin_AzimuthAng(std::sin(AzimuthAng * DegToRadians));
-                    Real64 const cos_AzimuthAng(std::cos(AzimuthAng * DegToRadians));
+                    Real64 const sin_AzimuthAng(std::sin(AzimuthAng * DataGlobalConstants::DegToRadians()));
+                    Real64 const cos_AzimuthAng(std::cos(AzimuthAng * DataGlobalConstants::DegToRadians()));
                     ChordalVel = RotorVel + InducedVel * cos_AzimuthAng;
                     NormalVel = InducedVel * sin_AzimuthAng;
                     RelFlowVel = std::sqrt(pow_2(ChordalVel) + pow_2(NormalVel));
@@ -898,8 +892,8 @@ namespace WindTurbine {
                     AngOfAttack = std::atan((sin_AzimuthAng / ((RotorVel / LocalWindSpeed) / (InducedVel / LocalWindSpeed) + cos_AzimuthAng)));
 
                     // Force coefficients
-                    Real64 const sin_AngOfAttack(std::sin(AngOfAttack * DegToRadians));
-                    Real64 const cos_AngOfAttack(std::cos(AngOfAttack * DegToRadians));
+                    Real64 const sin_AngOfAttack(std::sin(AngOfAttack * DataGlobalConstants::DegToRadians()));
+                    Real64 const cos_AngOfAttack(std::cos(AngOfAttack * DataGlobalConstants::DegToRadians()));
                     TanForceCoeff = std::abs(state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LiftCoeff * sin_AngOfAttack -
                                              state.dataWindTurbine->WindTurbineSys(WindTurbineNum).DragCoeff * cos_AngOfAttack);
                     NorForceCoeff =
@@ -982,7 +976,7 @@ namespace WindTurbine {
 
         using DataHVACGlobals::TimeStepSys;
 
-        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Energy = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Power * TimeStepSys * SecInHour;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Energy = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Power * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     //*****************************************************************************************
