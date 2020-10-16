@@ -463,7 +463,8 @@ namespace IntegratedHeatPump {
                              bool &ErrorsFound            // set to true if problem
     );
 
-    int GetGridLoadCtrlModeIHP(const int DXCoilNum // coil index No
+    int GetGridLoadCtrlModeIHP(EnergyPlusData &state,
+                                const int DXCoilNum // coil index No
     );
 
     void ClearCoils(EnergyPlusData &state, int const DXCoilNum // coil ID

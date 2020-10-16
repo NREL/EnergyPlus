@@ -185,7 +185,6 @@ namespace Furnaces {
     using namespace ScheduleManager;
     using DXCoils::SimDXCoil;
     using Fans::SimulateFanComponents;
-    using VariableSpeedCoils::MaxSpedLevels;
 
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -4766,7 +4765,7 @@ namespace Furnaces {
             }
         }
         bool anyRan;
-        ManageEMS(state, emsCallFromComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
+        ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
     }
 
     // End of Get Input subroutines for this Module
@@ -5011,7 +5010,7 @@ namespace Furnaces {
                     if (Furnace(FurnaceNum).MaxHeatCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(state,
                                                PlantLoop(Furnace(FurnaceNum).LoopNum).FluidName,
-                                               DataGlobals::HWInitConvTemp,
+                                               DataGlobalConstants::HWInitConvTemp(),
                                                PlantLoop(Furnace(FurnaceNum).LoopNum).FluidIndex,
                                                RoutineName);
                         Furnace(FurnaceNum).MaxHeatCoilFluidFlow *= rho;
@@ -5083,7 +5082,7 @@ namespace Furnaces {
                     if (Furnace(FurnaceNum).MaxSuppCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(state,
                                                PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidName,
-                                               DataGlobals::HWInitConvTemp,
+                                               DataGlobalConstants::HWInitConvTemp(),
                                                PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidIndex,
                                                RoutineName);
                         Furnace(FurnaceNum).MaxSuppCoilFluidFlow *= rho;
@@ -5156,7 +5155,7 @@ namespace Furnaces {
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(state, PlantLoop(Furnace(FurnaceNum).LoopNum).FluidName,
-                                                   DataGlobals::HWInitConvTemp,
+                                                   DataGlobalConstants::HWInitConvTemp(),
                                                    PlantLoop(Furnace(FurnaceNum).LoopNum).FluidIndex,
                                                    RoutineName);
                             Furnace(FurnaceNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
@@ -5197,7 +5196,7 @@ namespace Furnaces {
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(state,
                                                    PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidName,
-                                                   DataGlobals::HWInitConvTemp,
+                                                   DataGlobalConstants::HWInitConvTemp(),
                                                    PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidIndex,
                                                    RoutineName);
                             Furnace(FurnaceNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
@@ -6079,14 +6078,12 @@ namespace Furnaces {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataGlobals::emsCallFromUnitarySystemSizing;
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using IntegratedHeatPump::IntegratedHeatPumps;
         using IntegratedHeatPump::SizeIHP;
         using VariableSpeedCoils::SimVariableSpeedCoils;
-        using VariableSpeedCoils::VarSpeedCoil;
         using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 
         // Locals
@@ -6107,7 +6104,7 @@ namespace Furnaces {
         Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
         int IHPCoilIndex(0);      // refer to cooling or heating coil in IHP
         bool anyRan;
-        ManageEMS(state, emsCallFromUnitarySystemSizing, anyRan, ObjexxFCL::Optional_int_const()); // calling point
+        ManageEMS(state, EMSManager::EMSCallFrom::UnitarySystemSizing, anyRan, ObjexxFCL::Optional_int_const()); // calling point
 
         ThisCtrlZoneNum = 0;
         DXCoolCap = 0.0;
@@ -6154,9 +6151,9 @@ namespace Furnaces {
             if (Furnace(FurnaceNum).bIsIHP) {
                 SizeIHP(state, Furnace(FurnaceNum).CoolingCoilIndex);
                 IHPCoilIndex = IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).SCCoilIndex;
-                Furnace(FurnaceNum).NumOfSpeedCooling = VarSpeedCoil(IHPCoilIndex).NumOfSpeeds;
-                MulSpeedFlowScale = VarSpeedCoil(IHPCoilIndex).RatedAirVolFlowRate /
-                                    VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(VarSpeedCoil(IHPCoilIndex).NormSpedLevel);
+                Furnace(FurnaceNum).NumOfSpeedCooling = state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).NumOfSpeeds;
+                MulSpeedFlowScale = state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).RatedAirVolFlowRate /
+                                    state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).NormSpedLevel);
                 IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).CoolVolFlowScale = MulSpeedFlowScale;
             } else {
                 SimVariableSpeedCoils(state,
@@ -6173,19 +6170,19 @@ namespace Furnaces {
                                       0.0,
                                       0.0,
                                       0.0); // conduct the sizing operation in the VS WSHP
-                Furnace(FurnaceNum).NumOfSpeedCooling = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).NumOfSpeeds;
-                MulSpeedFlowScale = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).RatedAirVolFlowRate /
-                                    VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex)
-                                        .MSRatedAirVolFlowRate(VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).NormSpedLevel);
+                Furnace(FurnaceNum).NumOfSpeedCooling = state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).NumOfSpeeds;
+                MulSpeedFlowScale = state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).RatedAirVolFlowRate /
+                                    state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex)
+                                        .MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).NormSpedLevel);
                 IHPCoilIndex = Furnace(FurnaceNum).CoolingCoilIndex;
             }
 
             for (Iter = 1; Iter <= Furnace(FurnaceNum).NumOfSpeedCooling; ++Iter) {
-                Furnace(FurnaceNum).CoolVolumeFlowRate(Iter) = VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Iter) * MulSpeedFlowScale;
-                Furnace(FurnaceNum).CoolMassFlowRate(Iter) = VarSpeedCoil(IHPCoilIndex).MSRatedAirMassFlowRate(Iter) * MulSpeedFlowScale;
+                Furnace(FurnaceNum).CoolVolumeFlowRate(Iter) = state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Iter) * MulSpeedFlowScale;
+                Furnace(FurnaceNum).CoolMassFlowRate(Iter) = state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirMassFlowRate(Iter) * MulSpeedFlowScale;
                 Furnace(FurnaceNum).MSCoolingSpeedRatio(Iter) =
-                    VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Iter) /
-                    VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Furnace(FurnaceNum).NumOfSpeedCooling);
+                    state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Iter) /
+                    state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Furnace(FurnaceNum).NumOfSpeedCooling);
             }
 
             if (Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit ||
@@ -6194,9 +6191,9 @@ namespace Furnaces {
                 if (Furnace(FurnaceNum).bIsIHP) {
                     SizeIHP(state, Furnace(FurnaceNum).CoolingCoilIndex);
                     IHPCoilIndex = IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).SHCoilIndex;
-                    Furnace(FurnaceNum).NumOfSpeedHeating = VarSpeedCoil(IHPCoilIndex).NumOfSpeeds;
-                    MulSpeedFlowScale = VarSpeedCoil(IHPCoilIndex).RatedAirVolFlowRate /
-                                        VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(VarSpeedCoil(IHPCoilIndex).NormSpedLevel);
+                    Furnace(FurnaceNum).NumOfSpeedHeating = state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).NumOfSpeeds;
+                    MulSpeedFlowScale = state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).RatedAirVolFlowRate /
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).NormSpedLevel);
                     IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).HeatVolFlowScale = MulSpeedFlowScale;
                 } else {
                     SimVariableSpeedCoils(state,
@@ -6213,19 +6210,19 @@ namespace Furnaces {
                                           0.0,
                                           0.0,
                                           0.0); // conduct the sizing operation in the VS WSHP
-                    Furnace(FurnaceNum).NumOfSpeedHeating = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).NumOfSpeeds;
-                    MulSpeedFlowScale = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).RatedAirVolFlowRate /
-                                        VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex)
-                                            .MSRatedAirVolFlowRate(VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).NormSpedLevel);
+                    Furnace(FurnaceNum).NumOfSpeedHeating = state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).NumOfSpeeds;
+                    MulSpeedFlowScale = state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).RatedAirVolFlowRate /
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex)
+                                            .MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).NormSpedLevel);
                     IHPCoilIndex = Furnace(FurnaceNum).HeatingCoilIndex;
                 }
 
                 for (Iter = 1; Iter <= Furnace(FurnaceNum).NumOfSpeedHeating; ++Iter) {
-                    Furnace(FurnaceNum).HeatVolumeFlowRate(Iter) = VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Iter) * MulSpeedFlowScale;
-                    Furnace(FurnaceNum).HeatMassFlowRate(Iter) = VarSpeedCoil(IHPCoilIndex).MSRatedAirMassFlowRate(Iter) * MulSpeedFlowScale;
+                    Furnace(FurnaceNum).HeatVolumeFlowRate(Iter) = state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Iter) * MulSpeedFlowScale;
+                    Furnace(FurnaceNum).HeatMassFlowRate(Iter) = state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirMassFlowRate(Iter) * MulSpeedFlowScale;
                     Furnace(FurnaceNum).MSHeatingSpeedRatio(Iter) =
-                        VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Iter) /
-                        VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Furnace(FurnaceNum).NumOfSpeedHeating);
+                        state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Iter) /
+                        state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Furnace(FurnaceNum).NumOfSpeedHeating);
                 }
             }
 
@@ -10328,9 +10325,6 @@ namespace Furnaces {
         using Psychrometrics::PsyCpAirFnW;
         using TempSolveRoot::SolveRoot;
         using VariableSpeedCoils::GetGridLoadCtrlMode;
-        using VariableSpeedCoils::GRID_LATENT;
-        using VariableSpeedCoils::GRID_SENLAT;
-        using VariableSpeedCoils::GRID_SENSIBLE;
         using VariableSpeedCoils::CompareGridSpeed;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -10350,7 +10344,7 @@ namespace Furnaces {
         static int ErrCountCyc(0); // Counter used to minimize the occurrence of output warnings
         static int ErrCountVar(0); // Counter used to minimize the occurrence of output warnings
         IHPOperationMode IHPMode(IHPOperationMode::IdleMode);
-        int GridResponseMode(VariableSpeedCoils::GRID_SENLAT);
+        int GridResponseMode(state.dataVariableSpeedCoils->GRID_SENLAT);
         int MaxSpeedNum(1);
 
         // FLOW
@@ -10433,12 +10427,12 @@ namespace Furnaces {
                              SupHeaterLoad);
 
         if (Furnace(FurnaceNum).bIsIHP) {
-            GridResponseMode = GetGridLoadCtrlModeIHP(Furnace(FurnaceNum).CoolingCoilIndex);
+            GridResponseMode = GetGridLoadCtrlModeIHP(state, Furnace(FurnaceNum).CoolingCoilIndex);
         } else {
-            GridResponseMode = GetGridLoadCtrlMode(Furnace(FurnaceNum).CoolingCoilIndex);
+            GridResponseMode = GetGridLoadCtrlMode(state, Furnace(FurnaceNum).CoolingCoilIndex);
         }
 
-        if ((QLatReq < (-1.0 * SmallLoad)) && (GridResponseMode != VariableSpeedCoils::GRID_SENSIBLE)) { // dehumidification mode
+        if ((QLatReq < (-1.0 * SmallLoad)) && (GridResponseMode != state.dataVariableSpeedCoils->GRID_SENSIBLE)) { // dehumidification mode
             if (QLatReq <= LatOutput || (QZnReq < -SmallLoad && QZnReq <= FullOutput) || (QZnReq > SmallLoad && QZnReq >= FullOutput)) {
                 PartLoadFrac = 1.0;
                 SpeedRatio = 1.0;
@@ -10468,7 +10462,7 @@ namespace Furnaces {
         }
 
         if (((QZnReq < -SmallLoad && NoCompOutput - QZnReq > SmallLoad) || (QZnReq > SmallLoad && QZnReq - NoCompOutput > SmallLoad)) &&
-            (GridResponseMode != VariableSpeedCoils::GRID_LATENT)) {
+            (GridResponseMode != state.dataVariableSpeedCoils->GRID_LATENT)) {
             if ((QZnReq > SmallLoad && QZnReq < FullOutput) || (QZnReq < (-1.0 * SmallLoad) && QZnReq > FullOutput)) {
 
                 Par(1) = FurnaceNum;
@@ -10547,7 +10541,7 @@ namespace Furnaces {
 
                         if (!Furnace(FurnaceNum).bIsIHP) {
                             MaxSpeedNum = Furnace(FurnaceNum).NumOfSpeedCooling;
-                            MaxSpeedNum = CompareGridSpeed(Furnace(FurnaceNum).CoolingCoilIndex, MaxSpeedNum); 
+                            MaxSpeedNum = CompareGridSpeed(state, Furnace(FurnaceNum).CoolingCoilIndex, MaxSpeedNum); 
                         }
 
                         for (i = 2; i <= MaxSpeedNum; ++i) {
@@ -10573,7 +10567,7 @@ namespace Furnaces {
                     } else {
                         if (!Furnace(FurnaceNum).bIsIHP) {
                             MaxSpeedNum = Furnace(FurnaceNum).NumOfSpeedHeating;
-                            MaxSpeedNum = CompareGridSpeed(Furnace(FurnaceNum).HeatingCoilIndex, MaxSpeedNum);
+                            MaxSpeedNum = CompareGridSpeed(state, Furnace(FurnaceNum).HeatingCoilIndex, MaxSpeedNum);
                         }
 
                         for (i = 2; i <= MaxSpeedNum; ++i) {
@@ -10646,13 +10640,13 @@ namespace Furnaces {
         }
 
         // meet the latent load
-        if ((QLatReq < -SmallLoad && QLatReq < LatOutput) && (GridResponseMode != VariableSpeedCoils::GRID_SENSIBLE)) {
+        if ((QLatReq < -SmallLoad && QLatReq < LatOutput) && (GridResponseMode != state.dataVariableSpeedCoils->GRID_SENSIBLE)) {
             PartLoadFrac = 1.0;
             SpeedRatio = 1.0;
 
             if (!Furnace(FurnaceNum).bIsIHP) {
                 MaxSpeedNum = Furnace(FurnaceNum).NumOfSpeedCooling;
-                MaxSpeedNum = CompareGridSpeed(Furnace(FurnaceNum).CoolingCoilIndex, MaxSpeedNum);
+                MaxSpeedNum = CompareGridSpeed(state, Furnace(FurnaceNum).CoolingCoilIndex, MaxSpeedNum);
             }
 
             for (i = SpeedNum; i <= MaxSpeedNum; ++i) {
@@ -10810,7 +10804,6 @@ namespace Furnaces {
         using IntegratedHeatPump::IntegratedHeatPumps; 
         using VariableSpeedCoils::CompareGridSpeed;
         using VariableSpeedCoils::SimVariableSpeedCoils;
-        using VariableSpeedCoils::VarSpeedCoil;
         using VariableSpeedCoils::IsGridResponsiveMode; 
 
         // Locals
@@ -10850,36 +10843,36 @@ namespace Furnaces {
 
         if (Furnace(FurnaceNum).bIsIHP) {
             if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad)))) { // cooling or dehumidification
-                FanSpeed = CompareGridSpeed(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSCCoilIndex, 
+                FanSpeed = CompareGridSpeed(state, IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSCCoilIndex, 
                     SpeedNum);
                 if ((FanSpeed == 0) && 
-                    (IsGridResponsiveMode(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSCCoilIndex))) {
+                    (IsGridResponsiveMode(state, IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSCCoilIndex))) {
                     FanSpeed = 
-                        VarSpeedCoil(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSCCoilIndex)
+                        state.dataVariableSpeedCoils->VarSpeedCoil(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSCCoilIndex)
                         .NormSpedLevel; // compressor off, allow maximum fan flow speed
                     GridOnOff = true; 
                 }
             } else {                                    // heating
-                FanSpeed = CompareGridSpeed(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSHCoilIndex, 
+                FanSpeed = CompareGridSpeed(state, IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSHCoilIndex, 
                     SpeedNum);
                 if ((FanSpeed == 0) && 
-                    (IsGridResponsiveMode(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSHCoilIndex))) {
-                    FanSpeed = VarSpeedCoil(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSHCoilIndex)
+                    (IsGridResponsiveMode(state, IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSHCoilIndex))) {
+                    FanSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSHCoilIndex)
                                    .NormSpedLevel; // compressor off, allow maximum fan flow speed
                     GridOnOff = true; 
                 }
             }
         } else {
             if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad)))) {//cooling or dehumidification
-                FanSpeed = CompareGridSpeed(Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum);
-                if ((FanSpeed == 0) && (IsGridResponsiveMode(Furnace(FurnaceNum).CoolingCoilIndex))) {
-                    FanSpeed = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).NormSpedLevel;
+                FanSpeed = CompareGridSpeed(state, Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum);
+                if ((FanSpeed == 0) && (IsGridResponsiveMode(state, Furnace(FurnaceNum).CoolingCoilIndex))) {
+                    FanSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).NormSpedLevel;
                     GridOnOff = true; 
                 }             
             } else {//heating
-                FanSpeed = CompareGridSpeed(Furnace(FurnaceNum).HeatingCoilIndex, SpeedNum);
-                if ((FanSpeed == 0) && (IsGridResponsiveMode(Furnace(FurnaceNum).HeatingCoilIndex))) {
-                    FanSpeed = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).NormSpedLevel;
+                FanSpeed = CompareGridSpeed(state, Furnace(FurnaceNum).HeatingCoilIndex, SpeedNum);
+                if ((FanSpeed == 0) && (IsGridResponsiveMode(state, Furnace(FurnaceNum).HeatingCoilIndex))) {
+                    FanSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).NormSpedLevel;
                     GridOnOff = true; 
                 }           
             }
@@ -10955,7 +10948,9 @@ namespace Furnaces {
 
                 if (Furnace(FurnaceNum).bIsIHP)
                     SaveCompressorPLR = IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).CompressorPartLoadRatio; 
-                else SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
+                else
+                    SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
+
             } else {
                 if (Furnace(FurnaceNum).bIsIHP) {
                     SimIHP(state,
@@ -11032,7 +11027,9 @@ namespace Furnaces {
 
                     if (Furnace(FurnaceNum).bIsIHP)
                         SaveCompressorPLR = IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).CompressorPartLoadRatio;
-                    else SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
+                    else
+                        SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
+
                 } else {
                     if (Furnace(FurnaceNum).bIsIHP) {
                         SimIHP(state,
@@ -11123,9 +11120,12 @@ namespace Furnaces {
 
                 SavePartloadRatio = PartLoadFrac;
                 SaveSpeedRatio = SpeedRatio;
+
                 if (Furnace(FurnaceNum).bIsIHP) 
                     SaveCompressorPLR = IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).CompressorPartLoadRatio;
-                else SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
+                else
+                    SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
+
             } else {
 
                 if (Furnace(FurnaceNum).bIsIHP) {
@@ -11201,9 +11201,12 @@ namespace Furnaces {
 
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
+
                     if (Furnace(FurnaceNum).bIsIHP)
                         SaveCompressorPLR = IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).CompressorPartLoadRatio;
-                    else SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
+                    else
+                        SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
+
                 } else {
                     if (Furnace(FurnaceNum).bIsIHP) {
                         SimIHP(state,
@@ -11299,9 +11302,12 @@ namespace Furnaces {
 
                 SavePartloadRatio = PartLoadFrac;
                 SaveSpeedRatio = SpeedRatio;
+
                 if (Furnace(FurnaceNum).bIsIHP) 
                     SaveCompressorPLR = IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).CompressorPartLoadRatio;
-                else SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
+                else
+                    SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
+
             } else {
                 if (Furnace(FurnaceNum).bIsIHP) {
                     SimIHP(state,
@@ -11377,9 +11383,12 @@ namespace Furnaces {
 
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
+
                     if (Furnace(FurnaceNum).bIsIHP)
                         SaveCompressorPLR = IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).CompressorPartLoadRatio;
-                    else SaveCompressorPLR = VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
+                    else
+                        SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
+
                 } else {
                     if (Furnace(FurnaceNum).bIsIHP) {
                         SimIHP(state,
