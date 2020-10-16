@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -109,13 +108,11 @@ namespace ZoneDehumidifier {
     //   http://www.thermastor.com/HI-E-DRY-195/HI-E-DRY-195-Spec.pdf
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::StdBaroPress;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::ScheduleAlwaysOn;
-    using DataGlobals::SecInHour;
     using General::TrimSigDigits;
     using namespace ScheduleManager;
 
@@ -797,7 +794,7 @@ namespace ZoneDehumidifier {
             WaterRemovalVolRate = WaterRemovalRateFactor * state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedWaterRemoval;
 
             WaterRemovalMassRate =
-                WaterRemovalVolRate / (24.0 * SecInHour * 1000.0) *
+                WaterRemovalVolRate / (24.0 * DataGlobalConstants::SecInHour() * 1000.0) *
                 RhoH2O(max((InletAirTemp - 11.0), 1.0)); //(L/d)/(24 hr/day *3600 sec/hr * 1000 L/m3) | Density of water, minimum temp = 1.0C
 
             if (WaterRemovalMassRate > 0.0) {
@@ -1074,7 +1071,7 @@ namespace ZoneDehumidifier {
         Real64 OutletAirTemp;     // Dry-bulb temperature of air leaving the dehumidifier (C)
         int AirInletNodeNum;      // Node number corresponding to the air entering dehumidifier
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
 
         state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).SensHeatingEnergy = state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).SensHeatingRate * ReportingConstant;
         state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).WaterRemoved = state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).WaterRemovalRate * ReportingConstant;

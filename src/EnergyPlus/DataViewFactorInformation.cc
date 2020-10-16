@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 
 namespace EnergyPlus {
@@ -59,8 +58,6 @@ namespace DataViewFactorInformation {
     // MODULE INFORMATION:
     //       AUTHOR         Rob Hitchcock
     //       DATE WRITTEN   September 2007; Moved from HeatBalanceIntRadExchange
-
-    using namespace DataPrecisionGlobals;
 
     int NumOfRadiantEnclosures(0); // Number of radiant enclosures
     int NumOfSolarEnclosures(0);   // Number of solar enclosures

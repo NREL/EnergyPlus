@@ -246,7 +246,7 @@ namespace SolarCollectors {
                 }
 
                 if (DataIPShortCuts::rNumericArgs(2) > 0.0) {
-                    Parameters(ParametersNum).TestMassFlowRate = DataIPShortCuts::rNumericArgs(2) * Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+                    Parameters(ParametersNum).TestMassFlowRate = DataIPShortCuts::rNumericArgs(2) * Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
                 } else {
                     ShowSevereError(CurrentModuleParamObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  flow rate must be greater than zero for " + DataIPShortCuts::cNumericFieldNames(2));
@@ -828,7 +828,7 @@ namespace SolarCollectors {
             if (this->VolFlowRateMax > 0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                DataPlant::PlantLoop(this->WLoopNum).FluidName,
-                                                               DataGlobals::InitConvTemp,
+                                                               DataGlobalConstants::InitConvTemp(),
                                                                DataPlant::PlantLoop(this->WLoopNum).FluidIndex,
                                                                RoutineName);
 
@@ -870,14 +870,14 @@ namespace SolarCollectors {
 
             this->Tilt = DataSurfaces::Surface(SurfNum).Tilt;
             this->TiltR2V = std::abs(90.0 - Tilt);
-            this->CosTilt = std::cos(Tilt * DataGlobals::DegToRadians);
-            this->SinTilt = std::sin(1.8 * Tilt * DataGlobals::DegToRadians);
+            this->CosTilt = std::cos(Tilt * DataGlobalConstants::DegToRadians());
+            this->SinTilt = std::sin(1.8 * Tilt * DataGlobalConstants::DegToRadians());
 
             // Diffuse reflectance of the cover for solar radiation diffusely reflected back from the absober
             // plate to the cover.  The diffuse solar radiation reflected back from the absober plate to the
             // cover is represented by the 60 degree equivalent incident angle.  This diffuse reflectance is
             // used to calculate the transmittance - absorptance product (Duffie and Beckman, 1991)
-            Real64 Theta = 60.0 * DataGlobals::DegToRadians;
+            Real64 Theta = 60.0 * DataGlobalConstants::DegToRadians();
             Real64 TransSys = 0.0;
             Real64 RefSys = 0.0;
             Real64 AbsCover1 = 0.0;
@@ -894,7 +894,7 @@ namespace SolarCollectors {
 
             // transmittance-absorptance product for sky diffuse radiation.  Uses equivalent incident angle
             // of sky radiation (radians), and is calculated according to Brandemuehl and Beckman (1980):
-            Theta = (59.68 - 0.1388 * Tilt + 0.001497 * pow_2(Tilt)) * DataGlobals::DegToRadians;
+            Theta = (59.68 - 0.1388 * Tilt + 0.001497 * pow_2(Tilt)) * DataGlobalConstants::DegToRadians();
             this->CalcTransRefAbsOfCover(Theta, TransSys, RefSys, AbsCover1, AbsCover2);
             this->TauAlphaSkyDiffuse = TransSys * SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate /
                                        (1.0 - (1.0 - SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate) * this->RefDiffInnerCover);
@@ -903,7 +903,7 @@ namespace SolarCollectors {
 
             // transmittance-absorptance product for ground diffuse radiation.  Uses equivalent incident angle
             // of ground radiation (radians), and is calculated according to Brandemuehl and Beckman (1980):
-            Theta = (90.0 - 0.5788 * Tilt + 0.002693 * pow_2(Tilt)) * DataGlobals::DegToRadians;
+            Theta = (90.0 - 0.5788 * Tilt + 0.002693 * pow_2(Tilt)) * DataGlobalConstants::DegToRadians();
             this->CalcTransRefAbsOfCover(Theta, TransSys, RefSys, AbsCover1, AbsCover2);
             this->TauAlphaGndDiffuse = TransSys * SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate /
                                        (1.0 - (1.0 - SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate) * this->RefDiffInnerCover);
@@ -992,10 +992,10 @@ namespace SolarCollectors {
             Real64 tilt = DataSurfaces::Surface(SurfNum).Tilt;
 
             // Equivalent incident angle of sky radiation (radians)
-            Real64 ThetaSky = (59.68 - 0.1388 * tilt + 0.001497 * pow_2(tilt)) * DataGlobals::DegToRadians;
+            Real64 ThetaSky = (59.68 - 0.1388 * tilt + 0.001497 * pow_2(tilt)) * DataGlobalConstants::DegToRadians();
 
             // Equivalent incident angle of ground radiation (radians)
-            Real64 ThetaGnd = (90.0 - 0.5788 * tilt + 0.002693 * pow_2(tilt)) * DataGlobals::DegToRadians;
+            Real64 ThetaGnd = (90.0 - 0.5788 * tilt + 0.002693 * pow_2(tilt)) * DataGlobalConstants::DegToRadians();
 
             incidentAngleModifier = (DataHeatBalance::SurfQRadSWOutIncidentBeam(SurfNum) * SolarCollectors::Parameters(ParamNum).IAM(ThetaBeam) +
                                      DataHeatBalance::SurfQRadSWOutIncidentSkyDiffuse(SurfNum) * SolarCollectors::Parameters(ParamNum).IAM(ThetaSky) +
@@ -1209,7 +1209,7 @@ namespace SolarCollectors {
         Real64 IAM;
 
         // cut off IAM for angles greater than 60 degrees. (CR 7534)
-        Real64 CutoffAngle = 60.0 * DataGlobals::DegToRadians;
+        Real64 CutoffAngle = 60.0 * DataGlobalConstants::DegToRadians();
         if (std::abs(IncidentAngle) > CutoffAngle) { // cut off, model curves not robust beyond cutoff
             // curves from FSEC/SRCC testing are only certified to 60 degrees, larger angles can cause numerical problems in curves
             IAM = 0.0;
@@ -1262,7 +1262,7 @@ namespace SolarCollectors {
 
         int SurfNum = this->Surface;
         int ParamNum = this->Parameters;
-        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         Real64 TempWater = this->SavedTempOfWater;
         Real64 TempAbsPlate = this->SavedTempOfAbsPlate;
         Real64 TempOutdoorAir = DataSurfaces::Surface(SurfNum).OutDryBulbTemp;
@@ -1680,8 +1680,8 @@ namespace SolarCollectors {
             auto const SELECT_CASE_var(NumCovers);
             if (SELECT_CASE_var == 1) {
                 // calc linearized radiation coefficient
-                tempnom = DataGlobals::StefanBoltzmann * ((TempAbsPlate + DataGlobals::KelvinConv) + (TempOuterCover + DataGlobals::KelvinConv)) *
-                          (pow_2(TempAbsPlate + DataGlobals::KelvinConv) + pow_2(TempOuterCover + DataGlobals::KelvinConv));
+                tempnom = DataGlobalConstants::StefanBoltzmann() * ((TempAbsPlate + DataGlobalConstants::KelvinConv()) + (TempOuterCover + DataGlobalConstants::KelvinConv())) *
+                          (pow_2(TempAbsPlate + DataGlobalConstants::KelvinConv()) + pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()));
                 tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfOuterCover - 1.0;
                 hRadCoefA2C = tempnom / tempdenom;
                 hRadCoefC2C = 0.0;
@@ -1693,9 +1693,9 @@ namespace SolarCollectors {
                 for (int CoverNum = 1; CoverNum <= NumCovers; ++CoverNum) {
                     if (CoverNum == 1) {
                         // calc linearized radiation coefficient
-                        tempnom = DataGlobals::StefanBoltzmann *
-                                  ((TempAbsPlate + DataGlobals::KelvinConv) + (TempInnerCover + DataGlobals::KelvinConv)) *
-                                  (pow_2(TempAbsPlate + DataGlobals::KelvinConv) + pow_2(TempInnerCover + DataGlobals::KelvinConv));
+                        tempnom = DataGlobalConstants::StefanBoltzmann() *
+                                  ((TempAbsPlate + DataGlobalConstants::KelvinConv()) + (TempInnerCover + DataGlobalConstants::KelvinConv())) *
+                                  (pow_2(TempAbsPlate + DataGlobalConstants::KelvinConv()) + pow_2(TempInnerCover + DataGlobalConstants::KelvinConv()));
                         tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfInnerCover - 1.0;
                         hRadCoefA2C = tempnom / tempdenom;
                         // Calc convection heat transfer coefficient:
@@ -1703,9 +1703,9 @@ namespace SolarCollectors {
                             TempAbsPlate, TempOuterCover, AirGapDepth, this->CosTilt, this->SinTilt);
                     } else {
                         // calculate the linearized radiation coeff.
-                        tempnom = DataGlobals::StefanBoltzmann *
-                                  ((TempInnerCover + DataGlobals::KelvinConv) + (TempOuterCover + DataGlobals::KelvinConv)) *
-                                  (pow_2(TempInnerCover + DataGlobals::KelvinConv) + pow_2(TempOuterCover + DataGlobals::KelvinConv));
+                        tempnom = DataGlobalConstants::StefanBoltzmann() *
+                                  ((TempInnerCover + DataGlobalConstants::KelvinConv()) + (TempOuterCover + DataGlobalConstants::KelvinConv())) *
+                                  (pow_2(TempInnerCover + DataGlobalConstants::KelvinConv()) + pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()));
                         tempdenom = 1.0 / EmissOfInnerCover + 1.0 / EmissOfOuterCover - 1.0;
                         hRadCoefC2C = tempnom / tempdenom;
                         // Calc convection heat transfer coefficient:
@@ -1720,9 +1720,9 @@ namespace SolarCollectors {
         hConvCoefC2O = 2.8 + 3.0 * DataSurfaces::Surface(SurfNum).WindSpeed;
 
         // Calc linearized radiation coefficient between outer cover and the surrounding:
-        tempnom = DataSurfaces::Surface(SurfNum).ViewFactorSky * EmissOfOuterCover * DataGlobals::StefanBoltzmann *
-                  ((TempOuterCover + DataGlobals::KelvinConv) + DataEnvironment::SkyTempKelvin) *
-                  (pow_2(TempOuterCover + DataGlobals::KelvinConv) + pow_2(DataEnvironment::SkyTempKelvin));
+        tempnom = DataSurfaces::Surface(SurfNum).ViewFactorSky * EmissOfOuterCover * DataGlobalConstants::StefanBoltzmann() *
+                  ((TempOuterCover + DataGlobalConstants::KelvinConv()) + DataEnvironment::SkyTempKelvin) *
+                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()) + pow_2(DataEnvironment::SkyTempKelvin));
         tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - DataEnvironment::SkyTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
@@ -1734,9 +1734,9 @@ namespace SolarCollectors {
             hRadCoefC2Sky = tempnom / tempdenom;
         }
 
-        tempnom = DataSurfaces::Surface(SurfNum).ViewFactorGround * EmissOfOuterCover * DataGlobals::StefanBoltzmann *
-                  ((TempOuterCover + DataGlobals::KelvinConv) + DataEnvironment::GroundTempKelvin) *
-                  (pow_2(TempOuterCover + DataGlobals::KelvinConv) + pow_2(DataEnvironment::GroundTempKelvin));
+        tempnom = DataSurfaces::Surface(SurfNum).ViewFactorGround * EmissOfOuterCover * DataGlobalConstants::StefanBoltzmann() *
+                  ((TempOuterCover + DataGlobalConstants::KelvinConv()) + DataEnvironment::GroundTempKelvin) *
+                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()) + pow_2(DataEnvironment::GroundTempKelvin));
         tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - DataEnvironment::GroundTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
@@ -1873,7 +1873,7 @@ namespace SolarCollectors {
             DensOfAir = Density(Index - 1) + InterpFrac * (Density(Index) - Density(Index - 1));
         }
 
-        VolExpAir = 1.0 / (Tref + DataGlobals::KelvinConv);
+        VolExpAir = 1.0 / (Tref + DataGlobalConstants::KelvinConv());
 
         // Rayleigh number
         Real64 RaNum = gravity * pow_2(DensOfAir) * VolExpAir * PrOfAir * DeltaT * pow_3(AirGap) / pow_2(VisDOfAir);
@@ -1943,7 +1943,7 @@ namespace SolarCollectors {
 
         // Grashof number
         Real64 GrNum = gravity * VolExpWater * DensOfWater * DensOfWater * PrOfWater * DeltaT * pow_3(Lc) / pow_2(VisOfWater);
-        Real64 CosTilt = std::cos(TiltR2V * DataGlobals::DegToRadians);
+        Real64 CosTilt = std::cos(TiltR2V * DataGlobalConstants::DegToRadians());
 
         Real64 RaNum; // Raleigh number
         Real64 NuL;   // Nusselt number
@@ -2010,7 +2010,7 @@ namespace SolarCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates report variables.
 
-        Real64 TimeStepInSecond = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 TimeStepInSecond = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         this->Energy = this->Power * TimeStepInSecond;
         this->HeatEnergy = this->HeatRate * TimeStepInSecond;

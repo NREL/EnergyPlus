@@ -335,7 +335,7 @@ namespace WaterToAirHeatPumpSimple {
 
         // Default Constructor
         WaterToAirHeatPumpSimpleData()
-            : CelsiustoKelvin(DataGlobals::KelvinConv), NumWatertoAirHPs(0), GetCoilsInputFlag(true),
+            : CelsiustoKelvin(DataGlobalConstants::KelvinConv()), NumWatertoAirHPs(0), GetCoilsInputFlag(true),
               SourceSideMassFlowRate(0.0), SourceSideInletTemp(0.0), SourceSideInletEnth(0.0), LoadSideMassFlowRate(0.0),
               LoadSideInletDBTemp(0.0), LoadSideInletWBTemp(0.0), LoadSideInletHumRat(0.0), LoadSideInletEnth(0.0),
               LoadSideOutletDBTemp(0.0), LoadSideOutletHumRat(0.0), LoadSideOutletEnth(0.0), QSensible(0.0),

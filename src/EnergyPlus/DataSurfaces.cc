@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -92,7 +91,6 @@ namespace DataSurfaces {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataVectorTypes;
     using namespace DataBSDFWindow;
     using namespace DataHeatBalance;
@@ -962,7 +960,7 @@ namespace DataSurfaces {
             value = SurfWinIRfromParentZone(ExtBoundCond) + QHTRadSysSurf(ExtBoundCond) + QHWBaseboardSurf(ExtBoundCond) +
                     QSteamBaseboardSurf(ExtBoundCond) + QElecBaseboardSurf(ExtBoundCond);
         } else {
-            Real64 tout = getOutsideAirTemperature(t_SurfNum) + KelvinConv;
+            Real64 tout = getOutsideAirTemperature(t_SurfNum) + DataGlobalConstants::KelvinConv();
             value = state.dataWindowManager->sigma * pow_4(tout);
             value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
                     ViewFactorGroundIR * value;

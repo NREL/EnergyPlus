@@ -616,7 +616,7 @@ namespace OutputReportTabularAnnual {
     {
         Real64 secondsInTimeStep;
         if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
-            secondsInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            secondsInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         } else {
             secondsInTimeStep = DataGlobals::TimeStepZoneSec;
         }

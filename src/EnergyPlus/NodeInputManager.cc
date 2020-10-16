@@ -1166,7 +1166,7 @@ namespace NodeInputManager {
 
         if (CalcMoreNodeInfoMyOneTimeFlag) {
             RhoAirStdInit = StdRhoAir;
-            RhoWaterStdInit = RhoH2O(DataGlobals::InitConvTemp);
+            RhoWaterStdInit = RhoH2O(DataGlobalConstants::InitConvTemp());
             NodeWetBulbRepReq.allocate(NumOfNodes);
             NodeWetBulbSchedPtr.allocate(NumOfNodes);
             NodeRelHumidityRepReq.allocate(NumOfNodes);
@@ -1299,7 +1299,7 @@ namespace NodeInputManager {
                 } else {
                     Cp = GetSpecificHeatGlycol(state, nodeFluidNames[iNode - 1], Node(iNode).Temp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
                     rhoStd = GetDensityGlycol(
-                        state, nodeFluidNames[iNode - 1], DataGlobals::InitConvTemp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
+                        state, nodeFluidNames[iNode - 1], DataGlobalConstants::InitConvTemp(), Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
                     rho = GetDensityGlycol(state, nodeFluidNames[iNode - 1], Node(iNode).Temp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
                 }
 

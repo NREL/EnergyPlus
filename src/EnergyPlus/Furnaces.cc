@@ -4746,7 +4746,7 @@ namespace Furnaces {
             }
         }
         bool anyRan;
-        ManageEMS(state, emsCallFromComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
+        ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
     }
 
     // End of Get Input subroutines for this Module
@@ -4991,7 +4991,7 @@ namespace Furnaces {
                     if (Furnace(FurnaceNum).MaxHeatCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(state,
                                                PlantLoop(Furnace(FurnaceNum).LoopNum).FluidName,
-                                               DataGlobals::HWInitConvTemp,
+                                               DataGlobalConstants::HWInitConvTemp(),
                                                PlantLoop(Furnace(FurnaceNum).LoopNum).FluidIndex,
                                                RoutineName);
                         Furnace(FurnaceNum).MaxHeatCoilFluidFlow *= rho;
@@ -5063,7 +5063,7 @@ namespace Furnaces {
                     if (Furnace(FurnaceNum).MaxSuppCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(state,
                                                PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidName,
-                                               DataGlobals::HWInitConvTemp,
+                                               DataGlobalConstants::HWInitConvTemp(),
                                                PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidIndex,
                                                RoutineName);
                         Furnace(FurnaceNum).MaxSuppCoilFluidFlow *= rho;
@@ -5136,7 +5136,7 @@ namespace Furnaces {
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(state, PlantLoop(Furnace(FurnaceNum).LoopNum).FluidName,
-                                                   DataGlobals::HWInitConvTemp,
+                                                   DataGlobalConstants::HWInitConvTemp(),
                                                    PlantLoop(Furnace(FurnaceNum).LoopNum).FluidIndex,
                                                    RoutineName);
                             Furnace(FurnaceNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
@@ -5177,7 +5177,7 @@ namespace Furnaces {
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(state,
                                                    PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidName,
-                                                   DataGlobals::HWInitConvTemp,
+                                                   DataGlobalConstants::HWInitConvTemp(),
                                                    PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidIndex,
                                                    RoutineName);
                             Furnace(FurnaceNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
@@ -6059,7 +6059,6 @@ namespace Furnaces {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataGlobals::emsCallFromUnitarySystemSizing;
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
@@ -6086,7 +6085,7 @@ namespace Furnaces {
         Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
         int IHPCoilIndex(0);      // refer to cooling or heating coil in IHP
         bool anyRan;
-        ManageEMS(state, emsCallFromUnitarySystemSizing, anyRan, ObjexxFCL::Optional_int_const()); // calling point
+        ManageEMS(state, EMSManager::EMSCallFrom::UnitarySystemSizing, anyRan, ObjexxFCL::Optional_int_const()); // calling point
 
         ThisCtrlZoneNum = 0;
         DXCoolCap = 0.0;

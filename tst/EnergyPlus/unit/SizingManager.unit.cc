@@ -397,7 +397,6 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     bool Warmup;
     int HourNum;
     int TimeStepNum;
-    int KindSim;
     int DaySim;
 
     //Tests for when to do a pulse test for the Load Component Output Report
@@ -407,9 +406,9 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Warmup = false;
     HourNum = 10;
     TimeStepNum = 1;
-    KindSim = EnergyPlus::DataGlobals::ksRunPeriodDesign;
+    state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
     DaySim = 2;
-    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,state.dataGlobal->KindOfSim,DaySim);
     ASSERT_TRUE(Answer);
 
     //Test 16: Everything as it should be to set this to true-->result should be true
@@ -417,9 +416,9 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Warmup = false;
     HourNum = 10;
     TimeStepNum = 1;
-    KindSim = EnergyPlus::DataGlobals::ksDesignDay;
+    state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::DesignDay;
     DaySim = 1;
-    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,state.dataGlobal->KindOfSim,DaySim);
     ASSERT_TRUE(Answer);
 
     //Test 2: PulseSizing is false-->result should be false
@@ -427,9 +426,9 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Warmup = false;
     HourNum = 10;
     TimeStepNum = 1;
-    KindSim = EnergyPlus::DataGlobals::ksRunPeriodDesign;
+    state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
     DaySim = 1;
-    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,state.dataGlobal->KindOfSim,DaySim);
     ASSERT_FALSE(Answer);
 
     //Test 3: Warmup is true-->result should be false
@@ -437,9 +436,9 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Warmup = true;
     HourNum = 10;
     TimeStepNum = 1;
-    KindSim = EnergyPlus::DataGlobals::ksRunPeriodDesign;
+    state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
     DaySim = 1;
-    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,state.dataGlobal->KindOfSim,DaySim);
     ASSERT_FALSE(Answer);
 
     //Test 4: HourNum not 10-->result should be false
@@ -447,9 +446,9 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Warmup = false;
     HourNum = 7;
     TimeStepNum = 1;
-    KindSim = EnergyPlus::DataGlobals::ksRunPeriodDesign;
+    state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
     DaySim = 1;
-    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,state.dataGlobal->KindOfSim,DaySim);
     ASSERT_FALSE(Answer);
 
     //Test 5: TimeStepNum not 1-->result should be false
@@ -457,9 +456,9 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Warmup = false;
     HourNum = 10;
     TimeStepNum = 2;
-    KindSim = EnergyPlus::DataGlobals::ksRunPeriodDesign;
+    state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
     DaySim = 1;
-    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,state.dataGlobal->KindOfSim,DaySim);
     ASSERT_FALSE(Answer);
 
     //Test 6: DaySim not 1 and KindSim not weather file period --> result should be false
@@ -467,9 +466,9 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Warmup = false;
     HourNum = 10;
     TimeStepNum = 1;
-    KindSim = EnergyPlus::DataGlobals::ksDesignDay;
+    state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::DesignDay;
     DaySim = 2;
-    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,state.dataGlobal->KindOfSim,DaySim);
     ASSERT_FALSE(Answer);
 
     //Test 7: everything set to make the answer false
@@ -477,9 +476,9 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     Warmup = true;
     HourNum = 2;
     TimeStepNum = 7;
-    KindSim = EnergyPlus::DataGlobals::ksDesignDay;
+    state.dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::DesignDay;
     DaySim = 2;
-    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,state.dataGlobal->KindOfSim,DaySim);
     ASSERT_FALSE(Answer);
 
 }

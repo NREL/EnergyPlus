@@ -213,17 +213,6 @@
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
-#include <EnergyPlus/SwimmingPool.hh>
-#include <EnergyPlus/SystemAvailabilityManager.hh>
-#include <EnergyPlus/ThermalChimney.hh>
-#include <EnergyPlus/ThermalComfort.hh>
-#include <EnergyPlus/TranspiredCollector.hh>
-#include <EnergyPlus/UFADManager.hh>
-#include <EnergyPlus/UnitHeater.hh>
-#include <EnergyPlus/UnitVentilator.hh>
-#include <EnergyPlus/UnitarySystem.hh>
-#include <EnergyPlus/UserDefinedComponents.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -391,17 +380,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     SplitterComponent::clear_state();
     SteamCoils::clear_state();
     SurfaceGeometry::clear_state();
-    SurfaceGroundHeatExchanger::clear_state();
-    SystemAvailabilityManager::clear_state();
-    SwimmingPool::clear_state();
-    ThermalChimney::clear_state();
-    ThermalComfort::clear_state();
-    TranspiredCollector::clear_state();
-    UFADManager::clear_state();
-    UnitarySystems::clear_state();
-    UnitHeater::clear_state();
-    UnitVentilator::clear_state();
-    UserDefinedComponents::clear_state();
     UtilityRoutines::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();

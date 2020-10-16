@@ -97,7 +97,6 @@ namespace Humidifiers {
     public:
         // Members
         std::string Name; // unique name of component
-        //    CHARACTER(len=MaxNameLength) :: HumType           =' ' ! Type of humidifier
         int HumType_Code;           // Pointer to Humidifier in list of humidifiers
         int EquipIndex;             // Pointer to Humidifier in list of humidifiers
         std::string Sched;          // name of availability schedule

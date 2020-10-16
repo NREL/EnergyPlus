@@ -346,12 +346,12 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
 
     SurfaceGeometry::CosZoneRelNorth.allocate(3);
     SurfaceGeometry::SinZoneRelNorth.allocate(3);
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(3) = std::cos(-DataHeatBalance::Zone(3).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(3) = std::sin(-DataHeatBalance::Zone(3).RelNorth * DataGlobals::DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::CosZoneRelNorth(3) = std::cos(-DataHeatBalance::Zone(3).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(3) = std::sin(-DataHeatBalance::Zone(3).RelNorth * DataGlobalConstants::DegToRadians());
 
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;

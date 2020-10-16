@@ -109,7 +109,6 @@ namespace PoweredInductionUnits {
     // to meet the zone load.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::BeginDayFlag;
@@ -117,7 +116,6 @@ namespace PoweredInductionUnits {
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::NumOfZones;
     using DataGlobals::ScheduleAlwaysOn;
-    using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::PlenumInducedMassFlow;
     using DataHVACGlobals::SingleCoolingSetPoint;
@@ -867,7 +865,7 @@ namespace PoweredInductionUnits {
                 // plant upgrade note? why no separate handling of steam coil? add it ?
                 rho = GetDensityGlycol(state,
                                        PlantLoop(PIU(PIUNum).HWLoopNum).FluidName,
-                                       DataGlobals::HWInitConvTemp,
+                                       DataGlobalConstants::HWInitConvTemp(),
                                        PlantLoop(PIU(PIUNum).HWLoopNum).FluidIndex,
                                        RoutineName);
 
@@ -1340,12 +1338,12 @@ namespace PoweredInductionUnits {
 
                                 rho = GetDensityGlycol(state,
                                                        PlantLoop(PIU(PIUNum).HWLoopNum).FluidName,
-                                                       DataGlobals::HWInitConvTemp,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(PIU(PIUNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
                                 Cp = GetSpecificHeatGlycol(state,
                                                            PlantLoop(PIU(PIUNum).HWLoopNum).FluidName,
-                                                           DataGlobals::HWInitConvTemp,
+                                                           DataGlobalConstants::HWInitConvTemp(),
                                                            PlantLoop(PIU(PIUNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
 
@@ -1779,7 +1777,7 @@ namespace PoweredInductionUnits {
         PowerMet = Node(OutletNode).MassFlowRate *
                    (PsyHFnTdbW(Node(OutletNode).Temp, Node(ZoneNode).HumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, Node(ZoneNode).HumRat));
         PIU(PIUNum).HeatingRate = max(0.0, PowerMet);
-        PIU(PIUNum).SensCoolRate = std::abs(min(constant_zero, PowerMet));
+        PIU(PIUNum).SensCoolRate = std::abs(min(DataPrecisionGlobals::constant_zero, PowerMet));
         if (Node(OutletNode).MassFlowRate == 0.0) {
             Node(PriNode).MassFlowRate = 0.0;
             Node(SecNode).MassFlowRate = 0.0;
@@ -2068,7 +2066,7 @@ namespace PoweredInductionUnits {
         PowerMet = Node(OutletNode).MassFlowRate *
                    (PsyHFnTdbW(Node(OutletNode).Temp, Node(ZoneNode).HumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, Node(ZoneNode).HumRat));
         PIU(PIUNum).HeatingRate = max(0.0, PowerMet);
-        PIU(PIUNum).SensCoolRate = std::abs(min(constant_zero, PowerMet));
+        PIU(PIUNum).SensCoolRate = std::abs(min(DataPrecisionGlobals::constant_zero, PowerMet));
         if (Node(OutletNode).MassFlowRate == 0.0) {
             Node(PriNode).MassFlowRate = 0.0;
             Node(SecNode).MassFlowRate = 0.0;
@@ -2119,8 +2117,8 @@ namespace PoweredInductionUnits {
 
         // FLOW
 
-        PIU(PIUNum).HeatingEnergy = PIU(PIUNum).HeatingRate * TimeStepSys * SecInHour;
-        PIU(PIUNum).SensCoolEnergy = PIU(PIUNum).SensCoolRate * TimeStepSys * SecInHour;
+        PIU(PIUNum).HeatingEnergy = PIU(PIUNum).HeatingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        PIU(PIUNum).SensCoolEnergy = PIU(PIUNum).SensCoolRate * TimeStepSys * DataGlobalConstants::SecInHour();
 
         // set zone OA Volume flow rate
         PIU(PIUNum).CalcOutdoorAirVolumeFlowRate(state);

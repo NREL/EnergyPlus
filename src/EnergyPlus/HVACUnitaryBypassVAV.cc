@@ -1487,7 +1487,7 @@ namespace HVACUnitaryBypassVAV {
                     if (CBVAV(CBVAVNum).MaxHeatCoilFluidFlow > 0.0) {
                         Real64 FluidDensity = FluidProperties::GetDensityGlycol(state,
                                                                                 DataPlant::PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidName,
-                                                                                DataGlobals::HWInitConvTemp,
+                                                                                DataGlobalConstants::HWInitConvTemp(),
                                                                                 DataPlant::PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidIndex,
                                                                                 RoutineName);
                         CBVAV(CBVAVNum).MaxHeatCoilFluidFlow =
@@ -1597,7 +1597,7 @@ namespace HVACUnitaryBypassVAV {
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             Real64 FluidDensity = FluidProperties::GetDensityGlycol(state,
                                                                                     DataPlant::PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidName,
-                                                                                    DataGlobals::HWInitConvTemp,
+                                                                                    DataGlobalConstants::HWInitConvTemp(),
                                                                                     DataPlant::PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidIndex,
                                                                                     RoutineName);
                             CBVAV(CBVAVNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
@@ -3966,7 +3966,7 @@ namespace HVACUnitaryBypassVAV {
         // PURPOSE OF THIS SUBROUTINE:
         // Fills some of the report variables for the changeover-bypass VAV system
 
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         CBVAV(CBVAVNum).TotCoolEnergy = CBVAV(CBVAVNum).TotCoolEnergyRate * ReportingConstant;
         CBVAV(CBVAVNum).TotHeatEnergy = CBVAV(CBVAVNum).TotHeatEnergyRate * ReportingConstant;

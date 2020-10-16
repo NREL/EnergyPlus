@@ -62,7 +62,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -418,12 +417,12 @@ namespace OutsideEnergySources {
         if (PltSizNum > 0) {
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                 DataGlobals::InitConvTemp,
+                                                                 DataGlobalConstants::InitConvTemp(),
                                                                  DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                  "SizeDistrict" + typeName);
             Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                      DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                                     DataGlobals::InitConvTemp,
+                                                                     DataGlobalConstants::InitConvTemp(),
                                                                      DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                      "SizeDistrict" + typeName);
             Real64 const NomCapDes = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate;
@@ -527,7 +526,7 @@ namespace OutsideEnergySources {
         int const OutletNode = this->OutletNodeNum;
         DataLoopNode::Node(OutletNode).Temp = this->OutletTemp;
         this->EnergyRate = std::abs(MyLoad);
-        this->EnergyTransfer = this->EnergyRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->EnergyTransfer = this->EnergyRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
 } // namespace OutsideEnergySources

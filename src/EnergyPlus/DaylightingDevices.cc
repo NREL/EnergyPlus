@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
@@ -168,11 +167,7 @@ namespace DaylightingDevices {
     // Mills, A. F.  Heat and Mass Transfer, 1995, p. 499.  (Shape factor for adjacent rectangles.)
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataGlobals::DegToRadians;
     using DataGlobals::NumOfZones;
-    using DataGlobals::Pi;
-    using DataGlobals::PiOvr2;
     using DataHeatBalance::MinimalShadowing;
     using DataHeatBalance::SolarDistribution;
     using DataHeatBalance::TotConstructs;
@@ -280,8 +275,8 @@ namespace DaylightingDevices {
             COSAngle(1) = 0.0;
             COSAngle(NumOfAngles) = 1.0;
 
-            dTheta = 90.0 * DegToRadians / (NumOfAngles - 1.0);
-            Theta = 90.0 * DegToRadians;
+            dTheta = 90.0 * DataGlobalConstants::DegToRadians() / (NumOfAngles - 1.0);
+            Theta = 90.0 * DataGlobalConstants::DegToRadians();
             for (AngleNum = 2; AngleNum <= NumOfAngles - 1; ++AngleNum) {
                 Theta -= dTheta;
                 COSAngle(AngleNum) = std::cos(Theta);
@@ -321,7 +316,7 @@ namespace DaylightingDevices {
                         TDDPipeStored(NumStored).TransBeam(NumOfAngles) = 1.0;
 
                         // Calculate intermediate beam transmittances between 0 and 90 degrees
-                        Theta = 90.0 * DegToRadians;
+                        Theta = 90.0 * DataGlobalConstants::DegToRadians();
                         for (AngleNum = 2; AngleNum <= NumOfAngles - 1; ++AngleNum) {
                             Theta -= dTheta;
                             TDDPipeStored(NumStored).TransBeam(AngleNum) = CalcPipeTransBeam(Reflectance, TDDPipe(PipeNum).AspectRatio, Theta);
@@ -494,11 +489,8 @@ namespace DaylightingDevices {
         using General::SafeDivide;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // unused1208  CHARACTER(len=MaxNameLength), &
-        //                   DIMENSION(20) :: Alphas                ! Alpha items for object
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int IOStatus;                   // Used in GetObjectItem
-        // unused1208  REAL(r64), DIMENSION(9)             :: Numbers               ! Numeric items for object
         int NumAlphas;         // Number of Alphas for each GetObjectItem call
         int NumNumbers;        // Number of Numbers for each GetObjectItem call
         int PipeNum;           // TDD pipe object number
@@ -673,7 +665,7 @@ namespace DaylightingDevices {
                     ErrorsFound = true;
                 }
 
-                PipeArea = 0.25 * Pi * pow_2(TDDPipe(PipeNum).Diameter);
+                PipeArea = 0.25 * DataGlobalConstants::Pi() * pow_2(TDDPipe(PipeNum).Diameter);
                 if (TDDPipe(PipeNum).Dome > 0 && std::abs(PipeArea - Surface(TDDPipe(PipeNum).Dome).Area) > 0.1) {
                     if (SafeDivide(std::abs(PipeArea - Surface(TDDPipe(PipeNum).Dome).Area), Surface(TDDPipe(PipeNum).Dome).Area) >
                         0.1) { // greater than 10%
@@ -1011,7 +1003,7 @@ namespace DaylightingDevices {
         xLimit = (std::log(pow_2(N) * myLocalTiny) / std::log(R)) / xTol;
 
         c1 = A * std::tan(Theta);
-        c2 = 4.0 / Pi;
+        c2 = 4.0 / DataGlobalConstants::Pi();
 
         s = i;
         while (s < (1.0 - i)) {
@@ -1073,13 +1065,13 @@ namespace DaylightingDevices {
         Real64 COSI;            // Cosine of incident angle
         Real64 SINI;            // Sine of incident angle
 
-        Real64 const dPH = 90.0 * DegToRadians / NPH; // Altitude angle of sky element
+        Real64 const dPH = 90.0 * DataGlobalConstants::DegToRadians() / NPH; // Altitude angle of sky element
         Real64 PH = 0.5 * dPH;                        // Altitude angle increment
 
         // Integrate from 0 to Pi/2 altitude
         for (int N = 1; N <= NPH; ++N) {
-            COSI = std::cos(PiOvr2 - PH);
-            SINI = std::sin(PiOvr2 - PH);
+            COSI = std::cos(DataGlobalConstants::PiOvr2() - PH);
+            SINI = std::sin(DataGlobalConstants::PiOvr2() - PH);
 
             Real64 P = COSI; // Angular distribution function: P = COS(Incident Angle) for diffuse isotropic
 
@@ -1137,14 +1129,14 @@ namespace DaylightingDevices {
         Real64 CosPhi;          // Cosine of TDD:DOME altitude angle
         Real64 Theta;           // TDD:DOME azimuth angle
 
-        CosPhi = std::cos(PiOvr2 - Surface(TDDPipe(PipeNum).Dome).Tilt * DegToRadians);
-        Theta = Surface(TDDPipe(PipeNum).Dome).Azimuth * DegToRadians;
+        CosPhi = std::cos(DataGlobalConstants::PiOvr2() - Surface(TDDPipe(PipeNum).Dome).Tilt * DataGlobalConstants::DegToRadians());
+        Theta = Surface(TDDPipe(PipeNum).Dome).Azimuth * DataGlobalConstants::DegToRadians();
 
         if (CosPhi > 0.01) { // Dome has a view of the horizon
             // Integrate over the semicircle
-            Real64 const THMIN = Theta - PiOvr2; // Minimum azimuth integration limit
+            Real64 const THMIN = Theta - DataGlobalConstants::PiOvr2(); // Minimum azimuth integration limit
             // Real64 const THMAX = Theta + PiOvr2; // Maximum azimuth integration limit
-            Real64 const dTH = 180.0 * DegToRadians / NTH; // Azimuth angle increment
+            Real64 const dTH = 180.0 * DataGlobalConstants::DegToRadians() / NTH; // Azimuth angle increment
             Real64 TH = THMIN + 0.5 * dTH;                 // Azimuth angle of sky horizon element
 
             for (int N = 1; N <= NTH; ++N) {
@@ -1582,7 +1574,7 @@ namespace DaylightingDevices {
         E3 = std::pow(pow_2(M) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(M)) * (pow_2(M) + pow_2(N))), pow_2(M));
         E4 = std::pow(pow_2(N) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(N)) * (pow_2(M) + pow_2(N))), pow_2(N));
 
-        Shelf(ShelfNum).ViewFactor = (1.0 / (Pi * M)) * (E1 + 0.25 * std::log(E2 * E3 * E4));
+        Shelf(ShelfNum).ViewFactor = (1.0 / (DataGlobalConstants::Pi() * M)) * (E1 + 0.25 * std::log(E2 * E3 * E4));
     }
 
     void FigureTDDZoneGains()
