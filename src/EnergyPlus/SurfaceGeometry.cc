@@ -4956,7 +4956,6 @@ namespace SurfaceGeometry {
                         Found = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf).ExtBoundCondName, state.dataSurfaceGeometry->SurfaceTmp, SurfNum);
                         if (Found != 0) state.dataSurfaceGeometry->SurfaceTmp(Found).Area -= state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area;
                     }
-
                     if (state.dataSurfaceGeometry->SurfaceTmp(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf).Area <= 0.0) {
                         ShowSevereError(cRoutineName +
                                         ": Surface Openings have too much area for base surface=" + state.dataSurfaceGeometry->SurfaceTmp(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf).Name);

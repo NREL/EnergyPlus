@@ -332,7 +332,7 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     OutdoorAirUnit::clear_state();
     OutputProcessor::clear_state();
     OutputReportPredefined::clear_state();
-    OutputReportTabular::clear_state();
+    OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
     OutsideEnergySources::clear_state();
     PackagedTerminalHeatPump::clear_state();
