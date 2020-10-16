@@ -5918,7 +5918,7 @@ namespace WaterCoils {
 
         double ts = tsi; // (tsi - 32) / 1.8;
         double T = (273.15 + ts);
-        double xi = xsi / 100;
+        double xi = xsi;// / 100;
         double B0 = 1.43980, B1 = -1.24317, B2 = -0.12070, B3 = 0.12825, B4 = 0.62934, B5 = 58.5225, B6 = -105.6343, B7 = 47.7948;
         double theta = T / 228 - 1;
         double A0 = 88.7891, A1 = -120.1959, A2 = -16.9264, A3 = 52.4654, A4 = 0.10826, A5 = 0.46988;
@@ -6153,7 +6153,7 @@ namespace WaterCoils {
 
         const double MoleW_LiCl = 42.39;    // g/mole
         const double MoleW_H2O = 18.02;     // g/mole
-        const double dTcH2O = 374 + 273.14; // critical water temperature [K]
+        const double dTcH2O = 374 + 273.15; // critical water temperature [K]
 
         const double dNumH2O = ((1.0 - xsi) / MoleW_H2O) / (xsi / MoleW_LiCl);
 
@@ -6237,7 +6237,7 @@ namespace WaterCoils {
         }
 
         dRet = dTheta * dTcH2O;              // cristalization temperature [K]
-        dRet = (dRet - 273.14) * 1.8 + 32.0; // convert to [F]
+        dRet = (dRet - 273.15);// * 1.8 + 32.0; // convert to [C]
 
         return (dRet);
     }
