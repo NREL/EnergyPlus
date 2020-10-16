@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 
 namespace EnergyPlus {
@@ -71,8 +70,6 @@ namespace DataWindowEquivalentLayer {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // CFSTY: Complex Fenestration System
     int const CFSMAXNL(6); // max # of glaze or shade layers

@@ -101,8 +101,6 @@ namespace GeneratorFuelSupply {
 
     // Using/Aliasing
     using namespace DataGenerators;
-    using DataGlobals::HoursInDay;
-
     // <use statements for access to subroutines in other modules>
 
     // Data

@@ -84,7 +84,6 @@ extern "C" {
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -172,7 +171,6 @@ namespace SimulationManager {
     // and internal Evolutionary Engineering documentation.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataSizing;
     using namespace DataReportingFlags;
@@ -453,7 +451,7 @@ namespace SimulationManager {
             CreateEnergyReportStructure();
             bool anyEMSRan;
             ManageEMS(state,
-                      emsCallFromSetupSimulation,
+                      EMSManager::EMSCallFrom::SetupSimulation,
                       anyEMSRan,
                       ObjexxFCL::Optional_int_const()); // point to finish setup processing EMS, sensor ready now
 
@@ -498,17 +496,17 @@ namespace SimulationManager {
 
             if (!Available) break;
             if (ErrorsFound) break;
-            if ((!DoDesDaySim) && (KindOfSim != ksRunPeriodWeather)) continue;
-            if ((!DoWeathSim) && (KindOfSim == ksRunPeriodWeather)) continue;
-            if (KindOfSim == ksHVACSizeDesignDay) continue; // don't run these here, only for sizing simulations
+            if ((!DoDesDaySim) && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) continue;
+            if ((!DoWeathSim) && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) continue;
+            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay) continue; // don't run these here, only for sizing simulations
 
-            if (KindOfSim == ksHVACSizeRunPeriodDesign) continue; // don't run these here, only for sizing simulations
+            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) continue; // don't run these here, only for sizing simulations
 
             ++EnvCount;
 
             if (sqlite) {
                 sqlite->sqliteBegin();
-                sqlite->createSQLiteEnvironmentPeriodRecord(DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName, DataGlobals::KindOfSim);
+                sqlite->createSQLiteEnvironmentPeriodRecord(DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName, state.dataGlobal->KindOfSim);
                 sqlite->sqliteCommit();
             }
 
@@ -517,7 +515,7 @@ namespace SimulationManager {
             DisplayString("Initializing New Environment Parameters");
 
             BeginEnvrnFlag = true;
-            if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
+            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                 // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                 // easily converge fewer warmup days are allowed
                 DisplayString("Design Day Fast Warmup Mode: Suppressing Initialization of New Environment Parameters");
@@ -544,7 +542,7 @@ namespace SimulationManager {
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
-            ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+            ManageEMS(state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
                 if (state.dataGlobal->stopSimulation) break;
@@ -567,7 +565,7 @@ namespace SimulationManager {
                     cWarmupDay = TrimSigDigits(NumOfWarmupDays);
                     DisplayString("Warming up {" + cWarmupDay + '}');
                 } else if (DayOfSim == 1) {
-                    if (KindOfSim == ksRunPeriodWeather) {
+                    if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         DisplayString("Starting Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
                     } else {
                         DisplayString("Starting Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
@@ -576,7 +574,7 @@ namespace SimulationManager {
                     print(state.files.eio, Format_700, NumOfWarmupDays);
                     ResetAccumulationWhenWarmupComplete();
                 } else if (DisplayPerfSimulationFlag) {
-                    if (KindOfSim == ksRunPeriodWeather) {
+                    if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
                     } else {
                         DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
@@ -993,7 +991,7 @@ namespace SimulationManager {
 
         TimeStepZone = 1.0 / double(NumOfTimeStepInHour);
         MinutesPerTimeStep = TimeStepZone * 60;
-        TimeStepZoneSec = TimeStepZone * SecInHour;
+        TimeStepZoneSec = TimeStepZone * DataGlobalConstants::SecInHour();
 
         CurrentModuleObject = "ConvergenceLimits";
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -1327,7 +1325,7 @@ namespace SimulationManager {
                         DataGlobals::NumOfTimeStepInHour = 1;
                         DataGlobals::TimeStepZone = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
                         DataGlobals::MinutesPerTimeStep = DataGlobals::TimeStepZone * 60;
-                        DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * SecInHour;
+                        DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
                     }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError(
@@ -2989,7 +2987,7 @@ namespace SimulationManager {
         Array1D_int VarTypes;
         Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
         Array1D_string VarNames;
-        Array1D_int ResourceTypes;
+        std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;
         Array1D_string EndUses;
         Array1D_string Groups;
 
@@ -3006,7 +3004,11 @@ namespace SimulationManager {
             VarTypes.dimension(NumVariables, 0);
             VarNames.allocate(NumVariables);
             unitsForVar.allocate(NumVariables);
-            ResourceTypes.dimension(NumVariables, 0);
+
+            for (int idx = 1; idx <= NumVariables; ++idx) {
+                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::None));
+            }
+
             EndUses.allocate(NumVariables);
             Groups.allocate(NumVariables);
             GetMeteredVariables(CompSets(Loop).CType,
@@ -3027,7 +3029,7 @@ namespace SimulationManager {
                       VarIDs(Loop1),
                       VarNames(Loop1),
                       unitEnumToString(unitsForVar(Loop1)),
-                      GetResourceTypeChar(ResourceTypes(Loop1)),
+                      GetResourceTypeChar(ResourceTypes.at(Loop1)),
                       EndUses(Loop1),
                       Groups(Loop1)
                       // TODO: Should call OutputProcessor::StandardTimeStepTypeKey(IndexTypes(Loop1)) to return "Zone" or "HVAC"
@@ -3040,7 +3042,6 @@ namespace SimulationManager {
             VarIDs.deallocate();
             VarNames.deallocate();
             unitsForVar.deallocate();
-            ResourceTypes.deallocate();
             EndUses.deallocate();
             Groups.deallocate();
         }
@@ -3143,7 +3144,6 @@ void Resimulate(EnergyPlusData &state,
     //         ReportHeatBalance
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataHeatBalFanSys::iGetZoneSetPoints;
     using DataHeatBalFanSys::iPredictStep;
     using DemandManager::DemandManagerExtIterations;

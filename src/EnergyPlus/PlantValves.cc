@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -85,7 +84,6 @@ namespace PlantValves {
     // PURPOSE OF THIS MODULE:
     // Collect "valve" type models for Plant loops
 
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using General::TrimSigDigits;
 

@@ -47,8 +47,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataDefineEquip.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-
 namespace EnergyPlus {
 
 namespace DataDefineEquip {
@@ -69,8 +67,6 @@ namespace DataDefineEquip {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.

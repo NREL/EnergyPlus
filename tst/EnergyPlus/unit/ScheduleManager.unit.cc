@@ -779,7 +779,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST)
     DataGlobals::NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
+    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
 
     ScheduleManager::ProcessScheduleInput(state); // read schedules
 
@@ -828,7 +828,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_SouthernHemispher
     DataGlobals::NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
+    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
 
     ScheduleManager::ProcessScheduleInput(state); // read schedules
 
@@ -925,7 +925,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
     DataGlobals::NumOfTimeStepInHour = NumOfTimeStepInHour;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
+    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
 
     DataEnvironment::Month = 12;
     DataEnvironment::DayOfMonth = 31;
@@ -1134,7 +1134,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
     DataGlobals::NumOfTimeStepInHour = NumOfTimeStepInHour;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
+    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
 
     DataEnvironment::Month = 12;
     DataEnvironment::DayOfMonth = 31;

@@ -127,7 +127,6 @@ namespace FanCoilUnits {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataSizing;
     using DataEnvironment::OutBaroPress;
@@ -136,7 +135,6 @@ namespace FanCoilUnits {
     using DataGlobals::BeginDayFlag;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;
@@ -1270,7 +1268,7 @@ namespace FanCoilUnits {
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil_Water) {
                 rho = GetDensityGlycol(state,
                                        PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidName,
-                                       DataGlobals::HWInitConvTemp,
+                                       DataGlobalConstants::HWInitConvTemp(),
                                        PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidIndex,
                                        RoutineName);
                 FanCoil(FanCoilNum).MaxHeatCoilFluidFlow = rho * FanCoil(FanCoilNum).MaxHotWaterVolFlow;
@@ -1279,7 +1277,7 @@ namespace FanCoilUnits {
 
             rho = GetDensityGlycol(state,
                                    PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidName,
-                                   DataGlobals::CWInitConvTemp,
+                                   DataGlobalConstants::CWInitConvTemp(),
                                    PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidIndex,
                                    RoutineName);
             FanCoil(FanCoilNum).MaxCoolCoilFluidFlow = rho * FanCoil(FanCoilNum).MaxColdWaterVolFlow;
@@ -1887,12 +1885,12 @@ namespace FanCoilUnits {
                             if (DesCoilLoad >= SmallLoad) {
                                 rho = GetDensityGlycol(state,
                                                        PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidName,
-                                                       DataGlobals::HWInitConvTemp,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidIndex,
                                                        RoutineNameNoSpace);
                                 Cp = GetSpecificHeatGlycol(state,
                                                            PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidName,
-                                                           DataGlobals::HWInitConvTemp,
+                                                           DataGlobalConstants::HWInitConvTemp(),
                                                            PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidIndex,
                                                            RoutineNameNoSpace);
 
@@ -2692,8 +2690,8 @@ namespace FanCoilUnits {
                 QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
                 // report variables
                 FanCoil(FanCoilNum).HeatPower = max(0.0, QUnitOut);
-                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(constant_zero, QUnitOut));
-                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(constant_zero, QTotUnitOut));
+                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QUnitOut));
+                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QTotUnitOut));
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
                 } else {
@@ -3018,8 +3016,8 @@ namespace FanCoilUnits {
                 QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
                 // report variables
                 FanCoil(FanCoilNum).HeatPower = max(0.0, QUnitOut);
-                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(constant_zero, QUnitOut));
-                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(constant_zero, QTotUnitOut));
+                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QUnitOut));
+                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QTotUnitOut));
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
                 } else {
@@ -3353,8 +3351,8 @@ namespace FanCoilUnits {
                 QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
                 // report variables
                 FanCoil(FanCoilNum).HeatPower = max(0.0, QSensUnitOutNoATM);
-                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(constant_zero, QSensUnitOutNoATM));
-                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(constant_zero, QTotUnitOut));
+                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QSensUnitOutNoATM));
+                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QTotUnitOut));
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
                 } else {
@@ -3375,8 +3373,8 @@ namespace FanCoilUnits {
                 QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
                 // report variables
                 FanCoil(FanCoilNum).HeatPower = max(0.0, QSensUnitOutNoATM);
-                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(constant_zero, QSensUnitOutNoATM));
-                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(constant_zero, QTotUnitOut));
+                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QSensUnitOutNoATM));
+                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QTotUnitOut));
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
                 } else {
@@ -4668,7 +4666,7 @@ namespace FanCoilUnits {
         Real64 ReportingConstant;
 
         // FLOW
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         FanCoil(FanCoilNum).HeatEnergy = FanCoil(FanCoilNum).HeatPower * ReportingConstant;
         FanCoil(FanCoilNum).SensCoolEnergy = FanCoil(FanCoilNum).SensCoolPower * ReportingConstant;
         FanCoil(FanCoilNum).TotCoolEnergy = FanCoil(FanCoilNum).TotCoolPower * ReportingConstant;

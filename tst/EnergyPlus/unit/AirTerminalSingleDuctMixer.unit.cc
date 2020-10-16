@@ -7975,7 +7975,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
 
     auto &thisFanCoil(FanCoil(1));
     auto &thisATMixer(SysATMixer(1));
-    auto &thisAvaiManager(SystemAvailabilityManager::NCycSysAvailMgrData(1));
+    auto &thisAvaiManager(state.dataSystemAvailabilityManager->NCycSysAvailMgrData(1));
 
     // get input test for terminal air single duct mixer on inlet side of PTAC
     ASSERT_EQ(1, NumATMixers);
@@ -7988,7 +7988,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
     EXPECT_EQ("FCU HEATING COIL", thisFanCoil.HCoilName);
     EXPECT_EQ("NIGHTCYCLE AVAILMGR", thisAvaiManager.Name);
-    EXPECT_EQ(SystemAvailabilityManager::SysAvailMgr_NightCycle, thisAvaiManager.MgrType);
+    EXPECT_EQ(state.dataSystemAvailabilityManager->SysAvailMgr_NightCycle, thisAvaiManager.MgrType);
 
     TotNumLoops = 2;
     PlantLoop.allocate(TotNumLoops);
@@ -8130,8 +8130,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     BeginEnvrnFlag = true;
     ZoneEqFanCoil = true;
     // check availability manager Night Cycle parameters
-    EXPECT_EQ(SystemAvailabilityManager::ThermostatWithMinimumRunTime, SystemAvailabilityManager::NCycSysAvailMgrData(1).CycRunTimeCntrlType);
-    EXPECT_EQ(DataHVACGlobals::NoAction, SystemAvailabilityManager::NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(state.dataSystemAvailabilityManager->ThermostatWithMinimumRunTime, state.dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CycRunTimeCntrlType);
+    EXPECT_EQ(DataHVACGlobals::NoAction, state.dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
 
     // set predicted heating load
     zoneSysEnergyDemand.RemainingOutputReqToCoolSP = 4000.0;
@@ -8156,14 +8156,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     DataGlobals::SimTimeSteps = 0;
     DataHVACGlobals::ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 0.0;
     DataHVACGlobals::ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
-    SystemAvailabilityManager::NCycSysAvailMgrData(1).AvailStatus = 0;
+    state.dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 0;
     // run CalcNCycSysAvailMgr to the availability of the fan coil unit on
     SystemAvailabilityManager::CalcNCycSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // check that the NightCycle has turned on the equipment
     EXPECT_EQ(DataHVACGlobals::CycleOn, AvailStatus);
-    EXPECT_EQ(DataHVACGlobals::CycleOn, SystemAvailabilityManager::NCycSysAvailMgrData(1).AvailStatus);
+    EXPECT_EQ(DataHVACGlobals::CycleOn, state.dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);
     // set zone equipment is CyclOn based on night cycle manager status
-    if (SystemAvailabilityManager::NCycSysAvailMgrData(1).AvailStatus) {
+    if (state.dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus) {
         ZoneCompTurnFansOn = true;
         ZoneCompTurnFansOff = false;
     }

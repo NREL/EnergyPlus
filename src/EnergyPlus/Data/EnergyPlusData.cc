@@ -84,6 +84,12 @@ namespace EnergyPlus {
         this->dataGlobal = std::unique_ptr<DataGlobal>(new DataGlobal);
         this->dataPipes = std::unique_ptr<PipesData>(new PipesData);
         this->dataPlantChillers = std::unique_ptr<PlantChillersData>(new PlantChillersData);
+        this->dataSurfaceGroundHeatExchangers = std::unique_ptr<SurfaceGroundHeatExchangersData>(new SurfaceGroundHeatExchangersData);
+        this->dataSwimmingPools = std::unique_ptr<SwimmingPoolsData>(new SwimmingPoolsData);
+        this->dataSystemAvailabilityManager = std::unique_ptr<SystemAvailabilityManagerData>(new SystemAvailabilityManagerData);
+        this->dataThermalChimneys = std::unique_ptr<ThermalChimneysData>(new ThermalChimneysData);
+        this->dataThermalComforts = std::unique_ptr<ThermalComfortsData>(new ThermalComfortsData);
+        this->dataTranspiredCollector = std::unique_ptr<TranspiredCollectorData>(new TranspiredCollectorData);
         this->dataUFADManager = std::unique_ptr<UFADManagerData>(new UFADManagerData);
         this->dataUnitarySystems = std::unique_ptr<UnitarySystemsData>(new UnitarySystemsData);
         this->dataUnitHeaters = std::unique_ptr<UnitHeatersData>(new UnitHeatersData);
@@ -140,6 +146,12 @@ namespace EnergyPlus {
         this->dataGlobal->clear_state();
         this->dataPipes->clear_state();
         this->dataPlantChillers->clear_state();
+        this->dataSurfaceGroundHeatExchangers->clear_state();
+        this->dataSwimmingPools->clear_state();
+        this->dataSystemAvailabilityManager->clear_state();
+        this->dataThermalChimneys->clear_state();
+        this->dataThermalComforts->clear_state();
+        this->dataTranspiredCollector->clear_state();
         this->dataUFADManager->clear_state();
         this->dataUnitarySystems->clear_state();
         this->dataUnitHeaters->clear_state();

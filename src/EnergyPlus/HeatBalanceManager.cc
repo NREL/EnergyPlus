@@ -72,7 +72,6 @@
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
@@ -144,7 +143,6 @@ namespace HeatBalanceManager {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataComplexFenestration;
     using namespace DataGlobals;
     using namespace DataEnvironment;
@@ -318,9 +316,6 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using namespace HeatBalanceSurfaceManager;
-        using DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp;
-        using DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting;
-        using DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting;
         using EMSManager::ManageEMS;
         using EMSManager::UpdateEMSTrendVariables;
 
@@ -363,13 +358,13 @@ namespace HeatBalanceManager {
 
         bool anyRan;
         ManageEMS(state,
-                  DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance,
+                  EMSManager::EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance,
                   anyRan,
                   ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
         InitHeatBalance(state); // Initialize all heat balance related parameters
-        ManageEMS(state, DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
+        ManageEMS(state, EMSManager::EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
         // and then the Air Heat Balance Manager is called by the Surface Heat Balance
@@ -379,7 +374,7 @@ namespace HeatBalanceManager {
         // the HVAC system (called from the Air Heat Balance) and the zone (simulated
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance(state);
-        ManageEMS(state, emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
+        ManageEMS(state, EMSManager::EMSCallFrom::EndZoneTimestepBeforeZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
         RecKeepHeatBalance(state);                                             // Do any heat balance related record keeping
 
         // This call has been moved to the FanSystemModule and does effect the output file
@@ -388,7 +383,7 @@ namespace HeatBalanceManager {
 
         ReportHeatBalance(state); // Manage heat balance reporting until the new reporting is in place
 
-        ManageEMS(state, emsCallFromEndZoneTimestepAfterZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
+        ManageEMS(state, EMSManager::EMSCallFrom::EndZoneTimestepAfterZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
         UpdateEMSTrendVariables();
         EnergyPlus::PluginManagement::PluginManager::updatePluginValues();
@@ -400,7 +395,7 @@ namespace HeatBalanceManager {
                 DayOfSim = 0; // Reset DayOfSim if Warmup converged
                 state.dataGlobal->DayOfSimChr = "0";
 
-                ManageEMS(state, emsCallFromBeginNewEvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const()); // calling point
+                ManageEMS(state, EMSManager::EMSCallFrom::BeginNewEnvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const()); // calling point
             }
         }
 
@@ -3446,7 +3441,7 @@ namespace HeatBalanceManager {
 
             // Minimum and maximum slat angles allowed by slat geometry
             if (Blind(Loop).SlatWidth > Blind(Loop).SlatSeparation) {
-                MinSlatAngGeom = std::asin(Blind(Loop).SlatThickness / (Blind(Loop).SlatThickness + Blind(Loop).SlatSeparation)) / DegToRadians;
+                MinSlatAngGeom = std::asin(Blind(Loop).SlatThickness / (Blind(Loop).SlatThickness + Blind(Loop).SlatSeparation)) / DataGlobalConstants::DegToRadians();
             } else {
                 MinSlatAngGeom = 0.0;
             }
@@ -4711,8 +4706,6 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  CHARACTER(len=MaxNameLength), DIMENSION(MaxZonesInList + 1) :: Alphas
-        //  REAL(r64), DIMENSION(8)              :: Numbers
         int NumAlphas;
         int NumNumbers;
         int IOStatus;
@@ -5088,8 +5081,6 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  CHARACTER(len=MaxNameLength), DIMENSION(MaxZonesInList + 1) :: Alphas
-        //  REAL(r64), DIMENSION(8)              :: Numbers
 
         Zone(ZoneLoop).Name = cAlphaArgs(1);
         if (NumNumbers >= 1) Zone(ZoneLoop).RelNorth = rNumericArgs(1);
@@ -5318,7 +5309,7 @@ namespace HeatBalanceManager {
             PerformSolarCalculations(state);
         }
 
-        if (BeginDayFlag && !WarmupFlag && KindOfSim == ksRunPeriodWeather && ReportExtShadingSunlitFrac) {
+        if (BeginDayFlag && !WarmupFlag && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && ReportExtShadingSunlitFrac) {
             for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
                 for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
                     static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
@@ -5957,15 +5948,13 @@ namespace HeatBalanceManager {
         using OutputReportTabular::UpdateTabularReports;
         using ScheduleManager::ReportScheduleValues;
         using namespace DataReportingFlags;
-        using DataGlobals::KindOfSim;
-        using DataGlobals::ksHVACSizeDesignDay;
 
         ReportScheduleValues(state);
 
         if (!WarmupFlag && DoOutputReporting) {
             CalcMoreNodeInfo(state);
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
-            if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
+            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay || state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
             }
 
@@ -6008,13 +5997,13 @@ namespace HeatBalanceManager {
             }
             CalcMoreNodeInfo(state);
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
-            if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
+            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay || state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
             }
 
         } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
-            if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
+            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay || state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
             }
         }
@@ -6756,13 +6745,13 @@ namespace HeatBalanceManager {
 
             // Pre-calculate constants
             for (IPhi = 1; IPhi <= 10; ++IPhi) {
-                CosPhiIndepVar(IPhi) = std::cos((IPhi - 1) * 10.0 * DegToRadians);
+                CosPhiIndepVar(IPhi) = std::cos((IPhi - 1) * 10.0 * DataGlobalConstants::DegToRadians());
             }
 
             // Pre-calculate constants
             for (IPhi = 1; IPhi <= 10; ++IPhi) {
                 Phi = double(IPhi - 1) * 10.0;
-                CosPhi(IPhi) = std::cos(Phi * DegToRadians);
+                CosPhi(IPhi) = std::cos(Phi * DataGlobalConstants::DegToRadians());
                 if (std::abs(CosPhi(IPhi)) < 0.0001) CosPhi(IPhi) = 0.0;
             }
 

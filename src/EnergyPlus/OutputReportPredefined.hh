@@ -1043,8 +1043,6 @@ namespace OutputReportPredefined {
     struct ShadowRelateType
     {
         // Members
-        //  CHARACTER(len=MaxNameLength)  :: castSurf          = ''
-        //  CHARACTER(len=MaxNameLength)  :: recSurf           = ''
         int castSurf;
         int recSurf;
         int recKind;

@@ -723,7 +723,7 @@ namespace CoolTower {
         int CoolTowerNum;
         Real64 TSMult;
 
-        TSMult = TimeStepSys * SecInHour;
+        TSMult = TimeStepSys * DataGlobalConstants::SecInHour();
 
         for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
 
