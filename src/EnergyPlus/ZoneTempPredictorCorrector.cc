@@ -56,8 +56,6 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -71,7 +69,6 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -92,6 +89,7 @@
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -123,7 +121,6 @@ namespace ZoneTempPredictorCorrector {
     //    "correct" step determines zone air temp with available HVAC
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace DataHeatBalance;
@@ -3569,7 +3566,7 @@ namespace ZoneTempPredictorCorrector {
 
             AIRRAT(ZoneNum) = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
                               PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) * PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) /
-                              (TimeStepSys * SecInHour);
+                              (TimeStepSys * DataGlobalConstants::SecInHour());
             AirCap = AIRRAT(ZoneNum);
             RAFNFrac = 0.0;
 
@@ -3613,7 +3610,7 @@ namespace ZoneTempPredictorCorrector {
                                   RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SysDepZoneLoadsLagged;
                     AirCap = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).AirVolume * Zone(ZoneNum).ZoneVolCapMultpSens *
                              RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).RhoAir *
-                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).CpAir / (TimeStepSys * SecInHour);
+                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).CpAir / (TimeStepSys * DataGlobalConstants::SecInHour());
                     AIRRAT(ZoneNum) = AirCap;
                     TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum));
                     state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
@@ -4508,7 +4505,7 @@ namespace ZoneTempPredictorCorrector {
             // to determine system added/subtracted moisture.
             LatentGain = ZoneLatentGain(ZoneNum) + SumLatentHTRadSys(ZoneNum) + SumLatentPool(ZoneNum);
 
-            SysTimeStepInSeconds = SecInHour * TimeStepSys;
+            SysTimeStepInSeconds = DataGlobalConstants::SecInHour() * TimeStepSys;
 
             // Calculate the coefficients for the 3rd Order derivative for final
             // zone humidity ratio.  The A, B, C coefficients are analogous to the heat balance.
@@ -4559,7 +4556,7 @@ namespace ZoneTempPredictorCorrector {
                 B = (RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntLatentGain / H2OHtOfVap) +
                     RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumLinkMW + RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARaW;
                 C = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).RhoAir * RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).AirVolume *
-                    Zone(ZoneNum).ZoneVolCapMultpMoist / (SecInHour * TimeStepSys);
+                    Zone(ZoneNum).ZoneVolCapMultpMoist / (DataGlobalConstants::SecInHour() * TimeStepSys);
             }
 
             // Use a 3rd Order derivative to predict zone moisture addition or removal and
@@ -4755,7 +4752,7 @@ namespace ZoneTempPredictorCorrector {
 
         // FLOW:
         // Initializations
-        ZoneTempChange = constant_zero;
+        ZoneTempChange = DataPrecisionGlobals::constant_zero;
 
         // Update zone temperatures
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
@@ -4882,7 +4879,7 @@ namespace ZoneTempPredictorCorrector {
 
             AIRRAT(ZoneNum) = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
                               PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName) *
-                              PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * SecInHour);
+                              PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour());
 
             AirCap = AIRRAT(ZoneNum);
 
@@ -5047,8 +5044,8 @@ namespace ZoneTempPredictorCorrector {
             // Determine sensible load heating/cooling rate and energy
             SNLoadHeatRate(ZoneNum) = max(SNLoad, 0.0);
             SNLoadCoolRate(ZoneNum) = std::abs(min(SNLoad, 0.0));
-            SNLoadHeatEnergy(ZoneNum) = max(SNLoad, 0.0) * TimeStepSys * SecInHour;
-            SNLoadCoolEnergy(ZoneNum) = std::abs(min(SNLoad, 0.0) * TimeStepSys * SecInHour);
+            SNLoadHeatEnergy(ZoneNum) = max(SNLoad, 0.0) * TimeStepSys * DataGlobalConstants::SecInHour();
+            SNLoadCoolEnergy(ZoneNum) = std::abs(min(SNLoad, 0.0) * TimeStepSys * DataGlobalConstants::SecInHour());
 
             // Final humidity calcs
             CorrectZoneHumRat(state, ZoneNum);
@@ -5494,7 +5491,7 @@ namespace ZoneTempPredictorCorrector {
             LatentGainExceptPeople = ZoneLatentGainExceptPeople(ZoneNum) + SumLatentHTRadSys(ZoneNum) + SumLatentPool(ZoneNum);
         }
 
-        SysTimeStepInSeconds = SecInHour * TimeStepSys;
+        SysTimeStepInSeconds = DataGlobalConstants::SecInHour() * TimeStepSys;
 
         // Calculate the coefficients for the 3rd order derivative for final
         // zone humidity ratio.  The A, B, C coefficients are analogous to the
@@ -5779,8 +5776,8 @@ namespace ZoneTempPredictorCorrector {
                 } else {
                     M_inf = (BB + CC * DD - ((11.0 / 6.0) * CC + AA) * Zone(ZoneNum).ZoneMeasuredTemperature) / (CpAir * delta_T);
                 }
-                ACH_inf = max(0.0, min(10.0, (M_inf / AirDensity) / Zone(ZoneNum).Volume * SecInHour));
-                M_inf = (ACH_inf / SecInHour) * Zone(ZoneNum).Volume * AirDensity;
+                ACH_inf = max(0.0, min(10.0, (M_inf / AirDensity) / Zone(ZoneNum).Volume * DataGlobalConstants::SecInHour()));
+                M_inf = (ACH_inf / DataGlobalConstants::SecInHour()) * Zone(ZoneNum).Volume * AirDensity;
 
                 // Overwrite variable with inverse solution
                 Zone(ZoneNum).MCPIHM = M_inf;
@@ -5825,7 +5822,7 @@ namespace ZoneTempPredictorCorrector {
                     MultpHM = AirCapHM /
                               (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                PsyCpAirFnW(ZoneAirHumRat(ZoneNum))) *
-                              (TimeStepZone * SecInHour);      // Inverse equation
+                              (TimeStepZone * DataGlobalConstants::SecInHour());      // Inverse equation
                     if ((MultpHM < 1.0) || (MultpHM > 30.0)) { // Temperature capacity multiplier greater than
                                                                // 1 and less than 30
                         MultpHM = 1.0;                         // Default value 1.0
@@ -5968,7 +5965,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 M_inf(0.0);
         Real64 ACH_inf(0.0);
         Real64 SysTimeStepInSeconds(0.0);
-        SysTimeStepInSeconds = SecInHour * TimeStepSys;
+        SysTimeStepInSeconds = DataGlobalConstants::SecInHour() * TimeStepSys;
 
         // Get measured zone humidity ratio
         Zone(ZoneNum).ZoneMeasuredHumidityRatio = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneMeasuredHumidityRatioSchedulePtr);
@@ -6015,8 +6012,8 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 // Add threshold for air change rate
-                ACH_inf = max(0.0, min(10.0, (M_inf / AirDensity) / Zone(ZoneNum).Volume * SecInHour));
-                M_inf = (ACH_inf / SecInHour) * Zone(ZoneNum).Volume * AirDensity;
+                ACH_inf = max(0.0, min(10.0, (M_inf / AirDensity) / Zone(ZoneNum).Volume * DataGlobalConstants::SecInHour()));
+                M_inf = (ACH_inf / DataGlobalConstants::SecInHour()) * Zone(ZoneNum).Volume * AirDensity;
                 Zone(ZoneNum).MCPIHM = M_inf;
                 Zone(ZoneNum).InfilOAAirChangeRateHM = ACH_inf;
             }
@@ -6291,7 +6288,7 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 // Other convection term is applicable to equivalent layer window (ASHWAT) model
-                if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGain += SurfWinOtherConvHeatGain(SurfNum);
+                if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGain += SurfWinOtherConvHeatGain(SurfNum);
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
                 if (shading_flag == IntShadeOn || shading_flag == IntBlindOn) SumIntGain += SurfWinConvHeatFlowNatural(SurfNum);
@@ -6521,8 +6518,8 @@ namespace ZoneTempPredictorCorrector {
                     CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), ADUHeatAddRate);
                     AirDistUnit(ADUNum).HeatRate = max(0.0, ADUHeatAddRate);
                     AirDistUnit(ADUNum).CoolRate = std::abs(min(0.0, ADUHeatAddRate));
-                    AirDistUnit(ADUNum).HeatGain = AirDistUnit(ADUNum).HeatRate * TimeStepSys * SecInHour;
-                    AirDistUnit(ADUNum).CoolGain = AirDistUnit(ADUNum).CoolRate * TimeStepSys * SecInHour;
+                    AirDistUnit(ADUNum).HeatGain = AirDistUnit(ADUNum).HeatRate * TimeStepSys * DataGlobalConstants::SecInHour();
+                    AirDistUnit(ADUNum).CoolGain = AirDistUnit(ADUNum).CoolRate * TimeStepSys * DataGlobalConstants::SecInHour();
                 }
 
             } // NodeNum
@@ -6626,7 +6623,7 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 // Other convection term is applicable to equivalent layer window (ASHWAT) model
-                if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGains += SurfWinOtherConvHeatGain(SurfNum);
+                if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGains += SurfWinOtherConvHeatGain(SurfNum);
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
                 if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn)
@@ -6675,7 +6672,7 @@ namespace ZoneTempPredictorCorrector {
             auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
             if (SELECT_CASE_var == Use3rdOrder) {
                 CzdTdt = RhoAir * CpAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens * (MAT(ZoneNum) - ZTM1(ZoneNum)) /
-                         (TimeStepSys * SecInHour);
+                         (TimeStepSys * DataGlobalConstants::SecInHour());
                 // Exact solution
             } else if (SELECT_CASE_var == UseAnalyticalSolution) {
                 CzdTdt = TempIndCoef - TempDepCoef * MAT(ZoneNum);
@@ -6970,7 +6967,7 @@ namespace ZoneTempPredictorCorrector {
         // FLOW:
         // adjust zone operative setpoint
         if (!(TempControlledZone(TempControlledZoneID).AdaptiveComfortTempControl)) return; // do nothing to setpoint
-        if ((state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != ksDesignDay) && (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != ksHVACSizeDesignDay)) {
+        if ((state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::HVACSizeDesignDay)) {
             // Adjust run period cooling set point
             switch (AdaptiveComfortModelTypeIndex) {
             case static_cast<int>(AdaptiveComfortModel::ASH55_CENTRAL):
@@ -7140,21 +7137,21 @@ namespace ZoneTempPredictorCorrector {
                 if (SELECT_CASE_var == static_cast<int>(AverageMethod::NO)) {
                     PeopleNum = ComfortControlledZone(RelativeZoneNum).SpecificObjectNum;
                     if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-                        GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
                     } else {
-                        GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
                     }
                     if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger))
-                        GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
                 } else if (SELECT_CASE_var == static_cast<int>(AverageMethod::SPE)) {
                     PeopleNum = ComfortControlledZone(RelativeZoneNum).SpecificObjectNum;
                     if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-                        GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
                     } else {
-                        GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
                     }
                     if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger))
-                        GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
                 } else if (SELECT_CASE_var == static_cast<int>(AverageMethod::OBJ)) {
                     ObjectCount = 0;
                     SetPointLo = 0.0;
@@ -7162,10 +7159,10 @@ namespace ZoneTempPredictorCorrector {
                     for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
                         if (ActualZoneNum == People(PeopleNum).ZonePtr) {
                             ++ObjectCount;
-                            GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
+                            GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
                             SetPointLo += Tset;
                             if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                                GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
+                                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
                                 SetPointHi += Tset;
                             }
                         }
@@ -7180,10 +7177,10 @@ namespace ZoneTempPredictorCorrector {
                         if (ActualZoneNum == People(PeopleNum).ZonePtr) {
                             NumberOccupants = People(PeopleNum).NumberOfPeople * GetCurrentScheduleValue(People(PeopleNum).NumberOfPeoplePtr);
                             PeopleCount += NumberOccupants;
-                            GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
+                            GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
                             SetPointLo += Tset * NumberOccupants;
                             if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                                GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
+                                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
                                 SetPointHi += Tset * NumberOccupants;
                             }
                         }
@@ -7212,10 +7209,10 @@ namespace ZoneTempPredictorCorrector {
                         for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
                             if (ActualZoneNum == People(PeopleNum).ZonePtr) {
                                 ++ObjectCount;
-                                GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
+                                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
                                 SetPointLo += Tset;
                                 if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                                    GetComfortSetPoints(PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
+                                    GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
                                     SetPointHi += Tset;
                                 }
                             }
@@ -7365,7 +7362,8 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void GetComfortSetPoints(int const PeopleNum,
+    void GetComfortSetPoints(EnergyPlusData &state,
+                             int const PeopleNum,
                              int const ComfortControlNum,
                              Real64 const PMVSet,
                              Real64 &Tset // drybulb setpoint temperature for a given PMV value
@@ -7410,14 +7408,14 @@ namespace ZoneTempPredictorCorrector {
         Tmin = ComfortControlledZone(ComfortControlNum).TdbMinSetPoint;
         Tmax = ComfortControlledZone(ComfortControlNum).TdbMaxSetPoint;
 
-        CalcThermalComfortFanger(PeopleNum, Tmin, PMVResult);
+        CalcThermalComfortFanger(state, PeopleNum, Tmin, PMVResult);
         PMVMin = PMVResult;
-        CalcThermalComfortFanger(PeopleNum, Tmax, PMVResult);
+        CalcThermalComfortFanger(state, PeopleNum, Tmax, PMVResult);
         PMVMax = PMVResult;
         if (PMVSet > PMVMin && PMVSet < PMVMax) {
             Par(1) = PMVSet;
             Par(2) = double(PeopleNum);
-            SolveRoot(Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par);
+            TempSolveRoot::SolveRoot(state, Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par);
             if (SolFla == -1) {
                 if (!WarmupFlag) {
                     ++IterLimitExceededNum1;
@@ -7454,7 +7452,8 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    Real64 PMVResidual(Real64 const Tset,
+    Real64 PMVResidual(EnergyPlusData &state,
+                       Real64 const Tset,
                        Array1D<Real64> const &Par // par(1) = PMV set point
     )
     {
@@ -7482,7 +7481,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 PMVresult; // resulting PMV values
 
         PeopleNum = int(Par(2));
-        CalcThermalComfortFanger(PeopleNum, Tset, PMVresult);
+        CalcThermalComfortFanger(state, PeopleNum, Tset, PMVresult);
         PMVResidual = Par(1) - PMVresult;
         return PMVResidual;
     }

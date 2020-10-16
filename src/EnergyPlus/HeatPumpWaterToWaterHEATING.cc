@@ -94,8 +94,6 @@ namespace HeatPumpWaterToWaterHEATING {
     using DataGlobals::BeginSimFlag;
     using DataGlobals::DayOfSim;
     using DataGlobals::HourOfDay;
-    using DataGlobals::KelvinConv;
-    using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataGlobals::WarmupFlag;
@@ -505,7 +503,7 @@ namespace HeatPumpWaterToWaterHEATING {
             this->beginEnvironFlag = false;
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->LoadLoopNum).FluidName,
-                                                           DataGlobals::CWInitConvTemp,
+                                                           DataGlobalConstants::CWInitConvTemp(),
                                                            DataPlant::PlantLoop(this->LoadLoopNum).FluidIndex,
                                                            RoutineName);
             this->LoadSideDesignMassFlow = this->LoadSideVolFlowRate * rho;
@@ -521,7 +519,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
             rho = FluidProperties::GetDensityGlycol(state,
                                                     DataPlant::PlantLoop(this->SourceLoopNum).FluidName,
-                                                    DataGlobals::CWInitConvTemp,
+                                                    DataGlobalConstants::CWInitConvTemp(),
                                                     DataPlant::PlantLoop(this->SourceLoopNum).FluidIndex,
                                                     RoutineName);
             this->SourceSideDesignMassFlow = this->SourceSideVolFlowRate * rho;
@@ -896,7 +894,7 @@ namespace HeatPumpWaterToWaterHEATING {
             // set node flow rates;  for these load based models
             // assume that the sufficient Source Side flow rate available
 
-            Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * SecInHour;
+            Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
             this->Energy = this->Power * ReportingConstant;
             this->QSourceEnergy = QSource * ReportingConstant;

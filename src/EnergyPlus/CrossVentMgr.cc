@@ -383,7 +383,7 @@ namespace CrossVentMgr {
 
         // Check if wind direction is within +/- 90 degrees of the outward normal of the dominant surface
         SurfNorm = Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).Azimuth;
-        CosPhi = std::cos((WindDir - SurfNorm) * DegToRadians);
+        CosPhi = std::cos((WindDir - SurfNorm) * DataGlobalConstants::DegToRadians());
         if (CosPhi <= 0) {
             AirModel(ZoneNum).SimAirModel = false;
             auto flows(CVJetRecFlows(_, ZoneNum));

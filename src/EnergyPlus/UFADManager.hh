@@ -58,35 +58,12 @@ struct EnergyPlusData;
 
 namespace UFADManager {
 
-    // Data
-    // MODULE VARIABLE DECLARATIONS:
-    extern Real64 HAT_MX;                  // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
-    extern Real64 HAT_MXWin;               // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone (windows only)
-    extern Real64 HA_MX;                   // HA_MX Convection Coefficient times Area for the upper subzone
-    extern Real64 HA_MXWin;                // HA_MX Convection Coefficient times Area for the upper subzone (windows only)
-    extern Real64 HAT_OC;                  // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone
-    extern Real64 HAT_OCWin;               // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone (windows only)
-    extern Real64 HA_OC;                   // HA_OC Convection Coefficient times Area for the lower subzone
-    extern Real64 HA_OCWin;                // HA_OC Convection Coefficient times Area for the lower subzone (windows only)
-    extern Real64 HAT_FLOOR;               // HAT_FLOOR Convection Coefficient times Area times Temperature for the floor(?) subzone
-    extern Real64 HA_FLOOR;                // HA_FLOOR Convection Coefficient times Area for the floor(?) subzone
-    extern Real64 HeightFloorSubzoneTop;   // Assumed thickness of floor subzone
-    extern Real64 ThickOccupiedSubzoneMin; // Minimum thickness of occupied subzone
-    extern Real64 HeightIntMass;           // Height of internal mass surfaces, assumed vertical, cannot exceed ceiling height
-    extern Real64 HeightIntMassDefault;    // Default height of internal mass surfaces
-
-    // SUBROUTINE SPECIFICATIONS:
-
-    // Functions
-
-    void clear_state();
-
     void ManageUCSDUFModels(EnergyPlusData &state,
                             int const ZoneNum,      // index number for the specified zone
                             int const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
-    void InitUCSDUF(int const ZoneNum,
+    void InitUCSDUF(EnergyPlusData &state, int const ZoneNum,
                     int const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
@@ -102,6 +79,33 @@ namespace UFADManager {
 
 } // namespace UFADManager
 
+struct UFADManagerData : BaseGlobalStruct {
+
+    Real64 HAT_MX = 0.0;                  // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
+    Real64 HAT_MXWin = 0.0;               // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone (windows only)
+    Real64 HA_MX = 0.0;                   // HA_MX Convection Coefficient times Area for the upper subzone
+    Real64 HA_MXWin = 0.0;                // HA_MX Convection Coefficient times Area for the upper subzone (windows only)
+    Real64 HAT_OC = 0.0;                  // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone
+    Real64 HAT_OCWin = 0.0;               // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone (windows only)
+    Real64 HA_OC = 0.0;                   // HA_OC Convection Coefficient times Area for the lower subzone
+    Real64 HA_OCWin = 0.0;                // HA_OC Convection Coefficient times Area for the lower subzone (windows only)
+    Real64 HAT_FLOOR = 0.0;               // HAT_FLOOR Convection Coefficient times Area times Temperature for the floor(?) subzone
+    Real64 HA_FLOOR = 0.0;                // HA_FLOOR Convection Coefficient times Area for the floor(?) subzone
+    Real64 HeightFloorSubzoneTop = 0.2;   // Assumed thickness of floor subzone
+    Real64 ThickOccupiedSubzoneMin = 0.2; // Minimum thickness of occupied subzone
+    Real64 HeightIntMass = 0.0;           // Height of internal mass surfaces, assumed vertical, cannot exceed ceiling height
+    Real64 HeightIntMassDefault = 2.0;    // Default height of internal mass surfaces
+
+    bool MyOneTimeFlag = true;
+
+    void clear_state() override
+    {
+        MyOneTimeFlag = true;
+    }
+
+    // Default Constructor
+    UFADManagerData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

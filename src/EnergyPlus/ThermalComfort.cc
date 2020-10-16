@@ -101,7 +101,6 @@ namespace ThermalComfort {
     // the people statements and perform the requested thermal comfort evaluations
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutDryBulbTemp;
@@ -141,7 +140,7 @@ namespace ThermalComfort {
     }                                            // namespace
 
     // MODULE PARAMETER DEFINITIONS
-    Real64 const TAbsConv(KelvinConv); // Converter for absolute temperature
+    Real64 const TAbsConv(DataGlobalConstants::KelvinConv()); // Converter for absolute temperature
     Real64 const ActLevelConv(58.2);   // Converter for activity level (1Met = 58.2 W/m2)
     Real64 const BodySurfArea(1.8);    // Dubois body surface area of the human body (m2)
     Real64 const RadSurfEff(0.72);     // Fraction of surface effective for radiation
@@ -394,10 +393,10 @@ namespace ThermalComfort {
         }
 
         if (!DoingSizing && !WarmupFlag) {
-            CalcThermalComfortFanger();
-            CalcThermalComfortPierce();
-            CalcThermalComfortKSU();
-            CalcThermalComfortSimpleASH55();
+            CalcThermalComfortFanger(state);
+            CalcThermalComfortPierce(state);
+            CalcThermalComfortKSU(state);
+            CalcThermalComfortSimpleASH55(state);
             CalcIfSetPointMet(state);
             if (ASH55Flag) CalcThermalComfortAdaptiveASH55(state, false);
             if (CEN15251Flag) CalcThermalComfortAdaptiveCEN15251(state, false);
@@ -663,7 +662,8 @@ namespace ThermalComfort {
         ZoneOccHrs.dimension(NumOfZones, 0.0);
     }
 
-    void CalcThermalComfortFanger(Optional_int_const PNum,     // People number for thermal comfort control
+    void CalcThermalComfortFanger(EnergyPlusData &state,
+                                  Optional_int_const PNum,     // People number for thermal comfort control
                                   Optional<Real64 const> Tset, // Temperature setpoint for thermal comfort control
                                   Optional<Real64> PMVResult   // PMV value for thermal comfort control
     )
@@ -744,7 +744,7 @@ namespace ThermalComfort {
                     AirTemp = ZTAVComf(ZoneNum);
                 }
             }
-            RadTemp = CalcRadTemp(PeopleNum);
+            RadTemp = CalcRadTemp(state, PeopleNum);
             // Use mean air temp for calculating RH when thermal comfort control is used
             if (present(PNum)) {
                 RelHum = PsyRhFnTdbWPb(MAT(ZoneNum), ZoneAirHumRatAvgComf(ZoneNum), OutBaroPress);
@@ -916,7 +916,7 @@ namespace ThermalComfort {
             // Calculate the Fanger PPD (Predicted Percentage of Dissatisfied), as a %
 
             Real64 expTest1 = -0.03353 * pow_4(PMV) - 0.2179 * pow_2(PMV);
-            if (expTest1 > EXP_LowerLimit) {
+            if (expTest1 > DataPrecisionGlobals::EXP_LowerLimit) {
                 PPD = 100.0 - 95.0 * std::exp(expTest1);
             } else {
                 PPD = 100.0;
@@ -932,7 +932,7 @@ namespace ThermalComfort {
         }
     }
 
-    void CalcThermalComfortPierce()
+    void CalcThermalComfortPierce(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1029,7 +1029,7 @@ namespace ThermalComfort {
             } else {
                 AirTemp = ZTAVComf(ZoneNum);
             }
-            RadTemp = CalcRadTemp(PeopleNum);
+            RadTemp = CalcRadTemp(state, PeopleNum);
             RelHum = PsyRhFnTdbWPb(AirTemp, ZoneAirHumRatAvgComf(ZoneNum), OutBaroPress);
             // Metabolic rate of body (W/m2)
             ActLevel = GetCurrentScheduleValue(People(PeopleNum).ActivityLevelPtr) / BodySurfArea;
@@ -1378,7 +1378,7 @@ namespace ThermalComfort {
         }
     }
 
-    void CalcThermalComfortKSU()
+    void CalcThermalComfortKSU(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1449,7 +1449,7 @@ namespace ThermalComfort {
             } else {
                 AirTemp = ZTAVComf(ZoneNum);
             }
-            RadTemp = CalcRadTemp(PeopleNum);
+            RadTemp = CalcRadTemp(state, PeopleNum);
             RelHum = PsyRhFnTdbWPb(AirTemp, ZoneAirHumRatAvgComf(ZoneNum), OutBaroPress);
             ActLevel = GetCurrentScheduleValue(People(PeopleNum).ActivityLevelPtr) / BodySurfArea;
             WorkEff = GetCurrentScheduleValue(People(PeopleNum).WorkEffPtr) * ActLevel;
@@ -1960,7 +1960,7 @@ namespace ThermalComfort {
         }
     }
 
-    Real64 CalcAngleFactorMRT(int const AngleFacNum)
+    Real64 CalcAngleFactorMRT(EnergyPlusData &state, int const AngleFacNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1978,9 +1978,6 @@ namespace ThermalComfort {
         // Locals
         Real64 SurfaceTemp;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const KelvinConv(273.15); // Conversion from Celsius to Kelvin
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;
         Real64 SurfTempEmissAngleFacSummed;
@@ -1994,18 +1991,18 @@ namespace ThermalComfort {
         auto &thisAngFacList(AngleFactorList(AngleFacNum));
 
         for (SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
-            SurfaceTemp = TH(2, 1, thisAngFacList.SurfacePtr(SurfNum)) + KelvinConv;
-            SurfEAF = dataConstruction.Construct(Surface(thisAngFacList.SurfacePtr(SurfNum)).Construction).InsideAbsorpThermal * thisAngFacList.AngleFactor(SurfNum);
+            SurfaceTemp = TH(2, 1, thisAngFacList.SurfacePtr(SurfNum)) + DataGlobalConstants::KelvinConv();
+            SurfEAF = state.dataConstruction->Construct(Surface(thisAngFacList.SurfacePtr(SurfNum)).Construction).InsideAbsorpThermal * thisAngFacList.AngleFactor(SurfNum);
             SurfTempEmissAngleFacSummed += SurfEAF * pow_4(SurfaceTemp);
             SumSurfaceEmissAngleFactor += SurfEAF;
         }
 
-        CalcAngleFactorMRT = root_4(SurfTempEmissAngleFacSummed / SumSurfaceEmissAngleFactor) - KelvinConv;
+        CalcAngleFactorMRT = root_4(SurfTempEmissAngleFacSummed / SumSurfaceEmissAngleFactor) - DataGlobalConstants::KelvinConv();
 
         return CalcAngleFactorMRT;
     }
 
-    Real64 CalcSurfaceWeightedMRT(int const ZoneNum, int const SurfNum)
+    Real64 CalcSurfaceWeightedMRT(EnergyPlusData &state, int const ZoneNum, int const SurfNum)
     {
 
         // Purpose: Calculate a modified zone MRT that excludes the Surface( SurfNum ).
@@ -2043,7 +2040,7 @@ namespace ThermalComfort {
             ZoneAESum = 0.0;
             for (SurfNum2 = 1; SurfNum2 <= TotSurfaces; ++SurfNum2) {
                 if (Surface(SurfNum2).HeatTransSurf) {
-                    SurfaceAE(SurfNum2) = Surface(SurfNum2).Area * dataConstruction.Construct(Surface(SurfNum2).Construction).InsideAbsorpThermal;
+                    SurfaceAE(SurfNum2) = Surface(SurfNum2).Area * state.dataConstruction->Construct(Surface(SurfNum2).Construction).InsideAbsorpThermal;
                     ZoneNum2 = Surface(SurfNum2).Zone;
                     // Do NOT include the contribution of the Surface that is being surface weighted in this calculation since it will already be
                     // accounted for
@@ -2058,7 +2055,7 @@ namespace ThermalComfort {
         ZoneAESum(ZoneNum) = 0.0;
         for (SurfNum2 = Zone(ZoneNum).SurfaceFirst; SurfNum2 <= Zone(ZoneNum).SurfaceLast; ++SurfNum2) {
             if ((Surface(SurfNum2).HeatTransSurf) && (SurfNum2 != SurfNum)) {
-                SurfaceAE(SurfNum2) = Surface(SurfNum2).Area * dataConstruction.Construct(Surface(SurfNum2).Construction).InsideAbsorpThermal;
+                SurfaceAE(SurfNum2) = Surface(SurfNum2).Area * state.dataConstruction->Construct(Surface(SurfNum2).Construction).InsideAbsorpThermal;
                 SumAET += SurfaceAE(SurfNum2) * TH(2, 1, SurfNum2);
                 ZoneAESum(ZoneNum) += SurfaceAE(SurfNum2);
             }
@@ -2101,7 +2098,7 @@ namespace ThermalComfort {
         return 6.16796 + 358.1855 * pow_2(XT) - 550.3543 * pow_3(XT) + 1048.8115 * pow_4(XT);
     }
 
-    Real64 CalcRadTemp(int const PeopleListNum) // Type of MRT calculation (zone averaged or surface weighted)
+    Real64 CalcRadTemp(EnergyPlusData &state, int const PeopleListNum) // Type of MRT calculation (zone averaged or surface weighted)
     {
 
         // FUNCTION INFORMATION:
@@ -2164,20 +2161,20 @@ namespace ThermalComfort {
             } else if (SELECT_CASE_var == SurfaceWeighted) {
                 ZoneRadTemp = MRT(ZoneNum);
                 SurfaceTemp = TH(2, 1, People(PeopleListNum).SurfacePtr);
-                RadTemp = CalcSurfaceWeightedMRT(ZoneNum, People(PeopleListNum).SurfacePtr);
+                RadTemp = CalcSurfaceWeightedMRT(state, ZoneNum, People(PeopleListNum).SurfacePtr);
             } else if (SELECT_CASE_var == AngleFactor) {
-                RadTemp = CalcAngleFactorMRT(People(PeopleListNum).AngleFactorListPtr);
+                RadTemp = CalcAngleFactorMRT(state, People(PeopleListNum).AngleFactorListPtr);
             }
         }
 
         // If high temperature radiant heater present and on, then must account for this in MRT calculation
         if (QHTRadSysToPerson(ZoneNum) > 0.0 || QCoolingPanelToPerson(ZoneNum) > 0.0 || QHWBaseboardToPerson(ZoneNum) > 0.0 ||
             QSteamBaseboardToPerson(ZoneNum) > 0.0 || QElecBaseboardToPerson(ZoneNum) > 0.0) {
-            RadTemp += KelvinConv; // Convert to Kelvin
+            RadTemp += DataGlobalConstants::KelvinConv(); // Convert to Kelvin
             RadTemp = root_4(pow_4(RadTemp) + ((QHTRadSysToPerson(ZoneNum) + QCoolingPanelToPerson(ZoneNum) + QHWBaseboardToPerson(ZoneNum) +
                                                 QSteamBaseboardToPerson(ZoneNum) + QElecBaseboardToPerson(ZoneNum)) /
                                                AreaEff / StefanBoltzmannConst));
-            RadTemp -= KelvinConv; // Convert back to Celsius
+            RadTemp -= DataGlobalConstants::KelvinConv(); // Convert back to Celsius
         }
 
         CalcRadTemp = RadTemp;
@@ -2185,7 +2182,7 @@ namespace ThermalComfort {
         return CalcRadTemp;
     }
 
-    void CalcThermalComfortSimpleASH55()
+    void CalcThermalComfortSimpleASH55(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -2359,12 +2356,12 @@ namespace ThermalComfort {
             TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
             // report how the aggregation is conducted
             {
-                auto const SELECT_CASE_var(KindOfSim);
-                if (SELECT_CASE_var == ksDesignDay) {
+                auto const SELECT_CASE_var(state.dataGlobal->KindOfSim);
+                if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::DesignDay) {
                     addFootNoteSubTable(pdstSimpleComfort, "Aggregated over the Design Days");
-                } else if (SELECT_CASE_var == ksRunPeriodDesign) {
+                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
                     addFootNoteSubTable(pdstSimpleComfort, "Aggregated over the RunPeriods for Design");
-                } else if (SELECT_CASE_var == ksRunPeriodWeather) {
+                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                     addFootNoteSubTable(pdstSimpleComfort, "Aggregated over the RunPeriods for Weather");
                 }
             }
@@ -2544,12 +2541,12 @@ namespace ThermalComfort {
             TotalAnyZoneNotMetOccupied = 0.0;
             // report how the aggregation is conducted
             {
-                auto const SELECT_CASE_var(KindOfSim);
-                if (SELECT_CASE_var == ksDesignDay) {
+                auto const SELECT_CASE_var(state.dataGlobal->KindOfSim);
+                if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::DesignDay) {
                     addFootNoteSubTable(pdstUnmetLoads, "Aggregated over the Design Days");
-                } else if (SELECT_CASE_var == ksRunPeriodDesign) {
+                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
                     addFootNoteSubTable(pdstUnmetLoads, "Aggregated over the RunPeriods for Design");
-                } else if (SELECT_CASE_var == ksRunPeriodWeather) {
+                } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                     addFootNoteSubTable(pdstUnmetLoads, "Aggregated over the RunPeriods for Weather");
                 }
             }
@@ -2782,7 +2779,7 @@ namespace ThermalComfort {
             } else {
                 AirTemp = ZTAVComf(ZoneNum);
             }
-            RadTemp = CalcRadTemp(PeopleNum);
+            RadTemp = CalcRadTemp(state, PeopleNum);
             OpTemp = (AirTemp + RadTemp) / 2.0;
             ThermalComfortData(PeopleNum).ThermalComfortOpTemp = OpTemp;
             ThermalComfortData(PeopleNum).ASHRAE55RunningMeanOutdoorTemp = runningAverageASH;
@@ -2985,7 +2982,7 @@ namespace ThermalComfort {
             } else {
                 AirTemp = ZTAVComf(ZoneNum);
             }
-            RadTemp = CalcRadTemp(PeopleNum);
+            RadTemp = CalcRadTemp(state, PeopleNum);
             OpTemp = (AirTemp + RadTemp) / 2.0;
             ThermalComfortData(PeopleNum).ThermalComfortOpTemp = OpTemp;
             ThermalComfortData(PeopleNum).CEN15251RunningMeanOutdoorTemp = runningAverageCEN;

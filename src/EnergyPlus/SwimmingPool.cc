@@ -249,7 +249,7 @@ namespace SwimmingPool {
                 }
             }
 
-            Pool(Item).ErrorCheckSetupPoolSurface(Alphas(1),Alphas(2),cAlphaFields(2),ErrorsFound);
+            Pool(Item).ErrorCheckSetupPoolSurface(state, Alphas(1),Alphas(2),cAlphaFields(2),ErrorsFound);
 
             Pool(Item).AvgDepth = Numbers(1);
             if (Pool(Item).AvgDepth < MinDepth) {
@@ -411,7 +411,8 @@ namespace SwimmingPool {
         }
     }
 
-    void SwimmingPoolData::ErrorCheckSetupPoolSurface(std::string const Alpha1,
+    void SwimmingPoolData::ErrorCheckSetupPoolSurface(EnergyPlusData &state,
+                                                      std::string const Alpha1,
                                                       std::string const Alpha2,
                                                       std::string const cAlphaField2,
                                                       bool &ErrorsFound
@@ -445,7 +446,7 @@ namespace SwimmingPool {
             ShowSevereError(DataSurfaces::Surface(this->SurfacePtr).Name +
                             " is a pool and has movable insulation.  This is not allowed.  Remove the movable insulation for this surface.");
             ErrorsFound = true;
-        } else if (dataConstruction.Construct(DataSurfaces::Surface(this->SurfacePtr).Construction).SourceSinkPresent) {
+        } else if (state.dataConstruction->Construct(DataSurfaces::Surface(this->SurfacePtr).Construction).SourceSinkPresent) {
             ShowSevereError(
                 DataSurfaces::Surface(this->SurfacePtr).Name +
                 " is a pool and uses a construction with a source/sink.  This is not allowed.  Use a standard construction for this surface.");
@@ -826,13 +827,13 @@ namespace SwimmingPool {
         // LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
         // to the air directly and added to the zone air heat balance
         Real64 LWsum =
-            (DataHeatBalance::QRadThermInAbs(SurfNum) + DataHeatBalSurface::NetLWRadToSurf(SurfNum) + DataHeatBalFanSys::QHTRadSysSurf(SurfNum) +
+            (DataHeatBalance::SurfQRadThermInAbs(SurfNum) + DataHeatBalSurface::SurfNetLWRadToSurf(SurfNum) + DataHeatBalFanSys::QHTRadSysSurf(SurfNum) +
              DataHeatBalFanSys::QHWBaseboardSurf(SurfNum) + DataHeatBalFanSys::QSteamBaseboardSurf(SurfNum) +
              DataHeatBalFanSys::QElecBaseboardSurf(SurfNum)); // summation of all long-wavelenth radiation going to surface
         Real64 LWtotal = this->CurCoverLWRadFac * LWsum;      // total flux from long-wavelength radiation to surface
-        Real64 SWtotal = this->CurCoverSWRadFac * DataHeatBalSurface::QRadSWInAbs(SurfNum); // total flux from short-wavelength radiation to surface
+        Real64 SWtotal = this->CurCoverSWRadFac * DataHeatBalSurface::SurfOpaqQRadSWInAbs(SurfNum); // total flux from short-wavelength radiation to surface
         this->RadConvertToConvect =
-            ((1.0 - this->CurCoverLWRadFac) * LWsum) + ((1.0 - this->CurCoverSWRadFac) * DataHeatBalSurface::QRadSWInAbs(SurfNum));
+            ((1.0 - this->CurCoverLWRadFac) * LWsum) + ((1.0 - this->CurCoverSWRadFac) * DataHeatBalSurface::SurfOpaqQRadSWInAbs(SurfNum));
 
         // Heat gain from people (assumed to be all convective to pool water)
         Real64 PeopleGain =
@@ -858,7 +859,7 @@ namespace SwimmingPool {
         // Now calculate the requested mass flow rate from the plant loop to achieve the proper pool temperature
         // old equation using surface heat balance form: MassFlowRate = CpDeltaTi * ( CondTerms + ConvTerm + SWtotal + LWtotal + PeopleGain +
         // PoolMassTerm + MUWTerm + EvapEnergyLossPerArea );
-        Real64 MassFlowRate = (this->WaterMass / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour)) *
+        Real64 MassFlowRate = (this->WaterMass / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour())) *
                               ((TInSurf - TH22) / (TLoopInletTemp - TInSurf)); // Target mass flow rate to achieve the proper setpoint temperature
         if (MassFlowRate > this->WaterMassFlowRateMax) {
             MassFlowRate = this->WaterMassFlowRateMax;
@@ -1105,10 +1106,10 @@ namespace SwimmingPool {
             Pool(PoolNum).RadConvertToConvectRep = Pool(PoolNum).RadConvertToConvect * DataSurfaces::Surface(SurfNum).Area;
 
             // Finally calculate the summed up report variables
-            Pool(PoolNum).MiscEquipEnergy = Pool(PoolNum).MiscEquipPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            Pool(PoolNum).HeatEnergy = Pool(PoolNum).HeatPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            Pool(PoolNum).MakeUpWaterMass = Pool(PoolNum).MakeUpWaterMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            Pool(PoolNum).EvapEnergyLoss = Pool(PoolNum).EvapHeatLossRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            Pool(PoolNum).MiscEquipEnergy = Pool(PoolNum).MiscEquipPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            Pool(PoolNum).HeatEnergy = Pool(PoolNum).HeatPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            Pool(PoolNum).MakeUpWaterMass = Pool(PoolNum).MakeUpWaterMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            Pool(PoolNum).EvapEnergyLoss = Pool(PoolNum).EvapHeatLossRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
             Pool(PoolNum).MakeUpWaterVolFlowRate = MakeUpWaterVolFlowFunct(Pool(PoolNum).MakeUpWaterMassFlowRate, Density);
             Pool(PoolNum).MakeUpWaterVol = MakeUpWaterVolFunct(Pool(PoolNum).MakeUpWaterMass, Density);

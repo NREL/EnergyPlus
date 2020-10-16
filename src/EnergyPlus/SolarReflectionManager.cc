@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -113,7 +114,7 @@ namespace SolarReflectionManager {
 
     // Functions
 
-    void InitSolReflRecSurf()
+    void InitSolReflRecSurf(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -392,8 +393,8 @@ namespace SolarReflectionManager {
             }
             SolReflRecSurf(RecSurfNum).PhiNormVec = PhiSurf;
             SolReflRecSurf(RecSurfNum).ThetaNormVec = ThetaSurf;
-            PhiMin = max(-PiOvr2, PhiSurf - PiOvr2);
-            PhiMax = min(PiOvr2, PhiSurf + PiOvr2);
+            PhiMin = max(-DataGlobalConstants::PiOvr2(), PhiSurf - DataGlobalConstants::PiOvr2());
+            PhiMax = min(DataGlobalConstants::PiOvr2(), PhiSurf + DataGlobalConstants::PiOvr2());
             DPhi = (PhiMax - PhiMin) / AltAngStepsForSolReflCalc;
             RayNum = 0;
 
@@ -406,9 +407,9 @@ namespace SolarReflectionManager {
                 URay(3) = SPhi;
 
                 if (PhiSurf >= 0.0) {
-                    if (Phi >= PiOvr2 - PhiSurf) {
-                        ThetaMin = -Pi;
-                        ThetaMax = Pi;
+                    if (Phi >= DataGlobalConstants::PiOvr2() - PhiSurf) {
+                        ThetaMin = -DataGlobalConstants::Pi();
+                        ThetaMax = DataGlobalConstants::Pi();
                     } else {
                         ACosTanTan = std::acos(-std::tan(Phi) * tan_PhiSurf);
                         ThetaMin = ThetaSurf - std::abs(ACosTanTan);
@@ -416,9 +417,9 @@ namespace SolarReflectionManager {
                     }
 
                 } else { // PhiSurf < 0.0
-                    if (Phi <= -PhiSurf - PiOvr2) {
-                        ThetaMin = -Pi;
-                        ThetaMax = Pi;
+                    if (Phi <= -PhiSurf - DataGlobalConstants::PiOvr2()) {
+                        ThetaMin = -DataGlobalConstants::Pi();
+                        ThetaMax = DataGlobalConstants::Pi();
                     } else {
                         ACosTanTan = std::acos(-std::tan(Phi) * tan_PhiSurf);
                         ThetaMin = ThetaSurf - std::abs(ACosTanTan);
@@ -521,9 +522,9 @@ namespace SolarReflectionManager {
                         ObsConstrNum = Surface(NearestHitSurfNum).Construction;
                         if (ObsConstrNum > 0) {
                             // Exterior building surface is nearest hit
-                            if (!dataConstruction.Construct(ObsConstrNum).TypeIsWindow) {
+                            if (!state.dataConstruction->Construct(ObsConstrNum).TypeIsWindow) {
                                 // Obstruction is not a window, i.e., is an opaque surface
-                                SolReflRecSurf(RecSurfNum).HitPtSolRefl(RayNum, RecPtNum) = 1.0 - dataConstruction.Construct(ObsConstrNum).OutsideAbsorpSolar;
+                                SolReflRecSurf(RecSurfNum).HitPtSolRefl(RayNum, RecPtNum) = 1.0 - state.dataConstruction->Construct(ObsConstrNum).OutsideAbsorpSolar;
                             } else {
                                 // Obstruction is a window. Assume it is bare so that there is no beam-to-diffuse reflection
                                 // (beam-to-beam reflection is calculated in subroutine CalcBeamSolSpecularReflFactors).
@@ -805,13 +806,13 @@ namespace SolarReflectionManager {
                         if (HitPtSurfNum > 0) {
                             // Ray hits an obstruction
                             dReflBeamToDiffSol = BmReflSolRadiance * SolReflRecSurf(RecSurfNum).dOmegaRay(RayNum) *
-                                                 SolReflRecSurf(RecSurfNum).CosIncAngRay(RayNum) / Pi;
+                                                 SolReflRecSurf(RecSurfNum).CosIncAngRay(RayNum) / DataGlobalConstants::Pi();
                             ReflBmToDiffSolObs(RecPtNum) += dReflBeamToDiffSol;
                         } else {
                             // Ray hits ground (in this case we do not multiply by BmReflSolRadiance since
                             // ground reflectance and cos of incidence angle of sun on
                             // ground is taken into account later when ReflFacBmToDiffSolGnd is used)
-                            dReflBeamToDiffSol = SolReflRecSurf(RecSurfNum).dOmegaRay(RayNum) * SolReflRecSurf(RecSurfNum).CosIncAngRay(RayNum) / Pi;
+                            dReflBeamToDiffSol = SolReflRecSurf(RecSurfNum).dOmegaRay(RayNum) * SolReflRecSurf(RecSurfNum).CosIncAngRay(RayNum) / DataGlobalConstants::Pi();
                             ReflBmToDiffSolGnd(RecPtNum) += dReflBeamToDiffSol;
                         }
                     }
@@ -838,7 +839,7 @@ namespace SolarReflectionManager {
 
     //=================================================================================================
 
-    void CalcBeamSolSpecularReflFactors()
+    void CalcBeamSolSpecularReflFactors(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -879,16 +880,16 @@ namespace SolarReflectionManager {
             ReflFacBmToBmSolObs = 0.0;
             CosIncAveBmToBmSolObs = 0.0;
             for (IHr = 1; IHr <= 24; ++IHr) {
-                FigureBeamSolSpecularReflFactors(IHr);
+                FigureBeamSolSpecularReflFactors(state, IHr);
             }    // End of IHr loop
         } else { // timestep integrated solar, use current hour of day
             ReflFacBmToBmSolObs(HourOfDay, {1, TotSurfaces}) = 0.0;
             CosIncAveBmToBmSolObs(HourOfDay, {1, TotSurfaces}) = 0.0;
-            FigureBeamSolSpecularReflFactors(HourOfDay);
+            FigureBeamSolSpecularReflFactors(state, HourOfDay);
         }
     }
 
-    void FigureBeamSolSpecularReflFactors(int const iHour)
+    void FigureBeamSolSpecularReflFactors(EnergyPlusData &state, int const iHour)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1046,12 +1047,12 @@ namespace SolarReflectionManager {
                                 SpecReflectance = 0.0;
                                 if (Surface(ReflSurfNum).Class == SurfaceClass_Window) {
                                     ConstrNumRefl = Surface(ReflSurfNum).Construction;
-                                    SpecReflectance = POLYF(std::abs(CosIncAngRefl), dataConstruction.Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
+                                    SpecReflectance = POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                                 }
                                 if (Surface(ReflSurfNum).ShadowingSurf && Surface(ReflSurfNum).ShadowSurfGlazingConstruct > 0) {
                                     ConstrNumRefl = Surface(ReflSurfNum).ShadowSurfGlazingConstruct;
                                     SpecReflectance = Surface(ReflSurfNum).ShadowSurfGlazingFrac *
-                                                      POLYF(std::abs(CosIncAngRefl), dataConstruction.Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
+                                                      POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                                 }
                                 // Angle of incidence of reflected beam on receiving surface
                                 CosIncAngRec = dot(SolReflRecSurf(RecSurfNum).NormVec, SunVecMir);
@@ -1130,8 +1131,8 @@ namespace SolarReflectionManager {
         static Vector3<Real64> SurfVert(0.0); // Surface vertex (m)
         // FLOW:
 
-        Real64 const DPhi(PiOvr2 / (AltAngStepsForSolReflCalc / 2.0));      // Altitude angle and increment (radians)
-        Real64 const DTheta(2.0 * Pi / (2.0 * AzimAngStepsForSolReflCalc)); // Azimuth increment (radians)
+        Real64 const DPhi(DataGlobalConstants::PiOvr2() / (AltAngStepsForSolReflCalc / 2.0));      // Altitude angle and increment (radians)
+        Real64 const DTheta(2.0 * DataGlobalConstants::Pi() / (2.0 * AzimAngStepsForSolReflCalc)); // Azimuth increment (radians)
 
         // Pre-compute these constants
         // Initialize the 0 index with dummy value so the iterators line up below
@@ -1196,7 +1197,7 @@ namespace SolarReflectionManager {
                                                  SolReflRecSurf(RecSurfNum).HitPtSolRefl(RayNum, RecPtNum);
                         }
                         dReflSkySol =
-                            SkyReflSolRadiance * SolReflRecSurf(RecSurfNum).dOmegaRay(RayNum) * SolReflRecSurf(RecSurfNum).CosIncAngRay(RayNum) / Pi;
+                            SkyReflSolRadiance * SolReflRecSurf(RecSurfNum).dOmegaRay(RayNum) * SolReflRecSurf(RecSurfNum).CosIncAngRay(RayNum) / DataGlobalConstants::Pi();
                         ReflSkySolObs(RecPtNum) += dReflSkySol;
                     } else {
                         // Ray hits ground;
@@ -1239,11 +1240,11 @@ namespace SolarReflectionManager {
                                 }
                                 if (hitObs) continue; // Obstruction hit
                                 // Sky is hit
-                                dReflSkyGnd += CosIncAngRayToSky * dOmega / Pi;
+                                dReflSkyGnd += CosIncAngRayToSky * dOmega / DataGlobalConstants::Pi();
                             } // End of azimuth loop
                         }     // End of altitude loop
                         ReflSkySolGnd(RecPtNum) +=
-                            dReflSkyGnd * SolReflRecSurf(RecSurfNum).dOmegaRay(RayNum) * SolReflRecSurf(RecSurfNum).CosIncAngRay(RayNum) / Pi;
+                            dReflSkyGnd * SolReflRecSurf(RecSurfNum).dOmegaRay(RayNum) * SolReflRecSurf(RecSurfNum).CosIncAngRay(RayNum) / DataGlobalConstants::Pi();
                     } // End of check if ray from receiving point hits obstruction or ground
                 }     // End of loop over rays from receiving point
             }         // End of loop over receiving points

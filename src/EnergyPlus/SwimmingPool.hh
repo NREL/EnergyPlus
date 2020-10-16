@@ -164,7 +164,8 @@ namespace SwimmingPool {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void ErrorCheckSetupPoolSurface(std::string const Alpha1,
+        void ErrorCheckSetupPoolSurface(EnergyPlusData &state,
+                                        std::string const Alpha1,
                                         std::string const Alpha2,
                                         std::string const cAlphaField2,
                                         bool &ErrorsFound

@@ -603,7 +603,6 @@ namespace HVACInterfaceManager {
 
         // Using/Aliasing
         using DataGlobals::HourOfDay;
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
@@ -672,7 +671,7 @@ namespace HVACInterfaceManager {
         // tank conditions each call.
         // Analytical solution for ODE, formulated for both final tank temp and average tank temp.
 
-        TimeStepSeconds = TimeStepSys * SecInHour;
+        TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour();
         MassFlowRate = Node(TankInletNode).MassFlowRate;
         PumpHeat = PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TotalPumpHeat;
         ThisTankMass = FracTotLoopMass * PlantLoop(LoopNum).Mass;
@@ -767,7 +766,6 @@ namespace HVACInterfaceManager {
 
         // Using/Aliasing
         using DataGlobals::HourOfDay;
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
@@ -851,7 +849,7 @@ namespace HVACInterfaceManager {
         // no common pipe case.
         // calculation is separated because for common pipe, a different split for mass fraction is applied
         // The pump heat source is swapped around here compared to no common pipe (so pump heat sort stays on its own side).
-        TimeStepSeconds = TimeStepSys * SecInHour;
+        TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour();
         MassFlowRate = Node(TankInletNode).MassFlowRate;
         PumpHeat = PlantLoop(LoopNum).LoopSide(TankInletLoopSide).TotalPumpHeat;
         ThisTankMass = FracTotLoopMass * PlantLoop(LoopNum).Mass;

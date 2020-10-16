@@ -957,7 +957,7 @@ namespace FourPipeBeam {
         if (this->beamCoolingPresent) {
             rho = FluidProperties::GetDensityGlycol(state,
                                                     DataPlant::PlantLoop(this->cWLocation.loopNum).FluidName,
-                                                    DataGlobals::CWInitConvTemp,
+                                                    DataGlobalConstants::CWInitConvTemp(),
                                                     DataPlant::PlantLoop(this->cWLocation.loopNum).FluidIndex,
                                                     routineName);
             this->mDotNormRatedCW = this->vDotNormRatedCW * rho;
@@ -974,7 +974,7 @@ namespace FourPipeBeam {
         if (this->beamHeatingPresent) {
             rho = FluidProperties::GetDensityGlycol(state,
                                                     DataPlant::PlantLoop(this->hWLocation.loopNum).FluidName,
-                                                    DataGlobals::HWInitConvTemp,
+                                                    DataGlobalConstants::HWInitConvTemp(),
                                                     DataPlant::PlantLoop(this->hWLocation.loopNum).FluidIndex,
                                                     routineName);
             this->mDotNormRatedHW = this->vDotNormRatedHW * rho;
@@ -1032,7 +1032,7 @@ namespace FourPipeBeam {
             this->vDotDesignCW = this->vDotNormRatedCW * this->totBeamLength;
             rho = FluidProperties::GetDensityGlycol(state,
                                                     DataPlant::PlantLoop(this->cWLocation.loopNum).FluidName,
-                                                    DataGlobals::CWInitConvTemp,
+                                                    DataGlobalConstants::CWInitConvTemp(),
                                                     DataPlant::PlantLoop(this->cWLocation.loopNum).FluidIndex,
                                                     routineName);
             this->mDotNormRatedCW = this->vDotNormRatedCW * rho;
@@ -1052,7 +1052,7 @@ namespace FourPipeBeam {
             this->vDotDesignHW = this->vDotNormRatedHW * this->totBeamLength;
             rho = FluidProperties::GetDensityGlycol(state,
                                                     DataPlant::PlantLoop(this->hWLocation.loopNum).FluidName,
-                                                    DataGlobals::HWInitConvTemp,
+                                                    DataGlobalConstants::HWInitConvTemp(),
                                                     DataPlant::PlantLoop(this->hWLocation.loopNum).FluidIndex,
                                                     routineName);
             this->mDotNormRatedHW = this->vDotNormRatedHW * rho;
@@ -1482,7 +1482,7 @@ namespace FourPipeBeam {
 
         Real64 ReportingConstant;
 
-        ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (this->beamCoolingPresent) {
             this->beamCoolingRate = std::abs(this->qDotBeamCooling); // report var has positive sign convention

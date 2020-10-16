@@ -102,13 +102,11 @@ namespace Fans {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::emsCallFromComponentGetInput;
     using DataGlobals::SysSizingCalc;
     using DataGlobals::WarmupFlag;
     using DataHVACGlobals::BalancedExhMassFlow;
@@ -1000,7 +998,7 @@ namespace Fans {
         }
 
         bool anyRan;
-        ManageEMS(state, emsCallFromComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
+        ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
         MySizeFlag.dimension(state.dataFans->NumFans, true);
     }
 
@@ -1272,7 +1270,7 @@ namespace Fans {
             //   StdRhoAir=PsyRhoAirFnPbTdbW(StdBaroPress,20,0)
             // From PsychRoutines:
             //   w=MAX(dw,1.0d-5)
-            //   rhoair = pb/(287.d0*(tdb+KelvinConv)*(1.0d0+1.6077687d0*w))
+            //   rhoair = pb/(287.d0*(tdb+DataGlobalConstants::KelvinConv())*(1.0d0+1.6077687d0*w))
             RhoAir = StdRhoAir;
 
             // Adjust max fan volumetric airflow using fan sizing factor
@@ -2321,7 +2319,7 @@ namespace Fans {
         //   StdRhoAir=PsyRhoAirFnPbTdbW(StdBaroPress,20,0)
         // From PsychRoutines:
         //   w=MAX(dw,1.0d-5)
-        //   rhoair = pb/(287.d0*(tdb+KelvinConv)*(1.0d0+1.6077687d0*w))
+        //   rhoair = pb/(287.d0*(tdb+DataGlobalConstants::KelvinConv())*(1.0d0+1.6077687d0*w))
         RhoAir = Fan(FanNum).RhoAirStdInit;
         MassFlow = min(Fan(FanNum).InletAirMassFlowRate, Fan(FanNum).MaxAirMassFlowRate);
 
@@ -2603,7 +2601,6 @@ namespace Fans {
         // na
 
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
 
         // Locals
@@ -2621,7 +2618,7 @@ namespace Fans {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        Fan(FanNum).FanEnergy = Fan(FanNum).FanPower * TimeStepSys * SecInHour;
+        Fan(FanNum).FanEnergy = Fan(FanNum).FanPower * TimeStepSys * DataGlobalConstants::SecInHour();
         Fan(FanNum).DeltaTemp = Fan(FanNum).OutletAirTemp - Fan(FanNum).InletAirTemp;
 
         if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
@@ -3157,7 +3154,7 @@ namespace Fans {
             MotEff = Fan(FanNum).MotEff;
             MotInAirFrac = Fan(FanNum).MotInAirFrac;
             RhoAir = StdRhoAir;
-            CpAir = PsyCpAirFnW(constant_zero);
+            CpAir = PsyCpAirFnW(DataPrecisionGlobals::constant_zero);
             DesignDeltaT = (DeltaP / (RhoAir * CpAir * TotEff)) * (MotEff + MotInAirFrac * (1.0 - MotEff));
         } else {
             DesignDeltaT = 0.0;

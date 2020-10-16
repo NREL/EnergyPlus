@@ -482,8 +482,8 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     CosZoneRelNorth.allocate(1);
     SinZoneRelNorth.allocate(1);
 
-    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
+    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
@@ -934,8 +934,8 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
     EXPECT_FALSE(ErrorsFound);
     CosZoneRelNorth.allocate(1);
     SinZoneRelNorth.allocate(1);
-    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
+    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
     GetSurfaceData(state, ErrorsFound); // setup zone geometry and get zone data
@@ -2837,8 +2837,8 @@ TEST_F(EnergyPlusFixture, MakeRectangularVertices)
 
     CosZoneRelNorth.allocate(zoneNum);
     SinZoneRelNorth.allocate(zoneNum);
-    CosZoneRelNorth(zoneNum) = std::cos(-Zone(zoneNum).RelNorth * DataGlobals::DegToRadians);
-    SinZoneRelNorth(zoneNum) = std::sin(-Zone(zoneNum).RelNorth * DataGlobals::DegToRadians);
+    CosZoneRelNorth(zoneNum) = std::cos(-Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians());
+    SinZoneRelNorth(zoneNum) = std::sin(-Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians());
 
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
@@ -3171,8 +3171,8 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
     WindowShadingControl(3).FenestrationName(1) = "Fene-08";
     WindowShadingControl(3).FenestrationName(2) = "Fene-09";
 
-    dataConstruction.Construct.allocate(1);
-    dataConstruction.Construct(1).WindowTypeEQL = false;
+    state.dataConstruction->Construct.allocate(1);
+    state.dataConstruction->Construct(1).WindowTypeEQL = false;
 
     SurfaceTmp.allocate(9);
 
@@ -3215,55 +3215,55 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
     bool Err = false;
 
     int surfNum = 1;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    InitialAssociateWindowShadingControlFenestration(state, Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 2);
     EXPECT_FALSE(Err);
 
     surfNum = 2;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    InitialAssociateWindowShadingControlFenestration(state, Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 2);
     EXPECT_FALSE(Err);
 
     surfNum = 3;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    InitialAssociateWindowShadingControlFenestration(state, Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 2);
     EXPECT_FALSE(Err);
 
     surfNum = 4;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    InitialAssociateWindowShadingControlFenestration(state, Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 1);
     EXPECT_FALSE(Err);
 
     surfNum = 5;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    InitialAssociateWindowShadingControlFenestration(state, Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 1);
     EXPECT_FALSE(Err);
 
     surfNum = 6;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    InitialAssociateWindowShadingControlFenestration(state, Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 1);
     EXPECT_FALSE(Err);
 
     surfNum = 7;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    InitialAssociateWindowShadingControlFenestration(state, Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 2);
     EXPECT_FALSE(Err);
 
     surfNum = 8;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    InitialAssociateWindowShadingControlFenestration(state, Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 3);
     EXPECT_FALSE(Err);
 
     surfNum = 9;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    InitialAssociateWindowShadingControlFenestration(state, Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).activeWindowShadingControl, 3);
     EXPECT_FALSE(Err);
@@ -3305,8 +3305,8 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi
     WindowShadingControl(3).FenestrationName(1) = "Fene-03";
     WindowShadingControl(3).FenestrationName(2) = "Fene-05";
 
-    dataConstruction.Construct.allocate(1);
-    dataConstruction.Construct(1).WindowTypeEQL = false;
+    state.dataConstruction->Construct.allocate(1);
+    state.dataConstruction->Construct(1).WindowTypeEQL = false;
 
     SurfaceTmp.allocate(5);
 
@@ -3333,14 +3333,14 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi
     bool Err = false;
 
     int surfNum = 1;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    InitialAssociateWindowShadingControlFenestration(state, Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList.size(), 1u);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList[0], 1);
     EXPECT_FALSE(Err);
 
     surfNum = 2;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    InitialAssociateWindowShadingControlFenestration(state, Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList.size(), 2u);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList[0], 1);
@@ -3348,7 +3348,7 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi
     EXPECT_FALSE(Err);
 
     surfNum = 3;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    InitialAssociateWindowShadingControlFenestration(state, Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList.size(), 3u);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList[0], 1);
@@ -3357,14 +3357,14 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi
     EXPECT_FALSE(Err);
 
     surfNum = 4;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    InitialAssociateWindowShadingControlFenestration(state, Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList.size(), 1u);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList[0], 2);
     EXPECT_FALSE(Err);
 
     surfNum = 5;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
+    InitialAssociateWindowShadingControlFenestration(state, Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList.size(), 2u);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList[0], 2);
@@ -3664,26 +3664,26 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_createAirMaterialFromDistance_Test)
 TEST_F(EnergyPlusFixture, SurfaceGeometry_createConstructionWithStorm_Test)
 {
     TotConstructs = 1;
-    dataConstruction.Construct.allocate(TotConstructs);
+    state.dataConstruction->Construct.allocate(TotConstructs);
 
     dataMaterial.Material.allocate(60);
     dataMaterial.Material(47).AbsorpThermalFront = 0.11;
 
     // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
-    dataConstruction.Construct(TotConstructs).TotLayers = 3;
-    dataConstruction.Construct(TotConstructs).LayerPoint(1) = 11;
-    dataConstruction.Construct(TotConstructs).LayerPoint(2) = 22;
-    dataConstruction.Construct(TotConstructs).LayerPoint(3) = 33;
+    state.dataConstruction->Construct(TotConstructs).TotLayers = 3;
+    state.dataConstruction->Construct(TotConstructs).LayerPoint(1) = 11;
+    state.dataConstruction->Construct(TotConstructs).LayerPoint(2) = 22;
+    state.dataConstruction->Construct(TotConstructs).LayerPoint(3) = 33;
 
-    createConstructionWithStorm(1, "construction_A", 47, 59);
+    createConstructionWithStorm(state, 1, "construction_A", 47, 59);
     EXPECT_EQ(TotConstructs, 2);
-    EXPECT_EQ(dataConstruction.Construct(TotConstructs).Name, "construction_A");
-    EXPECT_EQ(dataConstruction.Construct(TotConstructs).LayerPoint(1), 47);
-    EXPECT_EQ(dataConstruction.Construct(TotConstructs).LayerPoint(2), 59);
-    EXPECT_EQ(dataConstruction.Construct(TotConstructs).LayerPoint(3), 11);
-    EXPECT_EQ(dataConstruction.Construct(TotConstructs).LayerPoint(4), 22);
-    EXPECT_EQ(dataConstruction.Construct(TotConstructs).LayerPoint(5), 33);
-    EXPECT_EQ(dataConstruction.Construct(TotConstructs).OutsideAbsorpThermal, 0.11);
+    EXPECT_EQ(state.dataConstruction->Construct(TotConstructs).Name, "construction_A");
+    EXPECT_EQ(state.dataConstruction->Construct(TotConstructs).LayerPoint(1), 47);
+    EXPECT_EQ(state.dataConstruction->Construct(TotConstructs).LayerPoint(2), 59);
+    EXPECT_EQ(state.dataConstruction->Construct(TotConstructs).LayerPoint(3), 11);
+    EXPECT_EQ(state.dataConstruction->Construct(TotConstructs).LayerPoint(4), 22);
+    EXPECT_EQ(state.dataConstruction->Construct(TotConstructs).LayerPoint(5), 33);
+    EXPECT_EQ(state.dataConstruction->Construct(TotConstructs).OutsideAbsorpThermal, 0.11);
 }
 
 
@@ -3890,8 +3890,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     CosZoneRelNorth.allocate(2);
     SinZoneRelNorth.allocate(2);
 
-    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
+    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     CosZoneRelNorth(2) = CosZoneRelNorth(1);
     SinZoneRelNorth(2) = SinZoneRelNorth(1);
     CosBldgRelNorth = 1.0;
@@ -4869,43 +4869,43 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
 TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
 {
     bool RevLayerDiffs;
-    dataConstruction.Construct.allocate(6);
+    state.dataConstruction->Construct.allocate(6);
     dataMaterial.Material.allocate(7);
 
     // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
-    dataConstruction.Construct(1).TotLayers = 3;
-    dataConstruction.Construct(1).LayerPoint(1) = 1;
-    dataConstruction.Construct(1).LayerPoint(2) = 2;
-    dataConstruction.Construct(1).LayerPoint(3) = 3;
-    dataConstruction.Construct(2).TotLayers = 3;
-    dataConstruction.Construct(2).LayerPoint(1) = 3;
-    dataConstruction.Construct(2).LayerPoint(2) = 2;
-    dataConstruction.Construct(2).LayerPoint(3) = 1;
+    state.dataConstruction->Construct(1).TotLayers = 3;
+    state.dataConstruction->Construct(1).LayerPoint(1) = 1;
+    state.dataConstruction->Construct(1).LayerPoint(2) = 2;
+    state.dataConstruction->Construct(1).LayerPoint(3) = 3;
+    state.dataConstruction->Construct(2).TotLayers = 3;
+    state.dataConstruction->Construct(2).LayerPoint(1) = 3;
+    state.dataConstruction->Construct(2).LayerPoint(2) = 2;
+    state.dataConstruction->Construct(2).LayerPoint(3) = 1;
     RevLayerDiffs = true;
     // ExpectResult = false;
-    CheckForReversedLayers(RevLayerDiffs, 1, 2, 3);
+    CheckForReversedLayers(state, RevLayerDiffs, 1, 2, 3);
     EXPECT_FALSE(RevLayerDiffs);
 
     // Case 1a: Constructs with regular materials are not reverse of each other--material layers do not match in reverse (should get a "true" answer)
-    dataConstruction.Construct(2).LayerPoint(1) = 1;
-    dataConstruction.Construct(2).LayerPoint(3) = 3;
+    state.dataConstruction->Construct(2).LayerPoint(1) = 1;
+    state.dataConstruction->Construct(2).LayerPoint(3) = 3;
     dataMaterial.Material(1).Group = RegularMaterial;
     dataMaterial.Material(2).Group = RegularMaterial;
     dataMaterial.Material(3).Group = RegularMaterial;
     RevLayerDiffs = false;
     // ExpectResult = true;
-    CheckForReversedLayers(RevLayerDiffs, 1, 2, 3);
+    CheckForReversedLayers(state, RevLayerDiffs, 1, 2, 3);
     EXPECT_TRUE(RevLayerDiffs);
 
     // Case 2a: Constructs are reverse of each other using WindowGlass, front/back properties properly switched (should get a "false" answer)
-    dataConstruction.Construct(3).TotLayers = 3;
-    dataConstruction.Construct(3).LayerPoint(1) = 4;
-    dataConstruction.Construct(3).LayerPoint(2) = 2;
-    dataConstruction.Construct(3).LayerPoint(3) = 5;
-    dataConstruction.Construct(4).TotLayers = 3;
-    dataConstruction.Construct(4).LayerPoint(1) = 4;
-    dataConstruction.Construct(4).LayerPoint(2) = 2;
-    dataConstruction.Construct(4).LayerPoint(3) = 5;
+    state.dataConstruction->Construct(3).TotLayers = 3;
+    state.dataConstruction->Construct(3).LayerPoint(1) = 4;
+    state.dataConstruction->Construct(3).LayerPoint(2) = 2;
+    state.dataConstruction->Construct(3).LayerPoint(3) = 5;
+    state.dataConstruction->Construct(4).TotLayers = 3;
+    state.dataConstruction->Construct(4).LayerPoint(1) = 4;
+    state.dataConstruction->Construct(4).LayerPoint(2) = 2;
+    state.dataConstruction->Construct(4).LayerPoint(3) = 5;
     dataMaterial.Material(4).Group = WindowGlass;
     dataMaterial.Material(4).Thickness = 0.15;
     dataMaterial.Material(4).ReflectSolBeamFront = 0.35;
@@ -4938,7 +4938,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     dataMaterial.Material(5).PoissonsRatio = 1.11;
     RevLayerDiffs = true;
     // ExpectResult = false;
-    CheckForReversedLayers(RevLayerDiffs, 3, 4, 3);
+    CheckForReversedLayers(state, RevLayerDiffs, 3, 4, 3);
     EXPECT_FALSE(RevLayerDiffs);
 
     // Case 2b: Constructs are reverse of each other using WindowGlass, front/back properties NOT properly switched (should get a "true" answer)
@@ -4946,14 +4946,14 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     dataMaterial.Material(5).ReflectVisBeamBack = 0.24;  // correct would be 0.34
     RevLayerDiffs = false;
     // ExpectResult = true;
-    CheckForReversedLayers(RevLayerDiffs, 3, 4, 3);
+    CheckForReversedLayers(state, RevLayerDiffs, 3, 4, 3);
     EXPECT_TRUE(RevLayerDiffs);
 
     // Case 3a: Single layer constructs using Equivalent Glass, front/back properties properly switched (should get a "false" answer)
-    dataConstruction.Construct(5).TotLayers = 1;
-    dataConstruction.Construct(5).LayerPoint(1) = 6;
-    dataConstruction.Construct(6).TotLayers = 1;
-    dataConstruction.Construct(6).LayerPoint(1) = 7;
+    state.dataConstruction->Construct(5).TotLayers = 1;
+    state.dataConstruction->Construct(5).LayerPoint(1) = 6;
+    state.dataConstruction->Construct(6).TotLayers = 1;
+    state.dataConstruction->Construct(6).LayerPoint(1) = 7;
     dataMaterial.Material(6).Group = GlassEquivalentLayer;
     dataMaterial.Material(6).TausFrontBeamBeam = 0.39;
     dataMaterial.Material(6).TausBackBeamBeam = 0.29;
@@ -5010,14 +5010,14 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     dataMaterial.Material(7).Resistance = 1.234;
     RevLayerDiffs = true;
     // ExpectResult = false;
-    CheckForReversedLayers(RevLayerDiffs, 5, 6, 1);
+    CheckForReversedLayers(state, RevLayerDiffs, 5, 6, 1);
     EXPECT_FALSE(RevLayerDiffs);
 
     // Case 3a: Single layer constructs using Equivalent Glass, front/back properties NOT properly switched (should get a "true" answer)
     dataMaterial.Material(7).EmissThermalFront = 0.888;
     RevLayerDiffs = false;
     // ExpectResult = true;
-    CheckForReversedLayers(RevLayerDiffs, 5, 6, 1);
+    CheckForReversedLayers(state, RevLayerDiffs, 5, 6, 1);
     EXPECT_TRUE(RevLayerDiffs);
 
 }

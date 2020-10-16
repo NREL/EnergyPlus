@@ -52,6 +52,7 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -75,7 +76,7 @@ namespace GeneratorDynamicsManager {
     void SetupGeneratorControlStateManager(int const GenNum); // index of generator to setup
 
     void ManageGeneratorControlState(EnergyPlusData &state,
-                                     int const GeneratorType,           // type of Generator
+                                     GeneratorType const GeneratorType,           // type of Generator
                                      std::string const &GeneratorName,  // user specified name of Generator
                                      int const GeneratorNum,            // Generator number
                                      bool const RunFlagElectCenter,     // TRUE when Generator operating per electric load center request
@@ -89,7 +90,7 @@ namespace GeneratorDynamicsManager {
                                      bool const FirstHVACIteration      // True is this is first HVAC iteration
     );
 
-    void ManageGeneratorFuelFlow(int const GeneratorType,          // type of Generator
+    void ManageGeneratorFuelFlow(GeneratorType const GeneratorType,          // type of Generator
                                  std::string const &GeneratorName, // user specified name of Generator
                                  int const GeneratorNum,           // Generator number
                                  bool const RunFlag,               // TRUE when Generator operating

@@ -660,14 +660,16 @@ int currentEnvironmentNum(EnergyPlusState) {
     return EnergyPlus::DataEnvironment::CurEnvirNum;
 }
 
-int kindOfSim(EnergyPlusState) {
-    return EnergyPlus::DataGlobals::KindOfSim;
+int kindOfSim(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return static_cast<int>(thisState->dataGlobal->KindOfSim);
 }
 
-int getConstructionHandle(EnergyPlusState, const char* constructionName) {
+int getConstructionHandle(EnergyPlusState state, const char* constructionName) {
     int handle = 0;
     std::string const nameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(constructionName);
-    for (auto const & construct : EnergyPlus::dataConstruction.Construct) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    for (auto const & construct : thisState->dataConstruction->Construct) {
         handle++;
         std::string const thisNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(construct.Name);
         if (nameUC == thisNameUC) {

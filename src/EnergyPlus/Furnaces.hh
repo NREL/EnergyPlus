@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
@@ -65,7 +66,6 @@ struct EnergyPlusData;
 namespace Furnaces {
 
     // Using/Aliasing
-    using VariableSpeedCoils::MaxSpedLevels;
 
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -288,37 +288,36 @@ namespace Furnaces {
         Array1D<int> iterationMode; // keep track of previous iteration mode (i.e., cooling or heating)
         bool FirstPass;             // used to determine when first call is made
 
-        // Default Constructor
         FurnaceEquipConditions()
             : FurnaceType_Num(0), FurnaceIndex(0), SchedPtr(0), FanSchedPtr(0), FanAvailSchedPtr(0), ControlZoneNum(0), ZoneSequenceCoolingNum(0),
-              ZoneSequenceHeatingNum(0), CoolingCoilType_Num(0), CoolingCoilIndex(0), ActualDXCoilIndexForHXAssisted(0), CoolingCoilUpstream(true),
-              HeatingCoilType_Num(0), HeatingCoilIndex(0), ReheatingCoilType_Num(0), ReheatingCoilIndex(0), CoilControlNode(0), HWCoilAirInletNode(0),
-              HWCoilAirOutletNode(0), SuppCoilAirInletNode(0), SuppCoilAirOutletNode(0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0),
-              SuppCoilControlNode(0), FanType_Num(0), FanIndex(0), FurnaceInletNodeNum(0), FurnaceOutletNodeNum(0), OpMode(0), LastMode(0),
-              AirFlowControl(0), FanPlace(0), NodeNumOfControlledZone(0), WatertoAirHPType(0), CoolingConvergenceTolerance(0.0),
-              HeatingConvergenceTolerance(0.0), DesignHeatingCapacity(0.0), DesignCoolingCapacity(0.0), CoolingCoilSensDemand(0.0),
-              HeatingCoilSensDemand(0.0), CoolingCoilLatentDemand(0.0), DesignSuppHeatingCapacity(0.0), DesignFanVolFlowRate(0.0),
-              DesignFanVolFlowRateEMSOverrideOn(false), DesignFanVolFlowRateEMSOverrideValue(0.0), DesignMassFlowRate(0.0), MaxCoolAirVolFlow(0.0),
-              MaxCoolAirVolFlowEMSOverrideOn(false), MaxCoolAirVolFlowEMSOverrideValue(0.0), MaxHeatAirVolFlow(0.0),
-              MaxHeatAirVolFlowEMSOverrideOn(false), MaxHeatAirVolFlowEMSOverrideValue(0.0), MaxNoCoolHeatAirVolFlow(0.0),
-              MaxNoCoolHeatAirVolFlowEMSOverrideOn(false), MaxNoCoolHeatAirVolFlowEMSOverrideValue(0.0), MaxCoolAirMassFlow(0.0),
-              MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0), MaxHeatCoilFluidFlow(0.0), MaxSuppCoilFluidFlow(0.0),
-              ControlZoneMassFlowFrac(0.0), DesignMaxOutletTemp(9999.0), MdotFurnace(0.0), FanPartLoadRatio(0.0), CompPartLoadRatio(0.0),
-              WSHPRuntimeFrac(0.0), CoolPartLoadRatio(0.0), HeatPartLoadRatio(0.0), MinOATCompressorCooling(0.0), MinOATCompressorHeating(0.0),
-              MaxOATSuppHeat(0.0), CondenserNodeNum(0), MaxONOFFCyclesperHour(0.0), HPTimeConstant(0.0), OnCyclePowerFraction(0.0), FanDelayTime(0.0),
-              Humidistat(false), InitHeatPump(false), DehumidControlType_Num(0), LatentMaxIterIndex(0), LatentRegulaFalsiFailedIndex(0),
-              LatentRegulaFalsiFailedIndex2(0), SensibleMaxIterIndex(0), SensibleRegulaFalsiFailedIndex(0), WSHPHeatMaxIterIndex(0),
-              WSHPHeatRegulaFalsiFailedIndex(0), DXHeatingMaxIterIndex(0), DXHeatingRegulaFalsiFailedIndex(0), HeatingMaxIterIndex(0),
-              HeatingMaxIterIndex2(0), HeatingRegulaFalsiFailedIndex(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0),
-              NoHeatCoolSpeedRatio(1.0), ZoneInletNode(0), SenLoadLoss(0.0), LatLoadLoss(0.0), SensibleLoadMet(0.0), LatentLoadMet(0.0),
-              DehumidInducedHeatingDemandRate(0.0), CoilOutletNode(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), SuppCoilOutletNode(0),
-              LoopNumSupp(0), LoopSideSupp(0), BranchNumSupp(0), CompNumSupp(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0),
-              EMSOverrideSensZoneLoadRequest(false), EMSSensibleZoneLoadValue(0.0), EMSOverrideMoistZoneLoadRequest(false),
-              EMSMoistureZoneLoadValue(0.0), HeatCoolMode(0), NumOfSpeedCooling(0), NumOfSpeedHeating(0), IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0),
-              IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true), HeatVolumeFlowRate(MaxSpedLevels, 0.0),
-              HeatMassFlowRate(MaxSpedLevels, 0.0), CoolVolumeFlowRate(MaxSpedLevels, 0.0), CoolMassFlowRate(MaxSpedLevels, 0.0),
-              MSHeatingSpeedRatio(MaxSpedLevels, 0.0), MSCoolingSpeedRatio(MaxSpedLevels, 0.0), bIsIHP(false), CompSpeedNum(0), CompSpeedRatio(0.0),
-              ErrIndexCyc(0), ErrIndexVar(0), WaterCyclingMode(0), iterationCounter(0), iterationMode(0), FirstPass(true)
+            ZoneSequenceHeatingNum(0), CoolingCoilType_Num(0), CoolingCoilIndex(0), ActualDXCoilIndexForHXAssisted(0), CoolingCoilUpstream(true),
+            HeatingCoilType_Num(0), HeatingCoilIndex(0), ReheatingCoilType_Num(0), ReheatingCoilIndex(0), CoilControlNode(0), HWCoilAirInletNode(0),
+            HWCoilAirOutletNode(0), SuppCoilAirInletNode(0), SuppCoilAirOutletNode(0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0),
+            SuppCoilControlNode(0), FanType_Num(0), FanIndex(0), FurnaceInletNodeNum(0), FurnaceOutletNodeNum(0), OpMode(0), LastMode(0),
+            AirFlowControl(0), FanPlace(0), NodeNumOfControlledZone(0), WatertoAirHPType(0), CoolingConvergenceTolerance(0.0),
+            HeatingConvergenceTolerance(0.0), DesignHeatingCapacity(0.0), DesignCoolingCapacity(0.0), CoolingCoilSensDemand(0.0),
+            HeatingCoilSensDemand(0.0), CoolingCoilLatentDemand(0.0), DesignSuppHeatingCapacity(0.0), DesignFanVolFlowRate(0.0),
+            DesignFanVolFlowRateEMSOverrideOn(false), DesignFanVolFlowRateEMSOverrideValue(0.0), DesignMassFlowRate(0.0), MaxCoolAirVolFlow(0.0),
+            MaxCoolAirVolFlowEMSOverrideOn(false), MaxCoolAirVolFlowEMSOverrideValue(0.0), MaxHeatAirVolFlow(0.0),
+            MaxHeatAirVolFlowEMSOverrideOn(false), MaxHeatAirVolFlowEMSOverrideValue(0.0), MaxNoCoolHeatAirVolFlow(0.0),
+            MaxNoCoolHeatAirVolFlowEMSOverrideOn(false), MaxNoCoolHeatAirVolFlowEMSOverrideValue(0.0), MaxCoolAirMassFlow(0.0),
+            MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0), MaxHeatCoilFluidFlow(0.0), MaxSuppCoilFluidFlow(0.0),
+            ControlZoneMassFlowFrac(0.0), DesignMaxOutletTemp(9999.0), MdotFurnace(0.0), FanPartLoadRatio(0.0), CompPartLoadRatio(0.0),
+            WSHPRuntimeFrac(0.0), CoolPartLoadRatio(0.0), HeatPartLoadRatio(0.0), MinOATCompressorCooling(0.0), MinOATCompressorHeating(0.0),
+            MaxOATSuppHeat(0.0), CondenserNodeNum(0), MaxONOFFCyclesperHour(0.0), HPTimeConstant(0.0), OnCyclePowerFraction(0.0), FanDelayTime(0.0),
+            Humidistat(false), InitHeatPump(false), DehumidControlType_Num(0), LatentMaxIterIndex(0), LatentRegulaFalsiFailedIndex(0),
+            LatentRegulaFalsiFailedIndex2(0), SensibleMaxIterIndex(0), SensibleRegulaFalsiFailedIndex(0), WSHPHeatMaxIterIndex(0),
+            WSHPHeatRegulaFalsiFailedIndex(0), DXHeatingMaxIterIndex(0), DXHeatingRegulaFalsiFailedIndex(0), HeatingMaxIterIndex(0),
+            HeatingMaxIterIndex2(0), HeatingRegulaFalsiFailedIndex(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0),
+            NoHeatCoolSpeedRatio(1.0), ZoneInletNode(0), SenLoadLoss(0.0), LatLoadLoss(0.0), SensibleLoadMet(0.0), LatentLoadMet(0.0),
+            DehumidInducedHeatingDemandRate(0.0), CoilOutletNode(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), SuppCoilOutletNode(0),
+            LoopNumSupp(0), LoopSideSupp(0), BranchNumSupp(0), CompNumSupp(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0),
+            EMSOverrideSensZoneLoadRequest(false), EMSSensibleZoneLoadValue(0.0), EMSOverrideMoistZoneLoadRequest(false),
+            EMSMoistureZoneLoadValue(0.0), HeatCoolMode(0), NumOfSpeedCooling(0), NumOfSpeedHeating(0), IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0),
+            IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true), HeatVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels(), 0.0),
+            HeatMassFlowRate(DataGlobalConstants::MaxSpeedLevels(), 0.0), CoolVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels(), 0.0), CoolMassFlowRate(DataGlobalConstants::MaxSpeedLevels(), 0.0),
+            MSHeatingSpeedRatio(DataGlobalConstants::MaxSpeedLevels(), 0.0), MSCoolingSpeedRatio(DataGlobalConstants::MaxSpeedLevels(), 0.0), bIsIHP(false), CompSpeedNum(0), CompSpeedRatio(0.0),
+            ErrIndexCyc(0), ErrIndexVar(0), WaterCyclingMode(0), iterationCounter(0), iterationMode(0), FirstPass(true)
         {
         }
     };

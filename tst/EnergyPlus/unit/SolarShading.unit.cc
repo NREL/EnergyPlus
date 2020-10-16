@@ -640,8 +640,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -654,7 +654,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays(state);
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::DetermineShadowingCombinations(state);
     DataEnvironment::DayOfYear_Schedule = 168;
     DataEnvironment::DayOfWeek = 6;
     DataGlobals::TimeStep = 4;
@@ -1040,8 +1040,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -1050,13 +1050,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays(state);
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::DetermineShadowingCombinations(state);
     DataEnvironment::DayOfYear_Schedule = 168;
     DataEnvironment::DayOfWeek = 6;
     DataGlobals::TimeStep = 4;
     DataGlobals::HourOfDay = 9;
     DataGlobals::DoingSizing = false;
-    DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather;
+    state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
 
     compare_err_stream(""); // just for debugging
 
@@ -1453,8 +1453,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -1821,8 +1821,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -1835,7 +1835,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays(state);
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::DetermineShadowingCombinations(state);
     DataEnvironment::DayOfYear_Schedule = 168;
     DataEnvironment::DayOfWeek = 6;
     DataGlobals::TimeStep = 4;
@@ -2228,8 +2228,8 @@ WindowMaterial:SimpleGlazingSystem,
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -2246,7 +2246,7 @@ WindowMaterial:SimpleGlazingSystem,
     EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays(state);
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::DetermineShadowingCombinations(state);
 
     std::string error_string = delimited_string({"** Severe  ** Problem in interior solar distribution calculation (CHKBKS)"});
 
@@ -2540,8 +2540,8 @@ EXPECT_FALSE(FoundError);
 SurfaceGeometry::CosZoneRelNorth.allocate(1);
 SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DegToRadians);
-SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DegToRadians);
+SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
 SurfaceGeometry::CosBldgRelNorth = 1.0;
 SurfaceGeometry::SinBldgRelNorth = 0.0;
 
@@ -2559,7 +2559,7 @@ EXPECT_FALSE(FoundError);
 
 if (SolarShading::penumbra) {
     SolarShading::AllocateModuleArrays(state);
-    SolarShading::DetermineShadowingCombinations();
+    SolarShading::DetermineShadowingCombinations(state);
 
     std::string error_string = delimited_string({"** Severe  ** Problem in interior solar distribution calculation (CHKBKS)"});
 
