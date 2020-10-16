@@ -1144,12 +1144,12 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     // No EMS
     ThermalChimney::GetThermalChimney(state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    ThermalChimney::CalcThermalChimney();
-    EXPECT_NEAR(ThermalChimney::ThermalChimneyReport(1).OverallTCVolumeFlow, 0.015668, 0.0001);
+    ThermalChimney::CalcThermalChimney(state);
+    EXPECT_NEAR(state.dataThermalChimneys->ThermalChimneyReport(1).OverallTCVolumeFlow, 0.015668, 0.0001);
     // EMS Override
-    ThermalChimney::ThermalChimneySys(1).EMSOverrideOn = true;
-    ThermalChimney::ThermalChimneySys(1).EMSAirFlowRateValue = 0.01;
-    ThermalChimney::CalcThermalChimney();
-    EXPECT_NEAR(ThermalChimney::ThermalChimneyReport(1).OverallTCVolumeFlow, 0.01, 0.0001);
+    state.dataThermalChimneys->ThermalChimneySys(1).EMSOverrideOn = true;
+    state.dataThermalChimneys->ThermalChimneySys(1).EMSAirFlowRateValue = 0.01;
+    ThermalChimney::CalcThermalChimney(state);
+    EXPECT_NEAR(state.dataThermalChimneys->ThermalChimneyReport(1).OverallTCVolumeFlow, 0.01, 0.0001);
 
 }

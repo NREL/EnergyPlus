@@ -4743,7 +4743,7 @@ namespace HeatBalanceSurfaceManager {
         UpdateBBSteamRadSourceValAvg(SteamBaseboardSysOn);
         UpdateBBElecRadSourceValAvg(ElecBaseboardSysOn);
         UpdateCoolingPanelSourceValAvg(state, CoolingPanelSysOn);
-        UpdatePoolSourceValAvg(SwimmingPoolOn);
+        UpdatePoolSourceValAvg(state, SwimmingPoolOn);
 
         if (LowTempRadSysOn || HighTempRadSysOn || HWBaseboardSysOn || SteamBaseboardSysOn || ElecBaseboardSysOn || CoolingPanelSysOn ||
             SwimmingPoolOn) {
@@ -5288,7 +5288,7 @@ namespace HeatBalanceSurfaceManager {
                 ZoneOccPierceSETLastStep(ZoneNum) = ZoneOccPierceSET(ZoneNum);
                 if (ZoneNumOcc(ZoneNum) > 0) {
                     if (People(iPeople).Pierce) {
-                        ZoneOccPierceSET(ZoneNum) = ThermalComfort::ThermalComfortData(iPeople).PierceSET;
+                        ZoneOccPierceSET(ZoneNum) = state.dataThermalComforts->ThermalComfortData(iPeople).PierceSET;
                     } else {
                         ZoneOccPierceSET(ZoneNum) = -1;
                     }

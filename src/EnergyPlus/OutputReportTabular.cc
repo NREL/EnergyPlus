@@ -15333,8 +15333,6 @@ namespace OutputReportTabular {
         // Reset all gathering arrays to zero for multi-year simulations
         // so that only last year is reported in tabular reports
         using OutputProcessor::isFinalYear;
-        using ThermalComfort::ResetSetPointMet;
-        using ThermalComfort::ResetThermalComfortSimpleASH55;
 
         gatherElapsedTimeBEPS = 0.0;
         ResetMonthlyGathering();
@@ -15345,8 +15343,6 @@ namespace OutputReportTabular {
         ResetPeakDemandGathering();
         ResetHeatGainGathering();
         ResetRemainingPredefinedEntries();
-        ResetThermalComfortSimpleASH55();
-        ResetSetPointMet();
         ResetAdaptiveComfort();
         isFinalYear = true;
     }

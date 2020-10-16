@@ -205,12 +205,12 @@ namespace Photovoltaics {
 
                 InitTRNSYSPV(PVnum);
 
-                CalcTRNSYSPV(PVnum, RunFlag);
+                CalcTRNSYSPV(state, PVnum, RunFlag);
 
             } else if (SELECT_CASE_var == iSandiaPVModel) {
                 // 'PhotovoltaicPerformance:Sandia' (aka. King model, Sandia Nat. Labs.)
 
-                CalcSandiaPV(PVnum, RunFlag);
+                CalcSandiaPV(state, PVnum, RunFlag);
 
             } else {
 
@@ -218,7 +218,7 @@ namespace Photovoltaics {
             }
         }
 
-        ReportPV(PVnum);
+        ReportPV(state, PVnum);
     }
 
     void GetPVGeneratorResults(GeneratorType const EP_UNUSED(GeneratorType), // type of Generator !unused1208
@@ -882,7 +882,7 @@ namespace Photovoltaics {
         }
     }
 
-    void ReportPV(int const PVnum)
+    void ReportPV(EnergyPlusData &state, int const PVnum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -921,7 +921,7 @@ namespace Photovoltaics {
                 QPVSysSource(PVarray(PVnum).SurfacePtr) = -1.0 * PVarray(PVnum).SurfaceSink;
 
             } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
-                SetUTSCQdotSource(PVarray(PVnum).UTSCPtr, -1.0 * PVarray(PVnum).SurfaceSink);
+                SetUTSCQdotSource(state, PVarray(PVnum).UTSCPtr, -1.0 * PVarray(PVnum).SurfaceSink);
 
             } else if (SELECT_CASE_var == iExteriorVentedCavityCellIntegration) {
                 SetVentedModuleQdotSource(PVarray(PVnum).ExtVentCavPtr, -1.0 * PVarray(PVnum).SurfaceSink);
@@ -934,7 +934,7 @@ namespace Photovoltaics {
 
     // *************
 
-    void CalcSandiaPV(int const PVnum,   // ptr to current PV system
+    void CalcSandiaPV(EnergyPlusData &state, int const PVnum,   // ptr to current PV system
                       bool const RunFlag // controls if generator is scheduled *ON*
     )
     {
@@ -971,19 +971,6 @@ namespace Photovoltaics {
         using DataSurfaces::Surface;
         using TranspiredCollector::GetUTSCTsColl;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ThisSurf; // working variable for indexing surfaces
         // unused1208    INTEGER :: thisMod  ! working variable for indexing module parameters
         Real64 Ee;
@@ -1033,7 +1020,7 @@ namespace Photovoltaics {
                                                                             PVarray(PVnum).SNLPVModule.DT0);
 
                 } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
-                    GetUTSCTsColl(PVarray(PVnum).UTSCPtr, PVarray(PVnum).SNLPVCalc.Tback);
+                    GetUTSCTsColl(state, PVarray(PVnum).UTSCPtr, PVarray(PVnum).SNLPVCalc.Tback);
 
                     PVarray(PVnum).SNLPVCalc.Tcell = SandiaTcellFromTmodule(PVarray(PVnum).SNLPVCalc.Tback,
                                                                             PVarray(PVnum).SNLPVinto.IcBeam,
@@ -1277,7 +1264,7 @@ namespace Photovoltaics {
 
     // *************
 
-    void CalcTRNSYSPV(int const PVnum,   // BTG added intent
+    void CalcTRNSYSPV(EnergyPlusData &state, int const PVnum,   // BTG added intent
                       bool const RunFlag // BTG added intent    !flag tells whether the PV is ON or OFF
     )
     {
@@ -1293,13 +1280,6 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the PV performance.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::MinutesPerTimeStep;
         using DataSurfaces::Surface;
         //  USE DataPhotovoltaics, ONLY:CellTemp,LastCellTemp
@@ -1307,25 +1287,12 @@ namespace Photovoltaics {
         using DataHeatBalSurface::SurfTempOut;
         using TranspiredCollector::GetUTSCTsColl;
 
-        // Locals
-        // SUBROUTINE FUNCTION DECLARATIONS:
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const EPS(0.001);
         Real64 const ERR(0.001);
         Real64 const MinInsolation(30.0);
         int const KMAX(100);
         Real64 const EtaIni(0.10); // initial value of eta
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Real64 PVTimeStep; // internal timestep (in seconds) for cell temperature mode 3
         Real64 DummyErr;
         Real64 ETA;
@@ -1404,7 +1371,7 @@ namespace Photovoltaics {
                     } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
                         CellTemp = SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv();
                     } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
-                        GetUTSCTsColl(PVarray(PVnum).UTSCPtr, CellTemp);
+                        GetUTSCTsColl(state, PVarray(PVnum).UTSCPtr, CellTemp);
                         CellTemp += DataGlobalConstants::KelvinConv();
                     } else if (SELECT_CASE_var == iExteriorVentedCavityCellIntegration) {
                         GetExtVentedCavityTsColl(PVarray(PVnum).ExtVentCavPtr, CellTemp);
@@ -1477,7 +1444,7 @@ namespace Photovoltaics {
                 } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
                     CellTemp = SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv();
                 } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
-                    GetUTSCTsColl(PVarray(PVnum).UTSCPtr, CellTemp);
+                    GetUTSCTsColl(state, PVarray(PVnum).UTSCPtr, CellTemp);
                     CellTemp += DataGlobalConstants::KelvinConv();
                 } else if (SELECT_CASE_var == iExteriorVentedCavityCellIntegration) {
                     GetExtVentedCavityTsColl(PVarray(PVnum).ExtVentCavPtr, CellTemp);
