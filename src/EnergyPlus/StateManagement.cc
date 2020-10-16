@@ -211,7 +211,6 @@
 #include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SplitterComponent.hh>
-#include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
@@ -333,7 +332,7 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     OutdoorAirUnit::clear_state();
     OutputProcessor::clear_state();
     OutputReportPredefined::clear_state();
-    OutputReportTabular::clear_state();
+    OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
     OutsideEnergySources::clear_state();
     PackagedTerminalHeatPump::clear_state();
@@ -378,7 +377,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     SolarCollectors::clear_state();
     SolarShading::clear_state();
     SplitterComponent::clear_state();
-    SteamCoils::clear_state();
     SurfaceGeometry::clear_state();
     UtilityRoutines::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();

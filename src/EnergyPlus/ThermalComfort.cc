@@ -2155,6 +2155,22 @@ namespace ThermalComfort {
         }
     }
 
+    void ResetThermalComfortSimpleASH55(EnergyPlusData &state)	
+    {	
+        // Jason Glazer - October 2015	
+        // Reset thermal comfort table gathering arrays to zero for multi-year simulations	
+        // so that only last year is reported in tabular reports	
+        int iZone;	
+        for (iZone = 1; iZone <= NumOfZones; ++iZone) {	
+            state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotWinter = 0.0;	
+            state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotSummer = 0.0;	
+            state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither = 0.0;	
+        }	
+        state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Winter = 0.0;	
+        state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Summer = 0.0;	
+        state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Either = 0.0;	
+    }
+
     void CalcIfSetPointMet(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
@@ -2318,6 +2334,25 @@ namespace ThermalComfort {
                 }
             }
         }
+    }
+
+    void ResetSetPointMet(EnergyPlusData &state)	
+    {	
+        // Jason Glazer - October 2015	
+        // Reset set point not met table gathering arrays to zero for multi-year simulations	
+        // so that only last year is reported in tabular reports	
+        int iZone;	
+        for (iZone = 1; iZone <= NumOfZones; ++iZone) {	
+            state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetHeating = 0.0;	
+            state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetCooling = 0.0;	
+            state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetHeatingOccupied = 0.0;	
+            state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetCoolingOccupied = 0.0;	
+        }	
+        state.dataThermalComforts->TotalAnyZoneNotMetHeating = 0.0;	
+        state.dataThermalComforts->TotalAnyZoneNotMetCooling = 0.0;	
+        state.dataThermalComforts->TotalAnyZoneNotMetHeatingOccupied = 0.0;	
+        state.dataThermalComforts->TotalAnyZoneNotMetCoolingOccupied = 0.0;	
+        state.dataThermalComforts->TotalAnyZoneNotMetOccupied = 0.0;	
     }
 
     void CalcThermalComfortAdaptiveASH55(

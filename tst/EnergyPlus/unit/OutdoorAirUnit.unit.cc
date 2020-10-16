@@ -901,18 +901,18 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
         loopsidebranch.Comp.allocate(1);
     }
 
-    SteamCoil(1).LoopNum = 1;
-    SteamCoil(1).LoopSide = 1;
-    SteamCoil(1).BranchNum = 1;
-    SteamCoil(1).CompNum = 1;
+    state.dataSteamCoils->SteamCoil(1).LoopNum = 1;
+    state.dataSteamCoils->SteamCoil(1).LoopSide = 1;
+    state.dataSteamCoils->SteamCoil(1).BranchNum = 1;
+    state.dataSteamCoils->SteamCoil(1).CompNum = 1;
 
     PlantLoop(1).Name = "SteamLoop";
     PlantLoop(1).FluidIndex = 0;
     PlantLoop(1).FluidName = "STEAM";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = SteamCoil(1).Name;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataSteamCoils->SteamCoil(1).Name;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = TypeOf_CoilSteamAirHeating;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = SteamCoil(1).SteamInletNodeNum;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = SteamCoil(1).SteamOutletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataSteamCoils->SteamCoil(1).SteamInletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataSteamCoils->SteamCoil(1).SteamOutletNodeNum;
 
     PlantSizData(1).PlantLoopName = "SteamLoop";
     PlantSizData(1).ExitTemp = 100.0;
@@ -964,7 +964,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     int ZoneNum(1);
 
     InitOutdoorAirUnit(state, OAUnitNum, ZoneNum, FirstHVACIteration);
-    EXPECT_EQ(SteamCoil(1).MaxSteamVolFlowRate, OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow);
+    EXPECT_EQ(state.dataSteamCoils->SteamCoil(1).MaxSteamVolFlowRate, OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow);
 
     Real64 DesCoilInTemp = FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp;
     Real64 DesCoilOutTemp = FinalZoneSizing(CurZoneEqNum).HeatDesTemp;
@@ -975,15 +975,15 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     Real64 DesSteamCoilLoad = DesAirMassFlow * CpAirAvg * (DesCoilOutTemp - DesCoilInTemp);
 
     // do steam flow rate sizing calculation
-    Real64 EnthSteamIn = GetSatEnthalpyRefrig(state, "STEAM", DataGlobalConstants::SteamInitConvTemp(), 1.0, SteamCoil(1).FluidIndex, "");
-    Real64 EnthSteamOut = GetSatEnthalpyRefrig(state, "STEAM", DataGlobalConstants::SteamInitConvTemp(), 0.0, SteamCoil(1).FluidIndex, "");
-    Real64 SteamDensity = GetSatDensityRefrig(state, "STEAM", DataGlobalConstants::SteamInitConvTemp(), 1.0, SteamCoil(1).FluidIndex, "");
-    Real64 CpOfCondensate = GetSatSpecificHeatRefrig(state, "STEAM", DataGlobalConstants::SteamInitConvTemp(), 0.0, SteamCoil(1).FluidIndex, "");
+    Real64 EnthSteamIn = GetSatEnthalpyRefrig(state, "STEAM", DataGlobalConstants::SteamInitConvTemp(), 1.0, state.dataSteamCoils->SteamCoil(1).FluidIndex, "");
+    Real64 EnthSteamOut = GetSatEnthalpyRefrig(state, "STEAM", DataGlobalConstants::SteamInitConvTemp(), 0.0, state.dataSteamCoils->SteamCoil(1).FluidIndex, "");
+    Real64 SteamDensity = GetSatDensityRefrig(state, "STEAM", DataGlobalConstants::SteamInitConvTemp(), 1.0, state.dataSteamCoils->SteamCoil(1).FluidIndex, "");
+    Real64 CpOfCondensate = GetSatSpecificHeatRefrig(state, "STEAM", DataGlobalConstants::SteamInitConvTemp(), 0.0, state.dataSteamCoils->SteamCoil(1).FluidIndex, "");
     Real64 LatentHeatChange = EnthSteamIn - EnthSteamOut;
-    Real64 DesMaxSteamVolFlowRate = DesSteamCoilLoad / (SteamDensity * (LatentHeatChange + SteamCoil(1).DegOfSubcooling * CpOfCondensate));
+    Real64 DesMaxSteamVolFlowRate = DesSteamCoilLoad / (SteamDensity * (LatentHeatChange + state.dataSteamCoils->SteamCoil(1).DegOfSubcooling * CpOfCondensate));
 
     // check water coil water flow rate calc
-    EXPECT_EQ(DesSteamCoilLoad, SteamCoil(1).DesCoilCapacity);
-    EXPECT_EQ(DesMaxSteamVolFlowRate, SteamCoil(1).MaxSteamVolFlowRate);
+    EXPECT_EQ(DesSteamCoilLoad, state.dataSteamCoils->SteamCoil(1).DesCoilCapacity);
+    EXPECT_EQ(DesMaxSteamVolFlowRate, state.dataSteamCoils->SteamCoil(1).MaxSteamVolFlowRate);
 }
 } // namespace EnergyPlus
