@@ -208,7 +208,6 @@
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
@@ -372,7 +371,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     SingleDuct::clear_state();
     SizingAnalysisObjects_clear_state(); // SizingAnalysisObjects does not have a namespace
     SizingManager::clear_state();
-    SolarCollectors::clear_state();
     SurfaceGeometry::clear_state();
     UtilityRoutines::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();

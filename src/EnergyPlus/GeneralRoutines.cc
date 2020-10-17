@@ -1047,7 +1047,6 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using Psychrometrics::PsyWFnTdbTwbPb;
-    using SolarCollectors::Collector;
 
     // Argument array dimensioning
 
@@ -1173,12 +1172,12 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
             ICSULossbottom = 0.40;
             ICSWaterTemp = 20.0;
         } else {
-            if (!Collector.allocated()) {
+            if (!state.dataSolarCollectors->Collector.allocated()) {
                 ICSULossbottom = 0.40;
                 ICSWaterTemp = 20.0;
             } else {
-                ICSULossbottom = Collector(CollectorNum).UbLoss;
-                ICSWaterTemp = Collector(CollectorNum).TempOfWater;
+                ICSULossbottom = state.dataSolarCollectors->Collector(CollectorNum).UbLoss;
+                ICSWaterTemp = state.dataSolarCollectors->Collector(CollectorNum).TempOfWater;
                 MyICSEnvrnFlag = false;
             }
         }
