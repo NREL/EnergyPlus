@@ -82,6 +82,7 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SteamBaseboardRadiator.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
