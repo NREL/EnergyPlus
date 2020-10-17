@@ -8750,9 +8750,9 @@ namespace SolarShading {
 
             // Calculate factors for solar reflection
             if (CalcSolRefl) {
-                CalcBeamSolDiffuseReflFactors();
+                CalcBeamSolDiffuseReflFactors(state);
                 CalcBeamSolSpecularReflFactors(state);
-                if (BeginSimFlag) CalcSkySolDiffuseReflFactors();
+                if (BeginSimFlag) CalcSkySolDiffuseReflFactors(state);
             }
 
             //  Calculate daylighting coefficients

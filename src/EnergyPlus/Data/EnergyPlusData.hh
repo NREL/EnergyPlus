@@ -93,6 +93,7 @@ struct ExteriorEnergyUseData;
 struct FansData;
 struct PipesData;
 struct PlantChillersData;
+struct SolarReflectionManagerData;
 struct SolarShadingData;
 struct SplitterComponentData;
 struct SteamBaseboardRadiatorData;
@@ -162,6 +163,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<FansData> dataFans;
     std::unique_ptr<PipesData> dataPipes;
     std::unique_ptr<PlantChillersData> dataPlantChillers;
+    std::unique_ptr<SolarReflectionManagerData> dataSolarReflectionManager;
     std::unique_ptr<SolarShadingData> dataSolarShading;
     std::unique_ptr<SplitterComponentData> dataSplitterComponent;
     std::unique_ptr<SteamBaseboardRadiatorData> dataSteamBaseboardRadiator;

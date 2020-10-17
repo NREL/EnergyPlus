@@ -82,6 +82,7 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/SolarReflectionManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SteamBaseboardRadiator.hh>
