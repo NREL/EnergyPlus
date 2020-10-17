@@ -80,10 +80,6 @@ namespace SolarShading {
     using DataBSDFWindow::BSDFWindowGeomDescr;
     using DataVectorTypes::Vector;
 
-    extern std::unique_ptr<std::iostream> os; // Shading file stream
-
-    // Types
-
     struct SurfaceErrorTracking
     {
         // Members
