@@ -103,11 +103,11 @@ namespace Photovoltaics {
                       bool const RunFlag // unused1208
     );
 
-    void ReportPV(int const PVnum);
+    void ReportPV(EnergyPlusData &state, int const PVnum);
 
     // *************
 
-    void CalcSandiaPV(int const PVnum,   // ptr to current PV system
+    void CalcSandiaPV(EnergyPlusData &state, int const PVnum,   // ptr to current PV system
                       bool const RunFlag // controls if generator is scheduled *ON*
     );
 
@@ -118,7 +118,7 @@ namespace Photovoltaics {
 
     // *************
 
-    void CalcTRNSYSPV(int const PVnum,   // BTG added intent
+    void CalcTRNSYSPV(EnergyPlusData &state, int const PVnum,   // BTG added intent
                       bool const RunFlag // BTG added intent    !flag tells whether the PV is ON or OFF
     );
 
