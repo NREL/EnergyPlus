@@ -13109,7 +13109,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     }
 
     // set up environment
-    DataGlobals::DayOfSim = 1; // revert hotfix 7723 // user a higher day than previous unit test to get around static timer variables problem
+    DataGlobals::DayOfSim = 2; // user a higher day than previous unit test to get around static timer variables problem
     DataGlobals::CurrentTime = 0.25;
     DataGlobals::TimeStepZone = 0.25;
     DataHVACGlobals::TimeStepSys = 0.25;
@@ -13119,12 +13119,12 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 21.1340575;
 
-    // revert hotfix 7723 // call with zero loads to reset CurrentEndTimeLast until that's resolved
-    //TerminalUnitList(1).TotalCoolLoad = 0.0;
-    //TerminalUnitList(1).HRCoolRequest = false;
-    //TerminalUnitList(1).TotalHeatLoad = 0.0;
-    //TerminalUnitList(1).HRHeatRequest = false;
-    //CalcVRFCondenser(state, VRFCond);
+    // call with zero loads to reset CurrentEndTimeLast until that's resolved
+    TerminalUnitList(1).TotalCoolLoad = 0.0;
+    TerminalUnitList(1).HRCoolRequest = false;
+    TerminalUnitList(1).TotalHeatLoad = 0.0;
+    TerminalUnitList(1).HRHeatRequest = false;
+    CalcVRFCondenser(state, VRFCond);
 
     // increment time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 0.5
