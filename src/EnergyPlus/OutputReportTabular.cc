@@ -1148,6 +1148,9 @@ namespace OutputReportTabular {
                 curVariMeter = UtilityRoutines::MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
                 // call the key count function but only need count during this pass
                 GetVariableKeyCountandType(state, curVariMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
+                if (TypeVar == OutputProcessor::VarType_NotFound) {
+                    ShowWarningError("In Output:Table:Monthly '" +  MonthlyInput(TabNum).name + "' invalid Variable or Meter Name '" + curVariMeter + "'");
+                }
                 //    IF (KeyCount > maxKeyCount) THEN
                 //      DEALLOCATE(NamesOfKeys)
                 //      DEALLOCATE(IndexesForKeyVar)
