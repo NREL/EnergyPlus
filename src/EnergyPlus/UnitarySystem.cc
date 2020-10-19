@@ -14006,7 +14006,6 @@ namespace UnitarySystems {
                         this->m_CoolingAuxElecConsumption = this->m_AncillaryOnPower * this->m_PartLoadFrac * ReportingConstant;
                     }
                     if (this->m_LastMode == state.dataUnitarySystems->CoolingMode) {
-                        this->m_TotalAuxElecPower = this->m_AncillaryOffPower;
                         this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
                     }
                 }
