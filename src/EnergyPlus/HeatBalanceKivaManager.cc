@@ -47,9 +47,6 @@
 
 // C++ Headers
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 // Kiva Headers
 #include <libkiva/Errors.hpp>
 #ifdef GROUND_PLOT

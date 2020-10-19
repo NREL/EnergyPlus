@@ -50,7 +50,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -485,8 +484,6 @@ namespace UserDefinedComponents {
 
     void GetUserDefinedPlantComponents(EnergyPlusData &state)
     {
-        static ObjexxFCL::gio::Fmt fmtLD("*");
-
         bool ErrorsFound(false);
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
@@ -1211,8 +1208,6 @@ namespace UserDefinedComponents {
         //       DATE WRITTEN   Jan 2012
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         bool ErrorsFound(false);
         int NumAlphas; // Number of elements in the alpha array

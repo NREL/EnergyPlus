@@ -54,7 +54,6 @@
 #include <vector>
 
 #include <ObjexxFCL/Optional.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
