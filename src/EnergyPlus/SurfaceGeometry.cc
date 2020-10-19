@@ -1196,8 +1196,7 @@ namespace SurfaceGeometry {
                       TotRectRoofs + TotRectCeilings + TotRectIZCeilings + TotRectGCFloors + TotRectIntFloors + TotRectIZFloors;
 
         SurfaceTmp.allocate(TotSurfaces); // Allocate the Surface derived type appropriately
-        SurfaceTmpClassInvalid.dimension(TotSurfaces, false);
-        SurfaceTmpClassMoved.dimension(TotSurfaces, false);
+
         UniqueSurfaceNames.reserve(TotSurfaces);
         // SurfaceTmp structure is allocated via derived type initialization.
 
@@ -1458,6 +1457,8 @@ namespace SurfaceGeometry {
 
         // Move all shading Surfaces to Front
 
+        SurfaceTmpClassInvalid.dimension(TotSurfaces, false);
+        SurfaceTmpClassMoved.dimension(TotSurfaces, false);
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_F && SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_B &&
                 SurfaceTmp(SurfNum).Class != SurfaceClass::Shading)

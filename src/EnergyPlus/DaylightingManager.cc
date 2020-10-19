@@ -3400,26 +3400,9 @@ namespace DaylightingManager {
         // METHODOLOGY EMPLOYED:
         // switch as need to serve both reference points and map points based on calledFrom
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
         using General::BlindBeamBeamTrans;
         using General::POLYF;
-        using SolarReflectionManager::SolReflRecSurf;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         if (SUNCOSHR(iHour, 3) < SunIsUpValue) return;
 
@@ -3892,10 +3875,10 @@ namespace DaylightingManager {
                 // Receiving surface number corresponding this window
                 RecSurfNum = Surface(IWin2).ShadowSurfRecSurfNum;
                 if (RecSurfNum > 0) { // interior windows do not apply
-                    if (SolReflRecSurf(RecSurfNum).NumPossibleObs > 0) {
+                    if (state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NumPossibleObs > 0) {
                         // This window has associated obstructions that could reflect beam onto the window
-                        for (int loop = 1, loop_end = SolReflRecSurf(RecSurfNum).NumPossibleObs; loop <= loop_end; ++loop) {
-                            ReflSurfNum = SolReflRecSurf(RecSurfNum).PossibleObsSurfNums(loop);
+                        for (int loop = 1, loop_end = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NumPossibleObs; loop <= loop_end; ++loop) {
+                            ReflSurfNum = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).PossibleObsSurfNums(loop);
                             ReflSurfNumX = ReflSurfNum;
                             // Each shadowing surface has a "mirror" duplicate surface facing in the opposite direction.
                             // The following gets the correct side of a shadowing surface for reflection.
@@ -3928,8 +3911,8 @@ namespace DaylightingManager {
                                 ReflDistance = std::sqrt(ReflDistanceSq);
                                 // Is ray from ref. pt. to reflection point (HitPtRefl) obstructed?
                                 hitObsRefl = false;
-                                for (int loop2 = 1, loop2_end = SolReflRecSurf(RecSurfNum).NumPossibleObs; loop2 <= loop2_end; ++loop2) {
-                                    int const ObsSurfNum = SolReflRecSurf(RecSurfNum).PossibleObsSurfNums(loop2);
+                                for (int loop2 = 1, loop2_end = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NumPossibleObs; loop2 <= loop2_end; ++loop2) {
+                                    int const ObsSurfNum = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).PossibleObsSurfNums(loop2);
                                     if (ObsSurfNum == ReflSurfNum || ObsSurfNum == Surface(ReflSurfNum).BaseSurf) continue;
                                     PierceSurface(ObsSurfNum, RREF2, SunVecMir, ReflDistance, HitPtObs, hitObs); // ReflDistance cutoff added
                                     if (hitObs) { // => Could skip distance check (unless < vs <= ReflDistance really matters)
@@ -3949,8 +3932,8 @@ namespace DaylightingManager {
                                     ReflSurfRecNum = Surface(ReflSurfNum).ShadowSurfRecSurfNum;
                                     if (ReflSurfRecNum > 0) {
                                         // Loop over possible obstructions for this reflecting window
-                                        for (int loop2 = 1, loop2_end = SolReflRecSurf(ReflSurfRecNum).NumPossibleObs; loop2 <= loop2_end; ++loop2) {
-                                            int const ObsSurfNum = SolReflRecSurf(ReflSurfRecNum).PossibleObsSurfNums(loop2);
+                                        for (int loop2 = 1, loop2_end = state.dataSolarReflectionManager->SolReflRecSurf(ReflSurfRecNum).NumPossibleObs; loop2 <= loop2_end; ++loop2) {
+                                            int const ObsSurfNum = state.dataSolarReflectionManager->SolReflRecSurf(ReflSurfRecNum).PossibleObsSurfNums(loop2);
                                             PierceSurface(ObsSurfNum, HitPtRefl, RAYCOS, HitPtObs, hitObs);
                                             if (hitObs) break;
                                         }
