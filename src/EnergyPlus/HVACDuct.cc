@@ -52,7 +52,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -91,7 +90,6 @@ namespace HVACDuct {
     // USE STATEMENTS:
     // <use statements for data only modules>
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::BeginEnvrnFlag;
     using namespace DataHVACGlobals;
     using namespace DataLoopNode;

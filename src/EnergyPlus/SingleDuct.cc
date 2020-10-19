@@ -67,7 +67,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -110,7 +109,6 @@ namespace SingleDuct {
     // simulate single duct systems as a single driver or inter-connecting controllers.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using BranchNodeConnections::SetUpCompSets;
     using BranchNodeConnections::TestCompSet;
@@ -679,7 +677,7 @@ namespace SingleDuct {
                     }
                 }
             }
-            if (Numbers(7) == AutoCalculate) {
+            if (Numbers(7) == DataGlobalConstants::AutoCalculate()) {
                 sd_airterminal(SysNum).MaxAirVolFlowRateDuringReheat = Numbers(7);
             } else {
                 sd_airterminal(SysNum).MaxAirVolFlowRateDuringReheat = Numbers(7) * sd_airterminal(SysNum).ZoneFloorArea;
@@ -2238,7 +2236,7 @@ namespace SingleDuct {
 
             if (this->HWLoopNum > 0 && this->ReheatComp_Num != HCoilType_SteamAirHeating) { // protect early calls before plant is setup
                 rho = GetDensityGlycol(
-                    state, PlantLoop(this->HWLoopNum).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(this->HWLoopNum).FluidIndex, RoutineName);
+                    state, PlantLoop(this->HWLoopNum).FluidName, DataGlobalConstants::HWInitConvTemp(), PlantLoop(this->HWLoopNum).FluidIndex, RoutineName);
             } else {
                 rho = 1000.0;
             }
@@ -2461,7 +2459,6 @@ namespace SingleDuct {
         // Obtains flow rates from the zone or system sizing arrays.
 
         // Using/Aliasing
-        using DataGlobals::AutoCalculate;
         using DataHeatBalance::Zone;
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
@@ -2816,7 +2813,7 @@ namespace SingleDuct {
             } else {
                 MaxAirVolFractionDuringReheatDes = 0.0;
             }
-            if (this->MaxAirVolFlowRateDuringReheat == AutoCalculate && this->MaxAirVolFractionDuringReheat == AutoCalculate) {
+            if (this->MaxAirVolFlowRateDuringReheat == DataGlobalConstants::AutoCalculate() && this->MaxAirVolFractionDuringReheat == DataGlobalConstants::AutoCalculate()) {
                 // if both inputs are autosize (the default) report both out and save in the Sys array.
                 BaseSizer::reportSizerOutput(
                     this->SysType, this->SysName, "Design Size Maximum Flow Fraction during Reheat []", MaxAirVolFractionDuringReheatDes);
@@ -2828,7 +2825,7 @@ namespace SingleDuct {
                 }
                 this->MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
                 this->MaxAirVolFractionDuringReheat = MaxAirVolFractionDuringReheatDes;
-            } else if (this->MaxAirVolFlowRateDuringReheat == AutoCalculate && this->MaxAirVolFractionDuringReheat != AutoCalculate) {
+            } else if (this->MaxAirVolFlowRateDuringReheat == DataGlobalConstants::AutoCalculate() && this->MaxAirVolFractionDuringReheat != DataGlobalConstants::AutoCalculate()) {
                 // if max reheat flow fraction was input, set the max reheat flow design value correspondingly, report both out.
                 // Check for optional caution message that user input value is not within 10% of the design value.
                 MaxAirVolFlowRateDuringReheatDes = this->MaxAirVolFractionDuringReheat * this->MaxAirVolFlowRate;
@@ -2859,7 +2856,7 @@ namespace SingleDuct {
                         ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
                     }
                 }
-            } else if (this->MaxAirVolFlowRateDuringReheat != AutoCalculate && this->MaxAirVolFractionDuringReheat == AutoCalculate) {
+            } else if (this->MaxAirVolFlowRateDuringReheat != DataGlobalConstants::AutoCalculate() && this->MaxAirVolFractionDuringReheat == DataGlobalConstants::AutoCalculate()) {
                 // if max reheat flow was input set the design max reheat flow frac to the corresponding value, report both out, save the design value
                 // of the flow frac in Sys. Check for optional caution message that user input value is not within 10% of the design value.
                 if (this->MaxAirVolFlowRate > 0.0) {
@@ -3073,12 +3070,12 @@ namespace SingleDuct {
                             if (DesCoilLoad >= SmallLoad) {
 
                                 rho = GetDensityGlycol(state, PlantLoop(this->HWLoopNum).FluidName,
-                                                       DataGlobals::HWInitConvTemp,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(this->HWLoopNum).FluidIndex,
                                                        RoutineName);
 
                                 Cp = GetSpecificHeatGlycol(state, PlantLoop(this->HWLoopNum).FluidName,
-                                                           DataGlobals::HWInitConvTemp,
+                                                           DataGlobalConstants::HWInitConvTemp(),
                                                            PlantLoop(this->HWLoopNum).FluidIndex,
                                                            RoutineName);
 

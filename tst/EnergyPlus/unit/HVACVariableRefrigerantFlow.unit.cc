@@ -4723,7 +4723,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
 
     // Additional tests for fuel type input
     EXPECT_EQ(VRF(VRFTUNum).FuelType, "Electricity");
-    EXPECT_EQ(VRF(VRFTUNum).FuelTypeNum, DataGlobalConstants::iRT_Electricity);
+    EXPECT_EQ(VRF(VRFTUNum).FuelTypeNum, DataGlobalConstants::ResourceType::Electricity);
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
@@ -5674,7 +5674,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     EXPECT_DOUBLE_EQ(CondVolFlowRate, VRF(VRFCond).WaterCondVolFlowRate);
 
     rho = GetDensityGlycol(state,
-        PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, InitConvTemp, PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
+        PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, DataGlobalConstants::InitConvTemp(), PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
     EXPECT_DOUBLE_EQ(VRF(VRFCond).WaterCondenserDesignMassFlow, (VRF(VRFCond).WaterCondVolFlowRate * rho));
 
     // set zone load to heating
@@ -7921,7 +7921,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
     HeatingCoils::CoilIsSuppHeater = true;
     HeatingCoils::HeatingCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
     HeatingCoils::HeatingCoil(CoilNum).HeatingCoilType = thisVRFTU.SuppHeatCoilType;
-    HeatingCoils::HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::iRT_Electricity;
+    HeatingCoils::HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
     HeatingCoils::HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
     HeatingCoils::HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     HeatingCoils::HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
@@ -7985,7 +7985,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
     HeatingCoils::CoilIsSuppHeater = true;
     HeatingCoils::HeatingCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
     HeatingCoils::HeatingCoil(CoilNum).HeatingCoilType = thisVRFTU.SuppHeatCoilType;
-    HeatingCoils::HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::iRT_Natural_Gas;
+    HeatingCoils::HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
     HeatingCoils::HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
     HeatingCoils::HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     HeatingCoils::HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
@@ -8056,7 +8056,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
     state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
 
-    // state.dataWaterCoils->WaterCoil(CoilNum).FuelType_Num = DataGlobalConstants::iRT_Natural_Gas;
+    // state.dataWaterCoils->WaterCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
     state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
     state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = thisVRFTU.SuppHeatCoilFluidInletNode;
@@ -8164,32 +8164,32 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
 
     int CoilNum(1);
     DataLoopNode::Node.allocate(4);
-    SteamCoils::NumSteamCoils = 1;
-    SteamCoils::SteamCoil.allocate(SteamCoils::NumSteamCoils);
-    SteamCoils::SteamCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
-    SteamCoils::SteamCoil(CoilNum).SteamCoilType_Num = SteamCoils::SteamCoil_AirHeating;
-    SteamCoils::SteamCoil(CoilNum).LoopNum = 1;
-    SteamCoils::SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
-    SteamCoils::SteamCoil(CoilNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
-    SteamCoils::SteamCoil(CoilNum).InletSteamTemp = 100.0;
-    SteamCoils::SteamCoil(CoilNum).InletSteamPress = 101325.0;
-    SteamCoils::SteamCoil(CoilNum).DegOfSubcooling = 0.0;
+    state.dataSteamCoils->NumSteamCoils = 1;
+    state.dataSteamCoils->SteamCoil.allocate(state.dataSteamCoils->NumSteamCoils);
+    state.dataSteamCoils->SteamCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
+    state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num = state.dataSteamCoils->SteamCoil_AirHeating;
+    state.dataSteamCoils->SteamCoil(CoilNum).LoopNum = 1;
+    state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
+    state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    state.dataSteamCoils->SteamCoil(CoilNum).InletSteamTemp = 100.0;
+    state.dataSteamCoils->SteamCoil(CoilNum).InletSteamPress = 101325.0;
+    state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling = 0.0;
 
-    SteamCoils::SteamCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
-    SteamCoils::SteamCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
-    SteamCoils::SteamCoil(CoilNum).SteamInletNodeNum = thisVRFTU.SuppHeatCoilFluidInletNode;
-    SteamCoils::SteamCoil(CoilNum).SteamOutletNodeNum = thisVRFTU.SuppHeatCoilFluidOutletNode;
-    SteamCoils::SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.015;
-    SteamCoils::SteamCoil(CoilNum).LoopNum = 1;
-    SteamCoils::SteamCoil(CoilNum).LoopSide = 1;
-    SteamCoils::SteamCoil(CoilNum).BranchNum = 1;
-    SteamCoils::SteamCoil(CoilNum).CompNum = 1;
-    SteamCoils::SteamCoil(CoilNum).Coil_PlantTypeNum = DataPlant::TypeOf_CoilSteamAirHeating;
-    SteamCoils::SteamCoil(CoilNum).TypeOfCoil = SteamCoils::ZoneLoadControl;
-    SteamCoils::GetSteamCoilsInputFlag = false;
-    SteamCoils::CheckEquipName.dimension(SteamCoils::NumSteamCoils, true);
-    SteamCoils::MySizeFlag.allocate(CoilNum);
-    SteamCoils::MySizeFlag(CoilNum) = true;
+    state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
+    state.dataSteamCoils->SteamCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
+    state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum = thisVRFTU.SuppHeatCoilFluidInletNode;
+    state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum = thisVRFTU.SuppHeatCoilFluidOutletNode;
+    state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.015;
+    state.dataSteamCoils->SteamCoil(CoilNum).LoopNum = 1;
+    state.dataSteamCoils->SteamCoil(CoilNum).LoopSide = 1;
+    state.dataSteamCoils->SteamCoil(CoilNum).BranchNum = 1;
+    state.dataSteamCoils->SteamCoil(CoilNum).CompNum = 1;
+    state.dataSteamCoils->SteamCoil(CoilNum).Coil_PlantTypeNum = DataPlant::TypeOf_CoilSteamAirHeating;
+    state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = state.dataSteamCoils->ZoneLoadControl;
+    state.dataSteamCoils->GetSteamCoilsInputFlag = false;
+    state.dataSteamCoils->CheckEquipName.dimension(state.dataSteamCoils->NumSteamCoils, true);
+    state.dataSteamCoils->MySizeFlag.allocate(CoilNum);
+    state.dataSteamCoils->MySizeFlag(CoilNum) = true;
 
     NumPltSizInput = 1;
     PlantSizData.allocate(NumPltSizInput);
@@ -8210,24 +8210,24 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
 
     PlantLoop(1).Name = "SteamLoop";
     PlantLoop(1).FluidName = "STEAM";
-    PlantLoop(1).FluidIndex = SteamCoils::SteamIndex;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = SteamCoils::SteamCoil(CoilNum).Name;
+    PlantLoop(1).FluidIndex = state.dataSteamCoils->SteamIndex;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataSteamCoils->SteamCoil(CoilNum).Name;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilSteamAirHeating;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = SteamCoils::SteamCoil(CoilNum).SteamInletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum;
 
     SysSizingCalc = true;
     DataGlobals::BeginEnvrnFlag = true;
     DataEnvironment::OutDryBulbTemp = 5.0;
     // init coil inlet condition
-    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
-    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
-    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
-    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).Temp,
-                                   DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).AirInletNodeNum).HumRat);
+    DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
+    DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).Temp = 15.0;
+    DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
+    DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).Temp,
+                                   DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum).HumRat);
 
-    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).SteamInletNodeNum).MassFlowRate = thisVRFTU.SuppHeatCoilFluidMaxFlow;
-    DataLoopNode::Node(SteamCoils::SteamCoil(CoilNum).SteamInletNodeNum).MassFlowRateMax = thisVRFTU.SuppHeatCoilFluidMaxFlow;
+    DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum).MassFlowRate = thisVRFTU.SuppHeatCoilFluidMaxFlow;
+    DataLoopNode::Node(state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum).MassFlowRateMax = thisVRFTU.SuppHeatCoilFluidMaxFlow;
 
     bool FirstHVACIteration(true);
     Real64 SuppHeatCoilLoad = 20000.0;
@@ -8235,15 +8235,15 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     thisVRFTU.CalcVRFSuppHeatingCoil(state, VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
     // check heating load delivered
     EXPECT_DOUBLE_EQ(20000.0, SuppHeatCoilLoad);
-    EXPECT_DOUBLE_EQ(20000.0, SteamCoils::SteamCoil(CoilNum).TotSteamHeatingCoilRate);
-    EXPECT_DOUBLE_EQ(20311.199999999997, SteamCoils::SteamCoil(CoilNum).OperatingCapacity);
+    EXPECT_DOUBLE_EQ(20000.0, state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate);
+    EXPECT_DOUBLE_EQ(20311.199999999997, state.dataSteamCoils->SteamCoil(CoilNum).OperatingCapacity);
 
     // testing heating load larger than available capacity
     SuppHeatCoilLoad = 24000.0;
     thisVRFTU.CalcVRFSuppHeatingCoil(state, VRFTUNum, FirstHVACIteration, thisVRFTU.SuppHeatPartLoadRatio, SuppHeatCoilLoad);
     // delivered heating load can not exceed available operating capacity
-    EXPECT_DOUBLE_EQ(SteamCoils::SteamCoil(CoilNum).OperatingCapacity, SuppHeatCoilLoad);
-    EXPECT_DOUBLE_EQ(SteamCoils::SteamCoil(CoilNum).OperatingCapacity, SteamCoils::SteamCoil(CoilNum).TotSteamHeatingCoilRate);
+    EXPECT_DOUBLE_EQ(state.dataSteamCoils->SteamCoil(CoilNum).OperatingCapacity, SuppHeatCoilLoad);
+    EXPECT_DOUBLE_EQ(state.dataSteamCoils->SteamCoil(CoilNum).OperatingCapacity, state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate);
 }
 
 TEST_F(EnergyPlusFixture, VRFTU_SupplementalHeatingCoilCapacityLimitTest)
@@ -14250,7 +14250,7 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_EQ(1.00, maxEIRfLowPLRXInput);               // getinput checks this
     EXPECT_GT(thisHeatEIRFPLR.Var1Min, thisVRF.MinPLR); // expect warning message
     EXPECT_EQ(thisVRF.FuelType, "Electricity"); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
-    EXPECT_EQ(thisVRF.FuelTypeNum, DataGlobalConstants::iRT_Electricity); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
+    EXPECT_EQ(thisVRF.FuelTypeNum, DataGlobalConstants::ResourceType::Electricity); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
 }
 
 

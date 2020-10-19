@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -102,8 +101,6 @@ namespace PlantPressureSystem {
     //                                -Not currently implemented
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataGlobals::Pi;
     using namespace DataBranchAirLoopPlant;
 
     // Data

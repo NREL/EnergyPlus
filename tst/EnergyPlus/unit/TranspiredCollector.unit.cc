@@ -224,8 +224,8 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     CosZoneRelNorth.allocate(1);
     SinZoneRelNorth.allocate(1);
 
-    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
+    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
@@ -247,9 +247,9 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     SkyTemp = 24.0;
     IsRain = false;
 
-    InitTranspiredCollector(UTSCNum);
+    InitTranspiredCollector(state, UTSCNum);
 
-    EXPECT_DOUBLE_EQ(22.0, UTSC(UTSCNum).Tcoll);
-    EXPECT_DOUBLE_EQ(22.5, UTSC(UTSCNum).Tplen);
-    EXPECT_NEAR(19.990, UTSC(UTSCNum).TairHX, 0.001);
+    EXPECT_DOUBLE_EQ(22.0, state.dataTranspiredCollector->UTSC(UTSCNum).Tcoll);
+    EXPECT_DOUBLE_EQ(22.5, state.dataTranspiredCollector->UTSC(UTSCNum).Tplen);
+    EXPECT_NEAR(19.990, state.dataTranspiredCollector->UTSC(UTSCNum).TairHX, 0.001);
 }

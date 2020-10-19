@@ -455,8 +455,8 @@ namespace EnergyPlus {
                 // correct loop temperature step.  Loop data is read in supply side, but the volume is not used in
                 // a calculation there.
                 this_loop.Volume = Num(5);
-                if (lNumericFieldBlanks(5)) this_loop.Volume = AutoCalculate;
-                if (this_loop.Volume == AutoCalculate) {
+                if (lNumericFieldBlanks(5)) this_loop.Volume = DataGlobalConstants::AutoCalculate();
+                if (this_loop.Volume == DataGlobalConstants::AutoCalculate()) {
                     this_loop.VolumeWasAutoSized = true;
                 }
                 // circulation time used to autocalculate loop volume
@@ -3204,7 +3204,7 @@ namespace EnergyPlus {
 
             // should now have plant volume, calculate plant volume's mass for fluid type
             if (PlantLoop(LoopNum).FluidType == NodeType_Water) {
-                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, InitConvTemp,
+                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp(),
                                                 PlantLoop(LoopNum).FluidIndex, RoutineName);
             } else if (PlantLoop(LoopNum).FluidType == NodeType_Steam) {
                 FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, PlantLoop(LoopNum).FluidIndex,
@@ -3334,7 +3334,7 @@ namespace EnergyPlus {
 
             // should now have plant volume, calculate plant volume's mass for fluid type
             if (PlantLoop(LoopNum).FluidType == NodeType_Water) {
-                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, InitConvTemp,
+                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp(),
                                                 PlantLoop(LoopNum).FluidIndex, RoutineName);
             } else if (PlantLoop(LoopNum).FluidType == NodeType_Steam) {
                 FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, PlantLoop(LoopNum).FluidIndex,

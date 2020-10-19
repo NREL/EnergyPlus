@@ -660,8 +660,9 @@ int currentEnvironmentNum(EnergyPlusState) {
     return EnergyPlus::DataEnvironment::CurEnvirNum;
 }
 
-int kindOfSim(EnergyPlusState) {
-    return EnergyPlus::DataGlobals::KindOfSim;
+int kindOfSim(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return static_cast<int>(thisState->dataGlobal->KindOfSim);
 }
 
 int getConstructionHandle(EnergyPlusState state, const char* constructionName) {

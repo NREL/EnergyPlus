@@ -1612,7 +1612,7 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
                                   " audit trail or error file for possible reasons.");
             }
             while (CountM <= NumAlphas) {
-                if (len(DataIPShortCuts::cAlphaArgs(CountM)) == DataGlobals::MaxNameLength) {
+                if (len(DataIPShortCuts::cAlphaArgs(CountM)) == DataGlobalConstants::MaxNameLength()) {
                     ShowContinueError(DataIPShortCuts::cAlphaArgs(CountM) + DataIPShortCuts::cAlphaArgs(CountM + 1));
                     CountM += 2;
                 } else {

@@ -883,19 +883,19 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Coil:Heating:Steam")) {
 
                     // Read in coil input if not done yet
-                    if (SteamCoils::GetSteamCoilsInputFlag) {
+                    if (state.dataSteamCoils->GetSteamCoilsInputFlag) {
                         SteamCoils::GetSteamCoilInput(state);
-                        SteamCoils::GetSteamCoilsInputFlag = false;
+                        state.dataSteamCoils->GetSteamCoilsInputFlag = false;
                     }
                     // Check the coil name and coil type
-                    int CoilNum = UtilityRoutines::FindItemInList(FaultsCoilSATSensor(jFault_CoilSAT).CoilName, SteamCoils::SteamCoil);
+                    int CoilNum = UtilityRoutines::FindItemInList(FaultsCoilSATSensor(jFault_CoilSAT).CoilName, state.dataSteamCoils->SteamCoil);
                     if (CoilNum <= 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
                         ErrorsFound = true;
                     } else {
 
-                        if (SteamCoils::SteamCoil(CoilNum).TypeOfCoil != SteamCoils::TemperatureSetPointControl) {
+                        if (state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil != state.dataSteamCoils->TemperatureSetPointControl) {
                             // The fault model is only applicable to the coils controlled on leaving air temperature
                             ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                              cAlphaArgs(5) +
@@ -903,8 +903,8 @@ namespace FaultsManager {
                                              "will not be applied.");
                         } else {
                             // Link the fault model with the coil that is controlled on leaving air temperature
-                            SteamCoils::SteamCoil(CoilNum).FaultyCoilSATFlag = true;
-                            SteamCoils::SteamCoil(CoilNum).FaultyCoilSATIndex = jFault_CoilSAT;
+                            state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATFlag = true;
+                            state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATIndex = jFault_CoilSAT;
                         }
                     }
 

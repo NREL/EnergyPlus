@@ -1515,7 +1515,7 @@ namespace VentilatedSlab {
 
                 if (state.dataVentilatedSlab->VentSlab(Item).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating && !MyPlantScanFlag(Item)) {
                     rho = GetDensityGlycol(
-                        state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName, HWInitConvTemp, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex, RoutineName);
+                        state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName, DataGlobalConstants::HWInitConvTemp(), PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex, RoutineName);
 
                     state.dataVentilatedSlab->VentSlab(Item).MaxHotWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MaxVolHotWaterFlow;
                     state.dataVentilatedSlab->VentSlab(Item).MinHotWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MinVolHotWaterFlow;
@@ -1551,7 +1551,7 @@ namespace VentilatedSlab {
                 if ((state.dataVentilatedSlab->VentSlab(Item).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling) ||
                     (state.dataVentilatedSlab->VentSlab(Item).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling)) {
                     rho = GetDensityGlycol(state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidName,
-                                           DataGlobals::CWInitConvTemp,
+                                           DataGlobalConstants::CWInitConvTemp(),
                                            PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidIndex,
                                            RoutineName);
                     state.dataVentilatedSlab->VentSlab(Item).MaxColdWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MaxVolColdWaterFlow;
@@ -2057,11 +2057,11 @@ namespace VentilatedSlab {
                                     DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                                 }
                                 rho = GetDensityGlycol(state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName,
-                                                       HWInitConvTemp,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex,
                                                        RoutineName);
                                 Cp = GetSpecificHeatGlycol(state, PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName,
-                                                           HWInitConvTemp,
+                                                           DataGlobalConstants::HWInitConvTemp(),
                                                            PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex,
                                                            RoutineName);
                                 MaxVolHotWaterFlowDes = DesCoilLoad / (WaterCoilSizDeltaT * Cp * rho);
@@ -2175,8 +2175,8 @@ namespace VentilatedSlab {
                                     GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataVentilatedSlab->VentSlab(Item).HCoil_FluidIndex, RoutineName);
                                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
                                 SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataVentilatedSlab->VentSlab(Item).HCoil_FluidIndex, RoutineName);
-                                Cp = GetSpecificHeatGlycol(state, fluidNameWater, HWInitConvTemp, DummyWaterIndex, RoutineName);
-                                rho = GetDensityGlycol(state, fluidNameWater, HWInitConvTemp, DummyWaterIndex, RoutineName);
+                                Cp = GetSpecificHeatGlycol(state, fluidNameWater, DataGlobalConstants::HWInitConvTemp(), DummyWaterIndex, RoutineName);
+                                rho = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::HWInitConvTemp(), DummyWaterIndex, RoutineName);
                                 MaxVolHotSteamFlowDes =
                                     DesCoilLoad / ((PlantSizData(PltSizHeatNum).DeltaT * Cp * rho) + SteamDensity * LatentHeatSteam);
                             } else {
@@ -4335,8 +4335,6 @@ namespace VentilatedSlab {
         // Code based loosely on code from IBLAST program (research version)
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-
         // Return value
         Real64 CalcVentSlabHXEffectTerm;
 
@@ -4405,7 +4403,7 @@ namespace VentilatedSlab {
         SysAirMassFlow = AirMassFlow / CoreNumbers;
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-        ReD = 4.0 * SysAirMassFlow * FlowFraction / (Pi * MUactual * CoreDiameter);
+        ReD = 4.0 * SysAirMassFlow * FlowFraction / (DataGlobalConstants::Pi() * MUactual * CoreDiameter);
 
         // Calculate the Nusselt number based on what flow regime one is in
         if (ReD >= MaxLaminarRe) { // Turbulent flow --> use Colburn equation
@@ -4421,7 +4419,7 @@ namespace VentilatedSlab {
         // NTU = UA/[(Mdot*Cp)min]
         // where: U = h (convection coefficient) and h = (k)(Nu)/D
         //        A = Pi*D*TubeLength
-        NTU = Pi * Kactual * NuD * CoreLength / (SysAirMassFlow * CpAppAir); // FlowFraction cancels out here
+        NTU = DataGlobalConstants::Pi() * Kactual * NuD * CoreLength / (SysAirMassFlow * CpAppAir); // FlowFraction cancels out here
 
         // Calculate Epsilon*MassFlowRate*Cp
         if (NTU > MaxExpPower) {
@@ -4518,7 +4516,6 @@ namespace VentilatedSlab {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
@@ -4551,15 +4548,15 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->VentSlab(Item).RadCoolingPower = -TotalVentSlabRadPower;
         }
 
-        state.dataVentilatedSlab->VentSlab(Item).RadHeatingEnergy = state.dataVentilatedSlab->VentSlab(Item).RadHeatingPower * TimeStepSys * SecInHour;
-        state.dataVentilatedSlab->VentSlab(Item).RadCoolingEnergy = state.dataVentilatedSlab->VentSlab(Item).RadCoolingPower * TimeStepSys * SecInHour;
+        state.dataVentilatedSlab->VentSlab(Item).RadHeatingEnergy = state.dataVentilatedSlab->VentSlab(Item).RadHeatingPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataVentilatedSlab->VentSlab(Item).RadCoolingEnergy = state.dataVentilatedSlab->VentSlab(Item).RadCoolingPower * TimeStepSys * DataGlobalConstants::SecInHour();
 
         // Coil Part
-        state.dataVentilatedSlab->VentSlab(Item).HeatCoilEnergy = state.dataVentilatedSlab->VentSlab(Item).HeatCoilPower * TimeStepSys * SecInHour;
-        state.dataVentilatedSlab->VentSlab(Item).SensCoolCoilEnergy = state.dataVentilatedSlab->VentSlab(Item).SensCoolCoilPower * TimeStepSys * SecInHour;
-        state.dataVentilatedSlab->VentSlab(Item).LateCoolCoilEnergy = state.dataVentilatedSlab->VentSlab(Item).LateCoolCoilPower * TimeStepSys * SecInHour;
-        state.dataVentilatedSlab->VentSlab(Item).TotCoolCoilEnergy = state.dataVentilatedSlab->VentSlab(Item).TotCoolCoilPower * TimeStepSys * SecInHour;
-        state.dataVentilatedSlab->VentSlab(Item).ElecFanEnergy = state.dataVentilatedSlab->VentSlab(Item).ElecFanPower * TimeStepSys * SecInHour;
+        state.dataVentilatedSlab->VentSlab(Item).HeatCoilEnergy = state.dataVentilatedSlab->VentSlab(Item).HeatCoilPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataVentilatedSlab->VentSlab(Item).SensCoolCoilEnergy = state.dataVentilatedSlab->VentSlab(Item).SensCoolCoilPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataVentilatedSlab->VentSlab(Item).LateCoolCoilEnergy = state.dataVentilatedSlab->VentSlab(Item).LateCoolCoilPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataVentilatedSlab->VentSlab(Item).TotCoolCoilEnergy = state.dataVentilatedSlab->VentSlab(Item).TotCoolCoilPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataVentilatedSlab->VentSlab(Item).ElecFanEnergy = state.dataVentilatedSlab->VentSlab(Item).ElecFanPower * TimeStepSys * DataGlobalConstants::SecInHour();
 
         if ((state.dataVentilatedSlab->VentSlab(Item).SysConfg == state.dataVentilatedSlab->SlabOnly) || (state.dataVentilatedSlab->VentSlab(Item).SysConfg == state.dataVentilatedSlab->SeriesSlabs)) {
             state.dataVentilatedSlab->VentSlab(Item).SlabInTemp = Node(state.dataVentilatedSlab->VentSlab(Item).RadInNode).Temp;

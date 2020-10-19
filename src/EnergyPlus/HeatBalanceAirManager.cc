@@ -979,7 +979,7 @@ namespace HeatBalanceAirManager {
                         } else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
                             if (Infiltration(Loop).ZonePtr != 0) {
                                 if (rNumericArgs(4) >= 0.0) {
-                                    Infiltration(Loop).DesignLevel = rNumericArgs(4) * Zone(Infiltration(Loop).ZonePtr).Volume / SecInHour;
+                                    Infiltration(Loop).DesignLevel = rNumericArgs(4) * Zone(Infiltration(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour();
                                     if (Zone(Infiltration(Loop).ZonePtr).Volume <= 0.0) {
                                         ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + Infiltration(Loop).Name + "\", " +
                                                          cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(4) +
@@ -1446,7 +1446,7 @@ namespace HeatBalanceAirManager {
                         } else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
                             if (Ventilation(Loop).ZonePtr != 0) {
                                 if (rNumericArgs(4) >= 0.0) {
-                                    Ventilation(Loop).DesignLevel = rNumericArgs(4) * Zone(Ventilation(Loop).ZonePtr).Volume / SecInHour;
+                                    Ventilation(Loop).DesignLevel = rNumericArgs(4) * Zone(Ventilation(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour();
                                     if (Zone(Ventilation(Loop).ZonePtr).Volume <= 0.0) {
                                         ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + Ventilation(Loop).Name + "\", " +
                                                          cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(4) +
@@ -1971,7 +1971,7 @@ namespace HeatBalanceAirManager {
             }
 
             Ventilation(VentiCount).OpenEff = rNumericArgs(2);
-            if (Ventilation(VentiCount).OpenEff != AutoCalculate &&
+            if (Ventilation(VentiCount).OpenEff != DataGlobalConstants::AutoCalculate() &&
                 (Ventilation(VentiCount).OpenEff < 0.0 || Ventilation(VentiCount).OpenEff > 1.0)) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
                                 " must be between 0 and 1.");
@@ -1992,7 +1992,7 @@ namespace HeatBalanceAirManager {
             }
 
             Ventilation(VentiCount).DiscCoef = rNumericArgs(5);
-            if (Ventilation(VentiCount).DiscCoef != AutoCalculate &&
+            if (Ventilation(VentiCount).DiscCoef != DataGlobalConstants::AutoCalculate() &&
                 (Ventilation(VentiCount).DiscCoef < 0.0 || Ventilation(VentiCount).DiscCoef > 1.0)) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(5) +
                                 " must be between 0 and 1.");
@@ -2406,7 +2406,7 @@ namespace HeatBalanceAirManager {
                 } else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
                     if (Mixing(Loop).ZonePtr != 0) {
                         if (rNumericArgs(4) >= 0.0) {
-                            Mixing(Loop).DesignLevel = rNumericArgs(4) * Zone(Mixing(Loop).ZonePtr).Volume / SecInHour;
+                            Mixing(Loop).DesignLevel = rNumericArgs(4) * Zone(Mixing(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour();
                             if (Zone(Mixing(Loop).ZonePtr).Volume <= 0.0) {
                                 ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
                                                  " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Mixing will result.");
@@ -2851,7 +2851,7 @@ namespace HeatBalanceAirManager {
                     else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
                         if (CrossMixing(Loop).ZonePtr != 0) {
                             if (rNumericArgs(4) >= 0.0) {
-                                CrossMixing(Loop).DesignLevel = rNumericArgs(4) * Zone(CrossMixing(Loop).ZonePtr).Volume / SecInHour;
+                                CrossMixing(Loop).DesignLevel = rNumericArgs(4) * Zone(CrossMixing(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour();
                                 if (Zone(CrossMixing(Loop).ZonePtr).Volume <= 0.0) {
                                     ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
                                         " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Cross Mixing will result.");
@@ -3558,7 +3558,7 @@ namespace HeatBalanceAirManager {
 
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).FloorArea, Infiltration(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).ExteriorTotalSurfArea, Infiltration(Loop).DesignLevel);
-            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, Infiltration(Loop).DesignLevel * SecInHour);
+            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, Infiltration(Loop).DesignLevel * DataGlobalConstants::SecInHour());
 
             print(state.files.eio, "{:.3R},", Infiltration(Loop).ConstantTermCoef);
             print(state.files.eio, "{:.3R},", Infiltration(Loop).TemperatureTermCoef);
@@ -3599,7 +3599,7 @@ namespace HeatBalanceAirManager {
 
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).FloorArea, Ventilation(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).TotOccupants, Ventilation(Loop).DesignLevel);
-            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, Ventilation(Loop).DesignLevel * SecInHour);
+            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, Ventilation(Loop).DesignLevel * DataGlobalConstants::SecInHour());
 
             if (Ventilation(Loop).FanType == ExhaustVentilation) {
                 print(state.files.eio, "Exhaust,");
@@ -3666,7 +3666,7 @@ namespace HeatBalanceAirManager {
             print(state.files.eio, "{:.3R},", Mixing(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).FloorArea, Mixing(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).TotOccupants, Mixing(Loop).DesignLevel);
-            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, Mixing(Loop).DesignLevel * SecInHour);
+            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, Mixing(Loop).DesignLevel * DataGlobalConstants::SecInHour());
 
             print(state.files.eio, "{},", Zone(Mixing(Loop).FromZone).Name);
             print(state.files.eio, "{:.2R}\n", Mixing(Loop).DeltaTemperature);
@@ -3700,7 +3700,7 @@ namespace HeatBalanceAirManager {
 
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).FloorArea, CrossMixing(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).TotOccupants, CrossMixing(Loop).DesignLevel);
-            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, CrossMixing(Loop).DesignLevel * SecInHour);
+            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, CrossMixing(Loop).DesignLevel * DataGlobalConstants::SecInHour());
 
             print(state.files.eio, "{},", Zone(CrossMixing(Loop).FromZone).Name);
             print(state.files.eio, "{:.2R}\n", CrossMixing(Loop).DeltaTemperature);
@@ -4226,11 +4226,11 @@ namespace HeatBalanceAirManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        if(DataGlobals::externalHVACManager) {
-          if (!DataGlobals::externalHVACManagerInitialized) {
+        if(state.dataGlobal->externalHVACManager) {
+          if (!state.dataGlobal->externalHVACManagerInitialized) {
               initializeForExternalHVACManager(state);
           }
-          DataGlobals::externalHVACManager(&state);
+          state.dataGlobal->externalHVACManager(&state);
         } else {
           ManageHVAC(state);
         }

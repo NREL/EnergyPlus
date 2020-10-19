@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -104,7 +103,6 @@ namespace RoomAirModelUserTempPattern {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::DisplayExtraWarnings;
     using namespace DataRoomAirModel;
 

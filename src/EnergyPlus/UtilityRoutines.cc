@@ -534,7 +534,7 @@ namespace UtilityRoutines {
 
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
                                                    std::string &FuelTypeOutput,
-                                                   int &FuelTypeNum,
+                                                   DataGlobalConstants::ResourceType &FuelTypeNum,
                                                    bool &FuelTypeErrorsFound)
     {
         // FUNCTION INFORMATION:
@@ -694,7 +694,7 @@ namespace UtilityRoutines {
             ReportSurfaces(state);
         }
 
-        ReportSurfaceErrors();
+        ReportSurfaceErrors(state);
         CheckPlantOnAbort();
         ShowRecurringErrors();
         SummarizeErrors();
@@ -870,7 +870,7 @@ namespace UtilityRoutines {
             sqlite->updateSQLiteSimulationRecord(true, true);
         }
 
-        ReportSurfaceErrors();
+        ReportSurfaceErrors(state);
         ShowRecurringErrors();
         SummarizeErrors();
         CloseMiscOpenFiles(state);
