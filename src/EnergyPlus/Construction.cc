@@ -47,6 +47,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataConversions.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -56,11 +57,9 @@
 
 namespace EnergyPlus {
 
-ConstructionData dataConstruction;
-
 namespace Construction {
 
-    void ConstructionProps::calculateTransferFunction(bool & ErrorsFound, bool & DoCTFErrorReport) {
+    void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool & ErrorsFound, bool & DoCTFErrorReport) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -409,7 +408,7 @@ namespace Construction {
             // previously this loop would go from 1..currentConstructionIndex-1
             // instead of that, we'll loop through the list and stop when we get to the current construction
             // should be the same behavior, we're just checking it by address
-            for (auto & otherConstruction : dataConstruction.Construct) {
+            for (auto & otherConstruction : state.dataConstruction->Construct) {
                 if (&otherConstruction == this) break;
 
                 // If a source or sink is present in this construction, do not allow any
@@ -1236,8 +1235,8 @@ namespace Construction {
                         // Make sure the next term won't cause an underflow.  If it will end up being
                         // so small as to go below TinyLimit, then ignore it since it won't add anything
                         // to AMatN anyway.
-                        if (std::abs(AMat1(ic, ict)) > DataGlobals::rTinyValue) {
-                            if (std::abs(AMato(ict, ir)) > std::abs(double(i) * DataGlobals::rTinyValue / AMat1(ic, ict)))
+                        if (std::abs(AMat1(ic, ict)) > DataGlobalConstants::rTinyValue()) {
+                            if (std::abs(AMato(ict, ir)) > std::abs(double(i) * DataGlobalConstants::rTinyValue() / AMat1(ic, ict)))
                                 AMatN(ic, ir) += AMato(ict, ir) * AMat1(ic, ict) / double(i);
                         }
                     }
@@ -1253,7 +1252,7 @@ namespace Construction {
             for (ir = 1; ir <= this->rcmax; ++ir) {
                 for (ic = 1; ic <= this->rcmax; ++ic) {
                     // Test of limit criteria:
-                    if (std::abs(this->AExp(ic, ir)) > DataGlobals::rTinyValue) { // Next line divides by AExp entry so it
+                    if (std::abs(this->AExp(ic, ir)) > DataGlobalConstants::rTinyValue()) { // Next line divides by AExp entry so it
                         // must be checked to avoid dividing by zero.
                         // If the ratio between any current element in the power
                         // of AMat and its corresponding element in AExp is
@@ -1301,7 +1300,7 @@ namespace Construction {
             for (ir = 1; ir <= this->rcmax; ++ir) {
                 for (ic = 1; ic <= this->rcmax; ++ic) {
                     for (idm = 1; idm <= this->rcmax; ++idm) {
-                        if (std::abs(AMato(idm, ir) * AMato(ic, idm)) > DataGlobals::rTinyValue) {
+                        if (std::abs(AMato(idm, ir) * AMato(ic, idm)) > DataGlobalConstants::rTinyValue()) {
                             this->AExp(ic, ir) += AMato(idm, ir) * AMato(ic, idm);
                             Backup = false;
                         }
@@ -1725,8 +1724,8 @@ namespace Construction {
                         // Make sure the next term won't cause an underflow.  If it will end up being
                         // so small as to go below TinyLimit, then ignore it since it won't add anything
                         // to PhiR0 anyway.
-                        if (std::abs(Rnew(ic, is)) > DataGlobals::rTinyValue) {
-                            if (std::abs(this->AExp(is, ir)) > std::abs(DataGlobals::rTinyValue / Rnew(ic, is))) PhiR0(ic, ir) += this->AExp(is, ir) * Rnew(ic, is);
+                        if (std::abs(Rnew(ic, is)) > DataGlobalConstants::rTinyValue()) {
+                            if (std::abs(this->AExp(is, ir)) > std::abs(DataGlobalConstants::rTinyValue() / Rnew(ic, is))) PhiR0(ic, ir) += this->AExp(is, ir) * Rnew(ic, is);
                         }
                     }
                 }
@@ -1896,10 +1895,10 @@ namespace Construction {
         Rold.deallocate();
     }
 
-    void ConstructionProps::reportTransferFunction(IOFiles &ioFiles, int const cCounter) {
+    void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const cCounter) {
 
         static constexpr auto Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
-        print(ioFiles.eio,
+        print(state.files.eio,
               Format_700,
               this->Name,
               cCounter,
@@ -1919,10 +1918,10 @@ namespace Construction {
                 auto const SELECT_CASE_var(dataMaterial.Material(Layer).Group);
                 if (SELECT_CASE_var == DataHeatBalance::Air) {
                     static constexpr auto Format_702(" Material:Air,{},{:12.4N}\n");
-                    print(ioFiles.eio, Format_702, dataMaterial.Material(Layer).Name, dataMaterial.Material(Layer).Resistance);
+                    print(state.files.eio, Format_702, dataMaterial.Material(Layer).Name, dataMaterial.Material(Layer).Resistance);
                 } else {
                     static constexpr auto Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
-                    print(ioFiles.eio,
+                    print(state.files.eio,
                           Format_701,
                           dataMaterial.Material(Layer).Name,
                           dataMaterial.Material(Layer).Thickness,
@@ -1937,7 +1936,7 @@ namespace Construction {
         for (int I = this->NumCTFTerms; I >= 0; --I) {
             if (I != 0) {
                 static constexpr auto Format_703(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N},{:20.8N}\n");
-                print(ioFiles.eio,
+                print(state.files.eio,
                       Format_703,
                       I,
                       this->CTFOutside(I),
@@ -1946,7 +1945,7 @@ namespace Construction {
                       this->CTFFlux(I));
             } else {
                 static constexpr auto Format_704(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
-                print(ioFiles.eio,
+                print(state.files.eio,
                       Format_704,
                       I,
                       this->CTFOutside(I),
@@ -1959,12 +1958,12 @@ namespace Construction {
             // QTFs...
             for (int I = this->NumCTFTerms; I >= 0; --I) {
                 static constexpr auto Format_705(" QTF,{:4},{:20.8N},{:20.8N}\n");
-                print(ioFiles.eio, Format_705, I, this->CTFSourceOut(I), this->CTFSourceIn(I));
+                print(state.files.eio, Format_705, I, this->CTFSourceOut(I), this->CTFSourceIn(I));
             }
             // QTFs for source/sink location temperature calculation...
             for (int I = this->NumCTFTerms; I >= 0; --I) {
                 static constexpr auto Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
-                print(ioFiles.eio,
+                print(state.files.eio,
                       Format_706,
                       I,
                       this->CTFTSourceOut(I),
@@ -1975,7 +1974,7 @@ namespace Construction {
                 // QTFs for user specified interior temperature calculation...
                 for (int I = this->NumCTFTerms; I >= 0; --I) {
                     static constexpr auto Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
-                    print(ioFiles.eio,
+                    print(state.files.eio,
                           Format_707,
                           I,
                           this->CTFTUserOut(I),
@@ -1985,7 +1984,7 @@ namespace Construction {
             }
         }
     }
-    
+
     bool ConstructionProps::isGlazingConstruction() const
     {
         // SUBROUTINE INFORMATION:

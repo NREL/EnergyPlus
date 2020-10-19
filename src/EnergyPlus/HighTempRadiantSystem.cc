@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
@@ -112,7 +111,6 @@ namespace HighTempRadiantSystem {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::BeginTimeStepFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::ScheduleAlwaysOn;
@@ -218,7 +216,7 @@ namespace HighTempRadiantSystem {
         // FLOW:
         if (GetInputFlag) {
             ErrorsFoundInGet = false;
-            GetHighTempRadiantSystem(ErrorsFoundInGet);
+            GetHighTempRadiantSystem(state, ErrorsFoundInGet);
             if (ErrorsFoundInGet) ShowFatalError("GetHighTempRadiantSystem: Errors found in input.  Preceding condition(s) cause termination.");
             GetInputFlag = false;
         }
@@ -261,7 +259,7 @@ namespace HighTempRadiantSystem {
         ReportHighTempRadiantSystem(RadSysNum);
     }
 
-    void GetHighTempRadiantSystem(bool &ErrorsFound // TRUE if errors are found on processing the input
+    void GetHighTempRadiantSystem(EnergyPlusData &state, bool &ErrorsFound // TRUE if errors are found on processing the input
     )
     {
 
@@ -328,7 +326,8 @@ namespace HighTempRadiantSystem {
         // Obtain all of the user data related to high temperature radiant systems...
         for (Item = 1; Item <= NumOfHighTempRadSys; ++Item) {
 
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Item,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -351,7 +350,7 @@ namespace HighTempRadiantSystem {
             if (lAlphaFieldBlanks(2)) {
                 HighTempRadSys(Item).SchedPtr = ScheduleAlwaysOn;
             } else {
-                HighTempRadSys(Item).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                HighTempRadSys(Item).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (HighTempRadSys(Item).SchedPtr == 0) {
                     ShowSevereError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered =" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + " = " + cAlphaArgs(1));
@@ -538,7 +537,7 @@ namespace HighTempRadiantSystem {
             }
 
             HighTempRadSys(Item).SetptSched = cAlphaArgs(7);
-            HighTempRadSys(Item).SetptSchedPtr = GetScheduleIndex(cAlphaArgs(7));
+            HighTempRadSys(Item).SetptSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
             if ((HighTempRadSys(Item).SetptSchedPtr == 0) && (!lAlphaFieldBlanks(7))) {
                 ShowSevereError(cAlphaFieldNames(7) + " not found: " + cAlphaArgs(7));
                 ShowContinueError("Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs(1));
@@ -624,13 +623,13 @@ namespace HighTempRadiantSystem {
         // Set up the output variables for high temperature radiant heaters
         // cCurrentModuleObject = "ZoneHVAC:HighTemperatureRadiant"
         for (Item = 1; Item <= NumOfHighTempRadSys; ++Item) {
-            SetupOutputVariable("Zone Radiant HVAC Heating Rate",
+            SetupOutputVariable(state, "Zone Radiant HVAC Heating Rate",
                                 OutputProcessor::Unit::W,
                                 HighTempRadSys(Item).HeatPower,
                                 "System",
                                 "Average",
                                 HighTempRadSys(Item).Name);
-            SetupOutputVariable("Zone Radiant HVAC Heating Energy",
+            SetupOutputVariable(state, "Zone Radiant HVAC Heating Energy",
                                 OutputProcessor::Unit::J,
                                 HighTempRadSys(Item).HeatEnergy,
                                 "System",
@@ -642,13 +641,13 @@ namespace HighTempRadiantSystem {
                                 _,
                                 "System");
             if (HighTempRadSys(Item).HeaterType == Gas) {
-                SetupOutputVariable("Zone Radiant HVAC NaturalGas Rate",
+                SetupOutputVariable(state, "Zone Radiant HVAC NaturalGas Rate",
                                     OutputProcessor::Unit::W,
                                     HighTempRadSys(Item).GasPower,
                                     "System",
                                     "Average",
                                     HighTempRadSys(Item).Name);
-                SetupOutputVariable("Zone Radiant HVAC NaturalGas Energy",
+                SetupOutputVariable(state, "Zone Radiant HVAC NaturalGas Energy",
                                     OutputProcessor::Unit::J,
                                     HighTempRadSys(Item).GasEnergy,
                                     "System",
@@ -660,13 +659,13 @@ namespace HighTempRadiantSystem {
                                     _,
                                     "System");
             } else if (HighTempRadSys(Item).HeaterType == Electric) {
-                SetupOutputVariable("Zone Radiant HVAC Electricity Rate",
+                SetupOutputVariable(state, "Zone Radiant HVAC Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     HighTempRadSys(Item).ElecPower,
                                     "System",
                                     "Average",
                                     HighTempRadSys(Item).Name);
-                SetupOutputVariable("Zone Radiant HVAC Electricity Energy",
+                SetupOutputVariable(state, "Zone Radiant HVAC Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     HighTempRadSys(Item).ElecEnergy,
                                     "System",
@@ -1065,7 +1064,7 @@ namespace HighTempRadiantSystem {
             DistributeHTRadGains();
 
             // Now "simulate" the system by recalculating the heat balances
-            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.files, ZoneNum);
+            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
             HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
             // First determine whether or not the unit should be on
@@ -1108,7 +1107,7 @@ namespace HighTempRadiantSystem {
                     DistributeHTRadGains();
 
                     // Now "simulate" the system by recalculating the heat balances
-                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.files, ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                     // Redetermine the current value of the controlling temperature
@@ -1228,7 +1227,7 @@ namespace HighTempRadiantSystem {
 
                 // Now "simulate" the system by recalculating the heat balances
                 ZoneNum = HighTempRadSys(RadSysNum).ZonePtr;
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.files, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
             }
         }
@@ -1435,7 +1434,6 @@ namespace HighTempRadiantSystem {
         // na
 
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using DataSurfaces::Surface;
 
@@ -1456,19 +1454,19 @@ namespace HighTempRadiantSystem {
         // FLOW:
         if (HighTempRadSys(RadSysNum).HeaterType == Gas) {
             HighTempRadSys(RadSysNum).GasPower = QHTRadSource(RadSysNum) / HighTempRadSys(RadSysNum).CombustionEffic;
-            HighTempRadSys(RadSysNum).GasEnergy = HighTempRadSys(RadSysNum).GasPower * TimeStepSys * SecInHour;
+            HighTempRadSys(RadSysNum).GasEnergy = HighTempRadSys(RadSysNum).GasPower * TimeStepSys * DataGlobalConstants::SecInHour();
             HighTempRadSys(RadSysNum).ElecPower = 0.0;
             HighTempRadSys(RadSysNum).ElecEnergy = 0.0;
         } else if (HighTempRadSys(RadSysNum).HeaterType == Electric) {
             HighTempRadSys(RadSysNum).GasPower = 0.0;
             HighTempRadSys(RadSysNum).GasEnergy = 0.0;
             HighTempRadSys(RadSysNum).ElecPower = QHTRadSource(RadSysNum);
-            HighTempRadSys(RadSysNum).ElecEnergy = HighTempRadSys(RadSysNum).ElecPower * TimeStepSys * SecInHour;
+            HighTempRadSys(RadSysNum).ElecEnergy = HighTempRadSys(RadSysNum).ElecPower * TimeStepSys * DataGlobalConstants::SecInHour();
         } else {
             ShowWarningError("Someone forgot to add a high temperature radiant heater type to the reporting subroutine");
         }
         HighTempRadSys(RadSysNum).HeatPower = QHTRadSource(RadSysNum);
-        HighTempRadSys(RadSysNum).HeatEnergy = HighTempRadSys(RadSysNum).HeatPower * TimeStepSys * SecInHour;
+        HighTempRadSys(RadSysNum).HeatEnergy = HighTempRadSys(RadSysNum).HeatPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     Real64 SumHATsurf(int const ZoneNum) // Zone number

@@ -396,7 +396,8 @@ namespace HVACInterfaceManager {
         }
     }
 
-    void UpdatePlantLoopInterface(int const LoopNum,                // The 'inlet/outlet node' loop number
+    void UpdatePlantLoopInterface(EnergyPlusData &state,
+                                  int const LoopNum,                // The 'inlet/outlet node' loop number
                                   int const ThisLoopSideNum,        // The 'outlet node' LoopSide number
                                   int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
                                   int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
@@ -472,7 +473,7 @@ namespace HVACInterfaceManager {
         OldTankOutletTemp = Node(OtherLoopSideInletNode).Temp;
 
         // calculate the specific heat
-        Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, OldTankOutletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
+        Cp = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, OldTankOutletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
 
         // update the enthalpy
         Node(OtherLoopSideInletNode).Enthalpy = Cp * Node(OtherLoopSideInletNode).Temp;
@@ -482,7 +483,7 @@ namespace HVACInterfaceManager {
         auto &flow_supply_to_demand_tol(convergence.PlantFlowSupplyToDemandTolValue);
         if (CommonPipeType == 1 || CommonPipeType == 2) {
             // update the temperature
-            UpdateCommonPipe(LoopNum, ThisLoopSideNum, CommonPipeType, MixedOutletTemp);
+            UpdateCommonPipe(state, LoopNum, ThisLoopSideNum, CommonPipeType, MixedOutletTemp);
             Node(OtherLoopSideInletNode).Temp = MixedOutletTemp;
             TankOutletTemp = MixedOutletTemp;
             if (ThisLoopSideNum == DemandSide) {
@@ -505,7 +506,7 @@ namespace HVACInterfaceManager {
             Node(ThisLoopSideInletNode).MassFlowRateMaxAvail = Node(ThisLoopSideOutletNode).MassFlowRateMaxAvail;
 
         } else { // no common pipe
-            UpdateHalfLoopInletTemp(LoopNum, ThisLoopSideNum, TankOutletTemp);
+            UpdateHalfLoopInletTemp(state, LoopNum, ThisLoopSideNum, TankOutletTemp);
             // update the temperature
             Node(OtherLoopSideInletNode).Temp = TankOutletTemp;
             // Set the flow tolerance array
@@ -570,7 +571,7 @@ namespace HVACInterfaceManager {
 
     //***************
 
-    void UpdateHalfLoopInletTemp(int const LoopNum, int const TankInletLoopSide, Real64 &TankOutletTemp)
+    void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, Real64 &TankOutletTemp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -602,7 +603,6 @@ namespace HVACInterfaceManager {
 
         // Using/Aliasing
         using DataGlobals::HourOfDay;
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
@@ -660,7 +660,7 @@ namespace HVACInterfaceManager {
         LastTankOutletTemp = PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;
 
         // calculate the specific heat for the capacitance calculation
-        Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, LastTankOutletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
+        Cp = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, LastTankOutletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
         // set the fraction of loop mass assigned to each half loop outlet capacitance ('tank') calculation
 
         // calculate new loop inlet temperature.  The calculation is a simple 'tank' (thermal capacitance) calculation that includes:
@@ -671,7 +671,7 @@ namespace HVACInterfaceManager {
         // tank conditions each call.
         // Analytical solution for ODE, formulated for both final tank temp and average tank temp.
 
-        TimeStepSeconds = TimeStepSys * SecInHour;
+        TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour();
         MassFlowRate = Node(TankInletNode).MassFlowRate;
         PumpHeat = PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TotalPumpHeat;
         ThisTankMass = FracTotLoopMass * PlantLoop(LoopNum).Mass;
@@ -734,7 +734,7 @@ namespace HVACInterfaceManager {
         TankOutletTemp = TankAverageTemp;
     }
 
-    void UpdateCommonPipe(int const LoopNum, int const TankInletLoopSide, int const CommonPipeType, Real64 &MixedOutletTemp)
+    void UpdateCommonPipe(EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, int const CommonPipeType, Real64 &MixedOutletTemp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -766,7 +766,6 @@ namespace HVACInterfaceManager {
 
         // Using/Aliasing
         using DataGlobals::HourOfDay;
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
@@ -836,7 +835,7 @@ namespace HVACInterfaceManager {
         LastTankOutletTemp = PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;
 
         // calculate the specific heat for the capacitance calculation
-        Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, LastTankOutletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
+        Cp = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, LastTankOutletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
 
         // set the fraction of loop mass assigned to each half loop outlet capacitance ('tank') calculation
 
@@ -850,7 +849,7 @@ namespace HVACInterfaceManager {
         // no common pipe case.
         // calculation is separated because for common pipe, a different split for mass fraction is applied
         // The pump heat source is swapped around here compared to no common pipe (so pump heat sort stays on its own side).
-        TimeStepSeconds = TimeStepSys * SecInHour;
+        TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour();
         MassFlowRate = Node(TankInletNode).MassFlowRate;
         PumpHeat = PlantLoop(LoopNum).LoopSide(TankInletLoopSide).TotalPumpHeat;
         ThisTankMass = FracTotLoopMass * PlantLoop(LoopNum).Mass;
@@ -881,11 +880,11 @@ namespace HVACInterfaceManager {
         }
         // Common Pipe Simulation
         if (CommonPipeType == CommonPipe_Single) {
-            ManageSingleCommonPipe(LoopNum, TankOutletLoopSide, TankAverageTemp, MixedOutletTemp);
+            ManageSingleCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp, MixedOutletTemp);
             // 2-way (controlled) common pipe simulation
         } else if (CommonPipeType == CommonPipe_TwoWay) {
 
-            ManageTwoWayCommonPipe(LoopNum, TankOutletLoopSide, TankAverageTemp);
+            ManageTwoWayCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp);
             MixedOutletTemp = Node(TankOutletNode).Temp;
         }
 
@@ -894,7 +893,8 @@ namespace HVACInterfaceManager {
         PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LoopSideInlet_TankTemp = TankAverageTemp;
     }
 
-    void ManageSingleCommonPipe(int const LoopNum,           // plant loop number
+    void ManageSingleCommonPipe(EnergyPlusData &state,
+                                int const LoopNum,           // plant loop number
                                 int const LoopSide,          // plant loop side number
                                 Real64 const TankOutletTemp, // inlet temperature to the common pipe passed in from the capacitance calculation
                                 Real64 &MixedOutletTemp      // inlet temperature to the common pipe passed in from the capacitance calculation
@@ -950,7 +950,7 @@ namespace HVACInterfaceManager {
 
         // One time call to set up report variables and set common pipe 'type' flag
         if (OneTimeData) {
-            if (!CommonPipeSetupFinished) SetupCommonPipes();
+            if (!CommonPipeSetupFinished) SetupCommonPipes(state);
             MyEnvrnFlag.dimension(TotNumLoops, true);
             OneTimeData = false;
         }
@@ -1038,7 +1038,7 @@ namespace HVACInterfaceManager {
         }
     }
 
-    void ManageTwoWayCommonPipe(int const LoopNum, int const LoopSide, Real64 const TankOutletTemp)
+    void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, int const LoopSide, Real64 const TankOutletTemp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1113,7 +1113,7 @@ namespace HVACInterfaceManager {
 
         // one time setups
         if (OneTimeData) {
-            if (!CommonPipeSetupFinished) SetupCommonPipes();
+            if (!CommonPipeSetupFinished) SetupCommonPipes(state);
             MyEnvrnFlag.dimension(TotNumLoops, true);
             OneTimeData = false;
         }
@@ -1298,7 +1298,7 @@ namespace HVACInterfaceManager {
         Node(NodeNumPriIn).Temp = TempPriInlet;
     }
 
-    void SetupCommonPipes()
+    void SetupCommonPipes(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1350,19 +1350,19 @@ namespace HVACInterfaceManager {
 
                 } else if (SELECT_CASE_var == CommonPipe_Single) { // Uncontrolled ('single') common pipe
                     PlantCommonPipe(CurLoopNum).CommonPipeType = CommonPipe_Single;
-                    SetupOutputVariable("Plant Common Pipe Mass Flow Rate",
+                    SetupOutputVariable(state, "Plant Common Pipe Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         PlantCommonPipe(CurLoopNum).Flow,
                                         "System",
                                         "Average",
                                         PlantLoop(CurLoopNum).Name);
-                    SetupOutputVariable("Plant Common Pipe Temperature",
+                    SetupOutputVariable(state, "Plant Common Pipe Temperature",
                                         OutputProcessor::Unit::C,
                                         PlantCommonPipe(CurLoopNum).Temp,
                                         "System",
                                         "Average",
                                         PlantLoop(CurLoopNum).Name);
-                    SetupOutputVariable("Plant Common Pipe Flow Direction Status",
+                    SetupOutputVariable(state, "Plant Common Pipe Flow Direction Status",
                                         OutputProcessor::Unit::None,
                                         PlantCommonPipe(CurLoopNum).FlowDir,
                                         "System",
@@ -1379,25 +1379,25 @@ namespace HVACInterfaceManager {
 
                 } else if (SELECT_CASE_var == CommonPipe_TwoWay) { // Controlled ('two-way') common pipe
                     PlantCommonPipe(CurLoopNum).CommonPipeType = CommonPipe_TwoWay;
-                    SetupOutputVariable("Plant Common Pipe Primary Mass Flow Rate",
+                    SetupOutputVariable(state, "Plant Common Pipe Primary Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         PlantCommonPipe(CurLoopNum).PriCPLegFlow,
                                         "System",
                                         "Average",
                                         PlantLoop(CurLoopNum).Name);
-                    SetupOutputVariable("Plant Common Pipe Secondary Mass Flow Rate",
+                    SetupOutputVariable(state, "Plant Common Pipe Secondary Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         PlantCommonPipe(CurLoopNum).SecCPLegFlow,
                                         "System",
                                         "Average",
                                         PlantLoop(CurLoopNum).Name);
-                    SetupOutputVariable("Plant Common Pipe Primary to Secondary Mass Flow Rate",
+                    SetupOutputVariable(state, "Plant Common Pipe Primary to Secondary Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         PlantCommonPipe(CurLoopNum).PriToSecFlow,
                                         "System",
                                         "Average",
                                         PlantLoop(CurLoopNum).Name);
-                    SetupOutputVariable("Plant Common Pipe Secondary to Primary Mass Flow Rate",
+                    SetupOutputVariable(state, "Plant Common Pipe Secondary to Primary Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         PlantCommonPipe(CurLoopNum).SecToPriFlow,
                                         "System",

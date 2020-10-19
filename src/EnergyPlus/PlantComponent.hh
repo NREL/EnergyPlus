@@ -62,7 +62,8 @@ class PlantComponent
 public:
     virtual void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) = 0;
 
-    virtual void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+    virtual void getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
+                                     const PlantLocation &EP_UNUSED(calledFromLocation),
                                      Real64 &EP_UNUSED(MaxLoad),
                                      Real64 &EP_UNUSED(MinLoad),
                                      Real64 &EP_UNUSED(OptLoad))

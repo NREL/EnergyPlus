@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -63,8 +63,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace ICEngineElectricGenerator {
-
-    using DataGlobalConstants::iGeneratorICEngine;
 
     extern Real64 const ReferenceTemp; // Reference temperature by which lower heating
     // value is reported.  This should be subtracted
@@ -78,7 +76,7 @@ namespace ICEngineElectricGenerator {
         // Members
         std::string Name;   // user identifier
         std::string TypeOf; // Type of Generator
-        int CompType_Num;
+        GeneratorType CompType_Num;
         std::string FuelType;       // Type of Fuel - DIESEL, GASOLINE, GAS
         Real64 RatedPowerOutput;    // W - design nominal capacity of Generator
         int ElectricCircuitNode;    // Electric Circuit Node
@@ -140,7 +138,7 @@ namespace ICEngineElectricGenerator {
 
         // Default Constructor
         ICEngineGeneratorSpecs()
-            : TypeOf("Generator:InternalCombustionEngine"), CompType_Num(iGeneratorICEngine), RatedPowerOutput(0.0), ElectricCircuitNode(0),
+            : TypeOf("Generator:InternalCombustionEngine"), CompType_Num(GeneratorType::ICEngine), RatedPowerOutput(0.0), ElectricCircuitNode(0),
               MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), ElecOutputFuelRat(0.0), ElecOutputFuelCurve(0), RecJacHeattoFuelRat(0.0),
               RecJacHeattoFuelCurve(0), RecLubeHeattoFuelRat(0.0), RecLubeHeattoFuelCurve(0), TotExhausttoFuelRat(0.0), TotExhausttoFuelCurve(0),
               ExhaustTemp(0.0), ExhaustTempCurve(0), ErrExhaustTempIndex(0), UA(0.0), UACoef(2, 0.0), MaxExhaustperPowerOutput(0.0),
@@ -160,13 +158,13 @@ namespace ICEngineElectricGenerator {
 
         void CalcICEngineGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
-        void CalcICEngineGenHeatRecovery(Real64 EnergyRecovered, Real64 HeatRecMdot, Real64 &HRecRatio);
+        void CalcICEngineGenHeatRecovery(EnergyPlusData &state, Real64 EnergyRecovered, Real64 HeatRecMdot, Real64 &HRecRatio);
 
         void update();
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };

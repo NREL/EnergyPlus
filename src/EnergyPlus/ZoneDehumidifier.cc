@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -109,13 +108,11 @@ namespace ZoneDehumidifier {
     //   http://www.thermastor.com/HI-E-DRY-195/HI-E-DRY-195-Spec.pdf
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::StdBaroPress;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::ScheduleAlwaysOn;
-    using DataGlobals::SecInHour;
     using General::TrimSigDigits;
     using namespace ScheduleManager;
 
@@ -245,7 +242,8 @@ namespace ZoneDehumidifier {
 
         for (ZoneDehumidIndex = 1; ZoneDehumidIndex <= state.dataZoneDehumidifier->NumDehumidifiers; ++ZoneDehumidIndex) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           ZoneDehumidIndex,
                                           Alphas,
                                           NumAlphas,
@@ -267,7 +265,7 @@ namespace ZoneDehumidifier {
             if (lAlphaBlanks(2)) {
                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr = ScheduleAlwaysOn;
             } else {
-                state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr = GetScheduleIndex(Alphas(2)); // Convert schedule name to pointer
+                state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr = GetScheduleIndex(state, Alphas(2)); // Convert schedule name to pointer
                 if (state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr == 0) {
                     ShowSevereError(cAlphaFields(2) + " not found = " + Alphas(2));
                     ShowContinueError("Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
@@ -276,11 +274,11 @@ namespace ZoneDehumidifier {
             }
 
             // A3 , \field Air Inlet Node Name
-            state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).AirInletNodeNum = GetOnlySingleNode(
+            state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).AirInletNodeNum = GetOnlySingleNode(state,
                 Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
             // A4 , \field Air Outlet Node Name
-            state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).AirOutletNodeNum = GetOnlySingleNode(
+            state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).AirOutletNodeNum = GetOnlySingleNode(state,
                 Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             // N1,  \field Rated Water Removal
@@ -443,37 +441,37 @@ namespace ZoneDehumidifier {
 
         for (ZoneDehumidIndex = 1; ZoneDehumidIndex <= state.dataZoneDehumidifier->NumDehumidifiers; ++ZoneDehumidIndex) {
             // Set up report variables for the dehumidifiers
-            SetupOutputVariable("Zone Dehumidifier Sensible Heating Rate",
+            SetupOutputVariable(state, "Zone Dehumidifier Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SensHeatingRate,
                                 "System",
                                 "Average",
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Sensible Heating Energy",
+            SetupOutputVariable(state, "Zone Dehumidifier Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SensHeatingEnergy,
                                 "System",
                                 "Sum",
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Removed Water Mass Flow Rate",
+            SetupOutputVariable(state, "Zone Dehumidifier Removed Water Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).WaterRemovalRate,
                                 "System",
                                 "Average",
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Removed Water Mass",
+            SetupOutputVariable(state, "Zone Dehumidifier Removed Water Mass",
                                 OutputProcessor::Unit::kg,
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).WaterRemoved,
                                 "System",
                                 "Sum",
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Electricity Rate",
+            SetupOutputVariable(state, "Zone Dehumidifier Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).ElecPower,
                                 "System",
                                 "Average",
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Electricity Energy",
+            SetupOutputVariable(state, "Zone Dehumidifier Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).ElecConsumption,
                                 "System",
@@ -484,31 +482,31 @@ namespace ZoneDehumidifier {
                                 "COOLING",
                                 _,
                                 "System");
-            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electricity Rate",
+            SetupOutputVariable(state, "Zone Dehumidifier Off Cycle Parasitic Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).OffCycleParasiticElecPower,
                                 "System",
                                 "Average",
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electricity Energy",
+            SetupOutputVariable(state, "Zone Dehumidifier Off Cycle Parasitic Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).OffCycleParasiticElecCons,
                                 "System",
                                 "Sum",
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Part Load Ratio",
+            SetupOutputVariable(state, "Zone Dehumidifier Part Load Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).DehumidPLR,
                                 "System",
                                 "Average",
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Runtime Fraction",
+            SetupOutputVariable(state, "Zone Dehumidifier Runtime Fraction",
                                 OutputProcessor::Unit::None,
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).DehumidRTF,
                                 "System",
                                 "Average",
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Outlet Air Temperature",
+            SetupOutputVariable(state, "Zone Dehumidifier Outlet Air Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).OutletAirTemp,
                                 "System",
@@ -516,13 +514,13 @@ namespace ZoneDehumidifier {
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
 
             if (state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).CondensateCollectMode == state.dataZoneDehumidifier->CondensateToTank) {
-                SetupOutputVariable("Zone Dehumidifier Condensate Volume Flow Rate",
+                SetupOutputVariable(state, "Zone Dehumidifier Condensate Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).DehumidCondVolFlowRate,
                                     "System",
                                     "Average",
                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
-                SetupOutputVariable("Zone Dehumidifier Condensate Volume",
+                SetupOutputVariable(state, "Zone Dehumidifier Condensate Volume",
                                     OutputProcessor::Unit::m3,
                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).DehumidCondVol,
                                     "System",
@@ -796,7 +794,7 @@ namespace ZoneDehumidifier {
             WaterRemovalVolRate = WaterRemovalRateFactor * state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedWaterRemoval;
 
             WaterRemovalMassRate =
-                WaterRemovalVolRate / (24.0 * SecInHour * 1000.0) *
+                WaterRemovalVolRate / (24.0 * DataGlobalConstants::SecInHour() * 1000.0) *
                 RhoH2O(max((InletAirTemp - 11.0), 1.0)); //(L/d)/(24 hr/day *3600 sec/hr * 1000 L/m3) | Density of water, minimum temp = 1.0C
 
             if (WaterRemovalMassRate > 0.0) {
@@ -1073,7 +1071,7 @@ namespace ZoneDehumidifier {
         Real64 OutletAirTemp;     // Dry-bulb temperature of air leaving the dehumidifier (C)
         int AirInletNodeNum;      // Node number corresponding to the air entering dehumidifier
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
 
         state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).SensHeatingEnergy = state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).SensHeatingRate * ReportingConstant;
         state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).WaterRemoved = state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).WaterRemovalRate * ReportingConstant;

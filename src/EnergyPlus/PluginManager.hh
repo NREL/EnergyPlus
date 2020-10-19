@@ -48,11 +48,15 @@
 #ifndef EPLUS_PLUGIN_MANAGER_HH
 #define EPLUS_PLUGIN_MANAGER_HH
 
+// C++ Headers
 #include <iomanip>
 #include <queue>
 #include <utility>
 #include <vector>
+
+// EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 #if LINK_WITH_PYTHON
@@ -76,8 +80,8 @@ struct EnergyPlusData;
 
 namespace PluginManagement {
 
-    void registerNewCallback(EnergyPlusData &state, int iCalledFrom, const std::function<void (void *)>& f);
-    void runAnyRegisteredCallbacks(EnergyPlusData &state, int iCalledFrom, bool &anyRan);
+    void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void (void *)>& f);
+    void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan);
     void onBeginEnvironment();
     std::string pythonStringForUsage();
 
@@ -108,7 +112,7 @@ namespace PluginManagement {
 
         // methods
         static void reportPythonError();
-        bool run(EnergyPlusData &state, int iCallingPoint) const; // calls main() on this plugin instance
+        bool run(EnergyPlusData &state, EMSManager::EMSCallFrom iCallingPoint) const; // calls main() on this plugin instance
 
         // plugin calling point hooks
         const char * sHookBeginNewEnvironment = "on_begin_new_environment";
@@ -180,7 +184,7 @@ namespace PluginManagement {
         static int numActiveCallbacks();
         static void addToPythonPath(const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
-        static void setupOutputVariables();
+        static void setupOutputVariables(EnergyPlusData &state);
 
         int maxGlobalVariableIndex = -1;
         void addGlobalVariable(const std::string& name);

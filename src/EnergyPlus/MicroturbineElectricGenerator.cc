@@ -157,7 +157,8 @@ namespace MicroturbineElectricGenerator {
             int IOStat;
             Array1D<Real64> NumArray(19);
             Array1D_string AlphArray(20);
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           GeneratorNum,
                                           AlphArray,
                                           NumAlphas,
@@ -409,7 +410,7 @@ namespace MicroturbineElectricGenerator {
             }
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(7)) {
-                MTGenerator(GeneratorNum).HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(7),
+                MTGenerator(GeneratorNum).HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(7),
                                                                                                     ErrorsFound,
                                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                                     MTGenerator(GeneratorNum).Name,
@@ -420,7 +421,7 @@ namespace MicroturbineElectricGenerator {
             }
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(8)) {
-                MTGenerator(GeneratorNum).HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(8),
+                MTGenerator(GeneratorNum).HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(8),
                                                                                                      ErrorsFound,
                                                                                                      DataIPShortCuts::cCurrentModuleObject,
                                                                                                      MTGenerator(GeneratorNum).Name,
@@ -629,7 +630,7 @@ namespace MicroturbineElectricGenerator {
             //             MTGenerator(GeneratorNum)%HeatRecOutletNodeNum .NE. 0) THEN'
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(15)) {
-                MTGenerator(GeneratorNum).CombustionAirInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(15),
+                MTGenerator(GeneratorNum).CombustionAirInletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(15),
                                                                                                           ErrorsFound,
                                                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                                                           AlphArray(1),
@@ -641,7 +642,7 @@ namespace MicroturbineElectricGenerator {
 
             //    Combustion air inlet node must be an outside air node
             if (!DataIPShortCuts::lAlphaFieldBlanks(15) &&
-                !OutAirNodeManager::CheckOutAirNodeNumber(MTGenerator(GeneratorNum).CombustionAirInletNodeNum)) {
+                !OutAirNodeManager::CheckOutAirNodeNumber(state, MTGenerator(GeneratorNum).CombustionAirInletNodeNum)) {
                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
                 ShowContinueError(DataIPShortCuts::cAlphaFieldNames(15) + " is not a valid Outdoor Air Node = " + AlphArray(15));
                 ShowContinueError("it does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
@@ -649,7 +650,7 @@ namespace MicroturbineElectricGenerator {
             }
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(16)) {
-                MTGenerator(GeneratorNum).CombustionAirOutletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(16),
+                MTGenerator(GeneratorNum).CombustionAirOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(16),
                                                                                                            ErrorsFound,
                                                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                                                            AlphArray(1),
@@ -763,11 +764,11 @@ namespace MicroturbineElectricGenerator {
         }
     }
 
-    void MTGeneratorSpecs::setupOutputVars()
+    void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Produced AC Electricity Energy",
+        SetupOutputVariable(state, "Generator Produced AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->EnergyGen,
                             "System",
@@ -779,14 +780,14 @@ namespace MicroturbineElectricGenerator {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Generator LHV Basis Electric Efficiency", OutputProcessor::Unit::None, this->ElectricEfficiencyLHV, "System", "Average", this->Name);
 
         //    Fuel specific report variables
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Generator " + this->FuelType + " HHV Basis Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRateHHV, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator " + this->FuelType + " HHV Basis Energy",
+        SetupOutputVariable(state, "Generator " + this->FuelType + " HHV Basis Energy",
                             OutputProcessor::Unit::J,
                             this->FuelEnergyHHV,
                             "System",
@@ -798,20 +799,20 @@ namespace MicroturbineElectricGenerator {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Generator " + this->FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, this->FuelMdot, "System", "Average", this->Name);
 
         //    general fuel use report (to match other generators)
-        SetupOutputVariable("Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRateHHV, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRateHHV, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, this->FuelEnergyHHV, "System", "Sum", this->Name);
+        SetupOutputVariable(state, "Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, this->FuelEnergyHHV, "System", "Sum", this->Name);
 
         //    Heat recovery (to water) report variables
         if (this->HeatRecActive) {
 
-            SetupOutputVariable("Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->QHeatRecovered, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->QHeatRecovered, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Produced Thermal Energy",
+            SetupOutputVariable(state, "Generator Produced Thermal Energy",
                                 OutputProcessor::Unit::J,
                                 this->ExhaustEnergyRec,
                                 "System",
@@ -823,24 +824,24 @@ namespace MicroturbineElectricGenerator {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Thermal Efficiency LHV Basis", OutputProcessor::Unit::None, this->ThermalEfficiencyLHV, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, this->HeatRecInletTemp, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, this->HeatRecOutletTemp, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Heat Recovery Water Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdot, "System", "Average", this->Name);
         }
 
         if (this->StandbyPower > 0.0) { // Report Standby Power if entered by user
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Standby Electricity Rate", OutputProcessor::Unit::W, this->StandbyPowerRate, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Standby Electricity Energy",
+            SetupOutputVariable(state, "Generator Standby Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->StandbyEnergy,
                                 "System",
@@ -854,18 +855,18 @@ namespace MicroturbineElectricGenerator {
         }
 
         if (this->AncillaryPower > 0.0) { // Report Ancillary Power if entered by user
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Ancillary Electricity Rate", OutputProcessor::Unit::W, this->AncillaryPowerRate, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Ancillary Electricity Energy", OutputProcessor::Unit::J, this->AncillaryEnergy, "System", "Sum", this->Name);
+            SetupOutputVariable(state, "Generator Ancillary Electricity Energy", OutputProcessor::Unit::J, this->AncillaryEnergy, "System", "Sum", this->Name);
         }
 
         //   Report combustion air outlet conditions if exhaust air calculations are active
         if (this->ExhAirCalcsActive) {
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Exhaust Air Mass Flow Rate", OutputProcessor::Unit::kg_s, this->ExhaustAirMassFlowRate, "System", "Average", this->Name);
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Generator Exhaust Air Temperature", OutputProcessor::Unit::C, this->ExhaustAirTemperature, "System", "Average", this->Name);
         }
     }
@@ -880,7 +881,7 @@ namespace MicroturbineElectricGenerator {
         // calls from the ElectricPowerServiceManger call the init, calc, and update worker functions
     }
 
-    void MTGeneratorSpecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void MTGeneratorSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MaxLoad = 0.0;
         MinLoad = 0.0;
@@ -909,7 +910,7 @@ namespace MicroturbineElectricGenerator {
         bool errFlag;
 
         if (this->myFlag) {
-            this->setupOutputVars();
+            this->setupOutputVars(state);
             this->myFlag = false;
         }
 
@@ -938,8 +939,9 @@ namespace MicroturbineElectricGenerator {
         if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
 
             // size mass flow rate
-            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
-                                                           DataGlobals::InitConvTemp,
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           DataPlant::PlantLoop(this->HRLoopNum).FluidName,
+                                                           DataGlobalConstants::InitConvTemp(),
                                                            DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
                                                            RoutineName);
 
@@ -1112,7 +1114,7 @@ namespace MicroturbineElectricGenerator {
         if (this->HeatRecActive) {
             HeatRecInTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
             HeatRecCp = FluidProperties::GetSpecificHeatGlycol(
-                DataPlant::PlantLoop(this->HRLoopNum).FluidName, HeatRecInTemp, DataPlant::PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
+                state, DataPlant::PlantLoop(this->HRLoopNum).FluidName, HeatRecInTemp, DataPlant::PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
             heatRecMdot = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
         } else {
             HeatRecInTemp = 0.0;
@@ -1431,7 +1433,7 @@ namespace MicroturbineElectricGenerator {
             //     Calculate heat recovery rate modifier curve output (function of water [volumetric] flow rate)
             if (this->HeatRecRateFWaterFlowCurveNum > 0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(
-                    DataPlant::PlantLoop(this->HRLoopNum).FluidName, HeatRecInTemp, DataPlant::PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
+                    state, DataPlant::PlantLoop(this->HRLoopNum).FluidName, HeatRecInTemp, DataPlant::PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
 
                 // Heat recovery fluid flow rate (m3/s)
                 Real64 HeatRecVolFlowRate = heatRecMdot / rho;
@@ -1747,9 +1749,9 @@ namespace MicroturbineElectricGenerator {
                 DataLoopNode::Node(this->CombustionAirInletNodeNum).MassFlowRateMinAvail;
         }
 
-        this->EnergyGen = this->ElecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->ExhaustEnergyRec = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->EnergyGen = this->ElecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->ExhaustEnergyRec = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         if (this->FuelEnergyUseRateLHV > 0.0) {
             this->ElectricEfficiencyLHV = this->ElecPowerGenerated / this->FuelEnergyUseRateLHV;
             this->ThermalEfficiencyLHV = this->QHeatRecovered / this->FuelEnergyUseRateLHV;
@@ -1757,8 +1759,8 @@ namespace MicroturbineElectricGenerator {
             this->ElectricEfficiencyLHV = 0.0;
             this->ThermalEfficiencyLHV = 0.0;
         }
-        this->AncillaryEnergy = this->AncillaryPowerRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->StandbyEnergy = this->StandbyPowerRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->AncillaryEnergy = this->AncillaryPowerRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->StandbyEnergy = this->StandbyPowerRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
 } // namespace MicroturbineElectricGenerator

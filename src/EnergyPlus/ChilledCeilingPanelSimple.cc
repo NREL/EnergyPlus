@@ -276,7 +276,8 @@ namespace CoolingPanelSimple {
         // Get the data from the user input related to cooling panels
         for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
 
-            inputProcessor->getObjectItem(cCMO_CoolingPanel_Simple,
+            inputProcessor->getObjectItem(state,
+                                          cCMO_CoolingPanel_Simple,
                                           CoolingPanelNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -312,7 +313,7 @@ namespace CoolingPanelSimple {
             if (lAlphaFieldBlanks(2)) {
                 ThisCP.SchedPtr = ScheduleAlwaysOn;
             } else {
-                ThisCP.SchedPtr = GetScheduleIndex(cAlphaArgs(2));
+                ThisCP.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ThisCP.SchedPtr == 0) {
                     ShowSevereError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(2) + "=\"" +
                                     cAlphaArgs(2) + "\" not found.");
@@ -321,11 +322,11 @@ namespace CoolingPanelSimple {
             }
 
             // Get inlet node number
-            ThisCP.WaterInletNode = GetOnlySingleNode(
+            ThisCP.WaterInletNode = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCMO_CoolingPanel_Simple, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
             // Get outlet node number
-            ThisCP.WaterOutletNode = GetOnlySingleNode(
+            ThisCP.WaterOutletNode = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCMO_CoolingPanel_Simple, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCMO_CoolingPanel_Simple, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Chilled Water Nodes");
 
@@ -465,7 +466,7 @@ namespace CoolingPanelSimple {
             }
 
             ThisCP.ColdSetptSched = cAlphaArgs(7);
-            ThisCP.ColdSetptSchedPtr = GetScheduleIndex(ThisCP.ColdSetptSched);
+            ThisCP.ColdSetptSchedPtr = GetScheduleIndex(state, ThisCP.ColdSetptSched);
             if ((ThisCP.ColdSetptSchedPtr == 0) && (!lAlphaFieldBlanks(7))) {
                 ShowSevereError(cAlphaFieldNames(7) + " not found: " + ThisCP.ColdSetptSched);
                 ShowContinueError("Occurs in " + RoutineName + " = " + cAlphaArgs(1));
@@ -610,32 +611,32 @@ namespace CoolingPanelSimple {
         // Setup Report variables for the Coils
         for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
             // CurrentModuleObject='ZoneHVAC:CoolingPanel:RadiantConvective:Water'
-            SetupOutputVariable("Cooling Panel Total Cooling Rate",
+            SetupOutputVariable(state, "Cooling Panel Total Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).Power,
                                 "System",
                                 "Average",
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
-            SetupOutputVariable("Cooling Panel Total System Cooling Rate",
+            SetupOutputVariable(state, "Cooling Panel Total System Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).TotPower,
                                 "System",
                                 "Average",
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
-            SetupOutputVariable("Cooling Panel Convective Cooling Rate",
+            SetupOutputVariable(state, "Cooling Panel Convective Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ConvPower,
                                 "System",
                                 "Average",
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
-            SetupOutputVariable("Cooling Panel Radiant Cooling Rate",
+            SetupOutputVariable(state, "Cooling Panel Radiant Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).RadPower,
                                 "System",
                                 "Average",
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
 
-            SetupOutputVariable("Cooling Panel Total Cooling Energy",
+            SetupOutputVariable(state, "Cooling Panel Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).Energy,
                                 "System",
@@ -646,7 +647,7 @@ namespace CoolingPanelSimple {
                                 "COOLINGPANEL",
                                 _,
                                 "System");
-            SetupOutputVariable("Cooling Panel Total System Cooling Energy",
+            SetupOutputVariable(state, "Cooling Panel Total System Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).TotEnergy,
                                 "System",
@@ -657,32 +658,32 @@ namespace CoolingPanelSimple {
                                 "COOLINGPANEL",
                                 _,
                                 "System");
-            SetupOutputVariable("Cooling Panel Convective Cooling Energy",
+            SetupOutputVariable(state, "Cooling Panel Convective Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ConvEnergy,
                                 "System",
                                 "Sum",
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
-            SetupOutputVariable("Cooling Panel Radiant Cooling Energy",
+            SetupOutputVariable(state, "Cooling Panel Radiant Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).RadEnergy,
                                 "System",
                                 "Sum",
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
 
-            SetupOutputVariable("Cooling Panel Water Mass Flow Rate",
+            SetupOutputVariable(state, "Cooling Panel Water Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).WaterMassFlowRate,
                                 "System",
                                 "Average",
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
-            SetupOutputVariable("Cooling Panel Water Inlet Temperature",
+            SetupOutputVariable(state, "Cooling Panel Water Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).WaterInletTemp,
                                 "System",
                                 "Average",
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
-            SetupOutputVariable("Cooling Panel Water Outlet Temperature",
+            SetupOutputVariable(state, "Cooling Panel Water Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).WaterOutletTemp,
                                 "System",
@@ -792,7 +793,7 @@ namespace CoolingPanelSimple {
                 // set design mass flow rates
                 if (ThisCP.WaterInletNode > 0) {
                     rho = GetDensityGlycol(
-                        PlantLoop(ThisCP.LoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+                        state, PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::CWInitConvTemp(), PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
                     ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
                     InitComponentNodes(0.0,
                                        ThisCP.WaterMassFlowRateMax,
@@ -810,7 +811,7 @@ namespace CoolingPanelSimple {
         if (BeginEnvrnFlag && MyEnvrnFlag(CoolingPanelNum)) {
             // Initialize
 
-            rho = GetDensityGlycol(PlantLoop(ThisCP.LoopNum).FluidName, InitConvTemp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+            rho = GetDensityGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::InitConvTemp(), PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
 
             ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
 
@@ -825,7 +826,7 @@ namespace CoolingPanelSimple {
 
             ThisInNode.Temp = 7.0;
 
-            Cp = GetSpecificHeatGlycol(PlantLoop(ThisCP.LoopNum).FluidName, ThisInNode.Temp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+            Cp = GetSpecificHeatGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, ThisInNode.Temp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
 
             ThisInNode.Enthalpy = Cp * ThisInNode.Temp;
             ThisInNode.Quality = 0.0;
@@ -1033,8 +1034,8 @@ namespace CoolingPanelSimple {
                     PltSizCoolNum = MyPlantSizingIndex(CompType, ThisCP.EquipID, ThisCP.WaterInletNode, ThisCP.WaterOutletNode, ErrorsFound);
                     if (PltSizCoolNum > 0) {
                         if (DesCoilLoad >= SmallLoad) {
-                            rho = GetDensityGlycol(PlantLoop(ThisCP.LoopNum).FluidName, 5., PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
-                            Cp = GetSpecificHeatGlycol(PlantLoop(ThisCP.LoopNum).FluidName, 5.0, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+                            rho = GetDensityGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, 5., PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+                            Cp = GetSpecificHeatGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, 5.0, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
                             WaterVolFlowMaxCoolDes = DesCoilLoad / (PlantSizData(PltSizCoolNum).DeltaT * Cp * rho);
                         } else {
                             WaterVolFlowMaxCoolDes = 0.0;
@@ -1306,7 +1307,7 @@ namespace CoolingPanelSimple {
 
             if (QZnReq < -SmallLoad && !CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
 
-                Cp = GetSpecificHeatGlycol(PlantLoop(this->LoopNum).FluidName, waterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+                Cp = GetSpecificHeatGlycol(state, PlantLoop(this->LoopNum).FluidName, waterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
                 // Find the actual load: this parameter modifies what the response of the system should be.  For total load control, the system tries
                 // to meet the QZnReq.  For convective load control, the convective output of the device equals QZnReq which means that the load on
@@ -1388,7 +1389,7 @@ namespace CoolingPanelSimple {
 
         if (CoolingPanelOn) {
             // Now simulate the system...
-            Cp = GetSpecificHeatGlycol(PlantLoop(this->LoopNum).FluidName, waterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            Cp = GetSpecificHeatGlycol(state, PlantLoop(this->LoopNum).FluidName, waterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
             Effectiveness = 1.0 - exp(-this->UA / (waterMassFlowRate * Cp));
             if (Effectiveness <= 0.0) {
                 Effectiveness = 0.0;
@@ -1407,7 +1408,7 @@ namespace CoolingPanelSimple {
                 // Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
                 DistributeCoolingPanelRadGains(state);
                 // Now "simulate" the system by recalculating the heat balances
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.files, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
 
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
@@ -1680,10 +1681,10 @@ namespace CoolingPanelSimple {
         this->ConvPower = -this->ConvPower;
         this->RadPower = -this->RadPower;
 
-        this->TotEnergy = this->TotPower * TimeStepSys * SecInHour;
-        this->Energy = this->Power * TimeStepSys * SecInHour;
-        this->ConvEnergy = this->ConvPower * TimeStepSys * SecInHour;
-        this->RadEnergy = this->RadPower * TimeStepSys * SecInHour;
+        this->TotEnergy = this->TotPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->Energy = this->Power * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->ConvEnergy = this->ConvPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->RadEnergy = this->RadPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     Real64 SumHATsurf(int const ZoneNum) // Zone number

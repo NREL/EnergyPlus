@@ -64,7 +64,6 @@
 namespace EnergyPlus {
 
 // Forward declarations
-class IOFiles;
 struct EnergyPlusData;
 
 namespace AirflowNetworkBalanceManager {
@@ -154,7 +153,7 @@ namespace AirflowNetworkBalanceManager {
 
     void UpdateAirflowNetwork(EnergyPlusData &state, Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
 
-    void AirflowNetworkVentingControl(int i,       // AirflowNetwork surface number
+    void AirflowNetworkVentingControl(EnergyPlusData &state, int i,       // AirflowNetwork surface number
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
     );
 

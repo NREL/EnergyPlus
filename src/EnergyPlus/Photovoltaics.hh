@@ -55,9 +55,13 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace Photovoltaics {
 
@@ -72,14 +76,15 @@ namespace Photovoltaics {
 
     void clear_state();
 
-    void SimPVGenerator(int const GeneratorType,          // type of Generator !unused1208
+    void SimPVGenerator(EnergyPlusData &state,
+                        GeneratorType const GeneratorType,          // type of Generator
                         std::string const &GeneratorName, // user specified name of Generator
                         int &GeneratorIndex,
                         bool const RunFlag, // is PV ON or OFF as determined by schedules in ElecLoadCenter
-                        Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on" !unused1208
+                        Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on"
     );
 
-    void GetPVGeneratorResults(int const GeneratorType, // type of Generator !unused1208
+    void GetPVGeneratorResults(GeneratorType const GeneratorType, // type of Generator
                                int const GeneratorIndex,
                                Real64 &GeneratorPower,  // electrical power
                                Real64 &GeneratorEnergy, // electrical energy
@@ -88,7 +93,7 @@ namespace Photovoltaics {
 
     // *************
 
-    void GetPVInput();
+    void GetPVInput(EnergyPlusData &state);
 
     int GetPVZone(int const SurfNum);
 
@@ -98,11 +103,11 @@ namespace Photovoltaics {
                       bool const RunFlag // unused1208
     );
 
-    void ReportPV(int const PVnum);
+    void ReportPV(EnergyPlusData &state, int const PVnum);
 
     // *************
 
-    void CalcSandiaPV(int const PVnum,   // ptr to current PV system
+    void CalcSandiaPV(EnergyPlusData &state, int const PVnum,   // ptr to current PV system
                       bool const RunFlag // controls if generator is scheduled *ON*
     );
 
@@ -113,7 +118,7 @@ namespace Photovoltaics {
 
     // *************
 
-    void CalcTRNSYSPV(int const PVnum,   // BTG added intent
+    void CalcTRNSYSPV(EnergyPlusData &state, int const PVnum,   // BTG added intent
                       bool const RunFlag // BTG added intent    !flag tells whether the PV is ON or OFF
     );
 

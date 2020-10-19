@@ -127,7 +127,6 @@ namespace FanCoilUnits {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataSizing;
     using DataEnvironment::OutBaroPress;
@@ -136,7 +135,6 @@ namespace FanCoilUnits {
     using DataGlobals::BeginDayFlag;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;
@@ -401,7 +399,8 @@ namespace FanCoilUnits {
         // loop over 4 pipe fan coil units; get and load the input data
         for (FanCoilIndex = 1; FanCoilIndex <= Num4PipeFanCoils; ++FanCoilIndex) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           FanCoilIndex,
                                           Alphas,
                                           NumAlphas,
@@ -427,7 +426,7 @@ namespace FanCoilUnits {
             if (lAlphaBlanks(2)) {
                 FanCoil(FanCoilNum).SchedPtr = ScheduleAlwaysOn;
             } else {
-                FanCoil(FanCoilNum).SchedPtr = GetScheduleIndex(Alphas(2)); // convert schedule name to pointer
+                FanCoil(FanCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (FanCoil(FanCoilNum).SchedPtr == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid");
                     ShowContinueError("invalid-not found: " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
@@ -458,7 +457,7 @@ namespace FanCoilUnits {
             }
 
             FanCoil(FanCoilNum).SchedOutAir = Alphas(4);
-            FanCoil(FanCoilNum).SchedOutAirPtr = GetScheduleIndex(Alphas(4)); // convert schedule name to pointer
+            FanCoil(FanCoilNum).SchedOutAirPtr = GetScheduleIndex(state, Alphas(4)); // convert schedule name to pointer
             if (FanCoil(FanCoilNum).SchedOutAirPtr == 0 && (!lAlphaBlanks(4))) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
                 ShowContinueError("illegal value: " + cAlphaFields(4) + "=\"" + Alphas(4) + "\".");
@@ -481,7 +480,7 @@ namespace FanCoilUnits {
 
             FanCoil(FanCoilNum).OutAirVolFlow = Numbers(4);
 
-            FanCoil(FanCoilNum).AirInNode = GetOnlySingleNode(Alphas(5),
+            FanCoil(FanCoilNum).AirInNode = GetOnlySingleNode(state, Alphas(5),
                                                               ErrorsFound,
                                                               FanCoil(FanCoilNum).UnitType,
                                                               Alphas(1),
@@ -490,7 +489,7 @@ namespace FanCoilUnits {
                                                               1,
                                                               ObjectIsParent); // air input node
 
-            FanCoil(FanCoilNum).AirOutNode = GetOnlySingleNode(Alphas(6),
+            FanCoil(FanCoilNum).AirOutNode = GetOnlySingleNode(state, Alphas(6),
                                                                ErrorsFound,
                                                                FanCoil(FanCoilNum).UnitType,
                                                                Alphas(1),
@@ -504,13 +503,13 @@ namespace FanCoilUnits {
             // check to see if local OA mixer specified
             if (!lAlphaBlanks(8)) {
                 errFlag = false;
-                ValidateComponent(FanCoil(FanCoilNum).OAMixType, FanCoil(FanCoilNum).OAMixName, errFlag, CurrentModuleObject);
+                ValidateComponent(state, FanCoil(FanCoilNum).OAMixType, FanCoil(FanCoilNum).OAMixName, errFlag, CurrentModuleObject);
                 if (errFlag) {
                     ShowContinueError("specified in " + CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name + "\".");
                     ErrorsFound = true;
                 } else {
                     // Get outdoor air mixer node numbers
-                    OANodeNums = GetOAMixerNodeNumbers(FanCoil(FanCoilNum).OAMixName, errFlag);
+                    OANodeNums = GetOAMixerNodeNumbers(state, FanCoil(FanCoilNum).OAMixName, errFlag);
                     if (errFlag) {
                         ShowContinueError("that was specified in " + CurrentModuleObject + " = " + FanCoil(FanCoilNum).Name);
                         ShowContinueError("..OutdoorAir:Mixer is required. Enter an OutdoorAir:Mixer object with this name.");
@@ -568,7 +567,7 @@ namespace FanCoilUnits {
                     }
                 }
                 IsNotOK = false;
-                ValidateComponent(FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK, FanCoil(FanCoilNum).UnitType);
+                ValidateComponent(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK, FanCoil(FanCoilNum).UnitType);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\".");
                     ErrorsFound = true;
@@ -605,7 +604,7 @@ namespace FanCoilUnits {
                 FanCoil(FanCoilNum).HCoilType_Num = HCoil_Water;
                 FanCoil(FanCoilNum).HCoilPlantTypeOfNum = TypeOf_CoilWaterSimpleHeating;
                 IsNotOK = false;
-                ValidateComponent(FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\".");
                     ErrorsFound = true;
@@ -625,7 +624,7 @@ namespace FanCoilUnits {
             } else if (UtilityRoutines::SameString(Alphas(13), "Coil:Heating:Electric")) {
                 FanCoil(FanCoilNum).HCoilType_Num = HCoil_Electric;
                 IsNotOK = false;
-                ValidateComponent(FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, IsNotOK, CurrentModuleObject);
+                ValidateComponent(state, FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\".");
                     ErrorsFound = true;
@@ -665,7 +664,7 @@ namespace FanCoilUnits {
             }
 
             errFlag = false;
-            ValidateComponent(FanCoil(FanCoilNum).FanType, FanCoil(FanCoilNum).FanName, errFlag, CurrentModuleObject);
+            ValidateComponent(state, FanCoil(FanCoilNum).FanType, FanCoil(FanCoilNum).FanName, errFlag, CurrentModuleObject);
             if (errFlag) {
                 ShowContinueError("specified in " + CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name + "\".");
                 ErrorsFound = true;
@@ -879,7 +878,7 @@ namespace FanCoilUnits {
             }
             if (FanCoil(FanCoilNum).CapCtrlMeth == "MULTISPEEDFAN") {
                 if (!lAlphaBlanks(17)) {
-                    FanCoil(FanCoilNum).FanOpModeSchedPtr = GetScheduleIndex(Alphas(17));
+                    FanCoil(FanCoilNum).FanOpModeSchedPtr = GetScheduleIndex(state, Alphas(17));
                     if (FanCoil(FanCoilNum).FanType_Num != FanType_SimpleOnOff &&
                         FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                         ShowSevereError(CurrentModuleObject + " = " + FanCoil(FanCoilNum).Name);
@@ -992,63 +991,63 @@ namespace FanCoilUnits {
         for (FanCoilNum = 1; FanCoilNum <= NumFanCoils; ++FanCoilNum) {
             // Setup Report variables for the Fan Coils
             // CurrentModuleObject='ZoneHVAC:FourPipeFanCoil'
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Fan Coil Heating Rate", OutputProcessor::Unit::W, FanCoil(FanCoilNum).HeatPower, "System", "Average", FanCoil(FanCoilNum).Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Fan Coil Heating Energy", OutputProcessor::Unit::J, FanCoil(FanCoilNum).HeatEnergy, "System", "Sum", FanCoil(FanCoilNum).Name);
-            SetupOutputVariable("Fan Coil Total Cooling Rate",
+            SetupOutputVariable(state, "Fan Coil Total Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 FanCoil(FanCoilNum).TotCoolPower,
                                 "System",
                                 "Average",
                                 FanCoil(FanCoilNum).Name);
-            SetupOutputVariable("Fan Coil Total Cooling Energy",
+            SetupOutputVariable(state, "Fan Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 FanCoil(FanCoilNum).TotCoolEnergy,
                                 "System",
                                 "Sum",
                                 FanCoil(FanCoilNum).Name);
-            SetupOutputVariable("Fan Coil Sensible Cooling Rate",
+            SetupOutputVariable(state, "Fan Coil Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 FanCoil(FanCoilNum).SensCoolPower,
                                 "System",
                                 "Average",
                                 FanCoil(FanCoilNum).Name);
-            SetupOutputVariable("Fan Coil Sensible Cooling Energy",
+            SetupOutputVariable(state, "Fan Coil Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 FanCoil(FanCoilNum).SensCoolEnergy,
                                 "System",
                                 "Sum",
                                 FanCoil(FanCoilNum).Name);
-            SetupOutputVariable("Fan Coil Fan Electricity Rate",
+            SetupOutputVariable(state, "Fan Coil Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 FanCoil(FanCoilNum).ElecPower,
                                 "System",
                                 "Average",
                                 FanCoil(FanCoilNum).Name);
-            SetupOutputVariable("Fan Coil Fan Electricity Energy",
+            SetupOutputVariable(state, "Fan Coil Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 FanCoil(FanCoilNum).ElecEnergy,
                                 "System",
                                 "Sum",
                                 FanCoil(FanCoilNum).Name);
             if (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_CycFan || FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_MultiSpeedFan) {
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "Fan Coil Runtime Fraction", OutputProcessor::Unit::None, FanCoil(FanCoilNum).PLR, "System", "Average", FanCoil(FanCoilNum).Name);
-                SetupOutputVariable("Fan Coil Fan Speed Level",
+                SetupOutputVariable(state, "Fan Coil Fan Speed Level",
                                     OutputProcessor::Unit::None,
                                     FanCoil(FanCoilNum).SpeedFanSel,
                                     "System",
                                     "Average",
                                     FanCoil(FanCoilNum).Name);
                 if (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_MultiSpeedFan) {
-                    SetupOutputVariable("Fan Coil Speed Ratio",
+                    SetupOutputVariable(state, "Fan Coil Speed Ratio",
                                         OutputProcessor::Unit::None,
                                         FanCoil(FanCoilNum).SpeedRatio,
                                         "System",
                                         "Average",
                                         FanCoil(FanCoilNum).Name);
-                    SetupOutputVariable("Fan Coil Part Load Ratio",
+                    SetupOutputVariable(state, "Fan Coil Part Load Ratio",
                                         OutputProcessor::Unit::None,
                                         FanCoil(FanCoilNum).PLR,
                                         "System",
@@ -1057,10 +1056,10 @@ namespace FanCoilUnits {
                 }
             }
             if (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_VarFanVarFlow || FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_VarFanConsFlow) {
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "Fan Coil Part Load Ratio", OutputProcessor::Unit::None, FanCoil(FanCoilNum).PLR, "System", "Average", FanCoil(FanCoilNum).Name);
             }
-            SetupOutputVariable("Fan Coil Availability Status",
+            SetupOutputVariable(state, "Fan Coil Availability Status",
                                 OutputProcessor::Unit::None,
                                 FanCoil(FanCoilNum).AvailStatus,
                                 "System",
@@ -1267,16 +1266,18 @@ namespace FanCoilUnits {
             FanCoil(FanCoilNum).OutAirMassFlow = RhoAir * FanCoil(FanCoilNum).OutAirVolFlow;
 
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil_Water) {
-                rho = GetDensityGlycol(PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidName,
-                                       DataGlobals::HWInitConvTemp,
+                rho = GetDensityGlycol(state,
+                                       PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidName,
+                                       DataGlobalConstants::HWInitConvTemp(),
                                        PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidIndex,
                                        RoutineName);
                 FanCoil(FanCoilNum).MaxHeatCoilFluidFlow = rho * FanCoil(FanCoilNum).MaxHotWaterVolFlow;
                 FanCoil(FanCoilNum).MinHotWaterFlow = rho * FanCoil(FanCoilNum).MinHotWaterVolFlow;
             }
 
-            rho = GetDensityGlycol(PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidName,
-                                   DataGlobals::CWInitConvTemp,
+            rho = GetDensityGlycol(state,
+                                   PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidName,
+                                   DataGlobalConstants::CWInitConvTemp(),
                                    PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidIndex,
                                    RoutineName);
             FanCoil(FanCoilNum).MaxCoolCoilFluidFlow = rho * FanCoil(FanCoilNum).MaxColdWaterVolFlow;
@@ -1509,7 +1510,7 @@ namespace FanCoilUnits {
                 FieldNum = 1;
                 PrintFlag = true;
                 SizingString = FanCoilNumericFields(FanCoilNum).FieldNames(FieldNum) + " [m3/s]";
-                if (DataGlobals::isEpJSON) SizingString = "maximum_supply_air_flow_rate [m3/s]";
+                if (state.dataGlobal->isEpJSON) SizingString = "maximum_supply_air_flow_rate [m3/s]";
                 if (ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod > 0) {
                     SizingMethod = CoolingAirflowSizing;
                     SAFMethod = ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
@@ -1882,12 +1883,14 @@ namespace FanCoilUnits {
                             }
                             FanCoil(FanCoilNum).DesHeatingLoad = DesCoilLoad;
                             if (DesCoilLoad >= SmallLoad) {
-                                rho = GetDensityGlycol(PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidName,
-                                                       DataGlobals::HWInitConvTemp,
+                                rho = GetDensityGlycol(state,
+                                                       PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidName,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidIndex,
                                                        RoutineNameNoSpace);
-                                Cp = GetSpecificHeatGlycol(PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidName,
-                                                           DataGlobals::HWInitConvTemp,
+                                Cp = GetSpecificHeatGlycol(state,
+                                                           PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidName,
+                                                           DataGlobalConstants::HWInitConvTemp(),
                                                            PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidIndex,
                                                            RoutineNameNoSpace);
 
@@ -2054,11 +2057,13 @@ namespace FanCoilUnits {
                         }
                         FanCoil(FanCoilNum).DesCoolingLoad = DesCoilLoad;
                         if (DesCoilLoad >= SmallLoad) {
-                            rho = GetDensityGlycol(PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidName,
+                            rho = GetDensityGlycol(state,
+                                                   PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidName,
                                                    5.,
                                                    PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidIndex,
                                                    RoutineNameNoSpace);
-                            Cp = GetSpecificHeatGlycol(PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidName,
+                            Cp = GetSpecificHeatGlycol(state,
+                                                       PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidName,
                                                        5.,
                                                        PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidIndex,
                                                        RoutineNameNoSpace);
@@ -2685,8 +2690,8 @@ namespace FanCoilUnits {
                 QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
                 // report variables
                 FanCoil(FanCoilNum).HeatPower = max(0.0, QUnitOut);
-                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(constant_zero, QUnitOut));
-                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(constant_zero, QTotUnitOut));
+                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QUnitOut));
+                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QTotUnitOut));
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
                 } else {
@@ -3011,8 +3016,8 @@ namespace FanCoilUnits {
                 QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
                 // report variables
                 FanCoil(FanCoilNum).HeatPower = max(0.0, QUnitOut);
-                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(constant_zero, QUnitOut));
-                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(constant_zero, QTotUnitOut));
+                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QUnitOut));
+                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QTotUnitOut));
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
                 } else {
@@ -3346,8 +3351,8 @@ namespace FanCoilUnits {
                 QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
                 // report variables
                 FanCoil(FanCoilNum).HeatPower = max(0.0, QSensUnitOutNoATM);
-                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(constant_zero, QSensUnitOutNoATM));
-                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(constant_zero, QTotUnitOut));
+                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QSensUnitOutNoATM));
+                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QTotUnitOut));
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
                 } else {
@@ -3368,8 +3373,8 @@ namespace FanCoilUnits {
                 QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
                 // report variables
                 FanCoil(FanCoilNum).HeatPower = max(0.0, QSensUnitOutNoATM);
-                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(constant_zero, QSensUnitOutNoATM));
-                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(constant_zero, QTotUnitOut));
+                FanCoil(FanCoilNum).SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QSensUnitOutNoATM));
+                FanCoil(FanCoilNum).TotCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QTotUnitOut));
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
                 } else {
@@ -3668,7 +3673,7 @@ namespace FanCoilUnits {
             }
             Node(FanCoil(FanCoilNum).AirReliefNode).MassFlowRate = Node(FanCoil(FanCoilNum).OutsideAirNode).MassFlowRate;
             AirMassFlow = Node(InletNode).MassFlowRate;
-            SimOAMixer(FanCoil(FanCoilNum).OAMixName, FirstHVACIteration, FanCoil(FanCoilNum).OAMixIndex);
+            SimOAMixer(state, FanCoil(FanCoilNum).OAMixName, FirstHVACIteration, FanCoil(FanCoilNum).OAMixIndex);
         }
 
         if (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_CycFan) {
@@ -4661,7 +4666,7 @@ namespace FanCoilUnits {
         Real64 ReportingConstant;
 
         // FLOW
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         FanCoil(FanCoilNum).HeatEnergy = FanCoil(FanCoilNum).HeatPower * ReportingConstant;
         FanCoil(FanCoilNum).SensCoolEnergy = FanCoil(FanCoilNum).SensCoolPower * ReportingConstant;
         FanCoil(FanCoilNum).TotCoolEnergy = FanCoil(FanCoilNum).TotCoolPower * ReportingConstant;
@@ -4825,7 +4830,7 @@ namespace FanCoilUnits {
         GetFanCoilReturnAirNode = 0;
         if (FanCoilNum > 0 && FanCoilNum <= NumFanCoils) {
             if (FanCoil(FanCoilNum).OAMixIndex > 0) {
-                GetFanCoilReturnAirNode = GetOAMixerReturnNodeNumber(FanCoil(FanCoilNum).OAMixIndex);
+                GetFanCoilReturnAirNode = GetOAMixerReturnNodeNumber(state, FanCoil(FanCoilNum).OAMixIndex);
             } else {
                 GetFanCoilReturnAirNode = 0;
             }
@@ -4881,7 +4886,7 @@ namespace FanCoilUnits {
         GetFanCoilMixedAirNode = 0;
         if (FanCoilNum > 0 && FanCoilNum <= NumFanCoils) {
             if (FanCoil(FanCoilNum).OAMixIndex > 0) {
-                GetFanCoilMixedAirNode = GetOAMixerMixedNodeNumber(FanCoil(FanCoilNum).OAMixIndex);
+                GetFanCoilMixedAirNode = GetOAMixerMixedNodeNumber(state, FanCoil(FanCoilNum).OAMixIndex);
             } else {
                 GetFanCoilMixedAirNode = 0;
             }

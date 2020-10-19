@@ -65,7 +65,6 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -110,7 +109,6 @@ namespace WindowAC {
     // modeled - instead cycling inefficiencies must be included in the efficiency
     // curves of the DX module.
 
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataSizing;
     using DataEnvironment::OutBaroPress;
@@ -119,7 +117,6 @@ namespace WindowAC {
     using DataGlobals::BeginDayFlag;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::CoilDX_CoolingHXAssisted;
@@ -307,7 +304,8 @@ namespace WindowAC {
         // loop over window AC units; get and load the input data
         for (WindACIndex = 1; WindACIndex <= state.dataWindowAC->NumWindACCyc; ++WindACIndex) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           WindACIndex,
                                           Alphas,
                                           NumAlphas,
@@ -332,7 +330,7 @@ namespace WindowAC {
             if (lAlphaBlanks(2)) {
                 state.dataWindowAC->WindAC(WindACNum).SchedPtr = ScheduleAlwaysOn;
             } else {
-                state.dataWindowAC->WindAC(WindACNum).SchedPtr = GetScheduleIndex(Alphas(2)); // convert schedule name to pointer
+                state.dataWindowAC->WindAC(WindACNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataWindowAC->WindAC(WindACNum).SchedPtr == 0) {
                     ShowSevereError(CurrentModuleObject + "=\"" + state.dataWindowAC->WindAC(WindACNum).Name + "\" invalid data.");
                     ShowContinueError("invalid-not found " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
@@ -343,22 +341,22 @@ namespace WindowAC {
             state.dataWindowAC->WindAC(WindACNum).OutAirVolFlow = Numbers(2);
 
             state.dataWindowAC->WindAC(WindACNum).AirInNode =
-                GetOnlySingleNode(Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
 
             state.dataWindowAC->WindAC(WindACNum).AirOutNode =
-                GetOnlySingleNode(Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
 
             state.dataWindowAC->WindAC(WindACNum).OAMixType = Alphas(5);
             state.dataWindowAC->WindAC(WindACNum).OAMixName = Alphas(6);
             // Get outdoor air mixer node numbers
             errFlag = false;
-            ValidateComponent(state.dataWindowAC->WindAC(WindACNum).OAMixType, state.dataWindowAC->WindAC(WindACNum).OAMixName, errFlag, CurrentModuleObject);
+            ValidateComponent(state, state.dataWindowAC->WindAC(WindACNum).OAMixType, state.dataWindowAC->WindAC(WindACNum).OAMixName, errFlag, CurrentModuleObject);
             if (errFlag) {
                 ShowContinueError("specified in " + CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name + "\".");
                 ErrorsFound = true;
             } else {
                 // Get outdoor air mixer node numbers
-                OANodeNums = GetOAMixerNodeNumbers(state.dataWindowAC->WindAC(WindACNum).OAMixName, errFlag);
+                OANodeNums = GetOAMixerNodeNumbers(state, state.dataWindowAC->WindAC(WindACNum).OAMixName, errFlag);
                 if (errFlag) {
                     ShowContinueError("that was specified in " + CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name + "\"");
                     ShowContinueError("..OutdoorAir:Mixer is required. Enter an OutdoorAir:Mixer object with this name.");
@@ -374,7 +372,7 @@ namespace WindowAC {
             state.dataWindowAC->WindAC(WindACNum).FanName = Alphas(8);
 
             FanErrFlag = false;
-            ValidateComponent(state.dataWindowAC->WindAC(WindACNum).FanType, state.dataWindowAC->WindAC(WindACNum).FanName, FanErrFlag, CurrentModuleObject);
+            ValidateComponent(state, state.dataWindowAC->WindAC(WindACNum).FanType, state.dataWindowAC->WindAC(WindACNum).FanName, FanErrFlag, CurrentModuleObject);
             if (FanErrFlag) {
                 ShowContinueError("specified in " + CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name + "\".");
                 ErrorsFound = true;
@@ -483,7 +481,7 @@ namespace WindowAC {
                 ErrorsFound = true;
             }
 
-            state.dataWindowAC->WindAC(WindACNum).FanSchedPtr = GetScheduleIndex(Alphas(11));
+            state.dataWindowAC->WindAC(WindACNum).FanSchedPtr = GetScheduleIndex(state, Alphas(11));
 
             // Default to cycling fan when fan mode schedule is not present
             if (!lAlphaBlanks(11) && state.dataWindowAC->WindAC(WindACNum).FanSchedPtr == 0) {
@@ -645,67 +643,67 @@ namespace WindowAC {
 
         for (WindACNum = 1; WindACNum <= state.dataWindowAC->NumWindAC; ++WindACNum) {
             // Setup Report variables for the Fan Coils
-            SetupOutputVariable("Zone Window Air Conditioner Total Cooling Rate",
+            SetupOutputVariable(state, "Zone Window Air Conditioner Total Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWindowAC->WindAC(WindACNum).TotCoolEnergyRate,
                                 "System",
                                 "Average",
                                state.dataWindowAC->WindAC(WindACNum).Name);
-            SetupOutputVariable("Zone Window Air Conditioner Total Cooling Energy",
+            SetupOutputVariable(state, "Zone Window Air Conditioner Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWindowAC->WindAC(WindACNum).TotCoolEnergy,
                                 "System",
                                 "Sum",
                                 state.dataWindowAC->WindAC(WindACNum).Name);
-            SetupOutputVariable("Zone Window Air Conditioner Sensible Cooling Rate",
+            SetupOutputVariable(state, "Zone Window Air Conditioner Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWindowAC->WindAC(WindACNum).SensCoolEnergyRate,
                                 "System",
                                 "Average",
                                 state.dataWindowAC->WindAC(WindACNum).Name);
-            SetupOutputVariable("Zone Window Air Conditioner Sensible Cooling Energy",
+            SetupOutputVariable(state, "Zone Window Air Conditioner Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWindowAC->WindAC(WindACNum).SensCoolEnergy,
                                 "System",
                                 "Sum",
                                 state.dataWindowAC->WindAC(WindACNum).Name);
-            SetupOutputVariable("Zone Window Air Conditioner Latent Cooling Rate",
+            SetupOutputVariable(state, "Zone Window Air Conditioner Latent Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWindowAC->WindAC(WindACNum).LatCoolEnergyRate,
                                 "System",
                                 "Average",
                                 state.dataWindowAC->WindAC(WindACNum).Name);
-            SetupOutputVariable("Zone Window Air Conditioner Latent Cooling Energy",
+            SetupOutputVariable(state, "Zone Window Air Conditioner Latent Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWindowAC->WindAC(WindACNum).LatCoolEnergy,
                                 "System",
                                 "Sum",
                                 state.dataWindowAC->WindAC(WindACNum).Name);
-            SetupOutputVariable("Zone Window Air Conditioner Electricity Rate",
+            SetupOutputVariable(state, "Zone Window Air Conditioner Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWindowAC->WindAC(WindACNum).ElecPower,
                                 "System",
                                 "Average",
                                 state.dataWindowAC->WindAC(WindACNum).Name);
-            SetupOutputVariable("Zone Window Air Conditioner Electricity Energy",
+            SetupOutputVariable(state, "Zone Window Air Conditioner Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWindowAC->WindAC(WindACNum).ElecConsumption,
                                 "System",
                                 "Sum",
                                 state.dataWindowAC->WindAC(WindACNum).Name);
-            SetupOutputVariable("Zone Window Air Conditioner Fan Part Load Ratio",
+            SetupOutputVariable(state, "Zone Window Air Conditioner Fan Part Load Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataWindowAC->WindAC(WindACNum).FanPartLoadRatio,
                                 "System",
                                 "Average",
                                 state.dataWindowAC->WindAC(WindACNum).Name);
-            SetupOutputVariable("Zone Window Air Conditioner Compressor Part Load Ratio",
+            SetupOutputVariable(state, "Zone Window Air Conditioner Compressor Part Load Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataWindowAC->WindAC(WindACNum).CompPartLoadRatio,
                                 "System",
                                 "Average",
                                 state.dataWindowAC->WindAC(WindACNum).Name);
-            SetupOutputVariable("Zone Window Air Conditioner Fan Availability Status",
+            SetupOutputVariable(state, "Zone Window Air Conditioner Fan Availability Status",
                                 OutputProcessor::Unit::None,
                                 state.dataWindowAC->WindAC(WindACNum).AvailStatus,
                                 "System",
@@ -1016,7 +1014,7 @@ namespace WindowAC {
                     bool errorsFound = false;
                     CoolingAirFlowSizer sizingCoolingAirFlow;
                     std::string stringOverride = "Maximum Supply Air Flow Rate [m3/s]";
-                    if (DataGlobals::isEpJSON) stringOverride = "maximum_supply_air_flow_rate [m3/s]";
+                    if (state.dataGlobal->isEpJSON) stringOverride = "maximum_supply_air_flow_rate [m3/s]";
                     sizingCoolingAirFlow.overrideSizingString(stringOverride);
                     // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
@@ -1042,7 +1040,7 @@ namespace WindowAC {
                     errorsFound = false;
                     CoolingAirFlowSizer sizingCoolingAirFlow;
                     std::string stringOverride = "Maximum Supply Air Flow Rate [m3/s]";
-                    if (DataGlobals::isEpJSON) stringOverride = "maximum_supply_air_flow_rate [m3/s]";
+                    if (state.dataGlobal->isEpJSON) stringOverride = "maximum_supply_air_flow_rate [m3/s]";
                     sizingCoolingAirFlow.overrideSizingString(stringOverride);
                     // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
@@ -1261,7 +1259,7 @@ namespace WindowAC {
 
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
 
         state.dataWindowAC->WindAC(WindACNum).SensCoolEnergy = state.dataWindowAC->WindAC(WindACNum).SensCoolEnergyRate * ReportingConstant;
         state.dataWindowAC->WindAC(WindACNum).TotCoolEnergy = state.dataWindowAC->WindAC(WindACNum).TotCoolEnergyRate * ReportingConstant;
@@ -1322,7 +1320,7 @@ namespace WindowAC {
             Node(AirRelNode).MassFlowRate = Node(OutsideAirNode).MassFlowRate;
         }
         AirMassFlow = Node(InletNode).MassFlowRate;
-        SimOAMixer(state.dataWindowAC->WindAC(WindACNum).OAMixName, FirstHVACIteration, state.dataWindowAC->WindAC(WindACNum).OAMixIndex);
+        SimOAMixer(state, state.dataWindowAC->WindAC(WindACNum).OAMixName, FirstHVACIteration, state.dataWindowAC->WindAC(WindACNum).OAMixIndex);
 
         // if blow through, simulate fan then coil. For draw through, simulate coil then fan.
         if (state.dataWindowAC->WindAC(WindACNum).FanPlace == BlowThru) {
@@ -1645,7 +1643,7 @@ namespace WindowAC {
 
         if (WindACNum > 0 && WindACNum <= state.dataWindowAC->NumWindAC) {
             if (state.dataWindowAC->WindAC(WindACNum).OAMixIndex > 0) {
-                GetWindowACReturnAirNode = GetOAMixerReturnNodeNumber(state.dataWindowAC->WindAC(WindACNum).OAMixIndex);
+                GetWindowACReturnAirNode = GetOAMixerReturnNodeNumber(state, state.dataWindowAC->WindAC(WindACNum).OAMixIndex);
             } else {
                 GetWindowACReturnAirNode = 0;
             }
@@ -1680,7 +1678,7 @@ namespace WindowAC {
 
         if (WindACNum > 0 && WindACNum <= state.dataWindowAC->NumWindAC) {
             if (state.dataWindowAC->WindAC(WindACNum).OAMixIndex > 0) {
-                GetWindowACMixedAirNode = GetOAMixerMixedNodeNumber(state.dataWindowAC->WindAC(WindACNum).OAMixIndex);
+                GetWindowACMixedAirNode = GetOAMixerMixedNodeNumber(state, state.dataWindowAC->WindAC(WindACNum).OAMixIndex);
             } else {
                 GetWindowACMixedAirNode = 0;
             }

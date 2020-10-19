@@ -54,8 +54,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -101,8 +101,6 @@ namespace GeneratorFuelSupply {
 
     // Using/Aliasing
     using namespace DataGenerators;
-    using DataGlobals::HoursInDay;
-
     // <use statements for access to subroutines in other modules>
 
     // Data
@@ -126,7 +124,7 @@ namespace GeneratorFuelSupply {
         MyOneTimeFlag = true;
     }
 
-    void GetGeneratorFuelSupplyInput(EnergyPlusData &state, IOFiles &ioFiles)
+    void GetGeneratorFuelSupplyInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -171,7 +169,7 @@ namespace GeneratorFuelSupply {
 
             for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
                 inputProcessor->getObjectItem(
-                    cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames);
+                    state, cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
                 FuelSupply(FuelSupNum).Name = AlphArray(1);
@@ -187,10 +185,10 @@ namespace GeneratorFuelSupply {
                 }
 
                 FuelSupply(FuelSupNum).NodeName = AlphArray(3);
-                FuelSupply(FuelSupNum).NodeNum = GetOnlySingleNode(
+                FuelSupply(FuelSupNum).NodeNum = GetOnlySingleNode(state,
                     AlphArray(3), ErrorsFound, cCurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
 
-                FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(AlphArray(4));
+                FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(state, AlphArray(4));
                 if ((FuelSupply(FuelSupNum).SchedNum == 0) && (FuelSupply(FuelSupNum).FuelTempMode == FuelInTempSchedule)) {
                     ShowSevereError("Invalid, " + cAlphaFieldNames(4) + " = " + AlphArray(4));
                     ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
@@ -255,7 +253,7 @@ namespace GeneratorFuelSupply {
             // now make calls to Setup
 
             for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
-                SetupFuelConstituentData(ioFiles, FuelSupNum, ErrorsFound);
+                SetupFuelConstituentData(state, FuelSupNum, ErrorsFound);
             }
 
             if (ErrorsFound) {
@@ -268,7 +266,7 @@ namespace GeneratorFuelSupply {
 
     //******************************************************************************
 
-    void SetupFuelConstituentData(IOFiles &ioFiles, int const FuelSupplyNum, bool &ErrorsFound)
+    void SetupFuelConstituentData(EnergyPlusData &state, int const FuelSupplyNum, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -702,10 +700,10 @@ namespace GeneratorFuelSupply {
         }
 
         // report Heating Values in EIO.
-        print(ioFiles.eio, "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher "
+        print(state.files.eio, "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher "
                                              "Heating Value [KJ/kg],  Molecular Weight [g/mol] \n");
         static constexpr auto Format_501(" Fuel Supply, {},{:13.6N},{:13.6N},{:13.6N},{:13.6N}\n");
-        print(ioFiles.eio,
+        print(state.files.eio,
               Format_501,
               FuelSupply(FuelSupplyNum).Name,
               FuelSupply(FuelSupplyNum).LHV * 1000000.0,

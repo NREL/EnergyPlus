@@ -257,7 +257,7 @@ namespace HVACVariableRefrigerantFlow {
         int CoolingMaxTempLimitIndex;          // Warning message recurring error index
         int HeatingMaxTempLimitIndex;          // Warning message recurring error index
         std::string FuelType;                  // Fuel type
-        int FuelTypeNum;                       // Fuel type number
+        DataGlobalConstants::ResourceType FuelTypeNum;  // Fuel type number
         Real64 SUMultiplier;                   // exponential timer for mode changes
         Real64 TUCoolingLoad;                  // total TU cooling load for each VRF system
         Real64 TUHeatingLoad;                  // total TU heating load for each VRF system
@@ -404,7 +404,8 @@ namespace HVACVariableRefrigerantFlow {
               EvapCondEffectiveness(0.0), EvapCondAirVolFlowRate(0.0), EvapCondPumpPower(0.0), CoolCombRatioPTR(0), HeatCombRatioPTR(0),
               OperatingMode(0), ElecPower(0.0), ElecCoolingPower(0.0), ElecHeatingPower(0.0), CoolElecConsumption(0.0), HeatElecConsumption(0.0),
               CrankCaseHeaterPower(0.0), CrankCaseHeaterElecConsumption(0.0), EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0),
-              EvapWaterConsumpRate(0.0), HRMaxTempLimitIndex(0), CoolingMaxTempLimitIndex(0), HeatingMaxTempLimitIndex(0), FuelTypeNum(0), 
+              EvapWaterConsumpRate(0.0), HRMaxTempLimitIndex(0), CoolingMaxTempLimitIndex(0), HeatingMaxTempLimitIndex(0),
+              FuelTypeNum(DataGlobalConstants::ResourceType::None),
               SUMultiplier(0.0), TUCoolingLoad(0.0), TUHeatingLoad(0.0), SwitchedMode(false), OperatingCOP(0.0), MinOATHeatRecovery(0.0),
               MaxOATHeatRecovery(0.0), HRCAPFTCool(0), HRCAPFTCoolConst(0.9), HRInitialCoolCapFrac(0.5), HRCoolCapTC(0.15), HREIRFTCool(0),
               HREIRFTCoolConst(1.1), HRInitialCoolEIRFrac(1.0), HRCoolEIRTC(0.0), HRCAPFTHeat(0), HRCAPFTHeatConst(1.1), HRInitialHeatCapFrac(1.0),
@@ -432,13 +433,13 @@ namespace HVACVariableRefrigerantFlow {
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void SizeVRFCondenser();
+        void SizeVRFCondenser(EnergyPlusData &state);
 
         void CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state);
 
@@ -480,7 +481,8 @@ namespace HVACVariableRefrigerantFlow {
                           Real64 OutdoorPressure // Outdoor air pressure [Pa]
         ) const;
 
-        Real64 VRFOU_CapModFactor(Real64 h_comp_in_real, // Enthalpy of refrigerant at the compressor inlet at real conditions [kJ/kg]
+        Real64 VRFOU_CapModFactor(EnergyPlusData &state,
+                                  Real64 h_comp_in_real, // Enthalpy of refrigerant at the compressor inlet at real conditions [kJ/kg]
                                   Real64 h_evap_in_real, // Enthalpy of refrigerant at the evaporator inlet at real conditions [kJ/kg]
                                   Real64 P_evap_real,    // Evaporative pressure at real conditions [Pa]
                                   Real64 T_comp_in_real, // Temperature of the refrigerant at the compressor inlet at real conditions [C]
@@ -488,7 +490,8 @@ namespace HVACVariableRefrigerantFlow {
                                   Real64 T_cond_out_rate // Temperature of the refrigerant at the condensor outlet at rated conditions [C]
         );
 
-        void VRFOU_TeModification(Real64 Te_up,          // Upper bound of Te during iteration, i.e., Te before reduction [C]
+        void VRFOU_TeModification(EnergyPlusData &state,
+                                  Real64 Te_up,          // Upper bound of Te during iteration, i.e., Te before reduction [C]
                                   Real64 Te_low,         // Lower bound of Te during iteration, i.e., the given suction temperature Te' [C]
                                   Real64 Pipe_h_IU_in,   // Piping Loss Algorithm Parameter: enthalpy of IU at inlet [kJ/kg]
                                   Real64 OutdoorDryBulb, // outdoor dry-bulb temperature [C]
@@ -570,7 +573,8 @@ namespace HVACVariableRefrigerantFlow {
                            Real64 &Ncomp              // Compressor power [W]
         );
 
-        void VRFOU_PipeLossC(Real64 Pipe_m_ref,     // Refrigerant mass flow rate [kg/s]
+        void VRFOU_PipeLossC(EnergyPlusData &state,
+                             Real64 Pipe_m_ref,     // Refrigerant mass flow rate [kg/s]
                              Real64 Pevap,          // VRF evaporating pressure [Pa]
                              Real64 Pipe_h_IU_out,  // Enthalpy of IU at outlet [kJ/kg]
                              Real64 Pipe_SH_merged, // Average super heating degrees after the indoor units [C]
@@ -580,7 +584,8 @@ namespace HVACVariableRefrigerantFlow {
                              Real64 &Pipe_h_comp_in       // Piping Loss Algorithm Parameter: Enthalpy after piping loss (compressor inlet) [kJ/kg]
         );
 
-        void VRFOU_PipeLossH(Real64 Pipe_m_ref,     // Refrigerant mass flow rate [kg/s]
+        void VRFOU_PipeLossH(EnergyPlusData &state,
+                             Real64 Pipe_m_ref,     // Refrigerant mass flow rate [kg/s]
                              Real64 Pcond,          // VRF condensing pressure [Pa]
                              Real64 Pipe_h_IU_in,   // Enthalpy of IU at outlet [kJ/kg]
                              Real64 OutdoorDryBulb, // outdoor dry-bulb temperature (C)

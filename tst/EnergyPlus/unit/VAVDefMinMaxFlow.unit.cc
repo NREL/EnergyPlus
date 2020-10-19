@@ -241,13 +241,13 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     TermUnitFinalZoneSizing.allocate(1);
     CalcFinalZoneSizing.allocate(1);
     TermUnitSizing.allocate(1);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_EQ("SPACE3-1", Zone(1).Name);
-    GetOARequirements();      // get the OA requirements object
-    GetZoneAirDistribution(); // get zone air distribution objects
-    GetZoneSizingInput();
+    GetOARequirements(state);      // get the OA requirements object
+    GetZoneAirDistribution(state); // get zone air distribution objects
+    GetZoneSizingInput(state);
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(state);
     GetSysInput(state);
@@ -421,13 +421,13 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     NumAirTerminalSizingSpec = 1;
     CalcFinalZoneSizing.allocate(1);
     TermUnitSizing.allocate(1);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_EQ("SPACE3-1", Zone(1).Name);
-    GetOARequirements();      // get the OA requirements object
-    GetZoneAirDistribution(); // get zone air distribution objects
-    GetZoneSizingInput();
+    GetOARequirements(state);      // get the OA requirements object
+    GetZoneAirDistribution(state); // get zone air distribution objects
+    GetZoneSizingInput(state);
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(state);
     GetSysInput(state);
@@ -600,13 +600,13 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     TermUnitFinalZoneSizing.allocate(1);
     CalcFinalZoneSizing.allocate(1);
     TermUnitSizing.allocate(1);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_EQ("SPACE3-1", Zone(1).Name);
-    GetOARequirements();      // get the OA requirements object
-    GetZoneAirDistribution(); // get zone air distribution objects
-    GetZoneSizingInput();
+    GetOARequirements(state);      // get the OA requirements object
+    GetZoneAirDistribution(state); // get zone air distribution objects
+    GetZoneSizingInput(state);
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(state);
     GetSysInput(state);
@@ -781,13 +781,13 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     TermUnitFinalZoneSizing.allocate(1);
     CalcFinalZoneSizing.allocate(1);
     TermUnitSizing.allocate(1);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_EQ("SPACE3-1", Zone(1).Name);
-    // GetOARequirements(); // get the OA requirements object
-    // GetZoneAirDistribution(); // get zone air distribution objects
-    // GetZoneSizingInput();
+    // GetOARequirements(state); // get the OA requirements object
+    // GetZoneAirDistribution(state); // get zone air distribution objects
+    // GetZoneSizingInput(state);
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(state);
     GetSysInput(state);
@@ -931,13 +931,13 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     TermUnitFinalZoneSizing.allocate(1);
     CalcFinalZoneSizing.allocate(1);
     TermUnitSizing.allocate(1);
-    GetZoneData(ErrorsFound);
+    GetZoneData(state, ErrorsFound);
     EXPECT_EQ("SPACE3-1", Zone(1).Name);
-    GetOARequirements();      // get the OA requirements object
-    GetZoneAirDistribution(); // get zone air distribution objects
-    GetZoneSizingInput();
+    GetOARequirements(state);      // get the OA requirements object
+    GetZoneAirDistribution(state); // get zone air distribution objects
+    GetZoneSizingInput(state);
     GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(state);
     GetSysInput(state);

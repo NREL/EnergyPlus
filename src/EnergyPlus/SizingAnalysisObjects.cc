@@ -51,10 +51,8 @@
 #include <vector>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -74,7 +72,7 @@ namespace EnergyPlus {
 
 ZoneTimestepObject::ZoneTimestepObject()
 {
-    kindOfSim = 0;
+    kindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
     envrnNum = 0;
     dayOfSim = 0;
     hourOfDay = 0;
@@ -85,7 +83,7 @@ ZoneTimestepObject::ZoneTimestepObject()
 }
 
 ZoneTimestepObject::ZoneTimestepObject(
-    int kindSim,              // kind of simulation, e.g. ksDesignDay, ksHVACSizeDesignDay, usally DataGlobals::KindOfSim
+    DataGlobalConstants::KindOfSim kindSim,              // kind of simulation
     int environmentNum,       // index in Environment data structure, usually WeatherManager::Envrn
     int daySim,               // days into simulation period, usually DataGlobals::DayOfSim
     int hourDay,              // hour into day, 1-24, filled by DataGlobals::HourOfDay
@@ -271,10 +269,10 @@ ZoneTimestepObject SizingLog::GetLogVariableDataMax()
     }
 
     for (auto &zt : ztStepObj) {
-        if (zt.envrnNum > 0 && zt.kindOfSim > 0 && zt.runningAvgDataValue > MaxVal) {
+        if (zt.envrnNum > 0 && zt.kindOfSim != DataGlobalConstants::KindOfSim::Unassigned && zt.runningAvgDataValue > MaxVal) {
             MaxVal = zt.runningAvgDataValue;
             tmpztStepStamp = zt;
-        } else if (zt.envrnNum == 0 && zt.kindOfSim == 0) { // null timestamp, problem to fix
+        } else if (zt.envrnNum == 0 && zt.kindOfSim == DataGlobalConstants::KindOfSim::Unassigned) { // null timestamp, problem to fix
             ShowWarningMessage("GetLogVariableDataMax: null timestamp in log");
         }
     }
@@ -306,8 +304,6 @@ void SizingLog::SetupNewEnvironment(int const seedEnvrnNum, int const newEnvrnNu
 
 int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData& state, Real64 &rVariable, int stepsInAverage)
 {
-    using DataGlobals::ksDesignDay;
-    using DataGlobals::ksRunPeriodDesign;
     using DataGlobals::NumOfTimeStepInHour;
     int VectorLength(0);
     int const HoursPerDay(24);
@@ -320,11 +316,11 @@ int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData& state, Real64 
     // search environment structure for sizing periods
     // this is coded to occur before the additions to Environment structure that will occur to run them as HVAC Sizing sims
     for (int i = 1; i <= state.dataWeatherManager->NumOfEnvrn; ++i) {
-        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == ksDesignDay) {
+        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::DesignDay) {
             ++tmpLog.NumOfEnvironmentsInLogSet;
             ++tmpLog.NumOfDesignDaysInLogSet;
         }
-        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == ksRunPeriodDesign) {
+        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
             ++tmpLog.NumOfEnvironmentsInLogSet;
             ++tmpLog.NumberOfSizingPeriodsInLogSet;
         }
@@ -333,10 +329,10 @@ int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData& state, Real64 
     // next fill in the count of steps into map
     for (int i = 1; i <= state.dataWeatherManager->NumOfEnvrn; ++i) {
 
-        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == ksDesignDay) {
+        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::DesignDay) {
             tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * NumOfTimeStepInHour;
         }
-        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == ksRunPeriodDesign) {
+        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
             tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * NumOfTimeStepInHour * state.dataWeatherManager->Environment(i).TotalDays;
         }
     }
@@ -384,7 +380,7 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp(EnergyPlusDat
     }
 
     ZoneTimestepObject tmpztStepStamp( // call constructor
-        DataGlobals::KindOfSim,
+        state.dataGlobal->KindOfSim,
         state.dataWeatherManager->Envrn,
         locDayOfSim,
         DataGlobals::HourOfDay,
@@ -446,7 +442,7 @@ PlantCoinicidentAnalysis::PlantCoinicidentAnalysis(
     plantSizingIndex = sizingIndex;
 }
 
-void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, IOFiles &ioFiles, int const HVACSizingIterCount)
+void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, int const HVACSizingIterCount)
 {
     using DataSizing::GlobalCoolingSizingFactorMode;
     using DataSizing::GlobalCoolSizingFactor;
@@ -552,7 +548,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, IOFi
 
     // add a seperate eio summary report about what happened, did demand trap get used, what were the key values.
     if (!eioHeaderDoneOnce) {
-        print(ioFiles.eio,"{}", "! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass "
+        print(state.files.eio,"{}", "! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass "
                                              "Flow{kg/s},Measured Demand {W},Demand Calculated Mass Flow{kg/s},Sizes Changed {Yes/No},Previous "
                                              "Volume Flow Rate {m3/s},New Volume Flow Rate {m3/s},Demand Check Applied {Yes/No},Sizing Factor "
                                              "{},Normalized Change {},Specific Heat{J/kg-K},Density {kg/m3}\n");
@@ -570,7 +566,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, IOFi
         chDemandTrapUsed = "No";
     }
 
-    print(ioFiles.eio,
+    print(state.files.eio,
           "Plant Coincident Sizing Algorithm,{},{},{:.7R},{:.2R},{:.7R},{},{:.6R},{:.6R},{},{:.4R},{:.6R},{:.4R},{:.4R}\n",
           name,
           chIteration,
@@ -637,7 +633,7 @@ bool PlantCoinicidentAnalysis::CheckTimeStampForNull(ZoneTimestepObject testStam
     if (testStamp.envrnNum != 0) {
         isNull = false;
     }
-    if (testStamp.kindOfSim != 0) {
+    if (testStamp.kindOfSim != DataGlobalConstants::KindOfSim::Unassigned) {
         isNull = false;
     }
 

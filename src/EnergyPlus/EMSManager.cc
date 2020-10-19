@@ -59,19 +59,17 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -93,10 +91,7 @@ namespace EMSManager {
     // PURPOSE OF THIS MODULE:
     // This module manages the programmable energy management system(EMS).
 
-    // METHODOLOGY EMPLOYED:
-
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataRuntimeLanguage;
 
     // Data
@@ -113,16 +108,10 @@ namespace EMSManager {
 
     static std::string const BlankString;
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
-
     // MODULE VARIABLE DECLARATIONS:
     bool GetEMSUserInput(true); // Flag to prevent input from being read multiple times
     bool ZoneThermostatActuatorsHaveBeenSetup(false);
     bool FinishProcessingUserInput(true); // Flag to indicate still need to process input
-
-    // SUBROUTINE SPECIFICATIONS:
 
     // Functions
     void clear_state()
@@ -132,7 +121,7 @@ namespace EMSManager {
         FinishProcessingUserInput = true;
     }
 
-    void CheckIfAnyEMS(IOFiles &ioFiles)
+    void CheckIfAnyEMS(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -229,17 +218,17 @@ namespace EMSManager {
             AnyEnergyManagementSystemInModel = false;
         }
 
-        AnyEnergyManagementSystemInModel = AnyEnergyManagementSystemInModel || DataGlobals::externalHVACManager;
+        AnyEnergyManagementSystemInModel = AnyEnergyManagementSystemInModel || state.dataGlobal->externalHVACManager;
 
         if (AnyEnergyManagementSystemInModel) {
 
-            ScanForReports("EnergyManagementSystem", OutputEDDFile);
+            ScanForReports(state, "EnergyManagementSystem", OutputEDDFile);
             if (OutputEDDFile) {
                 // open up output file for EMS EDD file  EMS Data and Debug
-                ioFiles.edd.ensure_open("CheckIFAnyEMS", ioFiles.outputControl.edd);
+                state.files.edd.ensure_open("CheckIFAnyEMS", state.files.outputControl.edd);
             }
         } else {
-            ScanForReports("EnergyManagementSystem", OutputEDDFile);
+            ScanForReports(state, "EnergyManagementSystem", OutputEDDFile);
             if (OutputEDDFile) {
                 ShowWarningError("CheckIFAnyEMS: No EnergyManagementSystem has been set up in the input file but output is requested.");
                 ShowContinueError("No EDD file will be produced. Refer to EMS Application Guide and/or InputOutput Reference to set up your "
@@ -251,7 +240,7 @@ namespace EMSManager {
     // MODULE SUBROUTINES:
 
     void ManageEMS(EnergyPlusData &state,
-                   int const iCalledFrom,                 // indicates where subroutine was called from, parameters in DataGlobals.
+                   EMSCallFrom const iCalledFrom,  // indicates where subroutine was called from, parameters in DataGlobals.
                    bool &anyProgramRan,                   // true if any Erl programs ran for this call
                    Optional_int_const ProgramManagerToRun // specific program manager to run
     )
@@ -272,9 +261,6 @@ namespace EMSManager {
 
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::emsCallFromExternalInterface;
-        using DataGlobals::emsCallFromSetupSimulation;
-        using DataGlobals::emsCallFromUserDefinedComponentModel;
         using OutputProcessor::MeterType;
         using OutputProcessor::RealVariables;
         using OutputProcessor::RealVariableType;
@@ -297,35 +283,35 @@ namespace EMSManager {
         anyProgramRan = false;
         if (!AnyEnergyManagementSystemInModel) return; // quick return if nothing to do
 
-        if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) {
+        if (iCalledFrom == EMSCallFrom::BeginNewEnvironment) {
             BeginEnvrnInitializeRuntimeLanguage();
             PluginManagement::onBeginEnvironment();
         }
 
-        InitEMS(state, state.files, iCalledFrom);
+        InitEMS(state, iCalledFrom);
 
         // also call plugins and callbacks here for convenience
         bool anyPluginsOrCallbacksRan = false;
-        if (iCalledFrom != DataGlobals::emsCallFromUserDefinedComponentModel) { // don't run user-defined component plugins this way
+        if (iCalledFrom != EMSCallFrom::UserDefinedComponentModel) { // don't run user-defined component plugins this way
             PluginManagement::runAnyRegisteredCallbacks(state, iCalledFrom, anyPluginsOrCallbacksRan);
             if (anyPluginsOrCallbacksRan) {
                 anyProgramRan = true;
             }
         }
 
-        if (iCalledFrom == emsCallFromSetupSimulation) {
-            ProcessEMSInput(true);
+        if (iCalledFrom == EMSCallFrom::SetupSimulation) {
+            ProcessEMSInput(state, true);
             return;
         }
 
         // Run the Erl programs depending on calling point.
 
-        if (iCalledFrom != emsCallFromUserDefinedComponentModel) {
+        if (iCalledFrom != EMSCallFrom::UserDefinedComponentModel) {
             for (ProgramManagerNum = 1; ProgramManagerNum <= NumProgramCallManagers; ++ProgramManagerNum) {
 
                 if (EMSProgramCallManager(ProgramManagerNum).CallingPoint == iCalledFrom) {
                     for (ErlProgramNum = 1; ErlProgramNum <= EMSProgramCallManager(ProgramManagerNum).NumErlPrograms; ++ErlProgramNum) {
-                        EvaluateStack(state, state.files, EMSProgramCallManager(ProgramManagerNum).ErlProgramARR(ErlProgramNum));
+                        EvaluateStack(state, EMSProgramCallManager(ProgramManagerNum).ErlProgramARR(ErlProgramNum));
                         anyProgramRan = true;
                     }
                 }
@@ -333,13 +319,13 @@ namespace EMSManager {
         } else { // call specific program manager
             if (present(ProgramManagerToRun)) {
                 for (ErlProgramNum = 1; ErlProgramNum <= EMSProgramCallManager(ProgramManagerToRun).NumErlPrograms; ++ErlProgramNum) {
-                    EvaluateStack(state, state.files, EMSProgramCallManager(ProgramManagerToRun).ErlProgramARR(ErlProgramNum));
+                    EvaluateStack(state, EMSProgramCallManager(ProgramManagerToRun).ErlProgramARR(ErlProgramNum));
                     anyProgramRan = true;
                 }
             }
         }
 
-        if (iCalledFrom == emsCallFromExternalInterface) {
+        if (iCalledFrom == EMSCallFrom::ExternalInterface) {
             anyProgramRan = true;
         }
 
@@ -389,7 +375,7 @@ namespace EMSManager {
         ReportEMS();
     }
 
-    void InitEMS(EnergyPlusData &state, IOFiles &ioFiles, int const iCalledFrom) // indicates where subroutine was called from, parameters in DataGlobals.
+    void InitEMS(EnergyPlusData &state, EMSCallFrom const iCalledFrom) // indicates where subroutine was called from, parameters in DataGlobals.
     {
 
         // SUBROUTINE INFORMATION:
@@ -410,9 +396,6 @@ namespace EMSManager {
         // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::DoingSizing;
-        using DataGlobals::emsCallFromSystemSizing;
-        using DataGlobals::emsCallFromUserDefinedComponentModel;
-        using DataGlobals::emsCallFromZoneSizing;
         using DataGlobals::KickOffSimulation;
         using DataZoneControls::GetZoneAirStatsInputFlag;
         using RuntimeLanguageProcessor::InitializeRuntimeLanguage;
@@ -441,12 +424,12 @@ namespace EMSManager {
 
         if (GetEMSUserInput) {
             SetupZoneInfoAsInternalDataAvail();
-            SetupWindowShadingControlActuators();
+            SetupWindowShadingControlActuators(state);
             SetupSurfaceConvectionActuators();
             SetupSurfaceConstructionActuators();
             SetupSurfaceOutdoorBoundaryConditionActuators();
             SetupZoneOutdoorBoundaryConditionActuators();
-            GetEMSInput(state, ioFiles);
+            GetEMSInput(state);
             GetEMSUserInput = false;
         }
 
@@ -465,14 +448,14 @@ namespace EMSManager {
             FinishProcessingUserInput = false;
         }
 
-        InitializeRuntimeLanguage(state, ioFiles);
+        InitializeRuntimeLanguage(state);
 
-        if ((BeginEnvrnFlag) || (iCalledFrom == emsCallFromZoneSizing) || (iCalledFrom == emsCallFromSystemSizing) ||
-            (iCalledFrom == emsCallFromUserDefinedComponentModel)) {
+        if ((BeginEnvrnFlag) || (iCalledFrom == EMSCallFrom::ZoneSizing) || (iCalledFrom == EMSCallFrom::SystemSizing) ||
+            (iCalledFrom == EMSCallFrom::UserDefinedComponentModel)) {
 
             // another pass at trying to setup input data.
             if (FinishProcessingUserInput) {
-                ProcessEMSInput(false);
+                ProcessEMSInput(state, false);
             }
 
             // update internal data variables being used by Erl
@@ -542,7 +525,7 @@ namespace EMSManager {
         ReportRuntimeLanguage();
     }
 
-    void GetEMSInput(EnergyPlusData &state, IOFiles &ioFiles)
+    void GetEMSInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -559,22 +542,6 @@ namespace EMSManager {
 
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::emsCallFromAfterHVACManagers;
-        using DataGlobals::emsCallFromBeforeHVACManagers;
-        using DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp;
-        using DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance;
-        using DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance;
-        using DataGlobals::emsCallFromBeginTimestepBeforePredictor;
-        using DataGlobals::emsCallFromComponentGetInput;
-        using DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting;
-        using DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting;
-        using DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting;
-        using DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting;
-        using DataGlobals::emsCallFromHVACIterationLoop;
-        using DataGlobals::emsCallFromSystemSizing;
-        using DataGlobals::emsCallFromUnitarySystemSizing;
-        using DataGlobals::emsCallFromUserDefinedComponentModel;
-        using DataGlobals::emsCallFromZoneSizing;
         using RuntimeLanguageProcessor::ExternalInterfaceInitializeErlVariable;
         using RuntimeLanguageProcessor::FindEMSVariable;
         using RuntimeLanguageProcessor::InitializeRuntimeLanguage;
@@ -686,7 +653,8 @@ namespace EMSManager {
             Sensor.allocate(NumSensors);
 
             for (SensorNum = 1; SensorNum <= NumSensors; ++SensorNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               SensorNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -734,7 +702,7 @@ namespace EMSManager {
                     }
                 } else {
                     // Search for variable names
-                    GetVariableTypeAndIndex(cAlphaArgs(3), cAlphaArgs(2), VarType, VarIndex);
+                    GetVariableTypeAndIndex(state,cAlphaArgs(3), cAlphaArgs(2), VarType, VarIndex);
                     if (VarType != 0) {
                         Sensor(SensorNum).Type = VarType;
                         if (VarIndex != 0) {
@@ -762,7 +730,8 @@ namespace EMSManager {
                 // If we process the ExternalInterface actuators, all we need to do is to change the
                 // name of the module object, and shift the ActuatorNum in GetObjectItem
                 if (ActuatorNum <= numActuatorsUsed) {
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   ActuatorNum,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -775,7 +744,8 @@ namespace EMSManager {
                                                   cNumericFieldNames);
                 } else if (ActuatorNum > numActuatorsUsed && ActuatorNum <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed) {
                     cCurrentModuleObject = "ExternalInterface:Actuator";
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   ActuatorNum - numActuatorsUsed,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -790,7 +760,8 @@ namespace EMSManager {
                            ActuatorNum <=
                                (numActuatorsUsed + NumExternalInterfaceActuatorsUsed + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed)) {
                     cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   ActuatorNum - numActuatorsUsed - NumExternalInterfaceActuatorsUsed,
                                                   cAlphaArgs,
                                                   NumAlphas,
@@ -807,7 +778,8 @@ namespace EMSManager {
                                               NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed +
                                               NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed) {
                     cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-                    inputProcessor->getObjectItem(cCurrentModuleObject,
+                    inputProcessor->getObjectItem(state,
+                                                  cCurrentModuleObject,
                                                   ActuatorNum - numActuatorsUsed - NumExternalInterfaceActuatorsUsed -
                                                       NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed,
                                                   cAlphaArgs,
@@ -891,7 +863,8 @@ namespace EMSManager {
             EMSInternalVarsUsed.allocate(NumInternalVariablesUsed);
 
             for (InternVarNum = 1; InternVarNum <= NumInternalVariablesUsed; ++InternVarNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               InternVarNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -941,7 +914,7 @@ namespace EMSManager {
             }
         }
 
-        InitializeRuntimeLanguage(state, ioFiles); // Loads built-in globals and functions, then performs GetInput for runtime language objects
+        InitializeRuntimeLanguage(state); // Loads built-in globals and functions, then performs GetInput for runtime language objects
 
         if (NumProgramCallManagers > 0) {
             cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
@@ -949,7 +922,8 @@ namespace EMSManager {
 
             for (CallManagerNum = 1; CallManagerNum <= NumProgramCallManagers; ++CallManagerNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               CallManagerNum,
                                               cAlphaArgs,
                                               NumAlphas,
@@ -968,41 +942,41 @@ namespace EMSManager {
                     auto const SELECT_CASE_var(cAlphaArgs(2));
 
                     if (SELECT_CASE_var == "BEGINNEWENVIRONMENT") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = DataGlobals::emsCallFromBeginNewEvironment;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::BeginNewEnvironment;
                     } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFORESETCURRENTWEATHER") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::BeginZoneTimestepBeforeSetCurrentWeather;
                     } else if (SELECT_CASE_var == "AFTERNEWENVIRONMENTWARMUPISCOMPLETE") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginNewEvironmentAfterWarmUp;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::BeginNewEnvironmentAfterWarmUp;
                     } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFOREINITHEATBALANCE") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginZoneTimestepBeforeInitHeatBalance;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance;
                     } else if (SELECT_CASE_var == "BEGINZONETIMESTEPAFTERINITHEATBALANCE") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginZoneTimestepAfterInitHeatBalance;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance;
                     } else if (SELECT_CASE_var == "BEGINTIMESTEPBEFOREPREDICTOR") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginTimestepBeforePredictor;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::BeginTimestepBeforePredictor;
                     } else if (SELECT_CASE_var == "AFTERPREDICTORBEFOREHVACMANAGERS") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeforeHVACManagers;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::BeforeHVACManagers;
                     } else if (SELECT_CASE_var == "AFTERPREDICTORAFTERHVACMANAGERS") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromAfterHVACManagers;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::AfterHVACManagers;
                     } else if (SELECT_CASE_var == "INSIDEHVACSYSTEMITERATIONLOOP") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromHVACIterationLoop;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::HVACIterationLoop;
                     } else if (SELECT_CASE_var == "ENDOFZONETIMESTEPBEFOREZONEREPORTING") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromEndZoneTimestepBeforeZoneReporting;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::EndZoneTimestepBeforeZoneReporting;
                     } else if (SELECT_CASE_var == "ENDOFZONETIMESTEPAFTERZONEREPORTING") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromEndZoneTimestepAfterZoneReporting;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::EndZoneTimestepAfterZoneReporting;
                     } else if (SELECT_CASE_var == "ENDOFSYSTEMTIMESTEPBEFOREHVACREPORTING") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromEndSystemTimestepBeforeHVACReporting;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::EndSystemTimestepBeforeHVACReporting;
                     } else if (SELECT_CASE_var == "ENDOFSYSTEMTIMESTEPAFTERHVACREPORTING") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromEndSystemTimestepAfterHVACReporting;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::EndSystemTimestepAfterHVACReporting;
                     } else if (SELECT_CASE_var == "ENDOFZONESIZING") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromZoneSizing;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::ZoneSizing;
                     } else if (SELECT_CASE_var == "ENDOFSYSTEMSIZING") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromSystemSizing;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::SystemSizing;
                     } else if (SELECT_CASE_var == "AFTERCOMPONENTINPUTREADIN") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromComponentGetInput;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::ComponentGetInput;
                     } else if (SELECT_CASE_var == "USERDEFINEDCOMPONENTMODEL") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromUserDefinedComponentModel;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::UserDefinedComponentModel;
                     } else if (SELECT_CASE_var == "UNITARYSYSTEMSIZING") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromUnitarySystemSizing;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::UnitarySystemSizing;
                     } else {
                         ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -1068,7 +1042,7 @@ namespace EMSManager {
         }
     }
 
-    void ProcessEMSInput(bool const reportErrors) // .  If true, then report out errors ,otherwise setup what we can
+    void ProcessEMSInput(EnergyPlusData &state, bool const reportErrors) // .  If true, then report out errors ,otherwise setup what we can
     {
 
         // SUBROUTINE INFORMATION:
@@ -1119,7 +1093,7 @@ namespace EMSManager {
 
             } else {
                 // Search for variable names
-                GetVariableTypeAndIndex(Sensor(SensorNum).OutputVarName, Sensor(SensorNum).UniqueKeyName, VarType, VarIndex);
+                GetVariableTypeAndIndex(state, Sensor(SensorNum).OutputVarName, Sensor(SensorNum).UniqueKeyName, VarType, VarIndex);
                 if (VarType == 0) {
                     if (reportErrors) {
                         ShowSevereError("Invalid Output:Variable or Output:Meter Name =" + Sensor(SensorNum).OutputVarName);
@@ -1141,7 +1115,7 @@ namespace EMSManager {
                     Sensor(SensorNum).CheckedOkay = true;
                     // If variable is Schedule Value, then get the schedule id to register it as being used
                     if (UtilityRoutines::SameString(Sensor(SensorNum).OutputVarName, "Schedule Value")) {
-                        Sensor(SensorNum).SchedNum = GetScheduleIndex(Sensor(SensorNum).UniqueKeyName);
+                        Sensor(SensorNum).SchedNum = GetScheduleIndex(state, Sensor(SensorNum).UniqueKeyName);
                         if (Sensor(SensorNum).SchedNum == 0) {
                             Sensor(SensorNum).CheckedOkay = false;
                             if (reportErrors) {
@@ -1307,9 +1281,8 @@ namespace EMSManager {
             }
         }
         if (reportErrors) {
-            auto &ioFiles = IOFiles::getSingleton();
-            EchoOutActuatorKeyChoices(ioFiles);
-            EchoOutInternalVariableChoices(ioFiles);
+            EchoOutActuatorKeyChoices(state);
+            EchoOutInternalVariableChoices(state);
         }
 
         if (ErrorsFound) {
@@ -1321,7 +1294,7 @@ namespace EMSManager {
         }
     }
 
-    void GetVariableTypeAndIndex(std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex)
+    void GetVariableTypeAndIndex(EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1359,14 +1332,14 @@ namespace EMSManager {
         VarType = 0;
         VarIndex = 0;
         Found = false;
-        GetVariableKeyCountandType(VarName, NumKeys, VarType, AvgOrSum, StepType, Units);
+        GetVariableKeyCountandType(state, VarName, NumKeys, VarType, AvgOrSum, StepType, Units);
 
         // note that schedules are not getting VarType set right...
 
         if (NumKeys > 0) {
             KeyName.allocate(NumKeys);
             KeyIndex.allocate(NumKeys);
-            GetVariableKeys(VarName, VarType, KeyName, KeyIndex);
+            GetVariableKeys(state, VarName, VarType, KeyName, KeyIndex);
 
             if (KeyName(1) == "ENVIRONMENT") {
                 VarIndex = KeyIndex(1);
@@ -1385,7 +1358,7 @@ namespace EMSManager {
         }
     }
 
-    void EchoOutActuatorKeyChoices(IOFiles &ioFiles)
+    void EchoOutActuatorKeyChoices(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1407,9 +1380,9 @@ namespace EMSManager {
 
         if (OutputEMSActuatorAvailFull) {
 
-            print(ioFiles.edd, "! <EnergyManagementSystem:Actuator Available>, Component Unique Name, Component Type,  Control Type, Units\n");
+            print(state.files.edd, "! <EnergyManagementSystem:Actuator Available>, Component Unique Name, Component Type,  Control Type, Units\n");
             for (int ActuatorLoop = 1; ActuatorLoop <= numEMSActuatorsAvailable; ++ActuatorLoop) {
-                print(ioFiles.edd,
+                print(state.files.edd,
                       "EnergyManagementSystem:Actuator Available,{},{},{},{}\n",
                       EMSActuatorAvailable(ActuatorLoop).UniqueIDName,
                       EMSActuatorAvailable(ActuatorLoop).ComponentTypeName,
@@ -1417,7 +1390,7 @@ namespace EMSManager {
                       EMSActuatorAvailable(ActuatorLoop).Units);
             }
         } else if (OutputEMSActuatorAvailSmall) {
-            print(ioFiles.edd, "! <EnergyManagementSystem:Actuator Available>, *, Component Type, Control Type, Units\n");
+            print(state.files.edd, "! <EnergyManagementSystem:Actuator Available>, *, Component Type, Control Type, Units\n");
             int FoundTypeName;
             int FoundControlType;
             for (int ActuatorLoop = 1; ActuatorLoop <= numEMSActuatorsAvailable; ++ActuatorLoop) {
@@ -1435,7 +1408,7 @@ namespace EMSManager {
                     FoundControlType = 1;
                 }
                 if ((FoundTypeName == 0) || (FoundControlType == 0)) {
-                    print(ioFiles.edd,
+                    print(state.files.edd,
                           "EnergyManagementSystem:Actuator Available, *,{},{},{}\n",
                           EMSActuatorAvailable(ActuatorLoop).ComponentTypeName,
                           EMSActuatorAvailable(ActuatorLoop).ControlTypeName,
@@ -1445,7 +1418,7 @@ namespace EMSManager {
         }
     }
 
-    void EchoOutInternalVariableChoices(IOFiles &ioFiles)
+    void EchoOutInternalVariableChoices(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1466,9 +1439,9 @@ namespace EMSManager {
 
         if (OutputEMSInternalVarsFull) {
 
-            print(ioFiles.edd, "! <EnergyManagementSystem:InternalVariable Available>, Unique Name, Internal Data Type, Units \n");
+            print(state.files.edd, "! <EnergyManagementSystem:InternalVariable Available>, Unique Name, Internal Data Type, Units \n");
             for (int InternalDataLoop = 1; InternalDataLoop <= numEMSInternalVarsAvailable; ++InternalDataLoop) {
-                print(ioFiles.edd,
+                print(state.files.edd,
                       "EnergyManagementSystem:InternalVariable Available,{},{},{}\n",
                       EMSInternalVarsAvailable(InternalDataLoop).UniqueIDName,
                       EMSInternalVarsAvailable(InternalDataLoop).DataTypeName,
@@ -1476,7 +1449,7 @@ namespace EMSManager {
             }
 
         } else if (OutputEMSInternalVarsSmall) {
-            print(ioFiles.edd, "! <EnergyManagementSystem:InternalVariable Available>, *, Internal Data Type\n");
+            print(state.files.edd, "! <EnergyManagementSystem:InternalVariable Available>, *, Internal Data Type\n");
             for (int InternalDataLoop = 1; InternalDataLoop <= numEMSInternalVarsAvailable; ++InternalDataLoop) {
                 int Found(0);
                 if (InternalDataLoop + 1 <= numEMSInternalVarsAvailable) {
@@ -1486,7 +1459,7 @@ namespace EMSManager {
                                                             numEMSInternalVarsAvailable - (InternalDataLoop + 1));
                 }
                 if (Found == 0) {
-                    print(ioFiles.edd,
+                    print(state.files.edd,
                           "EnergyManagementSystem:InternalVariable Available, *,{},{}\n",
                           EMSInternalVarsAvailable(InternalDataLoop).DataTypeName,
                           EMSInternalVarsAvailable(InternalDataLoop).Units);
@@ -1847,31 +1820,31 @@ namespace EMSManager {
                 nodeSetpointCheck.needsSetpointChecking = false;
 
                 if (nodeSetpointCheck.checkTemperatureSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iTemperatureSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iTemperatureSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkTemperatureMinSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iTemperatureMinSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iTemperatureMinSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkTemperatureMaxSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iTemperatureMaxSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iTemperatureMaxSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkHumidityRatioSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iHumidityRatioSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iHumidityRatioSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkHumidityRatioMinSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iHumidityRatioMinSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iHumidityRatioMinSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkHumidityRatioMaxSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iHumidityRatioMaxSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iHumidityRatioMaxSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkMassFlowRateSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iMassFlowRateSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iMassFlowRateSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkMassFlowRateMinSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iMassFlowRateMinSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iMassFlowRateMinSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkMassFlowRateMaxSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iMassFlowRateMaxSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, iMassFlowRateMaxSetPoint, true);
                 }
 
                 if (nodeSetpointCheck.needsSetpointChecking) {
@@ -1954,7 +1927,7 @@ namespace EMSManager {
         }
     }
 
-    void SetupWindowShadingControlActuators()
+    void SetupWindowShadingControlActuators(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2028,7 +2001,7 @@ namespace EMSManager {
             } else {
                 if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WSC_ST_SwitchableGlazing) {
                     ShowSevereError("Missing shade or blind layer in window construction name = '" +
-                                    dataConstruction.Construct(Surface(loopSurfNum).activeShadedConstruction).Name + "', surface name = '" +
+                                    state.dataConstruction->Construct(Surface(loopSurfNum).activeShadedConstruction).Name + "', surface name = '" +
                                     Surface(loopSurfNum).Name + "'.");
                     ShowContinueError("...'Control Status' or 'Slat Angle' EMS Actuator cannot be set for a construction that does not have a shade "
                                       "or a blind layer.");
@@ -2457,7 +2430,6 @@ void SetupEMSActuator(std::string const &cComponentTypeName,
     //  check for duplicates.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataRuntimeLanguage;
 
     std::string const UpperCaseObjectType(UtilityRoutines::MakeUPPERCase(cComponentTypeName));
@@ -2513,7 +2485,6 @@ void SetupEMSActuator(std::string const &cComponentTypeName,
     //  check for duplicates.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataRuntimeLanguage;
 
     std::string const UpperCaseObjectType(UtilityRoutines::MakeUPPERCase(cComponentTypeName));
@@ -2569,7 +2540,6 @@ void SetupEMSActuator(std::string const &cComponentTypeName,
     //  check for duplicates.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataRuntimeLanguage;
 
     std::string const UpperCaseObjectType(UtilityRoutines::MakeUPPERCase(cComponentTypeName));
@@ -2615,7 +2585,6 @@ void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string cons
     // Setup internal data source and make available to EMS
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataRuntimeLanguage;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2675,7 +2644,6 @@ void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string cons
     // Setup internal data source and make available to EMS
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataRuntimeLanguage;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

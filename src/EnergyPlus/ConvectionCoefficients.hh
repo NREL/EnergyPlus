@@ -62,7 +62,6 @@
 namespace EnergyPlus {
 
 // Forward declarations
-class IOFiles;
 struct EnergyPlusData;
 
 namespace ConvectionCoefficients {
@@ -419,13 +418,11 @@ namespace ConvectionCoefficients {
     // Functions
 
     void InitInteriorConvectionCoeffs(EnergyPlusData &state,
-                                      IOFiles &ioFiles,
                                       const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                       Optional_int_const ZoneToResimulate = _    // if passed in, then only calculate surfaces that have this zone
     );
 
     void InitExteriorConvectionCoeff(EnergyPlusData &state,
-                                     IOFiles &ioFiles,
                                      int SurfNum,      // Surface number (in Surface derived type)
                                      Real64 HMovInsul, // Equivalent convection coefficient of movable insulation
                                      int Roughness,    // Roughness index (1-6), see DataHeatBalance parameters
@@ -451,9 +448,9 @@ namespace ConvectionCoefficients {
                   Real64 WindDirection // Wind direction measured clockwise from geographhic North
     );
 
-    void GetUserConvectionCoefficients(EnergyPlusData &state, IOFiles &ioFiles);
+    void GetUserConvectionCoefficients(EnergyPlusData &state);
 
-    void ApplyConvectionValue(std::string const &SurfaceTypes, std::string const &ConvectionType, int Value);
+    void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes, std::string const &ConvectionType, int Value);
 
     Real64 CalcASHRAESimpExtConvectCoeff(int Roughness,       // Integer index for roughness, relates to parameter array indices
                                          Real64 SurfWindSpeed // Current wind speed, m/s
@@ -488,7 +485,8 @@ namespace ConvectionCoefficients {
 
     Real64 CalcCeilingDiffuserACH(int ZoneNum);
 
-    Real64 CalcCeilingDiffuserIntConvCoeff(Real64 ACH,  // [1/hr] air system air change rate
+    Real64 CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state,
+                                           Real64 ACH,  // [1/hr] air system air change rate
                                            Real64 Tsurf,
                                            Real64 Tair,
                                            Real64 cosTilt,
@@ -496,12 +494,13 @@ namespace ConvectionCoefficients {
                                            Real64 height,
                                            bool isWindow=false);
 
-    void CalcCeilingDiffuserIntConvCoeff(int ZoneNum, const Array1D<Real64> &SurfaceTemperatures); // zone number for which coefficients are being calculated
+    void CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state, int ZoneNum, const Array1D<Real64> &SurfaceTemperatures); // zone number for which coefficients are being calculated
 
     // CalcCeilingDiffuserInletCorr should replace CalcCeilingDiffuser (above), if ZoneTempPredictorCorrector can
     // ever be made to work correctly with the inlet air temperature.
 
-    void CalcCeilingDiffuserInletCorr(int ZoneNum,                        // Zone number
+    void CalcCeilingDiffuserInletCorr(EnergyPlusData &state,
+                                      int ZoneNum,                        // Zone number
                                       Array1D<Real64> &SurfaceTemperatures // For CalcASHRAEDetailed, if called
     );
 
@@ -535,7 +534,7 @@ namespace ConvectionCoefficients {
                                         Real64 AirTemperature      // Mean Air Temperature of Zone (or adjacent air temperature)
     );
 
-    void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state, EnergyPlus::IOFiles &ioFiles);
+    void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state);
 
     void SetupAdaptiveConvectionRadiantSurfaceData(EnergyPlusData &state);
 

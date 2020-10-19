@@ -77,7 +77,7 @@ public:
 class ZoneTimestepObject
 {
 public:
-    int kindOfSim = 0;
+    DataGlobalConstants::KindOfSim kindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
     int envrnNum = 0;
     int dayOfSim = 0; // since start of simulation
     int hourOfDay = 0;
@@ -92,7 +92,7 @@ public:
     std::vector<SystemTimestepObject> subSteps; // nested object array for system timesteps inside here.
 
     ZoneTimestepObject( // full constructor
-        int kindSim,
+        DataGlobalConstants::KindOfSim kindSim,
         int environmentNum,
         int daySim,
         int hourDay,
@@ -188,7 +188,7 @@ public:
 
     PlantCoinicidentAnalysis(std::string loopName, int loopIndex, int nodeNum, Real64 density, Real64 cp, int numStepsInAvg, int sizingIndex);
 
-    void ResolveDesignFlowRate(EnergyPlusData& state, IOFiles &ioFiles, int const HVACSizingIterCount);
+    void ResolveDesignFlowRate(EnergyPlusData& state, int const HVACSizingIterCount);
 
 private:
     std::string name = "";                // name of analysis object

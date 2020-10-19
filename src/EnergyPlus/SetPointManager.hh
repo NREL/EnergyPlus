@@ -951,7 +951,7 @@ namespace SetPointManager {
         }
 
         // Calculation method
-        void calculate(DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode);
+        void calculate(EnergyPlusData &state, DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode);
     };
 
     struct DefineReturnWaterHWSetPointManager // derived type for SetpointManager:SupplyResetForReturnTemperature:HotWater data
@@ -978,7 +978,7 @@ namespace SetPointManager {
         }
 
         // Calculation method
-        void calculate(DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode);
+        void calculate(EnergyPlusData &state, DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode);
     };
 
     struct DefineScheduledTESSetPointManager // Derived type for Scheduled TES Setpoint Manager data

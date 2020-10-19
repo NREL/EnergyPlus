@@ -151,7 +151,8 @@ namespace ExteriorEnergyUse {
 
         cCurrentModuleObject = "Exterior:Lights";
         for (Item = 1; Item <= state.dataExteriorEnergyUse->NumExteriorLights; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Item,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -165,7 +166,7 @@ namespace ExteriorEnergyUse {
             if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
 
             state.dataExteriorEnergyUse->ExteriorLights(Item).Name = cAlphaArgs(1);
-            state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
+            state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
             if (state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(2)) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(2) + " is required, missing for " +
@@ -220,10 +221,10 @@ namespace ExteriorEnergyUse {
                                  state.dataExteriorEnergyUse->ExteriorLights(Item).PowerActuatorValue);
             }
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Exterior Lights Electricity Rate", OutputProcessor::Unit::W, state.dataExteriorEnergyUse->ExteriorLights(Item).Power, "Zone", "Average", state.dataExteriorEnergyUse->ExteriorLights(Item).Name);
 
-            SetupOutputVariable("Exterior Lights Electricity Energy",
+            SetupOutputVariable(state, "Exterior Lights Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse,
                                 "Zone",
@@ -242,7 +243,7 @@ namespace ExteriorEnergyUse {
                 PreDefTableEntry(pdchExLtSchd, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, "-");
             } else {
                 PreDefTableEntry(pdchExLtClock, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, "Schedule");
-                PreDefTableEntry(pdchExLtSchd, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, GetScheduleName(state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr));
+                PreDefTableEntry(pdchExLtSchd, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, GetScheduleName(state, state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr));
             }
         }
         PreDefTableEntry(pdchExLtPower, "Exterior Lighting Total", sumDesignLevel);
@@ -251,7 +252,8 @@ namespace ExteriorEnergyUse {
 
         cCurrentModuleObject = "Exterior:FuelEquipment";
         for (Item = 1; Item <= NumFuelEq; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Item,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -286,13 +288,13 @@ namespace ExteriorEnergyUse {
                 ErrorsFound = true;
             } else {
                 if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).FuelType != ExteriorEnergyUse::ExteriorFuelUsage::WaterUse) {
-                    SetupOutputVariable("Exterior Equipment Fuel Rate",
+                    SetupOutputVariable(state, "Exterior Equipment Fuel Rate",
                                         OutputProcessor::Unit::W,
                                         state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).Power,
                                         "Zone",
                                         "Average",
                                         state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).Name);
-                    SetupOutputVariable("Exterior Equipment " + TypeString + " Energy",
+                    SetupOutputVariable(state, "Exterior Equipment " + TypeString + " Energy",
                                         OutputProcessor::Unit::J,
                                         state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).CurrentUse,
                                         "Zone",
@@ -303,13 +305,13 @@ namespace ExteriorEnergyUse {
                                         "ExteriorEquipment",
                                         EndUseSubcategoryName);
                 } else {
-                    SetupOutputVariable("Exterior Equipment Water Volume Flow Rate",
+                    SetupOutputVariable(state, "Exterior Equipment Water Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
                                         state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).Power,
                                         "Zone",
                                         "Average",
                                         state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).Name);
-                    SetupOutputVariable("Exterior Equipment " + TypeString + " Volume",
+                    SetupOutputVariable(state, "Exterior Equipment " + TypeString + " Volume",
                                         OutputProcessor::Unit::m3,
                                         state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).CurrentUse,
                                         "Zone",
@@ -321,7 +323,7 @@ namespace ExteriorEnergyUse {
                                         EndUseSubcategoryName);
                 }
             }
-            state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr = GetScheduleIndex(cAlphaArgs(3));
+            state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
             if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(3) + " is required, missing for " +
@@ -356,7 +358,8 @@ namespace ExteriorEnergyUse {
 
         cCurrentModuleObject = "Exterior:WaterEquipment";
         for (Item = 1; Item <= NumWtrEq; ++Item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           Item,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -373,7 +376,7 @@ namespace ExteriorEnergyUse {
             ++state.dataExteriorEnergyUse->NumExteriorEqs;
             state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).Name = cAlphaArgs(1);
             state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).FuelType = ExteriorEnergyUse::ExteriorFuelUsage::WaterUse;
-            state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr = GetScheduleIndex(cAlphaArgs(3));
+            state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
             if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(3) + " is required, missing for " +
@@ -410,14 +413,14 @@ namespace ExteriorEnergyUse {
 
             state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).DesignLevel = rNumericArgs(1);
 
-            SetupOutputVariable("Exterior Equipment Water Volume Flow Rate",
+            SetupOutputVariable(state, "Exterior Equipment Water Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).Power,
                                 "Zone",
                                 "Average",
                                 state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).Name);
 
-            SetupOutputVariable("Exterior Equipment Water Volume",
+            SetupOutputVariable(state, "Exterior Equipment Water Volume",
                                 OutputProcessor::Unit::m3,
                                 state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).CurrentUse,
                                 "Zone",
@@ -427,7 +430,7 @@ namespace ExteriorEnergyUse {
                                 "Water",
                                 "ExteriorEquipment",
                                 EndUseSubcategoryName);
-            SetupOutputVariable("Exterior Equipment Mains Water Volume",
+            SetupOutputVariable(state, "Exterior Equipment Mains Water Volume",
                                 OutputProcessor::Unit::m3,
                                 state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).CurrentUse,
                                 "Zone",
@@ -542,8 +545,6 @@ namespace ExteriorEnergyUse {
         // Using/Aliasing
         using DataEnvironment::SunIsUp;
         using DataGlobals::DoOutputReporting;
-        using DataGlobals::KindOfSim;
-        using DataGlobals::ksRunPeriodWeather;
         using DataGlobals::WarmupFlag;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -596,7 +597,7 @@ namespace ExteriorEnergyUse {
             // gather for tabular reports
             if (!WarmupFlag) {
                 //      IF (DoOutputReporting .AND.  WriteTabularFiles .and. (KindOfSim == ksRunPeriodWeather)) THEN !for weather simulations only
-                if (DoOutputReporting && (KindOfSim == ksRunPeriodWeather)) { // for weather simulations only
+                if (DoOutputReporting && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // for weather simulations only
                     // for tabular report, accumua the total electricity used for each ExteriorLights object
                     state.dataExteriorEnergyUse->ExteriorLights(Item).SumConsumption += state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse;
                     // for tabular report, accumulate the time when each ExteriorLights has consumption

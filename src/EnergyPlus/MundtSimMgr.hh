@@ -155,11 +155,11 @@ namespace MundtSimMgr {
 
     // Functions
 
-    void ManageMundtModel(int const ZoneNum); // index number for the specified zone
+    void ManageMundtModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
-    void InitMundtModel();
+    void InitMundtModel(EnergyPlusData &state);
 
     //*****************************************************************************************
 
