@@ -517,7 +517,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HREIRTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
         Real64 CurrentEndTime;     // end time of current time step
         static Real64 CurrentEndTimeLast; // end time of last time step
-        // static Real64 TimeStepSysLast;    // system time step on last time step
         Real64 SUMultiplier;              // multiplier for simulating mode changes
         Real64 CondPower;                 // condenser power [W]
         Real64 CondCapacity;              // condenser heat rejection [W]
@@ -1146,7 +1145,6 @@ namespace HVACVariableRefrigerantFlow {
             }
             VRF(VRFCond).SUMultiplier = SUMultiplier;
 
-            // TimeStepSysLast = DataHVACGlobals::TimeStepSys;
             CurrentEndTimeLast = CurrentEndTime;
 
             if (VRF(VRFCond).HeatRecoveryUsed && VRF(VRFCond).HRCoolingActive) {
@@ -5062,8 +5060,7 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    void
-    InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool const FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq)
+    void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool const FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5113,7 +5110,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 RhoAir;                    // air density at InNode
         Real64 CurrentEndTime;     // end time of current time step
         static Real64 CurrentEndTimeLast; // end time of last time step
-        static Real64 TimeStepSysLast;    // system time step on last time step
+        Real64 TimeStepSysLast;    // system time step on last time step
         Real64 TempOutput;                // Sensible output of TU
         Real64 LoadToCoolingSP;           // thermostat load to cooling setpoint (W)
         Real64 LoadToHeatingSP;           // thermostat load to heating setpoint (W)
@@ -10222,7 +10219,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HREIRTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
         Real64 CurrentEndTime;     // end time of current time step
         static Real64 CurrentEndTimeLast; // end time of last time step
-        // static Real64 TimeStepSysLast;    // system time step on last time step
         Real64 SUMultiplier;              // multiplier for simulating mode changes
         Real64 CondPower;                 // condenser power [W]
         Real64 CondCapacity;              // condenser heat rejection [W]
@@ -11312,7 +11308,6 @@ namespace HVACVariableRefrigerantFlow {
                 }
                 this->SUMultiplier = SUMultiplier;
 
-                // TimeStepSysLast = DataHVACGlobals::TimeStepSys;
                 CurrentEndTimeLast = CurrentEndTime;
             }
 
