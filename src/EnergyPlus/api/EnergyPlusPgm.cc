@@ -405,7 +405,7 @@ int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepat
         return EnergyPlus::AbortEnergyPlus(state);
     }
 
-//    std::cout << "Timer: " << EnergyPlus::DataGlobals::timer_1 << "\n";
+    std::cout << "Timer: " << EnergyPlus::DataGlobals::timer_1 << "\n";
     return wrapUpEnergyPlus(state);
 }
 

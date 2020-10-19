@@ -151,42 +151,6 @@ namespace DataSurfaces {
     // (Note: GLASSDOOR and TDD:DIFFUSER get overwritten as WINDOW
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential (LKL - 13 Aug 2007)
-//    enum class SurfaceClass {
-//        SurfaceClass_None,
-//        SurfaceClass_Wall,
-//        SurfaceClass_Floor,
-//        SurfaceClass_Roof,
-//        SurfaceClass_PH0,
-//        SurfaceClass_IntMass,
-//        SurfaceClass_Detached_B,
-//        SurfaceClass_Detached_F,
-//        SurfaceClass_PH1,
-//        SurfaceClass_PH2,
-//        SurfaceClass_PH3,
-//        SurfaceClass_Window,
-//        SurfaceClass_GlassDoor,
-//        SurfaceClass_Door,
-//        SurfaceClass_Shading,
-//        SurfaceClass_Overhang,
-//        SurfaceClass_Fin,
-//        SurfaceClass::TDD_Dome,
-//        SurfaceClass::TDD_Diffuser,
-//    };
-//    int const SurfaceClass::Wall(1);
-//    int const SurfaceClass::Floor(2);
-//    int const SurfaceClass::Roof(3);
-//    int const SurfaceClass::IntMass(5);
-//    int const SurfaceClass::Detached_B(6);
-//    int const SurfaceClass::Detached_F(7);
-//    int const SurfaceClass::Window(11);
-//    int const SurfaceClass::Door(13);
-//    int const SurfaceClass::GlassDoor(12);
-//    int const SurfaceClass::Shading(14);
-//    int const SurfaceClass::Overhang(15);
-//    int const SurfaceClass::Fin(16);
-//    int const SurfaceClass::TDD_Dome(17);
-//    int const SurfaceClass::TDD_Diffuser(18);
-
     Array1D_string const HeatTransferModelNames(10,
                                                 {"CTF - ConductionTransferFunction",
                                                  "EMPD - MoisturePenetrationDepthConductionTransferFunction",

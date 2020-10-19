@@ -2329,10 +2329,7 @@ namespace HeatBalanceSurfaceManager {
         // (I)BLAST legacy routine QSUN
 
         // TODO: InterpSlatAng (XL)
-        // TODO: Duplicated AbsDiffWin? (XL)
-        // TODO: ENUM surface class
         // TODO: Shading Surface Start and End
-        // TODO: EXT SOLAR INDEX LIST
         // TODO: TDD in Zone
 
         // Using/Aliasing
@@ -2349,6 +2346,7 @@ namespace HeatBalanceSurfaceManager {
         using namespace DataWindowEquivalentLayer;
         using SolarShading::SurfaceScheduledSolarInc;
         using SolarShading::WindowScheduledSolarAbs;
+        using namespace std::chrono;
 
         static Array1D<Real64> AbsDiffWin(CFSMAXNL);    // Diffuse solar absorptance of glass layers //Tuned Made static
         static Array1D<Real64> AbsDiffWinGnd(CFSMAXNL); // Ground diffuse solar absorptance of glass layers //Tuned Made static
@@ -2646,12 +2644,17 @@ namespace HeatBalanceSurfaceManager {
 
             if (CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface(state);
 
+            high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
             if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() && state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
                 CalcInteriorSolarDistributionWCE(state);
             } else {
                 CalcInteriorSolarDistribution(state);
             }
 
+            high_resolution_clock::time_point t2 = high_resolution_clock::now();
+            duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+            DataGlobals::timer_1 += time_span.count();
             for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
 
                 // TH 3/24/2010 - QBV is not used!
@@ -2729,8 +2732,7 @@ namespace HeatBalanceSurfaceManager {
             //      DifIncInsSurfAmountRepEnergy(SurfNum) = DifIncInsSurfAmountRep(SurfNum) * TimeStepZoneSec
             //    END DO
             if (BuildingShadingCount || FixedShadingCount || AttachedShadingCount) {
-                for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                    if (!Surface(SurfNum).ShadowingSurf) continue;
+                for (int SurfNum : AllShadingSurfList) {
                     // Cosine of incidence angle and solar incident on outside of surface, for reporting
                     Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum);
                     SurfCosIncidenceAngle(SurfNum) = CosInc;
