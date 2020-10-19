@@ -6807,14 +6807,10 @@ void UpdateMeterReporting(EnergyPlusData &state)
     int NumAlpha;
     int NumNumbers;
     int IOStat;
-    std::string::size_type WildCard;
-    std::string::size_type TestLen(0);
     std::string::size_type varnameLen;
     int NumReqMeters;
     int NumReqMeterFOs;
-    int Meter;
     ReportingFrequency ReportFreq;
-    bool NeverFound;
 
     static bool ErrorsFound(false); // If errors detected in input
 
@@ -6822,6 +6818,29 @@ void UpdateMeterReporting(EnergyPlusData &state)
     if (ErrorsFound) {
         ErrorsLogged = true;
     }
+
+    // Helper lambda to locate a meter index from its name. Returns a negative value if not found
+    auto findMeterIndexFromMeterName = [](std::string const &name) -> int {
+        // Return a value <= 0 if not found
+        int meterIndex = -99;
+
+        std::string::size_type wildCardPosition = index(name, '*');
+
+        if (wildCardPosition == std::string::npos) {
+            meterIndex = UtilityRoutines::FindItem(name, OutputProcessor::EnergyMeters);
+        } else { // Wildcard input
+            for (int Meter = 1; Meter <= OutputProcessor::NumEnergyMeters; ++Meter) {
+                if (UtilityRoutines::SameString(OutputProcessor::EnergyMeters(Meter).Name.substr(0, wildCardPosition),
+                                                name.substr(0, wildCardPosition)))
+                {
+                    meterIndex = Meter;
+                    break;
+                }
+            }
+        }
+
+        return meterIndex;
+    };
 
     cCurrentModuleObject = "Output:Meter";
     NumReqMeters = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -6844,33 +6863,14 @@ void UpdateMeterReporting(EnergyPlusData &state)
         varnameLen = index(Alphas(1), '[');
         if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);
 
-        WildCard = index(Alphas(1), '*');
-        if (WildCard != std::string::npos) {
-            TestLen = WildCard;
-        }
-
         ReportFreq = determineFrequency(Alphas(2));
 
-        if (WildCard == std::string::npos) {
-            Meter = UtilityRoutines::FindItem(Alphas(1), EnergyMeters);
-            if (Meter == 0) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
-                continue;
-            }
-
-            SetInitialMeterReportingAndOutputNames(state, Meter, false, ReportFreq, false);
-
-        } else { // Wildcard input
-            NeverFound = true;
-            for (Meter = 1; Meter <= NumEnergyMeters; ++Meter) {
-                if (!UtilityRoutines::SameString(EnergyMeters(Meter).Name.substr(0, TestLen), Alphas(1).substr(0, TestLen))) continue;
-                NeverFound = false;
-
-                SetInitialMeterReportingAndOutputNames(state, Meter, false, ReportFreq, false);
-            }
-            if (NeverFound) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
-            }
+        int meterIndex = findMeterIndexFromMeterName(Alphas(1));
+        if (meterIndex > 0) {
+            // MeterFileOnlyIndicator is false, CumulativeIndicator is false
+            SetInitialMeterReportingAndOutputNames(state, meterIndex, false, ReportFreq, false);
+        } else {
+            ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
         }
     }
 
@@ -6894,33 +6894,14 @@ void UpdateMeterReporting(EnergyPlusData &state)
         varnameLen = index(Alphas(1), '[');
         if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);
 
-        WildCard = index(Alphas(1), '*');
-        if (WildCard != std::string::npos) {
-            TestLen = WildCard;
-        }
-
         ReportFreq = determineFrequency(Alphas(2));
 
-        if (WildCard == std::string::npos) {
-            Meter = UtilityRoutines::FindItem(Alphas(1), EnergyMeters);
-            if (Meter == 0) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
-                continue;
-            }
-
-            SetInitialMeterReportingAndOutputNames(state, Meter, true, ReportFreq, false);
-
-        } else { // Wildcard input
-            NeverFound = true;
-            for (Meter = 1; Meter <= NumEnergyMeters; ++Meter) {
-                if (!UtilityRoutines::SameString(EnergyMeters(Meter).Name.substr(0, TestLen), Alphas(1).substr(0, TestLen))) continue;
-                NeverFound = false;
-
-                SetInitialMeterReportingAndOutputNames(state, Meter, true, ReportFreq, false);
-            }
-            if (NeverFound) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
-            }
+        int meterIndex = findMeterIndexFromMeterName(Alphas(1));
+        if (meterIndex > 0) {
+            // MeterFileOnlyIndicator is true, CumulativeIndicator is false
+            SetInitialMeterReportingAndOutputNames(state, meterIndex, true, ReportFreq, false);
+        } else {
+            ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
         }
     }
 
@@ -6945,33 +6926,14 @@ void UpdateMeterReporting(EnergyPlusData &state)
         varnameLen = index(Alphas(1), '[');
         if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);
 
-        WildCard = index(Alphas(1), '*');
-        if (WildCard != std::string::npos) {
-            TestLen = WildCard;
-        }
-
         ReportFreq = determineFrequency(Alphas(2));
 
-        if (WildCard == std::string::npos) {
-            Meter = UtilityRoutines::FindItem(Alphas(1), EnergyMeters);
-            if (Meter == 0) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
-                continue;
-            }
-
-            SetInitialMeterReportingAndOutputNames(state, Meter, false, ReportFreq, true);
-
-        } else { // Wildcard input
-            NeverFound = true;
-            for (Meter = 1; Meter <= NumEnergyMeters; ++Meter) {
-                if (!UtilityRoutines::SameString(EnergyMeters(Meter).Name.substr(0, TestLen), Alphas(1).substr(0, TestLen))) continue;
-                NeverFound = false;
-
-                SetInitialMeterReportingAndOutputNames(state, Meter, false, ReportFreq, true);
-            }
-            if (NeverFound) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
-            }
+        int meterIndex = findMeterIndexFromMeterName(Alphas(1));
+        if (meterIndex > 0) {
+            // MeterFileOnlyIndicator is false, CumulativeIndicator is true
+            SetInitialMeterReportingAndOutputNames(state, meterIndex, false, ReportFreq, true);
+        } else {
+            ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
         }
     }
 
@@ -6995,33 +6957,14 @@ void UpdateMeterReporting(EnergyPlusData &state)
         varnameLen = index(Alphas(1), '[');
         if (varnameLen != std::string::npos) Alphas(1).erase(varnameLen);
 
-        WildCard = index(Alphas(1), '*');
-        if (WildCard != std::string::npos) {
-            TestLen = WildCard;
-        }
-
         ReportFreq = determineFrequency(Alphas(2));
 
-        if (WildCard == std::string::npos) {
-            Meter = UtilityRoutines::FindItem(Alphas(1), EnergyMeters);
-            if (Meter == 0) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
-                continue;
-            }
-
-            SetInitialMeterReportingAndOutputNames(state, Meter, true, ReportFreq, true);
-
-        } else { // Wildcard input
-            NeverFound = true;
-            for (Meter = 1; Meter <= NumEnergyMeters; ++Meter) {
-                if (!UtilityRoutines::SameString(EnergyMeters(Meter).Name.substr(0, TestLen), Alphas(1).substr(0, TestLen))) continue;
-                NeverFound = false;
-
-                SetInitialMeterReportingAndOutputNames(state, Meter, true, ReportFreq, true);
-            }
-            if (NeverFound) {
-                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
-            }
+        int meterIndex = findMeterIndexFromMeterName(Alphas(1));
+        if (meterIndex > 0) {
+            // MeterFileOnlyIndicator is true, CumulativeIndicator is true
+            SetInitialMeterReportingAndOutputNames(state, meterIndex, true, ReportFreq, true);
+        } else {
+            ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + Alphas(1) + "\" - not found.");
         }
     }
 
