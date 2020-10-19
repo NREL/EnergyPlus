@@ -2758,53 +2758,49 @@ namespace HeatBalanceSurfaceManager {
             }
 
             for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
-                int const firstSurf = Zone(zoneNum).SurfaceFirst;
-                int const lastSurf = Zone(zoneNum).SurfaceLast;
-                for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-                    if (Surface(SurfNum).ExtSolar) {
-                        // Regular surface
-                        currCosInc(SurfNum) = CosIncAng(TimeStep, HourOfDay, SurfNum);
-                        currBeamSolar(SurfNum) = BeamSolarRad;
-                        currSkySolarInc(SurfNum) = SurfSkySolarInc(SurfNum);
-                        currGndSolarInc(SurfNum) = SurfGndSolarInc(SurfNum);
-                        // Cosine of incidence angle and solar incident on outside of surface, for reporting
-                        SurfCosIncidenceAngle(SurfNum) = currCosInc(SurfNum);
-                        // Report variables for various incident solar quantities
-                        // Incident direct (unreflected) beam
-                        SurfQRadSWOutIncidentBeam(SurfNum) =
-                                currBeamSolar(SurfNum) * SunlitFrac(TimeStep, HourOfDay, SurfNum) * currCosInc(SurfNum);
+                for (int SurfNum : Zone(zoneNum).ZoneExtSolarSurfaceList) {
+                    // Regular surface
+                    currCosInc(SurfNum) = CosIncAng(TimeStep, HourOfDay, SurfNum);
+                    currBeamSolar(SurfNum) = BeamSolarRad;
+                    currSkySolarInc(SurfNum) = SurfSkySolarInc(SurfNum);
+                    currGndSolarInc(SurfNum) = SurfGndSolarInc(SurfNum);
+                    // Cosine of incidence angle and solar incident on outside of surface, for reporting
+                    SurfCosIncidenceAngle(SurfNum) = currCosInc(SurfNum);
+                    // Report variables for various incident solar quantities
+                    // Incident direct (unreflected) beam
+                    SurfQRadSWOutIncidentBeam(SurfNum) =
+                            currBeamSolar(SurfNum) * SunlitFrac(TimeStep, HourOfDay, SurfNum) * currCosInc(SurfNum);
 
-                        // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
-                        SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
-                        // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
-                        SurfQRadSWOutIncidentGndDiffuse(SurfNum) = currGndSolarInc(SurfNum);
-                        // Incident diffuse solar from beam-to-diffuse reflection from ground
-                        SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) =
-                                BeamSolarRad * SOLCOS(3) * GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
+                    // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
+                    SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
+                    // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
+                    SurfQRadSWOutIncidentGndDiffuse(SurfNum) = currGndSolarInc(SurfNum);
+                    // Incident diffuse solar from beam-to-diffuse reflection from ground
+                    SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) =
+                            BeamSolarRad * SOLCOS(3) * GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
 
-                        // Incident diffuse solar from sky diffuse reflection from ground
-                        SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
-                                DifSolarRad * GndReflectance * SurfSkyDiffReflFacGnd(SurfNum);
-                        // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
-                        // in SkySolarInc.
-                        // QRadSWOutIncident(SurfNum) = QRadSWOutIncidentBeam(SurfNum) + SkySolarInc + GndSolarInc
-                        // TH2 CR 9056
-                        SurfQRadSWOutIncident(SurfNum) =
-                                SurfQRadSWOutIncidentBeam(SurfNum) + SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
-                                SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
+                    // Incident diffuse solar from sky diffuse reflection from ground
+                    SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
+                            DifSolarRad * GndReflectance * SurfSkyDiffReflFacGnd(SurfNum);
+                    // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
+                    // in SkySolarInc.
+                    // QRadSWOutIncident(SurfNum) = QRadSWOutIncidentBeam(SurfNum) + SkySolarInc + GndSolarInc
+                    // TH2 CR 9056
+                    SurfQRadSWOutIncident(SurfNum) =
+                            SurfQRadSWOutIncidentBeam(SurfNum) + SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
+                            SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
 
-                        if (CalcSolRefl) {
-                            // Incident beam solar from beam-to-beam (specular) reflection from obstructions
-                            SurfQRadSWOutIncBmToBmReflObs(SurfNum) = SurfBmToBmReflFacObs(SurfNum) * BeamSolarRad;
-                            // Incident diffuse solar from beam-to-diffuse reflection from obstructions
-                            SurfQRadSWOutIncBmToDiffReflObs(SurfNum) = SurfBmToDiffReflFacObs(SurfNum) * BeamSolarRad;
-                            // Incident diffuse solar from sky diffuse reflection from obstructions
-                            SurfQRadSWOutIncSkyDiffReflObs(SurfNum) = DifSolarRad * ReflFacSkySolObs(SurfNum);
-                            // TH2 CR 9056: Add reflections from obstructions to the total incident
-                            SurfQRadSWOutIncident(SurfNum) +=
-                                    SurfQRadSWOutIncBmToBmReflObs(SurfNum) + SurfQRadSWOutIncBmToDiffReflObs(SurfNum) +
-                                    SurfQRadSWOutIncSkyDiffReflObs(SurfNum);
-                        }
+                    if (CalcSolRefl) {
+                        // Incident beam solar from beam-to-beam (specular) reflection from obstructions
+                        SurfQRadSWOutIncBmToBmReflObs(SurfNum) = SurfBmToBmReflFacObs(SurfNum) * BeamSolarRad;
+                        // Incident diffuse solar from beam-to-diffuse reflection from obstructions
+                        SurfQRadSWOutIncBmToDiffReflObs(SurfNum) = SurfBmToDiffReflFacObs(SurfNum) * BeamSolarRad;
+                        // Incident diffuse solar from sky diffuse reflection from obstructions
+                        SurfQRadSWOutIncSkyDiffReflObs(SurfNum) = DifSolarRad * ReflFacSkySolObs(SurfNum);
+                        // TH2 CR 9056: Add reflections from obstructions to the total incident
+                        SurfQRadSWOutIncident(SurfNum) +=
+                                SurfQRadSWOutIncBmToBmReflObs(SurfNum) + SurfQRadSWOutIncBmToDiffReflObs(SurfNum) +
+                                SurfQRadSWOutIncSkyDiffReflObs(SurfNum);
                     }
                 }
             }
