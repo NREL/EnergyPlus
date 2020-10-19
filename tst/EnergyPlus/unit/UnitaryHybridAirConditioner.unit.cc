@@ -142,7 +142,7 @@ std::vector<std::string> parseLine(std::string line)
     return vect;
 }
 
-TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_Unittest)
+TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 {
     std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
@@ -509,7 +509,7 @@ TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_Unittest)
 }
 
 
-TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_ValidateFieldsParsing)
+TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateFieldsParsing)
 {
     std::string idf_objects = delimited_string({
         "ZoneHVAC:HybridUnitaryHVAC,",
@@ -588,7 +588,7 @@ TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_ValidateFiel
 }
 
 
-TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_ValidateMinimumIdfInput)
+TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateMinimumIdfInput)
 {
     std::string idf_objects = delimited_string({
         "ZoneHVAC:HybridUnitaryHVAC,",
@@ -631,7 +631,7 @@ TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_ValidateMini
     EXPECT_EQ(pZoneHybridUnitaryAirConditioner->OperatingModes.size(), expectedOperatingModesSize);
 }
 
-TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_CalculateCurveVal)
+TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
 {
     std::string const idf_objects = delimited_string({
         "ZoneHVAC:HybridUnitaryHVAC,",
@@ -862,7 +862,7 @@ TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_CalculateCur
     }
 }
 
-TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_ModelOperatingSettings_SolutionSpaceSearching)
+TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ModelOperatingSettings_SolutionSpaceSearching)
 {
 
     std::string const idf_objects = delimited_string({
@@ -1269,7 +1269,7 @@ TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_ModelOperati
     }
 }
 
-TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_ValidateError)
+TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateError)
 {
     std::string idf_objects = delimited_string({
         "ZoneHVAC:HybridUnitaryHVAC,",
@@ -1383,7 +1383,7 @@ TEST_F(EnergyPlusFixture, DISABLED_Test_UnitaryHybridAirConditioner_ValidateErro
     bool ErrorsFound = false;
     GetInputZoneHybridUnitaryAirConditioners(state, ErrorsFound);
     std::string const error_string = delimited_string({
-        "   ** Severe  ** Invalid =ALWAYS_ON\n   **   ~~~   ** Entered in ZoneHVAC:HybridUnitaryHVAC=MUNTERSEPX5000\n   ** Severe  ** GetInputZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC = MUNTERSEPX5000 invalid data\n   **   ~~~   ** Invalid-not found=\"\"."
+        "   ** Severe  ** Invalid =ALWAYS_ON\n   **   ~~~   ** Entered in ZoneHVAC:HybridUnitaryHVAC=MUNTERSEPX5000\n   ** Severe  ** GetInputZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC = MUNTERSEPX5000 invalid data\n   **   ~~~   ** Invalid-not found Design Specification Outdoor Air Object Name=\"\"."
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
