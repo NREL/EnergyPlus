@@ -584,7 +584,7 @@ namespace SimulationManager {
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
                 if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
                     DisplayString("Starting last  year of environment at:  " + state.dataGlobal->DayOfSimChr);
-                    ResetTabularReports();
+                    ResetTabularReports(state);
                 }
 
                 for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -1906,8 +1906,6 @@ namespace SimulationManager {
         using OutputProcessor::NumVarMeterArrays;
         using OutputReportTabular::maxUniqueKeyCount;
         using OutputReportTabular::MonthlyFieldSetInputCount;
-        using SolarShading::MAXHCArrayBounds;
-        using SolarShading::maxNumberOfFigures;
         using namespace DataRuntimeLanguage;
         using DataBranchNodeConnections::MaxNumOfNodeConnections;
         using DataBranchNodeConnections::NumOfNodeConnections;
@@ -1953,8 +1951,8 @@ namespace SimulationManager {
         print(state.files.audit, variable_fmt, "NumEnergyMeters", NumEnergyMeters);
         print(state.files.audit, variable_fmt, "NumVarMeterArrays", NumVarMeterArrays);
         print(state.files.audit, variable_fmt, "maxUniqueKeyCount", maxUniqueKeyCount);
-        print(state.files.audit, variable_fmt, "maxNumberOfFigures", maxNumberOfFigures);
-        print(state.files.audit, variable_fmt, "MAXHCArrayBounds", MAXHCArrayBounds);
+        print(state.files.audit, variable_fmt, "maxNumberOfFigures", state.dataSolarShading->maxNumberOfFigures);
+        print(state.files.audit, variable_fmt, "MAXHCArrayBounds", state.dataSolarShading->MAXHCArrayBounds);
         print(state.files.audit, variable_fmt, "MaxVerticesPerSurface", MaxVerticesPerSurface);
         print(state.files.audit, variable_fmt, "NumReportList", NumReportList);
         print(state.files.audit, variable_fmt, "InstMeterCacheSize", InstMeterCacheSize);

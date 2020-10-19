@@ -167,6 +167,7 @@ namespace DataGlobalConstants {
     Real64 constexpr UniversalGasConst () { return 8314.462175; }           // Universal Gas Constant (J/mol*K)
     Real64 constexpr convertJtoGJ () { return 1.0E-9; }                     // Conversion factor for J to GJ
     int constexpr MaxSpeedLevels () { return 10; }                          // Maximum number of speed that supports
+    int constexpr MaxCTFTerms () { return 19; }                             // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms
 
     ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar);
     std::string GetResourceTypeChar(ResourceType ResourceTypeNum);

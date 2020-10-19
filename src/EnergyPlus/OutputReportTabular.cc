@@ -545,7 +545,7 @@ namespace OutputReportTabular {
     } // namespace
 
     // Functions
-    void clear_state()
+    void clear_state(EnergyPlusData &state)
     {
         GatherMonthlyResultsForTimestepRunOnce = true;
         UpdateTabularReportsGetInput = true;
@@ -723,7 +723,7 @@ namespace OutputReportTabular {
         TOCEntries.deallocate();
         UnitConv.deallocate();
 
-        OutputReportTabular::ResetTabularReports();
+        OutputReportTabular::ResetTabularReports(state);
 
         numPeopleAdaptive = 0;
     }
@@ -15327,14 +15327,12 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ResetTabularReports()
+    void ResetTabularReports(EnergyPlusData &state)
     {
         // Jason Glazer - October 2015
         // Reset all gathering arrays to zero for multi-year simulations
         // so that only last year is reported in tabular reports
         using OutputProcessor::isFinalYear;
-        using ThermalComfort::ResetSetPointMet;
-        using ThermalComfort::ResetThermalComfortSimpleASH55;
 
         gatherElapsedTimeBEPS = 0.0;
         ResetMonthlyGathering();
@@ -15345,8 +15343,8 @@ namespace OutputReportTabular {
         ResetPeakDemandGathering();
         ResetHeatGainGathering();
         ResetRemainingPredefinedEntries();
-        ResetThermalComfortSimpleASH55();
-        ResetSetPointMet();
+        ThermalComfort::ResetThermalComfortSimpleASH55(state);
+        ThermalComfort::ResetSetPointMet(state);
         ResetAdaptiveComfort();
         isFinalYear = true;
     }
