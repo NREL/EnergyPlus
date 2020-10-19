@@ -47,11 +47,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -90,7 +90,6 @@ namespace HVACDuct {
     // USE STATEMENTS:
     // <use statements for data only modules>
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::BeginEnvrnFlag;
     using namespace DataHVACGlobals;
     using namespace DataLoopNode;
@@ -124,7 +123,8 @@ namespace HVACDuct {
 
     // Functions
 
-    void SimDuct(std::string const &CompName,              // name of the duct component
+    void SimDuct(EnergyPlusData &state,
+                 std::string const &CompName,              // name of the duct component
                  bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep !unused1208
                  int &CompIndex                            // index of duct component
     )
@@ -146,7 +146,7 @@ namespace HVACDuct {
         int DuctNum;                    // index of duct being simulated
 
         if (GetInputFlag) {
-            GetDuctInput();
+            GetDuctInput(state);
             GetInputFlag = false;
         }
 
@@ -181,7 +181,7 @@ namespace HVACDuct {
         ReportDuct(DuctNum);
     }
 
-    void GetDuctInput()
+    void GetDuctInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -215,7 +215,8 @@ namespace HVACDuct {
         CheckEquipName.dimension(NumDucts, true);
 
         for (DuctNum = 1; DuctNum <= NumDucts; ++DuctNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           DuctNum,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -229,9 +230,9 @@ namespace HVACDuct {
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             Duct(DuctNum).Name = cAlphaArgs(1);
-            Duct(DuctNum).InletNodeNum = GetOnlySingleNode(
+            Duct(DuctNum).InletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            Duct(DuctNum).OutletNodeNum = GetOnlySingleNode(
+            Duct(DuctNum).OutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Air Nodes");
         }

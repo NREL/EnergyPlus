@@ -101,7 +101,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
 
     // autosize nominal gas use rate
     OutBaroPress = 101325.0;
-    thisHum.SizeHumidifier();
+    thisHum.SizeHumidifier(state);
     EXPECT_DOUBLE_EQ(4.00E-5, thisHum.NomCapVol);
     EXPECT_DOUBLE_EQ(0.040000010708118504, thisHum.NomCap);
     EXPECT_DOUBLE_EQ(103710.42776358133, thisHum.NomPower);
@@ -138,7 +138,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
     // volumetric capacity autosize unit test
     thisHum.NomCapVol = AutoSize;
     CurZoneEqNum = 0; // size it based on system
-    thisHum.SizeHumidifier();
+    thisHum.SizeHumidifier(state);
     // test autosized nominal capacity
     EXPECT_NEAR(8.185E-05, thisHum.NomCapVol, 1.0E-06); // m3/s
     // test autosized nominal capacity
@@ -180,7 +180,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     thisHum.NomCapVol = 4.00E-5;
     thisHum.NomPower = 103710;
     OutBaroPress = 101325.0;
-    thisHum.SizeHumidifier();
+    thisHum.SizeHumidifier(state);
     EXPECT_DOUBLE_EQ(0.040000010708118504, thisHum.NomCap);
     EXPECT_DOUBLE_EQ(103710.42776358133, thisHum.NomPower);
 

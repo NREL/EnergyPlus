@@ -1249,9 +1249,9 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     ASSERT_TRUE(process_idf(idf_objects));
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.files);
+    ProcessScheduleInput(state);
 
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // zones are specified in the idf snippet
 
     // Get Zone Equipment Configuration data
@@ -1260,7 +1260,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     DataZoneEquipment::ZoneEquipList(2).EquipIndex(1) = 1; // 2nd zone is 401, so this is 1st direct air unit
     MixedAir::GetOutsideAirSysInputs(state);
     MixedAir::GetOAControllerInputs(state);
-    SplitterComponent::GetSplitterInput();
+    SplitterComponent::GetSplitterInput(state);
     BranchInputManager::GetMixerInput(state);
     BranchInputManager::ManageBranchInput(state);
     GetZoneAirLoopEquipment(state);
@@ -1270,7 +1270,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     SimAirServingZones::GetAirPathData(state);
     SimAirServingZones::InitAirLoops(state, FirstHVACIteration);
 
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state, state.files);
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state);
 
     CurDeadBandOrSetback.allocate(2);
     CurDeadBandOrSetback(1) = false;
@@ -1422,7 +1422,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
     DataPlant::PlantLoop(1).FluidIndex = 1;
 
     DataLoopNode::Node(HeatRecInNode).MassFlowRate = 0.0; // test heat recovery result with 0 water flow rate
-    HVACMultiSpeedHeatPump::MSHPHeatRecovery(1);
+    HVACMultiSpeedHeatPump::MSHPHeatRecovery(state, 1);
 
     // outlet temp should equal inlet temp since mass flow rate = 0
     Real64 calculatedOutletTemp =
@@ -1433,7 +1433,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
     EXPECT_DOUBLE_EQ(0.0, MSHeatPump(1).HeatRecoveryMassFlowRate);
 
     DataLoopNode::Node(HeatRecInNode).MassFlowRate = 0.1; // initialize flow rate and test heat recovery result using 1 kW heat transfer to fluid
-    HVACMultiSpeedHeatPump::MSHPHeatRecovery(1);
+    HVACMultiSpeedHeatPump::MSHPHeatRecovery(state, 1);
 
     // outlet temp should equal temperature rise due to 1 kW of heat input at 0.1 kg/s
     calculatedOutletTemp =
@@ -1446,7 +1446,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
 
     DataHVACGlobals::MSHPWasteHeat = 100000.0; // test very high heat transfer that would limit outlet water temperature
     DataLoopNode::Node(HeatRecInNode).MassFlowRate = 0.1;
-    HVACMultiSpeedHeatPump::MSHPHeatRecovery(1);
+    HVACMultiSpeedHeatPump::MSHPHeatRecovery(state, 1);
 
     // outlet temp should equal max limit of 80 C since 100 kW would cause outlet water temperature to exceed 80 C
     EXPECT_DOUBLE_EQ(50.0, MSHeatPump(1).HeatRecoveryInletTemp);

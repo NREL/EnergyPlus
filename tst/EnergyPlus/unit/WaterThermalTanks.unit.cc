@@ -357,7 +357,7 @@ TEST_F(EnergyPlusFixture, HPWHZoneEquipSeqenceNumberWarning)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
 }
@@ -775,7 +775,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     state.dataWaterThermalTanks->mdotAir = 0.0993699992873531;
 
     int GlycolIndex = 0;
-    const Real64 Cp = FluidProperties::GetSpecificHeatGlycol(Water, Tank.TankTemp, GlycolIndex, "HPWHEnergyBalance");
+    const Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, Water, Tank.TankTemp, GlycolIndex, "HPWHEnergyBalance");
 
     Tank.CalcHeatPumpWaterHeater(state, false);
 
@@ -1037,7 +1037,7 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     int CompIndex = 1;
     Real64 SenseLoadMet = 0;
     Real64 LatLoadMet = 0;
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataHVACGlobals::TimeStepSys = 1;
     SetPredefinedTables();
@@ -1405,7 +1405,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 1;
     SetPredefinedTables();
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
 
@@ -1704,14 +1704,14 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     InternalHeatGains::GetInternalHeatGainsInput(state);
 
     DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
     DataGlobals::TimeStep = 1;
@@ -1723,7 +1723,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     int TankNum(1);
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
@@ -1825,7 +1825,7 @@ TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     InternalHeatGains::GetInternalHeatGainsInput(state);
@@ -1942,7 +1942,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     InternalHeatGains::GetInternalHeatGainsInput(state);
@@ -2024,14 +2024,14 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     for (int i = 0; i < Tank.Nodes - 1; ++i) {
         EXPECT_GE(NodeTemps[i], NodeTemps[i + 1]);
     }
-    const Real64 SecInTimeStep = TimeStepSys * DataGlobals::SecInHour;
+    const Real64 SecInTimeStep = TimeStepSys * DataGlobalConstants::SecInHour();
     int DummyIndex = 1;
     Real64 TankNodeEnergy = 0;
     for (int i = 0; i < Tank.Nodes; ++i) {
         auto &node = Tank.Node[i];
         TankNodeEnergy += node.Mass * (NodeTemps[i] - PrevNodeTemps[i]);
     }
-    Real64 Cp = FluidProperties::GetSpecificHeatGlycol("WATER", 60.0, DummyIndex, "StratifiedTankCalcNoDraw");
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, "WATER", 60.0, DummyIndex, "StratifiedTankCalcNoDraw");
     TankNodeEnergy *= Cp;
     EXPECT_NEAR(Tank.NetHeatTransferRate * SecInTimeStep, TankNodeEnergy, fabs(TankNodeEnergy * 0.0001));
 
@@ -2064,7 +2064,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
 {
     using DataGlobals::HourOfDay;
-    using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
@@ -2143,7 +2142,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     InternalHeatGains::GetInternalHeatGainsInput(state);
@@ -2153,7 +2152,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
     WaterThermalTanks::WaterThermalTankData &Tank = state.dataWaterThermalTanks->WaterThermalTank(TankNum);
     Tank.SourceInletNode = 1;
     Tank.SourceOutletNode = 2;
-    Tank.SetupStratifiedNodes();
+    Tank.SetupStratifiedNodes(state);
 
     HourOfDay = 0;
     TimeStep = 1;
@@ -2176,7 +2175,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
     Tank.SourceMassFlowRate = 6.30901964e-5 * 997; // 1 gal/min
 
     int DummyIndex = 1;
-    Real64 Cp = FluidProperties::GetSpecificHeatGlycol("WATER", 60.0, DummyIndex, "StratifiedTankCalcNoDraw");
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, "WATER", 60.0, DummyIndex, "StratifiedTankCalcNoDraw");
 
     Tank.CalcWaterThermalTankStratified(state);
 
@@ -2186,7 +2185,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
         EnergySum += node.Mass * Cp * (node.Temp - 60.0);
     }
     Real64 Esource = Tank.SourceEffectiveness * Tank.SourceMassFlowRate * Cp *
-                     (Tank.SourceInletTemp - Tank.Node(Tank.SourceOutletStratNode).TempAvg) * TimeStepSys * SecInHour;
+                     (Tank.SourceInletTemp - Tank.Node(Tank.SourceOutletStratNode).TempAvg) * TimeStepSys * DataGlobalConstants::SecInHour();
     EXPECT_NEAR(Esource, EnergySum, EnergySum * 0.001);
 }
 
@@ -2385,12 +2384,12 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
     DataGlobals::TimeStep = 1;
@@ -2402,7 +2401,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     int TankNum = 1;
     int DXNum = 1;
@@ -2619,12 +2618,12 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
     DataGlobals::TimeStep = 1;
@@ -2636,7 +2635,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
     DataPlant::TotNumLoops = 1;
     int TankNum(1);
     int HPNum(1);
@@ -3017,12 +3016,12 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
     DataGlobals::TimeStep = 1;
@@ -3034,7 +3033,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     int TankNum(1);
     int DXNum(1);
@@ -3121,7 +3120,6 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
 {
     using DataGlobals::HourOfDay;
-    using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataHVACGlobals::SysTimeElapsed;
@@ -3185,7 +3183,7 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
     // Schedules setup
     DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
     DataGlobals::TimeStep = 1;
@@ -3197,7 +3195,7 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
 
@@ -3215,7 +3213,7 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
     // Source side is in the demand side of the plant loop
     Tank.SrcSide.loopSideNum = DemandSide;
     Tank.SavedSourceOutletTemp = 60.0;
-    rho = GetDensityGlycol("Water", Tank.TankTemp, WaterIndex, "MixedTankAlternateSchedule");
+    rho = GetDensityGlycol(state, "Water", Tank.TankTemp, WaterIndex, "MixedTankAlternateSchedule");
 
     // Set the available max flow rates for tank and node
     Tank.PlantSourceMassFlowRateMax = Tank.SourceDesignVolFlowRate * rho;
@@ -3683,7 +3681,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 
     DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
     DataGlobals::TimeStep = 1;
@@ -3695,7 +3693,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     // Inititate tank conditions
     HourOfDay = 0;
@@ -4441,7 +4439,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 1;
     SetPredefinedTables();
-    ScheduleManager::UpdateScheduleValues();
+    ScheduleManager::UpdateScheduleValues(state);
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(state));
 
@@ -5089,7 +5087,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_FalsePositiveBlank
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     InternalHeatGains::GetInternalHeatGainsInput(state);
@@ -5190,7 +5188,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_FalsePositiveZeroe
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     InternalHeatGains::GetInternalHeatGainsInput(state);
@@ -5289,7 +5287,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_ExpectedWarning)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     InternalHeatGains::GetInternalHeatGainsInput(state);

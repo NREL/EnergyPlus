@@ -328,32 +328,30 @@ namespace EconomicTariff {
         //    routines for economics.
 
         using DataGlobals::DoOutputReporting;
-        using DataGlobals::KindOfSim;
-        using DataGlobals::ksRunPeriodWeather;
         using OutputReportTabular::AddTOCEntry;
         using OutputReportTabular::displayEconomicResultSummary;
 
         bool ErrorsFound(false);
 
         if (Update_GetInput) {
-            GetInputEconomicsTariff(ErrorsFound);
+            GetInputEconomicsTariff(state, ErrorsFound);
             // do rest of GetInput only if at least one tariff is defined.
             GetInputEconomicsCurrencyType(state, ErrorsFound);
             if (numTariff >= 1) {
                 if (!ErrorsFound && displayEconomicResultSummary) AddTOCEntry("Economics Results Summary Report", "Entire Facility");
                 CreateCategoryNativeVariables();
-                GetInputEconomicsQualify(ErrorsFound);
-                GetInputEconomicsChargeSimple(ErrorsFound);
-                GetInputEconomicsChargeBlock(ErrorsFound);
-                GetInputEconomicsRatchet(ErrorsFound);
-                GetInputEconomicsVariable(ErrorsFound);
-                GetInputEconomicsComputation(ErrorsFound);
+                GetInputEconomicsQualify(state, ErrorsFound);
+                GetInputEconomicsChargeSimple(state, ErrorsFound);
+                GetInputEconomicsChargeBlock(state, ErrorsFound);
+                GetInputEconomicsRatchet(state, ErrorsFound);
+                GetInputEconomicsVariable(state, ErrorsFound);
+                GetInputEconomicsComputation(state, ErrorsFound);
                 CreateDefaultComputation();
             }
             Update_GetInput = false;
             if (ErrorsFound) ShowFatalError("UpdateUtilityBills: Preceding errors cause termination.");
         }
-        if (DoOutputReporting && (KindOfSim == ksRunPeriodWeather)) {
+        if (DoOutputReporting && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
             GatherForEconomics();
         }
     }
@@ -366,7 +364,7 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputEconomicsTariff(bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -391,8 +389,6 @@ namespace EconomicTariff {
         int jObj;      // loop index for objects
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(100)  :: AlphaArray !character string data
-        // REAL(r64),                        DIMENSION(100)  :: NumArray  !numeric data
         int IOStat; // IO Status when calling get input subroutine
         int found;
         bool isNotNumeric;
@@ -411,7 +407,8 @@ namespace EconomicTariff {
         numTariff = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         tariff.allocate(numTariff);
         for (iInObj = 1; iInObj <= numTariff; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -448,7 +445,7 @@ namespace EconomicTariff {
             // name of the report meter
             tariff(iInObj).reportMeter = cAlphaArgs(2);
             // call the key count function but only need count during this pass
-            GetVariableKeyCountandType(tariff(iInObj).reportMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
+            GetVariableKeyCountandType(state, tariff(iInObj).reportMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
             // if no meters found for that name
             if (KeyCount == 0) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" missing meter");
@@ -458,7 +455,7 @@ namespace EconomicTariff {
             } else {
                 NamesOfKeys.allocate(KeyCount);
                 IndexesForKeyVar.allocate(KeyCount);
-                GetVariableKeys(tariff(iInObj).reportMeter, TypeVar, NamesOfKeys, IndexesForKeyVar);
+                GetVariableKeys(state, tariff(iInObj).reportMeter, TypeVar, NamesOfKeys, IndexesForKeyVar);
                 // although this retrieves all keys for a variable, we only need one so the first one is chosen
                 if (KeyCount > 1) {
                     ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" multiple keys");
@@ -677,7 +674,7 @@ namespace EconomicTariff {
             // period schedule
             if (len(cAlphaArgs(4)) > 0) {
                 tariff(iInObj).periodSchedule = cAlphaArgs(4);                   // name of the period schedule (time of day)
-                tariff(iInObj).periodSchIndex = GetScheduleIndex(cAlphaArgs(4)); // index to the period schedule
+                tariff(iInObj).periodSchIndex = GetScheduleIndex(state, cAlphaArgs(4)); // index to the period schedule
                 if (tariff(iInObj).periodSchIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError(" not found " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
@@ -689,7 +686,7 @@ namespace EconomicTariff {
             // season schedule
             if (len(cAlphaArgs(5)) > 0) {
                 tariff(iInObj).seasonSchedule = cAlphaArgs(5);                   // name of the season schedule (winter/summer)
-                tariff(iInObj).seasonSchIndex = GetScheduleIndex(cAlphaArgs(5)); // index to the season schedule
+                tariff(iInObj).seasonSchIndex = GetScheduleIndex(state, cAlphaArgs(5)); // index to the season schedule
                 if (tariff(iInObj).seasonSchIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError(" not found " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
@@ -701,7 +698,7 @@ namespace EconomicTariff {
             // month schedule
             if (len(cAlphaArgs(6)) > 0) {
                 tariff(iInObj).monthSchedule = cAlphaArgs(6);                   // name of month schedule (when months end)
-                tariff(iInObj).monthSchIndex = GetScheduleIndex(cAlphaArgs(6)); // index to the month schedule
+                tariff(iInObj).monthSchIndex = GetScheduleIndex(state, cAlphaArgs(6)); // index to the month schedule
                 if (tariff(iInObj).monthSchIndex == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError(" not found " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
@@ -787,9 +784,9 @@ namespace EconomicTariff {
             tariff(iInObj).minMonthChgPt = AssignVariablePt(cAlphaArgs(9), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, iInObj);
             // real time pricing
             tariff(iInObj).chargeSchedule = cAlphaArgs(10);
-            tariff(iInObj).chargeSchIndex = GetScheduleIndex(cAlphaArgs(10));
+            tariff(iInObj).chargeSchIndex = GetScheduleIndex(state, cAlphaArgs(10));
             tariff(iInObj).baseUseSchedule = cAlphaArgs(11);
-            tariff(iInObj).baseUseSchIndex = GetScheduleIndex(cAlphaArgs(11));
+            tariff(iInObj).baseUseSchIndex = GetScheduleIndex(state, cAlphaArgs(11));
             // group name for separate distribution and transmission rates
             tariff(iInObj).groupName = cAlphaArgs(12);
             // buy or sell option
@@ -848,7 +845,7 @@ namespace EconomicTariff {
         }
     }
 
-    void GetInputEconomicsQualify(bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
@@ -860,8 +857,6 @@ namespace EconomicTariff {
         int iInObj;    // loop index variable for reading in objects
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(100)  :: cAlphaArgs !character string data
-        // REAL(r64),                        DIMENSION(100)  :: rNumericArgs  !numeric data
         int IOStat; // IO Status when calling get input subroutine
         bool isNotNumeric;
         int jFld;
@@ -871,7 +866,8 @@ namespace EconomicTariff {
         numQualify = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         qualify.allocate(numQualify);
         for (iInObj = 1; iInObj <= numQualify; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -930,7 +926,7 @@ namespace EconomicTariff {
         }
     }
 
-    void GetInputEconomicsChargeSimple(bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
@@ -943,8 +939,6 @@ namespace EconomicTariff {
         int iInObj;    // loop index variable for reading in objects
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(100)  :: cAlphaArgs !character string data
-        // REAL(r64),                        DIMENSION(100)  :: rNumericArgs  !numeric data
         int IOStat; // IO Status when calling get input subroutine
         bool isNotNumeric;
         int jFld;
@@ -954,7 +948,8 @@ namespace EconomicTariff {
         numChargeSimple = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         chargeSimple.allocate(numChargeSimple);
         for (iInObj = 1; iInObj <= numChargeSimple; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1002,7 +997,7 @@ namespace EconomicTariff {
         }
     }
 
-    void GetInputEconomicsChargeBlock(bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
@@ -1015,8 +1010,6 @@ namespace EconomicTariff {
         int iInObj;    // loop index variable for reading in objects
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(100)  :: cAlphaArgs !character string data
-        // REAL(r64),                        DIMENSION(100)  :: rNumericArgs  !numeric data
         int IOStat; // IO Status when calling get input subroutine
         bool isNotNumeric;
         int jBlk;               // loop index for blocks
@@ -1030,7 +1023,8 @@ namespace EconomicTariff {
         numChargeBlock = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         chargeBlock.allocate(numChargeBlock);
         for (iInObj = 1; iInObj <= numChargeBlock; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1106,7 +1100,7 @@ namespace EconomicTariff {
         }
     }
 
-    void GetInputEconomicsRatchet(bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsRatchet(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
@@ -1119,8 +1113,6 @@ namespace EconomicTariff {
         int iInObj;    // loop index variable for reading in objects
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(100)  :: cAlphaArgs !character string data
-        // REAL(r64),                        DIMENSION(100)  :: rNumericArgs  !numeric data
         int IOStat; // IO Status when calling get input subroutine
         bool isNotNumeric;
         int jFld;
@@ -1130,7 +1122,8 @@ namespace EconomicTariff {
         numRatchet = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         ratchet.allocate(numRatchet);
         for (iInObj = 1; iInObj <= numRatchet; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1173,7 +1166,7 @@ namespace EconomicTariff {
         }
     }
 
-    void GetInputEconomicsVariable(bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
@@ -1189,8 +1182,6 @@ namespace EconomicTariff {
         int iInObj;    // loop index variable for reading in objects
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(100)  :: cAlphaArgs !character string data
-        // REAL(r64),                        DIMENSION(100)  :: rNumericArgs  !numeric data
         int IOStat; // IO Status when calling get input subroutine
         int jVal;
         int variablePt;
@@ -1200,7 +1191,8 @@ namespace EconomicTariff {
         CurrentModuleObject = "UtilityCost:Variable";
         numEconVarObj = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         for (iInObj = 1; iInObj <= numEconVarObj; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1249,7 +1241,7 @@ namespace EconomicTariff {
         }
     }
 
-    void GetInputEconomicsComputation(bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsComputation(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
@@ -1265,8 +1257,6 @@ namespace EconomicTariff {
         int iInObj;    // loop index variable for reading in objects
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(100)  :: cAlphaArgs !character string data
-        // REAL(r64),                        DIMENSION(100)  :: rNumericArgs  !numeric data
         int IOStat; // IO Status when calling get input subroutine
         int jLine;
         int jFld;
@@ -1283,7 +1273,8 @@ namespace EconomicTariff {
             e.isUserDef = false;
         }
         for (iInObj = 1; iInObj <= numComputation; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           iInObj,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -1356,7 +1347,8 @@ namespace EconomicTariff {
         if (NumCurrencyType == 0) {
             state.dataCostEstimateManager->selectedMonetaryUnit = 1; // USD - U.S. Dollar
         } else if (NumCurrencyType == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           1,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -2728,7 +2720,6 @@ namespace EconomicTariff {
         //   calculation.
 
         using DataEnvironment::Month;
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStepZoneSec;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -2759,7 +2750,7 @@ namespace EconomicTariff {
                 tariff(iTariff).collectEnergy += curInstantValue;
                 tariff(iTariff).collectTime += TimeStepZoneSec;
                 // added *SecInHour when adding RTP support August 2008
-                if (tariff(iTariff).collectTime >= tariff(iTariff).demWinTime * SecInHour) {
+                if (tariff(iTariff).collectTime >= tariff(iTariff).demWinTime * DataGlobalConstants::SecInHour()) {
                     // get current value that has been converted into desired units
                     curDemand = tariff(iTariff).demandConv * tariff(iTariff).collectEnergy / tariff(iTariff).collectTime;
                     curEnergy = tariff(iTariff).energyConv * tariff(iTariff).collectEnergy;
@@ -2865,7 +2856,7 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ComputeTariff(IOFiles &ioFiles)
+    void ComputeTariff(EnergyPlusData &state)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
@@ -2897,7 +2888,7 @@ namespace EconomicTariff {
         Real64 annualAggregate;
         int annualCnt;
 
-        if (!(ioFiles.outputControl.tabular || ioFiles.outputControl.sqlite)) {
+        if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
             WriteTabularFiles = false;
             return;
         }
@@ -5026,7 +5017,7 @@ namespace EconomicTariff {
         MinTariffIndex.deallocate();
     }
 
-    void GetMonthlyCostForResource(int const inResourceNumber, Array1A<Real64> outMonthlyCosts)
+    void GetMonthlyCostForResource(DataGlobalConstants::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts)
     {
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   May 2010

@@ -54,6 +54,7 @@
 #include <vector>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -67,6 +68,18 @@ enum class ThermalLossDestination : int
     heatLossNotDetermined = 0,
     zoneGains,    // device thermal losses are added to a zone as internal gains
     lostToOutside // device thermal losses have no destination
+};
+
+enum class GeneratorType {
+    Unassigned,
+    ICEngine,
+    CombTurbine,
+    PV,
+    FuelCell,
+    MicroCHP,
+    Microturbine,
+    WindTurbine,
+    PVWatts
 };
 
 void initializeElectricPowerServiceZoneGains();
@@ -388,7 +401,7 @@ class ElectricTransformer
 
 public: // methods
     // Constructor
-    ElectricTransformer(std::string const &objectName);
+    ElectricTransformer(EnergyPlusData &state, std::string const &objectName);
 
     Real64 getLossRateForOutputPower(Real64 const powerOutOfTransformer);
 
@@ -491,22 +504,10 @@ public: // Method
     void reinitAtBeginEnvironment();
 
 public: // data // might make this class a friend of ElectPowerLoadCenter?
-    enum class GeneratorType : int
-    {
-        notYetSet = 0,
-        iCEngine,
-        combTurbine,
-        pV,
-        fuelCell,
-        microCHP,
-        microturbine,
-        windTurbine,
-        pvWatts,
-    };
 
     std::string name;          // user identifier
     std::string typeOfName;    // equipment type
-    int compGenTypeOf_Num;     // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
+    GeneratorType compGenTypeOf_Num;     // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
     int compPlantTypeOf_Num;   // numeric designator for plant component, in DataPlant
     std::string compPlantName; // name of plant component if heat recovery
     GeneratorType generatorType;

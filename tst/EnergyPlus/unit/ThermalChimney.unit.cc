@@ -1097,22 +1097,22 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     // Read objects
     HeatBalanceManager::GetProjectControlData(state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetZoneData(localErrorsFound);
+    HeatBalanceManager::GetZoneData(state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(localErrorsFound);
+    HeatBalanceManager::GetWindowGlassSpectralData(state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, state.files, localErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetConstructData(state.files, localErrorsFound);
+    HeatBalanceManager::GetConstructData(state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.files, localErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state, state.files, localErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
 
     DataHeatBalance::Zone(2).HasWindow = true;
@@ -1142,14 +1142,14 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
     DataHeatBalance::ZnAirRpt.allocate(DataGlobals::NumOfZones);
     // No EMS
-    ThermalChimney::GetThermalChimney(localErrorsFound);
+    ThermalChimney::GetThermalChimney(state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    ThermalChimney::CalcThermalChimney();
-    EXPECT_NEAR(ThermalChimney::ThermalChimneyReport(1).OverallTCVolumeFlow, 0.015668, 0.0001);
+    ThermalChimney::CalcThermalChimney(state);
+    EXPECT_NEAR(state.dataThermalChimneys->ThermalChimneyReport(1).OverallTCVolumeFlow, 0.015668, 0.0001);
     // EMS Override
-    ThermalChimney::ThermalChimneySys(1).EMSOverrideOn = true;
-    ThermalChimney::ThermalChimneySys(1).EMSAirFlowRateValue = 0.01;
-    ThermalChimney::CalcThermalChimney();
-    EXPECT_NEAR(ThermalChimney::ThermalChimneyReport(1).OverallTCVolumeFlow, 0.01, 0.0001);
+    state.dataThermalChimneys->ThermalChimneySys(1).EMSOverrideOn = true;
+    state.dataThermalChimneys->ThermalChimneySys(1).EMSAirFlowRateValue = 0.01;
+    ThermalChimney::CalcThermalChimney(state);
+    EXPECT_NEAR(state.dataThermalChimneys->ThermalChimneyReport(1).OverallTCVolumeFlow, 0.01, 0.0001);
 
 }

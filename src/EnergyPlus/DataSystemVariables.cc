@@ -50,7 +50,6 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -198,7 +197,7 @@ namespace DataSystemVariables {
 
     // Functions
 
-    void CheckForActualFileName(IOFiles &ioFiles,
+    void CheckForActualFileName(EnergyPlusData &state,
                                 std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
                                 std::string &CheckedFileName              // Blank if not found.
@@ -241,7 +240,7 @@ namespace DataSystemVariables {
         std::string::size_type pos;
 
         if (firstTime) {
-            ioFiles.audit.ensure_open("CheckForActualFileName", ioFiles.outputControl.audit);
+            state.files.audit.ensure_open("CheckForActualFileName", state.files.outputControl.audit);
             get_environment_variable(cInputPath1, envinputpath1);
             if (!envinputpath1.empty()) {
                 pos = index(envinputpath1, pathChar, true); // look backwards for pathChar
@@ -261,50 +260,50 @@ namespace DataSystemVariables {
         if (FileSystem::fileExists(InputFileName)) {
             FileFound = true;
             CheckedFileName = InputFileName;
-            print(ioFiles.audit, "{}={}\n", "found (user input)", getAbsolutePath(CheckedFileName));
+            print(state.files.audit, "{}={}\n", "found (user input)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            print(ioFiles.audit, "{}={}\n", "not found (user input)", getAbsolutePath(InputFileName));
+            print(state.files.audit, "{}={}\n", "not found (user input)", getAbsolutePath(InputFileName));
         }
 
         // Look relative to input file path
         if (FileSystem::fileExists(DataStringGlobals::inputDirPathName + InputFileName)) {
             FileFound = true;
             CheckedFileName = DataStringGlobals::inputDirPathName + InputFileName;
-            print(ioFiles.audit, "{}={}\n", "found (input file)", getAbsolutePath(CheckedFileName));
+            print(state.files.audit, "{}={}\n", "found (input file)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            print(ioFiles.audit, "{}={}\n", "not found (input file)", getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName));
+            print(state.files.audit, "{}={}\n", "not found (input file)", getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName));
         }
 
         // Look relative to input path
         if (FileSystem::fileExists(envinputpath1 + InputFileName)) {
             FileFound = true;
             CheckedFileName = envinputpath1 + InputFileName;
-            print(ioFiles.audit, "{}={}\n", "found (epin)", getAbsolutePath(CheckedFileName));
+            print(state.files.audit, "{}={}\n", "found (epin)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            print(ioFiles.audit, "{}={}\n", "not found (epin)", getAbsolutePath(envinputpath1 + InputFileName));
+            print(state.files.audit, "{}={}\n", "not found (epin)", getAbsolutePath(envinputpath1 + InputFileName));
         }
 
         // Look relative to input path
         if (FileSystem::fileExists(envinputpath2 + InputFileName)) {
             FileFound = true;
             CheckedFileName = envinputpath2 + InputFileName;
-            print(ioFiles.audit, "{}={}\n", "found (input_path)", getAbsolutePath(CheckedFileName));
+            print(state.files.audit, "{}={}\n", "found (input_path)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            print(ioFiles.audit, "{}={}\n", "not found (input_path)", getAbsolutePath(envinputpath2 + InputFileName));
+            print(state.files.audit, "{}={}\n", "not found (input_path)", getAbsolutePath(envinputpath2 + InputFileName));
         }
 
         // Look relative to program path
         if (FileSystem::fileExists(envprogrampath + InputFileName)) {
             FileFound = true;
             CheckedFileName = envprogrampath + InputFileName;
-            print(ioFiles.audit, "{}={}\n", "found (program_path)", getAbsolutePath(CheckedFileName));
+            print(state.files.audit, "{}={}\n", "found (program_path)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            print(ioFiles.audit, "{}={}\n", "not found (program_path)", getAbsolutePath(envprogrampath + InputFileName));
+            print(state.files.audit, "{}={}\n", "not found (program_path)", getAbsolutePath(envprogrampath + InputFileName));
         }
 
         if (!TestAllPaths) return;
@@ -313,20 +312,20 @@ namespace DataSystemVariables {
         if (FileSystem::fileExists(CurrentWorkingFolder + InputFileName)) {
             FileFound = true;
             CheckedFileName = CurrentWorkingFolder + InputFileName;
-            print(ioFiles.audit, "{}={}\n", "found (CWF)", getAbsolutePath(CheckedFileName));
+            print(state.files.audit, "{}={}\n", "found (CWF)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            print(ioFiles.audit, "{}={}\n", "not found (CWF)", getAbsolutePath(CurrentWorkingFolder + InputFileName));
+            print(state.files.audit, "{}={}\n", "not found (CWF)", getAbsolutePath(CurrentWorkingFolder + InputFileName));
         }
 
         // Look relative to program path
         if (FileSystem::fileExists(ProgramPath + InputFileName)) {
             FileFound = true;
             CheckedFileName = ProgramPath + InputFileName;
-            print(ioFiles.audit, "{}={}\n", "found (program path - ini)", getAbsolutePath(CheckedFileName));
+            print(state.files.audit, "{}={}\n", "found (program path - ini)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            print(ioFiles.audit, "{}={}\n", "not found (program path - ini)", getAbsolutePath(ProgramPath + InputFileName));
+            print(state.files.audit, "{}={}\n", "not found (program path - ini)", getAbsolutePath(ProgramPath + InputFileName));
         }
     }
 
@@ -380,7 +379,7 @@ namespace DataSystemVariables {
 
         get_environment_variable(DDOnlyEnvVar, cEnvValue);
         DDOnly = env_var_on(cEnvValue); // Yes or True
-        if (DataGlobals::DDOnlySimulation) DDOnly = true;
+        if (state.dataGlobal->DDOnlySimulation) DDOnly = true;
 
         get_environment_variable(ReverseDDEnvVar, cEnvValue);
         ReverseDD = env_var_on(cEnvValue); // Yes or True

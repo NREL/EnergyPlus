@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -102,7 +101,6 @@ namespace HVACHXAssistedCoolingCoil {
     // USE STATEMENTS:
     //  Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using namespace DataHVACGlobals;
@@ -363,7 +361,8 @@ namespace HVACHXAssistedCoolingCoil {
         CurrentModuleObject = "CoilSystem:Cooling:DX:HeatExchangerAssisted";
 
         for (HXAssistedCoilNum = 1; HXAssistedCoilNum <= NumHXAssistedDXCoils; ++HXAssistedCoilNum) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           HXAssistedCoilNum,
                                           AlphArray,
                                           NumAlphas,
@@ -434,25 +433,25 @@ namespace HVACHXAssistedCoolingCoil {
             }
 
             HXErrFlag = false;
-            SupplyAirInletNode = GetSupplyInletNode(HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
+            SupplyAirInletNode = GetSupplyInletNode(state, HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError("...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
             }
 
             HXErrFlag = false;
-            SupplyAirOutletNode = GetSupplyOutletNode(HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
+            SupplyAirOutletNode = GetSupplyOutletNode(state, HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError("...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
             }
 
             HXErrFlag = false;
-            SecondaryAirInletNode = GetSecondaryInletNode(HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
+            SecondaryAirInletNode = GetSecondaryInletNode(state, HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError("...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
             }
 
             HXErrFlag = false;
-            SecondaryAirOutletNode = GetSecondaryOutletNode(HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
+            SecondaryAirOutletNode = GetSecondaryOutletNode(state, HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError("...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
             }
@@ -538,7 +537,7 @@ namespace HVACHXAssistedCoolingCoil {
                         NodeID(SecondaryAirOutletNode),
                         "Air Nodes");
 
-            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInletNodeNum = GetOnlySingleNode(NodeID(SupplyAirInletNode),
+            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInletNodeNum = GetOnlySingleNode(state, NodeID(SupplyAirInletNode),
                                                                                              ErrorsFound,
                                                                                              CurrentModuleObject,
                                                                                              HXAssistedCoil(HXAssistedCoilNum).Name,
@@ -546,7 +545,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                              NodeConnectionType_Inlet,
                                                                                              1,
                                                                                              ObjectIsParent);
-            CoolingCoilInletNodeNum = GetOnlySingleNode(NodeID(SupplyAirOutletNode),
+            CoolingCoilInletNodeNum = GetOnlySingleNode(state, NodeID(SupplyAirOutletNode),
                                                         ErrorsFound,
                                                         CurrentModuleObject,
                                                         HXAssistedCoil(HXAssistedCoilNum).Name,
@@ -554,7 +553,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                         NodeConnectionType_Internal,
                                                         1,
                                                         ObjectIsParent);
-            HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum = GetOnlySingleNode(NodeID(SecondaryAirInletNode),
+            HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum = GetOnlySingleNode(state, NodeID(SecondaryAirInletNode),
                                                                                            ErrorsFound,
                                                                                            CurrentModuleObject,
                                                                                            HXAssistedCoil(HXAssistedCoilNum).Name,
@@ -562,7 +561,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                            NodeConnectionType_Internal,
                                                                                            1,
                                                                                            ObjectIsParent);
-            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum = GetOnlySingleNode(NodeID(SecondaryAirOutletNode),
+            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum = GetOnlySingleNode(state, NodeID(SecondaryAirOutletNode),
                                                                                               ErrorsFound,
                                                                                               CurrentModuleObject,
                                                                                               HXAssistedCoil(HXAssistedCoilNum).Name,
@@ -602,7 +601,8 @@ namespace HVACHXAssistedCoolingCoil {
 
         for (HXAssistedCoilNum = NumHXAssistedDXCoils + 1; HXAssistedCoilNum <= NumHXAssistedWaterCoils; ++HXAssistedCoilNum) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
                                           HXAssistedCoilNum,
                                           AlphArray,
                                           NumAlphas,
@@ -638,25 +638,25 @@ namespace HVACHXAssistedCoolingCoil {
             HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName = AlphArray(5);
 
             HXErrFlag = false;
-            SupplyAirInletNode = GetSupplyInletNode(HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
+            SupplyAirInletNode = GetSupplyInletNode(state, HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError("...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
             }
 
             HXErrFlag = false;
-            SupplyAirOutletNode = GetSupplyOutletNode(HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
+            SupplyAirOutletNode = GetSupplyOutletNode(state, HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError("...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name);
             }
 
             HXErrFlag = false;
-            SecondaryAirInletNode = GetSecondaryInletNode(HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
+            SecondaryAirInletNode = GetSecondaryInletNode(state, HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError("...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
             }
 
             HXErrFlag = false;
-            SecondaryAirOutletNode = GetSecondaryOutletNode(HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
+            SecondaryAirOutletNode = GetSecondaryOutletNode(state, HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError("...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
             }
@@ -676,8 +676,8 @@ namespace HVACHXAssistedCoolingCoil {
                 CoolingCoilErrFlag = false;
                 CoolingCoilInletNodeNum = GetWaterCoilInletNode(state,
                     HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
-                CoolingCoilWaterInletNodeNum = GetCoilWaterInletNode(state, 
-                    HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
+                CoolingCoilWaterInletNodeNum = GetCoilWaterInletNode(
+                    state, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
                 GetControllerNameAndIndex(state, CoolingCoilWaterInletNodeNum,
                                           HXAssistedCoil(HXAssistedCoilNum).ControllerName,
                                           HXAssistedCoil(HXAssistedCoilNum).ControllerIndex,
@@ -724,7 +724,7 @@ namespace HVACHXAssistedCoolingCoil {
                         NodeID(SecondaryAirOutletNode),
                         "Air Nodes");
 
-            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInletNodeNum = GetOnlySingleNode(NodeID(SupplyAirInletNode),
+            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInletNodeNum = GetOnlySingleNode(state, NodeID(SupplyAirInletNode),
                                                                                              ErrorsFound,
                                                                                              CurrentModuleObject,
                                                                                              HXAssistedCoil(HXAssistedCoilNum).Name,
@@ -732,7 +732,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                              NodeConnectionType_Inlet,
                                                                                              1,
                                                                                              ObjectIsParent);
-            CoolingCoilInletNodeNum = GetOnlySingleNode(NodeID(SupplyAirOutletNode),
+            CoolingCoilInletNodeNum = GetOnlySingleNode(state, NodeID(SupplyAirOutletNode),
                                                         ErrorsFound,
                                                         CurrentModuleObject,
                                                         HXAssistedCoil(HXAssistedCoilNum).Name,
@@ -740,7 +740,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                         NodeConnectionType_Internal,
                                                         1,
                                                         ObjectIsParent);
-            HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum = GetOnlySingleNode(NodeID(SecondaryAirInletNode),
+            HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum = GetOnlySingleNode(state, NodeID(SecondaryAirInletNode),
                                                                                            ErrorsFound,
                                                                                            CurrentModuleObject,
                                                                                            HXAssistedCoil(HXAssistedCoilNum).Name,
@@ -748,7 +748,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                            NodeConnectionType_Internal,
                                                                                            1,
                                                                                            ObjectIsParent);
-            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum = GetOnlySingleNode(NodeID(SecondaryAirOutletNode),
+            HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum = GetOnlySingleNode(state, NodeID(SecondaryAirOutletNode),
                                                                                               ErrorsFound,
                                                                                               CurrentModuleObject,
                                                                                               HXAssistedCoil(HXAssistedCoilNum).Name,
@@ -1807,7 +1807,7 @@ namespace HVACHXAssistedCoolingCoil {
             if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted") ||
                 UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                 if (WhichCoil != 0) {
-                    MaxAirFlowRate = GetSupplyAirFlowRate(HXAssistedCoil(WhichCoil).HeatExchangerName, ErrorsFound);
+                    MaxAirFlowRate = GetSupplyAirFlowRate(state, HXAssistedCoil(WhichCoil).HeatExchangerName, ErrorsFound);
                 }
             } else {
                 WhichCoil = 0;

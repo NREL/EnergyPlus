@@ -402,12 +402,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_DOASDXCoilTest)
 
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
 
     HVACDXSystem::GetDXCoolingSystemInput(state);
     EXPECT_EQ(HVACDXSystem::DXCoolingSystem(1).Name, "DX COOLING COIL SYSTEM");
     EXPECT_FALSE(HVACDXSystem::DXCoolingSystem(1).ISHundredPercentDOASDXCoil);
-    EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).Name, "VS DX COOLING COIL");
+    EXPECT_EQ(state.dataVariableSpeedCoils->VarSpeedCoil(1).Name, "VS DX COOLING COIL");
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
@@ -518,7 +518,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     OutputReportPredefined::SetPredefinedTables();
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     int DXSystemNum = 1;
@@ -530,7 +530,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     HVACDXSystem::GetDXCoolingSystemInput(state);
     EXPECT_EQ(HVACDXSystem::DXCoolingSystem(DXSystemNum).Name, "DX COOLING COIL SYSTEM");
     EXPECT_FALSE(HVACDXSystem::DXCoolingSystem(DXSystemNum).ISHundredPercentDOASDXCoil);
-    EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(DXSystemNum).Name, "VS DX COOLING COIL");
+    EXPECT_EQ(state.dataVariableSpeedCoils->VarSpeedCoil(DXSystemNum).Name, "VS DX COOLING COIL");
     EXPECT_EQ(2, HVACDXSystem::DXCoolingSystem(DXSystemNum).DXSystemControlNodeNum);
 
     // set up outdoor environment
@@ -679,7 +679,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     OutputReportPredefined::SetPredefinedTables();
-    ScheduleManager::ProcessScheduleInput(state.files);
+    ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     int DXSystemNum = 1;
@@ -708,19 +708,19 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
 
     // test sensible control
     HVACDXSystem::ControlDXSystem(state, DXSystemNum, FirstHVACIteration, HXUnitOn);
-    Real64 SHR = VariableSpeedCoils::VarSpeedCoil(1).QSensible / VariableSpeedCoils::VarSpeedCoil(1).QLoadTotal;
+    Real64 SHR = state.dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state.dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 0.49605, 0.0001);
-    EXPECT_EQ(1, VariableSpeedCoils::VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
-    EXPECT_NEAR(0.199, VariableSpeedCoils::VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is low
+    EXPECT_EQ(1, state.dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
+    EXPECT_NEAR(0.199, state.dataVariableSpeedCoils->VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is low
 
     // add latent degradation model
-    VariableSpeedCoils::VarSpeedCoil(1).Twet_Rated = 1000.0;
-    VariableSpeedCoils::VarSpeedCoil(1).Gamma_Rated = 1.5;
+    state.dataVariableSpeedCoils->VarSpeedCoil(1).Twet_Rated = 1000.0;
+    state.dataVariableSpeedCoils->VarSpeedCoil(1).Gamma_Rated = 1.5;
     HVACDXSystem::ControlDXSystem(state, DXSystemNum, FirstHVACIteration, HXUnitOn);
-    SHR = VariableSpeedCoils::VarSpeedCoil(1).QSensible / VariableSpeedCoils::VarSpeedCoil(1).QLoadTotal;
+    SHR = state.dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state.dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 1.0, 0.0001); // more sensible capacity so PLR should be lower
-    EXPECT_EQ(1, VariableSpeedCoils::VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
-    EXPECT_NEAR(0.099, VariableSpeedCoils::VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is lower, latent capacity is 0
+    EXPECT_EQ(1, state.dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
+    EXPECT_NEAR(0.099, state.dataVariableSpeedCoils->VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is lower, latent capacity is 0
 
     // test more reasonable zone RH,about 50%
     DataLoopNode::Node(InletNode).HumRat = 0.0092994;
@@ -729,23 +729,23 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     DataLoopNode::Node(ControlNode).TempSetPoint = HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp;
 
     // remove latent degradation model
-    VariableSpeedCoils::VarSpeedCoil(1).Twet_Rated = 0.0;
-    VariableSpeedCoils::VarSpeedCoil(1).Gamma_Rated = 0.0;
+    state.dataVariableSpeedCoils->VarSpeedCoil(1).Twet_Rated = 0.0;
+    state.dataVariableSpeedCoils->VarSpeedCoil(1).Gamma_Rated = 0.0;
 
     HVACDXSystem::ControlDXSystem(state, DXSystemNum, FirstHVACIteration, HXUnitOn);
-    SHR = VariableSpeedCoils::VarSpeedCoil(1).QSensible / VariableSpeedCoils::VarSpeedCoil(1).QLoadTotal;
+    SHR = state.dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state.dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 0.7624, 0.0001);
-    EXPECT_EQ(1, VariableSpeedCoils::VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
-    EXPECT_NEAR(0.143, VariableSpeedCoils::VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is low
+    EXPECT_EQ(1, state.dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
+    EXPECT_NEAR(0.143, state.dataVariableSpeedCoils->VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is low
 
     // add latent degradation model
-    VariableSpeedCoils::VarSpeedCoil(1).Twet_Rated = 1000.0;
-    VariableSpeedCoils::VarSpeedCoil(1).Gamma_Rated = 1.5;
+    state.dataVariableSpeedCoils->VarSpeedCoil(1).Twet_Rated = 1000.0;
+    state.dataVariableSpeedCoils->VarSpeedCoil(1).Gamma_Rated = 1.5;
     HVACDXSystem::ControlDXSystem(state, DXSystemNum, FirstHVACIteration, HXUnitOn);
-    SHR = VariableSpeedCoils::VarSpeedCoil(1).QSensible / VariableSpeedCoils::VarSpeedCoil(1).QLoadTotal;
+    SHR = state.dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state.dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 1.0, 0.0001); // more sensible capacity so PLR should be lower
-    EXPECT_EQ(1, VariableSpeedCoils::VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
-    EXPECT_NEAR(0.109, VariableSpeedCoils::VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is lower, latent capacity is 0
+    EXPECT_EQ(1, state.dataVariableSpeedCoils->VarSpeedCoil(1).SpeedNumReport); // latent degradation only works at low speed
+    EXPECT_NEAR(0.109, state.dataVariableSpeedCoils->VarSpeedCoil(1).PartLoadRatio, 0.001); // PLR is lower, latent capacity is 0
 }
 
 } // namespace EnergyPlus

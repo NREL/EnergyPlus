@@ -53,10 +53,9 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DXFEarClipping.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -87,12 +86,7 @@ namespace DXFEarClipping {
 
     // Use statements:
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataVectorTypes;
-    using DataGlobals::Pi;
-    using DataGlobals::RadToDeg;
-    using DataGlobals::TwoPi;
-
     // Data
 
     // Derived type definitions:
@@ -162,7 +156,7 @@ namespace DXFEarClipping {
             }
         }
 
-        if (std::abs(anglesum - TwoPi) <= epsilon) {
+        if (std::abs(anglesum - DataGlobalConstants::TwoPi()) <= epsilon) {
             InPolygon = true;
         }
 
@@ -181,7 +175,7 @@ namespace DXFEarClipping {
         return rModulus;
     }
 
-    int Triangulate(IOFiles &ioFiles,
+    int Triangulate(EnergyPlusData &state,
                     int const nsides, // number of sides to polygon
                     Array1D<Vector> &polygon,
                     Array1D<dTriangle> &outtriangles,
@@ -313,7 +307,7 @@ namespace DXFEarClipping {
         evert = 3;
         removed = false;
         while (nvertcur > 3) {
-            generate_ears(ioFiles, nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
+            generate_ears(state, nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
             if (!any_gt(ears, 0)) {
                 ShowWarningError("DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
                                  "\", check surface vertex order(entry)");
@@ -329,7 +323,7 @@ namespace DXFEarClipping {
                     }
                     ShowMessage(format(" number of triangles found={:12}", ncount));
                     for (int j = 1; j <= nrangles; ++j) {
-                        ShowMessage(format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * RadToDeg));
+                        ShowMessage(format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * DataGlobalConstants::RadToDeg()));
                     }
                 }
                 break; // while loop
@@ -446,7 +440,7 @@ namespace DXFEarClipping {
         angle = std::acos(t);
 
         if (x2 * y1 - y2 * x1 < 0.0E+00) {
-            angle = 2.0E+00 * Pi - angle;
+            angle = 2.0E+00 * DataGlobalConstants::Pi() - angle;
         }
 
         return angle;
@@ -519,7 +513,7 @@ namespace DXFEarClipping {
         return inside;
     }
 
-    void generate_ears(IOFiles &ioFiles,
+    void generate_ears(EnergyPlusData &state,
                        int const nvert, // number of vertices in polygon
                        Array1D<Vector_2d> &vertex,
                        Array1D_int &ears,       // number of ears possible (dimensioned to nvert)
@@ -624,7 +618,7 @@ namespace DXFEarClipping {
 
             ang = angle_2dvector(vertex(svert).x, vertex(svert).y, vertex(mvert).x, vertex(mvert).y, vertex(evert).x, vertex(evert).y);
 
-            if (ang > Pi) { // sufficiently close to 180 degrees.
+            if (ang > DataGlobalConstants::Pi()) { // sufficiently close to 180 degrees.
                 ++nrverts;
                 r_vertices(nrverts) = mvert;
                 rangles(nrverts) = ang;
@@ -665,7 +659,7 @@ namespace DXFEarClipping {
                     earvert(3) = evert;
                 }
                 if (trackit) {
-                    print(ioFiles.debug, "ear={} triangle={:12}{:12}{:12}\n", nears, svert, mvert, evert);
+                    print(state.files.debug, "ear={} triangle={:12}{:12}{:12}\n", nears, svert, mvert, evert);
                 }
             }
         }
@@ -724,7 +718,7 @@ namespace DXFEarClipping {
         Real64 const alpha = surfazimuth;
 
         Real64 const alpha180 = 180.0 - alpha; // amount to rotate
-        Real64 const alphrad = alpha180 / RadToDeg;
+        Real64 const alphrad = alpha180 / DataGlobalConstants::RadToDeg();
         Real64 const cos_alphrad = std::cos(alphrad);
         Real64 const sin_alphrad = std::sin(alphrad);
 
@@ -784,7 +778,7 @@ namespace DXFEarClipping {
         // Subroutine local variable declarations:
 
         Real64 const alpha = -surftilt;
-        Real64 const alphrad = alpha / RadToDeg;
+        Real64 const alphrad = alpha / DataGlobalConstants::RadToDeg();
         Real64 const cos_alphrad = std::cos(alphrad);
         Real64 const sin_alphrad = std::sin(alphrad);
 

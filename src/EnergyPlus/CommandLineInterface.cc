@@ -51,12 +51,10 @@
 // Project headers
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -182,15 +180,15 @@ namespace CommandLineInterface {
 
         opt.get("-d")->getString(outDirPathName);
 
-        runReadVars = opt.isSet("-r");
+        state.dataGlobal->runReadVars = opt.isSet("-r");
 
-        DDOnlySimulation = opt.isSet("-D");
+        state.dataGlobal->DDOnlySimulation = opt.isSet("-D");
 
         state.dataGlobal->AnnualSimulation = opt.isSet("-a");
 
-        outputEpJSONConversion = opt.isSet("-c");
+        state.dataGlobal->outputEpJSONConversion = opt.isSet("-c");
 
-        outputEpJSONConversionOnly = opt.isSet("--convert-only");
+        state.dataGlobal->outputEpJSONConversionOnly = opt.isSet("--convert-only");
 
         // Process standard arguments
         if (opt.isSet("-h")) {
@@ -249,24 +247,24 @@ namespace CommandLineInterface {
 
         // TODO: figure out better logic for determining input file type
         if (inputFileExt == "EPJSON" || inputFileExt == "JSON") {
-            isEpJSON = true;
+            state.dataGlobal->isEpJSON = true;
         } else if (inputFileExt == "IDF" || inputFileExt == "IMF") {
-            isEpJSON = false;
+            state.dataGlobal->isEpJSON = false;
         } else if (inputFileExt == "CBOR") {
-            isEpJSON = true;
-            isCBOR = true;
+            state.dataGlobal->isEpJSON = true;
+            state.dataGlobal->isCBOR = true;
             DisplayString("CBOR input format is experimental and unsupported.");
         } else if (inputFileExt == "MSGPACK") {
-            isEpJSON = true;
-            isMsgPack = true;
+            state.dataGlobal->isEpJSON = true;
+            state.dataGlobal->isMsgPack = true;
             DisplayString("MsgPack input format is experimental and unsupported.");
         } else if (inputFileExt == "UBJSON") {
-            isEpJSON = true;
-            isUBJSON = true;
+            state.dataGlobal->isEpJSON = true;
+            state.dataGlobal->isUBJSON = true;
             DisplayString("UBJSON input format is experimental and unsupported.");
         } else if (inputFileExt == "BSON") {
-            isEpJSON = true;
-            isBSON = true;
+            state.dataGlobal->isEpJSON = true;
+            state.dataGlobal->isBSON = true;
             DisplayString("BSON input format is experimental and unsupported.");
         } else {
             DisplayString("ERROR: Input file must have IDF, IMF, or epJSON extension.");
@@ -495,7 +493,7 @@ namespace CommandLineInterface {
         }
 
         // Error for cases where both design-day and annual simulation switches are set
-        if (DDOnlySimulation && state.dataGlobal->AnnualSimulation) {
+        if (state.dataGlobal->DDOnlySimulation && state.dataGlobal->AnnualSimulation) {
             DisplayString("ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.");
             DisplayString(errorFollowUp);
             exit(EXIT_FAILURE);
@@ -531,7 +529,7 @@ namespace CommandLineInterface {
             exit(EXIT_FAILURE);
         }
 
-        if (opt.isSet("-w") && !DDOnlySimulation) {
+        if (opt.isSet("-w") && !state.dataGlobal->DDOnlySimulation) {
             if (!fileExists(state.files.inputWeatherFileName.fileName)) {
                 DisplayString("ERROR: Could not find weather file: " + getAbsolutePath(state.files.inputWeatherFileName.fileName) + ".");
                 DisplayString(errorFollowUp);
@@ -731,7 +729,7 @@ namespace CommandLineInterface {
         }
     }
 
-    int runReadVarsESO(IOFiles &ioFiles)
+    int runReadVarsESO(EnergyPlusData &state)
     {
         std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
 
@@ -752,8 +750,8 @@ namespace CommandLineInterface {
             if (!ofs.good()) {
                 ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
             } else {
-                ofs << ioFiles.eso.fileName << '\n';
-                ofs << ioFiles.csv.fileName << '\n';
+                ofs << state.files.eso.fileName << '\n';
+                ofs << state.files.csv.fileName << '\n';
             }
         }
 
@@ -763,8 +761,8 @@ namespace CommandLineInterface {
             if (!ofs.good()) {
                 ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
             } else {
-                ofs << ioFiles.mtr.fileName << '\n';
-                ofs << ioFiles.mtr_csv.fileName << '\n';
+                ofs << state.files.mtr.fileName << '\n';
+                ofs << state.files.mtr_csv.fileName << '\n';
             }
         }
 

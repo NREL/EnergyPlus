@@ -109,7 +109,7 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem)
 
     ErrorsFound = false;
 
-    GetHighTempRadiantSystem(ErrorsFound);
+    GetHighTempRadiantSystem(state, ErrorsFound);
 
     std::string const error_string01 =
         delimited_string({"   ** Severe  ** Heating Setpoint Temperature Schedule Name not found: RADIANT HEATING SETPOINTS",

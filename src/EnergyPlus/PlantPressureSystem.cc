@@ -55,12 +55,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -101,8 +101,6 @@ namespace PlantPressureSystem {
     //                                -Not currently implemented
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataGlobals::Pi;
     using namespace DataBranchAirLoopPlant;
 
     // Data
@@ -154,7 +152,7 @@ namespace PlantPressureSystem {
         {
             auto const SELECT_CASE_var(CallType);
             if (SELECT_CASE_var == PressureCall_Init) {
-                InitPressureDrop(LoopNum, FirstHVACIteration);
+                InitPressureDrop(state, LoopNum, FirstHVACIteration);
             } else if (SELECT_CASE_var == PressureCall_Calc) {
                 BranchPressureDrop(state, LoopNum, LoopSideNum, BranchNum); // Autodesk:OPTIONAL LoopSideNum, BranchNum used without PRESENT check
             } else if (SELECT_CASE_var == PressureCall_Update) {
@@ -165,7 +163,7 @@ namespace PlantPressureSystem {
         }
     }
 
-    void InitPressureDrop(int const LoopNum, bool const FirstHVACIteration)
+    void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -228,7 +226,7 @@ namespace PlantPressureSystem {
                         loop.HasPressureComponents = true;
 
                         // Setup output variable
-                        SetupOutputVariable(
+                        SetupOutputVariable(state,
                             "Plant Branch Pressure Difference", OutputProcessor::Unit::Pa, branch.PressureDrop, "Plant", "Average", branch.Name);
                     }
                 }
@@ -237,7 +235,7 @@ namespace PlantPressureSystem {
                 if (loop_side.HasPressureComponents) {
                     if (LoopSideNum == DemandSide) {
 
-                        SetupOutputVariable("Plant Demand Side Loop Pressure Difference",
+                        SetupOutputVariable(state, "Plant Demand Side Loop Pressure Difference",
                                             OutputProcessor::Unit::Pa,
                                             loop_side.PressureDrop,
                                             "Plant",
@@ -246,7 +244,7 @@ namespace PlantPressureSystem {
 
                     } else if (LoopSideNum == SupplySide) {
 
-                        SetupOutputVariable("Plant Supply Side Loop Pressure Difference",
+                        SetupOutputVariable(state, "Plant Supply Side Loop Pressure Difference",
                                             OutputProcessor::Unit::Pa,
                                             loop_side.PressureDrop,
                                             "Plant",
@@ -261,7 +259,7 @@ namespace PlantPressureSystem {
 
                 // Set up loop level variables if applicable
 
-                SetupOutputVariable("Plant Loop Pressure Difference", OutputProcessor::Unit::Pa, loop.PressureDrop, "Plant", "Average", loop.Name);
+                SetupOutputVariable(state, "Plant Loop Pressure Difference", OutputProcessor::Unit::Pa, loop.PressureDrop, "Plant", "Average", loop.Name);
 
                 // Check for illegal configurations on this plant loop
                 for (int LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
@@ -432,8 +430,8 @@ namespace PlantPressureSystem {
         // Get nodal conditions
         NodeMassFlow = Node(InletNodeNum).MassFlowRate;
         NodeTemperature = Node(InletNodeNum).Temp;
-        NodeDensity = GetDensityGlycol(DummyFluid, NodeTemperature, FluidIndex, RoutineName);
-        NodeViscosity = GetViscosityGlycol(DummyFluid, NodeTemperature, FluidIndex, RoutineName);
+        NodeDensity = GetDensityGlycol(state, DummyFluid, NodeTemperature, FluidIndex, RoutineName);
+        NodeViscosity = GetViscosityGlycol(state, DummyFluid, NodeTemperature, FluidIndex, RoutineName);
 
         // Call the appropriate pressure calculation routine
         {
@@ -909,7 +907,7 @@ namespace PlantPressureSystem {
 
         // Read data off the node data structure
         NodeTemperature = Node(PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumIn).Temp;
-        NodeDensity = GetDensityGlycol(DummyFluidName, NodeTemperature, FluidIndex, RoutineName);
+        NodeDensity = GetDensityGlycol(state, DummyFluidName, NodeTemperature, FluidIndex, RoutineName);
 
         // Store the passed in (requested, design) flow to the local value for performing iterations
         LocalSystemMassFlow = SystemMassFlow;

@@ -309,9 +309,9 @@ namespace EconomicTariff {
         std::string reportMeter;    // name of the report meter
         int reportMeterIndx;        // index of the report meter
         int kindElectricMtr;        // kind of electric meter - see enumerated list above, 0 is not electric
-        int kindWaterMtr;           // kinf of water meter - 0 (default) is not water, 1 is water
-        int kindGasMtr;             // kinf of gas meter - 0 (default) is not gas, 1 is gas
-        int resourceNum;            // based on list of DataGlobalConstants
+        int kindWaterMtr;           // kind of water meter - 0 (default) is not water, 1 is water
+        int kindGasMtr;             // kind of gas meter - 0 (default) is not gas, 1 is gas
+        DataGlobalConstants::ResourceType resourceNum;  // based on list of DataGlobalConstants
         int convChoice;             // enumerated choice index of the conversion factor
         Real64 energyConv;          // energy conversion factor
         Real64 demandConv;          // demand conversion factor
@@ -414,7 +414,8 @@ namespace EconomicTariff {
 
         // Default Constructor
         TariffType()
-            : reportMeterIndx(0), kindElectricMtr(0), kindWaterMtr(0), kindGasMtr(0), resourceNum(0), convChoice(0), energyConv(0.0), demandConv(0.0),
+            : reportMeterIndx(0), kindElectricMtr(0), kindWaterMtr(0), kindGasMtr(0), resourceNum(DataGlobalConstants::ResourceType::None),
+              convChoice(0), energyConv(0.0), demandConv(0.0),
               periodSchIndex(0), seasonSchIndex(0), monthSchIndex(0), demandWindow(0), demWinTime(0.0), monthChgVal(0.0), monthChgPt(0),
               minMonthChgVal(0.0), minMonthChgPt(0), chargeSchIndex(0), baseUseSchIndex(0), buyOrSell(0), firstCategory(0), lastCategory(0),
               ptEnergyCharges(0), ptDemandCharges(0), ptServiceCharges(0), ptBasis(0), ptAdjustment(0), ptSurcharge(0), ptSubtotal(0), ptTaxes(0),
@@ -567,19 +568,19 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputEconomicsTariff(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsQualify(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsChargeSimple(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsChargeBlock(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsRatchet(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsRatchet(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsVariable(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsComputation(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsComputation(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
     void GetInputEconomicsCurrencyType(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
@@ -647,7 +648,7 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ComputeTariff(IOFiles &ioFiles);
+    void ComputeTariff(EnergyPlusData &state);
 
     void pushStack(Array1A<Real64> const monthlyArray, int const variablePointer);
 
@@ -680,7 +681,7 @@ namespace EconomicTariff {
 
     void selectTariff();
 
-    void GetMonthlyCostForResource(int const inResourceNumber, Array1A<Real64> outMonthlyCosts);
+    void GetMonthlyCostForResource(DataGlobalConstants::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts);
 
     void clear_state();
 

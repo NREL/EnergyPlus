@@ -214,7 +214,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.files);  // read schedules
+    ProcessScheduleInput(state);  // read schedules
 
     GetFanInput(state);
 

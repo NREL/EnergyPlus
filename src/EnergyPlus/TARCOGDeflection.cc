@@ -197,7 +197,7 @@ namespace TARCOGDeflection {
         // OUTPUT
 
         // Static constants
-        static Real64 const Pi_6(pow_6(Pi));
+        static Real64 const Pi_6(pow_6(DataGlobalConstants::Pi()));
 
         // localy used
         Array1D<Real64> DPressure(maxlay); // delta pressure at each glazing layer

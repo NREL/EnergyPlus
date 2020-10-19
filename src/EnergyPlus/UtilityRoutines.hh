@@ -48,6 +48,9 @@
 #ifndef UtilityRoutines_hh_INCLUDED
 #define UtilityRoutines_hh_INCLUDED
 
+// C++ Headers
+#include <functional>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array1S.fwd.hh>
@@ -56,24 +59,22 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-
-#include <functional>
 
 namespace EnergyPlus {
 
 // Forward declarations
 class InputOutputFile;
-class IOFiles;
 struct EnergyPlusData;
 
 int AbortEnergyPlus(EnergyPlusData &state);
 
-void CloseMiscOpenFiles(IOFiles &ioFiles);
+void CloseMiscOpenFiles(EnergyPlusData &state);
 
 void CloseOutOpenFiles();
 
-int EndEnergyPlus(IOFiles &ioFiles);
+int EndEnergyPlus(EnergyPlusData &state);
 
 int FindUnitNumber(std::string const &FileName); // File name to be searched.
 
@@ -570,11 +571,14 @@ namespace UtilityRoutines {
         bool operator()(const std::string& a, const std::string& b) const noexcept;
     };
 
-    void appendPerfLog(IOFiles &ioFiles, std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
+    void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
 
     bool ValidateFuelType(std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound, bool const &AllowSteamAndDistrict = false);
 
-    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput, std::string &FuelTypeOutput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
+    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
+                                                   std::string &FuelTypeOutput,
+                                                   DataGlobalConstants::ResourceType &FuelTypeNum,
+                                                   bool &FuelTypeErrorsFound);
 
 } // namespace UtilityRoutines
 

@@ -143,15 +143,15 @@ namespace GroundTemperatureManager {
         } else if (objectType == objectType_FiniteDiffGroundTemp) {
             return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(state, objectType, objectName);
         } else if (objectType == objectType_SiteBuildingSurfaceGroundTemp) {
-            return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(state.files, objectType, objectName);
+            return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(state, objectType, objectName);
         } else if (objectType == objectType_SiteShallowGroundTemp) {
-            return SiteShallowGroundTemps::ShallowGTMFactory(state.files, objectType, objectName);
+            return SiteShallowGroundTemps::ShallowGTMFactory(state, objectType, objectName);
         } else if (objectType == objectType_SiteDeepGroundTemp) {
-            return SiteDeepGroundTemps::DeepGTMFactory(state.files, objectType, objectName);
+            return SiteDeepGroundTemps::DeepGTMFactory(state, objectType, objectName);
         } else if (objectType == objectType_SiteFCFactorMethodGroundTemp) {
-            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(state, state.files, objectType, objectName);
+            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(state, objectType, objectName);
         } else if (objectType == objectType_XingGroundTemp) {
-            return XingGroundTempsModel::XingGTMFactory(objectType, objectName);
+            return XingGroundTempsModel::XingGTMFactory(state, objectType, objectName);
         } else {
             // Error
             return nullptr;

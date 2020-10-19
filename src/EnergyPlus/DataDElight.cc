@@ -47,8 +47,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataDElight.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-
 namespace EnergyPlus {
 
 namespace DataDElight {
@@ -73,8 +71,6 @@ namespace DataDElight {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.

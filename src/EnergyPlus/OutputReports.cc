@@ -55,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DXFEarClipping.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
@@ -64,14 +65,13 @@
 #include <EnergyPlus/DataSurfaceColors.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
-void ReportSurfaces(IOFiles &ioFiles)
+void ReportSurfaces(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -129,10 +129,10 @@ void ReportSurfaces(IOFiles &ioFiles)
     Option1 = "";
     Option2 = "";
 
-    ScanForReports("Surfaces", DoReport, "Lines", Option1);
-    if (DoReport) LinesOut(ioFiles, Option1);
+    ScanForReports(state, "Surfaces", DoReport, "Lines", Option1);
+    if (DoReport) LinesOut(state, Option1);
 
-    ScanForReports("Surfaces", DoReport, "Vertices");
+    ScanForReports(state, "Surfaces", DoReport, "Vertices");
     if (DoReport) {
         if (!SurfVert) {
             ++SurfDetails;
@@ -140,7 +140,7 @@ void ReportSurfaces(IOFiles &ioFiles)
         }
     }
 
-    ScanForReports("Surfaces", DoReport, "Details");
+    ScanForReports(state, "Surfaces", DoReport, "Details");
     if (DoReport) {
         if (!SurfDet) {
             SurfDetails += 10;
@@ -148,7 +148,7 @@ void ReportSurfaces(IOFiles &ioFiles)
         }
     }
 
-    ScanForReports("Surfaces", DoReport, "DetailsWithVertices");
+    ScanForReports(state, "Surfaces", DoReport, "DetailsWithVertices");
     if (DoReport) {
         if (!SurfDet) {
             SurfDetails += 10;
@@ -160,53 +160,53 @@ void ReportSurfaces(IOFiles &ioFiles)
         }
     }
 
-    ScanForReports("Surfaces", DoReport, "DXF", Option1, Option2);
+    ScanForReports(state, "Surfaces", DoReport, "DXF", Option1, Option2);
     if (DoReport) {
         if (!DXFDone) {
             if (Option2 != "") {
-                SetUpSchemeColors(Option2, "DXF");
+                SetUpSchemeColors(state, Option2, "DXF");
             }
-            DXFOut(ioFiles, Option1, Option2);
+            DXFOut(state, Option1, Option2);
             DXFDone = true;
         } else {
             ShowWarningError("ReportSurfaces: DXF output already generated.  DXF with option=[" + Option1 + "] will not be generated.");
         }
     }
 
-    ScanForReports("Surfaces", DoReport, "DXF:WireFrame", Option1, Option2);
+    ScanForReports(state, "Surfaces", DoReport, "DXF:WireFrame", Option1, Option2);
     if (DoReport) {
         if (!DXFDone) {
             if (Option2 != "") {
-                SetUpSchemeColors(Option2, "DXF");
+                SetUpSchemeColors(state, Option2, "DXF");
             }
-            DXFOutWireFrame(ioFiles, Option2);
+            DXFOutWireFrame(state, Option2);
             DXFDone = true;
         } else {
             ShowWarningError("ReportSurfaces: DXF output already generated.  DXF:WireFrame will not be generated.");
         }
     }
 
-    ScanForReports("Surfaces", DoReport, "VRML", Option1, Option2);
+    ScanForReports(state, "Surfaces", DoReport, "VRML", Option1, Option2);
     if (DoReport) {
         if (!VRMLDone) {
-            VRMLOut(ioFiles, Option1, Option2);
+            VRMLOut(state, Option1, Option2);
             VRMLDone = true;
         } else {
             ShowWarningError("ReportSurfaces: VRML output already generated.  VRML with option=[" + Option1 + "] will not be generated.");
         }
     }
 
-    ScanForReports("Surfaces", DoReport, "CostInfo");
+    ScanForReports(state, "Surfaces", DoReport, "CostInfo");
     if (DoReport) {
-        CostInfoOut(ioFiles);
+        CostInfoOut(state);
     }
 
     if (SurfDet || SurfVert) {
-        DetailsForSurfaces(ioFiles, SurfDetails);
+        DetailsForSurfaces(state, SurfDetails);
     }
 }
 
-void LinesOut(IOFiles &ioFiles, std::string const &option)
+void LinesOut(EnergyPlusData &state, std::string const &option)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
@@ -260,7 +260,7 @@ void LinesOut(IOFiles &ioFiles, std::string const &option)
     lastoption = option;
     optiondone = true;
 
-    auto slnfile = ioFiles.sln.open("LinesOut", ioFiles.outputControl.sln);
+    auto slnfile = state.files.sln.open("LinesOut", state.files.outputControl.sln);
 
     if (option != "IDF") {
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
@@ -481,7 +481,7 @@ static void DXFDaylightingReferencePoints(InputOutputFile &of, bool const DELigh
     }
 }
 
-void DXFOut(IOFiles &ioFiles,
+void DXFOut(EnergyPlusData &state,
             std::string const &PolygonAction,
             std::string const &ColorScheme // Name from user for color scheme or blank
 )
@@ -580,7 +580,7 @@ void DXFOut(IOFiles &ioFiles,
         return;
     }
 
-    auto dxffile = ioFiles.dxf.open("DXFOut", ioFiles.outputControl.dxf);
+    auto dxffile = state.files.dxf.open("DXFOut", state.files.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -638,7 +638,7 @@ void DXFOut(IOFiles &ioFiles,
             } else {
                 Array1D<dTriangle> mytriangles;
 
-                const auto ntri = Triangulate(ioFiles,
+                const auto ntri = Triangulate(state,
                                               Surface(surf).Sides,
                                               Surface(surf).Vertex,
                                               mytriangles,
@@ -720,7 +720,7 @@ void DXFOut(IOFiles &ioFiles,
                 } else {
                     Array1D<dTriangle> mytriangles;
 
-                    const auto ntri = Triangulate(ioFiles,
+                    const auto ntri = Triangulate(state,
                                                   Surface(surf).Sides,
                                                   Surface(surf).Vertex,
                                                   mytriangles,
@@ -790,7 +790,7 @@ void DXFOut(IOFiles &ioFiles,
                     Array1D<dTriangle> mytriangles;
                     int ntri = 0;
                     if (Surface(surf).Shape == SurfaceShape::RectangularOverhang) {
-                        ntri = Triangulate(ioFiles,
+                        ntri = Triangulate(state,
                                            Surface(surf).Sides,
                                            Surface(surf).Vertex,
                                            mytriangles,
@@ -799,7 +799,7 @@ void DXFOut(IOFiles &ioFiles,
                                            Surface(surf).Name,
                                            SurfaceClass_Overhang);
                     } else {
-                        ntri = Triangulate(ioFiles,
+                        ntri = Triangulate(state,
                                            Surface(surf).Sides,
                                            Surface(surf).Vertex,
                                            mytriangles,
@@ -863,7 +863,7 @@ void DXFOut(IOFiles &ioFiles,
     print(dxffile, Format_706);
 }
 
-void DXFOutLines(IOFiles &ioFiles, std::string const &ColorScheme)
+void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
 {
 
     // SUBROUTINE INFORMATION:
@@ -924,7 +924,7 @@ void DXFOutLines(IOFiles &ioFiles, std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = ioFiles.dxf.open("DXFOutLines", ioFiles.outputControl.dxf);
+    auto dxffile = state.files.dxf.open("DXFOutLines", state.files.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1076,7 +1076,7 @@ void DXFOutLines(IOFiles &ioFiles, std::string const &ColorScheme)
     print(dxffile, Format_706);
 }
 
-void DXFOutWireFrame(IOFiles &ioFiles, std::string const &ColorScheme)
+void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1137,7 +1137,7 @@ void DXFOutWireFrame(IOFiles &ioFiles, std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = ioFiles.dxf.open("DXFOutWireFrame", ioFiles.outputControl.dxf);
+    auto dxffile = state.files.dxf.open("DXFOutWireFrame", state.files.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1249,7 +1249,7 @@ void DXFOutWireFrame(IOFiles &ioFiles, std::string const &ColorScheme)
     print(dxffile, Format_706);
 }
 
-void DetailsForSurfaces(IOFiles &ioFiles, int const RptType) // (1=Vertices only, 10=Details only, 11=Details with vertices)
+void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices only, 10=Details only, 11=Details with vertices)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1387,7 +1387,7 @@ void DetailsForSurfaces(IOFiles &ioFiles, int const RptType) // (1=Vertices only
                        << "," << AlgoName << ",";
             if (RptType == 10) {
                 if (Surface(surf).SchedShadowSurfIndex > 0) {
-                    ScheduleName = GetScheduleName(Surface(surf).SchedShadowSurfIndex);
+                    ScheduleName = GetScheduleName(state, Surface(surf).SchedShadowSurfIndex);
                     cSchedMin = RoundSigDigits(GetScheduleMinValue(Surface(surf).SchedShadowSurfIndex), 2);
                     cSchedMax = RoundSigDigits(GetScheduleMaxValue(Surface(surf).SchedShadowSurfIndex), 2);
                 } else {
@@ -1404,7 +1404,7 @@ void DetailsForSurfaces(IOFiles &ioFiles, int const RptType) // (1=Vertices only
                 *eiostream << TrimSigDigits(Surface(surf).Sides) << ",";
             } else {
                 if (Surface(surf).SchedShadowSurfIndex > 0) {
-                    ScheduleName = GetScheduleName(Surface(surf).SchedShadowSurfIndex);
+                    ScheduleName = GetScheduleName(state, Surface(surf).SchedShadowSurfIndex);
                     cSchedMin = RoundSigDigits(GetScheduleMinValue(Surface(surf).SchedShadowSurfIndex), 2);
                     cSchedMax = RoundSigDigits(GetScheduleMaxValue(Surface(surf).SchedShadowSurfIndex), 2);
                 } else {
@@ -1480,7 +1480,7 @@ void DetailsForSurfaces(IOFiles &ioFiles, int const RptType) // (1=Vertices only
                 // prescribed R-values for interior and exterior convection coefficients as found in ASHRAE 90.1-2004, Appendix A
                 if (Surface(surf).Construction > 0 && Surface(surf).Construction <= TotConstructs) {
                     cNominalUwithConvCoeffs = "";
-                    ConstructionName = dataConstruction.Construct(Surface(surf).Construction).Name;
+                    ConstructionName = state.dataConstruction->Construct(Surface(surf).Construction).Name;
                     {
                         auto const SELECT_CASE_var(Surface(surf).Class);
                         if (SELECT_CASE_var == SurfaceClass_Wall) {
@@ -1732,10 +1732,10 @@ void DetailsForSurfaces(IOFiles &ioFiles, int const RptType) // (1=Vertices only
         } // surfaces
     }     // zones
 
-    print(ioFiles.eio, "{}", eiostream->str());
+    print(state.files.eio, "{}", eiostream->str());
 }
 
-void CostInfoOut(IOFiles &ioFiles)
+void CostInfoOut(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1794,7 +1794,7 @@ void CostInfoOut(IOFiles &ioFiles)
         }
     }
 
-    auto scifile = ioFiles.sci.open("CostInfoOut", ioFiles.outputControl.sci);
+    auto scifile = state.files.sci.open("CostInfoOut", state.files.outputControl.sci);
 
     print(scifile, "{:12}{:12}\n", TotSurfaces, count(uniqueSurf));
     print(scifile, "{}\n", " data for surfaces useful for cost information");
@@ -1811,7 +1811,7 @@ void CostInfoOut(IOFiles &ioFiles)
                   Format_801,
                   surf,
                   Surface(surf).Name,
-                  dataConstruction.Construct(Surface(surf).Construction).Name,
+                  state.dataConstruction->Construct(Surface(surf).Construction).Name,
                   cSurfaceClass(Surface(surf).Class),
                   Surface(surf).Area,
                   Surface(surf).GrossArea);
@@ -1821,7 +1821,7 @@ void CostInfoOut(IOFiles &ioFiles)
     uniqueSurf.deallocate();
 }
 
-void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::string &ColorScheme)
+void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std::string &ColorScheme)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1897,7 +1897,7 @@ void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::stri
         return;
     }
 
-    auto wrlfile = ioFiles.wrl.open("VRMLOut", ioFiles.outputControl.wrl);
+    auto wrlfile = state.files.wrl.open("VRMLOut", state.files.outputControl.wrl);
 
     print(wrlfile, Format_702);
 
@@ -1931,7 +1931,7 @@ void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::stri
     for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         if (Surface(surf).HeatTransSurf) continue;
         if (Surface(surf).Construction > 0) {
-            if (dataConstruction.Construct(Surface(surf).Construction).TypeIsAirBoundary) continue;
+            if (state.dataConstruction->Construct(Surface(surf).Construction).TypeIsAirBoundary) continue;
         }
         if (Surface(surf).Class == SurfaceClass_Shading) continue;
         if (Surface(surf).Sides == 0) continue;
@@ -1957,7 +1957,7 @@ void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::stri
             print(wrlfile, Format_805);
         } else { // will be >4 sided polygon with triangulate option
             Array1D<dTriangle> mytriangles;
-            const auto ntri = Triangulate(ioFiles,
+            const auto ntri = Triangulate(state,
                                           Surface(surf).Sides,
                                           Surface(surf).Vertex,
                                           mytriangles,
@@ -2004,7 +2004,7 @@ void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::stri
                 print(wrlfile, Format_805);
             } else { // will be >4 sided polygon with triangulate option
                 Array1D<dTriangle> mytriangles;
-                const auto ntri = Triangulate(ioFiles,
+                const auto ntri = Triangulate(state,
                                               Surface(surf).Sides,
                                               Surface(surf).Vertex,
                                               mytriangles,
@@ -2043,7 +2043,7 @@ void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::stri
                 print(wrlfile, Format_805);
             } else { // will be >4 sided polygon with triangulate option
                 Array1D<dTriangle> mytriangles;
-                const auto ntri = Triangulate(ioFiles,
+                const auto ntri = Triangulate(state,
                                               Surface(surf).Sides,
                                               Surface(surf).Vertex,
                                               mytriangles,

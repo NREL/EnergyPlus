@@ -69,6 +69,7 @@
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CostEstimateManager.hh>
@@ -81,6 +82,19 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
+#include <EnergyPlus/SwimmingPool.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/ThermalChimney.hh>
+#include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/TranspiredCollector.hh>
+#include <EnergyPlus/UFADManager.hh>
+#include <EnergyPlus/UnitarySystem.hh>
+#include <EnergyPlus/UnitHeater.hh>
+#include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/UserDefinedComponents.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>

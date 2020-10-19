@@ -109,7 +109,7 @@ namespace PlantChillers {
     // Parameters for use in Chillers
     Real64 constexpr KJtoJ(1000.0); // convert Kjoules to joules
 
-    void BaseChillerSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void BaseChillerSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             MinLoad = this->NomCap * this->MinPartLoadRat;
@@ -131,7 +131,7 @@ namespace PlantChillers {
     {
         this->initialize(state, false, 0.0);
         if (calledFromLocation.loopNum == this->CWLoopNum) {
-            this->size();
+            this->size(state);
         }
     }
 
@@ -190,7 +190,8 @@ namespace PlantChillers {
 
         // LOAD ARRAYS WITH Electric CURVE FIT CHILLER DATA
         for (int ChillerNum = 1; ChillerNum <= state.dataPlantChillers->NumElectricChillers; ++ChillerNum) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           ChillerNum,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -240,7 +241,7 @@ namespace PlantChillers {
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
-            thisChiller.EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+            thisChiller.EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                                                ErrorsFound,
                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                DataIPShortCuts::cAlphaArgs(1),
@@ -248,7 +249,7 @@ namespace PlantChillers {
                                                                                DataLoopNode::NodeConnectionType_Inlet,
                                                                                1,
                                                                                DataLoopNode::ObjectIsNotParent);
-            thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
+            thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(4),
                                                                                 ErrorsFound,
                                                                                 DataIPShortCuts::cCurrentModuleObject,
                                                                                 DataIPShortCuts::cAlphaArgs(1),
@@ -269,21 +270,21 @@ namespace PlantChillers {
                 //  since it is not used elsewhere for connection
                 // for transition purposes, add this node if not there.
                 if (DataIPShortCuts::lAlphaFieldBlanks(5)) {
-                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobals::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobalConstants::MaxNameLength() - 21) { // protect against long name leading to > 100 chars
                         DataIPShortCuts::cAlphaArgs(5) = DataIPShortCuts::cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         DataIPShortCuts::cAlphaArgs(5) = DataIPShortCuts::cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
                     }
                 }
                 if (DataIPShortCuts::lAlphaFieldBlanks(6)) {
-                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobals::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobalConstants::MaxNameLength() - 22) { // protect against long name leading to > 100 chars
                         DataIPShortCuts::cAlphaArgs(6) = DataIPShortCuts::cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         DataIPShortCuts::cAlphaArgs(6) = DataIPShortCuts::cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";
                     }
                 }
 
-                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                    ErrorsFound,
                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                    DataIPShortCuts::cAlphaArgs(1),
@@ -292,12 +293,12 @@ namespace PlantChillers {
                                                                                    2,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
-                OutAirNodeManager::CheckAndAddAirNodeNumber(thisChiller.CondInletNodeNum, Okay);
+                OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
                 if (!Okay) {
                     ShowWarningError(DataIPShortCuts::cCurrentModuleObject + ", Adding OutdoorAir:Node=" + DataIPShortCuts::cAlphaArgs(5));
                 }
 
-                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
                                                                                     ErrorsFound,
                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                     DataIPShortCuts::cAlphaArgs(1),
@@ -306,7 +307,7 @@ namespace PlantChillers {
                                                                                     2,
                                                                                     DataLoopNode::ObjectIsNotParent);
             } else if (thisChiller.CondenserType == DataPlant::CondenserType::WATERCOOLED) {
-                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                    ErrorsFound,
                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                    DataIPShortCuts::cAlphaArgs(1),
@@ -314,7 +315,7 @@ namespace PlantChillers {
                                                                                    DataLoopNode::NodeConnectionType_Inlet,
                                                                                    2,
                                                                                    DataLoopNode::ObjectIsNotParent);
-                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
                                                                                     ErrorsFound,
                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                     DataIPShortCuts::cAlphaArgs(1),
@@ -338,7 +339,7 @@ namespace PlantChillers {
                     ErrorsFound = true;
                 }
             } else {
-                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                    ErrorsFound,
                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                    DataIPShortCuts::cAlphaArgs(1),
@@ -346,7 +347,7 @@ namespace PlantChillers {
                                                                                    DataLoopNode::NodeConnectionType_Inlet,
                                                                                    2,
                                                                                    DataLoopNode::ObjectIsNotParent);
-                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
                                                                                     ErrorsFound,
                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                     DataIPShortCuts::cAlphaArgs(1),
@@ -430,7 +431,7 @@ namespace PlantChillers {
 
             if ((thisChiller.DesignHeatRecVolFlowRate > 0.0) || (thisChiller.DesignHeatRecVolFlowRate == DataSizing::AutoSize)) {
                 thisChiller.HeatRecActive = true;
-                thisChiller.HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(8),
+                thisChiller.HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(8),
                                                                                       ErrorsFound,
                                                                                       DataIPShortCuts::cCurrentModuleObject,
                                                                                       DataIPShortCuts::cAlphaArgs(1),
@@ -443,7 +444,7 @@ namespace PlantChillers {
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                     ErrorsFound = true;
                 }
-                thisChiller.HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(9),
+                thisChiller.HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(9),
                                                                                        ErrorsFound,
                                                                                        DataIPShortCuts::cCurrentModuleObject,
                                                                                        DataIPShortCuts::cAlphaArgs(1),
@@ -489,7 +490,7 @@ namespace PlantChillers {
 
                 if (NumAlphas > 10) {
                     if (!DataIPShortCuts::lAlphaFieldBlanks(11)) {
-                        thisChiller.HeatRecInletLimitSchedNum = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(11));
+                        thisChiller.HeatRecInletLimitSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(11));
                         if (thisChiller.HeatRecInletLimitSchedNum == 0) {
                             ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                             ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + '=' + DataIPShortCuts::cAlphaArgs(11));
@@ -504,7 +505,7 @@ namespace PlantChillers {
 
                 if (NumAlphas > 11) {
                     if (!DataIPShortCuts::lAlphaFieldBlanks(12)) {
-                        thisChiller.HeatRecSetPointNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(12),
+                        thisChiller.HeatRecSetPointNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(12),
                                                                                                  ErrorsFound,
                                                                                                  DataIPShortCuts::cCurrentModuleObject,
                                                                                                  DataIPShortCuts::cAlphaArgs(1),
@@ -556,7 +557,7 @@ namespace PlantChillers {
             }
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(10)) {
-                thisChiller.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(10));
+                thisChiller.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(10));
                 if (thisChiller.BasinHeaterSchedulePtr == 0) {
                     ShowWarningError(DataIPShortCuts::cCurrentModuleObject + ", \"" + thisChiller.Name +
                                      "\" TRIM(DataIPShortCuts::cAlphaFieldNames(10)) \"" + DataIPShortCuts::cAlphaArgs(10) +
@@ -575,10 +576,10 @@ namespace PlantChillers {
         }
     }
 
-    void ElectricChillerSpecs::setupOutputVariables()
+    void ElectricChillerSpecs::setupOutputVariables(EnergyPlusData &state)
     {
-        SetupOutputVariable("Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Electricity Energy",
+        SetupOutputVariable(state, "Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Energy,
                             "System",
@@ -590,8 +591,8 @@ namespace PlantChillers {
                             this->EndUseSubcategory,
                             "Plant");
 
-        SetupOutputVariable("Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Evaporator Cooling Energy",
+        SetupOutputVariable(state, "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Evaporator Cooling Energy",
                             OutputProcessor::Unit::J,
                             this->EvaporatorEnergy,
                             "System",
@@ -602,12 +603,12 @@ namespace PlantChillers {
                             "CHILLERS",
                             _,
                             "Plant");
-        SetupOutputVariable("Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->EvapOutletTemp, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->EvapOutletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state,
             "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->EvapMassFlowRate, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->QCondenser, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
+        SetupOutputVariable(state, "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->QCondenser, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Condenser Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->CondenserEnergy,
                             "System",
@@ -618,21 +619,21 @@ namespace PlantChillers {
                             "HEATREJECTION",
                             _,
                             "Plant");
-        SetupOutputVariable("Chiller COP", OutputProcessor::Unit::W_W, this->ActualCOP, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->ActualCOP, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, "System", "Average", this->Name);
 
         // Condenser mass flow and outlet temp are valid for water cooled
         if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->CondOutletTemp, "System", "Average", this->Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->CondMassFlowRate, "System", "Average", this->Name);
         } else if (this->CondenserType == DataPlant::CondenserType::AIRCOOLED) {
         } else if (this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "Chiller Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
-                SetupOutputVariable("Chiller Basin Heater Electricity Energy",
+                SetupOutputVariable(state, "Chiller Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
                                     "System",
@@ -648,8 +649,8 @@ namespace PlantChillers {
 
         // If heat recovery is active then setup report variables
         if (this->HeatRecActive) {
-            SetupOutputVariable("Chiller Total Recovered Heat Rate", OutputProcessor::Unit::W, this->QHeatRecovery, "System", "Average", this->Name);
-            SetupOutputVariable("Chiller Total Recovered Heat Energy",
+            SetupOutputVariable(state, "Chiller Total Recovered Heat Rate", OutputProcessor::Unit::W, this->QHeatRecovery, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Chiller Total Recovered Heat Energy",
                                 OutputProcessor::Unit::J,
                                 this->EnergyHeatRecovery,
                                 "System",
@@ -660,13 +661,13 @@ namespace PlantChillers {
                                 "HEATRECOVERY",
                                 _,
                                 "Plant");
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, this->HeatRecInletTemp, "System", "Average", this->Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, this->HeatRecOutletTemp, "System", "Average", this->Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdot, "System", "Average", this->Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Effective Heat Rejection Temperature", OutputProcessor::Unit::C, this->ChillerCondAvgTemp, "System", "Average", this->Name);
         }
         if (DataGlobals::AnyEnergyManagementSystemInModel) {
@@ -680,10 +681,10 @@ namespace PlantChillers {
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
             this->initialize(state, RunFlag, CurLoad);
             auto &sim_component(DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
-            this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
+            this->calculate(state, CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(CurLoad, RunFlag);
         } else if (calledFromLocation.loopNum == this->CDLoopNum) { // condenser loop
-            PlantUtilities::UpdateChillerComponentCondenserSide(this->CDLoopNum,
+            PlantUtilities::UpdateChillerComponentCondenserSide(state, this->CDLoopNum,
                                                                 this->CDLoopSideNum,
                                                                 this->plantTypeOfNum,
                                                                 this->CondInletNodeNum,
@@ -694,7 +695,7 @@ namespace PlantChillers {
                                                                 this->CondMassFlowRate,
                                                                 FirstHVACIteration);
         } else if (calledFromLocation.loopNum == this->HRLoopNum) { // heat recovery loop
-            PlantUtilities::UpdateComponentHeatRecoverySide(this->HRLoopNum,
+            PlantUtilities::UpdateComponentHeatRecoverySide(state, this->HRLoopNum,
                                                             this->HRLoopSideNum,
                                                             this->plantTypeOfNum,
                                                             this->HeatRecInletNodeNum,
@@ -728,7 +729,7 @@ namespace PlantChillers {
         if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            this->setupOutputVariables();
+            this->setupOutputVariables(state);
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     this->plantTypeOfNum,
@@ -844,8 +845,9 @@ namespace PlantChillers {
 
         if (this->MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
-            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                           DataGlobals::CWInitConvTemp,
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                           DataGlobalConstants::CWInitConvTemp(),
                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                            RoutineName);
 
@@ -864,8 +866,9 @@ namespace PlantChillers {
 
                 DataLoopNode::Node(this->CondInletNodeNum).Temp = this->TempDesCondIn; // DSU? old behavior, still want?
 
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
-                                                        DataGlobals::CWInitConvTemp,
+                rho = FluidProperties::GetDensityGlycol(state,
+                                                        DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                                                        DataGlobalConstants::CWInitConvTemp(),
                                                         DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                         RoutineName);
 
@@ -896,8 +899,9 @@ namespace PlantChillers {
             }
 
             if (this->HeatRecActive) {
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
-                                                        DataGlobals::HWInitConvTemp,
+                rho = FluidProperties::GetDensityGlycol(state,
+                                                        DataPlant::PlantLoop(this->HRLoopNum).FluidName,
+                                                        DataGlobalConstants::HWInitConvTemp(),
                                                         DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
                                                         RoutineName);
                 this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
@@ -1010,7 +1014,7 @@ namespace PlantChillers {
         }
     }
 
-    void ElectricChillerSpecs::size()
+    void ElectricChillerSpecs::size(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1043,12 +1047,14 @@ namespace PlantChillers {
         Real64 tmpNomCap = this->NomCap;
         if (PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                               DataGlobals::CWInitConvTemp,
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                               DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                               DataGlobalConstants::CWInitConvTemp(),
                                                                DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                RoutineName);
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                                   DataGlobals::CWInitConvTemp,
+                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                   DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                                   DataGlobalConstants::CWInitConvTemp(),
                                                                    DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                    RoutineName);
                 tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
@@ -1160,11 +1166,13 @@ namespace PlantChillers {
         Real64 tmpCondVolFlowRate = this->CondVolFlowRate;
         if (PltSizCondNum > 0 && PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                               DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                                                this->TempDesCondIn,
                                                                DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                                RoutineName);
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                   DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                                                    this->TempDesCondIn,
                                                                    DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                                    RoutineName);
@@ -1281,7 +1289,7 @@ namespace PlantChillers {
         }
     }
 
-    void ElectricChillerSpecs::calculate(Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
+    void ElectricChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher / Brandon Anderson
@@ -1523,7 +1531,8 @@ namespace PlantChillers {
             OperPartLoadRat = 0.0;
         }
 
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                                            DataLoopNode::Node(this->EvapInletNodeNum).Temp,
                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                            RoutineName);
@@ -1795,9 +1804,9 @@ namespace PlantChillers {
         if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
             if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
-                if (this->HeatRecActive) this->calcHeatRecovery(this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
+                if (this->HeatRecActive) this->calcHeatRecovery(state, this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
                 Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(
-                    DataPlant::PlantLoop(this->CDLoopNum).FluidName, condInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
+                    state, DataPlant::PlantLoop(this->CDLoopNum).FluidName, condInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
                 this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + condInletTemp;
             } else {
                 ShowSevereError("CalcElectricChillerModel: Condenser flow = 0, for ElectricChiller=" + this->Name);
@@ -1812,7 +1821,7 @@ namespace PlantChillers {
             }
 
             // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
-            if (this->HeatRecActive) this->calcHeatRecovery(this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
+            if (this->HeatRecActive) this->calcHeatRecovery(state, this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
             if (this->CondMassFlowRate > 0.0) {
                 Real64 CpCond = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->CondInletNodeNum).HumRat);
                 this->CondOutletTemp = condInletTemp + this->QCondenser / this->CondMassFlowRate / CpCond;
@@ -1822,9 +1831,9 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         // check for problems (deal with observed negative energy results)
         if (this->Energy < 0.0) { // there is a serious problem
@@ -1858,7 +1867,8 @@ namespace PlantChillers {
         }
     }
 
-    void ElectricChillerSpecs::calcHeatRecovery(Real64 &QCond,              // current condenser load
+    void ElectricChillerSpecs::calcHeatRecovery(EnergyPlusData &state,
+                                                Real64 &QCond,              // current condenser load
                                                 Real64 const CondMassFlow,  // current condenser Mass Flow
                                                 Real64 const condInletTemp, // current condenser Inlet Temp
                                                 Real64 &QHeatRec            // amount of heat recovered
@@ -1883,12 +1893,12 @@ namespace PlantChillers {
         Real64 HeatRecMassFlowRate = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
 
         Real64 CpHeatRec = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->HRLoopNum).FluidName, this->HeatRecInletTemp, DataPlant::PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
+            state, DataPlant::PlantLoop(this->HRLoopNum).FluidName, this->HeatRecInletTemp, DataPlant::PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
 
         Real64 CpCond;
         if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
             CpCond = FluidProperties::GetSpecificHeatGlycol(
-                DataPlant::PlantLoop(this->CDLoopNum).FluidName, condInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
+                state, DataPlant::PlantLoop(this->CDLoopNum).FluidName, condInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
         } else {
             CpCond = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->CondInletNodeNum).HumRat);
         }
@@ -1942,7 +1952,7 @@ namespace PlantChillers {
         }
 
         this->QHeatRecovery = this->QHeatRecovered;
-        this->EnergyHeatRecovery = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->EnergyHeatRecovery = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         DataLoopNode::Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
         this->HeatRecMdot = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
         this->ChillerCondAvgTemp = this->AvgCondSinkTemp;
@@ -1954,7 +1964,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             // set node temperatures
@@ -2035,7 +2045,7 @@ namespace PlantChillers {
             this->calculate(state, CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(CurLoad, RunFlag);
         } else if (calledFromLocation.loopNum == this->CDLoopNum) { // condenser loop
-            PlantUtilities::UpdateChillerComponentCondenserSide(this->CDLoopNum,
+            PlantUtilities::UpdateChillerComponentCondenserSide(state, this->CDLoopNum,
                                                                 this->CDLoopSideNum,
                                                                 this->plantTypeOfNum,
                                                                 this->CondInletNodeNum,
@@ -2046,7 +2056,7 @@ namespace PlantChillers {
                                                                 this->CondMassFlowRate,
                                                                 FirstHVACIteration);
         } else if (calledFromLocation.loopNum == this->HRLoopNum) { // heat recovery loop
-            PlantUtilities::UpdateComponentHeatRecoverySide(this->HRLoopNum,
+            PlantUtilities::UpdateComponentHeatRecoverySide(state, this->HRLoopNum,
                                                             this->HRLoopSideNum,
                                                             this->plantTypeOfNum,
                                                             this->HeatRecInletNodeNum,
@@ -2093,7 +2103,8 @@ namespace PlantChillers {
 
         // LOAD ARRAYS WITH EngineDriven CURVE FIT CHILLER DATA
         for (int ChillerNum = 1; ChillerNum <= state.dataPlantChillers->NumEngineDrivenChillers; ++ChillerNum) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           ChillerNum,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -2145,7 +2156,7 @@ namespace PlantChillers {
                 ErrorsFound = true;
             }
 
-            thisChiller.EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+            thisChiller.EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                                                ErrorsFound,
                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                DataIPShortCuts::cAlphaArgs(1),
@@ -2153,7 +2164,7 @@ namespace PlantChillers {
                                                                                DataLoopNode::NodeConnectionType_Inlet,
                                                                                1,
                                                                                DataLoopNode::ObjectIsNotParent);
-            thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
+            thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(4),
                                                                                 ErrorsFound,
                                                                                 DataIPShortCuts::cCurrentModuleObject,
                                                                                 DataIPShortCuts::cAlphaArgs(1),
@@ -2173,21 +2184,21 @@ namespace PlantChillers {
                 // If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
                 //  since it is not used elsewhere for connection
                 if (DataIPShortCuts::lAlphaFieldBlanks(5)) {
-                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobals::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobalConstants::MaxNameLength() - 21) { // protect against long name leading to > 100 chars
                         DataIPShortCuts::cAlphaArgs(5) = DataIPShortCuts::cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         DataIPShortCuts::cAlphaArgs(5) = DataIPShortCuts::cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
                     }
                 }
                 if (DataIPShortCuts::lAlphaFieldBlanks(6)) {
-                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobals::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobalConstants::MaxNameLength() - 22) { // protect against long name leading to > 100 chars
                         DataIPShortCuts::cAlphaArgs(6) = DataIPShortCuts::cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         DataIPShortCuts::cAlphaArgs(6) = DataIPShortCuts::cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";
                     }
                 }
 
-                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                    ErrorsFound,
                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                    DataIPShortCuts::cAlphaArgs(1),
@@ -2196,13 +2207,13 @@ namespace PlantChillers {
                                                                                    2,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
-                OutAirNodeManager::CheckAndAddAirNodeNumber(thisChiller.CondInletNodeNum, Okay);
+                OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
                 if (!Okay) {
                     ShowWarningError(DataIPShortCuts::cCurrentModuleObject +
                                      ", Adding OutdoorAir:DataLoopNode::Node=" + DataIPShortCuts::cAlphaArgs(5));
                 }
 
-                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
                                                                                     ErrorsFound,
                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                     DataIPShortCuts::cAlphaArgs(1),
@@ -2214,7 +2225,7 @@ namespace PlantChillers {
                 // TestCompSet(TRIM(DataIPShortCuts::cCurrentModuleObject),DataIPShortCuts::cAlphaArgs(1),DataIPShortCuts::cAlphaArgs(5),DataIPShortCuts::cAlphaArgs(6),'Condenser
                 // (Air) Nodes')
             } else if (thisChiller.CondenserType == DataPlant::CondenserType::WATERCOOLED) {
-                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                    ErrorsFound,
                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                    DataIPShortCuts::cAlphaArgs(1),
@@ -2222,7 +2233,7 @@ namespace PlantChillers {
                                                                                    DataLoopNode::NodeConnectionType_Inlet,
                                                                                    2,
                                                                                    DataLoopNode::ObjectIsNotParent);
-                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
                                                                                     ErrorsFound,
                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                     DataIPShortCuts::cAlphaArgs(1),
@@ -2246,7 +2257,7 @@ namespace PlantChillers {
                     ErrorsFound = true;
                 }
             } else {
-                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                    ErrorsFound,
                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                    DataIPShortCuts::cAlphaArgs(1),
@@ -2254,7 +2265,7 @@ namespace PlantChillers {
                                                                                    DataLoopNode::NodeConnectionType_Inlet,
                                                                                    2,
                                                                                    DataLoopNode::ObjectIsNotParent);
-                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
                                                                                     ErrorsFound,
                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                     DataIPShortCuts::cAlphaArgs(1),
@@ -2372,7 +2383,7 @@ namespace PlantChillers {
             thisChiller.DesignHeatRecVolFlowRate = DataIPShortCuts::rNumericArgs(26);
             if (thisChiller.DesignHeatRecVolFlowRate > 0.0 || thisChiller.DesignHeatRecVolFlowRate == DataSizing::AutoSize) {
                 thisChiller.HeatRecActive = true;
-                thisChiller.HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(13),
+                thisChiller.HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(13),
                                                                                       ErrorsFound,
                                                                                       DataIPShortCuts::cCurrentModuleObject,
                                                                                       DataIPShortCuts::cAlphaArgs(1),
@@ -2385,7 +2396,7 @@ namespace PlantChillers {
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                     ErrorsFound = true;
                 }
-                thisChiller.HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(14),
+                thisChiller.HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(14),
                                                                                        ErrorsFound,
                                                                                        DataIPShortCuts::cCurrentModuleObject,
                                                                                        DataIPShortCuts::cAlphaArgs(1),
@@ -2481,7 +2492,7 @@ namespace PlantChillers {
             }
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(16)) {
-                thisChiller.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(16));
+                thisChiller.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(16));
                 if (thisChiller.BasinHeaterSchedulePtr == 0) {
                     ShowWarningError(DataIPShortCuts::cCurrentModuleObject + ", \"" + thisChiller.Name +
                                      "\" TRIM(DataIPShortCuts::cAlphaFieldNames(16)) \"" + DataIPShortCuts::cAlphaArgs(16) +
@@ -2505,12 +2516,12 @@ namespace PlantChillers {
         }
     }
 
-    void EngineDrivenChillerSpecs::setupOutputVariables()
+    void EngineDrivenChillerSpecs::setupOutputVariables(EnergyPlusData &state)
     {
-        SetupOutputVariable("Chiller Drive Shaft Power", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Drive Shaft Energy", OutputProcessor::Unit::J, this->Energy, "System", "Sum", this->Name);
-        SetupOutputVariable("Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Evaporator Cooling Energy",
+        SetupOutputVariable(state, "Chiller Drive Shaft Power", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Drive Shaft Energy", OutputProcessor::Unit::J, this->Energy, "System", "Sum", this->Name);
+        SetupOutputVariable(state, "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Evaporator Cooling Energy",
                             OutputProcessor::Unit::J,
                             this->EvaporatorEnergy,
                             "System",
@@ -2521,12 +2532,12 @@ namespace PlantChillers {
                             "CHILLERS",
                             _,
                             "Plant");
-        SetupOutputVariable("Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->EvapOutletTemp, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->EvapOutletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state,
             "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->EvapMassFlowRate, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->QCondenser, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
+        SetupOutputVariable(state, "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->QCondenser, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Condenser Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->CondenserEnergy,
                             "System",
@@ -2538,20 +2549,20 @@ namespace PlantChillers {
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, "System", "Average", this->Name);
 
         // Condenser mass flow and outlet temp are valid for Water Cooled
         if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->CondOutletTemp, "System", "Average", this->Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->CondMassFlowRate, "System", "Average", this->Name);
         } else if (this->CondenserType == DataPlant::CondenserType::AIRCOOLED) {
         } else if (this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "Chiller Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
-                SetupOutputVariable("Chiller Basin Heater Electricity Energy",
+                SetupOutputVariable(state, "Chiller Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
                                     "System",
@@ -2565,9 +2576,9 @@ namespace PlantChillers {
             }
         }
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller " + this->FuelType + " Energy",
+        SetupOutputVariable(state, "Chiller " + this->FuelType + " Energy",
                             OutputProcessor::Unit::J,
                             this->FuelEnergy,
                             "System",
@@ -2579,17 +2590,17 @@ namespace PlantChillers {
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller COP", OutputProcessor::Unit::W_W, this->FuelCOP, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->FuelCOP, "System", "Average", this->Name);
+        SetupOutputVariable(state,
             "Chiller " + this->FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, this->FuelMdot, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Exhaust Temperature", OutputProcessor::Unit::C, this->ExhaustStackTemp, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdot, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Exhaust Temperature", OutputProcessor::Unit::C, this->ExhaustStackTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdot, "System", "Average", this->Name);
 
         if (this->HeatRecActive) {
             // need to only report if heat recovery active
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Jacket Recovered Heat Rate", OutputProcessor::Unit::W, this->QJacketRecovered, "System", "Average", this->Name);
-            SetupOutputVariable("Chiller Jacket Recovered Heat Energy",
+            SetupOutputVariable(state, "Chiller Jacket Recovered Heat Energy",
                                 OutputProcessor::Unit::J,
                                 this->JacketEnergyRec,
                                 "System",
@@ -2601,9 +2612,9 @@ namespace PlantChillers {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Lube Recovered Heat Rate", OutputProcessor::Unit::W, this->QLubeOilRecovered, "System", "Average", this->Name);
-            SetupOutputVariable("Chiller Lube Recovered Heat Energy",
+            SetupOutputVariable(state, "Chiller Lube Recovered Heat Energy",
                                 OutputProcessor::Unit::J,
                                 this->LubeOilEnergyRec,
                                 "System",
@@ -2615,9 +2626,9 @@ namespace PlantChillers {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Exhaust Recovered Heat Rate", OutputProcessor::Unit::W, this->QExhaustRecovered, "System", "Average", this->Name);
-            SetupOutputVariable("Chiller Exhaust Recovered Heat Energy",
+            SetupOutputVariable(state, "Chiller Exhaust Recovered Heat Energy",
                                 OutputProcessor::Unit::J,
                                 this->ExhaustEnergyRec,
                                 "System",
@@ -2629,13 +2640,13 @@ namespace PlantChillers {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Total Recovered Heat Rate", OutputProcessor::Unit::W, this->QTotalHeatRecovered, "System", "Average", this->Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Total Recovered Heat Energy", OutputProcessor::Unit::J, this->TotalHeatEnergyRec, "System", "Sum", this->Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, this->HeatRecInletTemp, "System", "Average", this->Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, this->HeatRecOutletTemp, "System", "Average", this->Name);
         }
         if (DataGlobals::AnyEnergyManagementSystemInModel) {
@@ -2664,7 +2675,7 @@ namespace PlantChillers {
         if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            this->setupOutputVariables();
+            this->setupOutputVariables(state);
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     this->plantTypeOfNum,
@@ -2774,8 +2785,9 @@ namespace PlantChillers {
         // Initialize critical Demand Side Variables
         if (this->MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
-            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                           DataGlobals::CWInitConvTemp,
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                           DataGlobalConstants::CWInitConvTemp(),
                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                            RoutineName);
 
@@ -2795,8 +2807,9 @@ namespace PlantChillers {
 
                 DataLoopNode::Node(this->CondInletNodeNum).Temp = this->TempDesCondIn;
 
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
-                                                        DataGlobals::CWInitConvTemp,
+                rho = FluidProperties::GetDensityGlycol(state,
+                                                        DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                                                        DataGlobalConstants::CWInitConvTemp(),
                                                         DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                         RoutineName);
 
@@ -2825,8 +2838,9 @@ namespace PlantChillers {
             }
 
             if (this->HeatRecActive) {
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
-                                                        DataGlobals::HWInitConvTemp,
+                rho = FluidProperties::GetDensityGlycol(state,
+                                                        DataPlant::PlantLoop(this->HRLoopNum).FluidName,
+                                                        DataGlobalConstants::HWInitConvTemp(),
                                                         DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
                                                         RoutineName);
                 this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
@@ -2896,7 +2910,7 @@ namespace PlantChillers {
         }
     }
 
-    void EngineDrivenChillerSpecs::size()
+    void EngineDrivenChillerSpecs::size(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2931,12 +2945,14 @@ namespace PlantChillers {
 
         if (PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                               DataGlobals::CWInitConvTemp,
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                               DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                               DataGlobalConstants::CWInitConvTemp(),
                                                                DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                RoutineName);
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                                   DataGlobals::CWInitConvTemp,
+                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                   DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                                   DataGlobalConstants::CWInitConvTemp(),
                                                                    DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                    RoutineName);
                 tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
@@ -3045,12 +3061,14 @@ namespace PlantChillers {
 
         if (PltSizCondNum > 0 && PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                               DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                                                this->TempDesCondIn,
                                                                DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                                RoutineName);
 
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                   DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                                                    this->TempDesCondIn,
                                                                    DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                                    RoutineName);
@@ -3420,7 +3438,8 @@ namespace PlantChillers {
             OperPartLoadRat = 0.0;
         }
 
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                                            DataLoopNode::Node(this->EvapInletNodeNum).Temp,
                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                            RoutineName);
@@ -3691,7 +3710,8 @@ namespace PlantChillers {
         if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
 
             if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                       DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                                                        this->CondInletTemp,
                                                                        DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                                        RoutineName);
@@ -3767,21 +3787,21 @@ namespace PlantChillers {
         // Update Heat Recovery temperatures
         if (this->HeatRecActive) {
             Real64 HeatRecRatio;
-            this->calcHeatRecovery(this->QTotalHeatRecovered, HeatRecRatio);
+            this->calcHeatRecovery(state, this->QTotalHeatRecovered, HeatRecRatio);
             this->QExhaustRecovered *= HeatRecRatio;
             this->QLubeOilRecovered *= HeatRecRatio;
             this->QJacketRecovered *= HeatRecRatio;
         }
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         this->FuelEnergyUseRate = EngineDrivenFuelEnergy;
-        this->FuelEnergy = this->FuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->JacketEnergyRec = this->QJacketRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->LubeOilEnergyRec = this->QLubeOilRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->ExhaustEnergyRec = this->QExhaustRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->FuelEnergy = this->FuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->JacketEnergyRec = this->QJacketRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->LubeOilEnergyRec = this->QLubeOilRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->ExhaustEnergyRec = this->QExhaustRecovered * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         this->QTotalHeatRecovered = this->QExhaustRecovered + this->QLubeOilRecovered + this->QJacketRecovered;
         this->TotalHeatEnergyRec = this->ExhaustEnergyRec + this->LubeOilEnergyRec + this->JacketEnergyRec;
         this->FuelEnergyUseRate = std::abs(this->FuelEnergyUseRate);
@@ -3819,7 +3839,7 @@ namespace PlantChillers {
         }
     }
 
-    void EngineDrivenChillerSpecs::calcHeatRecovery(Real64 const EnergyRecovered, Real64 &HeatRecRatio)
+    void EngineDrivenChillerSpecs::calcHeatRecovery(EnergyPlusData &state, Real64 const EnergyRecovered, Real64 &HeatRecRatio)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brandon Anderson
@@ -3844,7 +3864,7 @@ namespace PlantChillers {
 
         this->HeatRecInletTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
         Real64 cp = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->HRLoopNum).FluidName, this->HeatRecInletTemp, DataPlant::PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
+            state, DataPlant::PlantLoop(this->HRLoopNum).FluidName, this->HeatRecInletTemp, DataPlant::PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
 
         // Don't divide by zero - Note This also results in no heat recovery when
         //  design Mdot for Heat Recovery - Specified on Chiller Input - is zero
@@ -3881,7 +3901,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running
             // set node temperatures
@@ -3954,10 +3974,10 @@ namespace PlantChillers {
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
             this->initialize(state, RunFlag, CurLoad);
             auto &sim_component(DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
-            this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
+            this->calculate(state, CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(CurLoad, RunFlag);
         } else if (calledFromLocation.loopNum == this->CDLoopNum) { // condenser loop
-            PlantUtilities::UpdateChillerComponentCondenserSide(this->CDLoopNum,
+            PlantUtilities::UpdateChillerComponentCondenserSide(state, this->CDLoopNum,
                                                                 this->CDLoopSideNum,
                                                                 this->plantTypeOfNum,
                                                                 this->CondInletNodeNum,
@@ -3968,7 +3988,7 @@ namespace PlantChillers {
                                                                 this->CondMassFlowRate,
                                                                 FirstHVACIteration);
         } else if (calledFromLocation.loopNum == this->HRLoopNum) { // heat recovery loop
-            PlantUtilities::UpdateComponentHeatRecoverySide(this->HRLoopNum,
+            PlantUtilities::UpdateComponentHeatRecoverySide(state, this->HRLoopNum,
                                                             this->HRLoopSideNum,
                                                             this->plantTypeOfNum,
                                                             this->HeatRecInletNodeNum,
@@ -4016,7 +4036,8 @@ namespace PlantChillers {
         state.dataPlantChillers->GTChiller.allocate(state.dataPlantChillers->NumGTChillers);
 
         for (int ChillerNum = 1; ChillerNum <= state.dataPlantChillers->NumGTChillers; ++ChillerNum) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           ChillerNum,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -4069,7 +4090,7 @@ namespace PlantChillers {
                 ErrorsFound = true;
             }
 
-            thisChiller.EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+            thisChiller.EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                                                ErrorsFound,
                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                DataIPShortCuts::cAlphaArgs(1),
@@ -4077,7 +4098,7 @@ namespace PlantChillers {
                                                                                DataLoopNode::NodeConnectionType_Inlet,
                                                                                1,
                                                                                DataLoopNode::ObjectIsNotParent);
-            thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
+            thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(4),
                                                                                 ErrorsFound,
                                                                                 DataIPShortCuts::cCurrentModuleObject,
                                                                                 DataIPShortCuts::cAlphaArgs(1),
@@ -4097,21 +4118,21 @@ namespace PlantChillers {
                 // If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
                 // since it is not used elsewhere for connection
                 if (DataIPShortCuts::lAlphaFieldBlanks(5)) {
-                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobals::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobalConstants::MaxNameLength() - 21) { // protect against long name leading to > 100 chars
                         DataIPShortCuts::cAlphaArgs(5) = DataIPShortCuts::cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         DataIPShortCuts::cAlphaArgs(5) = DataIPShortCuts::cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
                     }
                 }
                 if (DataIPShortCuts::lAlphaFieldBlanks(6)) {
-                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobals::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobalConstants::MaxNameLength() - 22) { // protect against long name leading to > 100 chars
                         DataIPShortCuts::cAlphaArgs(6) = DataIPShortCuts::cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         DataIPShortCuts::cAlphaArgs(6) = DataIPShortCuts::cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";
                     }
                 }
 
-                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                    ErrorsFound,
                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                    DataIPShortCuts::cAlphaArgs(1),
@@ -4120,12 +4141,12 @@ namespace PlantChillers {
                                                                                    2,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
-                OutAirNodeManager::CheckAndAddAirNodeNumber(thisChiller.CondInletNodeNum, Okay);
+                OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
                 if (!Okay) {
                     ShowWarningError(DataIPShortCuts::cCurrentModuleObject + ", Adding OutdoorAir:Node=" + DataIPShortCuts::cAlphaArgs(5));
                 }
 
-                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
                                                                                     ErrorsFound,
                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                     DataIPShortCuts::cAlphaArgs(1),
@@ -4134,7 +4155,7 @@ namespace PlantChillers {
                                                                                     2,
                                                                                     DataLoopNode::ObjectIsNotParent);
             } else { // WaterCooled CondenserType
-                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                    ErrorsFound,
                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                    DataIPShortCuts::cAlphaArgs(1),
@@ -4142,7 +4163,7 @@ namespace PlantChillers {
                                                                                    DataLoopNode::NodeConnectionType_Inlet,
                                                                                    2,
                                                                                    DataLoopNode::ObjectIsNotParent);
-                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
                                                                                     ErrorsFound,
                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                     DataIPShortCuts::cAlphaArgs(1),
@@ -4242,7 +4263,7 @@ namespace PlantChillers {
             thisChiller.DesignHeatRecVolFlowRate = DataIPShortCuts::rNumericArgs(45);
             if (thisChiller.DesignHeatRecVolFlowRate > 0.0 || thisChiller.DesignHeatRecVolFlowRate == DataSizing::AutoSize) {
                 thisChiller.HeatRecActive = true;
-                thisChiller.HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(7),
+                thisChiller.HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(7),
                                                                                       ErrorsFound,
                                                                                       DataIPShortCuts::cCurrentModuleObject,
                                                                                       DataIPShortCuts::cAlphaArgs(1),
@@ -4255,7 +4276,7 @@ namespace PlantChillers {
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                     ErrorsFound = true;
                 }
-                thisChiller.HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(8),
+                thisChiller.HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(8),
                                                                                        ErrorsFound,
                                                                                        DataIPShortCuts::cCurrentModuleObject,
                                                                                        DataIPShortCuts::cAlphaArgs(1),
@@ -4362,7 +4383,7 @@ namespace PlantChillers {
             }
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(11)) {
-                thisChiller.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(11));
+                thisChiller.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(11));
                 if (thisChiller.BasinHeaterSchedulePtr == 0) {
                     ShowWarningError(DataIPShortCuts::cCurrentModuleObject + ", \"" + thisChiller.Name +
                                      "\" TRIM(DataIPShortCuts::cAlphaFieldNames(11)) \"" + DataIPShortCuts::cAlphaArgs(11) +
@@ -4396,12 +4417,12 @@ namespace PlantChillers {
         }
     }
 
-    void GTChillerSpecs::setupOutputVariables()
+    void GTChillerSpecs::setupOutputVariables(EnergyPlusData &state)
     {
-        SetupOutputVariable("Chiller Drive Shaft Power", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Drive Shaft Energy", OutputProcessor::Unit::J, this->Energy, "System", "Sum", this->Name);
-        SetupOutputVariable("Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Evaporator Cooling Energy",
+        SetupOutputVariable(state, "Chiller Drive Shaft Power", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Drive Shaft Energy", OutputProcessor::Unit::J, this->Energy, "System", "Sum", this->Name);
+        SetupOutputVariable(state, "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Evaporator Cooling Energy",
                             OutputProcessor::Unit::J,
                             this->EvaporatorEnergy,
                             "System",
@@ -4412,12 +4433,12 @@ namespace PlantChillers {
                             "CHILLERS",
                             _,
                             "Plant");
-        SetupOutputVariable("Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->EvapOutletTemp, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->EvapOutletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state,
             "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->EvapMassFlowRate, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->QCondenser, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
+        SetupOutputVariable(state, "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->QCondenser, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Condenser Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->CondenserEnergy,
                             "System",
@@ -4429,20 +4450,20 @@ namespace PlantChillers {
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, "System", "Average", this->Name);
 
         // Condenser mass flow and outlet temp are valid for water cooled
         if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->CondOutletTemp, "System", "Average", this->Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->CondMassFlowRate, "System", "Average", this->Name);
         } else if (this->CondenserType == DataPlant::CondenserType::AIRCOOLED) {
         } else if (this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "Chiller Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
-                SetupOutputVariable("Chiller Basin Heater Electricity Energy",
+                SetupOutputVariable(state, "Chiller Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
                                     "System",
@@ -4456,8 +4477,8 @@ namespace PlantChillers {
             }
         }
 
-        SetupOutputVariable("Chiller Lube Recovered Heat Rate", OutputProcessor::Unit::W, this->HeatRecLubeRate, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Lube Recovered Heat Energy",
+        SetupOutputVariable(state, "Chiller Lube Recovered Heat Rate", OutputProcessor::Unit::W, this->HeatRecLubeRate, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Lube Recovered Heat Energy",
                             OutputProcessor::Unit::J,
                             this->HeatRecLubeEnergy,
                             "System",
@@ -4469,10 +4490,10 @@ namespace PlantChillers {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelEnergyUsedRate, "System", "Average", this->Name);
 
-        SetupOutputVariable("Chiller " + this->FuelType + " Energy",
+        SetupOutputVariable(state, "Chiller " + this->FuelType + " Energy",
                             OutputProcessor::Unit::J,
                             this->FuelEnergyUsed,
                             "System",
@@ -4484,16 +4505,16 @@ namespace PlantChillers {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller " + this->FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, this->FuelMassUsedRate, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller " + this->FuelType + " Mass", OutputProcessor::Unit::kg, this->FuelMassUsed, "System", "Sum", this->Name);
-        SetupOutputVariable("Chiller Exhaust Temperature", OutputProcessor::Unit::C, this->ExhaustStackTemp, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state, "Chiller " + this->FuelType + " Mass", OutputProcessor::Unit::kg, this->FuelMassUsed, "System", "Sum", this->Name);
+        SetupOutputVariable(state, "Chiller Exhaust Temperature", OutputProcessor::Unit::C, this->ExhaustStackTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state,
             "Chiller Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, this->HeatRecInletTemp, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state,
             "Chiller Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, this->HeatRecOutletTemp, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdot, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller COP", OutputProcessor::Unit::W_W, this->FuelCOP, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdot, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->FuelCOP, "System", "Average", this->Name);
 
         if (DataGlobals::AnyEnergyManagementSystemInModel) {
             SetupEMSInternalVariable("Chiller Nominal Capacity", this->Name, "[W]", this->NomCap);
@@ -4522,7 +4543,7 @@ namespace PlantChillers {
         if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            this->setupOutputVariables();
+            this->setupOutputVariables(state);
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     this->plantTypeOfNum,
@@ -4631,8 +4652,9 @@ namespace PlantChillers {
 
         if (this->MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
-            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                           DataGlobals::CWInitConvTemp,
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                           DataGlobalConstants::CWInitConvTemp(),
                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                            RoutineName);
 
@@ -4651,8 +4673,9 @@ namespace PlantChillers {
 
                 DataLoopNode::Node(this->CondInletNodeNum).Temp = this->TempDesCondIn;
 
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
-                                                        DataGlobals::CWInitConvTemp,
+                rho = FluidProperties::GetDensityGlycol(state,
+                                                        DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                                                        DataGlobalConstants::CWInitConvTemp(),
                                                         DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                         RoutineName);
 
@@ -4681,8 +4704,9 @@ namespace PlantChillers {
             }
 
             if (this->HeatRecActive) {
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
-                                                        DataGlobals::HWInitConvTemp,
+                rho = FluidProperties::GetDensityGlycol(state,
+                                                        DataPlant::PlantLoop(this->HRLoopNum).FluidName,
+                                                        DataGlobalConstants::HWInitConvTemp(),
                                                         DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
                                                         RoutineName);
                 this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
@@ -4752,7 +4776,7 @@ namespace PlantChillers {
         }
     }
 
-    void GTChillerSpecs::size()
+    void GTChillerSpecs::size(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4787,12 +4811,14 @@ namespace PlantChillers {
 
         if (PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                               DataGlobals::CWInitConvTemp,
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                               DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                               DataGlobalConstants::CWInitConvTemp(),
                                                                DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                RoutineName);
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                                   DataGlobals::CWInitConvTemp,
+                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                   DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                                   DataGlobalConstants::CWInitConvTemp(),
                                                                    DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                    RoutineName);
                 tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
@@ -4903,11 +4929,13 @@ namespace PlantChillers {
 
         if (PltSizCondNum > 0 && PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                               DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                                                this->TempDesCondIn,
                                                                DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                                RoutineName);
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                   DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                                                    this->TempDesCondIn,
                                                                    DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                                    RoutineName);
@@ -5076,7 +5104,7 @@ namespace PlantChillers {
         }
     }
 
-    void GTChillerSpecs::calculate(Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
+    void GTChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher / Brandon Anderson
@@ -5126,7 +5154,7 @@ namespace PlantChillers {
         // calculate end time of current time step
         Real64 CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
 
-        // Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
+        // Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         // Wait for next time step to print warnings. If simulation iterates, print out
         // the warning for the last iteration only. Must wait for next time step to accomplish this.
         // If a warning occurs and the simulation down shifts, the warning is not valid.
@@ -5305,7 +5333,8 @@ namespace PlantChillers {
             OperPartLoadRat = 0.0;
         }
 
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                                            DataLoopNode::Node(this->EvapInletNodeNum).Temp,
                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                            RoutineName);
@@ -5561,7 +5590,7 @@ namespace PlantChillers {
 
             if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(
-                    DataPlant::PlantLoop(this->CDLoopNum).FluidName, condInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
+                    state, DataPlant::PlantLoop(this->CDLoopNum).FluidName, condInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
                 this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + condInletTemp;
             } else {
                 ShowSevereError("CalcGasTurbineChillerModel: Condenser flow = 0, for GasTurbineChiller=" + this->Name);
@@ -5636,7 +5665,8 @@ namespace PlantChillers {
                 // This mdot is input specified mdot "Desired Flowrate", already set at node in init routine
                 heatRecMdot = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
                 this->HeatRecInletTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
-                Real64 HeatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
+                Real64 HeatRecCp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                          DataPlant::PlantLoop(this->HRLoopNum).FluidName,
                                                                           this->HeatRecInletTemp,
                                                                           DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
                                                                           RoutineNameHeatRecovery);
@@ -5675,14 +5705,14 @@ namespace PlantChillers {
 
         this->HeatRecOutletTemp = HeatRecOutTemp;
         this->HeatRecMdot = heatRecMdot;
-        this->HeatRecLubeEnergy = this->HeatRecLubeRate * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        this->HeatRecLubeEnergy = this->HeatRecLubeRate * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
         this->FuelEnergyIn = std::abs(fuelEnergyIn);
         this->FuelMassUsedRate = std::abs(fuelEnergyIn) / (this->FuelHeatingValue * KJtoJ);
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
         if (this->Energy < 0.0) { // there is a serious problem
@@ -5722,7 +5752,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             // set node temperatures
@@ -5775,8 +5805,8 @@ namespace PlantChillers {
             this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
 
             this->FuelEnergyUsedRate = this->FuelEnergyIn;
-            this->FuelEnergyUsed = this->FuelEnergyUsedRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            this->FuelMassUsed = this->FuelMassUsedRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->FuelEnergyUsed = this->FuelEnergyUsedRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            this->FuelMassUsed = this->FuelMassUsedRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
             if (this->FuelEnergyUsedRate != 0.0) {
                 this->FuelCOP = this->QEvaporator / this->FuelEnergyUsedRate;
             } else {
@@ -5811,10 +5841,10 @@ namespace PlantChillers {
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->initialize(state, RunFlag, CurLoad);
             auto &sim_component(DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
-            this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
+            this->calculate(state, CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(CurLoad, RunFlag);
         } else if (calledFromLocation.loopNum == this->CDLoopNum) {
-            PlantUtilities::UpdateChillerComponentCondenserSide(this->CDLoopNum,
+            PlantUtilities::UpdateChillerComponentCondenserSide(state, this->CDLoopNum,
                                                                 this->CDLoopSideNum,
                                                                 this->plantTypeOfNum,
                                                                 this->CondInletNodeNum,
@@ -5865,7 +5895,8 @@ namespace PlantChillers {
 
         // LOAD ARRAYS WITH BLAST ConstCOP CHILLER DATA
         for (int ChillerNum = 1; ChillerNum <= state.dataPlantChillers->NumConstCOPChillers; ++ChillerNum) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           ChillerNum,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
@@ -5933,7 +5964,7 @@ namespace PlantChillers {
             }
             thisChiller.SizFac = DataIPShortCuts::rNumericArgs(5);
 
-            thisChiller.EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2),
+            thisChiller.EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(2),
                                                                                ErrorsFound,
                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                DataIPShortCuts::cAlphaArgs(1),
@@ -5941,7 +5972,7 @@ namespace PlantChillers {
                                                                                DataLoopNode::NodeConnectionType_Inlet,
                                                                                1,
                                                                                DataLoopNode::ObjectIsNotParent);
-            thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+            thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                                                 ErrorsFound,
                                                                                 DataIPShortCuts::cCurrentModuleObject,
                                                                                 DataIPShortCuts::cAlphaArgs(1),
@@ -5961,21 +5992,21 @@ namespace PlantChillers {
                 // If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
                 //  since it is not used elsewhere for connection
                 if (DataIPShortCuts::lAlphaFieldBlanks(4)) {
-                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobals::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobalConstants::MaxNameLength() - 21) { // protect against long name leading to > 100 chars
                         DataIPShortCuts::cAlphaArgs(4) = DataIPShortCuts::cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         DataIPShortCuts::cAlphaArgs(4) = DataIPShortCuts::cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
                     }
                 }
                 if (DataIPShortCuts::lAlphaFieldBlanks(5)) {
-                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobals::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                    if (len(DataIPShortCuts::cAlphaArgs(1)) < DataGlobalConstants::MaxNameLength() - 22) { // protect against long name leading to > 100 chars
                         DataIPShortCuts::cAlphaArgs(5) = DataIPShortCuts::cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         DataIPShortCuts::cAlphaArgs(5) = DataIPShortCuts::cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";
                     }
                 }
 
-                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
+                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(4),
                                                                                    ErrorsFound,
                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                    DataIPShortCuts::cAlphaArgs(1),
@@ -5984,13 +6015,13 @@ namespace PlantChillers {
                                                                                    2,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
-                OutAirNodeManager::CheckAndAddAirNodeNumber(thisChiller.CondInletNodeNum, Okay);
+                OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
                 if (!Okay) {
                     ShowWarningError(DataIPShortCuts::cCurrentModuleObject +
                                      ", Adding OutdoorAir:DataLoopNode::Node=" + DataIPShortCuts::cAlphaArgs(4));
                 }
 
-                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                     ErrorsFound,
                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                     DataIPShortCuts::cAlphaArgs(1),
@@ -5999,7 +6030,7 @@ namespace PlantChillers {
                                                                                     2,
                                                                                     DataLoopNode::ObjectIsNotParent);
             } else if (thisChiller.CondenserType == DataPlant::CondenserType::WATERCOOLED) {
-                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
+                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(4),
                                                                                    ErrorsFound,
                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                    DataIPShortCuts::cAlphaArgs(1),
@@ -6007,7 +6038,7 @@ namespace PlantChillers {
                                                                                    DataLoopNode::NodeConnectionType_Inlet,
                                                                                    2,
                                                                                    DataLoopNode::ObjectIsNotParent);
-                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                     ErrorsFound,
                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                     DataIPShortCuts::cAlphaArgs(1),
@@ -6031,7 +6062,7 @@ namespace PlantChillers {
                     ErrorsFound = true;
                 }
             } else {
-                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
+                thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(4),
                                                                                    ErrorsFound,
                                                                                    DataIPShortCuts::cCurrentModuleObject,
                                                                                    DataIPShortCuts::cAlphaArgs(1),
@@ -6039,7 +6070,7 @@ namespace PlantChillers {
                                                                                    DataLoopNode::NodeConnectionType_Inlet,
                                                                                    2,
                                                                                    DataLoopNode::ObjectIsNotParent);
-                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+                thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                     ErrorsFound,
                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                     DataIPShortCuts::cAlphaArgs(1),
@@ -6102,7 +6133,7 @@ namespace PlantChillers {
             }
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(8)) {
-                thisChiller.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(8));
+                thisChiller.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(8));
                 if (thisChiller.BasinHeaterSchedulePtr == 0) {
                     ShowWarningError(DataIPShortCuts::cCurrentModuleObject + ", \"" + thisChiller.Name +
                                      "\" TRIM(DataIPShortCuts::cAlphaFieldNames(8)) \"" + DataIPShortCuts::cAlphaArgs(8) +
@@ -6116,10 +6147,10 @@ namespace PlantChillers {
         }
     }
 
-    void ConstCOPChillerSpecs::setupOutputVariables()
+    void ConstCOPChillerSpecs::setupOutputVariables(EnergyPlusData &state)
     {
-        SetupOutputVariable("Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Electricity Energy",
+        SetupOutputVariable(state, "Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Energy,
                             "System",
@@ -6130,8 +6161,8 @@ namespace PlantChillers {
                             "Cooling",
                             _,
                             "Plant");
-        SetupOutputVariable("Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Evaporator Cooling Energy",
+        SetupOutputVariable(state, "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Evaporator Cooling Energy",
                             OutputProcessor::Unit::J,
                             this->EvaporatorEnergy,
                             "System",
@@ -6142,13 +6173,13 @@ namespace PlantChillers {
                             "CHILLERS",
                             _,
                             "Plant");
-        SetupOutputVariable("Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->EvapOutletTemp, "System", "Average", this->Name);
-        SetupOutputVariable(
+        SetupOutputVariable(state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->EvapOutletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state,
             "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->EvapMassFlowRate, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller COP", OutputProcessor::Unit::W_W, this->ActualCOP, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->QCondenser, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
+        SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->ActualCOP, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->QCondenser, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Condenser Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->CondenserEnergy,
                             "System",
@@ -6160,20 +6191,20 @@ namespace PlantChillers {
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, "System", "Average", this->Name);
 
         // Condenser mass flow and outlet temp are valid for water cooled
         if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->CondOutletTemp, "System", "Average", this->Name);
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->CondMassFlowRate, "System", "Average", this->Name);
         } else if (this->CondenserType == DataPlant::CondenserType::AIRCOOLED) {
         } else if (this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable(
+                SetupOutputVariable(state,
                     "Chiller Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
-                SetupOutputVariable("Chiller Basin Heater Electricity Energy",
+                SetupOutputVariable(state, "Chiller Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
                                     "System",
@@ -6217,7 +6248,7 @@ namespace PlantChillers {
         if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            this->setupOutputVariables();
+            this->setupOutputVariables(state);
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     this->plantTypeOfNum,
@@ -6304,8 +6335,9 @@ namespace PlantChillers {
         // Initialize critical Demand Side Variables at the beginning of each environment
         if (this->MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
-            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                           DataGlobals::CWInitConvTemp,
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                           DataGlobalConstants::CWInitConvTemp(),
                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                            RoutineName);
             this->EvapMassFlowRateMax = this->EvapVolFlowRate * rho;
@@ -6323,8 +6355,9 @@ namespace PlantChillers {
 
                 DataLoopNode::Node(this->CondInletNodeNum).Temp = TempDesCondIn;
 
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
-                                                        DataGlobals::CWInitConvTemp,
+                rho = FluidProperties::GetDensityGlycol(state,
+                                                        DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                                                        DataGlobalConstants::CWInitConvTemp(),
                                                         DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                         RoutineName);
 
@@ -6389,7 +6422,7 @@ namespace PlantChillers {
         }
     }
 
-    void ConstCOPChillerSpecs::size()
+    void ConstCOPChillerSpecs::size(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6431,12 +6464,14 @@ namespace PlantChillers {
 
         if (PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                               DataGlobals::CWInitConvTemp,
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                               DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                               DataGlobalConstants::CWInitConvTemp(),
                                                                DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                RoutineName);
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                                   DataGlobals::CWInitConvTemp,
+                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                   DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                                   DataGlobalConstants::CWInitConvTemp(),
                                                                    DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                    RoutineName);
                 tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
@@ -6550,9 +6585,9 @@ namespace PlantChillers {
             if (PltSizCondNum > 0 && PltSizNum > 0) {
                 if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
                     Real64 rho = FluidProperties::GetDensityGlycol(
-                        DataPlant::PlantLoop(this->CDLoopNum).FluidName, 29.44, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
+                        state, DataPlant::PlantLoop(this->CDLoopNum).FluidName, 29.44, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
                     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-                        DataPlant::PlantLoop(this->CDLoopNum).FluidName, 29.44, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
+                        state, DataPlant::PlantLoop(this->CDLoopNum).FluidName, 29.44, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
                     tmpCondVolFlowRate = tmpNomCap * (1.0 + 1.0 / this->COP) / (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
                 } else {
                     if (this->CondVolFlowRateWasAutoSized) tmpCondVolFlowRate = 0.0;
@@ -6625,7 +6660,7 @@ namespace PlantChillers {
         }
     }
 
-    void ConstCOPChillerSpecs::calculate(Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
+    void ConstCOPChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -6847,7 +6882,8 @@ namespace PlantChillers {
         // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
         // condenser side outlet temperature.
 
-        Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+        Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                    DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                                     DataLoopNode::Node(this->EvapInletNodeNum).Temp,
                                                     DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                     RoutineName);
@@ -7061,7 +7097,7 @@ namespace PlantChillers {
 
         if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
             CpCond = FluidProperties::GetSpecificHeatGlycol(
-                DataPlant::PlantLoop(this->CDLoopNum).FluidName, CondInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
+                state, DataPlant::PlantLoop(this->CDLoopNum).FluidName, CondInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
             if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + CondInletTemp;
             } else {
@@ -7075,9 +7111,9 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
         if (this->Energy < 0.0) { // there is a serious problem
@@ -7107,7 +7143,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    October 1998
 
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             this->Power = 0.0;

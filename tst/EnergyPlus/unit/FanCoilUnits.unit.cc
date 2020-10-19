@@ -259,11 +259,11 @@ namespace EnergyPlus {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetZoneData(ErrorsFound);
+        GetZoneData(state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.files);
+        ProcessScheduleInput(state);
         ScheduleInputProcessed = true;
         GetFanInput(state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -403,7 +403,7 @@ namespace EnergyPlus {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-        UpdateScheduleValues();
+        UpdateScheduleValues(state);
 
         CalcMultiStage4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
 
@@ -572,11 +572,11 @@ namespace EnergyPlus {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetZoneData(ErrorsFound);
+        GetZoneData(state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.files);
+        ProcessScheduleInput(state);
         ScheduleInputProcessed = true;
         GetFanInput(state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -717,7 +717,7 @@ namespace EnergyPlus {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-        UpdateScheduleValues();
+        UpdateScheduleValues(state);
 
         CalcMultiStage4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
 
@@ -883,11 +883,11 @@ namespace EnergyPlus {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetZoneData(ErrorsFound);
+        GetZoneData(state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.files);
+        ProcessScheduleInput(state);
         ScheduleInputProcessed = true;
         GetFanInput(state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -1052,7 +1052,7 @@ namespace EnergyPlus {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-        UpdateScheduleValues();
+        UpdateScheduleValues(state);
 
         // Normal heating simulation for fan coil with constant fan, variable water flow
         Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
@@ -1261,11 +1261,11 @@ namespace EnergyPlus {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetZoneData(ErrorsFound);
+        GetZoneData(state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.files);
+        ProcessScheduleInput(state);
         ScheduleInputProcessed = true;
         GetFanInput(state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -1405,7 +1405,7 @@ namespace EnergyPlus {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-        UpdateScheduleValues();
+        UpdateScheduleValues(state);
 
         // Normal heating simulation for fan coil with constant fan, electric heating
         Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
@@ -1580,11 +1580,11 @@ namespace EnergyPlus {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetZoneData(ErrorsFound);
+        GetZoneData(state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.files);
+        ProcessScheduleInput(state);
         ScheduleInputProcessed = true;
         GetFanInput(state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -1750,7 +1750,7 @@ namespace EnergyPlus {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-        UpdateScheduleValues();
+        UpdateScheduleValues(state);
         // normal cooling simulation for constant fan variable flow fan coil
         Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -1936,11 +1936,11 @@ namespace EnergyPlus {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetZoneData(ErrorsFound);
+        GetZoneData(state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.files);
+        ProcessScheduleInput(state);
         ScheduleInputProcessed = true;
         GetFanInput(state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -2084,7 +2084,7 @@ namespace EnergyPlus {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-        UpdateScheduleValues();
+        UpdateScheduleValues(state);
 
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
@@ -2274,9 +2274,9 @@ namespace EnergyPlus {
 
         // OutputProcessor::TimeValue.allocate(2);
 
-        GetZoneData(ErrorsFound);
+        GetZoneData(state, ErrorsFound);
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.files);
+        ProcessScheduleInput(state);
         ScheduleInputProcessed = true;
         SetPredefinedTables();
         GetFanInput(state);
@@ -2339,8 +2339,8 @@ namespace EnergyPlus {
         DataEnvironment::DayOfYear_Schedule = 1;
         DataEnvironment::DayOfWeek = 2;
         DataGlobals::HourOfDay = 1;
-        ProcessScheduleInput(state.files);
-        UpdateScheduleValues();
+        ProcessScheduleInput(state);
+        UpdateScheduleValues(state);
 
         // fan coil can hit maximum iterations while trying to find the water mass flow rate to meet the load. In this case RegulaFalsi will return -1.
         // When this happens, this routine will find tighter limits on min/max water flow rate passed to RegulaFalsi
@@ -2646,11 +2646,11 @@ namespace EnergyPlus {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetZoneData(ErrorsFound);
+        GetZoneData(state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.files);
+        ProcessScheduleInput(state);
         ScheduleInputProcessed = true;
         GetFanInput(state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -2794,7 +2794,7 @@ namespace EnergyPlus {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-        UpdateScheduleValues();
+        UpdateScheduleValues(state);
 
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
@@ -3064,11 +3064,11 @@ namespace EnergyPlus {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetZoneData(ErrorsFound);
+        GetZoneData(state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.files);
+        ProcessScheduleInput(state);
         ScheduleInputProcessed = true;
 
         GetFanCoilUnits(state);
@@ -3207,7 +3207,7 @@ namespace EnergyPlus {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-        UpdateScheduleValues();
+        UpdateScheduleValues(state);
 
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
@@ -3467,10 +3467,10 @@ namespace EnergyPlus {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetZoneData(ErrorsFound);
+        GetZoneData(state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.files);
+        ProcessScheduleInput(state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(state);
         auto &thisFanCoil(FanCoil(1));
@@ -3570,7 +3570,7 @@ namespace EnergyPlus {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-        UpdateScheduleValues();
+        UpdateScheduleValues(state);
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
         ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
@@ -3834,10 +3834,10 @@ namespace EnergyPlus {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetZoneData(ErrorsFound);
+        GetZoneData(state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.files);
+        ProcessScheduleInput(state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(state);
         auto &thisFanCoil(FanCoil(1));
@@ -3937,7 +3937,7 @@ namespace EnergyPlus {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-        UpdateScheduleValues();
+        UpdateScheduleValues(state);
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
         ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
@@ -4201,10 +4201,10 @@ namespace EnergyPlus {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetZoneData(ErrorsFound);
+        GetZoneData(state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.files);
+        ProcessScheduleInput(state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(state);
         auto &thisFanCoil(FanCoil(1));
@@ -4304,7 +4304,7 @@ namespace EnergyPlus {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-        UpdateScheduleValues();
+        UpdateScheduleValues(state);
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
         ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
@@ -4523,10 +4523,10 @@ namespace EnergyPlus {
         DataSizing::CurZoneEqNum = 1;
         InitializePsychRoutines();
 
-        GetZoneData(ErrorsFound);
+        GetZoneData(state, ErrorsFound);
         EXPECT_EQ("WEST ZONE", Zone(1).Name);
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.files);
+        ProcessScheduleInput(state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(state);
         auto &thisFanCoil(FanCoil(1));
@@ -4615,7 +4615,7 @@ namespace EnergyPlus {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-        UpdateScheduleValues();
+        UpdateScheduleValues(state);
         ZoneEqSizing.allocate(1);
         CurDeadBandOrSetback.allocate(1);
         CurDeadBandOrSetback(1) = false;

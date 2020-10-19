@@ -1108,18 +1108,18 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
 
     NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.files);  // read schedule data
+    ProcessScheduleInput(state);  // read schedule data
 
     ErrorsFound = false;
     HeatBalanceManager::GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
     // OutputProcessor::TimeValue.allocate(2);
-    DataGlobals::DDOnlySimulation = true;
+    state.dataGlobal->DDOnlySimulation = true;
 
     GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
-    SetPreConstructionInputParameters(); // establish array bounds for constructions early
+    SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
     BeginSimFlag = true;
     BeginEnvrnFlag = true;
@@ -1128,8 +1128,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     SizingManager::ManageSizing(state);
 
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(1, NumOfUnitHeats);
-    EXPECT_EQ("ZONE2UNITHEAT", UnitHeat(1).Name);
+    EXPECT_EQ(1, state.dataUnitHeaters->NumOfUnitHeats);
+    EXPECT_EQ("ZONE2UNITHEAT", state.dataUnitHeaters->UnitHeat(1).Name);
 
     ErrorsFound = false;
     ZoneEqUnitHeater = true;
@@ -1139,20 +1139,20 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     InitWaterCoil(state, CoilNum, FirstHVACIteration); // init hot water heating coil
 
     PltSizHeatNum = PlantUtilities::MyPlantSizingIndex("Coil:Heating:Water",
-                                                       UnitHeat(UnitHeatNum).HCoilName,
+                                                       state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
                                                        state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum,
                                                        state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum,
                                                        ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     HWMaxVolFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate;
-    HWDensity = GetDensityGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
-                                 DataGlobals::HWInitConvTemp,
-                                 PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+    HWDensity = GetDensityGlycol(state, PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                 DataGlobalConstants::HWInitConvTemp(),
+                                 PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                  "xxx");
-    CpHW = GetSpecificHeatGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
-                                 DataGlobals::HWInitConvTemp,
-                                 PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+    CpHW = GetSpecificHeatGlycol(state, PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                 DataGlobalConstants::HWInitConvTemp(),
+                                 PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                  "xxx");
     HWPlantDeltaTDesign = PlantSizData(PltSizHeatNum).DeltaT;
     // calculate hot water coil design capacity
@@ -1282,10 +1282,10 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
 
     NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state.files);  // read schedule data
+    ProcessScheduleInput(state);  // read schedule data
 
     ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
@@ -1304,8 +1304,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     ErrorsFound = false;
     GetUnitHeaterInput(state); // get unit heaters data
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(1, NumOfUnitHeats);
-    EXPECT_EQ("ZONE2UNITHEAT", UnitHeat(1).Name);
+    EXPECT_EQ(1, state.dataUnitHeaters->NumOfUnitHeats);
+    EXPECT_EQ("ZONE2UNITHEAT", state.dataUnitHeaters->UnitHeat(1).Name);
 
     ErrorsFound = false;
     ZoneEqUnitHeater = true;
@@ -1361,23 +1361,23 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     DataGlobals::BeginEnvrnFlag = true;
     SysSizingCalc = true;
 
-    UHAirInletNode = UnitHeat(UnitHeatNum).AirInNode;
-    UHAirOutletNode = UnitHeat(UnitHeatNum).AirOutNode;
+    UHAirInletNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode;
+    UHAirOutletNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode;
 
-    SimUnitHeater(state, UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum);
+    SimUnitHeater(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum);
     // SimUnitHeater does not converge on the first call: the unit heater deliveres more than required heating load. But it meets
     // on the second call (iteration). I suspect it may be an initialization issue related to ControlCompOutput routine
-    SimUnitHeater(state, UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum);
+    SimUnitHeater(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum);
     // verify the total heat rate deleivered by the unit heater
     UHAirMassFlowRate = Node(UHAirInletNode).MassFlowRate;
     UHEnteringAirEnthalpy = PsyHFnTdbW(Node(UHAirInletNode).Temp, Node(UHAirInletNode).HumRat);
     UHLeavingAirEnthalpy = PsyHFnTdbW(Node(UHAirOutletNode).Temp, Node(UHAirOutletNode).HumRat);
     UHHeatingRate = UHAirMassFlowRate * (UHLeavingAirEnthalpy - UHEnteringAirEnthalpy);
-    EXPECT_NEAR(UHHeatingRate, UnitHeat(UnitHeatNum).HeatPower, ConvTol);
+    EXPECT_NEAR(UHHeatingRate, state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatPower, ConvTol);
     // verify the heat rate delivered by the hot water heating coil
     HWMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate;
-    CpHW = GetSpecificHeatGlycol(
-        PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName, 60.0, PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, "UnitTest");
+    CpHW = GetSpecificHeatGlycol(state,
+        PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName, 60.0, PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, "UnitTest");
     HWCoilHeatingRate = HWMassFlowRate * CpHW * (Node(WCWaterInletNode).Temp - Node(WCWaterOutletNode).Temp);
     EXPECT_NEAR(HWCoilHeatingRate, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate, ConvTol);
 }
@@ -2426,7 +2426,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    DataGlobals::DDOnlySimulation = true;
+    state.dataGlobal->DDOnlySimulation = true;
 
     ManageSimulation(state);
 
