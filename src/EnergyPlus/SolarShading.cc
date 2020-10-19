@@ -6037,7 +6037,9 @@ namespace SolarShading {
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                SurfWinA = 0.0;
+                for (int lay = 1; lay <= CFSMAXNL + 1; ++lay) {
+                    SurfWinA(lay, SurfNum) = 0.0;
+                }
                 SurfWinBmSolar(SurfNum) = 0.0;
                 SurfWinBmBmSolar(SurfNum) = 0.0;
                 SurfWinBmDifSolar(SurfNum) = 0.0;
