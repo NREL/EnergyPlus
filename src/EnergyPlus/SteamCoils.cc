@@ -96,18 +96,6 @@ namespace SteamCoils {
     // To encapsulate the data and algorithms required to
     // manage the SteamCoil System Component.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
-    // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using namespace DataHVACGlobals;
@@ -120,57 +108,8 @@ namespace SteamCoils {
     using PlantUtilities::ScanPlantLoopsForObject;
     using namespace ScheduleManager;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    int const SteamCoil_AirHeating(2);
-    int const TemperatureSetPointControl(1);
-    int const ZoneLoadControl(3);
     static std::string const fluidNameSteam("STEAM");
     static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE DEFINITIONS
-    // MODULE VARIABLE DECLARATIONS:
-    int SteamIndex(0);
-    int NumSteamCoils(0); // The Number of SteamCoils found in the Input
-    Array1D_bool MySizeFlag;
-    Array1D_bool CoilWarningOnceFlag;
-    Array1D_bool CheckEquipName;
-    bool GetSteamCoilsInputFlag(true); // Flag set to make sure you get input once
-    bool MyOneTimeFlag(true);          // one time initialization flag
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine to check convergence and update nodes
-
-    // Reporting routines for module
-
-    // Utility routines for module
-
-    // Object Data
-    Array1D<SteamCoilEquipConditions> SteamCoil;
-
-    // MODULE SUBROUTINES:
-
-    // Functions
-    void clear_state()
-    {
-        NumSteamCoils = 0;
-        MyOneTimeFlag = true;
-        GetSteamCoilsInputFlag = true;
-        SteamCoil.deallocate();
-        MySizeFlag.deallocate();
-        CoilWarningOnceFlag.deallocate();
-        CheckEquipName.deallocate();
-    }
 
     void SimulateSteamCoilComponents(EnergyPlusData &state,
                                      std::string const &CompName,
@@ -202,30 +141,30 @@ namespace SteamCoils {
         Real64 QCoilReqLocal;   // local required heating load optional
 
         // Obtains and Allocates SteamCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         // Find the correct SteamCoilNumber with the Coil Name
         if (CompIndex == 0) {
-            CoilNum = UtilityRoutines::FindItemInList(CompName, SteamCoil);
+            CoilNum = UtilityRoutines::FindItemInList(CompName, state.dataSteamCoils->SteamCoil);
             if (CoilNum == 0) {
                 ShowFatalError("SimulateSteamCoilComponents: Coil not found=" + CompName);
             }
             CompIndex = CoilNum;
         } else {
             CoilNum = CompIndex;
-            if (CoilNum > NumSteamCoils || CoilNum < 1) {
+            if (CoilNum > state.dataSteamCoils->NumSteamCoils || CoilNum < 1) {
                 ShowFatalError("SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
-                               ", Number of Steam Coils=" + TrimSigDigits(NumSteamCoils) + ", Coil name=" + CompName);
+                               ", Number of Steam Coils=" + TrimSigDigits(state.dataSteamCoils->NumSteamCoils) + ", Coil name=" + CompName);
             }
-            if (CheckEquipName(CoilNum)) {
-                if (CompName != SteamCoil(CoilNum).Name) {
+            if (state.dataSteamCoils->CheckEquipName(CoilNum)) {
+                if (CompName != state.dataSteamCoils->SteamCoil(CoilNum).Name) {
                     ShowFatalError("SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) + ", Coil name=" + CompName +
-                                   ", stored Coil Name for that index=" + SteamCoil(CoilNum).Name);
+                                   ", stored Coil Name for that index=" + state.dataSteamCoils->SteamCoil(CoilNum).Name);
                 }
-                CheckEquipName(CoilNum) = false;
+                state.dataSteamCoils->CheckEquipName(CoilNum) = false;
             }
         }
 
@@ -248,16 +187,16 @@ namespace SteamCoils {
             QCoilReqLocal = 0.0;
         }
 
-        if (SteamCoil(CoilNum).SteamCoilType_Num == SteamCoil_AirHeating) {
+        if (state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num == state.dataSteamCoils->SteamCoil_AirHeating) {
             CalcSteamAirCoil(state, CoilNum, QCoilReqLocal, QCoilActualTemp, OpMode, PartLoadFrac); // Autodesk:OPTIONAL QCoilReq used without PRESENT check
             if (present(QCoilActual)) QCoilActual = QCoilActualTemp;
         }
 
         // Update the current SteamCoil to the outlet nodes
-        UpdateSteamCoil(CoilNum);
+        UpdateSteamCoil(state, CoilNum);
 
         // Report the current SteamCoil
-        ReportSteamCoil(CoilNum);
+        ReportSteamCoil(state, CoilNum);
     }
 
     // Get Input Section of the Module
@@ -305,10 +244,10 @@ namespace SteamCoils {
 
         CurrentModuleObject = "Coil:Heating:Steam";
         NumStmHeat = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        NumSteamCoils = NumStmHeat;
-        if (NumSteamCoils > 0) {
-            SteamCoil.allocate(NumSteamCoils);
-            CheckEquipName.dimension(NumSteamCoils, true);
+        state.dataSteamCoils->NumSteamCoils = NumStmHeat;
+        if (state.dataSteamCoils->NumSteamCoils > 0) {
+            state.dataSteamCoils->SteamCoil.allocate(state.dataSteamCoils->NumSteamCoils);
+            state.dataSteamCoils->CheckEquipName.dimension(state.dataSteamCoils->NumSteamCoils, true);
         }
 
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
@@ -341,55 +280,55 @@ namespace SteamCoils {
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
-            SteamCoil(CoilNum).Name = AlphArray(1);
-            SteamCoil(CoilNum).Schedule = AlphArray(2);
+            state.dataSteamCoils->SteamCoil(CoilNum).Name = AlphArray(1);
+            state.dataSteamCoils->SteamCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
-                SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
-                SteamCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
-                if (SteamCoil(CoilNum).SchedPtr == 0) {
+                state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
+                if (state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\", invalid data.");
                     ShowContinueError(cAlphaFields(2) + " not found=" + AlphArray(2));
                     ErrorsFound = true;
                 }
             }
 
-            SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
-            SteamCoil(CoilNum).SteamCoilType_Num = SteamCoil_AirHeating;
-            SteamCoil(CoilNum).Coil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
-            SteamCoil(CoilNum).MaxSteamVolFlowRate = NumArray(1);
-            SteamCoil(CoilNum).DegOfSubcooling = NumArray(2);
-            SteamCoil(CoilNum).LoopSubcoolReturn = NumArray(3);
+            state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
+            state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num = state.dataSteamCoils->SteamCoil_AirHeating;
+            state.dataSteamCoils->SteamCoil(CoilNum).Coil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
+            state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate = NumArray(1);
+            state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling = NumArray(2);
+            state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn = NumArray(3);
 
-            SteamCoil(CoilNum).SteamInletNodeNum = GetOnlySingleNode(state,
+            state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum = GetOnlySingleNode(state,
                 AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Steam, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
-            SteamCoil(CoilNum).SteamOutletNodeNum = GetOnlySingleNode(state,
+            state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum = GetOnlySingleNode(state,
                 AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Steam, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
-            SteamCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
+            state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
                 AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            SteamCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
+            state.dataSteamCoils->SteamCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
                 AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(AlphArray(7)));
                 // TEMPERATURE SETPOINT CONTROL or ZONE LOAD CONTROLLED Coils
                 if (SELECT_CASE_var == "TEMPERATURESETPOINTCONTROL") {
-                    SteamCoil(CoilNum).TypeOfCoil = TemperatureSetPointControl;
-                    SteamCoil(CoilNum).TempSetPointNodeNum = GetOnlySingleNode(state,
+                    state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = state.dataSteamCoils->TemperatureSetPointControl;
+                    state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum = GetOnlySingleNode(state,
                         AlphArray(8), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-                    if (SteamCoil(CoilNum).TempSetPointNodeNum == 0) {
+                    if (state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum == 0) {
                         ShowSevereError(RoutineName + cAlphaFields(8) + " not found for " + CurrentModuleObject + " = " + AlphArray(1));
                         ShowContinueError("..required for Temperature Setpoint Controlled Coils.");
                         ErrorsFound = true;
                     }
 
                 } else if (SELECT_CASE_var == "ZONELOADCONTROL") {
-                    SteamCoil(CoilNum).TypeOfCoil = ZoneLoadControl;
+                    state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = state.dataSteamCoils->ZoneLoadControl;
 
                     if (!lAlphaBlanks(8)) {
                         ShowWarningError(RoutineName + "ZoneLoad Controlled Coil, so " + cAlphaFields(8) + " not needed");
                         ShowContinueError("for " + CurrentModuleObject + " = " + AlphArray(1));
-                        SteamCoil(CoilNum).TempSetPointNodeNum = 0;
+                        state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum = 0;
                     }
 
                 } else {
@@ -402,16 +341,16 @@ namespace SteamCoils {
             TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(3), AlphArray(4), "Steam Nodes");
             TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
 
-            if (SteamIndex == 0 && CoilNum == 1) {
-                SteamIndex = FindRefrigerant(state, "Steam");
-                if (SteamIndex == 0) {
+            if (state.dataSteamCoils->SteamIndex == 0 && CoilNum == 1) {
+                state.dataSteamCoils->SteamIndex = FindRefrigerant(state, "Steam");
+                if (state.dataSteamCoils->SteamIndex == 0) {
                     ShowSevereError(RoutineName + "Steam Properties for " + AlphArray(1) + " not found.");
                     ShowContinueError("Steam Fluid Properties should have been included in the input file.");
                     ErrorsFound = true;
                 }
             }
 
-            SteamCoil(CoilNum).FluidIndex = SteamIndex;
+            state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex = state.dataSteamCoils->SteamIndex;
         }
 
         for (CoilNum = 1; CoilNum <= NumStmHeat; ++CoilNum) {
@@ -420,10 +359,10 @@ namespace SteamCoils {
             // CurrentModuleObject = "Coil:Heating:Steam"
             SetupOutputVariable(state, "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
-                                SteamCoil(CoilNum).TotSteamHeatingCoilEnergy,
+                                state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilEnergy,
                                 "System",
                                 "Sum",
-                                SteamCoil(CoilNum).Name,
+                                state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                 _,
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
@@ -431,34 +370,34 @@ namespace SteamCoils {
                                 "System");
             SetupOutputVariable(state, "Heating Coil Heating Rate",
                                 OutputProcessor::Unit::W,
-                                SteamCoil(CoilNum).TotSteamHeatingCoilRate,
+                                state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate,
                                 "System",
                                 "Average",
-                                SteamCoil(CoilNum).Name);
+                                state.dataSteamCoils->SteamCoil(CoilNum).Name);
             SetupOutputVariable(state, "Heating Coil Steam Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                SteamCoil(CoilNum).OutletSteamMassFlowRate,
+                                state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate,
                                 "System",
                                 "Average",
-                                SteamCoil(CoilNum).Name);
+                                state.dataSteamCoils->SteamCoil(CoilNum).Name);
             SetupOutputVariable(state, "Heating Coil Steam Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                SteamCoil(CoilNum).InletSteamTemp,
+                                state.dataSteamCoils->SteamCoil(CoilNum).InletSteamTemp,
                                 "System",
                                 "Average",
-                                SteamCoil(CoilNum).Name);
+                                state.dataSteamCoils->SteamCoil(CoilNum).Name);
             SetupOutputVariable(state, "Heating Coil Steam Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                SteamCoil(CoilNum).OutletSteamTemp,
+                                state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamTemp,
                                 "System",
                                 "Average",
-                                SteamCoil(CoilNum).Name);
+                                state.dataSteamCoils->SteamCoil(CoilNum).Name);
             SetupOutputVariable(state, "Heating Coil Steam Trap Loss Rate",
                                 OutputProcessor::Unit::W,
-                                SteamCoil(CoilNum).LoopLoss,
+                                state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss,
                                 "System",
                                 "Average",
-                                SteamCoil(CoilNum).Name);
+                                state.dataSteamCoils->SteamCoil(CoilNum).Name);
         }
 
         if (ErrorsFound) {
@@ -522,28 +461,28 @@ namespace SteamCoils {
         static Array1D_bool MyPlantScanFlag;
         bool errFlag;
 
-        if (MyOneTimeFlag) {
+        if (state.dataSteamCoils->MyOneTimeFlag) {
             // initialize the environment and sizing flags
-            MyEnvrnFlag.allocate(NumSteamCoils);
-            MySizeFlag.allocate(NumSteamCoils);
-            CoilWarningOnceFlag.allocate(NumSteamCoils);
-            MyPlantScanFlag.allocate(NumSteamCoils);
+            MyEnvrnFlag.allocate(state.dataSteamCoils->NumSteamCoils);
+            state.dataSteamCoils->MySizeFlag.allocate(state.dataSteamCoils->NumSteamCoils);
+            state.dataSteamCoils->CoilWarningOnceFlag.allocate(state.dataSteamCoils->NumSteamCoils);
+            MyPlantScanFlag.allocate(state.dataSteamCoils->NumSteamCoils);
             MyEnvrnFlag = true;
-            MySizeFlag = true;
-            CoilWarningOnceFlag = true;
+            state.dataSteamCoils->MySizeFlag = true;
+            state.dataSteamCoils->CoilWarningOnceFlag = true;
             MyPlantScanFlag = true;
-            MyOneTimeFlag = false;
+            state.dataSteamCoils->MyOneTimeFlag = false;
         }
 
         if (MyPlantScanFlag(CoilNum) && allocated(PlantLoop)) {
             errFlag = false;
             ScanPlantLoopsForObject(state,
-                                    SteamCoil(CoilNum).Name,
-                                    SteamCoil(CoilNum).Coil_PlantTypeNum,
-                                    SteamCoil(CoilNum).LoopNum,
-                                    SteamCoil(CoilNum).LoopSide,
-                                    SteamCoil(CoilNum).BranchNum,
-                                    SteamCoil(CoilNum).CompNum,
+                                    state.dataSteamCoils->SteamCoil(CoilNum).Name,
+                                    state.dataSteamCoils->SteamCoil(CoilNum).Coil_PlantTypeNum,
+                                    state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
+                                    state.dataSteamCoils->SteamCoil(CoilNum).LoopSide,
+                                    state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,
+                                    state.dataSteamCoils->SteamCoil(CoilNum).CompNum,
                                     errFlag,
                                     _,
                                     _,
@@ -556,51 +495,51 @@ namespace SteamCoils {
             MyPlantScanFlag(CoilNum) = false;
         }
 
-        if (!SysSizingCalc && MySizeFlag(CoilNum)) {
+        if (!SysSizingCalc && state.dataSteamCoils->MySizeFlag(CoilNum)) {
             // for each coil, do the sizing once.
             SizeSteamCoil(state, CoilNum);
-            MySizeFlag(CoilNum) = false;
+            state.dataSteamCoils->MySizeFlag(CoilNum) = false;
         }
 
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CoilNum)) {
             // Initialize all report variables to a known state at beginning of simulation
-            SteamCoil(CoilNum).TotSteamHeatingCoilEnergy = 0.0;
-            SteamCoil(CoilNum).TotSteamCoolingCoilEnergy = 0.0;
-            SteamCoil(CoilNum).SenSteamCoolingCoilEnergy = 0.0;
-            SteamCoil(CoilNum).TotSteamHeatingCoilRate = 0.0;
-            SteamCoil(CoilNum).TotSteamCoolingCoilRate = 0.0;
-            SteamCoil(CoilNum).SenSteamCoolingCoilRate = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilEnergy = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).TotSteamCoolingCoilEnergy = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).SenSteamCoolingCoilEnergy = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).TotSteamCoolingCoilRate = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).SenSteamCoolingCoilRate = 0.0;
             // Initialize other module level variables
-            SteamCoil(CoilNum).InletAirMassFlowRate = 0.0;
-            SteamCoil(CoilNum).OutletAirMassFlowRate = 0.0;
-            SteamCoil(CoilNum).InletAirTemp = 0.0;
-            SteamCoil(CoilNum).OutletAirTemp = 0.0;
-            SteamCoil(CoilNum).InletAirHumRat = 0.0;
-            SteamCoil(CoilNum).OutletAirHumRat = 0.0;
-            SteamCoil(CoilNum).InletAirEnthalpy = 0.0;
-            SteamCoil(CoilNum).OutletAirEnthalpy = 0.0;
-            SteamCoil(CoilNum).TotSteamCoilLoad = 0.0;
-            SteamCoil(CoilNum).SenSteamCoilLoad = 0.0;
-            SteamCoil(CoilNum).LoopLoss = 0.0;
-            SteamCoil(CoilNum).LeavingRelHum = 0.0;
-            SteamCoil(CoilNum).DesiredOutletTemp = 0.0;
-            SteamCoil(CoilNum).DesiredOutletHumRat = 0.0;
-            SteamCoil(CoilNum).InletSteamTemp = 0.0;
-            SteamCoil(CoilNum).OutletSteamTemp = 0.0;
-            SteamCoil(CoilNum).InletSteamMassFlowRate = 0.0;
-            SteamCoil(CoilNum).OutletSteamMassFlowRate = 0.0;
-            SteamCoil(CoilNum).InletSteamEnthalpy = 0.0;
-            SteamCoil(CoilNum).OutletWaterEnthalpy = 0.0;
-            SteamCoil(CoilNum).InletSteamPress = 0.0;
-            SteamCoil(CoilNum).InletSteamQuality = 0.0;
-            SteamCoil(CoilNum).OutletSteamQuality = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).InletAirMassFlowRate = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).OutletAirMassFlowRate = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).InletAirTemp = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).OutletAirTemp = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).InletAirHumRat = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).OutletAirHumRat = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).InletAirEnthalpy = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).OutletAirEnthalpy = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).TotSteamCoilLoad = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).SenSteamCoilLoad = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).LeavingRelHum = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).DesiredOutletTemp = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).DesiredOutletHumRat = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).InletSteamTemp = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamTemp = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).InletSteamEnthalpy = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).InletSteamPress = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).InletSteamQuality = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamQuality = 0.0;
 
             // More Environment initializations
-            AirInletNode = SteamCoil(CoilNum).AirInletNodeNum;
-            SteamInletNode = SteamCoil(CoilNum).SteamInletNodeNum;
-            ControlNode = SteamCoil(CoilNum).TempSetPointNodeNum;
-            AirOutletNode = SteamCoil(CoilNum).AirOutletNodeNum;
+            AirInletNode = state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum;
+            SteamInletNode = state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum;
+            ControlNode = state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum;
+            AirOutletNode = state.dataSteamCoils->SteamCoil(CoilNum).AirOutletNodeNum;
 
             Node(SteamInletNode).Temp = 100.0;
             Node(SteamInletNode).Press = 101325.0;
@@ -609,18 +548,18 @@ namespace SteamCoils {
             Node(SteamInletNode).Enthalpy = StartEnthSteam;
             Node(SteamInletNode).Quality = 1.0;
             Node(SteamInletNode).HumRat = 0.0;
-            SteamCoil(CoilNum).MaxSteamMassFlowRate = SteamDensity * SteamCoil(CoilNum).MaxSteamVolFlowRate;
+            state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamMassFlowRate = SteamDensity * state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate;
             //     Node(SteamInletNode)%MassFlowRate         = SteamCoil(CoilNum)%MaxSteamMassFlowRate
             //     Node(SteamInletNode)%MassFlowRateMinAvail = 0.0
             //     Node(SteamInletNode)%MassFlowRateMaxAvail = SteamCoil(CoilNum)%MaxSteamMassFlowRate
             InitComponentNodes(0.0,
-                               SteamCoil(CoilNum).MaxSteamMassFlowRate,
-                               SteamCoil(CoilNum).SteamInletNodeNum,
-                               SteamCoil(CoilNum).SteamOutletNodeNum,
-                               SteamCoil(CoilNum).LoopNum,
-                               SteamCoil(CoilNum).LoopSide,
-                               SteamCoil(CoilNum).BranchNum,
-                               SteamCoil(CoilNum).CompNum);
+                               state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamMassFlowRate,
+                               state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
+                               state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
+                               state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
+                               state.dataSteamCoils->SteamCoil(CoilNum).LoopSide,
+                               state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,
+                               state.dataSteamCoils->SteamCoil(CoilNum).CompNum);
             MyEnvrnFlag(CoilNum) = false;
         } // End If for the Begin Environment initializations
 
@@ -637,38 +576,38 @@ namespace SteamCoils {
         // Do the following initializations (every time step): This should be the info from
         // the previous components outlets or the node data in this section.
 
-        AirInletNode = SteamCoil(CoilNum).AirInletNodeNum;
-        SteamInletNode = SteamCoil(CoilNum).SteamInletNodeNum;
-        ControlNode = SteamCoil(CoilNum).TempSetPointNodeNum;
-        AirOutletNode = SteamCoil(CoilNum).AirOutletNodeNum;
+        AirInletNode = state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum;
+        SteamInletNode = state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum;
+        ControlNode = state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum;
+        AirOutletNode = state.dataSteamCoils->SteamCoil(CoilNum).AirOutletNodeNum;
 
         // First set the conditions for the air into the coil model
 
         // If a temperature setpoint controlled coil must set the desired outlet temp everytime
         if (ControlNode == 0) {
-            SteamCoil(CoilNum).DesiredOutletTemp = 0.0;
+            state.dataSteamCoils->SteamCoil(CoilNum).DesiredOutletTemp = 0.0;
         } else if (ControlNode == AirOutletNode) {
-            SteamCoil(CoilNum).DesiredOutletTemp = Node(ControlNode).TempSetPoint;
+            state.dataSteamCoils->SteamCoil(CoilNum).DesiredOutletTemp = Node(ControlNode).TempSetPoint;
         } else {
-            SteamCoil(CoilNum).DesiredOutletTemp = Node(ControlNode).TempSetPoint - (Node(ControlNode).Temp - Node(AirOutletNode).Temp);
+            state.dataSteamCoils->SteamCoil(CoilNum).DesiredOutletTemp = Node(ControlNode).TempSetPoint - (Node(ControlNode).Temp - Node(AirOutletNode).Temp);
         }
 
-        SteamCoil(CoilNum).InletAirMassFlowRate = Node(AirInletNode).MassFlowRate;
-        SteamCoil(CoilNum).InletAirTemp = Node(AirInletNode).Temp;
-        SteamCoil(CoilNum).InletAirHumRat = Node(AirInletNode).HumRat;
-        SteamCoil(CoilNum).InletAirEnthalpy = Node(AirInletNode).Enthalpy;
+        state.dataSteamCoils->SteamCoil(CoilNum).InletAirMassFlowRate = Node(AirInletNode).MassFlowRate;
+        state.dataSteamCoils->SteamCoil(CoilNum).InletAirTemp = Node(AirInletNode).Temp;
+        state.dataSteamCoils->SteamCoil(CoilNum).InletAirHumRat = Node(AirInletNode).HumRat;
+        state.dataSteamCoils->SteamCoil(CoilNum).InletAirEnthalpy = Node(AirInletNode).Enthalpy;
         if (FirstHVACIteration) {
-            SteamCoil(CoilNum).InletSteamMassFlowRate = SteamCoil(CoilNum).MaxSteamMassFlowRate;
+            state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate = state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamMassFlowRate;
         } else {
-            SteamCoil(CoilNum).InletSteamMassFlowRate = Node(SteamInletNode).MassFlowRate;
+            state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate = Node(SteamInletNode).MassFlowRate;
         }
-        SteamCoil(CoilNum).InletSteamTemp = Node(SteamInletNode).Temp;
-        SteamCoil(CoilNum).InletSteamEnthalpy = Node(SteamInletNode).Enthalpy;
-        SteamCoil(CoilNum).InletSteamPress = Node(SteamInletNode).Press;
-        SteamCoil(CoilNum).InletSteamQuality = Node(SteamInletNode).Quality;
-        SteamCoil(CoilNum).TotSteamHeatingCoilRate = 0.0;
-        SteamCoil(CoilNum).TotSteamCoolingCoilRate = 0.0;
-        SteamCoil(CoilNum).SenSteamCoolingCoilRate = 0.0;
+        state.dataSteamCoils->SteamCoil(CoilNum).InletSteamTemp = Node(SteamInletNode).Temp;
+        state.dataSteamCoils->SteamCoil(CoilNum).InletSteamEnthalpy = Node(SteamInletNode).Enthalpy;
+        state.dataSteamCoils->SteamCoil(CoilNum).InletSteamPress = Node(SteamInletNode).Press;
+        state.dataSteamCoils->SteamCoil(CoilNum).InletSteamQuality = Node(SteamInletNode).Quality;
+        state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate = 0.0;
+        state.dataSteamCoils->SteamCoil(CoilNum).TotSteamCoolingCoilRate = 0.0;
+        state.dataSteamCoils->SteamCoil(CoilNum).SenSteamCoolingCoilRate = 0.0;
         //   Node(SteamInletNode)%MassFlowRateMaxAvail = MIN(Node(SteamInletNode)%MassFlowRateMaxAvail,&
         //                                                   SteamCoil(CoilNum)%MaxSteamMassFlowRate)
     }
@@ -755,12 +694,12 @@ namespace SteamCoils {
 
         // If this is a steam coil
         // Find the appropriate steam Plant Sizing object
-        if (SteamCoil(CoilNum).MaxSteamVolFlowRate == AutoSize) {
+        if (state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate == AutoSize) {
             coilWasAutosized = true; // coil report
             PltSizSteamNum = MyPlantSizingIndex("steam heating coil",
-                                                SteamCoil(CoilNum).Name,
-                                                SteamCoil(CoilNum).SteamInletNodeNum,
-                                                SteamCoil(CoilNum).SteamOutletNodeNum,
+                                                state.dataSteamCoils->SteamCoil(CoilNum).Name,
+                                                state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
+                                                state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
                                                 ErrorsFound);
         }
 
@@ -768,15 +707,15 @@ namespace SteamCoils {
             // If this is a central air system heating coil
             if (CurSysNum > 0) {
                 // If the coil water volume flow rate needs autosizing, then do it
-                if (SteamCoil(CoilNum).MaxSteamVolFlowRate == AutoSize) {
-                    CheckSysSizing("Coil:Heating:Steam", SteamCoil(CoilNum).Name);
+                if (state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate == AutoSize) {
+                    CheckSysSizing("Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).Name);
 
-                    if (SteamCoil(CoilNum).DesiccantRegenerationCoil) {
+                    if (state.dataSteamCoils->SteamCoil(CoilNum).DesiccantRegenerationCoil) {
 
                         DataDesicRegCoil = true;
-                        DataDesicDehumNum = SteamCoil(CoilNum).DesiccantDehumNum;
-                        CompType = SteamCoil(CoilNum).SteamCoilType;
-                        CompName = SteamCoil(CoilNum).Name;
+                        DataDesicDehumNum = state.dataSteamCoils->SteamCoil(CoilNum).DesiccantDehumNum;
+                        CompType = state.dataSteamCoils->SteamCoil(CoilNum).SteamCoilType;
+                        CompName = state.dataSteamCoils->SteamCoil(CoilNum).Name;
                         bPRINT = false;
                         HeatingCoilDesAirInletTempSizer sizerHeatingDesInletTemp;
                         bool ErrorsFound = false;
@@ -847,29 +786,29 @@ namespace SteamCoils {
                         // TempSteamIn=PlantSizData(PltSizSteamNum)%ExitTemp
                         TempSteamIn = 100.0; // DSU? Should be from the PlantSizing object (ExitTemp) instead of hardwired to 100?
                         // RefrigIndex is set during GetInput for this module
-                        EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamCoil(CoilNum).FluidIndex, RoutineName);
-                        EnthSteamOutWet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, SteamCoil(CoilNum).FluidIndex, RoutineName);
+                        EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                        EnthSteamOutWet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
                         LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-                        SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamCoil(CoilNum).FluidIndex, RoutineName);
+                        SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
                         // SteamCoil(CoilNum)%MaxSteamVolFlowRate = DesCoilLoad/(SteamDensity * LatentHeatSteam)
                         //            CpWater  =  GetSpecificHeatGlycol('WATER',  &
                         //                                              TempSteamIn, &
                         //                                              PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
                         //                                             'SizeSteamCoil')
-                        CpWater = GetSatSpecificHeatRefrig(state, fluidNameSteam, TempSteamIn, 0.0, SteamCoil(CoilNum).FluidIndex, RoutineName);
+                        CpWater = GetSatSpecificHeatRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
-                        SteamCoil(CoilNum).MaxSteamVolFlowRate =
-                            DesCoilLoad / (SteamDensity * (LatentHeatSteam + SteamCoil(CoilNum).DegOfSubcooling * CpWater));
+                        state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate =
+                            DesCoilLoad / (SteamDensity * (LatentHeatSteam + state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling * CpWater));
                         //             PlantSizData(PltSizSteamNum)%DeltaT*CPHW(PlantSizData(PltSizSteamNum)%ExitTemp)))
                     } else {
-                        SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.0;
-                        ShowWarningError("The design coil load is zero for COIL:Heating:Steam " + SteamCoil(CoilNum).Name);
+                        state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.0;
+                        ShowWarningError("The design coil load is zero for COIL:Heating:Steam " + state.dataSteamCoils->SteamCoil(CoilNum).Name);
                         // CALL ShowContinueError('The autosize value for max Steam flow rate is zero')
                         // CALL ShowContinueError('To change this, input a value for UA, change the heating design day, or lower')
                         // CALL ShowContinueError('  the system heating design supply air temperature')
                     }
                     BaseSizer::reportSizerOutput(
-                        "Coil:Heating:Steam", SteamCoil(CoilNum).Name, "Maximum Steam Flow Rate [m3/s]", SteamCoil(CoilNum).MaxSteamVolFlowRate);
+                        "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).Name, "Maximum Steam Flow Rate [m3/s]", state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate);
                 }
                 DataDesicRegCoil = false; // reset all globals to 0 to ensure correct sizing for other child components
                 // Coil report, set fan info for airloopnum
@@ -878,7 +817,7 @@ namespace SteamCoils {
                     int SupFanNum = DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum;
                     if (SupFanNum > 0) {
                         coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                                     SteamCoil(CoilNum).Name,
+                                                                     state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                                      "Coil:Heating:Steam",
                                                                      Fans::Fan(DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum).FanName,
                                                                      DataAirSystems::structArrayLegacyFanModels,
@@ -891,7 +830,7 @@ namespace SteamCoils {
                     if (DataAirSystems::PrimaryAirSystem(CurSysNum).supFanVecIndex >= 0) {
                         coilSelectionReportObj->setCoilSupplyFanInfo(
                             state,
-                            SteamCoil(CoilNum).Name,
+                            state.dataSteamCoils->SteamCoil(CoilNum).Name,
                             "Coil:Heating:Steam",
                             HVACFan::fanObjs[DataAirSystems::PrimaryAirSystem(CurSysNum).supFanVecIndex]->name,
                             DataAirSystems::objectVectorOOFanSystemModel,
@@ -907,15 +846,15 @@ namespace SteamCoils {
 
                 // if this is a zone coil
             } else if (CurZoneEqNum > 0) {
-                CheckZoneSizing("Coil:Heating:Steam", SteamCoil(CoilNum).Name);
+                CheckZoneSizing("Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).Name);
                 // autosize the coil steam volume flow rate if needed
-                if (SteamCoil(CoilNum).MaxSteamVolFlowRate == AutoSize) {
+                if (state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate == AutoSize) {
                     // if coil is part of a terminal unit just use the terminal unit value
                     if (TermUnitSingDuct || TermUnitPIU || TermUnitIU) {
                         if (CurTermUnitSizingNum > 0) {
-                            SteamCoil(CoilNum).MaxSteamVolFlowRate = TermUnitSizing(CurTermUnitSizingNum).MaxSTVolFlow;
+                            state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate = TermUnitSizing(CurTermUnitSizingNum).MaxSTVolFlow;
                         } else {
-                            SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.0;
+                            state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.0;
                         }
                         // if coil is part of a zonal unit, calc coil load to get hot Steam flow rate
                         DesCoilLoad = TermUnitSizing(CurTermUnitSizingNum).DesHeatingLoad; // coil report
@@ -931,50 +870,50 @@ namespace SteamCoils {
                         if (DesCoilLoad >= SmallLoad) {
                             TempSteamIn = 100.0;
                             // RefrigIndex is set during GetInput for this module
-                            EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamCoil(CoilNum).FluidIndex, RoutineName);
-                            EnthSteamOutWet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, SteamCoil(CoilNum).FluidIndex, RoutineName);
+                            EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                            EnthSteamOutWet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
                             LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-                            SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamCoil(CoilNum).FluidIndex, RoutineName);
+                            SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
                             // SteamCoil(CoilNum)%MaxSteamVolFlowRate = DesCoilLoad/(SteamDensity * LatentHeatSteam)
                             //           CpWater  =  GetSpecificHeatGlycol('WATER',  &
                             //                                             TempSteamIn, &
                             //                                             PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
                             //                                            'SizeSteamCoil')
-                            CpWater = GetSatSpecificHeatRefrig(state, fluidNameSteam, TempSteamIn, 0.0, SteamCoil(CoilNum).FluidIndex, RoutineName);
+                            CpWater = GetSatSpecificHeatRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
-                            SteamCoil(CoilNum).MaxSteamVolFlowRate =
-                                DesCoilLoad / (SteamDensity * (LatentHeatSteam + SteamCoil(CoilNum).DegOfSubcooling * CpWater));
+                            state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate =
+                                DesCoilLoad / (SteamDensity * (LatentHeatSteam + state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling * CpWater));
                             //             PlantSizData(PltSizSteamNum)%DeltaT*CPHW(PlantSizData(PltSizSteamNum)%ExitTemp)))
                         } else {
-                            SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.0;
+                            state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.0;
                         }
                     }
                     // issue warning if hw coil has zero flow
-                    if (SteamCoil(CoilNum).MaxSteamVolFlowRate == 0.0) {
-                        ShowWarningError("The design coil load is zero for COIL:Heating:Steam " + SteamCoil(CoilNum).Name);
+                    if (state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate == 0.0) {
+                        ShowWarningError("The design coil load is zero for COIL:Heating:Steam " + state.dataSteamCoils->SteamCoil(CoilNum).Name);
                         ShowContinueError("The autosize value for max Steam flow rate is zero");
                         // CALL ShowContinueError('To change this, input a value for UA, change the heating design day, or lower')
                         // CALL ShowContinueError('  the system heating design supply air temperature')
                     }
                     BaseSizer::reportSizerOutput(
-                        "Coil:Heating:Steam", SteamCoil(CoilNum).Name, "Maximum Steam Flow Rate [m3/s]", SteamCoil(CoilNum).MaxSteamVolFlowRate);
+                        "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).Name, "Maximum Steam Flow Rate [m3/s]", state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate);
                 }
             } // end zone coil ELSE - IF
 
         } else {
             // if there is no heating Plant Sizing object and autosizng was requested, issue an error message
-            if (SteamCoil(CoilNum).MaxSteamVolFlowRate == AutoSize) {
+            if (state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate == AutoSize) {
                 ShowSevereError("Autosizing of Steam coil requires a heating loop Sizing:Plant object");
-                ShowContinueError("Occurs in Steam coil object= " + SteamCoil(CoilNum).Name);
+                ShowContinueError("Occurs in Steam coil object= " + state.dataSteamCoils->SteamCoil(CoilNum).Name);
                 ErrorsFound = true;
             }
         } // end of heating Plant Sizing existence IF - ELSE
 
         // save the design Steam volumetric flow rate for use by the Steam loop sizing algorithms
-        RegisterPlantCompDesignFlow(SteamCoil(CoilNum).SteamInletNodeNum, SteamCoil(CoilNum).MaxSteamVolFlowRate);
+        RegisterPlantCompDesignFlow(state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum, state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate);
 
         coilSelectionReportObj->setCoilHeatingCapacity(state,
-                                                       SteamCoil(CoilNum).Name,
+                                                       state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                        "Coil:Heating:Steam",
                                                        DesCoilLoad,
                                                        coilWasAutosized,
@@ -985,33 +924,33 @@ namespace SteamCoils {
                                                        1.0,
                                                        -999.0,
                                                        -999.0);
-        coilSelectionReportObj->setCoilWaterFlowNodeNums(state, SteamCoil(CoilNum).Name,
+        coilSelectionReportObj->setCoilWaterFlowNodeNums(state, state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                          "Coil:Heating:Steam",
-                                                         SteamCoil(CoilNum).MaxSteamVolFlowRate,
+                                                         state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate,
                                                          coilWasAutosized,
-                                                         SteamCoil(CoilNum).SteamInletNodeNum,
-                                                         SteamCoil(CoilNum).SteamOutletNodeNum,
-                                                         SteamCoil(CoilNum).LoopNum);
-        coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums(SteamCoil(CoilNum).Name,
+                                                         state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
+                                                         state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
+                                                         state.dataSteamCoils->SteamCoil(CoilNum).LoopNum);
+        coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums(state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                                    "Coil:Heating:Steam",
                                                                    DesCoilLoad,
                                                                    coilWasAutosized,
-                                                                   SteamCoil(CoilNum).SteamInletNodeNum,
-                                                                   SteamCoil(CoilNum).SteamOutletNodeNum,
-                                                                   SteamCoil(CoilNum).LoopNum);
-        coilSelectionReportObj->setCoilEntWaterTemp(SteamCoil(CoilNum).Name, "Coil:Heating:Steam", TempSteamIn); // coil  report
-        coilSelectionReportObj->setCoilLvgWaterTemp(SteamCoil(CoilNum).Name,
+                                                                   state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
+                                                                   state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
+                                                                   state.dataSteamCoils->SteamCoil(CoilNum).LoopNum);
+        coilSelectionReportObj->setCoilEntWaterTemp(state.dataSteamCoils->SteamCoil(CoilNum).Name, "Coil:Heating:Steam", TempSteamIn); // coil  report
+        coilSelectionReportObj->setCoilLvgWaterTemp(state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                     "Coil:Heating:Steam",
-                                                    TempSteamIn - SteamCoil(CoilNum).DegOfSubcooling);                                 // coil report
-        coilSelectionReportObj->setCoilWaterDeltaT(SteamCoil(CoilNum).Name, "Coil:Heating:Steam", SteamCoil(CoilNum).DegOfSubcooling); // coil report
-        SteamCoil(CoilNum).DesCoilCapacity = DesCoilLoad;
-        SteamCoil(CoilNum).DesAirVolFlow = DesVolFlow;
+                                                    TempSteamIn - state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling);                                 // coil report
+        coilSelectionReportObj->setCoilWaterDeltaT(state.dataSteamCoils->SteamCoil(CoilNum).Name, "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling); // coil report
+        state.dataSteamCoils->SteamCoil(CoilNum).DesCoilCapacity = DesCoilLoad;
+        state.dataSteamCoils->SteamCoil(CoilNum).DesAirVolFlow = DesVolFlow;
         if (ErrorsFound) {
             ShowFatalError("Preceding Steam coil sizing errors cause program termination");
         }
 
         // There is no standard rating for heating coils at this point, so fill with dummy flag values
-        coilSelectionReportObj->setRatedCoilConditions(SteamCoil(CoilNum).Name,
+        coilSelectionReportObj->setRatedCoilConditions(state.dataSteamCoils->SteamCoil(CoilNum).Name,
                                                        "Coil:Heating:Steam",
                                                        -999.0,
                                                        -999.0,
@@ -1057,10 +996,6 @@ namespace SteamCoils {
         // desired is input by the user, which is used to calculate water outlet temp.
         // Heat exchange is = Latent Heat + Sensible heat,coil effectivness is 1.0
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
@@ -1068,20 +1003,9 @@ namespace SteamCoils {
         using FaultsManager::FaultsCoilSATSensor;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcSteamAirCoil");
         static std::string const RoutineNameSizeSteamCoil("SizeSteamCoil");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Real64 SteamMassFlowRate(0.0);
         static Real64 AirMassFlow(0.0); // [kg/sec]
         static Real64 TempAirIn(0.0);   // [C]
@@ -1109,35 +1033,35 @@ namespace SteamCoils {
         static Real64 CpWater(0.0);
 
         QCoilReq = QCoilRequested;
-        TempAirIn = SteamCoil(CoilNum).InletAirTemp;
-        Win = SteamCoil(CoilNum).InletAirHumRat;
-        TempSteamIn = SteamCoil(CoilNum).InletSteamTemp;
-        CoilPress = SteamCoil(CoilNum).InletSteamPress;
-        SubcoolDeltaTemp = SteamCoil(CoilNum).DegOfSubcooling;
-        TempSetPoint = SteamCoil(CoilNum).DesiredOutletTemp;
+        TempAirIn = state.dataSteamCoils->SteamCoil(CoilNum).InletAirTemp;
+        Win = state.dataSteamCoils->SteamCoil(CoilNum).InletAirHumRat;
+        TempSteamIn = state.dataSteamCoils->SteamCoil(CoilNum).InletSteamTemp;
+        CoilPress = state.dataSteamCoils->SteamCoil(CoilNum).InletSteamPress;
+        SubcoolDeltaTemp = state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling;
+        TempSetPoint = state.dataSteamCoils->SteamCoil(CoilNum).DesiredOutletTemp;
 
         // If there is a fault of coil SAT Sensor (zrp_Jul2016)
-        if (SteamCoil(CoilNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        if (state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
             // calculate the sensor offset using fault information
-            int FaultIndex = SteamCoil(CoilNum).FaultyCoilSATIndex;
-            SteamCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct();
+            int FaultIndex = state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATIndex;
+            state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct();
             // update the TempSetPoint
-            TempSetPoint -= SteamCoil(CoilNum).FaultyCoilSATOffset;
+            TempSetPoint -= state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATOffset;
         }
 
         //  adjust mass flow rates for cycling fan cycling coil operation
         if (FanOpMode == CycFanCycCoil) {
             if (PartLoadRatio > 0.0) {
-                AirMassFlow = SteamCoil(CoilNum).InletAirMassFlowRate / PartLoadRatio;
-                SteamMassFlowRate = min(SteamCoil(CoilNum).InletSteamMassFlowRate / PartLoadRatio, SteamCoil(CoilNum).MaxSteamMassFlowRate);
+                AirMassFlow = state.dataSteamCoils->SteamCoil(CoilNum).InletAirMassFlowRate / PartLoadRatio;
+                SteamMassFlowRate = min(state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate / PartLoadRatio, state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamMassFlowRate);
                 QCoilReq /= PartLoadRatio;
             } else {
                 AirMassFlow = 0.0;
                 SteamMassFlowRate = 0.0;
             }
         } else {
-            AirMassFlow = SteamCoil(CoilNum).InletAirMassFlowRate;
-            SteamMassFlowRate = SteamCoil(CoilNum).InletSteamMassFlowRate;
+            AirMassFlow = state.dataSteamCoils->SteamCoil(CoilNum).InletAirMassFlowRate;
+            SteamMassFlowRate = state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate;
         }
 
         if (AirMassFlow > 0.0) { // If the coil is operating
@@ -1151,17 +1075,17 @@ namespace SteamCoils {
         //  Also the coil has to be scheduled to be available
         //  Control output to meet load QCoilReq. Load Controlled Coil.
         {
-            auto const SELECT_CASE_var(SteamCoil(CoilNum).TypeOfCoil);
+            auto const SELECT_CASE_var(state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil);
 
-            if (SELECT_CASE_var == ZoneLoadControl) {
-                if ((CapacitanceAir > 0.0) && ((SteamCoil(CoilNum).InletSteamMassFlowRate) > 0.0) &&
-                    (GetCurrentScheduleValue(SteamCoil(CoilNum).SchedPtr) > 0.0 || MySizeFlag(CoilNum)) && (QCoilReq > 0.0)) {
+            if (SELECT_CASE_var == state.dataSteamCoils->ZoneLoadControl) {
+                if ((CapacitanceAir > 0.0) && ((state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate) > 0.0) &&
+                    (GetCurrentScheduleValue(state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr) > 0.0 || state.dataSteamCoils->MySizeFlag(CoilNum)) && (QCoilReq > 0.0)) {
 
                     // Steam heat exchangers would not have effectivness, since all of the steam is
                     // converted to water and only then the steam trap allows it to leave the heat
                     // exchanger, subsequently heat exchange is latent heat + subcooling.
-                    EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamCoil(CoilNum).FluidIndex, RoutineName);
-                    EnthSteamOutWet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, SteamCoil(CoilNum).FluidIndex, RoutineName);
+                    EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                    EnthSteamOutWet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
                     LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
 
@@ -1170,11 +1094,11 @@ namespace SteamCoils {
                     //                                           PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
                     //                                           'CalcSteamAirCoil')
 
-                    CpWater = GetSatSpecificHeatRefrig(state, fluidNameSteam, TempSteamIn, 0.0, SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
+                    CpWater = GetSatSpecificHeatRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
 
                     // Max Heat Transfer
-                    QSteamCoilMaxHT = SteamCoil(CoilNum).MaxSteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
-                    SteamCoil(CoilNum).OperatingCapacity = QSteamCoilMaxHT;
+                    QSteamCoilMaxHT = state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
+                    state.dataSteamCoils->SteamCoil(CoilNum).OperatingCapacity = QSteamCoilMaxHT;
 
                     // Determine the Max coil capacity and check for the same.
                     if (QCoilReq > QSteamCoilMaxHT) {
@@ -1187,12 +1111,12 @@ namespace SteamCoils {
                     SteamMassFlowRate = QCoilCap / (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
 
                     SetComponentFlowRate(SteamMassFlowRate,
-                                         SteamCoil(CoilNum).SteamInletNodeNum,
-                                         SteamCoil(CoilNum).SteamOutletNodeNum,
-                                         SteamCoil(CoilNum).LoopNum,
-                                         SteamCoil(CoilNum).LoopSide,
-                                         SteamCoil(CoilNum).BranchNum,
-                                         SteamCoil(CoilNum).CompNum);
+                                         state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).LoopSide,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).CompNum);
 
                     // recalculate if mass flow rate changed in previous call.
                     QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
@@ -1211,8 +1135,8 @@ namespace SteamCoils {
                     // Temperature of air at outlet
                     TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnW(Win));
 
-                    SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
-                    SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
+                    state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
+                    state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
 
                     //************************* Loop Losses *****************************
                     // Loop pressure return considerations included in steam coil since the pipes are
@@ -1223,65 +1147,65 @@ namespace SteamCoils {
                     // considering saturated state.
                     //              StdBaroPress=101325
 
-                    TempWaterAtmPress = GetSatTemperatureRefrig(state, fluidNameSteam, StdBaroPress, SteamCoil(CoilNum).FluidIndex, RoutineName);
+                    TempWaterAtmPress = GetSatTemperatureRefrig(state, fluidNameSteam, StdBaroPress, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
                     // Point 4 at atm - loop delta subcool during return journery back to pump
-                    TempLoopOutToPump = TempWaterAtmPress - SteamCoil(CoilNum).LoopSubcoolReturn;
+                    TempLoopOutToPump = TempWaterAtmPress - state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;
 
                     // Actual Steam Coil Outlet Enthalpy
-                    EnthCoilOutlet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, SteamCoil(CoilNum).FluidIndex, RoutineName) -
+                    EnthCoilOutlet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName) -
                                      CpWater * SubcoolDeltaTemp;
 
                     // Enthalpy at Point 4
-                    EnthAtAtmPress = GetSatEnthalpyRefrig(state, fluidNameSteam, TempWaterAtmPress, 0.0, SteamCoil(CoilNum).FluidIndex, RoutineName);
+                    EnthAtAtmPress = GetSatEnthalpyRefrig(state, fluidNameSteam, TempWaterAtmPress, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
                     // Reported value of coil outlet enthalpy at the node to match the node outlet temperature
                     CpWater =
-                        GetSatSpecificHeatRefrig(state, fluidNameSteam, TempLoopOutToPump, 0.0, SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
+                        GetSatSpecificHeatRefrig(state, fluidNameSteam, TempLoopOutToPump, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
 
-                    EnthPumpInlet = EnthAtAtmPress - CpWater * SteamCoil(CoilNum).LoopSubcoolReturn;
+                    EnthPumpInlet = EnthAtAtmPress - CpWater * state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;
 
-                    SteamCoil(CoilNum).OutletWaterEnthalpy = EnthPumpInlet;
+                    state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = EnthPumpInlet;
 
                     // Point 3-Point 5,
                     EnergyLossToEnvironment = SteamMassFlowRate * (EnthCoilOutlet - EnthPumpInlet);
 
                     // Loss to enviornment due to pressure drop
-                    SteamCoil(CoilNum).LoopLoss = EnergyLossToEnvironment;
+                    state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss = EnergyLossToEnvironment;
                     //************************* Loop Losses *****************************
                 } else { // Coil is not running.
 
                     TempAirOut = TempAirIn;
                     TempWaterOut = TempSteamIn;
                     HeatingCoilLoad = 0.0;
-                    SteamCoil(CoilNum).OutletWaterEnthalpy = SteamCoil(CoilNum).InletSteamEnthalpy;
-                    SteamCoil(CoilNum).OutletSteamMassFlowRate = 0.0;
-                    SteamCoil(CoilNum).OutletSteamQuality = 0.0;
-                    SteamCoil(CoilNum).LoopLoss = 0.0;
+                    state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = state.dataSteamCoils->SteamCoil(CoilNum).InletSteamEnthalpy;
+                    state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = 0.0;
+                    state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamQuality = 0.0;
+                    state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss = 0.0;
                     TempLoopOutToPump = TempWaterOut;
                 }
 
-            } else if (SELECT_CASE_var == TemperatureSetPointControl) {
+            } else if (SELECT_CASE_var == state.dataSteamCoils->TemperatureSetPointControl) {
                 // Control coil output to meet a Setpoint Temperature.
-                if ((CapacitanceAir > 0.0) && ((SteamCoil(CoilNum).InletSteamMassFlowRate) > 0.0) &&
-                    (GetCurrentScheduleValue(SteamCoil(CoilNum).SchedPtr) > 0.0 || MySizeFlag(CoilNum)) &&
+                if ((CapacitanceAir > 0.0) && ((state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate) > 0.0) &&
+                    (GetCurrentScheduleValue(state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr) > 0.0 || state.dataSteamCoils->MySizeFlag(CoilNum)) &&
                     (std::abs(TempSetPoint - TempAirIn) > TempControlTol)) {
 
                     // Steam heat exchangers would not have effectivness, since all of the steam is
                     // converted to water and only then the steam trap allows it to leave the heat
                     // exchanger, subsequently heat exchange is latent heat + subcooling.
-                    EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamCoil(CoilNum).FluidIndex, RoutineName);
-                    EnthSteamOutWet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, SteamCoil(CoilNum).FluidIndex, RoutineName);
+                    EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
+                    EnthSteamOutWet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
                     LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
 
                     //          CpWater = GetSpecificHeatGlycol('WATER',  &
                     //                                           TempSteamIn, &
                     //                                           PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
                     //                                           'CalcSteamAirCoil')
-                    CpWater = GetSatSpecificHeatRefrig(state, fluidNameSteam, TempSteamIn, 0.0, SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
+                    CpWater = GetSatSpecificHeatRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
 
                     // Max Heat Transfer
-                    QSteamCoilMaxHT = SteamCoil(CoilNum).MaxSteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
+                    QSteamCoilMaxHT = state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
 
                     // Coil Load in case of temperature setpoint
                     QCoilCap = CapacitanceAir * (TempSetPoint - TempAirIn);
@@ -1295,12 +1219,12 @@ namespace SteamCoils {
                         // Steam Mass Flow Rate Required
                         SteamMassFlowRate = 0.0;
                         SetComponentFlowRate(SteamMassFlowRate,
-                                             SteamCoil(CoilNum).SteamInletNodeNum,
-                                             SteamCoil(CoilNum).SteamOutletNodeNum,
-                                             SteamCoil(CoilNum).LoopNum,
-                                             SteamCoil(CoilNum).LoopSide,
-                                             SteamCoil(CoilNum).BranchNum,
-                                             SteamCoil(CoilNum).CompNum);
+                                             state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
+                                             state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
+                                             state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
+                                             state.dataSteamCoils->SteamCoil(CoilNum).LoopSide,
+                                             state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,
+                                             state.dataSteamCoils->SteamCoil(CoilNum).CompNum);
                         // Inlet equal to outlet when not required to run.
                         TempWaterOut = TempSteamIn;
 
@@ -1308,11 +1232,11 @@ namespace SteamCoils {
                         HeatingCoilLoad = QCoilCap;
 
                         // The HeatingCoilLoad is the change in the enthalpy of the water
-                        SteamCoil(CoilNum).OutletWaterEnthalpy = SteamCoil(CoilNum).InletSteamEnthalpy;
+                        state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = state.dataSteamCoils->SteamCoil(CoilNum).InletSteamEnthalpy;
 
                         // Outlet flow rate set to inlet
-                        SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
-                        SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
+                        state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
+                        state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
 
                     } else if (QCoilCap > QSteamCoilMaxHT) {
                         // Setting to Maximum Coil Capacity
@@ -1332,12 +1256,12 @@ namespace SteamCoils {
                         // Steam Mass Flow Rate Required
                         SteamMassFlowRate = QCoilCap / (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
                         SetComponentFlowRate(SteamMassFlowRate,
-                                             SteamCoil(CoilNum).SteamInletNodeNum,
-                                             SteamCoil(CoilNum).SteamOutletNodeNum,
-                                             SteamCoil(CoilNum).LoopNum,
-                                             SteamCoil(CoilNum).LoopSide,
-                                             SteamCoil(CoilNum).BranchNum,
-                                             SteamCoil(CoilNum).CompNum);
+                                             state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
+                                             state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
+                                             state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
+                                             state.dataSteamCoils->SteamCoil(CoilNum).LoopSide,
+                                             state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,
+                                             state.dataSteamCoils->SteamCoil(CoilNum).CompNum);
 
                         // recalculate in case previous call changed mass flow rate
                         QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
@@ -1347,9 +1271,9 @@ namespace SteamCoils {
                         HeatingCoilLoad = QCoilCap;
 
                         // The HeatingCoilLoad is the change in the enthalpy of the water
-                        SteamCoil(CoilNum).OutletWaterEnthalpy = SteamCoil(CoilNum).InletSteamEnthalpy - HeatingCoilLoad / SteamMassFlowRate;
-                        SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
-                        SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
+                        state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = state.dataSteamCoils->SteamCoil(CoilNum).InletSteamEnthalpy - HeatingCoilLoad / SteamMassFlowRate;
+                        state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
+                        state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
 
                     } else {
                         // Temp air out is temperature Setpoint
@@ -1366,12 +1290,12 @@ namespace SteamCoils {
                         // Steam Mass Flow Rate Required
                         SteamMassFlowRate = QCoilCap / (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
                         SetComponentFlowRate(SteamMassFlowRate,
-                                             SteamCoil(CoilNum).SteamInletNodeNum,
-                                             SteamCoil(CoilNum).SteamOutletNodeNum,
-                                             SteamCoil(CoilNum).LoopNum,
-                                             SteamCoil(CoilNum).LoopSide,
-                                             SteamCoil(CoilNum).BranchNum,
-                                             SteamCoil(CoilNum).CompNum);
+                                             state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
+                                             state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
+                                             state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
+                                             state.dataSteamCoils->SteamCoil(CoilNum).LoopSide,
+                                             state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,
+                                             state.dataSteamCoils->SteamCoil(CoilNum).CompNum);
 
                         // recalculate in case previous call changed mass flow rate
                         QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
@@ -1380,8 +1304,8 @@ namespace SteamCoils {
                         // Total Heat Transfer to air
                         HeatingCoilLoad = QCoilCap;
 
-                        SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
-                        SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
+                        state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
+                        state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
 
                         //************************* Loop Losses *****************************
                         // Loop pressure return considerations included in steam coil since the pipes are
@@ -1393,50 +1317,50 @@ namespace SteamCoils {
                         // considering saturated state.
                         //              StdBaroPress=101325
 
-                        TempWaterAtmPress = GetSatTemperatureRefrig(state, fluidNameSteam, StdBaroPress, SteamCoil(CoilNum).FluidIndex, RoutineName);
+                        TempWaterAtmPress = GetSatTemperatureRefrig(state, fluidNameSteam, StdBaroPress, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
                         // Point 4 at atm - loop delta subcool during return journery back to pump
-                        TempLoopOutToPump = TempWaterAtmPress - SteamCoil(CoilNum).LoopSubcoolReturn;
+                        TempLoopOutToPump = TempWaterAtmPress - state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;
 
                         // Actual Steam Coil Outlet Enthalpy
-                        EnthCoilOutlet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, SteamCoil(CoilNum).FluidIndex, RoutineName) -
+                        EnthCoilOutlet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName) -
                                          CpWater * SubcoolDeltaTemp;
 
                         // Enthalpy at Point 4
-                        EnthAtAtmPress = GetSatEnthalpyRefrig(state, fluidNameSteam, TempWaterAtmPress, 0.0, SteamCoil(CoilNum).FluidIndex, RoutineName);
+                        EnthAtAtmPress = GetSatEnthalpyRefrig(state, fluidNameSteam, TempWaterAtmPress, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
 
                         CpWater =
-                            GetSatSpecificHeatRefrig(state, fluidNameSteam, TempLoopOutToPump, 0.0, SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
+                            GetSatSpecificHeatRefrig(state, fluidNameSteam, TempLoopOutToPump, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
 
                         // Reported value of coil outlet enthalpy at the node to match the node outlet temperature
-                        EnthPumpInlet = EnthAtAtmPress - CpWater * SteamCoil(CoilNum).LoopSubcoolReturn;
+                        EnthPumpInlet = EnthAtAtmPress - CpWater * state.dataSteamCoils->SteamCoil(CoilNum).LoopSubcoolReturn;
 
-                        SteamCoil(CoilNum).OutletWaterEnthalpy = EnthPumpInlet;
+                        state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = EnthPumpInlet;
 
                         // Point 3-Point 5,
                         EnergyLossToEnvironment = SteamMassFlowRate * (EnthCoilOutlet - EnthPumpInlet);
 
                         // Loss to enviornment due to pressure drop
-                        SteamCoil(CoilNum).LoopLoss = EnergyLossToEnvironment;
+                        state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss = EnergyLossToEnvironment;
                         //************************* Loop Losses *****************************
                     }
 
                 } else { // If not running Conditions do not change across coil from inlet to outlet
                     SteamMassFlowRate = 0.0;
                     SetComponentFlowRate(SteamMassFlowRate,
-                                         SteamCoil(CoilNum).SteamInletNodeNum,
-                                         SteamCoil(CoilNum).SteamOutletNodeNum,
-                                         SteamCoil(CoilNum).LoopNum,
-                                         SteamCoil(CoilNum).LoopSide,
-                                         SteamCoil(CoilNum).BranchNum,
-                                         SteamCoil(CoilNum).CompNum);
+                                         state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).LoopNum,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).LoopSide,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).BranchNum,
+                                         state.dataSteamCoils->SteamCoil(CoilNum).CompNum);
                     TempAirOut = TempAirIn;
                     TempWaterOut = TempSteamIn;
                     HeatingCoilLoad = 0.0;
-                    SteamCoil(CoilNum).OutletWaterEnthalpy = SteamCoil(CoilNum).InletSteamEnthalpy;
-                    SteamCoil(CoilNum).OutletSteamMassFlowRate = 0.0;
-                    SteamCoil(CoilNum).OutletSteamQuality = 0.0;
-                    SteamCoil(CoilNum).LoopLoss = 0.0;
+                    state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy = state.dataSteamCoils->SteamCoil(CoilNum).InletSteamEnthalpy;
+                    state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate = 0.0;
+                    state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamQuality = 0.0;
+                    state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss = 0.0;
                     TempLoopOutToPump = TempWaterOut;
                 }
             }
@@ -1447,22 +1371,22 @@ namespace SteamCoils {
         }
 
         // Set the outlet conditions
-        SteamCoil(CoilNum).TotSteamHeatingCoilRate = HeatingCoilLoad;
-        SteamCoil(CoilNum).OutletAirTemp = TempAirOut;
-        SteamCoil(CoilNum).OutletSteamTemp = TempLoopOutToPump;
-        SteamCoil(CoilNum).OutletSteamQuality = 0.0;
+        state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate = HeatingCoilLoad;
+        state.dataSteamCoils->SteamCoil(CoilNum).OutletAirTemp = TempAirOut;
+        state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamTemp = TempLoopOutToPump;
+        state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamQuality = 0.0;
         QCoilActual = HeatingCoilLoad;
 
         // This SteamCoil does not change the moisture or Mass Flow across the component
-        SteamCoil(CoilNum).OutletAirHumRat = SteamCoil(CoilNum).InletAirHumRat;
-        SteamCoil(CoilNum).OutletAirMassFlowRate = SteamCoil(CoilNum).InletAirMassFlowRate;
+        state.dataSteamCoils->SteamCoil(CoilNum).OutletAirHumRat = state.dataSteamCoils->SteamCoil(CoilNum).InletAirHumRat;
+        state.dataSteamCoils->SteamCoil(CoilNum).OutletAirMassFlowRate = state.dataSteamCoils->SteamCoil(CoilNum).InletAirMassFlowRate;
         // Set the outlet enthalpys for air and water
-        SteamCoil(CoilNum).OutletAirEnthalpy = PsyHFnTdbW(SteamCoil(CoilNum).OutletAirTemp, SteamCoil(CoilNum).OutletAirHumRat);
+        state.dataSteamCoils->SteamCoil(CoilNum).OutletAirEnthalpy = PsyHFnTdbW(state.dataSteamCoils->SteamCoil(CoilNum).OutletAirTemp, state.dataSteamCoils->SteamCoil(CoilNum).OutletAirHumRat);
     }
 
     // Beginning of Update subroutines for the SteamCoil Module
 
-    void UpdateSteamCoil(int const CoilNum)
+    void UpdateSteamCoil(EnergyPlusData &state, int const CoilNum)
     {
         // SUBROUTINE INFORMATION:
         //   AUTHOR         Rahul Chillar
@@ -1476,49 +1400,32 @@ namespace SteamCoils {
         // METHODOLOGY EMPLOYED:
         // Data is moved from the coil data structure to the coil outlet nodes.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataContaminantBalance::Contaminant;
         using PlantUtilities::SafeCopyPlantNode;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirInletNode;
         int SteamInletNode;
         int AirOutletNode;
         int SteamOutletNode;
 
-        AirInletNode = SteamCoil(CoilNum).AirInletNodeNum;
-        SteamInletNode = SteamCoil(CoilNum).SteamInletNodeNum;
-        AirOutletNode = SteamCoil(CoilNum).AirOutletNodeNum;
-        SteamOutletNode = SteamCoil(CoilNum).SteamOutletNodeNum;
+        AirInletNode = state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum;
+        SteamInletNode = state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum;
+        AirOutletNode = state.dataSteamCoils->SteamCoil(CoilNum).AirOutletNodeNum;
+        SteamOutletNode = state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum;
 
         // Set the outlet air nodes of the SteamCoil
-        Node(AirOutletNode).MassFlowRate = SteamCoil(CoilNum).OutletAirMassFlowRate;
-        Node(AirOutletNode).Temp = SteamCoil(CoilNum).OutletAirTemp;
-        Node(AirOutletNode).HumRat = SteamCoil(CoilNum).OutletAirHumRat;
-        Node(AirOutletNode).Enthalpy = SteamCoil(CoilNum).OutletAirEnthalpy;
+        Node(AirOutletNode).MassFlowRate = state.dataSteamCoils->SteamCoil(CoilNum).OutletAirMassFlowRate;
+        Node(AirOutletNode).Temp = state.dataSteamCoils->SteamCoil(CoilNum).OutletAirTemp;
+        Node(AirOutletNode).HumRat = state.dataSteamCoils->SteamCoil(CoilNum).OutletAirHumRat;
+        Node(AirOutletNode).Enthalpy = state.dataSteamCoils->SteamCoil(CoilNum).OutletAirEnthalpy;
 
         SafeCopyPlantNode(SteamInletNode, SteamOutletNode);
 
         // Set the outlet Steam nodes for the Coil
         //   Node(SteamOutletNode)%MassFlowRate = SteamCoil(CoilNum)%OutletSteamMassFlowRate
-        Node(SteamOutletNode).Temp = SteamCoil(CoilNum).OutletSteamTemp;
-        Node(SteamOutletNode).Enthalpy = SteamCoil(CoilNum).OutletWaterEnthalpy;
-        Node(SteamOutletNode).Quality = SteamCoil(CoilNum).OutletSteamQuality;
+        Node(SteamOutletNode).Temp = state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamTemp;
+        Node(SteamOutletNode).Enthalpy = state.dataSteamCoils->SteamCoil(CoilNum).OutletWaterEnthalpy;
+        Node(SteamOutletNode).Quality = state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamQuality;
         // Node(SteamInletNode)%MassFlowRate  = SteamCoil(CoilNum)%OutletSteamMassFlowRate
 
         // Set the outlet nodes for properties that just pass through & not used
@@ -1557,7 +1464,7 @@ namespace SteamCoils {
 
     // Beginning of Reporting subroutines for the SteamCoil Module
 
-    void ReportSteamCoil(int const CoilNum)
+    void ReportSteamCoil(EnergyPlusData &state, int const CoilNum)
     {
         // SUBROUTINE INFORMATION:
         //   AUTHOR         Rahul Chillar
@@ -1568,32 +1475,8 @@ namespace SteamCoils {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variable for the coils.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         // Report the SteamCoil energy from this component
-        SteamCoil(CoilNum).TotSteamHeatingCoilEnergy = SteamCoil(CoilNum).TotSteamHeatingCoilRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilEnergy = state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     // End of Reporting subroutines for the SteamCoil Module
@@ -1622,13 +1505,13 @@ namespace SteamCoils {
         int IndexNum; // returned air inlet node number of matched coil
 
         // Obtains and Allocates SteamCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         if (CoilType == "COIL:HEATING:STEAM") {
-            IndexNum = UtilityRoutines::FindItemInList(CoilName, SteamCoil);
+            IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataSteamCoils->SteamCoil);
         } else {
             IndexNum = 0;
         }
@@ -1660,30 +1543,30 @@ namespace SteamCoils {
         int CoilNum;
 
         // Obtains and Allocates SteamCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         // Find the correct Coil number
         if (CompIndex == 0) {
-            CoilNum = UtilityRoutines::FindItemInList(CompName, SteamCoil);
+            CoilNum = UtilityRoutines::FindItemInList(CompName, state.dataSteamCoils->SteamCoil);
             if (CoilNum == 0) {
                 ShowFatalError("CheckSteamCoilSchedule: Coil not found=" + CompName);
             }
             CompIndex = CoilNum;
-            Value = GetCurrentScheduleValue(SteamCoil(CoilNum).SchedPtr); // not scheduled?
+            Value = GetCurrentScheduleValue(state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr); // not scheduled?
         } else {
             CoilNum = CompIndex;
-            if (CoilNum > NumSteamCoils || CoilNum < 1) {
+            if (CoilNum > state.dataSteamCoils->NumSteamCoils || CoilNum < 1) {
                 ShowFatalError("SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
-                               ", Number of Steam Coils=" + TrimSigDigits(NumSteamCoils) + ", Coil name=" + CompName);
+                               ", Number of Steam Coils=" + TrimSigDigits(state.dataSteamCoils->NumSteamCoils) + ", Coil name=" + CompName);
             }
-            if (CompName != SteamCoil(CoilNum).Name) {
+            if (CompName != state.dataSteamCoils->SteamCoil(CoilNum).Name) {
                 ShowFatalError("SimulateSteamCoilComponents: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) + ", Coil name=" + CompName +
-                               ", stored Coil Name for that index=" + SteamCoil(CoilNum).Name);
+                               ", stored Coil Name for that index=" + state.dataSteamCoils->SteamCoil(CoilNum).Name);
             }
-            Value = GetCurrentScheduleValue(SteamCoil(CoilNum).SchedPtr); // not scheduled?
+            Value = GetCurrentScheduleValue(state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr); // not scheduled?
         }
     }
 
@@ -1713,13 +1596,13 @@ namespace SteamCoils {
         static int ErrCount(0);
 
         // Obtains and Allocates SteamCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Steam")) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, SteamCoil);
+            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataSteamCoils->SteamCoil);
             if (WhichCoil != 0) {
                 // coil does not specify MaxWaterFlowRate
                 MaxWaterFlowRate = 0.0;
@@ -1759,9 +1642,9 @@ namespace SteamCoils {
         Real64 MaxSteamFlowRate; // returned max steam flow rate of matched coil
 
         // Obtains and Allocates SteamCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         if (CoilIndex == 0) {
@@ -1769,7 +1652,7 @@ namespace SteamCoils {
             ErrorsFound = true;
             MaxSteamFlowRate = 0.0;
         } else {
-            MaxSteamFlowRate = SteamCoil(CoilIndex).MaxSteamVolFlowRate;
+            MaxSteamFlowRate = state.dataSteamCoils->SteamCoil(CoilIndex).MaxSteamVolFlowRate;
         }
 
         return MaxSteamFlowRate;
@@ -1797,9 +1680,9 @@ namespace SteamCoils {
         int NodeNumber; // returned air inlet node number of matched coil
 
         // Obtains and Allocates SteamCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         if (CoilIndex == 0) {
@@ -1807,7 +1690,7 @@ namespace SteamCoils {
             ErrorsFound = true;
             NodeNumber = 0;
         } else {
-            NodeNumber = SteamCoil(CoilIndex).AirInletNodeNum;
+            NodeNumber = state.dataSteamCoils->SteamCoil(CoilIndex).AirInletNodeNum;
         }
 
         return NodeNumber;
@@ -1843,25 +1726,10 @@ namespace SteamCoils {
         // Return value
         int NodeNumber; // returned air inlet node number of matched coil
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
         // Obtains and Allocates SteamCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         if (CoilIndex == 0) {
@@ -1869,7 +1737,7 @@ namespace SteamCoils {
             ErrorsFound = true;
             NodeNumber = 0;
         } else {
-            NodeNumber = SteamCoil(CoilIndex).AirOutletNodeNum;
+            NodeNumber = state.dataSteamCoils->SteamCoil(CoilIndex).AirOutletNodeNum;
         }
 
         return NodeNumber;
@@ -1900,13 +1768,13 @@ namespace SteamCoils {
         int IndexNum; // returned air inlet node number of matched coil
 
         // Obtains and Allocates SteamCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Steam")) {
-            IndexNum = UtilityRoutines::FindItem(CoilName, SteamCoil);
+            IndexNum = UtilityRoutines::FindItem(CoilName, state.dataSteamCoils->SteamCoil);
         } else {
             IndexNum = 0;
         }
@@ -1914,7 +1782,7 @@ namespace SteamCoils {
         if (IndexNum == 0) {
             NodeNumber = 0;
         } else {
-            NodeNumber = SteamCoil(IndexNum).AirOutletNodeNum;
+            NodeNumber = state.dataSteamCoils->SteamCoil(IndexNum).AirOutletNodeNum;
         }
 
         return NodeNumber;
@@ -1942,9 +1810,9 @@ namespace SteamCoils {
         int NodeNumber; // returned air inlet node number of matched coil
 
         // Obtains and Allocates SteamCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         if (CoilIndex == 0) {
@@ -1952,7 +1820,7 @@ namespace SteamCoils {
             ErrorsFound = true;
             NodeNumber = 0;
         } else {
-            NodeNumber = SteamCoil(CoilIndex).SteamInletNodeNum;
+            NodeNumber = state.dataSteamCoils->SteamCoil(CoilIndex).SteamInletNodeNum;
         }
 
         return NodeNumber;
@@ -1983,13 +1851,13 @@ namespace SteamCoils {
         int IndexNum; // returned air inlet node number of matched coil
 
         // Obtains and Allocates SteamCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Steam")) {
-            IndexNum = UtilityRoutines::FindItem(CoilName, SteamCoil);
+            IndexNum = UtilityRoutines::FindItem(CoilName, state.dataSteamCoils->SteamCoil);
         } else {
             IndexNum = 0;
         }
@@ -1999,7 +1867,7 @@ namespace SteamCoils {
             ErrorsFound = true;
             NodeNumber = 0;
         } else {
-            NodeNumber = SteamCoil(IndexNum).SteamInletNodeNum;
+            NodeNumber = state.dataSteamCoils->SteamCoil(IndexNum).SteamInletNodeNum;
         }
 
         return NodeNumber;
@@ -2027,9 +1895,9 @@ namespace SteamCoils {
         int NodeNumber; // returned air inlet node number of matched coil
 
         // Obtains and Allocates SteamCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         if (CoilIndex == 0) {
@@ -2037,7 +1905,7 @@ namespace SteamCoils {
             ErrorsFound = true;
             NodeNumber = 0;
         } else {
-            NodeNumber = SteamCoil(CoilIndex).SteamOutletNodeNum;
+            NodeNumber = state.dataSteamCoils->SteamCoil(CoilIndex).SteamOutletNodeNum;
         }
 
         return NodeNumber;
@@ -2068,13 +1936,13 @@ namespace SteamCoils {
         int IndexNum; // returned air inlet node number of matched coil
 
         // Obtains and Allocates SteamCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Steam")) {
-            IndexNum = UtilityRoutines::FindItem(CoilName, SteamCoil);
+            IndexNum = UtilityRoutines::FindItem(CoilName, state.dataSteamCoils->SteamCoil);
         } else {
             IndexNum = 0;
         }
@@ -2084,7 +1952,7 @@ namespace SteamCoils {
             ErrorsFound = true;
             NodeNumber = 0;
         } else {
-            NodeNumber = SteamCoil(IndexNum).SteamOutletNodeNum;
+            NodeNumber = state.dataSteamCoils->SteamCoil(IndexNum).SteamOutletNodeNum;
         }
 
         return NodeNumber;
@@ -2115,16 +1983,16 @@ namespace SteamCoils {
         int WhichCoil;
 
         // Obtains and Allocates SteamCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Steam")) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, SteamCoil);
+            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataSteamCoils->SteamCoil);
             if (WhichCoil != 0) {
                 // coil does not specify MaxWaterFlowRate
-                Capacity = SteamCoil(WhichCoil).OperatingCapacity;
+                Capacity = state.dataSteamCoils->SteamCoil(WhichCoil).OperatingCapacity;
             }
         } else {
             WhichCoil = 0;
@@ -2166,9 +2034,9 @@ namespace SteamCoils {
         // 3 = ZoneLoadControl
 
         // Obtains and Allocates SteamCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         if (CoilIndex == 0) {
@@ -2176,7 +2044,7 @@ namespace SteamCoils {
             ErrorsFound = true;
             TypeOfCoil = 0;
         } else {
-            TypeOfCoil = SteamCoil(CoilIndex).TypeOfCoil;
+            TypeOfCoil = state.dataSteamCoils->SteamCoil(CoilIndex).TypeOfCoil;
         }
 
         return TypeOfCoil;
@@ -2207,17 +2075,17 @@ namespace SteamCoils {
         int WhichCoil;
 
         // Obtains and Allocates SteamCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         WhichCoil = 0;
         NodeNumber = 0;
         if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Steam")) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, SteamCoil);
+            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataSteamCoils->SteamCoil);
             if (WhichCoil != 0) {
-                NodeNumber = SteamCoil(WhichCoil).TempSetPointNodeNum;
+                NodeNumber = state.dataSteamCoils->SteamCoil(WhichCoil).TempSetPointNodeNum;
             }
         } else {
             WhichCoil = 0;
@@ -2257,18 +2125,18 @@ namespace SteamCoils {
         int WhichCoil;
 
         // Obtains and Allocates HeatingCoil related parameters from input file
-        if (GetSteamCoilsInputFlag) { // First time subroutine has been entered
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) { // First time subroutine has been entered
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
         WhichCoil = 0;
         AvailSchIndex = 0;
 
         if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Steam")) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, SteamCoil);
+            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataSteamCoils->SteamCoil);
             if (WhichCoil != 0) {
-                AvailSchIndex = SteamCoil(WhichCoil).SchedPtr;
+                AvailSchIndex = state.dataSteamCoils->SteamCoil(WhichCoil).SchedPtr;
             }
         } else {
             WhichCoil = 0;
@@ -2303,24 +2171,24 @@ namespace SteamCoils {
         // Using/Aliasing
         using General::TrimSigDigits;
 
-        if (GetSteamCoilsInputFlag) {
+        if (state.dataSteamCoils->GetSteamCoilsInputFlag) {
             GetSteamCoilInput(state);
-            GetSteamCoilsInputFlag = false;
+            state.dataSteamCoils->GetSteamCoilsInputFlag = false;
         }
 
-        if (CoilNum <= 0 || CoilNum > NumSteamCoils) {
+        if (CoilNum <= 0 || CoilNum > state.dataSteamCoils->NumSteamCoils) {
             ShowSevereError("SetHeatingCoilData: called with heating coil Number out of range=" + TrimSigDigits(CoilNum) + " should be >0 and <" +
-                            TrimSigDigits(NumSteamCoils));
+                            TrimSigDigits(state.dataSteamCoils->NumSteamCoils));
             ErrorsFound = true;
             return;
         }
 
         if (present(DesiccantRegenerationCoil)) {
-            SteamCoil(CoilNum).DesiccantRegenerationCoil = DesiccantRegenerationCoil;
+            state.dataSteamCoils->SteamCoil(CoilNum).DesiccantRegenerationCoil = DesiccantRegenerationCoil;
         }
 
         if (present(DesiccantDehumIndex)) {
-            SteamCoil(CoilNum).DesiccantDehumNum = DesiccantDehumIndex;
+            state.dataSteamCoils->SteamCoil(CoilNum).DesiccantDehumNum = DesiccantDehumIndex;
         }
     }
     // End of Utility subroutines for the SteamCoil Module

@@ -250,8 +250,8 @@ namespace PipeHeatTransfer {
         void InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHVACIteration // component number
         );
 
-        Real64 TBND(EnergyPlusData &state, Real64 const z,       // Current Depth
-                    Real64 const DayOfSim // Current Simulation Day
+        Real64 TBND(EnergyPlusData &state,
+                    Real64 const z       // Current Depth
         );
 
         void CalcBuriedPipeSoil(EnergyPlusData &state);

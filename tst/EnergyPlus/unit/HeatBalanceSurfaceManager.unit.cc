@@ -2645,13 +2645,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataHeatBalance::People(1).NumberOfPeoplePtr = 1;
     ScheduleManager::Schedule.allocate(1);
 
-    EnergyPlus::ThermalComfort::ThermalComfortData.allocate(DataHeatBalance::TotPeople);
+    state.dataThermalComforts->ThermalComfortData.allocate(DataHeatBalance::TotPeople);
     DataHeatBalFanSys::ZoneOccPierceSET.dimension(NumOfZones, 0);
     DataHeatBalFanSys::ZoneOccPierceSETLastStep.dimension(NumOfZones, 0);
     DataHeatBalFanSys::ZoneLowSETHours.allocate(NumOfZones);
     DataHeatBalFanSys::ZoneHighSETHours.allocate(NumOfZones);
 
-    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 31;
+    state.dataThermalComforts->ThermalComfortData(1).PierceSET = 31;
     ScheduleManager::Schedule(1).CurrentValue = 0;
 
     // Heat Index Case 1: Zone T < 80 F;
@@ -2705,7 +2705,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_EQ(0, DataHeatBalFanSys::ZoneHighSETHours(1)[0]); // SET Hours
     EXPECT_EQ(0, DataHeatBalFanSys::ZoneHighSETHours(1)[1]); // SET OccupantHours
 
-    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 11.2;
+    state.dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
     ScheduleManager::Schedule(1).CurrentValue = 1;
     for (int hour = 5; hour <= 7; hour++) {
         DataGlobals::HourOfDay = hour;
@@ -2716,7 +2716,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_EQ(3, DataHeatBalFanSys::ZoneLowSETHours(1)[0]); // SET Hours = (12.2 - 11.2) * 3 Hours
     EXPECT_EQ(6, DataHeatBalFanSys::ZoneLowSETHours(1)[1]); // SET OccupantHours = (12.2 - 11.2) * 3 Hours * 2 OCC
 
-    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 32;
+    state.dataThermalComforts->ThermalComfortData(1).PierceSET = 32;
     for (int hour = 8; hour <= 10; hour++) {
         DataGlobals::HourOfDay = hour;
         ReportThermalResilience(state);
@@ -2725,12 +2725,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_EQ(6, DataHeatBalFanSys::ZoneHighSETHours(1)[0]); // SET Hours = (32 - 30) * 3 Hours
     EXPECT_EQ(12, DataHeatBalFanSys::ZoneHighSETHours(1)[1]); // SET OccupantHours = (32 - 30) * 3 Hours * 2 OCC
 
-    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 25;
+    state.dataThermalComforts->ThermalComfortData(1).PierceSET = 25;
     for (int hour = 11; hour <= 12; hour++) {
         DataGlobals::HourOfDay = hour;
         ReportThermalResilience(state);
     }
-    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 11.2;
+    state.dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
     for (int hour = 13; hour <= 18; hour++) {
         DataGlobals::HourOfDay = hour;
         ReportThermalResilience(state);

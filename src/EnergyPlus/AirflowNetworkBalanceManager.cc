@@ -9231,7 +9231,6 @@ namespace AirflowNetworkBalanceManager {
         using DataSurfaces::SurfWinVentingAvailabilityRep;
         using DataSurfaces::SurfWinVentingOpenFactorMultRep;
         using ScheduleManager::GetCurrentScheduleValue;
-        using ThermalComfort::ThermalComfortData;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 VentTemp;                // Venting temperature (C)
@@ -9401,8 +9400,8 @@ namespace AirflowNetworkBalanceManager {
         if (VentCtrlNum == VentControlType::ASH55) {
             if (VentingAllowed && (!state.dataGlobal->BeginEnvrnFlag) && (!WarmupFlag)) {
                 PeopleInd = MultizoneZoneData(IZ).ASH55PeopleInd;
-                if (PeopleInd > 0 && ThermalComfortData(PeopleInd).ThermalComfortAdaptiveASH5590 != -1) {
-                    if (ThermalComfortData(PeopleInd).ThermalComfortOpTemp > ThermalComfortData(PeopleInd).TComfASH55) {
+                if (PeopleInd > 0 && state.dataThermalComforts->ThermalComfortData(PeopleInd).ThermalComfortAdaptiveASH5590 != -1) {
+                    if (state.dataThermalComforts->ThermalComfortData(PeopleInd).ThermalComfortOpTemp > state.dataThermalComforts->ThermalComfortData(PeopleInd).TComfASH55) {
                         OpenFactor = MultizoneSurfaceData(i).Factor;
                         SurfWinVentingOpenFactorMultRep(SurfNum) = 1.0;
                     } else {
@@ -9419,8 +9418,8 @@ namespace AirflowNetworkBalanceManager {
         if (VentCtrlNum == VentControlType::CEN15251) {
             if (VentingAllowed && (!state.dataGlobal->BeginEnvrnFlag) && (!WarmupFlag)) {
                 PeopleInd = MultizoneZoneData(IZ).CEN15251PeopleInd;
-                if (PeopleInd > 0 && ThermalComfortData(PeopleInd).ThermalComfortAdaptiveCEN15251CatI != -1) {
-                    if (ThermalComfortData(PeopleInd).ThermalComfortOpTemp > ThermalComfortData(PeopleInd).TComfCEN15251) {
+                if (PeopleInd > 0 && state.dataThermalComforts->ThermalComfortData(PeopleInd).ThermalComfortAdaptiveCEN15251CatI != -1) {
+                    if (state.dataThermalComforts->ThermalComfortData(PeopleInd).ThermalComfortOpTemp > state.dataThermalComforts->ThermalComfortData(PeopleInd).TComfCEN15251) {
                         OpenFactor = MultizoneSurfaceData(i).Factor;
                         SurfWinVentingOpenFactorMultRep(SurfNum) = 1.0;
                     } else {

@@ -9903,7 +9903,7 @@ namespace UnitarySystems {
         // Set the compressor or coil ON mass flow rate
         if (state.dataUnitarySystems->HeatingLoad) {
 
-            this->m_LastMode = state.dataUnitarySystems->HeatingLoad;
+            this->m_LastMode = state.dataUnitarySystems->HeatingMode;
 
             if (this->m_MultiOrVarSpeedHeatCoil) {
 

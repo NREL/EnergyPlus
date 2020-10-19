@@ -168,6 +168,7 @@ namespace DataGlobalConstants {
     Real64 constexpr convertJtoGJ () { return 1.0E-9; }                     // Conversion factor for J to GJ
     int constexpr MaxSpeedLevels () { return 10; }                          // Maximum number of speed that supports
     int constexpr ScheduleAlwaysOn () { return -1; }                        // Value when passed to schedule routines gives back 1.0 (on)
+    int constexpr MaxCTFTerms () { return 19; }                             // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms
 
     ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar);
     std::string GetResourceTypeChar(ResourceType ResourceTypeNum);

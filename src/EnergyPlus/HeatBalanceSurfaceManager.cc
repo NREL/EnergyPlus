@@ -4702,10 +4702,6 @@ namespace HeatBalanceSurfaceManager {
         // radiant algorithm module.  Finally, using this source value, redo
         // the inside and outside heat balances.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using CoolingPanelSimple::UpdateCoolingPanelSourceValAvg;
         using ElectricBaseboardRadiator::UpdateBBElecRadSourceValAvg;
         using HighTempRadiantSystem::UpdateHTRadSourceValAvg;
@@ -4714,20 +4710,6 @@ namespace HeatBalanceSurfaceManager {
         using SteamBaseboardRadiator::UpdateBBSteamRadSourceValAvg;
         using SwimmingPool::UpdatePoolSourceValAvg;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool LowTempRadSysOn;     // .TRUE. if a low temperature radiant system is running
         bool HighTempRadSysOn;    // .TRUE. if a high temperature radiant system is running
         bool HWBaseboardSysOn;    // .TRUE. if a water baseboard heater is running
@@ -4740,10 +4722,10 @@ namespace HeatBalanceSurfaceManager {
         UpdateRadSysSourceValAvg(LowTempRadSysOn);
         UpdateHTRadSourceValAvg(HighTempRadSysOn);
         UpdateBBRadSourceValAvg(HWBaseboardSysOn);
-        UpdateBBSteamRadSourceValAvg(SteamBaseboardSysOn);
+        UpdateBBSteamRadSourceValAvg(state, SteamBaseboardSysOn);
         UpdateBBElecRadSourceValAvg(ElecBaseboardSysOn);
         UpdateCoolingPanelSourceValAvg(state, CoolingPanelSysOn);
-        UpdatePoolSourceValAvg(SwimmingPoolOn);
+        UpdatePoolSourceValAvg(state, SwimmingPoolOn);
 
         if (LowTempRadSysOn || HighTempRadSysOn || HWBaseboardSysOn || SteamBaseboardSysOn || ElecBaseboardSysOn || CoolingPanelSysOn ||
             SwimmingPoolOn) {
@@ -4779,20 +4761,6 @@ namespace HeatBalanceSurfaceManager {
         // Mechanical Systems in Heat Balance Based Energy Analysis Programs
         // on System Response and Control, Building Simulation '91, IBPSA, Nice, France.
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HistTermNum; // DO loop counter for history terms
         int SideNum;     // DO loop counter for surfaces sides (inside, outside)
         int SurfNum;     // Surface number DO loop counter
@@ -4805,9 +4773,6 @@ namespace HeatBalanceSurfaceManager {
         static Array1D<Real64> Tsrc1;    // Temperature at source/sink (during first time step/series)
         static Array1D<Real64> Tuser1;   // Temperature at the user specified location (during first time step/series)
         static Array1D<Real64> SumTime;  // Amount of time that has elapsed from start of master history to
-        // the current time step
-
-        // FLOW:
 
         // Tuned Assure safe to use shared linear indexing below
         assert(equal_dimensions(TH, THM));
@@ -5095,29 +5060,6 @@ namespace HeatBalanceSurfaceManager {
         // Calculates the current zone MRT for thermal comfort and radiation
         // calculation purposes.
 
-        // METHODOLOGY EMPLOYED:
-        // If you have to ask...
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         Real64 SumAET;                    // Intermediate calculational variable (area*emissivity*T) sum
         static Array1D<Real64> SurfaceAE; // Product of area and emissivity for each surface
         int SurfNum;                      // Surface number
@@ -5288,7 +5230,7 @@ namespace HeatBalanceSurfaceManager {
                 ZoneOccPierceSETLastStep(ZoneNum) = ZoneOccPierceSET(ZoneNum);
                 if (ZoneNumOcc(ZoneNum) > 0) {
                     if (People(iPeople).Pierce) {
-                        ZoneOccPierceSET(ZoneNum) = ThermalComfort::ThermalComfortData(iPeople).PierceSET;
+                        ZoneOccPierceSET(ZoneNum) = state.dataThermalComforts->ThermalComfortData(iPeople).PierceSET;
                     } else {
                         ZoneOccPierceSET(ZoneNum) = -1;
                     }

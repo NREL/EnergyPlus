@@ -587,7 +587,6 @@ namespace PackagedTerminalHeatPump {
         using SteamCoils::GetSteamCoilIndex;
         auto &GetCoilMaxSteamFlowRate(SteamCoils::GetCoilMaxSteamFlowRate);
         using SteamCoils::GetTypeOfCoil;
-        using SteamCoils::ZoneLoadControl;
         using WaterCoils::GetCoilMaxWaterFlowRate;
         using WaterCoils::GetCoilWaterInletNode;
         auto &GetWaterCoilInletNode(WaterCoils::GetCoilInletNode);
@@ -1846,7 +1845,7 @@ namespace PackagedTerminalHeatPump {
                         ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                         ErrorsFound = true;
                     }
-                    if (GetTypeOfCoil(state, PTUnit(PTUnitNum).ACHeatCoilIndex, ACHeatCoilName, errFlag) != ZoneLoadControl) {
+                    if (GetTypeOfCoil(state, PTUnit(PTUnitNum).ACHeatCoilIndex, ACHeatCoilName, errFlag) != state.dataSteamCoils->ZoneLoadControl) {
                         if (errFlag) {
                             ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                             ErrorsFound = true;

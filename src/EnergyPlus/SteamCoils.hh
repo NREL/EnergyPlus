@@ -63,42 +63,6 @@ struct EnergyPlusData;
 
 namespace SteamCoils {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const SteamCoil_AirHeating;
-    extern int const TemperatureSetPointControl;
-    extern int const ZoneLoadControl;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE DEFINITIONS
-    // MODULE VARIABLE DECLARATIONS:
-    extern int SteamIndex;
-    extern int NumSteamCoils; // The Number of SteamCoils found in the Input
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CoilWarningOnceFlag;
-    extern Array1D_bool CheckEquipName;
-    extern bool GetSteamCoilsInputFlag; // Flag set to make sure you get input once
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine to check convergence and update nodes
-
-    // Reporting routines for module
-
-    // Utility routines for module
-
-    // Types
-
     struct SteamCoilEquipConditions
     {
         // Members
@@ -181,11 +145,6 @@ namespace SteamCoils {
         }
     };
 
-    // Object Data
-    extern Array1D<SteamCoilEquipConditions> SteamCoil;
-
-    // Functions
-
     void SimulateSteamCoilComponents(EnergyPlusData &state, std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
@@ -194,21 +153,11 @@ namespace SteamCoils {
                                      Optional_int_const FanOpMode = _,
                                      Optional<Real64 const> PartLoadRatio = _);
 
-    // Get Input Section of the Module
-
     void GetSteamCoilInput(EnergyPlusData &state);
-
-    // End of Get Input subroutines for the HB Module
-
-    // Beginning Initialization Section of the Module
 
     void InitSteamCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration);
 
     void SizeSteamCoil(EnergyPlusData &state, int const CoilNum);
-
-    // End Initialization Section of the Module
-
-    // Begin Algorithm Section of the Module
 
     void CalcSteamAirCoil(EnergyPlusData &state,
                           int const CoilNum,
@@ -218,19 +167,9 @@ namespace SteamCoils {
                           Real64 const PartLoadRatio   // part-load ratio of heating coil
     );
 
-    // Beginning of Update subroutines for the SteamCoil Module
+    void UpdateSteamCoil(EnergyPlusData &state, int const CoilNum);
 
-    void UpdateSteamCoil(int const CoilNum);
-
-    // End of Update subroutines for the SteamCoil Module
-
-    // Beginning of Reporting subroutines for the SteamCoil Module
-
-    void ReportSteamCoil(int const CoilNum);
-
-    // End of Reporting subroutines for the SteamCoil Module
-
-    // Utility subroutines for the SteamCoil Module
+    void ReportSteamCoil(EnergyPlusData &state, int const CoilNum);
 
     int GetSteamCoilIndex(EnergyPlusData &state,
                           std::string const &CoilType, // must match coil types in this module
@@ -325,12 +264,38 @@ namespace SteamCoils {
                           Optional_int DesiccantDehumIndex = _         // Index for the desiccant dehum system where this caoil is used
     );
 
-    void clear_state();
-
-    // End of Utility subroutines for the SteamCoil Module
-
 } // namespace SteamCoils
 
+struct SteamCoilsData : BaseGlobalStruct {
+
+    int const SteamCoil_AirHeating = 2;
+    int const TemperatureSetPointControl = 1;
+    int const ZoneLoadControl = 3;
+
+    int SteamIndex = 0;
+    int NumSteamCoils = 0; // The Number of SteamCoils found in the Input
+    Array1D_bool MySizeFlag;
+    Array1D_bool CoilWarningOnceFlag;
+    Array1D_bool CheckEquipName;
+    bool GetSteamCoilsInputFlag = true; // Flag set to make sure you get input once
+    bool MyOneTimeFlag = true;          // one time initialization flag
+
+    Array1D<SteamCoils::SteamCoilEquipConditions> SteamCoil;
+
+    void clear_state() override
+    {
+        NumSteamCoils = 0;
+        MyOneTimeFlag = true;
+        GetSteamCoilsInputFlag = true;
+        SteamCoil.deallocate();
+        MySizeFlag.deallocate();
+        CoilWarningOnceFlag.deallocate();
+        CheckEquipName.deallocate();
+    }
+
+    // Default Constructor
+    SteamCoilsData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

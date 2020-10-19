@@ -247,8 +247,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
 
     InitTranspiredCollector(state, UTSCNum);
 
-    EXPECT_DOUBLE_EQ(22.0, UTSC(UTSCNum).Tcoll);
-    EXPECT_DOUBLE_EQ(22.5, UTSC(UTSCNum).Tplen);
-
-    EXPECT_NEAR(19.990, UTSC(UTSCNum).TairHX, 0.001);
+    EXPECT_DOUBLE_EQ(22.0, state.dataTranspiredCollector->UTSC(UTSCNum).Tcoll);
+    EXPECT_DOUBLE_EQ(22.5, state.dataTranspiredCollector->UTSC(UTSCNum).Tplen);
+    EXPECT_NEAR(19.990, state.dataTranspiredCollector->UTSC(UTSCNum).TairHX, 0.001);
 }
