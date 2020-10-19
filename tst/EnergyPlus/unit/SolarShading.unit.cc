@@ -102,7 +102,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     SunlitFracHR.allocate(24, TotSurfaces);
     SunlitFrac.allocate(NumTimeSteps, 24, TotSurfaces);
     SunlitFracWithoutReveal.allocate(NumTimeSteps, 24, TotSurfaces);
-    CTHETA.allocate(TotSurfaces);
+    state.dataSolarShading->CTHETA.allocate(TotSurfaces);
     CosIncAngHR.allocate(24, TotSurfaces);
     CosIncAng.allocate(NumTimeSteps, 24, TotSurfaces);
     AOSurf.allocate(TotSurfaces);
@@ -157,7 +157,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     SunlitFracHR.deallocate();
     SunlitFrac.deallocate();
     SunlitFracWithoutReveal.deallocate();
-    CTHETA.deallocate();
+    state.dataSolarShading->CTHETA.deallocate();
     CosIncAngHR.deallocate();
     CosIncAng.deallocate();
     AOSurf.deallocate();
@@ -666,10 +666,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
     SolarDistribution = FullExterior;
 
-    CalcSkyDifShading = true;
+    state.dataSolarShading->CalcSkyDifShading = true;
     SolarShading::InitSolarCalculations(state);
     SolarShading::SkyDifSolarShading(state);
-    CalcSkyDifShading = false;
+    state.dataSolarShading->CalcSkyDifShading = false;
 
     FigureSolarBeamAtTimestep(state, DataGlobals::HourOfDay, DataGlobals::TimeStep);
 
@@ -1011,7 +1011,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SolarShading::clear_state();
+    state.dataSolarShading->clear_state();
 
     SimulationManager::GetProjectData(state);
     bool FoundError = false;
@@ -1065,10 +1065,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     DataSystemVariables::shadingMethod = DataSystemVariables::ShadingMethod::Scheduled;
     SolarDistribution = FullExterior;
 
-    CalcSkyDifShading = true;
+    state.dataSolarShading->CalcSkyDifShading = true;
     SolarShading::InitSolarCalculations(state);
     SolarShading::SkyDifSolarShading(state);
-    CalcSkyDifShading = false;
+    state.dataSolarShading->CalcSkyDifShading = false;
 
     ScheduleManager::UpdateScheduleValues(state);
     DataBSDFWindow::SUNCOSTS(4, 9, 1) = 0.1;
@@ -1078,10 +1078,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     EXPECT_TRUE(DataSystemVariables::shadingMethod == DataSystemVariables::ShadingMethod::Scheduled);
     EXPECT_DOUBLE_EQ(0.5432, ScheduleManager::LookUpScheduleValue(state, 2, 9, 4));
-    EXPECT_FALSE(SolarShading::SUNCOS(3) < 0.00001);
+    EXPECT_FALSE(state.dataSolarShading->SUNCOS(3) < 0.00001);
     EXPECT_DOUBLE_EQ(0.00001, DataEnvironment::SunIsUpValue);
     ;
-    EXPECT_FALSE(SolarShading::SUNCOS(3) < DataEnvironment::SunIsUpValue);
+    EXPECT_FALSE(state.dataSolarShading->SUNCOS(3) < DataEnvironment::SunIsUpValue);
 
     int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", DataSurfaces::Surface);
     EXPECT_DOUBLE_EQ(1, SunlitFrac(4, 9, surfNum));
@@ -1089,7 +1089,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     EXPECT_DOUBLE_EQ(1, SunlitFrac(4, 9, surfNum));
     surfNum = UtilityRoutines::FindItemInList("ZN001:ROOF", DataSurfaces::Surface);
     EXPECT_DOUBLE_EQ(0.5432, SunlitFrac(4, 9, surfNum));
-    SolarShading::clear_state();
+    state.dataSolarShading->clear_state();
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
@@ -1422,7 +1422,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SolarShading::clear_state();
+    state.dataSolarShading->clear_state();
 
     SimulationManager::GetProjectData(state);
     bool FoundError = false;
@@ -1849,10 +1849,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SolarDistribution = FullExterior;
     DataSystemVariables::SlaterBarsky = true;
 
-    CalcSkyDifShading = true;
+    state.dataSolarShading->CalcSkyDifShading = true;
     SolarShading::InitSolarCalculations(state);
     SolarShading::SkyDifSolarShading(state);
-    CalcSkyDifShading = false;
+    state.dataSolarShading->CalcSkyDifShading = false;
 
     FigureSolarBeamAtTimestep(state, DataGlobals::HourOfDay, DataGlobals::TimeStep);
     int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
@@ -2557,7 +2557,7 @@ BeginSimFlag = true;
 HeatBalanceManager::InitHeatBalance(state);
 EXPECT_FALSE(FoundError);
 
-if (SolarShading::penumbra) {
+if (state.dataSolarShading->penumbra) {
     SolarShading::AllocateModuleArrays(state);
     SolarShading::DetermineShadowingCombinations(state);
 

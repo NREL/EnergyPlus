@@ -694,7 +694,7 @@ namespace UtilityRoutines {
             ReportSurfaces(state);
         }
 
-        ReportSurfaceErrors();
+        ReportSurfaceErrors(state);
         CheckPlantOnAbort();
         ShowRecurringErrors();
         SummarizeErrors();
@@ -870,7 +870,7 @@ namespace UtilityRoutines {
             sqlite->updateSQLiteSimulationRecord(true, true);
         }
 
-        ReportSurfaceErrors();
+        ReportSurfaceErrors(state);
         ShowRecurringErrors();
         SummarizeErrors();
         CloseMiscOpenFiles(state);
