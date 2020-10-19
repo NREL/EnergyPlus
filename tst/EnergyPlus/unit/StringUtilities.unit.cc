@@ -45,95 +45,55 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::EarthTube Unit Tests
-
-// Google Test Headers
 #include <gtest/gtest.h>
 
-// EnergyPlus Headers
+#include <EnergyPlus/StringUtilities.hh>
+
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/EarthTube.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::EarthTube;
-using namespace EnergyPlus::DataHeatBalFanSys;
-using namespace ObjexxFCL;
-using namespace DataGlobals;
-using namespace EnergyPlus::DataEnvironment;
 
-namespace EnergyPlus {
-
-TEST_F(EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest)
+TEST_F(EnergyPlusFixture, readItem)
 {
+  int i = 0;
 
-    // AUTHOR: R. Strand, UIUC
-    // DATE WRITTEN: June 2017
+  // should read just 12
+  EXPECT_TRUE(EnergyPlus::readItem("12", i));
+  EXPECT_EQ(i, 12);
 
-    // Set subroutine arguments
-    int ETnum = 1;
-    int ZNnum = 1;
+  // should fail if unable to process entire input string
+  EXPECT_FALSE(EnergyPlus::readItem("1234fgq", i));
+  // value is in an unknown state if read failed
+  // EXPECT_EQ(i, 12);
 
-    // Set environmental variables for all cases
-    OutHumRat = 0.009;
-    OutBaroPress = 101400.0;
-
-    // Allocate and set earth tube parameters necessary to run the tests
-    EarthTubeSys.allocate(ETnum);
-    EarthTubeSys(ETnum).InsideAirTemp = 21.0;
-    EarthTubeSys(ETnum).FanType = NaturalEarthTube;
-    EarthTubeSys(ETnum).AirTemp = 20.0;
-    EarthTubeSys(ETnum).FanPower = 0.05;
-
-    // Allocate and set any zone variables necessary to run the tests
-    MCPE.allocate(ZNnum);
-    MCPTE.allocate(ZNnum);
-    EAMFL.allocate(ZNnum);
-    EAMFLxHumRat.allocate(ZNnum);
-    MCPE(ZNnum) = 0.05;
-    EAMFL(ZNnum) = 0.05;
-
-    // First case--no condensation so inside humidity ratio should be the same as the outdoor humidity ratio
-    CalcEarthTubeHumRat(ETnum, ZNnum);
-    EXPECT_EQ(EarthTubeSys(ETnum).HumRat, OutHumRat);
-
-    // Second case--condensation so inside humidity should be less than outdoor humidity ratio
-    EarthTubeSys(ETnum).InsideAirTemp = 10.0;
-    CalcEarthTubeHumRat(ETnum, ZNnum);
-    EXPECT_GT(OutHumRat, EarthTubeSys(ETnum).HumRat);
+  // should read nothing
+  EXPECT_FALSE(EnergyPlus::readItem("abc123", i));
+  EXPECT_EQ(i, 0);
 }
 
-TEST_F(EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest)
+TEST_F(EnergyPlusFixture, readList)
 {
+    int i{};
+    float f{};
+    char c{};
+    std::string s;
 
-    // AUTHOR: R. Strand, UIUC
-    // DATE WRITTEN: June 2017
+    // with commas
+    EXPECT_TRUE(EnergyPlus::readList("1,3.4,a,hello", i, f, c, s));
+    EXPECT_EQ(i, 1);
+    EXPECT_FLOAT_EQ(f, 3.4);
+    EXPECT_EQ(c, 'a');
+    EXPECT_EQ(s,"hello");
 
-    // Set subroutine arguments
-    std::string ZoneName = "ZONE 1";
-    std::string InputName = "ZoneEarthtube";
-    bool ErrorsFound = false;
+    // without
+    EXPECT_TRUE(EnergyPlus::readList("bob q 1.5 10", s, c, f, i));
+    EXPECT_EQ(i, 10);
+    EXPECT_FLOAT_EQ(f, 1.5);
+    EXPECT_EQ(c, 'q');
+    EXPECT_EQ(s, "bob");
 
-    // Allocate and set earth tube parameters necessary to run the tests
-    TotEarthTube = 3;
-    EarthTubeSys.allocate(TotEarthTube);
-    EarthTubeSys(1).ZonePtr = 1;
-    EarthTubeSys(2).ZonePtr = 2;
-    EarthTubeSys(3).ZonePtr = 3;
-
-    // First case--no conflicts, only one earth tube per zone (ErrorsFound = false)
-    CheckEarthTubesInZones(ZoneName, InputName, ErrorsFound);
-    EXPECT_EQ(ErrorsFound, false);
-
-    // Second case--conflict with the last earth tube and first (ErrorsFound = true)
-    EarthTubeSys(3).ZonePtr = 1;
-    CheckEarthTubesInZones(ZoneName, InputName, ErrorsFound);
-    EXPECT_EQ(ErrorsFound, true);
-
-    EarthTubeSys.deallocate();
-    TotEarthTube = 0;
+    // with errors
+    EXPECT_FALSE(EnergyPlus::readList("bob;q;1.5;10", s, c, f, i));
+    EXPECT_FALSE(EnergyPlus::readList("1;3.4,a,hello", i, f, c, s));
+    EXPECT_FALSE(EnergyPlus::readList("a,hello", i, f, c, s));
 }
-
-} // namespace EnergyPlus
