@@ -199,10 +199,10 @@ namespace HVACVariableRefrigerantFlow {
     Real64 LoopDXCoolCoilRTF(0.0);          // holds value of DX cooling coil RTF
     Real64 LoopDXHeatCoilRTF(0.0);          // holds value of DX heating coil RTF
     Real64 CondenserWaterMassFlowRate(0.0); // VRF water-cooled condenser mass flow rate (kg/s)
-    Real64 TimeStepSysLast;                 // system time step on last time step
-    Real64 CurrentEndTimeLast_firstfunc;              // end time of last time step
-    Real64 CurrentEndTimeLast_secondfunc;
-    Real64 CurrentEndTimeLast_InitVRF;
+    //Real64 TimeStepSysLast;                 // system time step on last time step
+    //Real64 CurrentEndTimeLast_firstfunc;              // end time of last time step
+    //Real64 CurrentEndTimeLast_secondfunc;
+    //Real64 CurrentEndTimeLast_InitVRF;
     Array1D_bool HeatingLoad;               // defines a heating load on VRFTerminalUnits
     Array1D_bool CoolingLoad;               // defines a cooling load on VRFTerminalUnits
     Array1D_bool LastModeHeating;           // defines last mode was heating mode
@@ -520,7 +520,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HRInitialEIRFrac;          // Fractional cooling degradation at the start of heat recovery from cooling mode
         Real64 HREIRTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
         Real64 CurrentEndTime;     // end time of current time step
-        //Real64 CurrentEndTimeLast; // end time of last time step
+        Real64 CurrentEndTimeLast_firstfunc; // end time of last time step
         Real64 SUMultiplier;              // multiplier for simulating mode changes
         Real64 CondPower;                 // condenser power [W]
         Real64 CondCapacity;              // condenser heat rejection [W]
@@ -5113,7 +5113,8 @@ namespace HVACVariableRefrigerantFlow {
         int IndexToTUInTUList;            // index to TU in TerminalUnilList
         Real64 RhoAir;                    // air density at InNode
         Real64 CurrentEndTime;     // end time of current time step
-        // static Real64 CurrentEndTimeLast; // end time of last time step
+        Real64 CurrentEndTimeLast_InitVRF;
+        Real64 TimeStepSysLast;
         Real64 TempOutput;                // Sensible output of TU
         Real64 LoadToCoolingSP;           // thermostat load to cooling setpoint (W)
         Real64 LoadToHeatingSP;           // thermostat load to heating setpoint (W)
@@ -10213,7 +10214,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HRInitialEIRFrac;          // Fractional cooling degradation at the start of heat recovery from cooling mode
         Real64 HREIRTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
         Real64 CurrentEndTime;     // end time of current time step
-        //Real64 CurrentEndTimeLast; // end time of last time step
+        Real64 CurrentEndTimeLast_secondfunc;
         Real64 SUMultiplier;              // multiplier for simulating mode changes
         Real64 CondPower;                 // condenser power [W]
         Real64 CondCapacity;              // condenser heat rejection [W]
