@@ -517,7 +517,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HRInitialEIRFrac;          // Fractional cooling degradation at the start of heat recovery from cooling mode
         Real64 HREIRTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
         Real64 CurrentEndTime;     // end time of current time step
-        static Real64 CurrentEndTimeLast; // end time of last time step
+        Real64 CurrentEndTimeLast; // end time of last time step
         Real64 SUMultiplier;              // multiplier for simulating mode changes
         Real64 CondPower;                 // condenser power [W]
         Real64 CondCapacity;              // condenser heat rejection [W]
@@ -10210,7 +10210,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HRInitialEIRFrac;          // Fractional cooling degradation at the start of heat recovery from cooling mode
         Real64 HREIRTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
         Real64 CurrentEndTime;     // end time of current time step
-        static Real64 CurrentEndTimeLast; // end time of last time step
+        Real64 CurrentEndTimeLast; // end time of last time step
         Real64 SUMultiplier;              // multiplier for simulating mode changes
         Real64 CondPower;                 // condenser power [W]
         Real64 CondCapacity;              // condenser heat rejection [W]
