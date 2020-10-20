@@ -51,28 +51,22 @@
 #include <cmath>
 #include <cstdio>
 #include <cstring>
-#include <fstream>
 #include <memory>
-#include <ostream>
 #include <string>
 #include <unordered_set>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include "re2/re2.h"
-#include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/General.hh>
@@ -113,16 +107,13 @@ namespace OutputProcessor {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataEnvironment::DayOfMonth;
     using DataEnvironment::DayOfWeek;
     using DataEnvironment::DSTIndicator;
     using DataEnvironment::HolidayIndex;
     using DataEnvironment::Month;
     using DataEnvironment::Year;
-    using DataGlobals::DayOfSim;
     using DataGlobals::HourOfDay;
-    using DataGlobals::MaxNameLength;
     using DataGlobals::MinutesPerTimeStep;
     using DataGlobals::StdOutputRecordCount;
     using namespace DataGlobalConstants;
@@ -151,7 +142,6 @@ namespace OutputProcessor {
     int const MeterType_CustomDec(2);  // Type value for custom meters that decrement another meter
     int const MeterType_CustomDiff(3); // Type value for custom meters that difference another meter
 
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
     Array1D_string const DayTypes(12,
                                   {"Sunday",
                                    "Monday",
@@ -468,37 +458,37 @@ namespace OutputProcessor {
         NumExtraVars = 0;
 
         // Initialize end use category names - the indices must match up with endUseNames in OutputReportTabular
-        EndUseCategory.allocate(NumEndUses);
-        EndUseCategory(endUseHeating).Name = "Heating";
-        EndUseCategory(endUseCooling).Name = "Cooling";
-        EndUseCategory(endUseInteriorLights).Name = "InteriorLights";
-        EndUseCategory(endUseExteriorLights).Name = "ExteriorLights";
-        EndUseCategory(endUseInteriorEquipment).Name = "InteriorEquipment";
-        EndUseCategory(endUseExteriorEquipment).Name = "ExteriorEquipment";
-        EndUseCategory(endUseFans).Name = "Fans";
-        EndUseCategory(endUsePumps).Name = "Pumps";
-        EndUseCategory(endUseHeatRejection).Name = "HeatRejection";
-        EndUseCategory(endUseHumidification).Name = "Humidifier";
-        EndUseCategory(endUseHeatRecovery).Name = "HeatRecovery";
-        EndUseCategory(endUseWaterSystem).Name = "WaterSystems";
-        EndUseCategory(endUseRefrigeration).Name = "Refrigeration";
-        EndUseCategory(endUseCogeneration).Name = "Cogeneration";
+        EndUseCategory.allocate(DataGlobalConstants::iEndUse.size());
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)).Name = "Heating";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling)).Name = "Cooling";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)).Name = "InteriorLights";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)).Name = "ExteriorLights";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)).Name = "InteriorEquipment";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)).Name = "ExteriorEquipment";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans)).Name = "Fans";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps)).Name = "Pumps";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)).Name = "HeatRejection";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification)).Name = "Humidifier";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)).Name = "HeatRecovery";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem)).Name = "WaterSystems";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration)).Name = "Refrigeration";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)).Name = "Cogeneration";
 
         // Initialize display names for output table - this could go away if end use key names are changed to match
-        EndUseCategory(endUseHeating).DisplayName = "Heating";
-        EndUseCategory(endUseCooling).DisplayName = "Cooling";
-        EndUseCategory(endUseInteriorLights).DisplayName = "Interior Lighting";
-        EndUseCategory(endUseExteriorLights).DisplayName = "Exterior Lighting";
-        EndUseCategory(endUseInteriorEquipment).DisplayName = "Interior Equipment";
-        EndUseCategory(endUseExteriorEquipment).DisplayName = "Exterior Equipment";
-        EndUseCategory(endUseFans).DisplayName = "Fans";
-        EndUseCategory(endUsePumps).DisplayName = "Pumps";
-        EndUseCategory(endUseHeatRejection).DisplayName = "Heat Rejection";
-        EndUseCategory(endUseHumidification).DisplayName = "Humidification";
-        EndUseCategory(endUseHeatRecovery).DisplayName = "Heat Recovery";
-        EndUseCategory(endUseWaterSystem).DisplayName = "Water Systems";
-        EndUseCategory(endUseRefrigeration).DisplayName = "Refrigeration";
-        EndUseCategory(endUseCogeneration).DisplayName = "Generators";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)).DisplayName = "Heating";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling)).DisplayName = "Cooling";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)).DisplayName = "Interior Lighting";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)).DisplayName = "Exterior Lighting";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)).DisplayName = "Interior Equipment";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)).DisplayName = "Exterior Equipment";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans)).DisplayName = "Fans";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps)).DisplayName = "Pumps";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)).DisplayName = "Heat Rejection";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification)).DisplayName = "Humidification";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)).DisplayName = "Heat Recovery";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem)).DisplayName = "Water Systems";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration)).DisplayName = "Refrigeration";
+        EndUseCategory(DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)).DisplayName = "Generators";
 
         OutputInitialized = true;
 
@@ -3123,11 +3113,11 @@ namespace OutputProcessor {
                 if (HolidayIndex > 0) {
                     CurDayType = 7 + HolidayIndex;
                 }
-                WriteTimeStampFormatData(state.files.mtr,
+                WriteTimeStampFormatData(state,
+                                         state.files.mtr,
                                          ReportingFrequency::EachCall,
                                          TimeStepStampReportNbr,
                                          TimeStepStampReportChr,
-                                         DayOfSim,
                                          state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month,
@@ -3149,11 +3139,11 @@ namespace OutputProcessor {
                 if (HolidayIndex > 0) {
                     CurDayType = 7 + HolidayIndex;
                 }
-                WriteTimeStampFormatData(state.files.eso,
+                WriteTimeStampFormatData(state,
+                                         state.files.eso,
                                          ReportingFrequency::EachCall,
                                          TimeStepStampReportNbr,
                                          TimeStepStampReportChr,
-                                         DayOfSim,
                                          state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintESOTimeStamp && PrintTimeStampToSQL,
                                          Month,
@@ -3250,11 +3240,11 @@ namespace OutputProcessor {
                 if (HolidayIndex > 0) {
                     CurDayType = 7 + HolidayIndex;
                 }
-                WriteTimeStampFormatData(state.files.mtr,
+                WriteTimeStampFormatData(state,
+                                         state.files.mtr,
                                          ReportingFrequency::Hourly,
                                          TimeStepStampReportNbr,
                                          TimeStepStampReportChr,
-                                         DayOfSim,
                                          state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month,
@@ -3350,11 +3340,11 @@ namespace OutputProcessor {
                 if (HolidayIndex > 0) {
                     CurDayType = 7 + HolidayIndex;
                 }
-                WriteTimeStampFormatData(state.files.mtr,
+                WriteTimeStampFormatData(state,
+                                         state.files.mtr,
                                          ReportingFrequency::Daily,
                                          DailyStampReportNbr,
                                          DailyStampReportChr,
-                                         DayOfSim,
                                          state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month,
@@ -3445,11 +3435,11 @@ namespace OutputProcessor {
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
             if (!EnergyMeters(Loop).RptMN && !EnergyMeters(Loop).RptAccMN) continue;
             if (PrintTimeStamp) {
-                WriteTimeStampFormatData(state.files.mtr,
+                WriteTimeStampFormatData(state,
+                                         state.files.mtr,
                                          ReportingFrequency::Monthly,
                                          MonthlyStampReportNbr,
                                          MonthlyStampReportChr,
-                                         DayOfSim,
                                          state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month);
@@ -3533,7 +3523,7 @@ namespace OutputProcessor {
             if (!EnergyMeters(Loop).RptYR && !EnergyMeters(Loop).RptAccYR) continue;
             if (PrintTimeStamp) {
                 WriteYearlyTimeStamp(
-                    state.files.mtr, YearlyStampReportChr, DataGlobals::CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL);
+                    state, state.files.mtr, YearlyStampReportChr, state.dataGlobal->CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL);
                 if (ResultsFramework::resultsFramework->YRMeters.rDataFrameEnabled()) {
                     ResultsFramework::resultsFramework->YRMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
                 }
@@ -3621,11 +3611,11 @@ namespace OutputProcessor {
             EnergyMeters(Loop).LastSMMaxValDate = EnergyMeters(Loop).SMMaxValDate;
             if (!EnergyMeters(Loop).RptSM && !EnergyMeters(Loop).RptAccSM) continue;
             if (PrintTimeStamp) {
-                WriteTimeStampFormatData(state.files.mtr,
+                WriteTimeStampFormatData(state,
+                                         state.files.mtr,
                                          ReportingFrequency::Simulation,
                                          RunPeriodStampReportNbr,
                                          RunPeriodStampReportChr,
-                                         DayOfSim,
                                          state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL);
                 if (ResultsFramework::resultsFramework->SMMeters.rDataFrameEnabled()) {
@@ -3683,27 +3673,8 @@ namespace OutputProcessor {
         // for SM (Simulation period) meters, the value of the last calculation is stored
         // in the data structure.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace OutputReportPredefined;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const convertJtoGJ(1.0 / 1000000000.0);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop; // Loop Control
@@ -3711,19 +3682,19 @@ namespace OutputProcessor {
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
             int const RT_forIPUnits(EnergyMeters(Loop).RT_forIPUnits);
             if (RT_forIPUnits == RT_IPUnits_Electricity) {
-                PreDefTableEntry(pdchEMelecannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * convertJtoGJ);
+                PreDefTableEntry(pdchEMelecannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ());
                 PreDefTableEntry(pdchEMelecminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / TimeStepZoneSec);
                 PreDefTableEntry(pdchEMelecminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(pdchEMelecmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / TimeStepZoneSec);
                 PreDefTableEntry(pdchEMelecmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits_Gas) {
-                PreDefTableEntry(pdchEMgasannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * convertJtoGJ);
+                PreDefTableEntry(pdchEMgasannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ());
                 PreDefTableEntry(pdchEMgasminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / TimeStepZoneSec);
                 PreDefTableEntry(pdchEMgasminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(pdchEMgasmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / TimeStepZoneSec);
                 PreDefTableEntry(pdchEMgasmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits_Cooling) {
-                PreDefTableEntry(pdchEMcoolannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * convertJtoGJ);
+                PreDefTableEntry(pdchEMcoolannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ());
                 PreDefTableEntry(pdchEMcoolminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / TimeStepZoneSec);
                 PreDefTableEntry(pdchEMcoolminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(pdchEMcoolmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / TimeStepZoneSec);
@@ -3753,7 +3724,7 @@ namespace OutputProcessor {
                 PreDefTableEntry(pdchEMotherLmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / TimeStepZoneSec, 3);
                 PreDefTableEntry(pdchEMotherLmaxvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMaxValDate));
             } else {
-                PreDefTableEntry(pdchEMotherJannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * convertJtoGJ);
+                PreDefTableEntry(pdchEMotherJannual, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMValue * DataGlobalConstants::convertJtoGJ());
                 PreDefTableEntry(pdchEMotherJminvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMinVal / TimeStepZoneSec);
                 PreDefTableEntry(pdchEMotherJminvaluetime, EnergyMeters(Loop).Name, DateToStringWithMonth(EnergyMeters(Loop).FinYrSMMinValDate));
                 PreDefTableEntry(pdchEMotherJmaxvalue, EnergyMeters(Loop).Name, EnergyMeters(Loop).FinYrSMMaxVal / TimeStepZoneSec);
@@ -3981,12 +3952,11 @@ namespace OutputProcessor {
         // This subroutine manages the list of subcategories for each end-use category.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int EndUseNum;
         int EndUseSubNum;
         int NumSubs;
 
         bool Found = false;
-        for (EndUseNum = 1; EndUseNum <= NumEndUses; ++EndUseNum) {
+        for (size_t EndUseNum = 1; EndUseNum <= DataGlobalConstants::iEndUse.size(); ++EndUseNum) {
             if (UtilityRoutines::SameString(EndUseCategory(EndUseNum).Name, EndUseName)) {
 
                 for (EndUseSubNum = 1; EndUseSubNum <= EndUseCategory(EndUseNum).NumSubcategories; ++EndUseSubNum) {
@@ -4020,11 +3990,11 @@ namespace OutputProcessor {
         }
     }
     void WriteTimeStampFormatData(
+        EnergyPlusData &state,
         InputOutputFile &outputFile,
-        ReportingFrequency const reportingInterval, // See Module Parameter Definitons for ReportEach, ReportTimeStep, ReportHourly, etc.
+        ReportingFrequency const reportingInterval, // See Module Parameter Definitions for ReportEach, ReportTimeStep, ReportHourly, etc.
         int const reportID,                         // The ID of the time stamp
         std::string const &reportIDString,          // The ID of the time stamp
-        int const DayOfSim,                         // the number of days simulated so far
         std::string const &DayOfSimChr,             // the number of days simulated so far
         bool writeToSQL,
         Optional_int_const Month,           // the month of the reporting interval
@@ -4056,8 +4026,6 @@ namespace OutputProcessor {
         // na
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
-
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
 
@@ -4096,9 +4064,9 @@ namespace OutputProcessor {
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
-                                                    DayOfSim,
+                                                    state.dataGlobal->DayOfSim,
                                                     DataEnvironment::CurEnvirNum,
-                                                    DataGlobals::CalendarYear,
+                                                    state.dataGlobal->CalendarYear,
                                                     Month,
                                                     DayOfMonth,
                                                     Hour,
@@ -4125,9 +4093,9 @@ namespace OutputProcessor {
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
-                                                    DayOfSim,
+                                                    state.dataGlobal->DayOfSim,
                                                     DataEnvironment::CurEnvirNum,
-                                                    DataGlobals::CalendarYear,
+                                                    state.dataGlobal->CalendarYear,
                                                     Month,
                                                     DayOfMonth,
                                                     Hour,
@@ -4144,9 +4112,9 @@ namespace OutputProcessor {
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
-                                                    DayOfSim,
+                                                    state.dataGlobal->DayOfSim,
                                                     DataEnvironment::CurEnvirNum,
-                                                    DataGlobals::CalendarYear,
+                                                    state.dataGlobal->CalendarYear,
                                                     Month,
                                                     DayOfMonth,
                                                     _,
@@ -4162,7 +4130,7 @@ namespace OutputProcessor {
             print(outputFile, "{}\n", stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(
-                    static_cast<int>(reportingInterval), reportID, DayOfSim, DataEnvironment::CurEnvirNum, DataGlobals::CalendarYear, Month);
+                    static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, DataEnvironment::CurEnvirNum, state.dataGlobal->CalendarYear, Month);
             }
             break;
         case ReportingFrequency::Simulation:
@@ -4170,7 +4138,7 @@ namespace OutputProcessor {
             print(outputFile, "{}\n", stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(
-                    static_cast<int>(reportingInterval), reportID, DayOfSim, DataEnvironment::CurEnvirNum, DataGlobals::CalendarYear);
+                    static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, DataEnvironment::CurEnvirNum, state.dataGlobal->CalendarYear);
             }
             break;
         default:
@@ -4183,14 +4151,15 @@ namespace OutputProcessor {
         }
     }
 
-    void WriteYearlyTimeStamp(InputOutputFile &outputFile,
+    void WriteYearlyTimeStamp(EnergyPlusData &state,
+                              InputOutputFile &outputFile,
                               std::string const &reportIDString,   // The ID of the time stamp
                               std::string const &yearOfSimChr,     // the year of the simulation
                               bool writeToSQL)
     {
         print(outputFile, "{},{}\n", reportIDString, yearOfSimChr);
         if (writeToSQL && sqlite) {
-            sqlite->createYearlyTimeIndexRecord(DataGlobals::CalendarYear, DataEnvironment::CurEnvirNum);
+            sqlite->createYearlyTimeIndexRecord(state.dataGlobal->CalendarYear, DataEnvironment::CurEnvirNum);
         }
     }
 
@@ -4923,7 +4892,6 @@ namespace OutputProcessor {
         // na
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         using General::strip_trailing_zeros;
 
         // Locals
@@ -5499,7 +5467,6 @@ void SetupOutputVariable(EnergyPlusData &state,
     // Pointers (as pointers), pointers (as indices), and lots of other KEWL data stuff.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using General::TrimSigDigits;
 
@@ -5742,7 +5709,6 @@ void SetupOutputVariable(EnergyPlusData &state,
     // Pointers (as pointers), pointers (as indices), and lots of other KEWL data stuff.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using General::TrimSigDigits;
 
@@ -5914,8 +5880,6 @@ void SetupOutputVariable(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -5970,12 +5934,10 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using DataEnvironment::EndMonthFlag;
     using DataEnvironment::EndYearFlag;
     using DataGlobals::EndDayFlag;
-    using DataGlobals::EndEnvrnFlag;
     using DataGlobals::EndHourFlag;
     using DataGlobals::HourOfDay;
     using General::EncodeMonDayHrMin;
@@ -6120,11 +6082,11 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     if (HolidayIndex > 0) {
                         CurDayType = 7 + HolidayIndex;
                     }
-                    WriteTimeStampFormatData(state.files.eso,
+                    WriteTimeStampFormatData(state,
+                                             state.files.eso,
                                              ReportingFrequency::EachCall,
                                              TimeStepStampReportNbr,
                                              TimeStepStampReportChr,
-                                             DayOfSim,
                                              state.dataGlobal->DayOfSimChr,
                                              true,
                                              Month,
@@ -6204,11 +6166,11 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     if (HolidayIndex > 0) {
                         CurDayType = 7 + HolidayIndex;
                     }
-                    WriteTimeStampFormatData(state.files.eso,
+                    WriteTimeStampFormatData(state,
+                                             state.files.eso,
                                              ReportingFrequency::EachCall,
                                              TimeStepStampReportNbr,
                                              TimeStepStampReportChr,
-                                             DayOfSim,
                                              state.dataGlobal->DayOfSimChr,
                                              true,
                                              Month,
@@ -6293,11 +6255,11 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                             if (HolidayIndex > 0) {
                                 CurDayType = 7 + HolidayIndex;
                             }
-                            WriteTimeStampFormatData(state.files.eso,
+                            WriteTimeStampFormatData(state,
+                                                     state.files.eso,
                                                      ReportingFrequency::EachCall,
                                                      TimeStepStampReportNbr,
                                                      TimeStepStampReportChr,
-                                                     DayOfSim,
                                                      state.dataGlobal->DayOfSimChr,
                                                      true,
                                                      Month,
@@ -6349,11 +6311,11 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                             if (HolidayIndex > 0) {
                                 CurDayType = 7 + HolidayIndex;
                             }
-                            WriteTimeStampFormatData(state.files.eso,
+                            WriteTimeStampFormatData(state,
+                                                     state.files.eso,
                                                      ReportingFrequency::EachCall,
                                                      TimeStepStampReportNbr,
                                                      TimeStepStampReportChr,
-                                                     DayOfSim,
                                                      state.dataGlobal->DayOfSimChr,
                                                      true,
                                                      Month,
@@ -6395,11 +6357,11 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             if (HolidayIndex > 0) {
                 CurDayType = 7 + HolidayIndex;
             }
-            WriteTimeStampFormatData(state.files.eso,
+            WriteTimeStampFormatData(state,
+                                     state.files.eso,
                                      ReportingFrequency::Hourly,
                                      TimeStepStampReportNbr,
                                      TimeStepStampReportChr,
-                                     DayOfSim,
                                      state.dataGlobal->DayOfSimChr,
                                      true,
                                      Month,
@@ -6496,11 +6458,11 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             if (HolidayIndex > 0) {
                 CurDayType = 7 + HolidayIndex;
             }
-            WriteTimeStampFormatData(state.files.eso,
+            WriteTimeStampFormatData(state,
+                                     state.files.eso,
                                      ReportingFrequency::Daily,
                                      DailyStampReportNbr,
                                      DailyStampReportChr,
-                                     DayOfSim,
                                      state.dataGlobal->DayOfSimChr,
                                      true,
                                      Month,
@@ -6545,13 +6507,13 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     if (!EndDayFlag) return;
 
     // Month Block
-    if (EndMonthFlag || EndEnvrnFlag) {
+    if (EndMonthFlag || state.dataGlobal->EndEnvrnFlag) {
         if (TrackingMonthlyVariables) {
-            WriteTimeStampFormatData(state.files.eso,
+            WriteTimeStampFormatData(state,
+                                     state.files.eso,
                                      ReportingFrequency::Monthly,
                                      MonthlyStampReportNbr,
                                      MonthlyStampReportChr,
-                                     DayOfSim,
                                      state.dataGlobal->DayOfSimChr,
                                      true,
                                      Month);
@@ -6590,13 +6552,13 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     } // Month Block
 
     // Sim/Environment Block
-    if (EndEnvrnFlag) {
+    if (state.dataGlobal->EndEnvrnFlag) {
         if (TrackingRunPeriodVariables) {
-            WriteTimeStampFormatData(state.files.eso,
+            WriteTimeStampFormatData(state,
+                                     state.files.eso,
                                      ReportingFrequency::Simulation,
                                      RunPeriodStampReportNbr,
                                      RunPeriodStampReportChr,
-                                     DayOfSim,
                                      state.dataGlobal->DayOfSimChr,
                                      true);
             TimePrint = false;
@@ -6633,7 +6595,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     // Yearly Block
     if (EndYearFlag) {
         if (TrackingYearlyVariables) {
-            WriteYearlyTimeStamp(state.files.eso, YearlyStampReportChr, DataGlobals::CalendarYearChr, true);
+            WriteYearlyTimeStamp(state, state.files.eso, YearlyStampReportChr, state.dataGlobal->CalendarYearChr, true);
             TimePrint = false;
         }
         if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
@@ -6661,8 +6623,8 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
         ReportYRMeters(state, TimePrint);
 
-        DataGlobals::CalendarYear += 1;
-        DataGlobals::CalendarYearChr = fmt::to_string(DataGlobals::CalendarYear);
+        state.dataGlobal->CalendarYear += 1;
+        state.dataGlobal->CalendarYearChr = fmt::to_string(state.dataGlobal->CalendarYear);
     }
 }
 
@@ -6731,7 +6693,6 @@ void GenOutputVariablesAuditReport()
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using DataGlobals::DisplayAdvancedReportVariables;
 
@@ -6834,7 +6795,6 @@ void UpdateMeterReporting(EnergyPlusData &state)
 
     // Using/Aliasing
     using namespace DataIPShortCuts;
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -7095,7 +7055,6 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using General::TrimSigDigits;
 
@@ -7457,7 +7416,6 @@ int GetMeterIndex(std::string const &MeterName)
     // obtain a meter "value".
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using SortAndStringUtilities::SetupAndSort;
 
@@ -7511,7 +7469,6 @@ std::string GetMeterResourceType(int const MeterNumber) // Which Meter Number (f
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
 
     // Return value
@@ -7558,7 +7515,6 @@ Real64 GetCurrentMeterValue(int const MeterNumber) // Which Meter Number (from G
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
 
     // Return value
@@ -7610,7 +7566,6 @@ Real64 GetInstantMeterValue(int const MeterNumber,                             /
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
 
     // Return value
@@ -7799,7 +7754,6 @@ Real64 GetInternalVariableValue(int const varType,    // 1=integer, 2=real, 3=me
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -7883,7 +7837,6 @@ Real64 GetInternalVariableValueExternalInterface(int const varType,    // 1=inte
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -7962,7 +7915,6 @@ int GetNumMeteredVariables(std::string const &EP_UNUSED(ComponentType), // Given
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
 
     // Return value
@@ -8006,7 +7958,7 @@ void GetMeteredVariables(std::string const &ComponentType,                      
                          Array1D_int &VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
                          Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
-                         Array1D_int &ResourceTypes,                            // ResourceTypes for each variable
+                         std::map<int, DataGlobalConstants::ResourceType> &ResourceTypes,                            // ResourceTypes for each variable
                          Array1D_string &EndUses,                               // EndUses for each variable
                          Array1D_string &Groups,                                // Groups for each variable
                          Array1D_string &Names,                                 // Variable Names for each variable
@@ -8025,7 +7977,6 @@ void GetMeteredVariables(std::string const &ComponentType,                      
     // for metered variables associated with the given ComponentType/Name.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobalConstants;
     using namespace OutputProcessor;
 
@@ -8053,7 +8004,7 @@ void GetMeteredVariables(std::string const &ComponentType,                      
             TimeStepTypes(NumVariables) = RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = RVariableTypes(Loop).units;
 
-            ResourceTypes(NumVariables) = AssignResourceTypeNum(UtilityRoutines::MakeUPPERCase(EnergyMeters(MeterPtr).ResourceType));
+            ResourceTypes.at(NumVariables) = AssignResourceTypeNum(UtilityRoutines::MakeUPPERCase(EnergyMeters(MeterPtr).ResourceType));
 
             Names(NumVariables) = RVariableTypes(Loop).VarNameUC;
 
@@ -8087,7 +8038,7 @@ void GetMeteredVariables(std::string const &ComponentType,                      
                          Array1D_int &VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
                          Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
-                         Array1D_int &ResourceTypes,                            // ResourceTypes for each variable
+                         std::map<int, DataGlobalConstants::ResourceType> &ResourceTypes,                            // ResourceTypes for each variable
                          Array1D_string &EndUses,                               // EndUses for each variable
                          Array1D_string &Groups,                                // Groups for each variable
                          Array1D_string &Names,                                 // Variable Names for each variable
@@ -8106,7 +8057,6 @@ void GetMeteredVariables(std::string const &ComponentType,                      
     // for metered variables associated with the given ComponentType/Name.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobalConstants;
     using namespace OutputProcessor;
 
@@ -8134,7 +8084,7 @@ void GetMeteredVariables(std::string const &ComponentType,                      
             TimeStepTypes(NumVariables) = RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = RVariableTypes(Loop).units;
 
-            ResourceTypes(NumVariables) = AssignResourceTypeNum(UtilityRoutines::MakeUPPERCase(EnergyMeters(MeterPtr).ResourceType));
+            ResourceTypes.at(NumVariables) = AssignResourceTypeNum(UtilityRoutines::MakeUPPERCase(EnergyMeters(MeterPtr).ResourceType));
             Names(NumVariables) = RVariableTypes(Loop).VarNameUC;
 
             for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
@@ -8210,7 +8160,6 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
     //       2 = HVAC time step
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using ScheduleManager::GetScheduleIndex;
     using ScheduleManager::GetScheduleType;
@@ -8385,7 +8334,6 @@ void GetVariableKeys(EnergyPlusData &state,
     // in the data array for the
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using ScheduleManager::GetScheduleIndex;
 
@@ -8588,7 +8536,6 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
     //       Pollutant:Carbon Equivalent
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     // SUBROUTINE PARAMETER DEFINITIONS:
     //             Now for the Pollution Meters

@@ -68,7 +68,6 @@ namespace WindowAC {
         // Members
         // input data
         std::string Name; // name of unit
-        //  CHARACTER(len=MaxNameLength) :: UnitType         =' '  ! type of unit
         int UnitType;          // type of unit
         std::string Sched;     // availability schedule
         int SchedPtr;          // index to schedule

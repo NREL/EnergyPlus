@@ -64,16 +64,6 @@ struct EnergyPlusData;
 
 namespace UserDefinedComponents {
 
-    extern int NumUserPlantComps;
-    extern int NumUserCoils;
-    extern int NumUserZoneAir;
-    extern int NumUserAirTerminals;
-
-    extern Array1D_bool CheckUserPlantCompName;
-    extern Array1D_bool CheckUserCoilName;
-    extern Array1D_bool CheckUserZoneAirName;
-    extern Array1D_bool CheckUserAirTerminal;
-
     struct PlantConnectionStruct
     {
         // Members
@@ -301,14 +291,6 @@ namespace UserDefinedComponents {
         void report();
     };
 
-    // Object Data
-    extern Array1D<UserPlantComponentStruct> UserPlantComp;
-    extern Array1D<UserCoilComponentStruct> UserCoil;
-    extern Array1D<UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
-    extern Array1D<UserAirTerminalComponentStruct> UserAirTerminal;
-
-    void clear_state();
-
     void SimCoilUserDefined(EnergyPlusData &state,
                             std::string const &EquipName, // user name for component
                             int &CompIndex,
@@ -341,6 +323,51 @@ namespace UserDefinedComponents {
 
 } // namespace UserDefinedComponents
 
+struct UserDefinedComponentsData : BaseGlobalStruct {
+
+    int NumUserPlantComps = 0;
+    int NumUserCoils = 0;
+    int NumUserZoneAir = 0;
+    int NumUserAirTerminals = 0;
+
+    bool GetInput = true;
+    bool GetPlantCompInput = true;
+
+    Array1D_bool CheckUserPlantCompName;
+    Array1D_bool CheckUserCoilName;
+    Array1D_bool CheckUserZoneAirName;
+    Array1D_bool CheckUserAirTerminal;
+
+    // Object Data
+    Array1D<UserDefinedComponents::UserPlantComponentStruct> UserPlantComp;
+    Array1D<UserDefinedComponents::UserCoilComponentStruct> UserCoil;
+    Array1D<UserDefinedComponents::UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
+    Array1D<UserDefinedComponents::UserAirTerminalComponentStruct> UserAirTerminal;
+
+    void clear_state() override
+    {
+        GetInput = true;
+        GetPlantCompInput = true;
+
+        NumUserPlantComps = 0;
+        NumUserCoils = 0;
+        NumUserZoneAir = 0;
+        NumUserAirTerminals = 0;
+
+        CheckUserPlantCompName.deallocate();
+        CheckUserCoilName.deallocate();
+        CheckUserZoneAirName.deallocate();
+        CheckUserAirTerminal.deallocate();
+
+        UserPlantComp.deallocate();
+        UserCoil.deallocate();
+        UserZoneAirHVAC.deallocate();
+        UserAirTerminal.deallocate();
+    }
+
+    // Default Constructor
+    UserDefinedComponentsData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

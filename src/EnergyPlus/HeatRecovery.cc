@@ -63,7 +63,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
@@ -111,12 +110,8 @@ namespace HeatRecovery {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataHVACGlobals;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::ScheduleAlwaysOn;
-    using DataGlobals::SecInHour;
     using DataGlobals::SysSizingCalc;
     using DataGlobals::WarmupFlag;
     using namespace DataLoopNode;
@@ -430,7 +425,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).Name = cAlphaArgs(1);
             ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_FLATPLATE;
             if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = ScheduleAlwaysOn;
+                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
@@ -513,7 +508,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).Name = cAlphaArgs(1);
             ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_GENERIC;
             if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = ScheduleAlwaysOn;
+                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
@@ -646,7 +641,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).Name = cAlphaArgs(1);
             ExchCond(ExchNum).ExchTypeNum = HX_DESICCANT_BALANCED;
             if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = ScheduleAlwaysOn;
+                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
@@ -1340,7 +1335,7 @@ namespace HeatRecovery {
         LocalWarningError = false;
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && ExchCond(ExchNum).myEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && ExchCond(ExchNum).myEnvrnFlag) {
             // I believe that all of these initializations should be taking place at the SCFM conditions
             RhoAir = StdRhoAir;
             //    RhoAir = PsyRhoAirFnPbTdbW(101325.0,20.0,0.0)  do we want standard air density at sea level for generic ERVs per ARI 1060?
@@ -1495,7 +1490,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).myEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             ExchCond(ExchNum).myEnvrnFlag = true;
         }
 
@@ -1591,8 +1586,8 @@ namespace HeatRecovery {
                         }
                     } else if (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                         // how to support VS dx coil here?
-                        FullLoadOutAirTemp = VariableSpeedCoils::VarSpeedCoil(CompanionCoilIndex).OutletAirDBTemp;
-                        FullLoadOutAirHumRat = VariableSpeedCoils::VarSpeedCoil(CompanionCoilIndex).OutletAirHumRat;
+                        FullLoadOutAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirDBTemp;
+                        FullLoadOutAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirHumRat;
                     }
 
                 } else {
@@ -3296,7 +3291,7 @@ namespace HeatRecovery {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
         ExchCond(ExNum).ElecUseEnergy = ExchCond(ExNum).ElecUseRate * ReportingConstant;
         ExchCond(ExNum).SensHeatingEnergy = ExchCond(ExNum).SensHeatingRate * ReportingConstant;
         ExchCond(ExNum).LatHeatingEnergy = ExchCond(ExNum).LatHeatingRate * ReportingConstant;

@@ -327,7 +327,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     GetSysInput(state);
 
     DataGlobals::SysSizingCalc = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = 1.0;
     DataEnvironment::OutBaroPress = 101325.0;
 
@@ -503,7 +503,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     GetSysInput(state);
 
     DataGlobals::SysSizingCalc = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = 1.0;
     DataEnvironment::OutBaroPress = 101325.0;
 
@@ -539,7 +539,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     EXPECT_EQ(0.0, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);                // outlet mass flow rate is zero
     EXPECT_EQ(0.0, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);               // outlet mass flow rate is zero
 
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
     // Needs an airloop, assume 100% OA
     sd_airterminal(SysNum).AirLoopNum = 1;
@@ -664,7 +664,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
     GetSysInput(state);
 
     DataGlobals::SysSizingCalc = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = 1.0;
     DataEnvironment::OutBaroPress = 101325.0;
 
@@ -838,7 +838,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     GetSysInput(state);
 
     DataGlobals::SysSizingCalc = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = 1.0;
     DataEnvironment::OutBaroPress = 101325.0;
 
@@ -884,7 +884,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     EXPECT_EQ(0.0, thisAirTerminalOutlet.AirMassFlowRate);         // outlet mass flow rate is zero
     EXPECT_EQ(0.0, thisAirTerminal.OutdoorAirFlowRate);            // OA volume flow rate is zero
 
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
     // Needs an airloop, assume 100% OA
     thisAirLoop.OAFrac = 1.0;
@@ -1013,7 +1013,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
     GetSysInput(state);
 
     DataGlobals::SysSizingCalc = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = 1.0;
     DataEnvironment::OutBaroPress = 101325.0;
 

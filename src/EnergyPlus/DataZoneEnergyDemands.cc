@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 
 namespace EnergyPlus {
@@ -62,8 +61,6 @@ namespace DataZoneEnergyDemands {
     // loop managers as well as the coil simulations
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.

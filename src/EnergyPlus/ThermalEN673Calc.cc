@@ -260,9 +260,6 @@ namespace ThermalEN673Calc {
                        std::string &ErrorMessage)
     {
         // Using
-        using DataGlobals::GravityConstant;
-        using DataGlobals::StefanBoltzmann;
-
         // Argument array dimensioning
         EP_SIZE_CHECK(emis, maxlay2);
         EP_SIZE_CHECK(gap, MaxGap);
@@ -410,7 +407,7 @@ namespace ThermalEN673Calc {
                              standard,
                              nperr,
                              ErrorMessage);
-                    Gr(i) = (GravityConstant * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
+                    Gr(i) = (DataGlobalConstants::GravityConstant() * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
                     Ra(i) = Gr(i) * pr;
                     Nu(i) = A * std::pow(Ra(i), n);
                     if (Nu(i) < 1.0) {
@@ -425,7 +422,7 @@ namespace ThermalEN673Calc {
                 }
             }
             for (i = 1; i <= nlayer - 1; ++i) {
-                hr(i) = 4.0 * StefanBoltzmann * std::pow(1.0 / emis(2 * i) + 1.0 / emis(2 * i + 1) - 1.0, -1.0) * pow_3(Tm);
+                hr(i) = 4.0 * DataGlobalConstants::StefanBoltzmann() * std::pow(1.0 / emis(2 * i) + 1.0 / emis(2 * i + 1) - 1.0, -1.0) * pow_3(Tm);
                 hs(i) = hg(i) + hr(i);
                 rs(2 * i + 1) = 1.0 / hs(i); // Thermal resistance of each gap
                 sumRs += rs(2 * i + 1);
@@ -478,7 +475,7 @@ namespace ThermalEN673Calc {
                                      standard,
                                      nperr,
                                      ErrorMessage);
-                            Gr(i) = (GravityConstant * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
+                            Gr(i) = (DataGlobalConstants::GravityConstant() * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
                             Ra(i) = Gr(i) * pr;
                             Nu(i) = A * std::pow(Ra(i), n);
                             if (Nu(i) < 1.0) {

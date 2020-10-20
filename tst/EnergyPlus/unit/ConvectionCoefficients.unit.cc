@@ -597,14 +597,14 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     DataSurfaces::TotSurfaces = 1;
     DataGlobals::NumOfZones = 1;
     DataSurfaces::Surface.allocate( 1 );
-    dataConstruction.Construct.allocate( 1 );
+    state.dataConstruction->Construct.allocate( 1 );
     DataHeatBalance::Zone.allocate( 1 );
     DataLoopNode::Node.allocate( 1 );
 
     DataSurfaces::Surface( SurfNum ).Zone = 1;
     DataSurfaces::Surface( SurfNum ).Construction = 1;
     DataSurfaces::Surface(SurfNum).TAirRef = 0;
-    dataConstruction.Construct( 1 ).TypeIsWindow = false;
+    state.dataConstruction->Construct( 1 ).TypeIsWindow = false;
     DataHeatBalance::Zone( 1 ).SystemZoneNodeNumber = 1;
     DataHeatBalance::Zone( 1 ).Multiplier = 1.0;
     DataHeatBalance::Zone( 1 ).ListMultiplier = 1.0;
@@ -765,7 +765,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcZoneSystemACH)
     if (!allocated(DataHeatBalance::Zone)) DataHeatBalance::Zone.allocate(TotalNumberofZones);
     DataHeatBalance::Zone(ZoneNum).Volume = 100.0;
     DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber = 1;
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     DataHeatBalance::Zone(ZoneNum).Multiplier = 1.0;
     DataHeatBalance::Zone(ZoneNum).ListMultiplier = 1.0;
     EnergyPlus::DataEnvironment::OutBaroPress = 101400.0;
@@ -774,7 +774,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcZoneSystemACH)
     // Test 1: Node not allocated, returns a zero ACH
     if (allocated(EnergyPlus::DataLoopNode::Node)) EnergyPlus::DataLoopNode::Node.deallocate();
     ACHExpected = 0.0;
-    ACHAnswer = CalcZoneSystemACH(ZoneNum);
+    ACHAnswer = CalcZoneSystemACH(state, ZoneNum);
     EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
 
     // Test 2: Node now allocated, needs to return a proper ACH
@@ -782,7 +782,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcZoneSystemACH)
     EnergyPlus::DataLoopNode::Node(ZoneNode).Temp = 20.0;
     EnergyPlus::DataLoopNode::Node(ZoneNode).MassFlowRate = 0.2;
     ACHExpected = 6.11506;
-    ACHAnswer = CalcZoneSystemACH(ZoneNum);
+    ACHAnswer = CalcZoneSystemACH(state, ZoneNum);
     EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
 
 }

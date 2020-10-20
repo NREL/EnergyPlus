@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -78,7 +77,6 @@ namespace GlobalNames {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
 
     // Data

@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -104,7 +103,6 @@ namespace RoomAirModelUserTempPattern {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataGlobals::DisplayExtraWarnings;
     using namespace DataRoomAirModel;
 
@@ -180,7 +178,7 @@ namespace RoomAirModelUserTempPattern {
         // FLOW:
 
         // transfer data from surface domain to air domain for the specified zone
-        InitTempDistModel(ZoneNum);
+        InitTempDistModel(state, ZoneNum);
 
         GetSurfHBDataForTempDistModel(ZoneNum);
 
@@ -193,7 +191,7 @@ namespace RoomAirModelUserTempPattern {
 
     //****************************************************
 
-    void InitTempDistModel(int const ZoneNum) // index number for the specified zone
+    void InitTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -212,7 +210,6 @@ namespace RoomAirModelUserTempPattern {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::NumOfZones;
 
         // Locals
@@ -236,7 +233,7 @@ namespace RoomAirModelUserTempPattern {
             MyOneTimeFlag = false;
         }
 
-        if (BeginEnvrnFlag && MyEnvrnFlag(ZoneNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ZoneNum)) {
             AirPatternZoneInfo(ZoneNum).TairMean = 23.0;
             AirPatternZoneInfo(ZoneNum).Tstat = 23.0;
             AirPatternZoneInfo(ZoneNum).Tleaving = 23.0;
@@ -248,7 +245,7 @@ namespace RoomAirModelUserTempPattern {
             MyEnvrnFlag(ZoneNum) = false;
         }
 
-        if (!BeginEnvrnFlag) MyEnvrnFlag(ZoneNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag(ZoneNum) = true;
 
         // init report variable
         AirPatternZoneInfo(ZoneNum).Gradient = 0.0;

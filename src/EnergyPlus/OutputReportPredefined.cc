@@ -49,7 +49,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 
 namespace EnergyPlus {
@@ -68,8 +67,6 @@ namespace OutputReportPredefined {
     //    None.
     // OTHER NOTES:.
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // The following section initializes the predefined column heading variables
     // The variables get their value in AssignPredefined

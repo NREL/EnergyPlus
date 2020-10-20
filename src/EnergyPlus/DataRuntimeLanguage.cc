@@ -49,7 +49,6 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -68,9 +67,6 @@ namespace DataRuntimeLanguage {
     // PURPOSE OF THIS MODULE:
 
     // METHODOLOGY EMPLOYED: na
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
 
     // Data
     // module should be available to other modules and routines.

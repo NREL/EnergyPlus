@@ -450,7 +450,7 @@ namespace ConvectionCoefficients {
 
     void GetUserConvectionCoefficients(EnergyPlusData &state);
 
-    void ApplyConvectionValue(std::string const &SurfaceTypes, std::string const &ConvectionType, int Value);
+    void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes, std::string const &ConvectionType, int Value);
 
     Real64 CalcASHRAESimpExtConvectCoeff(int Roughness,       // Integer index for roughness, relates to parameter array indices
                                          Real64 SurfWindSpeed // Current wind speed, m/s
@@ -479,13 +479,14 @@ namespace ConvectionCoefficients {
 
     Real64 CalcZoneSupplyAirTemp(int ZoneNum);
 
-    Real64 CalcZoneSystemVolFlowRate(int ZoneNum);
+    Real64 CalcZoneSystemVolFlowRate(EnergyPlusData &state, int ZoneNum);
 
-    Real64 CalcZoneSystemACH(int ZoneNum);
+    Real64 CalcZoneSystemACH(EnergyPlusData &state, int ZoneNum);
 
-    Real64 CalcCeilingDiffuserACH(int ZoneNum);
+    Real64 CalcCeilingDiffuserACH(EnergyPlusData &state, int ZoneNum);
 
-    Real64 CalcCeilingDiffuserIntConvCoeff(Real64 ACH,  // [1/hr] air system air change rate
+    Real64 CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state,
+                                           Real64 ACH,  // [1/hr] air system air change rate
                                            Real64 Tsurf,
                                            Real64 Tair,
                                            Real64 cosTilt,
@@ -493,12 +494,13 @@ namespace ConvectionCoefficients {
                                            Real64 height,
                                            bool isWindow=false);
 
-    void CalcCeilingDiffuserIntConvCoeff(int ZoneNum, const Array1D<Real64> &SurfaceTemperatures); // zone number for which coefficients are being calculated
+    void CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state, int ZoneNum, const Array1D<Real64> &SurfaceTemperatures); // zone number for which coefficients are being calculated
 
     // CalcCeilingDiffuserInletCorr should replace CalcCeilingDiffuser (above), if ZoneTempPredictorCorrector can
     // ever be made to work correctly with the inlet air temperature.
 
-    void CalcCeilingDiffuserInletCorr(int ZoneNum,                        // Zone number
+    void CalcCeilingDiffuserInletCorr(EnergyPlusData &state,
+                                      int ZoneNum,                        // Zone number
                                       Array1D<Real64> &SurfaceTemperatures // For CalcASHRAEDetailed, if called
     );
 

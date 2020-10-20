@@ -51,59 +51,17 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
-#include <EnergyPlus/AirLoopHVACDOAS.hh>
-#include <EnergyPlus/BaseboardElectric.hh>
-#include <EnergyPlus/BaseboardRadiator.hh>
-#include <EnergyPlus/Boilers.hh>
-#include <EnergyPlus/BoilerSteam.hh>
-#include <EnergyPlus/BranchInputManager.hh>
-#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
-#include <EnergyPlus/ChillerAbsorption.hh>
-#include <EnergyPlus/ChillerElectricEIR.hh>
-#include <EnergyPlus/ChillerExhaustAbsorption.hh>
-#include <EnergyPlus/ChillerGasAbsorption.hh>
-#include <EnergyPlus/ChillerIndirectAbsorption.hh>
-#include <EnergyPlus/ChillerReformulatedEIR.hh>
-#include <EnergyPlus/CondenserLoopTowers.hh>
-#include <EnergyPlus/ConvectionCoefficients.hh>
-#include <EnergyPlus/CoolTower.hh>
-#include <EnergyPlus/CostEstimateManager.hh>
-#include <EnergyPlus/CrossVentMgr.hh>
-#include <EnergyPlus/CTElectricGenerator.hh>
-#include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/WaterManager.hh>
-#include <EnergyPlus/WaterThermalTanks.hh>
-#include <EnergyPlus/WaterToAirHeatPump.hh>
-#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
-#include <EnergyPlus/WaterUse.hh>
-#include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/WindowAC.hh>
-#include <EnergyPlus/WindowComplexManager.hh>
-#include <EnergyPlus/WindowEquivalentLayer.hh>
-#include <EnergyPlus/WindowManager.hh>
-#include <EnergyPlus/WindTurbine.hh>
-#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
-#include <EnergyPlus/ZoneDehumidifier.hh>
-#include <EnergyPlus/ZoneEquipmentManager.hh>
-#include <EnergyPlus/ZonePlenum.hh>
-#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace OutputProcessor;
@@ -112,22 +70,14 @@ using namespace DataPlant;
 using namespace DataSizing;
 using namespace OutputReportPredefined;
 
-class SizingAnalysisObjectsTest : public testing::Test
+class SizingAnalysisObjectsTest : public EnergyPlusFixture
 {
 
-public:
-    Real64 lowLogVal;
-    Real64 midLogVal;
-    Real64 hiLogVal;
-    Real64 LogVal; // actual variable pointed to
-    int averagingWindow;
-    int logIndex;
-
-    SizingLoggerFramework sizingLoggerFrameObj;
-
-    // constructor for test fixture class
-    SizingAnalysisObjectsTest()
+protected:
+    void SetUp() override
     {
+        EnergyPlus::EnergyPlusFixture::SetUp();
+
         state.files.eio.open_as_stringstream();
         // fill in test log data values
         lowLogVal = 50.0;
@@ -140,10 +90,10 @@ public:
         // setup weather manager state needed
         state.dataWeatherManager->NumOfEnvrn = 2;
         state.dataWeatherManager->Environment.allocate(state.dataWeatherManager->NumOfEnvrn);
-        state.dataWeatherManager->Environment(1).KindOfEnvrn = ksDesignDay;
+        state.dataWeatherManager->Environment(1).KindOfEnvrn = DataGlobalConstants::KindOfSim::DesignDay;
         state.dataWeatherManager->Environment(1).DesignDayNum = 1;
 
-        state.dataWeatherManager->Environment(2).KindOfEnvrn = ksDesignDay;
+        state.dataWeatherManager->Environment(2).KindOfEnvrn = DataGlobalConstants::KindOfSim::DesignDay;
         state.dataWeatherManager->Environment(2).DesignDayNum = 2;
 
         averagingWindow = 1;
@@ -152,11 +102,11 @@ public:
         state.dataWeatherManager->NumOfEnvrn = 4;
         state.dataWeatherManager->Environment.redimension(state.dataWeatherManager->NumOfEnvrn);
 
-        state.dataWeatherManager->Environment(3).KindOfEnvrn = ksHVACSizeDesignDay;
+        state.dataWeatherManager->Environment(3).KindOfEnvrn = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
         state.dataWeatherManager->Environment(3).DesignDayNum = 1;
         state.dataWeatherManager->Environment(3).SeedEnvrnNum = 1;
 
-        state.dataWeatherManager->Environment(4).KindOfEnvrn = ksHVACSizeDesignDay;
+        state.dataWeatherManager->Environment(4).KindOfEnvrn = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
         state.dataWeatherManager->Environment(4).DesignDayNum = 2;
         state.dataWeatherManager->Environment(4).SeedEnvrnNum = 2;
 
@@ -182,21 +132,22 @@ public:
         PlantLoop(1).VolumeWasAutoSized = true;
 
         SetPredefinedTables();
+
     }
 
-    // destructor
-    ~SizingAnalysisObjectsTest()
+    void TearDown() override
     {
-        TotNumLoops = 0;
-        PlantLoop(1).LoopSide.deallocate();
-        PlantLoop.deallocate();
-        state.dataWeatherManager->Environment.deallocate();
-        PlantSizData.deallocate();
-        TimeValue.clear();
-    }
+        EnergyPlus::EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
+    };
 
-
-    EnergyPlusData state;
+public:
+    Real64 lowLogVal;
+    Real64 midLogVal;
+    Real64 hiLogVal;
+    Real64 LogVal; // actual variable pointed to
+    int averagingWindow;
+    int logIndex;
+    SizingLoggerFramework sizingLoggerFrameObj;
 };
 
 TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
@@ -204,8 +155,8 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
     ShowMessage("Begin Test: SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework");
 
     // first step
-    KindOfSim = 4;
-    DayOfSim = 1;
+    state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
+    state.dataGlobal->DayOfSim = 1;
     HourOfDay = 1;
     state.dataWeatherManager->Envrn = 3;
     state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum = 1;
@@ -264,16 +215,16 @@ TEST_F(SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
     TestLogObj.ztStepObj.resize(TestLogObj.NumOfStepsInLogSet);
 
     // fill first step in log with zone step data
-    int KindOfSim(4);
+    state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
     int Envrn(3);
-    int DayOfSim(1);
+    state.dataGlobal->DayOfSim = 1;
     int HourofDay(1);
     int timeStp(1);
     Real64 timeStepDuration(0.25);
     int numTimeStepsInHour(4);
     LogVal = lowLogVal;
     ZoneTimestepObject tmpztStepStamp1( // call constructor
-        KindOfSim, Envrn, DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+        state.dataGlobal->KindOfSim, Envrn, state.dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
     TestLogObj.FillZoneStep(tmpztStepStamp1);
 
     // fill second step log with zone step data
@@ -281,21 +232,21 @@ TEST_F(SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
     timeStp = 2;
     LogVal = midLogVal;
     ZoneTimestepObject tmpztStepStamp2( // call constructor
-        KindOfSim, Envrn, DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+        state.dataGlobal->KindOfSim, Envrn, state.dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
     TestLogObj.FillZoneStep(tmpztStepStamp2);
 
     // fill third step log with zone step data
     timeStp = 3;
     LogVal = midLogVal;
     ZoneTimestepObject tmpztStepStamp3( // call constructor
-        KindOfSim, Envrn, DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+        state.dataGlobal->KindOfSim, Envrn, state.dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
     TestLogObj.FillZoneStep(tmpztStepStamp3);
 
     // fill fourth step log with zone step data
     timeStp = 4;
     LogVal = hiLogVal;
     ZoneTimestepObject tmpztStepStamp4( // call constructor
-        KindOfSim, Envrn, DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+        state.dataGlobal->KindOfSim, Envrn, state.dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
     TestLogObj.FillZoneStep(tmpztStepStamp4);
 
     // now check that the correct values were stored in the right spot
@@ -332,9 +283,9 @@ TEST_F(SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour)
     TestLogObj.ztStepObj.resize(TestLogObj.NumOfStepsInLogSet);
 
     // fill first step in log with zone step data
-    int KindOfSim(4);
+    state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
     int Envrn(3);
-    int DayOfSim(1);
+    state.dataGlobal->DayOfSim = 1;
     int HourofDay(1);
     int timeStp(1);
     Real64 timeStepDuration(1.0);
@@ -344,7 +295,7 @@ TEST_F(SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour)
     for (int hr = 1; hr <= 24; ++hr) {
         HourofDay = hr;
         ZoneTimestepObject tmpztStepStamp1( // call constructor
-            KindOfSim, Envrn, DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+            state.dataGlobal->KindOfSim, Envrn, state.dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
         TestLogObj.FillZoneStep(tmpztStepStamp1);
     }
 
@@ -353,7 +304,7 @@ TEST_F(SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour)
     for (int hr = 1; hr <= 24; ++hr) {
         HourofDay = hr;
         ZoneTimestepObject tmpztStepStamp1( // call constructor
-            KindOfSim, Envrn, DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+            state.dataGlobal->KindOfSim, Envrn, state.dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
         TestLogObj.FillZoneStep(tmpztStepStamp1);
     }
 
@@ -388,16 +339,16 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest)
     PlantCoinicidentAnalysis TestAnalysisObj(loopName, loopNum, nodeNum, density, cp, timestepsInAvg, plantSizingIndex);
 
     // fill first step in log with zone step data
-    int KindOfSim(4);
+    state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
     int Envrn(4);
-    int DayOfSim(1);
+    state.dataGlobal->DayOfSim = 1;
     int HourofDay(1);
     int timeStp(1);
     Real64 timeStepDuration(0.25);
     int numTimeStepsInHour(4);
 
     ZoneTimestepObject tmpztStepStamp1( // call constructor
-        KindOfSim, Envrn, DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+        state.dataGlobal->KindOfSim, Envrn, state.dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
     LogVal = 1.5; // kg/s
     tmpztStepStamp1.runningAvgDataValue = 1.5;
     sizingLoggerFrameObj.logObjs[logIndex].FillZoneStep(tmpztStepStamp1);
@@ -443,9 +394,9 @@ TEST_F(SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour)
 
     TestLogObj.ztStepObj.resize(TestLogObj.NumOfStepsInLogSet);
 
-    int KindOfSim(4);
+    state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
     int Envrn(3);
-    int DayOfSim(1);
+    state.dataGlobal->DayOfSim = 1;
     int HourofDay(0);
     DataHVACGlobals::TimeStepSys = 1.0 / (4.0 * 5.0); // fractional hours, duration
     Real64 zoneTimeStepDuration(0.25);
@@ -457,7 +408,7 @@ TEST_F(SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour)
         for (int timeStp = 1; timeStp <= 4; ++timeStp) {              // 15 minute zone timestep
             for (int subTimeStp = 1; subTimeStp <= 5; ++subTimeStp) { // 5 system substeps, so 3 minute system timestep
                 Real64 const minutesPerHour(60.0);
-                ZoneTimestepObject tmpztStepStamp(KindOfSim, Envrn, DayOfSim, HourofDay, timeStp, zoneTimeStepDuration,
+                ZoneTimestepObject tmpztStepStamp(state.dataGlobal->KindOfSim, Envrn, state.dataGlobal->DayOfSim, HourofDay, timeStp, zoneTimeStepDuration,
                                                   numTimeStepsInHour); // call constructor
                 SystemTimestepObject tmpSysStepStamp;
                 tmpSysStepStamp.CurMinuteEnd = (timeStp - 1) * (minutesPerHour * zoneTimeStepDuration) +
@@ -470,7 +421,7 @@ TEST_F(SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour)
                 TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
             }
 
-            ZoneTimestepObject tmpztStepStamp1(KindOfSim, Envrn, DayOfSim, HourofDay, timeStp, zoneTimeStepDuration,
+            ZoneTimestepObject tmpztStepStamp1(state.dataGlobal->KindOfSim, Envrn, state.dataGlobal->DayOfSim, HourofDay, timeStp, zoneTimeStepDuration,
                                                numTimeStepsInHour); // call constructor
             TestLogObj.FillZoneStep(tmpztStepStamp1);
         }
@@ -483,7 +434,7 @@ TEST_F(SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour)
         for (int timeStp = 1; timeStp <= 4; ++timeStp) {              // 15 minute zone timestep
             for (int subTimeStp = 1; subTimeStp <= 5; ++subTimeStp) { // 5 system substeps, so 3 minute system timestep
                 Real64 const minutesPerHour(60.0);
-                ZoneTimestepObject tmpztStepStamp(KindOfSim, Envrn, DayOfSim, HourofDay, timeStp, zoneTimeStepDuration,
+                ZoneTimestepObject tmpztStepStamp(state.dataGlobal->KindOfSim, Envrn, state.dataGlobal->DayOfSim, HourofDay, timeStp, zoneTimeStepDuration,
                                                   numTimeStepsInHour); // call constructor
                 SystemTimestepObject tmpSysStepStamp;
                 tmpSysStepStamp.CurMinuteEnd = (timeStp - 1) * (minutesPerHour * zoneTimeStepDuration) +
@@ -496,7 +447,7 @@ TEST_F(SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour)
                 TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
             }
 
-            ZoneTimestepObject tmpztStepStamp1(KindOfSim, Envrn, DayOfSim, HourofDay, timeStp, zoneTimeStepDuration,
+            ZoneTimestepObject tmpztStepStamp1(state.dataGlobal->KindOfSim, Envrn, state.dataGlobal->DayOfSim, HourofDay, timeStp, zoneTimeStepDuration,
                                                numTimeStepsInHour); // call constructor
             TestLogObj.FillZoneStep(tmpztStepStamp1);
         }
@@ -542,16 +493,16 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTestNullMassFlowRateTim
     PlantCoinicidentAnalysis TestAnalysisObj(loopName, loopNum, nodeNum, density, cp, timestepsInAvg, plantSizingIndex);
 
     // fill first step in log with zone step data
-    int KindOfSim(4);
+    state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
     int Envrn(4);
-    int DayOfSim(1);
+    state.dataGlobal->DayOfSim = 1;
     int HourofDay(1);
     int timeStp(1);
     Real64 timeStepDuration(0.25);
     int numTimeStepsInHour(4);
 
     ZoneTimestepObject tmpztStepStamp1( // call full constructor
-        KindOfSim, Envrn, DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
+        state.dataGlobal->KindOfSim, Envrn, state.dataGlobal->DayOfSim, HourofDay, timeStp, timeStepDuration, numTimeStepsInHour);
     LogVal = 1.5; // kg/s
     tmpztStepStamp1.runningAvgDataValue = 1.5;
     sizingLoggerFrameObj.logObjs[logIndex].FillZoneStep(tmpztStepStamp1);

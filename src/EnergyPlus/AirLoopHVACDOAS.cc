@@ -107,7 +107,7 @@ namespace AirLoopHVACDOAS {
 
         this->initAirLoopDOAS(state, FirstHVACIteration);
 
-        if (this->SumMassFlowRate == 0.0 && !DataGlobals::BeginEnvrnFlag) {
+        if (this->SumMassFlowRate == 0.0 && !state.dataGlobal->BeginEnvrnFlag) {
             DataLoopNode::Node(this->m_CompPointerAirLoopMixer->OutletNodeNum).MassFlowRate = 0.0;
             return;
         }
@@ -796,7 +796,7 @@ namespace AirLoopHVACDOAS {
         std::string RoutineName = "AirLoopDOAS::initAirLoopDOAS";
         bool ErrorsFound = false;
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             Real64 rho;
             DataSizing::CurSysNum = this->m_OASystemNum;
             for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).NumComponents; ++CompNum) {
@@ -814,7 +814,7 @@ namespace AirLoopHVACDOAS {
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             DataPlant::PlantLoop(this->HWLoopNum).FluidName,
-                                                            DataGlobals::HWInitConvTemp,
+                                                            DataGlobalConstants::HWInitConvTemp(),
                                                             DataPlant::PlantLoop(this->HWLoopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(0.0,
@@ -831,7 +831,7 @@ namespace AirLoopHVACDOAS {
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                            DataGlobals::CWInitConvTemp,
+                                                            DataGlobalConstants::CWInitConvTemp(),
                                                             DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(0.0,
@@ -848,7 +848,7 @@ namespace AirLoopHVACDOAS {
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water:DetailedGeometry", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                            DataGlobals::CWInitConvTemp,
+                                                            DataGlobalConstants::CWInitConvTemp(),
                                                             DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(0.0,
@@ -868,7 +868,7 @@ namespace AirLoopHVACDOAS {
             }
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag = true;
         }
 

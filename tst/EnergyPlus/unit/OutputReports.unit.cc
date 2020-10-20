@@ -138,8 +138,8 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
     SurfaceGeometry::SinZoneRelNorth.allocate(1);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 

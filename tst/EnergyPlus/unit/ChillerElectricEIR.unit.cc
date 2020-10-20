@@ -230,7 +230,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     thisEIR.size(state);
 
     // run through init again after sizing is complete to set mass flow rate
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     thisEIR.initialize(state, RunFlag, MyLoad);
 
     // check chiller water side evap flow rate is non-zero
@@ -353,7 +353,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     thisEIRChiller.initialize(state, RunFlag, MyLoad);
     thisEIRChiller.size(state);
     // init again after sizing is complete to set mass flow rate
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     thisEIRChiller.initialize(state, RunFlag, MyLoad);
     // check chiller water side evap flow rate is non-zero
     EXPECT_NEAR(thisEIRChiller.EvapMassFlowRateMax, 0.999898, 0.0000001);
@@ -366,7 +366,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     thisEIRChiller.calculate(state, MyLoad, RunFlag);
     // calc evap-cooler water consumption rate
     Real64 EvapCondWaterVolFlowRate = thisEIRChiller.CondMassFlowRate * (thisEIRChiller.CondOutletHumRat - DataEnvironment::OutHumRat) /
-                                      Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+                                      Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
     // check evap-cooled condenser water consumption rate
     EXPECT_NEAR(2.31460814, thisEIRChiller.CondMassFlowRate, 0.0000001);
     EXPECT_NEAR(6.22019725E-06, EvapCondWaterVolFlowRate, 0.000000001);

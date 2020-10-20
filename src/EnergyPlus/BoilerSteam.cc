@@ -341,7 +341,7 @@ namespace BoilerSteam {
         int BoilerInletNode = this->BoilerInletNodeNum;
         int BoilerOutletNode = this->BoilerOutletNodeNum;
 
-        if (DataGlobals::BeginEnvrnFlag && this->myEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->myEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             Real64 EnthSteamOutDry =
                 FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, this->TempUpLimitBoilerOut, 1.0, this->FluidIndex, RoutineName);
@@ -402,7 +402,7 @@ namespace BoilerSteam {
 
         } // End If for the Begin Environment initializations
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->myEnvrnFlag = true;
         }
 
@@ -797,7 +797,7 @@ namespace BoilerSteam {
         // PURPOSE OF THIS SUBROUTINE:
         // Boiler simulation reporting
 
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         int BoilerInletNode = this->BoilerInletNodeNum;
         int BoilerOutletNode = this->BoilerOutletNodeNum;
 

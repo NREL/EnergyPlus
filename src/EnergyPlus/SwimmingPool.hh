@@ -63,8 +63,6 @@ struct EnergyPlusData;
 
 namespace SwimmingPool {
 
-    extern int NumSwimmingPools; // Number of swimming pools
-
     struct SwimmingPoolData : PlantComponent
     {
         // Members
@@ -164,7 +162,8 @@ namespace SwimmingPool {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void ErrorCheckSetupPoolSurface(std::string const Alpha1,
+        void ErrorCheckSetupPoolSurface(EnergyPlusData &state,
+                                        std::string const Alpha1,
                                         std::string const Alpha2,
                                         std::string const cAlphaField2,
                                         bool &ErrorsFound
@@ -191,16 +190,11 @@ namespace SwimmingPool {
         void update();
     };
 
-    // Object Data
-    extern Array1D<SwimmingPoolData> Pool;
-
-    void clear_state();
-
     void GetSwimmingPool(EnergyPlusData &state);
 
     void SimSwimmingPool(EnergyPlusData &state, bool FirstHVACIteration);
 
-    void UpdatePoolSourceValAvg(bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
+    void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
 
     Real64 SumHATsurf(int ZoneNum); // Zone number
 
@@ -212,6 +206,25 @@ namespace SwimmingPool {
 
 } // namespace SwimmingPool
 
+struct SwimmingPoolsData : BaseGlobalStruct {
+
+    // MODULE VARIABLE DECLARATIONS:
+    int NumSwimmingPools = 0; // Number of swimming pools
+    Array1D_bool CheckEquipName;
+    bool getSwimmingPoolInput = true;
+    Array1D<SwimmingPool::SwimmingPoolData> Pool;
+
+    void clear_state() override
+    {
+        NumSwimmingPools = 0;
+        getSwimmingPoolInput = true;
+        CheckEquipName.deallocate();
+        Pool.deallocate();
+    }
+
+    // Default Constructor
+    SwimmingPoolsData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

@@ -60,7 +60,6 @@ extern "C" {
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/environment.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -84,7 +83,6 @@ extern "C" {
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -172,7 +170,6 @@ namespace SimulationManager {
     // and internal Evolutionary Engineering documentation.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataSizing;
     using namespace DataReportingFlags;
@@ -325,8 +322,8 @@ namespace SimulationManager {
 
         InitializePsychRoutines();
 
-        BeginSimFlag = true;
-        BeginFullSimFlag = false;
+        state.dataGlobal->BeginSimFlag = true;
+        state.dataGlobal->BeginFullSimFlag = false;
         DoOutputReporting = false;
         DisplayPerfSimulationFlag = false;
         DoWeatherInitReporting = false;
@@ -372,7 +369,7 @@ namespace SimulationManager {
         DoingSizing = true;
         ManageSizing(state);
 
-        BeginFullSimFlag = true;
+        state.dataGlobal->BeginFullSimFlag = true;
         SimsDone = false;
         if (DoDesDaySim || DoWeathSim || DoHVACSizingSimulation) {
             DoOutputReporting = true;
@@ -453,7 +450,7 @@ namespace SimulationManager {
             CreateEnergyReportStructure();
             bool anyEMSRan;
             ManageEMS(state,
-                      emsCallFromSetupSimulation,
+                      EMSManager::EMSCallFrom::SetupSimulation,
                       anyEMSRan,
                       ObjexxFCL::Optional_int_const()); // point to finish setup processing EMS, sensor ready now
 
@@ -498,17 +495,17 @@ namespace SimulationManager {
 
             if (!Available) break;
             if (ErrorsFound) break;
-            if ((!DoDesDaySim) && (KindOfSim != ksRunPeriodWeather)) continue;
-            if ((!DoWeathSim) && (KindOfSim == ksRunPeriodWeather)) continue;
-            if (KindOfSim == ksHVACSizeDesignDay) continue; // don't run these here, only for sizing simulations
+            if ((!DoDesDaySim) && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) continue;
+            if ((!DoWeathSim) && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) continue;
+            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay) continue; // don't run these here, only for sizing simulations
 
-            if (KindOfSim == ksHVACSizeRunPeriodDesign) continue; // don't run these here, only for sizing simulations
+            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) continue; // don't run these here, only for sizing simulations
 
             ++EnvCount;
 
             if (sqlite) {
                 sqlite->sqliteBegin();
-                sqlite->createSQLiteEnvironmentPeriodRecord(DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName, DataGlobals::KindOfSim);
+                sqlite->createSQLiteEnvironmentPeriodRecord(DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName, state.dataGlobal->KindOfSim);
                 sqlite->sqliteCommit();
             }
 
@@ -516,19 +513,19 @@ namespace SimulationManager {
             SimsDone = true;
             DisplayString("Initializing New Environment Parameters");
 
-            BeginEnvrnFlag = true;
-            if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
+            state.dataGlobal->BeginEnvrnFlag = true;
+            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                 // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                 // easily converge fewer warmup days are allowed
                 DisplayString("Design Day Fast Warmup Mode: Suppressing Initialization of New Environment Parameters");
-                DataGlobals::beginEnvrnWarmStartFlag = true;
+                state.dataGlobal->beginEnvrnWarmStartFlag = true;
             } else {
-                DataGlobals::beginEnvrnWarmStartFlag = false;
+                state.dataGlobal->beginEnvrnWarmStartFlag = false;
             }
-            EndEnvrnFlag = false;
+            state.dataGlobal->EndEnvrnFlag = false;
             EndMonthFlag = false;
             WarmupFlag = true;
-            DayOfSim = 0;
+            state.dataGlobal->DayOfSim = 0;
             state.dataGlobal->DayOfSimChr = "0";
             NumOfWarmupDays = 0;
             if (CurrentYearIsLeapYear) {
@@ -544,30 +541,30 @@ namespace SimulationManager {
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
-            ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+            ManageEMS(state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
-            while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+            while ((state.dataGlobal->DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
                 if (state.dataGlobal->stopSimulation) break;
 
                 if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
 
-                ++DayOfSim;
-                state.dataGlobal->DayOfSimChr = fmt::to_string(DayOfSim);
+                ++state.dataGlobal->DayOfSim;
+                state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
                 if (!WarmupFlag) {
                     ++CurrentOverallSimDay;
                     DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
                 } else {
                     state.dataGlobal->DayOfSimChr = "0";
                 }
-                BeginDayFlag = true;
+                state.dataGlobal->BeginDayFlag = true;
                 EndDayFlag = false;
 
                 if (WarmupFlag) {
                     ++NumOfWarmupDays;
                     cWarmupDay = TrimSigDigits(NumOfWarmupDays);
                     DisplayString("Warming up {" + cWarmupDay + '}');
-                } else if (DayOfSim == 1) {
-                    if (KindOfSim == ksRunPeriodWeather) {
+                } else if (state.dataGlobal->DayOfSim == 1) {
+                    if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         DisplayString("Starting Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
                     } else {
                         DisplayString("Starting Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
@@ -576,7 +573,7 @@ namespace SimulationManager {
                     print(state.files.eio, Format_700, NumOfWarmupDays);
                     ResetAccumulationWhenWarmupComplete();
                 } else if (DisplayPerfSimulationFlag) {
-                    if (KindOfSim == ksRunPeriodWeather) {
+                    if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
                     } else {
                         DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
@@ -584,15 +581,15 @@ namespace SimulationManager {
                     DisplayPerfSimulationFlag = false;
                 }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
-                if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
+                if ((state.dataGlobal->DayOfSim > 365) && ((NumOfDayInEnvrn - state.dataGlobal->DayOfSim) == 364) && !WarmupFlag) {
                     DisplayString("Starting last  year of environment at:  " + state.dataGlobal->DayOfSimChr);
-                    ResetTabularReports();
+                    ResetTabularReports(state);
                 }
 
                 for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
                     if (state.dataGlobal->stopSimulation) break;
 
-                    BeginHourFlag = true;
+                    state.dataGlobal->BeginHourFlag = true;
                     EndHourFlag = false;
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
@@ -611,7 +608,7 @@ namespace SimulationManager {
                             WeatherManager::UpdateLocationAndOrientation();
                         }
 
-                        BeginTimeStepFlag = true;
+                        state.dataGlobal->BeginTimeStepFlag = true;
                         ExternalInterfaceExchangeVariables(state);
 
                         // Set the End__Flag variables to true if necessary.  Note that
@@ -625,8 +622,8 @@ namespace SimulationManager {
                             EndHourFlag = true;
                             if (HourOfDay == 24) {
                                 EndDayFlag = true;
-                                if ((!WarmupFlag) && (DayOfSim == NumOfDayInEnvrn)) {
-                                    EndEnvrnFlag = true;
+                                if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
+                                    state.dataGlobal->EndEnvrnFlag = true;
                                 }
                             }
                         }
@@ -642,11 +639,11 @@ namespace SimulationManager {
                             oneTimeUnderwaterBoundaryCheck = false;
                         }
 
-                        BeginHourFlag = false;
-                        BeginDayFlag = false;
-                        BeginEnvrnFlag = false;
-                        BeginSimFlag = false;
-                        BeginFullSimFlag = false;
+                        state.dataGlobal->BeginHourFlag = false;
+                        state.dataGlobal->BeginDayFlag = false;
+                        state.dataGlobal->BeginEnvrnFlag = false;
+                        state.dataGlobal->BeginSimFlag = false;
+                        state.dataGlobal->BeginFullSimFlag = false;
                     } // TimeStep loop
 
                     PreviousHour = HourOfDay;
@@ -993,7 +990,7 @@ namespace SimulationManager {
 
         TimeStepZone = 1.0 / double(NumOfTimeStepInHour);
         MinutesPerTimeStep = TimeStepZone * 60;
-        TimeStepZoneSec = TimeStepZone * SecInHour;
+        TimeStepZoneSec = TimeStepZone * DataGlobalConstants::SecInHour();
 
         CurrentModuleObject = "ConvergenceLimits";
         Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -1327,7 +1324,7 @@ namespace SimulationManager {
                         DataGlobals::NumOfTimeStepInHour = 1;
                         DataGlobals::TimeStepZone = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
                         DataGlobals::MinutesPerTimeStep = DataGlobals::TimeStepZone * 60;
-                        DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * SecInHour;
+                        DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
                     }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError(
@@ -1908,8 +1905,6 @@ namespace SimulationManager {
         using OutputProcessor::NumVarMeterArrays;
         using OutputReportTabular::maxUniqueKeyCount;
         using OutputReportTabular::MonthlyFieldSetInputCount;
-        using SolarShading::MAXHCArrayBounds;
-        using SolarShading::maxNumberOfFigures;
         using namespace DataRuntimeLanguage;
         using DataBranchNodeConnections::MaxNumOfNodeConnections;
         using DataBranchNodeConnections::NumOfNodeConnections;
@@ -1955,8 +1950,8 @@ namespace SimulationManager {
         print(state.files.audit, variable_fmt, "NumEnergyMeters", NumEnergyMeters);
         print(state.files.audit, variable_fmt, "NumVarMeterArrays", NumVarMeterArrays);
         print(state.files.audit, variable_fmt, "maxUniqueKeyCount", maxUniqueKeyCount);
-        print(state.files.audit, variable_fmt, "maxNumberOfFigures", maxNumberOfFigures);
-        print(state.files.audit, variable_fmt, "MAXHCArrayBounds", MAXHCArrayBounds);
+        print(state.files.audit, variable_fmt, "maxNumberOfFigures", state.dataSolarShading->maxNumberOfFigures);
+        print(state.files.audit, variable_fmt, "MAXHCArrayBounds", state.dataSolarShading->MAXHCArrayBounds);
         print(state.files.audit, variable_fmt, "MaxVerticesPerSurface", MaxVerticesPerSurface);
         print(state.files.audit, variable_fmt, "NumReportList", NumReportList);
         print(state.files.audit, variable_fmt, "InstMeterCacheSize", InstMeterCacheSize);
@@ -2123,26 +2118,26 @@ namespace SimulationManager {
             if (!Available) break;
             if (ErrorsFound) break;
 
-            BeginEnvrnFlag = true;
-            EndEnvrnFlag = false;
+            state.dataGlobal->BeginEnvrnFlag = true;
+            state.dataGlobal->EndEnvrnFlag = false;
             EndMonthFlag = false;
             WarmupFlag = true;
-            DayOfSim = 0;
+            state.dataGlobal->DayOfSim = 0;
 
-            ++DayOfSim;
-            BeginDayFlag = true;
+            ++state.dataGlobal->DayOfSim;
+            state.dataGlobal->BeginDayFlag = true;
             EndDayFlag = false;
 
             HourOfDay = 1;
 
-            BeginHourFlag = true;
+            state.dataGlobal->BeginHourFlag = true;
             EndHourFlag = false;
 
             TimeStep = 1;
 
             if (DeveloperFlag) DisplayString("Initializing Simulation - timestep 1:" + EnvironmentName);
 
-            BeginTimeStepFlag = true;
+            state.dataGlobal->BeginTimeStepFlag = true;
 
             ManageWeather(state);
 
@@ -2150,11 +2145,11 @@ namespace SimulationManager {
 
             ManageHeatBalance(state);
 
-            BeginHourFlag = false;
-            BeginDayFlag = false;
-            BeginEnvrnFlag = false;
-            BeginSimFlag = false;
-            BeginFullSimFlag = false;
+            state.dataGlobal->BeginHourFlag = false;
+            state.dataGlobal->BeginDayFlag = false;
+            state.dataGlobal->BeginEnvrnFlag = false;
+            state.dataGlobal->BeginSimFlag = false;
+            state.dataGlobal->BeginFullSimFlag = false;
 
             //          ! do another timestep=1
             if (DeveloperFlag) DisplayString("Initializing Simulation - 2nd timestep 1:" + EnvironmentName);
@@ -2169,7 +2164,7 @@ namespace SimulationManager {
 
             HourOfDay = 24;
             TimeStep = NumOfTimeStepInHour;
-            EndEnvrnFlag = true;
+            state.dataGlobal->EndEnvrnFlag = true;
 
             if (DeveloperFlag) DisplayString("Initializing Simulation - hour 24 timestep 1:" + EnvironmentName);
             ManageWeather(state);
@@ -2989,7 +2984,7 @@ namespace SimulationManager {
         Array1D_int VarTypes;
         Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
         Array1D_string VarNames;
-        Array1D_int ResourceTypes;
+        std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;
         Array1D_string EndUses;
         Array1D_string Groups;
 
@@ -3006,7 +3001,11 @@ namespace SimulationManager {
             VarTypes.dimension(NumVariables, 0);
             VarNames.allocate(NumVariables);
             unitsForVar.allocate(NumVariables);
-            ResourceTypes.dimension(NumVariables, 0);
+
+            for (int idx = 1; idx <= NumVariables; ++idx) {
+                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::None));
+            }
+
             EndUses.allocate(NumVariables);
             Groups.allocate(NumVariables);
             GetMeteredVariables(CompSets(Loop).CType,
@@ -3027,7 +3026,7 @@ namespace SimulationManager {
                       VarIDs(Loop1),
                       VarNames(Loop1),
                       unitEnumToString(unitsForVar(Loop1)),
-                      GetResourceTypeChar(ResourceTypes(Loop1)),
+                      GetResourceTypeChar(ResourceTypes.at(Loop1)),
                       EndUses(Loop1),
                       Groups(Loop1)
                       // TODO: Should call OutputProcessor::StandardTimeStepTypeKey(IndexTypes(Loop1)) to return "Zone" or "HVAC"
@@ -3040,7 +3039,6 @@ namespace SimulationManager {
             VarIDs.deallocate();
             VarNames.deallocate();
             unitsForVar.deallocate();
-            ResourceTypes.deallocate();
             EndUses.deallocate();
             Groups.deallocate();
         }
@@ -3143,7 +3141,6 @@ void Resimulate(EnergyPlusData &state,
     //         ReportHeatBalance
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataHeatBalFanSys::iGetZoneSetPoints;
     using DataHeatBalFanSys::iPredictStep;
     using DemandManager::DemandManagerExtIterations;
@@ -3180,7 +3177,7 @@ void Resimulate(EnergyPlusData &state,
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
         // Air simulation
-        InitAirHeatBalance();
+        InitAirHeatBalance(state);
         ManageRefrigeratedCaseRacks(state);
 
         ++DemandManagerHBIterations;

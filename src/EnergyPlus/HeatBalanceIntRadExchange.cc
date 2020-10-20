@@ -134,7 +134,8 @@ namespace HeatBalanceIntRadExchange {
         CalcInteriorRadExchangefirstTime = true;
     }
 
-    void CalcInteriorRadExchange(Array1S<Real64> const SurfaceTemp,   // Current surface temperatures
+    void CalcInteriorRadExchange(EnergyPlusData &state,
+                                 Array1S<Real64> const SurfaceTemp,   // Current surface temperatures
                                  int const SurfIterations,            // Number of iterations in calling subroutine
                                  Array1D<Real64> &NetLWRadToSurf,      // Net long wavelength radiant exchange from other surfaces
                                  Optional_int_const ZoneToResimulate, // if passed in, then only calculate for this zone
@@ -265,11 +266,11 @@ namespace HeatBalanceIntRadExchange {
                 IntShadeOrBlindStatusChanged = false;
                 IntMovInsulChanged = false;
 
-                if (!BeginEnvrnFlag) { // Check for change in shade/blind status
+                if (!state.dataGlobal->BeginEnvrnFlag) { // Check for change in shade/blind status
                     for (int const SurfNum : zone_SurfacePtr) {
                         if (IntShadeOrBlindStatusChanged || IntMovInsulChanged)
                             break; // Need only check if one window's status or one movable insulation status has changed
-                        if (dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) {
+                        if (state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) {
                             ShadeFlag = SurfWinShadingFlag(SurfNum);
                             ShadeFlagPrev = SurfWinExtIntShadePrevTS(SurfNum);
                             if ((ShadeFlagPrev != IntShadeOn && ShadeFlag == IntShadeOn) ||
@@ -277,22 +278,22 @@ namespace HeatBalanceIntRadExchange {
                                 (ShadeFlagPrev == IntShadeOn && ShadeFlag != IntShadeOn) || (ShadeFlagPrev == IntBlindOn && ShadeFlag != IntBlindOn))
                                 IntShadeOrBlindStatusChanged = true;
                             if (SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
-                                DataWindowEquivalentLayer::CFS(dataConstruction.Construct(Surface(SurfNum).Construction).EQLConsPtr).ISControlled) {
+                                DataWindowEquivalentLayer::CFS(state.dataConstruction->Construct(Surface(SurfNum).Construction).EQLConsPtr).ISControlled) {
                                 IntShadeOrBlindStatusChanged = true;
                             }
                         } else {
-                            UpdateMovableInsulationFlag(IntMovInsulChanged, SurfNum);
+                            UpdateMovableInsulationFlag(state, IntMovInsulChanged, SurfNum);
                         }
                     }
                 }
 
-                if (IntShadeOrBlindStatusChanged || IntMovInsulChanged || BeginEnvrnFlag) { // Calc inside surface emissivities for this time step
+                if (IntShadeOrBlindStatusChanged || IntMovInsulChanged || state.dataGlobal->BeginEnvrnFlag) { // Calc inside surface emissivities for this time step
                     for (int ZoneSurfNum = 1; ZoneSurfNum <= n_zone_Surfaces; ++ZoneSurfNum) {
                         int const SurfNum = zone_SurfacePtr(ZoneSurfNum);
                         int const ConstrNum = Surface(SurfNum).Construction;
-                        zone_info.Emissivity(ZoneSurfNum) = dataConstruction.Construct(ConstrNum).InsideAbsorpThermal;
+                        zone_info.Emissivity(ZoneSurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
                         auto const &surface_window(SurfaceWindow(SurfNum));
-                        if (dataConstruction.Construct(ConstrNum).TypeIsWindow &&
+                        if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow &&
                             (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn)) {
                             zone_info.Emissivity(ZoneSurfNum) =
                                 InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), surface_window.EffShBlindEmiss) +
@@ -303,8 +304,8 @@ namespace HeatBalanceIntRadExchange {
                             zone_info.Emissivity(ZoneSurfNum) = dataMaterial.Material(Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal;
                         }
                         if (SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
-                            DataWindowEquivalentLayer::CFS(dataConstruction.Construct(ConstrNum).EQLConsPtr).ISControlled) {
-                            zone_info.Emissivity(ZoneSurfNum) = EQLWindowInsideEffectiveEmiss(ConstrNum);
+                            DataWindowEquivalentLayer::CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).ISControlled) {
+                            zone_info.Emissivity(ZoneSurfNum) = EQLWindowInsideEffectiveEmiss(state, ConstrNum);
                         }
                     }
 
@@ -328,10 +329,10 @@ namespace HeatBalanceIntRadExchange {
                 int const SurfNum = zone_SurfacePtr[ZoneSurfNum];
                 auto const &surface_window(SurfaceWindow(SurfNum));
                 int const ConstrNum = Surface(SurfNum).Construction;
-                auto const &construct(dataConstruction.Construct(ConstrNum));
+                auto const &construct(state.dataConstruction->Construct(ConstrNum));
                 if (construct.WindowTypeEQL) {
                     SurfaceTempRad[ZoneSurfNum] = SurfWinEffInsSurfTemp(SurfNum);
-                    SurfaceEmiss[ZoneSurfNum] = EQLWindowInsideEffectiveEmiss(ConstrNum);
+                    SurfaceEmiss[ZoneSurfNum] = EQLWindowInsideEffectiveEmiss(state, ConstrNum);
                 } else if (construct.WindowTypeBSDF && SurfWinShadingFlag(SurfNum) == IntShadeOn) {
                     SurfaceTempRad[ZoneSurfNum] = SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = surface_window.EffShBlindEmiss[0] + surface_window.EffGlassEmiss[0];
@@ -343,7 +344,7 @@ namespace HeatBalanceIntRadExchange {
                         // If the window is bare this TS and it is the first time through we use the previous TS glass
                         // temperature whether or not the window was shaded in the previous TS. If the window was shaded
                         // the previous time step this temperature is a better starting value than the shade temperature.
-                        SurfaceTempRad[ZoneSurfNum] = surface_window.ThetaFace(2 * construct.TotGlassLayers) - KelvinConv;
+                        SurfaceTempRad[ZoneSurfNum] = surface_window.ThetaFace(2 * construct.TotGlassLayers) - DataGlobalConstants::KelvinConv();
                         SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
                         // For windows with an interior shade or blind an effective inside surface temp
                         // and emiss is used here that is a weighted combination of shade/blind and glass temp and emiss.
@@ -363,12 +364,12 @@ namespace HeatBalanceIntRadExchange {
                     CarrollMRTNumerator += SurfaceTempRad[ZoneSurfNum]*zone_info.Fp[ZoneSurfNum]*zone_info.Area[ZoneSurfNum];
                     CarrollMRTDenominator += zone_info.Fp[ZoneSurfNum]*zone_info.Area[ZoneSurfNum];
                 }
-                SurfaceTempInKto4th[ZoneSurfNum] = pow_4(SurfaceTempRad[ZoneSurfNum] + KelvinConv);
+                SurfaceTempInKto4th[ZoneSurfNum] = pow_4(SurfaceTempRad[ZoneSurfNum] + DataGlobalConstants::KelvinConv());
             }
 
             if (CarrollMethod) {
                 if (CarrollMRTDenominator > 0.0) {
-                    CarrollMRTInKTo4th = pow_4(CarrollMRTNumerator/CarrollMRTDenominator + KelvinConv);
+                    CarrollMRTInKTo4th = pow_4(CarrollMRTNumerator/CarrollMRTDenominator + DataGlobalConstants::KelvinConv());
                 } else {
                     // Likely only one surface in this enclosure
                     CarrollMRTInKTo4th = 293.15;  // arbitrary value, IR will be zero
@@ -381,7 +382,7 @@ namespace HeatBalanceIntRadExchange {
                 for (size_type RecZoneSurfNum = 0; RecZoneSurfNum < s_zone_Surfaces; ++RecZoneSurfNum) {
                     int const RecSurfNum = zone_SurfacePtr[RecZoneSurfNum];
                     int const ConstrNumRec = Surface(RecSurfNum).Construction;
-                    auto const& rec_construct(dataConstruction.Construct(ConstrNumRec));
+                    auto const& rec_construct(state.dataConstruction->Construct(ConstrNumRec));
                     auto& netLWRadToRecSurf(NetLWRadToSurf(RecSurfNum));
                     if (rec_construct.TypeIsWindow) {
 //                        auto& rec_surface_window(SurfaceWindow(RecSurfNum));
@@ -396,7 +397,7 @@ namespace HeatBalanceIntRadExchange {
                             }
                         }
                         if (CarrollMRTDenominatorWin > 0.0) {
-                            CarrollMRTInKTo4thWin = pow_4(CarrollMRTNumeratorWin / CarrollMRTDenominatorWin + KelvinConv);
+                            CarrollMRTInKTo4thWin = pow_4(CarrollMRTNumeratorWin / CarrollMRTDenominatorWin + DataGlobalConstants::KelvinConv());
                         }
                         SurfWinIRfromParentZone(RecSurfNum) += (zone_info.Fp[RecZoneSurfNum] * CarrollMRTInKTo4thWin) / SurfaceEmiss[RecZoneSurfNum];
                     }
@@ -406,7 +407,7 @@ namespace HeatBalanceIntRadExchange {
                 for (size_type RecZoneSurfNum = 0; RecZoneSurfNum < s_zone_Surfaces; ++RecZoneSurfNum) {
                     int const RecSurfNum = zone_SurfacePtr[RecZoneSurfNum];
                     int const ConstrNumRec = Surface(RecSurfNum).Construction;
-                    auto const &rec_construct(dataConstruction.Construct(ConstrNumRec));
+                    auto const &rec_construct(state.dataConstruction->Construct(ConstrNumRec));
                     auto &netLWRadToRecSurf(NetLWRadToSurf(RecSurfNum));
 
                     // Calculate net long-wave radiation for opaque surfaces and incident
@@ -459,7 +460,7 @@ namespace HeatBalanceIntRadExchange {
 #endif
     }
 
-    void UpdateMovableInsulationFlag(bool &MovableInsulationChange, int const SurfNum)
+    void UpdateMovableInsulationFlag(EnergyPlusData &state, bool &MovableInsulationChange, int const SurfNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -482,7 +483,7 @@ namespace HeatBalanceIntRadExchange {
         }
         if ((Surface(SurfNum).MovInsulIntPresent != Surface(SurfNum).MovInsulIntPresentPrevTS)) {
             auto const &thissurf(Surface(SurfNum));
-            Real64 AbsorpDiff = std::abs(dataConstruction.Construct(thissurf.Construction).InsideAbsorpThermal - dataMaterial.Material(thissurf.MaterialMovInsulInt).AbsorpThermal);
+            Real64 AbsorpDiff = std::abs(state.dataConstruction->Construct(thissurf.Construction).InsideAbsorpThermal - dataMaterial.Material(thissurf.MaterialMovInsulInt).AbsorpThermal);
             if (AbsorpDiff > 0.01) {
                 MovableInsulationChange = true;
             }
@@ -592,7 +593,7 @@ namespace HeatBalanceIntRadExchange {
             for (int enclSurfNum = 1; enclSurfNum <= thisEnclosure.NumOfSurfaces; ++enclSurfNum) {
                 int const SurfNum = thisEnclosure.SurfacePtr(enclSurfNum);
                 thisEnclosure.Area(enclSurfNum) = Surface(SurfNum).Area;
-                thisEnclosure.Emissivity(enclSurfNum) = dataConstruction.Construct(Surface(SurfNum).Construction).InsideAbsorpThermal;
+                thisEnclosure.Emissivity(enclSurfNum) = state.dataConstruction->Construct(Surface(SurfNum).Construction).InsideAbsorpThermal;
                 thisEnclosure.Azimuth(enclSurfNum) = Surface(SurfNum).Azimuth;
                 thisEnclosure.Tilt(enclSurfNum) = Surface(SurfNum).Tilt;
             }
@@ -853,7 +854,7 @@ namespace HeatBalanceIntRadExchange {
                 for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     // Do not include non-heat transfer surfaces, unless it is an air boundary interior window
                     if (Surface(surfNum).Construction > 0) {
-                        if (!Surface(surfNum).HeatTransSurf && !dataConstruction.Construct(Surface(surfNum).Construction).TypeIsAirBoundaryInteriorWindow) {
+                        if (!Surface(surfNum).HeatTransSurf && !state.dataConstruction->Construct(Surface(surfNum).Construction).TypeIsAirBoundaryInteriorWindow) {
                             continue;
                         }
                     } else if (!Surface(surfNum).HeatTransSurf) {
@@ -880,7 +881,7 @@ namespace HeatBalanceIntRadExchange {
                 for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     // Do not include non-heat transfer surfaces, unless it is an air boundary interior window
                     if (Surface(surfNum).Construction > 0) {
-                        if (!Surface(surfNum).HeatTransSurf && !dataConstruction.Construct(Surface(surfNum).Construction).TypeIsAirBoundaryInteriorWindow) {
+                        if (!Surface(surfNum).HeatTransSurf && !state.dataConstruction->Construct(Surface(surfNum).Construction).TypeIsAirBoundaryInteriorWindow) {
                             continue;
                         }
                     } else if (!Surface(surfNum).HeatTransSurf) {
@@ -907,7 +908,7 @@ namespace HeatBalanceIntRadExchange {
             for (int enclSurfNum = 1; enclSurfNum <= thisEnclosure.NumOfSurfaces; ++enclSurfNum) {
                 int const SurfNum = thisEnclosure.SurfacePtr(enclSurfNum);
                 thisEnclosure.Area(enclSurfNum) = Surface(SurfNum).Area;
-                thisEnclosure.SolAbsorptance(enclSurfNum) = dataConstruction.Construct(Surface(SurfNum).Construction).InsideAbsorpSolar;
+                thisEnclosure.SolAbsorptance(enclSurfNum) = state.dataConstruction->Construct(Surface(SurfNum).Construction).InsideAbsorpSolar;
                 thisEnclosure.Azimuth(enclSurfNum) = Surface(SurfNum).Azimuth;
                 thisEnclosure.Tilt(enclSurfNum) = Surface(SurfNum).Tilt;
             }
@@ -1135,7 +1136,6 @@ namespace HeatBalanceIntRadExchange {
         int index;
         int inx1;
         int inx2;
-        // unused  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: ZoneSurfaceNames
 
         NoUserInputF = true;
         UserFZoneIndex = inputProcessor->getObjectItemNum(state, "ZoneProperty:UserViewFactors", ZoneName);
@@ -2010,7 +2010,7 @@ namespace HeatBalanceIntRadExchange {
                 Array1D<Real64> &Fp       // VECTOR OF OPPENHEIM RESISTANCE VALUES
     )
     {
-        Real64 SB = DataGlobals::StefanBoltzmann;
+        Real64 SB = DataGlobalConstants::StefanBoltzmann();
         for (int iS = 0; iS < N; iS++) {
             Fp[iS] = SB*EMISS[iS]/(EMISS[iS]/FMRT[iS] + 1. - EMISS[iS]);  // actually sigma *
         }

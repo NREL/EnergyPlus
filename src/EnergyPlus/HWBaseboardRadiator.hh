@@ -194,7 +194,7 @@ namespace HWBaseboardRadiator {
 
     void CalcHWBaseboard(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet);
 
-    void UpdateHWBaseboard(int const BaseboardNum);
+    void UpdateHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
     void UpdateBBRadSourceValAvg(bool &HWBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
 

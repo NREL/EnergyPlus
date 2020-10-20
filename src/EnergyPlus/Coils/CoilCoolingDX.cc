@@ -210,7 +210,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
     }
 
     if (input_data.availability_schedule_name.empty()) {
-      this->availScheduleIndex = DataGlobals::ScheduleAlwaysOn;
+      this->availScheduleIndex = DataGlobalConstants::ScheduleAlwaysOn();
     } else {
         this->availScheduleIndex = ScheduleManager::GetScheduleIndex(state, input_data.availability_schedule_name);
     }
@@ -633,7 +633,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor
-    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
     // update condensate collection tank
     if (this->condensateTankIndex > 0) {

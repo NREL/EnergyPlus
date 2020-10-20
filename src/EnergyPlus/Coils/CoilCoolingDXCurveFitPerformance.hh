@@ -52,6 +52,7 @@
 #include <vector>
 
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -70,7 +71,7 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
     Real64 basin_heater_capacity;
     Real64 basin_heater_setpoint_temperature;
     std::string basin_heater_operating_schedule_name;
-    int compressor_fuel_type;
+    DataGlobalConstants::ResourceType compressor_fuel_type;
     std::string base_operating_mode_name;
     std::string alternate_operating_mode_name;
     std::string alternate_operating_mode2_name;

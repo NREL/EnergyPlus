@@ -250,8 +250,8 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
     Surface.allocate(1);
     Surface(1).Construction = 1;
     Surface(1).Area = 1500.0;
-    dataConstruction.Construct.allocate(1);
-    dataConstruction.Construct(1).ThicknessPerpend = 0.075;
+    state.dataConstruction->Construct.allocate(1);
+    state.dataConstruction->Construct(1).ThicknessPerpend = 0.075;
 
     SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(ExpectedResult1, HydrRadSys(RadSysNum).WaterVolFlowMaxHeat, 0.1);
@@ -331,8 +331,8 @@ TEST_F(LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow)
     Surface.allocate(1);
     Surface(1).Construction = 1;
     Surface(1).Area = 1500.0;
-    dataConstruction.Construct.allocate(1);
-    dataConstruction.Construct(1).ThicknessPerpend = 0.075;
+    state.dataConstruction->Construct.allocate(1);
+    state.dataConstruction->Construct(1).ThicknessPerpend = 0.075;
 
     SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(ExpectedResult1, HydrRadSys(RadSysNum).ScaledHeatingCapacity, 0.1);
@@ -399,8 +399,8 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow)
     Surface.allocate(1);
     Surface(1).Construction = 1;
     Surface(1).Area = 150.0;
-    dataConstruction.Construct.allocate(1);
-    dataConstruction.Construct(1).ThicknessPerpend = 0.075;
+    state.dataConstruction->Construct.allocate(1);
+    state.dataConstruction->Construct(1).ThicknessPerpend = 0.075;
 
     SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
     EXPECT_NEAR(ExpectedResult1, CFloRadSys(RadSysNum).WaterVolFlowMax, 0.001);
@@ -1233,10 +1233,10 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystem)
     NumOfCFloLowTempRadSys = 1;
     CFloRadSys(RadSysNum).NumOfSurfaces = 0;
     TotalNumOfRadSystems = 0;
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     CFloRadSys(RadSysNum).HotWaterInNode = 0;
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
-    BeginTimeStepFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = false;
     CFloRadSys(RadSysNum).VolFlowSchedPtr = 0;
     CFloRadSys(RadSysNum).EMSOverrideOnWaterMdot = false;
     CFloRadSys(RadSysNum).WaterMassFlowRate = 1.0;
@@ -1277,11 +1277,11 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).NumOfSurfaces = 0;
     CFloRadSys(RadSysNum).Name = "NoNameRadSys";
     TotalNumOfRadSystems = 0;
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     DataZoneEquipment::ZoneEquipInputsFilled = false;
     CFloRadSys(RadSysNum).HotWaterInNode = 0;
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
-    BeginTimeStepFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = false;
     CFloRadSys(RadSysNum).VolFlowSchedPtr = 0;
     CFloRadSys(RadSysNum).EMSOverrideOnWaterMdot = false;
     CFloRadSys(RadSysNum).WaterMassFlowRate = 1.0;
@@ -1310,11 +1310,11 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).NumOfSurfaces = 0;
     CFloRadSys(RadSysNum).Name = "NoNameRadSys";
     TotalNumOfRadSystems = 0;
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     DataZoneEquipment::ZoneEquipInputsFilled = false;
     CFloRadSys(RadSysNum).HotWaterInNode = 0;
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
-    BeginTimeStepFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = false;
     CFloRadSys(RadSysNum).VolFlowSchedPtr = 0;
     CFloRadSys(RadSysNum).EMSOverrideOnWaterMdot = false;
     CFloRadSys(RadSysNum).WaterMassFlowRate = 1.0;
@@ -1348,11 +1348,11 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).NumOfSurfaces = 0;
     CFloRadSys(RadSysNum).Name = "NoNameRadSys";
     TotalNumOfRadSystems = 0;
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     DataZoneEquipment::ZoneEquipInputsFilled = false;
     CFloRadSys(RadSysNum).HotWaterInNode = 0;
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
-    BeginTimeStepFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = false;
     CFloRadSys(RadSysNum).VolFlowSchedPtr = 0;
     CFloRadSys(RadSysNum).EMSOverrideOnWaterMdot = false;
     CFloRadSys(RadSysNum).WaterMassFlowRate = 1.0;
@@ -1386,11 +1386,11 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).NumOfSurfaces = 0;
     CFloRadSys(RadSysNum).Name = "NoNameRadSys";
     TotalNumOfRadSystems = 0;
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     DataZoneEquipment::ZoneEquipInputsFilled = false;
     CFloRadSys(RadSysNum).HotWaterInNode = 0;
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
-    BeginTimeStepFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = false;
     CFloRadSys(RadSysNum).VolFlowSchedPtr = 0;
     CFloRadSys(RadSysNum).EMSOverrideOnWaterMdot = false;
     CFloRadSys(RadSysNum).WaterMassFlowRate = 1.0;
@@ -1504,8 +1504,8 @@ TEST_F(LowTempRadiantSystemTest, LowTempElecRadSurfaceGroupTest)
     Surface(4).ZoneName = "EAST ZONE";
     Surface(4).Zone = 2;
     Surface(4).Construction = 1;
-    dataConstruction.Construct.allocate(1);
-    dataConstruction.Construct(1).SourceSinkPresent = true;
+    state.dataConstruction->Construct.allocate(1);
+    state.dataConstruction->Construct(1).SourceSinkPresent = true;
 
     GetLowTempRadiantSystem(state);
     EXPECT_EQ(2, LowTempRadiantSystem::NumOfElecLowTempRadSys);
@@ -1680,60 +1680,60 @@ TEST_F(LowTempRadiantSystemTest, SizeRadSysTubeLengthTest)
     Surface(3).Construction = 3;
     Surface(3).Area = 300.0;
 
-    dataConstruction.Construct.allocate(3);
-    dataConstruction.Construct(1).ThicknessPerpend = 0.05;
-    dataConstruction.Construct(2).ThicknessPerpend = 0.125;
+    state.dataConstruction->Construct.allocate(3);
+    state.dataConstruction->Construct(1).ThicknessPerpend = 0.05;
+    state.dataConstruction->Construct(2).ThicknessPerpend = 0.125;
 
     // Test 1: Hydronic radiant system 1 (one surface)
     RadSysType = HydronicSystem;
     RadSysNum = 1;
-    FuncCalc = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength();
+    FuncCalc = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength(state);
     EXPECT_NEAR(FuncCalc, 1000.0, 0.1);
 
     // Test 2: Hydronic radiant system 2 (two surfaces)
     RadSysType = HydronicSystem;
     RadSysNum = 2;
-    FuncCalc = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength();
+    FuncCalc = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength(state);
     EXPECT_NEAR(FuncCalc, 1800.0, 0.1);
 
     // Test 3: Constant flow radiant system 1 (one surface)
     RadSysType = ConstantFlowSystem;
     RadSysNum = 1;
-    FuncCalc = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength();
+    FuncCalc = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength(state);
     EXPECT_NEAR(FuncCalc, 1000.0, 0.1);
 
     // Test 4: Constant flow radiant system 2 (two surfaces)
     RadSysType = ConstantFlowSystem;
     RadSysNum = 2;
-    FuncCalc = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength();
+    FuncCalc = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength(state);
     EXPECT_NEAR(FuncCalc, 1800.0, 0.1);
 
     // Test 5: Hydronic radiant system 3 (thickness out of range, low side)
     RadSysType = HydronicSystem;
     RadSysNum = 3;
-    dataConstruction.Construct(3).ThicknessPerpend = 0.004;
-    FuncCalc = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength();
+    state.dataConstruction->Construct(3).ThicknessPerpend = 0.004;
+    FuncCalc = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength(state);
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
     // Test 6: Hydronic radiant system 3 (thickness out of range, high side)
     RadSysType = HydronicSystem;
     RadSysNum = 3;
-    dataConstruction.Construct(3).ThicknessPerpend = 0.6;
-    FuncCalc = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength();
+    state.dataConstruction->Construct(3).ThicknessPerpend = 0.6;
+    FuncCalc = HydrRadSys(RadSysNum).sizeRadiantSystemTubeLength(state);
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
     // Test 7: Constant flow radiant system 3 (thickness out of range, low side)
     RadSysType = ConstantFlowSystem;
     RadSysNum = 3;
-    dataConstruction.Construct(3).ThicknessPerpend = 0.004;
-    FuncCalc = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength();
+    state.dataConstruction->Construct(3).ThicknessPerpend = 0.004;
+    FuncCalc = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength(state);
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
     // Test 8: Constant flow radiant system 3 (thickness out of range, high side)
     RadSysType = ConstantFlowSystem;
     RadSysNum = 3;
-    dataConstruction.Construct(3).ThicknessPerpend = 0.6;
-    FuncCalc = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength();
+    state.dataConstruction->Construct(3).ThicknessPerpend = 0.6;
+    FuncCalc = CFloRadSys(RadSysNum).sizeRadiantSystemTubeLength(state);
     EXPECT_NEAR(FuncCalc, 2000.0, 0.1);
 
 }
@@ -1764,8 +1764,8 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadConFlowSystemAutoSizeTempTest)
     Surface.allocate(1);
     Surface(1).Construction = 1;
     Surface(1).Area = 150.0;
-    dataConstruction.Construct.allocate(1);
-    dataConstruction.Construct(1).ThicknessPerpend = 0.075;
+    state.dataConstruction->Construct.allocate(1);
+    state.dataConstruction->Construct(1).ThicknessPerpend = 0.075;
 
     // Hydronic - Hot water volume flow rate autosize
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
@@ -2332,9 +2332,9 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     thisRadSys.ZonePtr = 1;
     Surface.allocate(3);
     Zone.allocate(3);
-    dataConstruction.Construct.allocate(2);
-    dataConstruction.Construct(1).SourceSinkPresent = true;
-    dataConstruction.Construct(2).SourceSinkPresent = false;
+    state.dataConstruction->Construct.allocate(2);
+    state.dataConstruction->Construct(1).SourceSinkPresent = true;
+    state.dataConstruction->Construct(2).SourceSinkPresent = false;
 
     // Test 1a: Surfaces are in the same zones, zone multipliers are all the same, and the construct has a source/sink.
     //          Everything is "ok" so the result should be the error flag is FALSE.
@@ -2351,7 +2351,7 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     Surface(1).Construction = 1;
     Surface(2).Construction = 1;
     Surface(3).Construction = 1;
-    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound);
+    thisRadSys.errorCheckZonesAndConstructions(state, actualErrorsFound);
     EXPECT_FALSE(actualErrorsFound);
 
     // Test 1b: Surfaces are in different zones, zone multipliers are all the same, and the construct has a source/sink.
@@ -2369,7 +2369,7 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     Surface(1).Construction = 1;
     Surface(2).Construction = 1;
     Surface(3).Construction = 1;
-    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound);
+    thisRadSys.errorCheckZonesAndConstructions(state, actualErrorsFound);
     EXPECT_FALSE(actualErrorsFound);
 
     // Test 2: Surfaces are in different zones, zone multipliers are NOT all the same (one is 7 instead of 2), and the construct has a source/sink.
@@ -2387,7 +2387,7 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     Surface(1).Construction = 1;
     Surface(2).Construction = 1;
     Surface(3).Construction = 1;
-    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound);
+    thisRadSys.errorCheckZonesAndConstructions(state, actualErrorsFound);
     EXPECT_TRUE(actualErrorsFound);
 
     // Test 3: Surfaces are in the same zones, zone multipliers are all the same, and one construct does NOT have a source/sink.
@@ -2405,7 +2405,7 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     Surface(1).Construction = 1;
     Surface(2).Construction = 1;
     Surface(3).Construction = 2;
-    thisRadSys.errorCheckZonesAndConstructions(actualErrorsFound);
+    thisRadSys.errorCheckZonesAndConstructions(state, actualErrorsFound);
     EXPECT_TRUE(actualErrorsFound);
 }
 
@@ -2420,14 +2420,14 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     auto &thisCFloSys (CFloRadSys(1));
 
     NumOfTimeStepInHour = 1;
-    state.dataWeatherManager->TodayOutDryBulbTemp.allocate(NumOfTimeStepInHour, DataGlobals::HoursInDay);
+    state.dataWeatherManager->TodayOutDryBulbTemp.allocate(NumOfTimeStepInHour, DataGlobalConstants::HoursInDay());
     state.dataWeatherManager->TodayOutDryBulbTemp = 0.0;
-    for (int hourNumber = 1; hourNumber <= DataGlobals::HoursInDay; ++hourNumber) {
+    for (int hourNumber = 1; hourNumber <= DataGlobalConstants::HoursInDay(); ++hourNumber) {
         state.dataWeatherManager->TodayOutDryBulbTemp(NumOfTimeStepInHour,hourNumber) = double(hourNumber);
     }
 
     // Test 1: First day of the simulation and it's in warmup-->everything set to the same temperature
-    DataGlobals::DayOfSim = 1;
+    state.dataGlobal->DayOfSim = 1;
     DataGlobals::WarmupFlag = true;
     DataGlobals::NumOfDayInEnvrn = 366;
     thisCFloSys.todayAverageOutdoorDryBulbTemperature = -9999.9;
@@ -2443,7 +2443,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
 
     // Test 2: Not first dsy of simulation but still in warmup-->should not do anything because in warmup same day repeated over and over
-    DataGlobals::DayOfSim = 2;
+    state.dataGlobal->DayOfSim = 2;
     DataGlobals::WarmupFlag = true;
     DataGlobals::NumOfDayInEnvrn = 366;
     thisCFloSys.todayAverageOutdoorDryBulbTemperature = -9999.9;
@@ -2459,7 +2459,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
 
     // Test 3: Not in warmup but number of days of simulation only 1-->should not do anything because it's a single day which means no real history
-    DataGlobals::DayOfSim = 1;
+    state.dataGlobal->DayOfSim = 1;
     DataGlobals::WarmupFlag = false;
     DataGlobals::NumOfDayInEnvrn = 1;
     thisCFloSys.todayAverageOutdoorDryBulbTemperature = 12.345;
@@ -2475,7 +2475,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
 
     // Test 4: Not in warmup and number of days of simulation greater than 1-->apply the formula for running mean temperature and shift data
-    DataGlobals::DayOfSim = 1;
+    state.dataGlobal->DayOfSim = 1;
     DataGlobals::WarmupFlag = false;
     DataGlobals::NumOfDayInEnvrn = 366;
     thisCFloSys.todayAverageOutdoorDryBulbTemperature = 15.0;
@@ -2501,7 +2501,7 @@ TEST_F(LowTempRadiantSystemTest, updateOperatingModeHistoryTest)
     int resetResult = -9999;
     HydrRadSys.allocate(1);
     DataGlobals::NumOfTimeStepInHour = 6;
-    DataGlobals::DayOfSim = 2;
+    state.dataGlobal->DayOfSim = 2;
     DataGlobals::HourOfDay = 4;
     DataGlobals::TimeStep = 5;
     auto &thisRadSys (HydrRadSys(1));
@@ -2512,13 +2512,13 @@ TEST_F(LowTempRadiantSystemTest, updateOperatingModeHistoryTest)
     thisRadSys.lastDayOfSim = resetResult;
     thisRadSys.lastHourOfDay = resetResult;
     thisRadSys.lastTimeStep = resetResult;
-    DataGlobals::BeginDayFlag = true;
-    DataGlobals::BeginHourFlag = false;
-    DataGlobals::BeginTimeStepFlag = false;
-    thisRadSys.updateOperatingModeHistory();
+    state.dataGlobal->BeginDayFlag = true;
+    state.dataGlobal->BeginHourFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = false;
+    thisRadSys.updateOperatingModeHistory(state);
     expectedResult = 1;
     EXPECT_EQ(thisRadSys.lastDayOfSim, expectedResult);
-    expectedResult = DataGlobals::HoursInDay;
+    expectedResult = DataGlobalConstants::HoursInDay();
     EXPECT_EQ(thisRadSys.lastHourOfDay, expectedResult);
     expectedResult = DataGlobals::NumOfTimeStepInHour;
     EXPECT_EQ(thisRadSys.lastTimeStep, expectedResult);
@@ -2531,10 +2531,10 @@ TEST_F(LowTempRadiantSystemTest, updateOperatingModeHistoryTest)
     thisRadSys.lastDayOfSim = resetResult;
     thisRadSys.lastHourOfDay = resetResult;
     thisRadSys.lastTimeStep = resetResult;
-    DataGlobals::BeginDayFlag = false;
-    DataGlobals::BeginHourFlag = true;
-    DataGlobals::BeginTimeStepFlag = false;
-    thisRadSys.updateOperatingModeHistory();
+    state.dataGlobal->BeginDayFlag = false;
+    state.dataGlobal->BeginHourFlag = true;
+    state.dataGlobal->BeginTimeStepFlag = false;
+    thisRadSys.updateOperatingModeHistory(state);
     expectedResult = 2;
     EXPECT_EQ(thisRadSys.lastDayOfSim, expectedResult);
     expectedResult = 3;
@@ -2550,10 +2550,10 @@ TEST_F(LowTempRadiantSystemTest, updateOperatingModeHistoryTest)
     thisRadSys.lastDayOfSim = resetResult;
     thisRadSys.lastHourOfDay = resetResult;
     thisRadSys.lastTimeStep = resetResult;
-    DataGlobals::BeginDayFlag = false;
-    DataGlobals::BeginHourFlag = false;
-    DataGlobals::BeginTimeStepFlag = true;
-    thisRadSys.updateOperatingModeHistory();
+    state.dataGlobal->BeginDayFlag = false;
+    state.dataGlobal->BeginHourFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = true;
+    thisRadSys.updateOperatingModeHistory(state);
     expectedResult = 2;
     EXPECT_EQ(thisRadSys.lastDayOfSim, expectedResult);
     expectedResult = 4;
@@ -2569,10 +2569,10 @@ TEST_F(LowTempRadiantSystemTest, updateOperatingModeHistoryTest)
     thisRadSys.lastDayOfSim = resetResult;
     thisRadSys.lastHourOfDay = resetResult;
     thisRadSys.lastTimeStep = resetResult;
-    DataGlobals::BeginDayFlag = false;
-    DataGlobals::BeginHourFlag = false;
-    DataGlobals::BeginTimeStepFlag = false;
-    thisRadSys.updateOperatingModeHistory();
+    state.dataGlobal->BeginDayFlag = false;
+    state.dataGlobal->BeginHourFlag = false;
+    state.dataGlobal->BeginTimeStepFlag = false;
+    thisRadSys.updateOperatingModeHistory(state);
     expectedResult = 2;
     EXPECT_EQ(thisRadSys.lastDayOfSim, expectedResult);
     expectedResult = 4;
@@ -2595,21 +2595,21 @@ TEST_F(LowTempRadiantSystemTest, setOperatingModeBasedOnChangeoverDelayTest)
     // Test 1: lastOperatingMode is NotOperating-->don't do anything to OperatingMode
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::NotOperating;
     thisRadSys.OperatingMode = LowTempRadiantSystem::HeatingMode;
-    thisRadSys.setOperatingModeBasedOnChangeoverDelay();
+    thisRadSys.setOperatingModeBasedOnChangeoverDelay(state);
     expectedResult = LowTempRadiantSystem::HeatingMode;
     EXPECT_EQ(thisRadSys.OperatingMode, expectedResult);
 
     // Test 2: lastOperatingMode is not NotOperating, OperatingMode is NotOperating-->don't do anything to OperatingMode
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::HeatingMode;
     thisRadSys.OperatingMode = LowTempRadiantSystem::NotOperating;
-    thisRadSys.setOperatingModeBasedOnChangeoverDelay();
+    thisRadSys.setOperatingModeBasedOnChangeoverDelay(state);
     expectedResult = LowTempRadiantSystem::NotOperating;
     EXPECT_EQ(thisRadSys.OperatingMode, expectedResult);
 
     // Test 3: lastOperatingMode and OperatingMode are both the same (and not NotOperating)-->don't do anything to OperatingMode
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::HeatingMode;
     thisRadSys.OperatingMode = LowTempRadiantSystem::HeatingMode;
-    thisRadSys.setOperatingModeBasedOnChangeoverDelay();
+    thisRadSys.setOperatingModeBasedOnChangeoverDelay(state);
     expectedResult = LowTempRadiantSystem::HeatingMode;
     EXPECT_EQ(thisRadSys.OperatingMode, expectedResult);
 
@@ -2617,7 +2617,7 @@ TEST_F(LowTempRadiantSystemTest, setOperatingModeBasedOnChangeoverDelayTest)
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::HeatingMode;
     thisRadSys.OperatingMode = LowTempRadiantSystem::CoolingMode;
     thisRadSys.schedPtrChangeoverDelay = 0;
-    thisRadSys.setOperatingModeBasedOnChangeoverDelay();
+    thisRadSys.setOperatingModeBasedOnChangeoverDelay(state);
     expectedResult = LowTempRadiantSystem::CoolingMode;
     EXPECT_EQ(thisRadSys.OperatingMode, expectedResult);
 
@@ -2627,13 +2627,13 @@ TEST_F(LowTempRadiantSystemTest, setOperatingModeBasedOnChangeoverDelayTest)
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::HeatingMode;
     thisRadSys.OperatingMode = LowTempRadiantSystem::CoolingMode;
     thisRadSys.schedPtrChangeoverDelay = -1;
-    DataGlobals::DayOfSim = 2;
+    state.dataGlobal->DayOfSim = 2;
     DataGlobals::HourOfDay = 1;
     DataGlobals::TimeStep = 1;
     thisRadSys.lastDayOfSim = 1;
     thisRadSys.lastHourOfDay = 24;
     thisRadSys.lastTimeStep = 2;
-    thisRadSys.setOperatingModeBasedOnChangeoverDelay();
+    thisRadSys.setOperatingModeBasedOnChangeoverDelay(state);
     expectedResult = LowTempRadiantSystem::NotOperating;
     EXPECT_EQ(thisRadSys.OperatingMode, expectedResult);
 
@@ -2642,13 +2642,13 @@ TEST_F(LowTempRadiantSystemTest, setOperatingModeBasedOnChangeoverDelayTest)
     //          to switch over yet-->don't do anything to OperatingMode
     thisRadSys.lastOperatingMode = LowTempRadiantSystem::HeatingMode;
     thisRadSys.OperatingMode = LowTempRadiantSystem::CoolingMode;
-    DataGlobals::DayOfSim = 2;
+    state.dataGlobal->DayOfSim = 2;
     DataGlobals::HourOfDay = 1;
     DataGlobals::TimeStep = 4;
     thisRadSys.lastDayOfSim = 1;
     thisRadSys.lastHourOfDay = 22;
     thisRadSys.lastTimeStep = 3;
-    thisRadSys.setOperatingModeBasedOnChangeoverDelay();
+    thisRadSys.setOperatingModeBasedOnChangeoverDelay(state);
     expectedResult = LowTempRadiantSystem::CoolingMode;
     EXPECT_EQ(thisRadSys.OperatingMode, expectedResult);
 }
@@ -2688,8 +2688,8 @@ TEST_F(LowTempRadiantSystemTest, calculateUFromISOStandardTest)
     int SurfNum = 1;
     DataSurfaces::Surface.allocate(1);
     Surface(1).Construction = 1;
-    dataConstruction.Construct.allocate(1);
-    dataConstruction.Construct(1).ThicknessPerpend = 0.5;
+    state.dataConstruction->Construct.allocate(1);
+    state.dataConstruction->Construct(1).ThicknessPerpend = 0.5;
     CFloRadSys.allocate(1);
     auto &thisCFloSys (CFloRadSys(1));
     thisCFloSys.TubeDiameterInner = 0.01;
@@ -2700,7 +2700,7 @@ TEST_F(LowTempRadiantSystemTest, calculateUFromISOStandardTest)
 
     Real64 expectedResult = 28.00687;
     Real64 allowedDifference = 0.00001;
-    Real64 actualResult = thisCFloSys.calculateUFromISOStandard(SurfNum, WaterMassFlow);
+    Real64 actualResult = thisCFloSys.calculateUFromISOStandard(state, SurfNum, WaterMassFlow);
     EXPECT_NEAR(expectedResult, actualResult, allowedDifference);
 
 }

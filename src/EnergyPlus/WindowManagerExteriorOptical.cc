@@ -49,6 +49,7 @@
 
 // EnergyPlus headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -185,7 +186,7 @@ namespace WindowManager {
 
         auto & aWinConstSimp = CWindowConstructionsSimplified::instance();
         for (auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
-            auto &construction(dataConstruction.Construct(ConstrNum));
+            auto &construction(state.dataConstruction->Construct(ConstrNum));
             if (construction.isGlazingConstruction()) {
                 for (auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum) {
                     auto &material(dataMaterial.Material(construction.LayerPoint(LayNum)));
@@ -214,23 +215,23 @@ namespace WindowManager {
 
         for (auto SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue;
-            if (!dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
+            if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
             if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) continue; // Irrelevant for Complex Fen
-            if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;    // not required
+            if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;    // not required
             auto ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
             if (ConstrNumSh == 0) continue;
-            auto TotLay = dataConstruction.Construct(ConstrNumSh).TotLayers;
+            auto TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
             auto IntShade = false;
             auto IntBlind = false;
             auto ShadeLayPtr = 0;
             auto BlNum = 0;
-            if (dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay)).Group == Shade) {
+            if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).Group == Shade) {
                 IntShade = true;
-                ShadeLayPtr = dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay);
+                ShadeLayPtr = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay);
             }
-            if (dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay)).Group == WindowBlind) {
+            if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).Group == WindowBlind) {
                 IntBlind = true;
-                BlNum = dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay)).BlindDataPtr;
+                BlNum = dataMaterial.Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).BlindDataPtr;
             }
 
             if (IntShade || IntBlind) {
@@ -238,7 +239,7 @@ namespace WindowManager {
                     auto EpsGlIR = 0.0;
                     auto RhoGlIR = 0.0;
                     if (IntShade || IntBlind) {
-                        EpsGlIR = dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotLay - 1)).AbsorpThermalBack;
+                        EpsGlIR = dataMaterial.Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1)).AbsorpThermalBack;
                         RhoGlIR = 1 - EpsGlIR;
                     }
                     if (IntShade) {

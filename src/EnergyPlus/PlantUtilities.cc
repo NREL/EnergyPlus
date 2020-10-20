@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -94,8 +93,6 @@ namespace PlantUtilities {
     // <use statements for data only modules>
     // <use statements for access to subroutines in other modules>
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     namespace {
         struct CriteriaData
         {

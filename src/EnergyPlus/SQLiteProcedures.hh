@@ -259,7 +259,7 @@ public:
 
     void createSQLiteEnvironmentPeriodRecord(const int curEnvirNum,
                                              const std::string &environmentName,
-                                             const int kindOfSim,
+                                             const DataGlobalConstants::KindOfSim kindOfSim,
                                              const int simulationIndex = 1);
 
     void sqliteWriteMessage(const std::string &message);

@@ -46,22 +46,24 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <EnergyPlus/HybridEvapCoolingModel.hh>
+#include <cmath>
+#include <string>
 
-#include <EnergyPlus/UtilityRoutines.hh>
+// ObjexxFCL Headers
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Fmath.hh>
 
+// EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/HybridEvapCoolingModel.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <cmath>
-#include <string>
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Fmath.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus { //***************
 
@@ -92,7 +94,6 @@ namespace HybridEvapCoolingModel {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataGlobals::SecInHour;
     using DataHVACGlobals::LimitNumSysSteps;
     using DataHVACGlobals::NumOfSysTimeSteps;
     using DataHVACGlobals::NumOfSysTimeStepsLastZoneTimeStep;
@@ -1632,19 +1633,19 @@ namespace HybridEvapCoolingModel {
         // day, so report", but that doesn't seem to exist.
         if ((TimeElapsed > 24) && WarnOnceFlag && !WarmupFlag) {
             if (count_EnvironmentConditionsNotMet > 0)
-                ShowWarningError("In day " + RoundSigDigits((Real64)DayOfSim, 1) + " of simulation, " + Name.c_str() + " was unable to operate for " +
+                ShowWarningError("In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() + " was unable to operate for " +
                                  RoundSigDigits((Real64)count_EnvironmentConditionsNotMet, 1) +
                                  " timesteps because environment conditions were beyond the allowable operating range for any mode.");
             if (count_SAHR_OC_MetOnce > 0)
-                ShowWarningError("In day " + RoundSigDigits((Real64)DayOfSim, 1) + " of simulation, " + Name.c_str() +
+                ShowWarningError("In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
                                  " failed to meet supply air humidity ratio for " + RoundSigDigits(Real64(count_SAHR_OC_MetOnce), 1) +
                                  " time steps. For these time steps For these time steps" + Name.c_str() + " was set to mode 0");
             if (count_SAT_OC_MetOnce > 0)
-                ShowWarningError("In day " + RoundSigDigits((Real64)DayOfSim, 1) + " of simulation, " + Name.c_str() +
+                ShowWarningError("In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
                                  " failed to meet supply air temperature constraints for " + RoundSigDigits(Real64(count_SAT_OC_MetOnce), 1) +
                                  " time steps. For these time steps For these time steps" + Name.c_str() + " was set to mode 0");
 
-            ShowWarningError("In day " + RoundSigDigits((Real64)DayOfSim, 1) + " of simulation, " + Name.c_str() +
+            ShowWarningError("In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
                              " failed to  satisfy sensible load for " + RoundSigDigits((Real64)count_DidWeNotMeetLoad, 1) +
                              " time steps. For these time steps settings were selected to provide as much sensible cooling or heating as possible, "
                              "given other constraints.");
@@ -1794,11 +1795,11 @@ namespace HybridEvapCoolingModel {
         Real64 LambdaRa = Psychrometrics::PsyHfgAirFnWTdb(0, InletTemp);
         RequestedHumdificationMass = OutputRequiredToHumidify;
         RequestedHumdificationLoad = OutputRequiredToHumidify * LambdaRa;                      // [W];
-        RequestedHumdificationEnergy = OutputRequiredToHumidify * LambdaRa * TimeStepSys * SecInHour; // [j]
+        RequestedHumdificationEnergy = OutputRequiredToHumidify * LambdaRa * TimeStepSys * DataGlobalConstants::SecInHour(); // [j]
 
         RequestedDeHumdificationMass = OutputRequiredToDehumidify;
         RequestedDeHumdificationLoad = OutputRequiredToDehumidify * LambdaRa;                      // [W];
-        RequestedDeHumdificationEnergy = OutputRequiredToDehumidify * LambdaRa * TimeStepSys * SecInHour; // [j]
+        RequestedDeHumdificationEnergy = OutputRequiredToDehumidify * LambdaRa * TimeStepSys * DataGlobalConstants::SecInHour(); // [j]
 
         MinOA_Msa = DesignMinVR; // as mass flow kg/s
 
@@ -1935,19 +1936,19 @@ namespace HybridEvapCoolingModel {
             if (QTotZoneOut > 0) // zone cooling is positive, else remain zero
             {
                 UnitTotalCoolingRate = std::abs(QTotZoneOut);                            // Watts
-                UnitTotalCoolingEnergy = UnitTotalCoolingRate * TimeStepSys * SecInHour; // J
+                UnitTotalCoolingEnergy = UnitTotalCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour(); // J
             } else {
                 UnitTotalHeatingRate = std::abs(QTotZoneOut);                            // Watts
-                UnitTotalHeatingEnergy = UnitTotalHeatingRate * TimeStepSys * SecInHour; // J
+                UnitTotalHeatingEnergy = UnitTotalHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour(); // J
             }
 
             if (QSensZoneOut > 0) // zone cooling is positive, else remain zero
             {
                 UnitSensibleCoolingRate = std::abs(QSensZoneOut);                              // Watts
-                UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * TimeStepSys * SecInHour; // J
+                UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour(); // J
             } else {
                 UnitSensibleHeatingRate = std::abs(QSensZoneOut);                              // Watts
-                UnitSensibleHeatingEnergy = UnitSensibleHeatingRate * TimeStepSys * SecInHour; // J
+                UnitSensibleHeatingEnergy = UnitSensibleHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour(); // J
             }
 
             if ((UnitTotalCoolingRate - UnitSensibleCoolingRate) > 0) {
@@ -1963,19 +1964,19 @@ namespace HybridEvapCoolingModel {
             if (QTotSystemOut > 0) // system cooling
             {
                 SystemTotalCoolingRate = std::abs(QTotSystemOut);
-                SystemTotalCoolingEnergy = SystemTotalCoolingRate * TimeStepSys * SecInHour;
+                SystemTotalCoolingEnergy = SystemTotalCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
             } else {
                 SystemTotalHeatingRate = std::abs(QTotSystemOut);
-                SystemTotalHeatingEnergy = SystemTotalHeatingRate * TimeStepSys * SecInHour;
+                SystemTotalHeatingEnergy = SystemTotalHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour();
             }
 
             if (QSensSystemOut > 0) // system sensible cooling
             {
                 SystemSensibleCoolingRate = std::abs(QSensSystemOut);
-                SystemSensibleCoolingEnergy = SystemSensibleCoolingRate * TimeStepSys * SecInHour;
+                SystemSensibleCoolingEnergy = SystemSensibleCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
             } else {
                 SystemSensibleHeatingRate = std::abs(QSensSystemOut);
-                SystemSensibleHeatingEnergy = SystemSensibleHeatingRate * TimeStepSys * SecInHour;
+                SystemSensibleHeatingEnergy = SystemSensibleHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour();
             }
             if ((SystemTotalCoolingRate - SystemSensibleCoolingRate) > 0) {
                 SystemLatentCoolingRate = SystemTotalCoolingRate - SystemSensibleCoolingRate;
@@ -2000,17 +2001,17 @@ namespace HybridEvapCoolingModel {
 
         // set timestep outputs calculated considering different runtime fractions.
         SupplyFanElectricPower = CalculateTimeStepAverage(SYSTEMOUTPUTS::OSUPPLY_FAN_POWER); // Watts
-        SupplyFanElectricEnergy = SupplyFanElectricPower * TimeStepSys * SecInHour;
+        SupplyFanElectricEnergy = SupplyFanElectricPower * TimeStepSys * DataGlobalConstants::SecInHour();
         SecondaryFuelConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OSECOND_FUEL_USE);
-        SecondaryFuelConsumption = SecondaryFuelConsumptionRate * TimeStepSys * SecInHour;
+        SecondaryFuelConsumption = SecondaryFuelConsumptionRate * TimeStepSys * DataGlobalConstants::SecInHour();
         ThirdFuelConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OTHIRD_FUEL_USE);
-        ThirdFuelConsumption = ThirdFuelConsumptionRate * TimeStepSys * SecInHour;
+        ThirdFuelConsumption = ThirdFuelConsumptionRate * TimeStepSys * DataGlobalConstants::SecInHour();
         WaterConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OWATER_USE);
-        WaterConsumption = WaterConsumptionRate * TimeStepSys * SecInHour;
+        WaterConsumption = WaterConsumptionRate * TimeStepSys * DataGlobalConstants::SecInHour();
         ExternalStaticPressure = CalculateTimeStepAverage(SYSTEMOUTPUTS::OEXTERNAL_STATIC_PRESSURE);
 
         FinalElectricalPower = CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
-        FinalElectricalEnergy = FinalElectricalPower * TimeStepSys * SecInHour;
+        FinalElectricalEnergy = FinalElectricalPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
 } // namespace HybridEvapCoolingModel

@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -314,43 +315,43 @@ namespace SizingManager {
                     if (ErrorsFound) break;
 
                     // check that environment is one of the design days
-                    if (KindOfSim == ksRunPeriodWeather) {
+                    if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         continue;
                     }
 
                     ++NumSizingPeriodsPerformed;
 
-                    BeginEnvrnFlag = true;
-                    if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
+                    state.dataGlobal->BeginEnvrnFlag = true;
+                    if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                         // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can
                         // more easily converge fewer warmup days are allowed
                         DisplayString("Suppressing Initialization of New Environment Parameters");
-                        DataGlobals::beginEnvrnWarmStartFlag = true;
+                        state.dataGlobal->beginEnvrnWarmStartFlag = true;
                     } else {
-                        DataGlobals::beginEnvrnWarmStartFlag = false;
+                        state.dataGlobal->beginEnvrnWarmStartFlag = false;
                     }
-                    EndEnvrnFlag = false;
+                    state.dataGlobal->EndEnvrnFlag = false;
                     EndMonthFlag = false;
                     WarmupFlag = true;
-                    DayOfSim = 0;
+                    state.dataGlobal->DayOfSim = 0;
                     state.dataGlobal->DayOfSimChr = "0";
                     CurEnvirNumSimDay = 1;
                     ++CurOverallSimDay;
-                    while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+                    while ((state.dataGlobal->DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
-                        ++DayOfSim;
-                        if (!WarmupFlag && DayOfSim > 1) {
+                        ++state.dataGlobal->DayOfSim;
+                        if (!WarmupFlag && state.dataGlobal->DayOfSim > 1) {
                             ++CurEnvirNumSimDay;
                         }
 
-                        state.dataGlobal->DayOfSimChr = fmt::to_string(DayOfSim);
-                        BeginDayFlag = true;
+                        state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
+                        state.dataGlobal->BeginDayFlag = true;
                         EndDayFlag = false;
 
                         if (WarmupFlag) {
                             DisplayString("Warming up");
                         } else { // (.NOT.WarmupFlag)
-                            if (DayOfSim == 1) {
+                            if (state.dataGlobal->DayOfSim == 1) {
                                 if (!isPulseZoneSizing) {
                                     DisplayString("Performing Zone Sizing Simulation");
                                     DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
@@ -359,18 +360,18 @@ namespace SizingManager {
                                     DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                                 }
                             }
-                            UpdateZoneSizing(state, BeginDay);
-                            UpdateFacilitySizing(state, BeginDay);
+                            UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::BeginDay);
+                            UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::BeginDay);
                         }
 
                         for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 
-                            BeginHourFlag = true;
+                            state.dataGlobal->BeginHourFlag = true;
                             EndHourFlag = false;
 
                             for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) { // Begin time step (TINC) loop ...
 
-                                BeginTimeStepFlag = true;
+                                state.dataGlobal->BeginTimeStepFlag = true;
 
                                 // Set the End__Flag variables to true if necessary.  Note that
                                 // each flag builds on the previous level.  EndDayFlag cannot be
@@ -383,15 +384,15 @@ namespace SizingManager {
                                     EndHourFlag = true;
                                     if (HourOfDay == 24) {
                                         EndDayFlag = true;
-                                        if ((!WarmupFlag) && (DayOfSim == NumOfDayInEnvrn)) {
-                                            EndEnvrnFlag = true;
+                                        if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
+                                            state.dataGlobal->EndEnvrnFlag = true;
                                         }
                                     }
                                 }
 
                                 // set flag for pulse used in load component reporting
                                 doLoadComponentPulseNow =
-                                    CalcdoLoadComponentPulseNow(isPulseZoneSizing, WarmupFlag, HourOfDay, TimeStep, KindOfSim, DayOfSim);
+                                    CalcdoLoadComponentPulseNow(state, isPulseZoneSizing, WarmupFlag, HourOfDay, TimeStep, state.dataGlobal->KindOfSim);
 
                                 ManageWeather(state);
 
@@ -407,10 +408,10 @@ namespace SizingManager {
 
                                 ManageHeatBalance(state);
 
-                                BeginHourFlag = false;
-                                BeginDayFlag = false;
-                                BeginEnvrnFlag = false;
-                                BeginSimFlag = false;
+                                state.dataGlobal->BeginHourFlag = false;
+                                state.dataGlobal->BeginDayFlag = false;
+                                state.dataGlobal->BeginEnvrnFlag = false;
+                                state.dataGlobal->BeginSimFlag = false;
 
                             } // ... End time step (TINC) loop.
 
@@ -419,11 +420,11 @@ namespace SizingManager {
                         } // ... End hour loop.
 
                         if (EndDayFlag) {
-                            UpdateZoneSizing(state, EndDay);
-                            UpdateFacilitySizing(state, EndDay);
+                            UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndDay);
+                            UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndDay);
                         }
 
-                        if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
+                        if (!WarmupFlag && (state.dataGlobal->DayOfSim > 0) && (state.dataGlobal->DayOfSim < NumOfDayInEnvrn)) {
                             ++CurOverallSimDay;
                         }
 
@@ -435,8 +436,8 @@ namespace SizingManager {
                 } // ... End environment loop
 
                 if (NumSizingPeriodsPerformed > 0) {
-                    UpdateZoneSizing(state, state.dataGlobal->EndZoneSizingCalc);
-                    UpdateFacilitySizing(state, state.dataGlobal->EndZoneSizingCalc);
+                    UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
+                    UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
                     ShowSevereError(RoutineName + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
@@ -500,7 +501,7 @@ namespace SizingManager {
                 GetNextEnvironment(state, Available, ErrorsFound); // get an environment
 
                 // check that environment is one of the design days
-                if (KindOfSim == ksRunPeriodWeather) {
+                if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                     continue;
                 }
 
@@ -509,50 +510,50 @@ namespace SizingManager {
 
                 ++NumSizingPeriodsPerformed;
 
-                BeginEnvrnFlag = true;
-                if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
+                state.dataGlobal->BeginEnvrnFlag = true;
+                if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                     // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                     // easily converge fewer warmup days are allowed
                     DisplayString("Suppressing Initialization of New Environment Parameters");
-                    DataGlobals::beginEnvrnWarmStartFlag = true;
+                    state.dataGlobal->beginEnvrnWarmStartFlag = true;
                 } else {
-                    DataGlobals::beginEnvrnWarmStartFlag = false;
+                    state.dataGlobal->beginEnvrnWarmStartFlag = false;
                 }
-                EndEnvrnFlag = false;
+                state.dataGlobal->EndEnvrnFlag = false;
                 WarmupFlag = false;
-                DayOfSim = 0;
+                state.dataGlobal->DayOfSim = 0;
                 state.dataGlobal->DayOfSimChr = "0";
                 CurEnvirNumSimDay = 1;
                 ++CurOverallSimDay;
 
-                while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+                while ((state.dataGlobal->DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
-                    ++DayOfSim;
-                    if (!WarmupFlag && DayOfSim > 1) {
+                    ++state.dataGlobal->DayOfSim;
+                    if (!WarmupFlag && state.dataGlobal->DayOfSim > 1) {
                         ++CurEnvirNumSimDay;
                     }
-                    state.dataGlobal->DayOfSimChr = fmt::to_string(DayOfSim);
-                    BeginDayFlag = true;
+                    state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
+                    state.dataGlobal->BeginDayFlag = true;
                     EndDayFlag = false;
 
                     if (WarmupFlag) {
                         DisplayString("Warming up");
                     } else { // (.NOT.WarmupFlag)
-                        if (DayOfSim == 1) {
+                        if (state.dataGlobal->DayOfSim == 1) {
                             DisplayString("Calculating System sizing");
                             DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                         }
-                        UpdateSysSizing(state, BeginDay);
+                        UpdateSysSizing(state, DataGlobalConstants::CallIndicator::BeginDay);
                     }
 
                     for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 
-                        BeginHourFlag = true;
+                        state.dataGlobal->BeginHourFlag = true;
                         EndHourFlag = false;
 
                         for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) { // Begin time step (TINC) loop ...
 
-                            BeginTimeStepFlag = true;
+                            state.dataGlobal->BeginTimeStepFlag = true;
 
                             // Set the End__Flag variables to true if necessary.  Note that
                             // each flag builds on the previous level.  EndDayFlag cannot be
@@ -563,19 +564,19 @@ namespace SizingManager {
                                 EndHourFlag = true;
                                 if (HourOfDay == 24) {
                                     EndDayFlag = true;
-                                    if ((!WarmupFlag) && (DayOfSim == NumOfDayInEnvrn)) {
-                                        EndEnvrnFlag = true;
+                                    if ((!WarmupFlag) && (state.dataGlobal->DayOfSim == NumOfDayInEnvrn)) {
+                                        state.dataGlobal->EndEnvrnFlag = true;
                                     }
                                 }
                             }
 
                             ManageWeather(state);
 
-                            UpdateSysSizing(state, DuringDay);
+                            UpdateSysSizing(state, DataGlobalConstants::CallIndicator::DuringDay);
 
-                            BeginHourFlag = false;
-                            BeginDayFlag = false;
-                            BeginEnvrnFlag = false;
+                            state.dataGlobal->BeginHourFlag = false;
+                            state.dataGlobal->BeginDayFlag = false;
+                            state.dataGlobal->BeginEnvrnFlag = false;
 
                         } // ... End time step (TINC) loop.
 
@@ -583,9 +584,9 @@ namespace SizingManager {
 
                     } // ... End hour loop.
 
-                    if (EndDayFlag) UpdateSysSizing(state, EndDay);
+                    if (EndDayFlag) UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndDay);
 
-                    if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
+                    if (!WarmupFlag && (state.dataGlobal->DayOfSim > 0) && (state.dataGlobal->DayOfSim < NumOfDayInEnvrn)) {
                         ++CurOverallSimDay;
                     }
 
@@ -594,7 +595,7 @@ namespace SizingManager {
             } // ... End environment loop
 
             if (NumSizingPeriodsPerformed > 0) {
-                UpdateSysSizing(state, EndSysSizingCalc);
+                UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndSysSizingCalc);
                 SysSizingRunDone = true;
             } else {
                 ShowSevereError(RoutineName + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
@@ -849,7 +850,12 @@ namespace SizingManager {
     }
 
     bool CalcdoLoadComponentPulseNow(
-        bool const isPulseZoneSizing, bool const WarmupFlag, int const HourOfDay, int const TimeStep, int const KindOfSim, int const DayOfSim)
+        EnergyPlusData &state,
+        bool const isPulseZoneSizing,
+        bool const WarmupFlag,
+        int const HourOfDay,
+        int const TimeStep,
+        DataGlobalConstants::KindOfSim const KindOfSim)
     {
         // This routine decides whether or not to do a Load Component Pulse.  True when yes it should, false when in shouldn't
         // This check looks to do the pulse at the first time step of the 10th hour of the day while not in warmup mode.
@@ -860,7 +866,7 @@ namespace SizingManager {
         int const TimeStepToPulse(1);
 
         if ((isPulseZoneSizing) && (!WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) &&
-            ((KindOfSim == ksRunPeriodDesign) || (DayOfSim == 1))) {
+            ((KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodDesign) || (state.dataGlobal->DayOfSim == 1))) {
             return true;
         } else {
             return false;
@@ -883,9 +889,9 @@ namespace SizingManager {
             // call zone component models to execute their component sizing routines
             bool t_SimZoneEquip(true);
             bool t_SimAir(false);
-            DataGlobals::BeginEnvrnFlag = true; // trigger begin envrn blocks in zone equipment models
+            state.dataGlobal->BeginEnvrnFlag = true; // trigger begin envrn blocks in zone equipment models
             ZoneEquipmentManager::ManageZoneEquipment(state, true, t_SimZoneEquip, t_SimAir);
-            DataGlobals::BeginEnvrnFlag = false;
+            state.dataGlobal->BeginEnvrnFlag = false;
 
             for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
                 // Mine data from ATUs to find new design heating flow rates and new maximum flow rates
@@ -2273,7 +2279,7 @@ namespace SizingManager {
         }
 
         // Set default schedule
-        OARequirements(OAIndex).OAFlowFracSchPtr = DataGlobals::ScheduleAlwaysOn;
+        OARequirements(OAIndex).OAFlowFracSchPtr = DataGlobalConstants::ScheduleAlwaysOn();
         if (NumAlphas > 2) {
             if (!lAlphaBlanks(3)) {
                 OARequirements(OAIndex).OAFlowFracSchPtr = GetScheduleIndex(state, Alphas(3));
@@ -3929,41 +3935,41 @@ namespace SizingManager {
             if (ErrorsFound) break;
 
             // check that environment is one of the design days
-            if (KindOfSim == ksRunPeriodWeather) {
+            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                 continue;
             }
 
-            BeginEnvrnFlag = true;
-            EndEnvrnFlag = false;
+            state.dataGlobal->BeginEnvrnFlag = true;
+            state.dataGlobal->EndEnvrnFlag = false;
             EndMonthFlag = false;
             WarmupFlag = true;
-            DayOfSim = 0;
+            state.dataGlobal->DayOfSim = 0;
 
             CurEnvirNumSimDay = 1;
             ++CurOverallSimDay;
 
-            ++DayOfSim;
-            BeginDayFlag = true;
+            ++state.dataGlobal->DayOfSim;
+            state.dataGlobal->BeginDayFlag = true;
             EndDayFlag = false;
 
             HourOfDay = 1;
 
-            BeginHourFlag = true;
+            state.dataGlobal->BeginHourFlag = true;
             EndHourFlag = false;
 
             TimeStep = 1;
 
-            BeginTimeStepFlag = true;
+            state.dataGlobal->BeginTimeStepFlag = true;
 
             ManageWeather(state);
 
             ManageHeatBalance(state);
 
-            BeginHourFlag = false;
-            BeginDayFlag = false;
-            BeginEnvrnFlag = false;
-            BeginSimFlag = false;
-            BeginFullSimFlag = false;
+            state.dataGlobal->BeginHourFlag = false;
+            state.dataGlobal->BeginDayFlag = false;
+            state.dataGlobal->BeginEnvrnFlag = false;
+            state.dataGlobal->BeginSimFlag = false;
+            state.dataGlobal->BeginFullSimFlag = false;
 
             //          ! do another timestep=1
             ManageWeather(state);
@@ -3974,7 +3980,7 @@ namespace SizingManager {
 
             HourOfDay = 24;
             TimeStep = NumOfTimeStepInHour;
-            EndEnvrnFlag = true;
+            state.dataGlobal->EndEnvrnFlag = true;
 
             ManageWeather(state);
 
@@ -4799,7 +4805,7 @@ namespace SizingManager {
     }
 
     // Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
-    void UpdateFacilitySizing(EnergyPlusData &state, int const CallIndicator)
+    void UpdateFacilitySizing(EnergyPlusData &EP_UNUSED(state), DataGlobalConstants::CallIndicator const CallIndicator)
     {
         int NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 
@@ -4853,10 +4859,10 @@ namespace SizingManager {
             CalcFinalFacilitySizing.HeatZoneTempSeq = 0.;
             CalcFinalFacilitySizing.HeatLoadSeq = 0.;
         }
-        if (CallIndicator == BeginDay) {
+        if (CallIndicator == DataGlobalConstants::CallIndicator::BeginDay) {
             CalcFacilitySizing(CurOverallSimDay).HeatDDNum = CurOverallSimDay;
             CalcFacilitySizing(CurOverallSimDay).CoolDDNum = CurOverallSimDay;
-        } else if (CallIndicator == DuringDay) {
+        } else if (CallIndicator == DataGlobalConstants::CallIndicator::DuringDay) {
             int TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
             // save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
             Real64 sumCoolLoad = 0.;
@@ -4899,7 +4905,7 @@ namespace SizingManager {
                 CalcFacilitySizing(CurOverallSimDay).HeatOutHumRatSeq(TimeStepInDay) = wghtdHeatHumRat / sumHeatLoad;
             }
 
-        } else if (CallIndicator == EndDay) {
+        } else if (CallIndicator == DataGlobalConstants::CallIndicator::EndDay) {
             for (int TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex) {
                 if (CalcFacilitySizing(CurOverallSimDay).CoolLoadSeq(TimeStepIndex) > CalcFacilitySizing(CurOverallSimDay).DesCoolLoad) {
                     CalcFacilitySizing(CurOverallSimDay).DesCoolLoad = CalcFacilitySizing(CurOverallSimDay).CoolLoadSeq(TimeStepIndex);
@@ -4911,7 +4917,7 @@ namespace SizingManager {
                 }
             }
 
-        } else if (CallIndicator == state.dataGlobal->EndZoneSizingCalc) {
+        } else if (CallIndicator == DataGlobalConstants::CallIndicator::EndZoneSizingCalc) {
             for (int DDNum = 1; DDNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DDNum) {
                 if (CalcFacilitySizing(DDNum).DesCoolLoad > CalcFinalFacilitySizing.DesCoolLoad) {
                     CalcFinalFacilitySizing.DesCoolLoad = CalcFacilitySizing(DDNum).DesCoolLoad;

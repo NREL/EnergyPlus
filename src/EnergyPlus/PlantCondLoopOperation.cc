@@ -65,7 +65,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -107,7 +106,6 @@ namespace PlantCondLoopOperation {
     // REFERENCES:
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataPlant;
     using DataHVACGlobals::NumCondLoops;
     using DataHVACGlobals::NumPlantLoops;
@@ -1838,8 +1836,6 @@ CurrentModuleObject, PlantOpSchemeName);
         // ManageLoadDistribution for every component.
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
-        using DataGlobals::emsCallFromUserDefinedComponentModel;
         using EMSManager::ManageEMS;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
@@ -2084,16 +2080,16 @@ CurrentModuleObject, PlantOpSchemeName);
                 for (int OpNum = 1, OpNum_end = this_plant_loop.NumOpSchemes; OpNum <= OpNum_end; ++OpNum) {
                     auto &this_op_scheme(this_plant_loop.OpScheme(OpNum));
                     if (this_op_scheme.OpSchemeType == EMSOpSchemeType) {
-                        if (BeginEnvrnFlag && this_op_scheme.MyEnvrnFlag) {
+                        if (state.dataGlobal->BeginEnvrnFlag && this_op_scheme.MyEnvrnFlag) {
                             if (this_op_scheme.ErlInitProgramMngr > 0) {
                                 bool anyEMSRan;
-                                ManageEMS(state, emsCallFromUserDefinedComponentModel, anyEMSRan, this_op_scheme.ErlInitProgramMngr);
+                                ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this_op_scheme.ErlInitProgramMngr);
                             } else if (this_op_scheme.initPluginLocation > -1) {
                                 EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, this_op_scheme.initPluginLocation);
                             }
                             this_op_scheme.MyEnvrnFlag = false;
                         }
-                        if (!BeginEnvrnFlag) this_op_scheme.MyEnvrnFlag = true;
+                        if (!state.dataGlobal->BeginEnvrnFlag) this_op_scheme.MyEnvrnFlag = true;
                     }
                 } // operation scheme
             }     // loop
@@ -3069,7 +3065,6 @@ CurrentModuleObject, PlantOpSchemeName);
         // na
 
         // Using/Aliasing
-        using DataGlobals::emsCallFromUserDefinedComponentModel;
         using EMSManager::ManageEMS;
 
         // Locals
@@ -3098,7 +3093,7 @@ CurrentModuleObject, PlantOpSchemeName);
         // Call EMS program(s)
         if (PlantLoop(LoopNum).OpScheme(CurSchemePtr).ErlSimProgramMngr > 0) {
             bool anyEMSRan;
-            ManageEMS(state, emsCallFromUserDefinedComponentModel, anyEMSRan, PlantLoop(LoopNum).OpScheme(CurSchemePtr).ErlSimProgramMngr);
+            ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, PlantLoop(LoopNum).OpScheme(CurSchemePtr).ErlSimProgramMngr);
         } else if (PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation > -1) {
             EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state,
                                                                                     PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation);

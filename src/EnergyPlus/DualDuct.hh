@@ -136,7 +136,6 @@ namespace DualDuct {
     {
         // Members
         std::string Name; // Name of the Damper
-        //  CHARACTER(len=MaxNameLength) :: DamperType  = ' ' ! Type of Damper ie. VAV, Mixing, Inducing, etc.
         int DamperType;            // Type of Damper ie. VAV, Mixing, Inducing, etc.
         std::string Schedule;      // Damper Operation Schedule
         int SchedPtr;              // Pointer to the correct schedule
@@ -192,7 +191,7 @@ namespace DualDuct {
         {
         }
 
-        void InitDualDuct(bool const FirstHVACIteration);
+        void InitDualDuct(EnergyPlusData &state, bool const FirstHVACIteration);
 
         void SizeDualDuct();
 

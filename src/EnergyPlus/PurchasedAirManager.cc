@@ -66,7 +66,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -120,7 +119,6 @@ namespace PurchasedAirManager {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using DataEnvironment::OutBaroPress;
@@ -348,7 +346,7 @@ namespace PurchasedAirManager {
                 // get optional  availability schedule
                 PurchAir(PurchAirNum).AvailSched = cAlphaArgs(2);
                 if (lAlphaFieldBlanks(2)) {
-                    PurchAir(PurchAirNum).AvailSchedPtr = ScheduleAlwaysOn;
+                    PurchAir(PurchAirNum).AvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     PurchAir(PurchAirNum).AvailSchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                     if (PurchAir(PurchAirNum).AvailSchedPtr == 0) {
@@ -472,7 +470,7 @@ namespace PurchasedAirManager {
                 // get optional heating availability schedule
                 PurchAir(PurchAirNum).HeatSched = cAlphaArgs(8);
                 if (lAlphaFieldBlanks(8)) {
-                    PurchAir(PurchAirNum).HeatSchedPtr = ScheduleAlwaysOn;
+                    PurchAir(PurchAirNum).HeatSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     PurchAir(PurchAirNum).HeatSchedPtr = GetScheduleIndex(state, cAlphaArgs(8));
                     if (PurchAir(PurchAirNum).HeatSchedPtr == 0) {
@@ -484,7 +482,7 @@ namespace PurchasedAirManager {
                 // get optional cooling availability schedule
                 PurchAir(PurchAirNum).CoolSched = cAlphaArgs(9);
                 if (lAlphaFieldBlanks(9)) {
-                    PurchAir(PurchAirNum).CoolSchedPtr = ScheduleAlwaysOn;
+                    PurchAir(PurchAirNum).CoolSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     PurchAir(PurchAirNum).CoolSchedPtr = GetScheduleIndex(state, cAlphaArgs(9));
                     if (PurchAir(PurchAirNum).CoolSchedPtr == 0) {
@@ -540,7 +538,7 @@ namespace PurchasedAirManager {
                 if (PurchAir(PurchAirNum).OutdoorAir) {
                     if (lAlphaFieldBlanks(13)) {
                         // If there is outdoor air and outdoor air inlet node is blank, then create one
-                        if (len(cAlphaArgs(1)) < MaxNameLength - 23) { // protect against long name leading to > 100 chars
+                        if (len(cAlphaArgs(1)) < DataGlobalConstants::MaxNameLength() - 23) { // protect against long name leading to > 100 chars
                             cAlphaArgs(13) = cAlphaArgs(1) + " OUTDOOR AIR INLET NODE";
                         } else {
                             cAlphaArgs(13) = cAlphaArgs(1).substr(0, 75) + " OUTDOOR AIR INLET NODE";
@@ -1256,7 +1254,7 @@ namespace PurchasedAirManager {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && InitPurchasedAirMyEnvrnFlag(PurchAirNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && InitPurchasedAirMyEnvrnFlag(PurchAirNum)) {
 
             if ((PurchAir(PurchAirNum).HeatingLimit == LimitFlowRate) || (PurchAir(PurchAirNum).HeatingLimit == LimitFlowRateAndCapacity)) {
                 PurchAir(PurchAirNum).MaxHeatMassFlowRate = StdRhoAir * PurchAir(PurchAirNum).MaxHeatVolFlowRate;
@@ -1271,7 +1269,7 @@ namespace PurchasedAirManager {
             InitPurchasedAirMyEnvrnFlag(PurchAirNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             InitPurchasedAirMyEnvrnFlag(PurchAirNum) = true;
         }
 
@@ -3119,7 +3117,7 @@ namespace PurchasedAirManager {
         PurchAir(PurchAirNum).HtRecTotHeatRate = PurchAir(PurchAirNum).HtRecSenHeatRate + PurchAir(PurchAirNum).HtRecLatHeatRate;
         PurchAir(PurchAirNum).HtRecTotCoolRate = PurchAir(PurchAirNum).HtRecSenCoolRate + PurchAir(PurchAirNum).HtRecLatCoolRate;
 
-        ReportingConstant = TimeStepSys * SecInHour;
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
 
         PurchAir(PurchAirNum).SenHeatEnergy = PurchAir(PurchAirNum).SenHeatRate * ReportingConstant;
         PurchAir(PurchAirNum).SenCoolEnergy = PurchAir(PurchAirNum).SenCoolRate * ReportingConstant;

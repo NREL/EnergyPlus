@@ -122,8 +122,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
 
     // Construction
     surface.Construction = 1;
-    dataConstruction.Construct.allocate(1);
-    Construction::ConstructionProps &construction = dataConstruction.Construct(1);
+    state.dataConstruction->Construct.allocate(1);
+    Construction::ConstructionProps &construction = state.dataConstruction->Construct(1);
     construction.TotLayers = 1;
     construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", dataMaterial.Material);
 
@@ -248,8 +248,8 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
 
     // Construction
     surface.Construction = 1;
-    dataConstruction.Construct.allocate(1);
-    Construction::ConstructionProps &construction = dataConstruction.Construct(1);
+    state.dataConstruction->Construct.allocate(1);
+    Construction::ConstructionProps &construction = state.dataConstruction->Construct(1);
     construction.TotLayers = 1;
     construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("CONCRETE", dataMaterial.Material);
 
@@ -340,8 +340,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     // Construction
     int constNum = 1;
     surface.Construction = constNum;
-    dataConstruction.Construct.allocate( constNum );
-    Construction::ConstructionProps &construction = dataConstruction.Construct( constNum );
+    state.dataConstruction->Construct.allocate( constNum );
+    Construction::ConstructionProps &construction = state.dataConstruction->Construct( constNum );
     construction.TotLayers = constNum;
     construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("WOOD", dataMaterial.Material);
 
@@ -366,7 +366,6 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     auto const &material(dataMaterial.Material(1));
 
     Real64 Tsat(0.0);
-    Real64 const KelvinConv(273.15);
     DataHeatBalSurface::TempSurfIn.allocate(surfNum);
     DataHeatBalSurface::TempSurfIn(surfNum) = 20.0;
 
@@ -375,7 +374,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     // Calculate RH for use in material property calculations.
     Real64 RV_Deep_Old = DataMoistureBalanceEMPD::RVdeepOld( surfNum );
     Real64 RVaver = DataMoistureBalanceEMPD::RVSurfLayerOld(surfNum);
-    Real64 RHaver = RVaver * 461.52 * (Taver + KelvinConv) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
+    Real64 RHaver = RVaver * 461.52 * (Taver + DataGlobalConstants::KelvinConv()) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
     Real64 dU_dRH = material.MoistACoeff * material.MoistBCoeff * pow(RHaver, material.MoistBCoeff - 1) +
                     material.MoistCCoeff * material.MoistDCoeff * pow(RHaver, material.MoistDCoeff - 1);
 

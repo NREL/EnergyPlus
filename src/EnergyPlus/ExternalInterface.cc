@@ -57,7 +57,6 @@ extern "C" {
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -235,8 +234,6 @@ namespace ExternalInterface {
         // Exchanges variables between EnergyPlus and the BCVTB socket.
 
         // Using/Aliasing
-        using DataGlobals::KindOfSim;
-        using DataGlobals::ksRunPeriodWeather;
         using DataGlobals::WarmupFlag;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -253,7 +250,7 @@ namespace ExternalInterface {
             // Exchange data only after sizing and after warm-up.
             // Note that checking for ZoneSizingCalc SysSizingCalc does not work here, hence we
             // use the KindOfSim flag
-            if (!WarmupFlag && (KindOfSim == ksRunPeriodWeather)) {
+            if (!WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
                 CalcExternalInterface(state);
             }
         }
@@ -577,7 +574,7 @@ namespace ExternalInterface {
             StopExternalInterfaceIfError();
 
             // make a single length here for all strings to be passed to getepvariables
-            size_t lenXmlStr(maxVar * DataGlobals::MaxNameLength); // Length of strings being passed to getepvariables
+            size_t lenXmlStr(maxVar * DataGlobalConstants::MaxNameLength()); // Length of strings being passed to getepvariables
 
             // initialize all the strings to this length with blanks
             xmlStrOut = std::string(lenXmlStr, ' ');
@@ -735,9 +732,6 @@ namespace ExternalInterface {
         // This routine gets, sets and does the time integration in FMUs.
 
         // Using/Aliasing
-        using DataGlobals::emsCallFromExternalInterface;
-        using DataGlobals::KindOfSim;
-        using DataGlobals::ksRunPeriodWeather;
         using DataGlobals::WarmupFlag;
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
@@ -947,7 +941,7 @@ namespace ExternalInterface {
         // If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
         if (useEMS) {
             bool anyRan;
-            ManageEMS(state, emsCallFromExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
+            ManageEMS(state, EMSManager::EMSCallFrom::ExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
         }
 
         FirstCallGetSetDoStep = false;
@@ -1989,9 +1983,6 @@ namespace ExternalInterface {
         // Using/Aliasing
         using DataEnvironment::TotalOverallSimDays;
         using DataEnvironment::TotDesDays;
-        using DataGlobals::emsCallFromExternalInterface;
-        using DataGlobals::KindOfSim;
-        using DataGlobals::ksRunPeriodWeather;
         using DataGlobals::TimeStepZone;
         using DataGlobals::WarmupFlag;
         using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
@@ -2012,13 +2003,13 @@ namespace ExternalInterface {
         Array1D_int keyIndexes(1);     // Array index for
         Array1D_string NamesOfKeys(1); // Specific key name
 
-        if (WarmupFlag && (KindOfSim != ksRunPeriodWeather)) { // No data exchange during design days
+        if (WarmupFlag && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // No data exchange during design days
             if (FirstCallDesignDays) {
                 ShowWarningError("ExternalInterface/CalcExternalInterfaceFMUImport: ExternalInterface does not exchange data during design days.");
             }
             FirstCallDesignDays = false;
         }
-        if (WarmupFlag && (KindOfSim == ksRunPeriodWeather)) { // Data exchange after design days
+        if (WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // Data exchange after design days
             if (FirstCallWUp) {
                 // set the report during warmup to true so that variables are also updated during the warmup
                 UpdateDataDuringWarmupExternalInterface = true;
@@ -2142,7 +2133,7 @@ namespace ExternalInterface {
             }
         }
         // BeginSimulation
-        if (!WarmupFlag && (KindOfSim == ksRunPeriodWeather)) {
+        if (!WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
 
             if (FirstCallTStep) {
                 // reset the UpdateDataDuringWarmupExternalInterface to be false.
@@ -2293,7 +2284,6 @@ namespace ExternalInterface {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataGlobals::emsCallFromExternalInterface;
         using DataGlobals::MinutesPerTimeStep;
         using DataGlobals::SimTimeSteps;
         using EMSManager::ManageEMS;
@@ -2417,7 +2407,7 @@ namespace ExternalInterface {
         // If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
         if (useEMS) {
             bool anyRan;
-            ManageEMS(state, emsCallFromExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
+            ManageEMS(state, EMSManager::EMSCallFrom::ExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
         }
 
         firstCall = false; // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui

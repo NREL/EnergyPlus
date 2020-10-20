@@ -79,7 +79,6 @@
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/gio.hh>
 #include <gtest/gtest.h>
 
 using namespace EnergyPlus;
@@ -443,7 +442,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     // Test for #7053:
     // Fake that there is at least one UnitarySystemPerformance:Multispeed object
     UnitarySystems::DesignSpecMSHP fakeDesignSpecMSHP;
-    UnitarySystems::designSpecMSHP.push_back(fakeDesignSpecMSHP);
+    state.dataUnitarySystems->designSpecMSHP.push_back(fakeDesignSpecMSHP);
 
     bool ErrorsFound(false);
     GetZoneData(state, ErrorsFound);
@@ -467,19 +466,19 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     PlantLoop(2).FluidName = "ChilledWater";
     PlantLoop(2).FluidIndex = 1;
     PlantLoop(2).FluidName = "WATER";
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = VarSpeedCoil(1).Name;
+    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state.dataVariableSpeedCoils->VarSpeedCoil(1).Name;
     PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilVSWAHPCoolingEquationFit;
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = VarSpeedCoil(1).WaterInletNodeNum;
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = VarSpeedCoil(1).WaterOutletNodeNum;
+    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataVariableSpeedCoils->VarSpeedCoil(1).WaterInletNodeNum;
+    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataVariableSpeedCoils->VarSpeedCoil(1).WaterOutletNodeNum;
 
     PlantLoop(1).Name = "HotWaterLoop";
     PlantLoop(1).FluidName = "HotWater";
     PlantLoop(1).FluidIndex = 1;
     PlantLoop(1).FluidName = "WATER";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = VarSpeedCoil(2).Name;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataVariableSpeedCoils->VarSpeedCoil(2).Name;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilVSWAHPHeatingEquationFit;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = VarSpeedCoil(2).WaterInletNodeNum;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = VarSpeedCoil(2).WaterOutletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataVariableSpeedCoils->VarSpeedCoil(2).WaterInletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataVariableSpeedCoils->VarSpeedCoil(2).WaterOutletNodeNum;
 
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneSizingRunDone = true;
@@ -501,40 +500,40 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     // For this reason, the parent object would size to an air flow that was different than the child.
 
     // identify coil
-    EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).Name, "LOBBY_ZN_1_FLR_2 WSHP COOLING MODE");
+    EXPECT_EQ(state.dataVariableSpeedCoils->VarSpeedCoil(1).Name, "LOBBY_ZN_1_FLR_2 WSHP COOLING MODE");
 
     // expect coil air flow to equal PTUnit cooling air flow
-    EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).RatedAirVolFlowRate, PTUnit(1).MaxCoolAirVolFlow);
-    EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(9), PTUnit(1).MaxCoolAirVolFlow);
+    EXPECT_EQ(state.dataVariableSpeedCoils->VarSpeedCoil(1).RatedAirVolFlowRate, PTUnit(1).MaxCoolAirVolFlow);
+    EXPECT_EQ(state.dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(9), PTUnit(1).MaxCoolAirVolFlow);
 
     // expect the ratio of air flow to capacity to be equal to the reference air flow and capacity ratio specified in coil input
     Real64 refAirflowCapacityRatio = 0.891980668 / 16092.825525; // speed 9 reference cooling data
     Real64 sizingAirflowCapacityRatio =
-        VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowRate(9) / VariableSpeedCoils::VarSpeedCoil(1).MSRatedTotCap(9);
+        state.dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(9) / state.dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedTotCap(9);
     EXPECT_EQ(refAirflowCapacityRatio, sizingAirflowCapacityRatio);
 
     // this same ratio should also equal the internal flow per capacity variable used to back calculate operating air flow rate
-    EXPECT_EQ(sizingAirflowCapacityRatio, VariableSpeedCoils::VarSpeedCoil(1).MSRatedAirVolFlowPerRatedTotCap(9));
+    EXPECT_EQ(sizingAirflowCapacityRatio, state.dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowPerRatedTotCap(9));
 
     // identify coil
-    EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(2).Name, "LOBBY_ZN_1_FLR_2 WSHP HEATING MODE");
+    EXPECT_EQ(state.dataVariableSpeedCoils->VarSpeedCoil(2).Name, "LOBBY_ZN_1_FLR_2 WSHP HEATING MODE");
 
     // expect coil air flow to equal PTUnit heating air flow
-    EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(2).RatedAirVolFlowRate, ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
-    EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(2).RatedAirVolFlowRate, PTUnit(1).MaxHeatAirVolFlow);
-    EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(2).MSRatedAirVolFlowRate(9), PTUnit(1).MaxHeatAirVolFlow);
+    EXPECT_EQ(state.dataVariableSpeedCoils->VarSpeedCoil(2).RatedAirVolFlowRate, ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
+    EXPECT_EQ(state.dataVariableSpeedCoils->VarSpeedCoil(2).RatedAirVolFlowRate, PTUnit(1).MaxHeatAirVolFlow);
+    EXPECT_EQ(state.dataVariableSpeedCoils->VarSpeedCoil(2).MSRatedAirVolFlowRate(9), PTUnit(1).MaxHeatAirVolFlow);
 
     // expect the ratio of air flow to capacity to equal to the reference air flow and capacity specified in coil input
     refAirflowCapacityRatio = 0.891980668 / 20894.501936; // speed 9 reference heating data
-    sizingAirflowCapacityRatio = VariableSpeedCoils::VarSpeedCoil(2).MSRatedAirVolFlowRate(9) / VariableSpeedCoils::VarSpeedCoil(2).MSRatedTotCap(9);
+    sizingAirflowCapacityRatio = state.dataVariableSpeedCoils->VarSpeedCoil(2).MSRatedAirVolFlowRate(9) / state.dataVariableSpeedCoils->VarSpeedCoil(2).MSRatedTotCap(9);
     EXPECT_EQ(refAirflowCapacityRatio, sizingAirflowCapacityRatio);
 
     // this same ratio should also equal the internal flow per capacity variable used to back calculate operating air flow rate
-    EXPECT_EQ(sizingAirflowCapacityRatio, VariableSpeedCoils::VarSpeedCoil(2).MSRatedAirVolFlowPerRatedTotCap(9));
+    EXPECT_EQ(sizingAirflowCapacityRatio, state.dataVariableSpeedCoils->VarSpeedCoil(2).MSRatedAirVolFlowPerRatedTotCap(9));
 
     SizeFan(state, 1);
     // the fan vol flow rate should equal the max of cooling and heating coil flow rates
-    Real64 maxCoilAirFlow = max(VariableSpeedCoils::VarSpeedCoil( 1 ).RatedAirVolFlowRate, VariableSpeedCoils::VarSpeedCoil( 2 ).RatedAirVolFlowRate);
+    Real64 maxCoilAirFlow = max(state.dataVariableSpeedCoils->VarSpeedCoil( 1 ).RatedAirVolFlowRate, state.dataVariableSpeedCoils->VarSpeedCoil( 2 ).RatedAirVolFlowRate);
     EXPECT_EQ(Fan(1).MaxAirFlowRate, maxCoilAirFlow);
     EXPECT_EQ(Fan(1).MaxAirFlowRate, max(PTUnit(1).MaxCoolAirVolFlow, PTUnit(1).MaxHeatAirVolFlow));
 
@@ -543,7 +542,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     Real64 ZoneLoad(0.0);          // cooling or heating needed by zone [watts]
 
     // Also set BeginEnvrnFlag so code is tested for coil initialization and does not crash
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     InitPTUnit(state, 1, DataSizing::CurZoneEqNum, true, OnOffAirFlowRatio, ZoneLoad);
 
     // check that an intermediate speed has the correct flow ratio
@@ -561,7 +560,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     // VS coils set SystemAirFlow to true and AirVolFlow to a value, all PTUnits set CoolingAirFlow and HeatingAirFlow, and CoolingAirVolFlow and
     // HeatingAirVolFlow
     EXPECT_TRUE(ZoneEqSizing(1).SystemAirFlow);
-    EXPECT_EQ(ZoneEqSizing(1).AirVolFlow, VariableSpeedCoils::VarSpeedCoil(1).RatedAirVolFlowRate);
+    EXPECT_EQ(ZoneEqSizing(1).AirVolFlow, state.dataVariableSpeedCoils->VarSpeedCoil(1).RatedAirVolFlowRate);
     EXPECT_TRUE(ZoneEqSizing(1).CoolingAirFlow);
     EXPECT_TRUE(ZoneEqSizing(1).HeatingAirFlow);
     EXPECT_EQ(ZoneEqSizing(1).CoolingAirVolFlow, PTUnit(1).MaxCoolAirVolFlow);
@@ -813,7 +812,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     EXPECT_EQ("COIL:HEATING:FUEL", PTUnit(1).ACHeatCoilType);                 // PTAC heating coil type
     EXPECT_EQ(HeatingCoil(1).HCoilType_Num, Coil_HeatingGasOrOtherFuel);      // gas heating coil type
 
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
     DataEnvironment::OutBaroPress = 101325.0;
@@ -1159,7 +1158,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // set input variables
     DataEnvironment::OutBaroPress = 101325.0;
@@ -1247,7 +1246,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     ASSERT_FALSE(PackagedTerminalHeatPump::HeatingLoad);
     // Init PTAC zoneHVAC equipment
     InitPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     InitPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
     // init sets heating mode to true due to cold ventilation air
     ASSERT_TRUE(PackagedTerminalHeatPump::HeatingLoad);

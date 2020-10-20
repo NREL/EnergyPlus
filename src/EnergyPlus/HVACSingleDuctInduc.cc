@@ -62,7 +62,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -109,13 +108,10 @@ namespace HVACSingleDuctInduc {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::NumOfZones;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
@@ -354,7 +350,7 @@ namespace HVACSingleDuctInduc {
             IndUnit(IUNum).UnitType_Num = SingleDuct_CV_FourPipeInduc;
             IndUnit(IUNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                IndUnit(IUNum).SchedPtr = ScheduleAlwaysOn;
+                IndUnit(IUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 IndUnit(IUNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (IndUnit(IUNum).SchedPtr == 0) {
@@ -642,7 +638,7 @@ namespace HVACSingleDuctInduc {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(IUNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(IUNum)) {
             RhoAir = StdRhoAir;
             PriNode = IndUnit(IUNum).PriAirInNode;
             SecNode = IndUnit(IUNum).SecAirInNode;
@@ -665,7 +661,7 @@ namespace HVACSingleDuctInduc {
 
                 rho = GetDensityGlycol(state,
                                        PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
-                                       DataGlobals::HWInitConvTemp,
+                                       DataGlobalConstants::HWInitConvTemp(),
                                        PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
                                        RoutineName);
                 IndUnit(IUNum).MaxHotWaterFlow = rho * IndUnit(IUNum).MaxVolHotWaterFlow;
@@ -690,7 +686,7 @@ namespace HVACSingleDuctInduc {
             if (ColdConNode > 0) {
                 rho = GetDensityGlycol(state,
                                        PlantLoop(IndUnit(IUNum).CWLoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
+                                       DataGlobalConstants::CWInitConvTemp(),
                                        PlantLoop(IndUnit(IUNum).CWLoopNum).FluidIndex,
                                        RoutineName);
                 IndUnit(IUNum).MaxColdWaterFlow = rho * IndUnit(IUNum).MaxVolColdWaterFlow;
@@ -714,7 +710,7 @@ namespace HVACSingleDuctInduc {
             MyEnvrnFlag(IUNum) = false;
         } // end one time inits
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(IUNum) = true;
         }
 
@@ -909,13 +905,13 @@ namespace HVACSingleDuctInduc {
                                 }
                                 IndUnit(IUNum).DesHeatingLoad = DesCoilLoad;
                                 Cp = GetSpecificHeatGlycol(state, PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
-                                                           DataGlobals::HWInitConvTemp,
+                                                           DataGlobalConstants::HWInitConvTemp(),
                                                            PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
 
                                 rho = GetDensityGlycol(state,
                                                        PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
-                                                       DataGlobals::HWInitConvTemp,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
 
