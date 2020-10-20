@@ -520,7 +520,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HRInitialEIRFrac;          // Fractional cooling degradation at the start of heat recovery from cooling mode
         Real64 HREIRTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
         Real64 CurrentEndTime;     // end time of current time step
-        Real64 CurrentEndTimeLast_firstfunc; // end time of last time step
+        Real64 CurrentEndTimeLast_firstfunc(0.0); // end time of last time step
         Real64 SUMultiplier;              // multiplier for simulating mode changes
         Real64 CondPower;                 // condenser power [W]
         Real64 CondCapacity;              // condenser heat rejection [W]
@@ -5113,8 +5113,8 @@ namespace HVACVariableRefrigerantFlow {
         int IndexToTUInTUList;            // index to TU in TerminalUnilList
         Real64 RhoAir;                    // air density at InNode
         Real64 CurrentEndTime;     // end time of current time step
-        Real64 CurrentEndTimeLast_InitVRF;
-        Real64 TimeStepSysLast;
+        Real64 CurrentEndTimeLast_InitVRF(0.0);
+        Real64 TimeStepSysLast(0.0);
         Real64 TempOutput;                // Sensible output of TU
         Real64 LoadToCoolingSP;           // thermostat load to cooling setpoint (W)
         Real64 LoadToHeatingSP;           // thermostat load to heating setpoint (W)
@@ -10214,7 +10214,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HRInitialEIRFrac;          // Fractional cooling degradation at the start of heat recovery from cooling mode
         Real64 HREIRTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
         Real64 CurrentEndTime;     // end time of current time step
-        Real64 CurrentEndTimeLast_secondfunc;
+        Real64 CurrentEndTimeLast_secondfunc(0.0);
         Real64 SUMultiplier;              // multiplier for simulating mode changes
         Real64 CondPower;                 // condenser power [W]
         Real64 CondCapacity;              // condenser heat rejection [W]
