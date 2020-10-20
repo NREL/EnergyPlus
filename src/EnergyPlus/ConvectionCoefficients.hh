@@ -504,7 +504,7 @@ namespace ConvectionCoefficients {
                                       Array1D<Real64> &SurfaceTemperatures // For CalcASHRAEDetailed, if called
     );
 
-    void CalcTrombeWallIntConvCoeff(int ZoneNum,                        // Zone number for which coefficients are being calculated
+    void CalcTrombeWallIntConvCoeff(EnergyPlusData &state, int ZoneNum,                        // Zone number for which coefficients are being calculated
                                     const Array1D<Real64> &SurfaceTemperatures // Temperature of surfaces for evaluation of HcIn
     );
 
