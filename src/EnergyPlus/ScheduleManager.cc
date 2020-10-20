@@ -50,11 +50,12 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include "StringUtilities.hh"
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -188,9 +189,6 @@ namespace ScheduleManager {
     std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
     Array1D<ScheduleData> Schedule; // Schedule Storage
     std::unordered_map<std::string, std::string> UniqueScheduleNames;
-
-    static ObjexxFCL::gio::Fmt fmtLD("*");
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -3443,7 +3441,6 @@ namespace ScheduleManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int IOS;
         Real64 rRetHH; // real Returned "hour"
         Real64 rRetMM; // real Returned "minute"
         bool nonIntegral;
@@ -3462,13 +3459,9 @@ namespace ScheduleManager {
         } else if (Pos == 0) {
             RetHH = 0;
         } else {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(String.substr(0, Pos), fmtLD, flags) >> rRetHH;
-                IOS = flags.ios();
-            }
+            const bool readFailed = !readItem(String.substr(0, Pos), rRetHH);
             RetHH = int(rRetHH);
-            if (double(RetHH) != rRetHH || IOS != 0 || rRetHH < 0.0) {
+            if (double(RetHH) != rRetHH || readFailed || rRetHH < 0.0) {
                 if (double(RetHH) != rRetHH && rRetHH >= 0.0) {
                     ShowWarningError("ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (non-integer numeric in HH)=" +
                                      stripped(FullFieldValue));
@@ -3485,13 +3478,9 @@ namespace ScheduleManager {
         }
 
         String.erase(0, Pos + 1);
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::read(String, fmtLD, flags) >> rRetMM;
-            IOS = flags.ios();
-        }
+        const bool readFailed = !readItem(String, rRetMM);
         RetMM = int(rRetMM);
-        if (double(RetMM) != rRetMM || IOS != 0 || rRetMM < 0.0) {
+        if (double(RetMM) != rRetMM || readFailed || rRetMM < 0.0) {
             if (double(RetMM) != rRetMM && rRetMM >= 0.0) {
                 ShowWarningError("ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (non-integer numeric in MM)=" +
                                  stripped(FullFieldValue));

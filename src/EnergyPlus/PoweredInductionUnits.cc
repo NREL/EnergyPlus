@@ -111,11 +111,8 @@ namespace PoweredInductionUnits {
     // Using/Aliasing
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::NumOfZones;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::PlenumInducedMassFlow;
     using DataHVACGlobals::SingleCoolingSetPoint;
@@ -349,7 +346,7 @@ namespace PoweredInductionUnits {
             PIU(PIUNum).UnitType_Num = SingleDuct_SeriesPIU_Reheat;
             PIU(PIUNum).Sched = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                PIU(PIUNum).SchedPtr = ScheduleAlwaysOn;
+                PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 PIU(PIUNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2)); // convert schedule name to pointer
                 if (PIU(PIUNum).SchedPtr == 0) {
@@ -544,7 +541,7 @@ namespace PoweredInductionUnits {
             PIU(PIUNum).UnitType_Num = SingleDuct_ParallelPIU_Reheat;
             PIU(PIUNum).Sched = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                PIU(PIUNum).SchedPtr = ScheduleAlwaysOn;
+                PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 PIU(PIUNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2)); // convert schedule name to pointer
                 if (PIU(PIUNum).SchedPtr == 0) {
@@ -885,7 +882,7 @@ namespace PoweredInductionUnits {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(PIUNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(PIUNum)) {
             RhoAir = StdRhoAir;
             PriNode = PIU(PIUNum).PriAirInNode;
             SecNode = PIU(PIUNum).SecAirInNode;
@@ -933,7 +930,7 @@ namespace PoweredInductionUnits {
             MyEnvrnFlag(PIUNum) = false;
         } // end one time inits
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(PIUNum) = true;
         }
 

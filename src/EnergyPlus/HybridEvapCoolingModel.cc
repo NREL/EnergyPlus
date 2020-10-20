@@ -46,22 +46,24 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <EnergyPlus/HybridEvapCoolingModel.hh>
+#include <cmath>
+#include <string>
 
-#include <EnergyPlus/UtilityRoutines.hh>
+// ObjexxFCL Headers
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Fmath.hh>
 
+// EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/HybridEvapCoolingModel.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <cmath>
-#include <string>
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Fmath.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus { //***************
 
@@ -1631,19 +1633,19 @@ namespace HybridEvapCoolingModel {
         // day, so report", but that doesn't seem to exist.
         if ((TimeElapsed > 24) && WarnOnceFlag && !WarmupFlag) {
             if (count_EnvironmentConditionsNotMet > 0)
-                ShowWarningError("In day " + RoundSigDigits((Real64)DayOfSim, 1) + " of simulation, " + Name.c_str() + " was unable to operate for " +
+                ShowWarningError("In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() + " was unable to operate for " +
                                  RoundSigDigits((Real64)count_EnvironmentConditionsNotMet, 1) +
                                  " timesteps because environment conditions were beyond the allowable operating range for any mode.");
             if (count_SAHR_OC_MetOnce > 0)
-                ShowWarningError("In day " + RoundSigDigits((Real64)DayOfSim, 1) + " of simulation, " + Name.c_str() +
+                ShowWarningError("In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
                                  " failed to meet supply air humidity ratio for " + RoundSigDigits(Real64(count_SAHR_OC_MetOnce), 1) +
                                  " time steps. For these time steps For these time steps" + Name.c_str() + " was set to mode 0");
             if (count_SAT_OC_MetOnce > 0)
-                ShowWarningError("In day " + RoundSigDigits((Real64)DayOfSim, 1) + " of simulation, " + Name.c_str() +
+                ShowWarningError("In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
                                  " failed to meet supply air temperature constraints for " + RoundSigDigits(Real64(count_SAT_OC_MetOnce), 1) +
                                  " time steps. For these time steps For these time steps" + Name.c_str() + " was set to mode 0");
 
-            ShowWarningError("In day " + RoundSigDigits((Real64)DayOfSim, 1) + " of simulation, " + Name.c_str() +
+            ShowWarningError("In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
                              " failed to  satisfy sensible load for " + RoundSigDigits((Real64)count_DidWeNotMeetLoad, 1) +
                              " time steps. For these time steps settings were selected to provide as much sensible cooling or heating as possible, "
                              "given other constraints.");

@@ -464,7 +464,6 @@ namespace HybridUnitaryAirConditioners {
         using BranchNodeConnections::TestCompSet;
         using namespace ScheduleManager;
         using BranchNodeConnections::SetUpCompSets;
-        using DataGlobals::ScheduleAlwaysOn;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using namespace DataLoopNode;
@@ -529,7 +528,7 @@ namespace HybridUnitaryAirConditioners {
                 // A2, \field Availability Schedule Name
                 ZoneHybridUnitaryAirConditioner(UnitLoop).Schedule = Alphas(2);
                 if (lAlphaFieldBlanks(2)) {
-                    ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = ScheduleAlwaysOn;
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
                 } else {
                     ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = GetScheduleIndex(state, Alphas(2));
                     if (ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr == 0) {

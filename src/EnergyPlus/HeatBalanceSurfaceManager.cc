@@ -55,7 +55,6 @@
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -378,8 +377,6 @@ namespace HeatBalanceSurfaceManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -480,7 +477,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         // Do the Begin Simulation initializations
-        if (BeginSimFlag) {
+        if (state.dataGlobal->BeginSimFlag) {
             AllocateSurfaceHeatBalArrays(state); // Allocate the Module Arrays before any inits take place
             InterZoneWindow = std::any_of(Zone.begin(), Zone.end(), [](DataHeatBalance::ZoneData const &e) { return e.HasInterZoneWindow; });
             IsZoneDV.dimension(NumOfZones, false);
@@ -489,7 +486,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Temperature and Flux Histories");
             InitThermalAndFluxHistories(state); // Set initial temperature and flux histories
         }
@@ -741,7 +738,7 @@ namespace HeatBalanceSurfaceManager {
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Convection Coefficients");
         InitInteriorConvectionCoeffs(state, TempSurfInTmp);
 
-        if (BeginSimFlag) { // Now's the time to report surfaces, if desired
+        if (state.dataGlobal->BeginSimFlag) { // Now's the time to report surfaces, if desired
             //    if (firstTime) CALL DisplayString('Reporting Surfaces')
             //    CALL ReportSurfaces
             if (InitSurfaceHeatBalancefirstTime) DisplayString("Gathering Information for Predefined Reporting");
@@ -4702,10 +4699,6 @@ namespace HeatBalanceSurfaceManager {
         // radiant algorithm module.  Finally, using this source value, redo
         // the inside and outside heat balances.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using CoolingPanelSimple::UpdateCoolingPanelSourceValAvg;
         using ElectricBaseboardRadiator::UpdateBBElecRadSourceValAvg;
         using HighTempRadiantSystem::UpdateHTRadSourceValAvg;
@@ -4714,20 +4707,6 @@ namespace HeatBalanceSurfaceManager {
         using SteamBaseboardRadiator::UpdateBBSteamRadSourceValAvg;
         using SwimmingPool::UpdatePoolSourceValAvg;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool LowTempRadSysOn;     // .TRUE. if a low temperature radiant system is running
         bool HighTempRadSysOn;    // .TRUE. if a high temperature radiant system is running
         bool HWBaseboardSysOn;    // .TRUE. if a water baseboard heater is running
@@ -4740,7 +4719,7 @@ namespace HeatBalanceSurfaceManager {
         UpdateRadSysSourceValAvg(LowTempRadSysOn);
         UpdateHTRadSourceValAvg(HighTempRadSysOn);
         UpdateBBRadSourceValAvg(HWBaseboardSysOn);
-        UpdateBBSteamRadSourceValAvg(SteamBaseboardSysOn);
+        UpdateBBSteamRadSourceValAvg(state, SteamBaseboardSysOn);
         UpdateBBElecRadSourceValAvg(ElecBaseboardSysOn);
         UpdateCoolingPanelSourceValAvg(state, CoolingPanelSysOn);
         UpdatePoolSourceValAvg(state, SwimmingPoolOn);
@@ -4779,20 +4758,6 @@ namespace HeatBalanceSurfaceManager {
         // Mechanical Systems in Heat Balance Based Energy Analysis Programs
         // on System Response and Control, Building Simulation '91, IBPSA, Nice, France.
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HistTermNum; // DO loop counter for history terms
         int SideNum;     // DO loop counter for surfaces sides (inside, outside)
         int SurfNum;     // Surface number DO loop counter
@@ -4805,9 +4770,6 @@ namespace HeatBalanceSurfaceManager {
         static Array1D<Real64> Tsrc1;    // Temperature at source/sink (during first time step/series)
         static Array1D<Real64> Tuser1;   // Temperature at the user specified location (during first time step/series)
         static Array1D<Real64> SumTime;  // Amount of time that has elapsed from start of master history to
-        // the current time step
-
-        // FLOW:
 
         // Tuned Assure safe to use shared linear indexing below
         assert(equal_dimensions(TH, THM));
@@ -5094,29 +5056,6 @@ namespace HeatBalanceSurfaceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the current zone MRT for thermal comfort and radiation
         // calculation purposes.
-
-        // METHODOLOGY EMPLOYED:
-        // If you have to ask...
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Real64 SumAET;                    // Intermediate calculational variable (area*emissivity*T) sum
         static Array1D<Real64> SurfaceAE; // Product of area and emissivity for each surface
@@ -5899,7 +5838,7 @@ namespace HeatBalanceSurfaceManager {
 
                         int OPtr = Surface(SurfNum).OSCPtr;
                         // Set surface temp from previous timestep
-                        if (BeginTimeStepFlag) {
+                        if (state.dataGlobal->BeginTimeStepFlag) {
                             OSC(OPtr).TOutsideSurfPast = TH(1, 1, SurfNum);
                         }
 
@@ -5962,7 +5901,7 @@ namespace HeatBalanceSurfaceManager {
                         // boundary condition for the surface
                         int OPtr = Surface(SurfNum).OSCPtr;
                         // Set surface temp from previous timestep
-                        if (BeginTimeStepFlag) {
+                        if (state.dataGlobal->BeginTimeStepFlag) {
                             OSC(OPtr).TOutsideSurfPast = TH(1, 1, SurfNum);
                         }
 
@@ -6363,7 +6302,7 @@ namespace HeatBalanceSurfaceManager {
             calcHeatBalInsideSurfFirstTime = false;
         }
 
-        if (BeginEnvrnFlag && calcHeatBalInsideSurEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && calcHeatBalInsideSurEnvrnFlag) {
             TempInsOld = 23.0;
             RefAirTemp = 23.0;
             TempEffBulkAir = 23.0;
@@ -6375,7 +6314,7 @@ namespace HeatBalanceSurfaceManager {
                 SurfaceGeometry::kivaManager.initKivaInstances(state);
             }
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             calcHeatBalInsideSurEnvrnFlag = true;
         }
 

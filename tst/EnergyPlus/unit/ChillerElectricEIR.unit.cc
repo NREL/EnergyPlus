@@ -230,7 +230,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     thisEIR.size(state);
 
     // run through init again after sizing is complete to set mass flow rate
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     thisEIR.initialize(state, RunFlag, MyLoad);
 
     // check chiller water side evap flow rate is non-zero
@@ -353,7 +353,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     thisEIRChiller.initialize(state, RunFlag, MyLoad);
     thisEIRChiller.size(state);
     // init again after sizing is complete to set mass flow rate
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     thisEIRChiller.initialize(state, RunFlag, MyLoad);
     // check chiller water side evap flow rate is non-zero
     EXPECT_NEAR(thisEIRChiller.EvapMassFlowRateMax, 0.999898, 0.0000001);
