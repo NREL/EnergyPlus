@@ -86,8 +86,6 @@ namespace MixerComponent {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
 

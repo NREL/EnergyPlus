@@ -162,7 +162,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
     thisChiller.initialize(state, RunFlag, MyLoad);
     thisChiller.size(state);
     // run init again after sizing is complete to set mass flow rate
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     thisChiller.initialize(state, RunFlag, MyLoad);
     // check hardsized chiller nominal capacity
     EXPECT_DOUBLE_EQ(state.dataPlantChillers->ElectricChiller(1).NomCap, 100000.00);
@@ -289,7 +289,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     thisChiller.initialize(state, RunFlag, MyLoad);
     thisChiller.size(state);
     // run init again after sizing is complete to set mass flow rate
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     thisChiller.initialize(state, RunFlag, MyLoad);
     // check hardsized chiller nominal capacity
     EXPECT_DOUBLE_EQ(state.dataPlantChillers->ElectricChiller(1).NomCap, 100000.00);

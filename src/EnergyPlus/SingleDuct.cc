@@ -113,8 +113,6 @@ namespace SingleDuct {
     using BranchNodeConnections::SetUpCompSets;
     using BranchNodeConnections::TestCompSet;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::NumOfZones;
     using DataGlobals::SysSizingCalc;
@@ -353,7 +351,6 @@ namespace SingleDuct {
         using namespace DataIPShortCuts;
         using namespace DataHeatBalance;
         using DataGlobals::DoZoneSizing;
-        using DataGlobals::ScheduleAlwaysOn;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataSizing::OARequirements;
@@ -485,7 +482,7 @@ namespace SingleDuct {
             }
             sd_airterminal(SysNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                sd_airterminal(SysNum).SchedPtr = ScheduleAlwaysOn;
+                sd_airterminal(SysNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 sd_airterminal(SysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (sd_airterminal(SysNum).SchedPtr == 0) {
@@ -802,7 +799,7 @@ namespace SingleDuct {
             }
             sd_airterminal(SysNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                sd_airterminal(SysNum).SchedPtr = ScheduleAlwaysOn;
+                sd_airterminal(SysNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 sd_airterminal(SysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (sd_airterminal(SysNum).SchedPtr == 0) {
@@ -1043,7 +1040,7 @@ namespace SingleDuct {
             }
             sd_airterminal(SysNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                sd_airterminal(SysNum).SchedPtr = ScheduleAlwaysOn;
+                sd_airterminal(SysNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 sd_airterminal(SysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (sd_airterminal(SysNum).SchedPtr == 0) {
@@ -1226,7 +1223,7 @@ namespace SingleDuct {
 
             sd_airterminal(SysNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                sd_airterminal(SysNum).SchedPtr = ScheduleAlwaysOn;
+                sd_airterminal(SysNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 sd_airterminal(SysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (sd_airterminal(SysNum).SchedPtr == 0) {
@@ -1390,7 +1387,7 @@ namespace SingleDuct {
             sd_airterminal(SysNum).ReheatName = "";
             sd_airterminal(SysNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                sd_airterminal(SysNum).SchedPtr = ScheduleAlwaysOn;
+                sd_airterminal(SysNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 sd_airterminal(SysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (sd_airterminal(SysNum).SchedPtr == 0) {
@@ -1601,7 +1598,7 @@ namespace SingleDuct {
             sd_airterminal(SysNum).ReheatName = "";
             sd_airterminal(SysNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                sd_airterminal(SysNum).SchedPtr = ScheduleAlwaysOn;
+                sd_airterminal(SysNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 sd_airterminal(SysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (sd_airterminal(SysNum).SchedPtr == 0) {
@@ -1825,7 +1822,7 @@ namespace SingleDuct {
 
             sd_airterminal(SysNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                sd_airterminal(SysNum).SchedPtr = ScheduleAlwaysOn;
+                sd_airterminal(SysNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 sd_airterminal(SysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (sd_airterminal(SysNum).SchedPtr == 0) {
@@ -2223,7 +2220,7 @@ namespace SingleDuct {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && this->MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
 
             // Set the outlet node max mass flow rate to the Max Air Flow specified for the Sys
             OutletNode = this->OutletNodeNum;
@@ -2302,7 +2299,7 @@ namespace SingleDuct {
             this->MyEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag = true;
         }
 

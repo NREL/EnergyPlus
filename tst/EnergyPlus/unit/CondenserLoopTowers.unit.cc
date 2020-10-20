@@ -491,7 +491,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
 
     bool ErrorsFound = false;
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
@@ -883,7 +883,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
 
     bool ErrorsFound = false;
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
@@ -1314,7 +1314,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
 
     bool ErrorsFound = false;
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
@@ -1729,7 +1729,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
 
     bool ErrorsFound = false;
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
@@ -2213,7 +2213,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
 
     bool ErrorsFound = false;
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
@@ -2640,7 +2640,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
 
     bool ErrorsFound = false;
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
@@ -3027,7 +3027,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     ASSERT_TRUE(process_idf(idf_objects));
     SimulationManager::PostIPProcessing(state);
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
@@ -3419,7 +3419,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     ASSERT_TRUE(process_idf(idf_objects));
     SimulationManager::PostIPProcessing(state);
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
@@ -3894,7 +3894,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     ASSERT_TRUE(process_idf(idf_objects));
     SimulationManager::PostIPProcessing(state);
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
@@ -3920,7 +3920,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     auto &VSTower = state.dataCondenserLoopTowers->towers(1);
 
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
 
     // test case 1:
     DataEnvironment::OutDryBulbTemp = 35.0;
@@ -3931,7 +3931,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     DataLoopNode::Node(VSTower.WaterInletNodeNum).Temp = 35.0;
 
     VSTower.initialize(state);
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     VSTower.SizeTower(state);
     VSTower.initialize(state);
 

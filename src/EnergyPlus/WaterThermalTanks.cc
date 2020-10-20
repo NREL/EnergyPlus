@@ -592,7 +592,7 @@ namespace WaterThermalTanks {
             }
         }
 
-        if (DataGlobals::BeginEnvrnFlag && state.dataWaterThermalTanks->calcWaterThermalTankZoneGainsMyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataWaterThermalTanks->calcWaterThermalTankZoneGainsMyEnvrnFlag) {
             for (auto &e : state.dataWaterThermalTanks->WaterThermalTank) {
                 e.AmbientZoneGain = 0.0;
                 e.FuelEnergy = 0.0;
@@ -602,7 +602,7 @@ namespace WaterThermalTanks {
             state.dataWaterThermalTanks->calcWaterThermalTankZoneGainsMyEnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) state.dataWaterThermalTanks->calcWaterThermalTankZoneGainsMyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) state.dataWaterThermalTanks->calcWaterThermalTankZoneGainsMyEnvrnFlag = true;
 
         for (int WaterThermalTankNum = 1; WaterThermalTankNum <= state.dataWaterThermalTanks->numWaterThermalTank; ++WaterThermalTankNum) {
             auto &Tank = state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum);
@@ -687,7 +687,7 @@ namespace WaterThermalTanks {
                     ErrorsFound = true;
                 }
             } else {
-                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
+                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             }
 
             //       convert schedule name to pointer
@@ -1139,7 +1139,7 @@ namespace WaterThermalTanks {
                     ErrorsFound = true;
                 }
             } else {
-                HPWH.AvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
+                HPWH.AvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             }
 
             // Compressor Setpoint Temperature Schedule
@@ -2200,8 +2200,8 @@ namespace WaterThermalTanks {
             Tank.FluidIndex = waterIndex;
 
             // default to always on
-            Tank.SourceSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
-            Tank.UseSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
+            Tank.SourceSideAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
+            Tank.UseSideAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
 
             // A user field will be added in a later release
             Tank.EndUseSubcategoryName = "Water Heater";
@@ -2628,8 +2628,8 @@ namespace WaterThermalTanks {
             Tank.FluidIndex = waterIndex;
 
             // default to always on
-            Tank.SourceSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
-            Tank.UseSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
+            Tank.SourceSideAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
+            Tank.UseSideAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
 
             Tank.EndUseSubcategoryName = DataIPShortCuts::cAlphaArgs(2);
 
@@ -3316,8 +3316,8 @@ namespace WaterThermalTanks {
             Tank.UseInletTempSchedule = 0;
 
             // default to always on
-            Tank.SourceSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
-            Tank.UseSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
+            Tank.SourceSideAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
+            Tank.UseSideAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
 
             if ((DataIPShortCuts::rNumericArgs(6) > 1) || (DataIPShortCuts::rNumericArgs(6) < 0)) {
                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
@@ -3345,7 +3345,7 @@ namespace WaterThermalTanks {
             Tank.UseSide.loopSideNum = DataPlant::DemandSupply_No;
 
             if (DataIPShortCuts::lAlphaFieldBlanks(9)) {
-                Tank.UseSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
+                Tank.UseSideAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Tank.UseSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(9));
                 if (Tank.UseSideAvailSchedNum == 0) {
@@ -3368,7 +3368,7 @@ namespace WaterThermalTanks {
             }
 
             if (DataIPShortCuts::lAlphaFieldBlanks(12)) {
-                Tank.SourceSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
+                Tank.SourceSideAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Tank.SourceSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(12));
                 if (Tank.SourceSideAvailSchedNum == 0) {
@@ -3621,8 +3621,8 @@ namespace WaterThermalTanks {
             Tank.UseInletHeight = DataIPShortCuts::rNumericArgs(10);
 
             // default to always on
-            Tank.SourceSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
-            Tank.UseSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
+            Tank.SourceSideAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
+            Tank.UseSideAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
 
             if (DataIPShortCuts::rNumericArgs(10) == DataGlobalConstants::AutoCalculate()) {
                 Tank.UseInletHeight = Tank.Height; // top of tank
@@ -3741,7 +3741,7 @@ namespace WaterThermalTanks {
             }
 
             if (DataIPShortCuts::lAlphaFieldBlanks(10)) {
-                Tank.UseSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
+                Tank.UseSideAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Tank.UseSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(10));
                 if (Tank.UseSideAvailSchedNum == 0) {
@@ -3757,7 +3757,7 @@ namespace WaterThermalTanks {
             }
 
             if (DataIPShortCuts::lAlphaFieldBlanks(13)) {
-                Tank.SourceSideAvailSchedNum = DataGlobals::ScheduleAlwaysOn;
+                Tank.SourceSideAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 Tank.SourceSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(13));
                 if (Tank.SourceSideAvailSchedNum == 0) {
@@ -5458,7 +5458,7 @@ namespace WaterThermalTanks {
             this->SetLoopIndexFlag = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag && !this->SetLoopIndexFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag && !this->SetLoopIndexFlag) {
 
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
 
@@ -5623,7 +5623,7 @@ namespace WaterThermalTanks {
             this->NetHeatTransferEnergy = 0.0;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlag = true;
 
         if (this->WarmupFlag && (!DataGlobals::WarmupFlag)) {
             // reInitialize tank temperature to setpoint of first hour (use HPWH or Desuperheater heating coil set point if applicable)

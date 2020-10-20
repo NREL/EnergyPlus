@@ -2181,7 +2181,7 @@ namespace SimAirServingZones {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && FirstHVACIteration && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && FirstHVACIteration && MyEnvrnFlag) {
 
             if (NumPrimaryAirSys > 0) {
                 for (auto &e : state.dataAirLoop->PriAirSysAvailMgr) {
@@ -2229,12 +2229,12 @@ namespace SimAirServingZones {
 
         } // End the environment initializations
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag = true;
         }
 
         // Do the Begin Day initializations
-        if (BeginDayFlag) {
+        if (state.dataGlobal->BeginDayFlag) {
         }
 
         // There are no hourly initializations done in the heat balance
@@ -2823,7 +2823,7 @@ namespace SimAirServingZones {
         // To enable generating a trace file with the converged solution for all controllers on each air loop,
         // define the environment variable TRACE_AIRLOOP=YES or TRACE_AIRLOOP=Y.
         if (TraceAirLoopEnvFlag) {
-            TraceAirLoopControllers(FirstHVACIteration, AirLoopNum, AirLoopPass, AirLoopConvergedFlag, AirLoopNumCalls);
+            TraceAirLoopControllers(state, FirstHVACIteration, AirLoopNum, AirLoopPass, AirLoopConvergedFlag, AirLoopNumCalls);
         }
 
         // When there is more than 1 controller on an air loop, each controller sensing

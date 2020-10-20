@@ -110,10 +110,8 @@ namespace HVACSingleDuctInduc {
     // Using/Aliasing
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::NumOfZones;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
@@ -352,7 +350,7 @@ namespace HVACSingleDuctInduc {
             IndUnit(IUNum).UnitType_Num = SingleDuct_CV_FourPipeInduc;
             IndUnit(IUNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                IndUnit(IUNum).SchedPtr = ScheduleAlwaysOn;
+                IndUnit(IUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 IndUnit(IUNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (IndUnit(IUNum).SchedPtr == 0) {
@@ -640,7 +638,7 @@ namespace HVACSingleDuctInduc {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(IUNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(IUNum)) {
             RhoAir = StdRhoAir;
             PriNode = IndUnit(IUNum).PriAirInNode;
             SecNode = IndUnit(IUNum).SecAirInNode;
@@ -712,7 +710,7 @@ namespace HVACSingleDuctInduc {
             MyEnvrnFlag(IUNum) = false;
         } // end one time inits
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(IUNum) = true;
         }
 

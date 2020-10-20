@@ -82,7 +82,7 @@ enum class GeneratorType {
     PVWatts
 };
 
-void initializeElectricPowerServiceZoneGains();
+void initializeElectricPowerServiceZoneGains(EnergyPlusData &state);
 
 class DCtoACInverter
 // This class is for modelling a power conversion device that takes DC power in and produces AC power out.

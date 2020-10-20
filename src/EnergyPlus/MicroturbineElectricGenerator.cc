@@ -964,7 +964,7 @@ namespace MicroturbineElectricGenerator {
         if (!this->HeatRecActive) return;
 
         // Do the Begin Environment initializations
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             // set the node max and min mass flow rates
             PlantUtilities::InitComponentNodes(0.0,
                                                this->HeatRecMaxMassFlowRate,
@@ -981,7 +981,7 @@ namespace MicroturbineElectricGenerator {
             this->MyEnvrnFlag = false;
         } // end environmental inits
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag = true;
         }
 

@@ -180,7 +180,7 @@ namespace UserDefinedComponents {
         // PURPOSE OF THIS SUBROUTINE:
         // User Defined plant generic component
 
-        if (DataGlobals::BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             this->onInitLoopEquip(state, calledFromLocation);
         }
 
@@ -256,7 +256,7 @@ namespace UserDefinedComponents {
             }
         }
         bool anyEMSRan;
-        if (DataGlobals::BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             if (state.dataUserDefinedComponents->UserCoil(CompNum).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(
                     state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, state.dataUserDefinedComponents->UserCoil(CompNum).ErlInitProgramMngr);
@@ -346,7 +346,7 @@ namespace UserDefinedComponents {
             }
         }
         bool anyEMSRan;
-        if (DataGlobals::BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initialize(state, ZoneNum);
 
             if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ErlInitProgramMngr > 0) {
@@ -442,7 +442,7 @@ namespace UserDefinedComponents {
             }
         }
         bool anyEMSRan;
-        if (DataGlobals::BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             state.dataUserDefinedComponents->UserAirTerminal(CompNum).initialize(state, ZoneNum);
 
             if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).ErlInitProgramMngr > 0) {

@@ -411,14 +411,14 @@ namespace EcoRoofManager {
         // Make sure the ecoroof module resets its conditions at start of EVERY warmup day and every new design day
         // for Reverse DD testing
 
-        if (BeginEnvrnFlag || WarmupFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag || WarmupFlag) {
             Moisture = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).InitMoisture;    // Initial moisture content in soil
             MeanRootMoisture = Moisture;                                             // Start the root zone moisture at the same value as the surface.
             Alphag = 1.0 - dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar; // albedo rather than absorptivity
         }
         // DJS July 2007
 
-        if (BeginEnvrnFlag && CalcEcoRoofMyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && CalcEcoRoofMyEnvrnFlag) {
             Tgold = OutDryBulbTempAt(Surface(SurfNum).Centroid.z); // OutDryBulbTemp           ! initial guess
             Tfold = OutDryBulbTempAt(Surface(SurfNum).Centroid.z); // OutDryBulbTemp           ! initial guess
             Tg = 10.0;
@@ -436,7 +436,7 @@ namespace EcoRoofManager {
             CalcEcoRoofMyEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             CalcEcoRoofMyEnvrnFlag = true;
         }
 
