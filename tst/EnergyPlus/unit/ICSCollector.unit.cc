@@ -71,7 +71,6 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalSurface;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::DataEnvironment;
-using DataGlobals::BeginEnvrnFlag;
 
 TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest)
 {
@@ -88,7 +87,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
 
     InitializePsychRoutines();
 
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     OutBaroPress = 101325.0;
     SkyTemp = 24.0;
     IsRain = false;

@@ -568,8 +568,9 @@ namespace FuelCellElectricGenerator {
 
         void FigurePowerConditioningLosses(EnergyPlusData &state, Real64 Pdemand, Real64 &PpcuLosses);
 
-        void FigureTransientConstraints(Real64 &Pel,       // DC power control setting for power module
-                                        bool &Constrained, // true if transient constraints kick in (TODO: never used anywhere)
+        void FigureTransientConstraints(EnergyPlusData &state,
+                                        Real64 &Pel,       // DC power control setting for power module
+                                        bool &Constrained, // true if transient constraints kick in
                                         Real64 &PelDiff    // if constrained then this is the difference, positive
         );
 
@@ -608,7 +609,7 @@ namespace FuelCellElectricGenerator {
 
     void getFuelCellInput(EnergyPlusData &state);
 
-    void FigureFuelCellZoneGains();
+    void FigureFuelCellZoneGains(EnergyPlusData &state);
 
     extern bool getFuelCellInputFlag;
     extern int NumFuelCellGenerators;

@@ -84,6 +84,12 @@ namespace EnergyPlus {
         this->dataGlobal = std::unique_ptr<DataGlobal>(new DataGlobal);
         this->dataPipes = std::unique_ptr<PipesData>(new PipesData);
         this->dataPlantChillers = std::unique_ptr<PlantChillersData>(new PlantChillersData);
+        this->dataSolarCollectors = std::unique_ptr<SolarCollectorsData>(new SolarCollectorsData);
+        this->dataSolarReflectionManager = std::unique_ptr<SolarReflectionManagerData>(new SolarReflectionManagerData);
+        this->dataSolarShading = std::unique_ptr<SolarShadingData>(new SolarShadingData);
+        this->dataSplitterComponent = std::unique_ptr<SplitterComponentData>(new SplitterComponentData);
+        this->dataSteamBaseboardRadiator = std::unique_ptr<SteamBaseboardRadiatorData>(new SteamBaseboardRadiatorData);
+        this->dataSteamCoils = std::unique_ptr<SteamCoilsData>(new SteamCoilsData);
         this->dataSurfaceGeometry = std::unique_ptr<SurfaceGeometryData>(new SurfaceGeometryData);
         this->dataSurfaceGroundHeatExchangers = std::unique_ptr<SurfaceGroundHeatExchangersData>(new SurfaceGroundHeatExchangersData);
         this->dataSwimmingPools = std::unique_ptr<SwimmingPoolsData>(new SwimmingPoolsData);
@@ -147,6 +153,11 @@ namespace EnergyPlus {
         this->dataGlobal->clear_state();
         this->dataPipes->clear_state();
         this->dataPlantChillers->clear_state();
+        this->dataSolarCollectors->clear_state();
+        this->dataSolarShading->clear_state();
+        this->dataSplitterComponent->clear_state();
+        this->dataSteamBaseboardRadiator->clear_state();
+        this->dataSteamCoils->clear_state();
         this->dataSurfaceGeometry->clear_state();
         this->dataSurfaceGroundHeatExchangers->clear_state();
         this->dataSwimmingPools->clear_state();

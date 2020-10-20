@@ -479,11 +479,11 @@ namespace ConvectionCoefficients {
 
     Real64 CalcZoneSupplyAirTemp(int ZoneNum);
 
-    Real64 CalcZoneSystemVolFlowRate(int ZoneNum);
+    Real64 CalcZoneSystemVolFlowRate(EnergyPlusData &state, int ZoneNum);
 
-    Real64 CalcZoneSystemACH(int ZoneNum);
+    Real64 CalcZoneSystemACH(EnergyPlusData &state, int ZoneNum);
 
-    Real64 CalcCeilingDiffuserACH(int ZoneNum);
+    Real64 CalcCeilingDiffuserACH(EnergyPlusData &state, int ZoneNum);
 
     Real64 CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state,
                                            Real64 ACH,  // [1/hr] air system air change rate

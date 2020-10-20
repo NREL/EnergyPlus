@@ -226,13 +226,13 @@ namespace EnergyPlus {
                 // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
                 // which would be carried over from the previous environment
                 thisDomain.Cur.CurSimTimeStepSize = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
-                thisDomain.Cur.CurSimTimeSeconds = ((DataGlobals::DayOfSim - 1) * 24 + (DataGlobals::HourOfDay - 1) +
+                thisDomain.Cur.CurSimTimeSeconds = ((state.dataGlobal->DayOfSim - 1) * 24 + (DataGlobals::HourOfDay - 1) +
                                                     (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone +
                                                     DataHVACGlobals::SysTimeElapsed) * DataGlobalConstants::SecInHour();
 
                 // There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
-                if ((DataGlobals::BeginSimFlag && thisDomain.BeginSimInit) ||
-                    (DataGlobals::BeginEnvrnFlag && thisDomain.BeginSimEnvironment)) {
+                if ((state.dataGlobal->BeginSimFlag && thisDomain.BeginSimInit) ||
+                    (state.dataGlobal->BeginEnvrnFlag && thisDomain.BeginSimEnvironment)) {
 
                     thisDomain.DoOneTimeInitializations(state, nullptr);
 
@@ -248,8 +248,8 @@ namespace EnergyPlus {
                     thisDomain.BeginSimInit = false;
                     thisDomain.BeginSimEnvironment = false;
                 }
-                if (!DataGlobals::BeginSimFlag) thisDomain.BeginSimInit = true;
-                if (!DataGlobals::BeginEnvrnFlag) thisDomain.BeginSimEnvironment = true;
+                if (!state.dataGlobal->BeginSimFlag) thisDomain.BeginSimInit = true;
+                if (!state.dataGlobal->BeginEnvrnFlag) thisDomain.BeginSimEnvironment = true;
 
                 // Reset the heat fluxes if domain update has been completed
                 if (thisDomain.ResetHeatFluxFlag) {
@@ -2187,13 +2187,13 @@ namespace EnergyPlus {
             // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
             // which would be carried over from the previous environment
             this->Cur.CurSimTimeStepSize = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-            this->Cur.CurSimTimeSeconds = (DataGlobals::DayOfSim - 1) * 24 + (DataGlobals::HourOfDay - 1) +
+            this->Cur.CurSimTimeSeconds = (state.dataGlobal->DayOfSim - 1) * 24 + (DataGlobals::HourOfDay - 1) +
                                           (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone +
                                           DataHVACGlobals::SysTimeElapsed;
 
             // There are also some inits that are "close to one time" inits...(one-time in standalone, each envrn in E+)
-            if ((DataGlobals::BeginSimFlag && this->BeginSimInit) ||
-                (DataGlobals::BeginEnvrnFlag && this->BeginSimEnvironment)) {
+            if ((state.dataGlobal->BeginSimFlag && this->BeginSimInit) ||
+                (state.dataGlobal->BeginEnvrnFlag && this->BeginSimEnvironment)) {
 
                 // this seemed to clean up a lot of reverse DD stuff because fluid thermal properties were
                 // being based on the inlet temperature, which wasn't updated until later
@@ -2205,8 +2205,8 @@ namespace EnergyPlus {
                 this->BeginSimInit = false;
                 this->BeginSimEnvironment = false;
             }
-            if (!DataGlobals::BeginSimFlag) this->BeginSimInit = true;
-            if (!DataGlobals::BeginEnvrnFlag) this->BeginSimEnvironment = true;
+            if (!state.dataGlobal->BeginSimFlag) this->BeginSimInit = true;
+            if (!state.dataGlobal->BeginEnvrnFlag) this->BeginSimEnvironment = true;
 
             // Shift history arrays only if necessary
             if (std::abs(this->Cur.CurSimTimeSeconds - this->Cur.PrevSimTimeSeconds) > 1.0e-6) {

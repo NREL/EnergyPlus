@@ -80,7 +80,6 @@ namespace HybridModel {
     using namespace DataGlobals;
     using namespace DataHeatBalance;
     using namespace DataRoomAirModel;
-    using DataGlobals::ScheduleAlwaysOn;
     using General::CheckCreatedZoneItemName;
 
     bool FlagHybridModel(false);    // True if hybrid model is activated

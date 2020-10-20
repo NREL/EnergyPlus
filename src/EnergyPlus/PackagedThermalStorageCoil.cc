@@ -317,7 +317,7 @@ namespace PackagedThermalStorageCoil {
 
             TESCoil(item).Name = cAlphaArgs(1);
             if (lAlphaFieldBlanks(2)) {
-                TESCoil(item).AvailSchedNum = ScheduleAlwaysOn;
+                TESCoil(item).AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 TESCoil(item).AvailSchedNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (TESCoil(item).AvailSchedNum == 0) {
@@ -1464,7 +1464,7 @@ namespace PackagedThermalStorageCoil {
             TESCoil(item).BasinHeaterSetpointTemp = rNumericArgs(39);
 
             if (lAlphaFieldBlanks(59)) {
-                TESCoil(item).BasinHeaterAvailSchedNum = ScheduleAlwaysOn;
+                TESCoil(item).BasinHeaterAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 TESCoil(item).BasinHeaterAvailSchedNum = GetScheduleIndex(state, cAlphaArgs(59));
                 if (TESCoil(item).BasinHeaterAvailSchedNum == 0) {
@@ -1928,7 +1928,7 @@ namespace PackagedThermalStorageCoil {
             MySizeFlag(TESCoilNum) = false;
         }
 
-        if (BeginEnvrnFlag && MyEnvrnFlag(TESCoilNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(TESCoilNum)) {
             TESCoil(TESCoilNum).CurControlMode = OffMode;
             TESCoil(TESCoilNum).QdotPlant = 0.0;
             TESCoil(TESCoilNum).Q_Plant = 0.0;
@@ -1958,7 +1958,7 @@ namespace PackagedThermalStorageCoil {
             MyEnvrnFlag(TESCoilNum) = false;
         }
 
-        if (!BeginEnvrnFlag) MyEnvrnFlag(TESCoilNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag(TESCoilNum) = true;
 
         if (MyWarmupFlag(TESCoilNum) && (!WarmupFlag)) {
             // reset to initial condition once warm up is over.

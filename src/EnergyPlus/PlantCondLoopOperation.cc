@@ -1836,7 +1836,6 @@ CurrentModuleObject, PlantOpSchemeName);
         // ManageLoadDistribution for every component.
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using EMSManager::ManageEMS;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
@@ -2081,7 +2080,7 @@ CurrentModuleObject, PlantOpSchemeName);
                 for (int OpNum = 1, OpNum_end = this_plant_loop.NumOpSchemes; OpNum <= OpNum_end; ++OpNum) {
                     auto &this_op_scheme(this_plant_loop.OpScheme(OpNum));
                     if (this_op_scheme.OpSchemeType == EMSOpSchemeType) {
-                        if (BeginEnvrnFlag && this_op_scheme.MyEnvrnFlag) {
+                        if (state.dataGlobal->BeginEnvrnFlag && this_op_scheme.MyEnvrnFlag) {
                             if (this_op_scheme.ErlInitProgramMngr > 0) {
                                 bool anyEMSRan;
                                 ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this_op_scheme.ErlInitProgramMngr);
@@ -2090,7 +2089,7 @@ CurrentModuleObject, PlantOpSchemeName);
                             }
                             this_op_scheme.MyEnvrnFlag = false;
                         }
-                        if (!BeginEnvrnFlag) this_op_scheme.MyEnvrnFlag = true;
+                        if (!state.dataGlobal->BeginEnvrnFlag) this_op_scheme.MyEnvrnFlag = true;
                     }
                 } // operation scheme
             }     // loop

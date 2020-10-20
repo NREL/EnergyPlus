@@ -106,7 +106,7 @@ namespace DaylightingDevices {
 
     void CalcViewFactorToShelf(int const ShelfNum); // Daylighting shelf object number
 
-    void FigureTDDZoneGains();
+    void FigureTDDZoneGains(EnergyPlusData &state);
 
     void clear_state();
 

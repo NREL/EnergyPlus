@@ -164,7 +164,7 @@ namespace HeatBalanceHAMTManager {
 
     void InitHeatBalHAMT(EnergyPlusData &state);
 
-    void CalcHeatBalHAMT(int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
+    void CalcHeatBalHAMT(EnergyPlusData &state, int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
 
     void UpdateHeatBalHAMT(int const sid);
 

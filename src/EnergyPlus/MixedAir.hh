@@ -494,7 +494,7 @@ namespace MixedAir {
 
     void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum);
 
-    void InitOAMixer(int const OAMixerNum, bool const FirstHVACIteration);
+    void InitOAMixer(EnergyPlusData &state, int const OAMixerNum, bool const FirstHVACIteration);
 
     // End of Initialization Section of the Module
     //******************************************************************************

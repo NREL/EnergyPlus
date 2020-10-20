@@ -107,7 +107,7 @@ namespace AirLoopHVACDOAS {
 
         this->initAirLoopDOAS(state, FirstHVACIteration);
 
-        if (this->SumMassFlowRate == 0.0 && !DataGlobals::BeginEnvrnFlag) {
+        if (this->SumMassFlowRate == 0.0 && !state.dataGlobal->BeginEnvrnFlag) {
             DataLoopNode::Node(this->m_CompPointerAirLoopMixer->OutletNodeNum).MassFlowRate = 0.0;
             return;
         }
@@ -796,7 +796,7 @@ namespace AirLoopHVACDOAS {
         std::string RoutineName = "AirLoopDOAS::initAirLoopDOAS";
         bool ErrorsFound = false;
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             Real64 rho;
             DataSizing::CurSysNum = this->m_OASystemNum;
             for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).NumComponents; ++CompNum) {
@@ -868,7 +868,7 @@ namespace AirLoopHVACDOAS {
             }
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag = true;
         }
 

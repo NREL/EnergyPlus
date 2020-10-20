@@ -107,7 +107,7 @@ protected:
         CurOASysNum = 0;
         NumOfZones = 1;
         NumOfNodes = 5;
-        BeginEnvrnFlag = true;
+        state.dataGlobal->BeginEnvrnFlag = true;
         int NumOfSurfaces = 2;
         RoomAirflowNetworkZoneInfo.allocate(NumOfZones);
         Zone.allocate(NumOfZones);

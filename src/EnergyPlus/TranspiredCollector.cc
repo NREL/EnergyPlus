@@ -224,7 +224,6 @@ namespace TranspiredCollector {
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
-        using DataGlobals::ScheduleAlwaysOn;
         using DataHeatBalance::MediumRough;
         using DataHeatBalance::MediumSmooth;
         using DataHeatBalance::Rough;
@@ -406,7 +405,7 @@ namespace TranspiredCollector {
             }
             state.dataTranspiredCollector->UTSC(Item).OSCMPtr = Found;
             if (lAlphaFieldBlanks(3)) {
-                state.dataTranspiredCollector->UTSC(Item).SchedPtr = ScheduleAlwaysOn;
+                state.dataTranspiredCollector->UTSC(Item).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 state.dataTranspiredCollector->UTSC(Item).SchedPtr = GetScheduleIndex(state, Alphas(3));
                 if (state.dataTranspiredCollector->UTSC(Item).SchedPtr == 0) {
@@ -790,13 +789,13 @@ namespace TranspiredCollector {
             state.dataTranspiredCollector->MySetPointCheckFlag = false;
         }
 
-        if (BeginEnvrnFlag && MyEnvrnFlag(UTSCNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(UTSCNum)) {
             state.dataTranspiredCollector->UTSC(UTSCNum).TplenLast = 22.5;
             state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast = 22.0;
 
             MyEnvrnFlag(UTSCNum) = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(UTSCNum) = true;
         }
 
