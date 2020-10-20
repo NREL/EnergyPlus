@@ -7056,13 +7056,6 @@ namespace HVACVariableRefrigerantFlow {
         int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                 // FractionOfAutosizedHeatingCapacity )
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_990(
-            "('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF "
-            "System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
-            "Correction Factor')");
-        static ObjexxFCL::gio::Fmt Format_991("(' VRF System Information',6(', ',A))");
-
         DataSizing::ZoneEqSizingData *select_EqSizing(nullptr);
 
         // sweep specific data into one pointer to avoid if statements throughout this subroutine
@@ -8316,7 +8309,6 @@ namespace HVACVariableRefrigerantFlow {
         int const MaxIte(500);        // maximum number of iterations
         Real64 const MinPLF(0.0);     // minimum part load factor allowed
         Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         int VRFCond = this->VRFSysNum;
         Real64 FullOutput = 0.0;   // unit full output when compressor is operating [W]
@@ -11504,7 +11496,6 @@ namespace HVACVariableRefrigerantFlow {
         int const MaxIte(500);        // maximum number of iterations
         Real64 const MinPLF(0.0);     // minimum part load factor allowed
         Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         Real64 FullOutput;      // unit full output when compressor is operating [W]
         Real64 TempOutput;      // unit output when iteration limit exceeded [W]

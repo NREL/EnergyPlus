@@ -53,8 +53,6 @@
 
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>

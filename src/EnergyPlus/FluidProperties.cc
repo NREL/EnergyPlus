@@ -53,7 +53,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -5360,7 +5359,6 @@ CurrentModuleObject,
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
         Real64 const incr(10.0);
         static std::string const RoutineName("ReportAndTestGlycols");
 
@@ -5630,7 +5628,6 @@ CurrentModuleObject,
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
         Real64 const incr(10.0);
         Real64 const Quality(1.0);
         static std::string const RoutineName("ReportAndTestRefrigerants");
