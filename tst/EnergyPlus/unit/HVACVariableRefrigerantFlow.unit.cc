@@ -5787,6 +5787,13 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
         "    For: AllDays,            !- Field 2",
         "    Until: 24:00,1;          !- Field 3",
 
+        "  Schedule:Compact,",
+        "    FanAvailSch,             !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1;          !- Field 3",
+
         "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
         "    Level1:Office1 VRF Indoor Unit,  !- Zone Terminal Unit Name",
         "    AlwaysOn,                !- Terminal Unit Availability Schedule",
@@ -5843,7 +5850,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
 
         "  Fan:ConstantVolume,",
         "    Level1:Office1 VRF Indoor Unit Supply Fan,  !- Name",
-        "    AlwaysOn,                 !- Availability Schedule Name",
+        "    FanAvailSch,             !- Availability Schedule Name",
         "    0.70,                    !- Fan Total Efficiency",
         "    100.00,                  !- Pressure Rise {Pa}",
         "    0.111000,                !- Maximum Flow Rate {m3/s}",
@@ -6452,6 +6459,8 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0; // No load
     QZnReq = DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired; // No load
     // Initialize terminal unit
+    Schedule(VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;                            // turn on TU
+    Schedule(VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;                    // turn on fan
     Schedule(VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0;                   // set continuous fan operating mode
     InitVRF(state, VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
     ASSERT_EQ(VRFTU(VRFTUNum).OpMode, DataHVACGlobals::ContFanCycCoil);               // continuous fan cycling coil operating mode
@@ -6459,6 +6468,28 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     SetAverageAirFlow(VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     AverageOAMassFlow = DataEnvironment::StdRhoAir * VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow;
     EXPECT_EQ(AverageOAMassFlow, Node(OutsideAirNode).MassFlowRate);
+
+    // test availability manager operation
+    Schedule(VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 0.0; // turn off fan
+    SetAverageAirFlow(VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
+    EXPECT_EQ(0.0, Node(OutsideAirNode).MassFlowRate);
+    EXPECT_FALSE(DataHVACGlobals::ZoneCompTurnFansOn);
+    EXPECT_FALSE(DataHVACGlobals::ZoneCompTurnFansOff);
+    EXPECT_EQ(0.0, Schedule(VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue);
+
+    // turn on "Turn Fan On" flag for availability manager, result should be the same as previous non-zero result
+    DataHVACGlobals::ZoneCompTurnFansOn = true;
+    SetAverageAirFlow(VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
+    EXPECT_EQ(AverageOAMassFlow, Node(OutsideAirNode).MassFlowRate);
+    EXPECT_TRUE(DataHVACGlobals::ZoneCompTurnFansOn);
+    EXPECT_FALSE(DataHVACGlobals::ZoneCompTurnFansOff);
+
+    // turn on "Turn Fan Off" flag for availability manager, result should be 0
+    DataHVACGlobals::ZoneCompTurnFansOff = true;
+    SetAverageAirFlow(VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
+    EXPECT_EQ(0.0, Node(OutsideAirNode).MassFlowRate);
+    EXPECT_TRUE(DataHVACGlobals::ZoneCompTurnFansOn);
+    EXPECT_TRUE(DataHVACGlobals::ZoneCompTurnFansOff);
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
