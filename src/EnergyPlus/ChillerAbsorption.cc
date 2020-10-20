@@ -715,7 +715,7 @@ namespace ChillerAbsorption {
             this->MyOneTimeFlag = false;
         }
 
-        if (this->MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidName,
@@ -801,7 +801,7 @@ namespace ChillerAbsorption {
 
             this->MyEnvrnFlag = false;
         }
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag = true;
         }
 

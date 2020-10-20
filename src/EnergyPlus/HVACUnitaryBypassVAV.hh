@@ -347,7 +347,7 @@ namespace HVACUnitaryBypassVAV {
                    bool const HXUnitOn            // flag to enable heat exchanger
     );
 
-    void GetZoneLoads(int const CBVAVNum // Index to CBVAV unit being simulated
+    void GetZoneLoads(EnergyPlusData &state, int const CBVAVNum // Index to CBVAV unit being simulated
     );
 
     Real64 CalcSetPointTempTarget(int const CBVAVNumber); // Index to changeover-bypass VAV system

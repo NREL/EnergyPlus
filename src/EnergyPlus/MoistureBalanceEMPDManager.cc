@@ -511,12 +511,12 @@ namespace MoistureBalanceEMPDManager {
         Real64 RH_surf_layer_tmp;
         Real64 RH_deep_layer;
 
-        if (BeginEnvrnFlag && OneTimeFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && OneTimeFlag) {
             InitMoistureBalanceEMPD(state);
             OneTimeFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             OneTimeFlag = true;
         }
 

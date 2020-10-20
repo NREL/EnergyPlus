@@ -379,7 +379,7 @@ namespace PVWatts {
         using DataHVACGlobals::TimeStepSys;
 
         // We only run this once for each zone time step.
-        if (!DataGlobals::BeginTimeStepFlag) {
+        if (!state.dataGlobal->BeginTimeStepFlag) {
             m_outputDCEnergy = m_outputDCPower * TimeStepSys * DataGlobalConstants::SecInHour();
             return;
         }

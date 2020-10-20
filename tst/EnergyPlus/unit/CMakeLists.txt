@@ -197,6 +197,7 @@ set( test_src
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
   StandardRatings.unit.cc
+  StringUtilities.unit.cc
   SurfaceGeometry.unit.cc
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc

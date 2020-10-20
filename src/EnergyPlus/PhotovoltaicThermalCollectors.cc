@@ -502,7 +502,7 @@ namespace PhotovoltaicThermalCollectors {
                     this->PVfound = true;
                 }
             } else {
-                if ((!DataGlobals::BeginEnvrnFlag) && (!FirstHVACIteration)) {
+                if ((!state.dataGlobal->BeginEnvrnFlag) && (!FirstHVACIteration)) {
                     ShowSevereError("Photovoltaic generators are missing for Photovoltaic Thermal modeling");
                     ShowContinueError("Needed for flat plate photovoltaic-thermal collector = " + this->Name);
                 }
@@ -553,7 +553,7 @@ namespace PhotovoltaicThermalCollectors {
             }
         }
 
-        if (DataGlobals::BeginEnvrnFlag && this->EnvrnInit) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->EnvrnInit) {
 
             this->MassFlowRate = 0.0;
             this->BypassDamperOff = true;
@@ -602,7 +602,7 @@ namespace PhotovoltaicThermalCollectors {
 
             this->EnvrnInit = false;
         }
-        if (!DataGlobals::BeginEnvrnFlag) this->EnvrnInit = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->EnvrnInit = true;
 
         {
             auto const SELECT_CASE_var(this->WorkingFluidType);

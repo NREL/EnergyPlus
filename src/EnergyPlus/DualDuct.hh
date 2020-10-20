@@ -191,7 +191,7 @@ namespace DualDuct {
         {
         }
 
-        void InitDualDuct(bool const FirstHVACIteration);
+        void InitDualDuct(EnergyPlusData &state, bool const FirstHVACIteration);
 
         void SizeDualDuct();
 

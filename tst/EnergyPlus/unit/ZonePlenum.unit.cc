@@ -68,7 +68,7 @@ using DataContaminantBalance::Contaminant;
 
 TEST_F(EnergyPlusFixture, ZonePlenum_InitAirZoneReturnPlenumTest)
 {
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     Contaminant.CO2Simulation = true;
     Contaminant.GenericContamSimulation = true;
 

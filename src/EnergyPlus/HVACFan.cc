@@ -189,7 +189,7 @@ namespace HVACFan {
             m_objSizingFlag = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && m_objEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && m_objEnvrnFlag) {
 
             // Currently, fan does not force minimum mass flow, only used for power calculation
             // m_minAirFlowRate = designAirVolFlowRate * m_minPowerFlowFrac;
@@ -211,7 +211,7 @@ namespace HVACFan {
             m_objEnvrnFlag = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             m_objEnvrnFlag = true;
         }
 
@@ -428,7 +428,7 @@ namespace HVACFan {
         m_fanType = locCurrentModuleObject;
         m_fanType_Num = DataHVACGlobals::FanType_SystemModelObject;
         if (isAlphaFieldBlank(2)) {
-            availSchedIndex = DataGlobals::ScheduleAlwaysOn;
+            availSchedIndex = DataGlobalConstants::ScheduleAlwaysOn();
         } else {
             availSchedIndex = ScheduleManager::GetScheduleIndex(state, alphaArgs(2));
             if (availSchedIndex == 0) {

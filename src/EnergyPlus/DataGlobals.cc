@@ -48,9 +48,6 @@
 // C++ Headers
 #include <ostream>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/numeric.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/IOFiles.hh>
@@ -68,24 +65,7 @@ namespace DataGlobals {
     //       MODIFIED       September 1999 (LKL) Rename WGTNEXT,WGTNOW for clarity
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS MODULE:
-    // This data-only module is a repository for all variables which are considered
-    // to be "global" in nature in EnergyPlus.
 
-    int const ScheduleAlwaysOn(-1); // Value when passed to schedule routines gives back 1.0 (on)
-
-    bool BeginDayFlag(false);           // True at the start of each day, False after first time step in day
-    bool BeginEnvrnFlag(false);         // True at the start of each environment, False after first time step in environ
-    bool beginEnvrnWarmStartFlag(false); // Sizing Speed Up
-    bool BeginHourFlag(false);          // True at the start of each hour, False after first time step in hour
-    bool BeginSimFlag(false);           // True until any actual simulation (full or sizing) has begun, False after first time step
-    bool BeginFullSimFlag(false);       // True until full simulation has begun, False after first time step
-    bool BeginTimeStepFlag(false);      // True at the start of each time step, False after first subtime step of time step
-    int DayOfSim(0);                    // Counter for days (during the simulation)
-    int CalendarYear(0);                // Calendar year of the current day of simulation
-    std::string CalendarYearChr;        // Calendar year of the current day of simulation (character -- for reporting)
-    bool EndEnvrnFlag(false);           // True at the end of each environment (last time step of last hour of last day of environ)
-    bool EndDesignDayEnvrnsFlag(false); // True at the end of the last design day environment
     // (last time step of last hour of last day of environ which is a design day)
     bool EndDayFlag(false);            // True at the end of each day (last time step of last hour of day)
     bool EndHourFlag(false);           // True at the end of each hour (last time step of hour)
@@ -160,17 +140,6 @@ namespace DataGlobals {
     // Needed for unit tests, should not be normally called.
     void clear_state(IOFiles &ioFiles)
     {
-        BeginDayFlag = false;
-        BeginEnvrnFlag = false;
-        BeginHourFlag = false;
-        BeginSimFlag = false;
-        BeginFullSimFlag = false;
-        BeginTimeStepFlag = false;
-        DayOfSim = 0;
-        CalendarYear = 0;
-        CalendarYearChr = "0";
-        EndEnvrnFlag = false;
-        EndDesignDayEnvrnsFlag = false;
         EndDayFlag = false;
         EndHourFlag = false;
         PreviousHour = 0;

@@ -703,7 +703,7 @@ namespace OutputReportTabular {
     extern Array1D<UnitConvType> UnitConv;
 
     // Functions
-    void clear_state();
+    void clear_state(EnergyPlusData &state);
 
     std::ofstream & open_tbl_stream(int const iStyle, std::string const & filename, bool output_to_file = true);
 
@@ -961,7 +961,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ResetTabularReports();
+    void ResetTabularReports(EnergyPlusData &state);
 
     void ResetMonthlyGathering();
 

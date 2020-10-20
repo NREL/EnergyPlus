@@ -102,7 +102,7 @@ namespace DataPlant {
 
         // The following block is related to validating the flow control paths of the loop side
         // Since the control types are scheduled, I think BeginTimeStep should be a decent check frequency
-        if (DataGlobals::BeginTimeStepFlag && this->OncePerTimeStepOperations) {
+        if (state.dataGlobal->BeginTimeStepFlag && this->OncePerTimeStepOperations) {
 
             // Initialize loop side controls -- could just be done for one loop since this routine inherently
             //  loops over all plant/condenser loops.  Not sure if the penalty is worth investigating.

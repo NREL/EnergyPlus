@@ -53,11 +53,12 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/ArrayS.functions.hh>
+#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include "StringUtilities.hh"
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -178,7 +179,6 @@ namespace HeatBalanceManager {
     // Data
     // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
 
     Array1D_string const PassFail(2, {"Fail", "Pass"});
 
@@ -390,16 +390,16 @@ namespace HeatBalanceManager {
 
         if (WarmupFlag && EndDayFlag) {
 
-            CheckWarmupConvergence();
+            CheckWarmupConvergence(state);
             if (!WarmupFlag) {
-                DayOfSim = 0; // Reset DayOfSim if Warmup converged
+                state.dataGlobal->DayOfSim = 0; // Reset DayOfSim if Warmup converged
                 state.dataGlobal->DayOfSimChr = "0";
 
                 ManageEMS(state, EMSManager::EMSCallFrom::BeginNewEnvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const()); // calling point
             }
         }
 
-        if (!WarmupFlag && EndDayFlag && DayOfSim == 1 && !DoingSizing) {
+        if (!WarmupFlag && EndDayFlag && state.dataGlobal->DayOfSim == 1 && !DoingSizing) {
             ReportWarmupConvergence(state);
         }
     }
@@ -5223,7 +5223,7 @@ namespace HeatBalanceManager {
         int SurfNum;     // Surface number
         int ZoneNum;
 
-        if (BeginSimFlag) {
+        if (state.dataGlobal->BeginSimFlag) {
             AllocateHeatBalArrays(); // Allocate the Module Arrays
             if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
                 DisplayString("Initializing Response Factors");
@@ -5239,7 +5239,7 @@ namespace HeatBalanceManager {
             InitSolarCalculations(state); // Initialize the shadowing calculations
         }
 
-        if (BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
 
             MaxHeatLoadPrevDay = 0.0;
             MaxCoolLoadPrevDay = 0.0;
@@ -5274,8 +5274,8 @@ namespace HeatBalanceManager {
         }
 
         if (TotStormWin > 0) {
-            if (BeginDayFlag) {
-                SetStormWindowControl();
+            if (state.dataGlobal->BeginDayFlag) {
+                SetStormWindowControl(state);
                 ChangeSet = false;
             } else if (!ChangeSet) {
                 StormWinChangeThisDay = false;
@@ -5287,13 +5287,13 @@ namespace HeatBalanceManager {
             }
         }
 
-        if (BeginSimFlag && DoWeathSim && ReportExtShadingSunlitFrac) {
+        if (state.dataGlobal->BeginSimFlag && DoWeathSim && ReportExtShadingSunlitFrac) {
             OpenShadingFile(state);
         }
 
-        if (BeginDayFlag) {
+        if (state.dataGlobal->BeginDayFlag) {
             if (!WarmupFlag) {
-                if (DayOfSim == 1) {
+                if (state.dataGlobal->DayOfSim == 1) {
                     MaxHeatLoadZone = -9999.0;
                     MaxCoolLoadZone = -9999.0;
                     MaxTempZone = -9999.0;
@@ -5309,7 +5309,7 @@ namespace HeatBalanceManager {
             PerformSolarCalculations(state);
         }
 
-        if (BeginDayFlag && !WarmupFlag && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && ReportExtShadingSunlitFrac) {
+        if (state.dataGlobal->BeginDayFlag && !WarmupFlag && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && ReportExtShadingSunlitFrac) {
             for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
                 for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
                     static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
@@ -5593,7 +5593,7 @@ namespace HeatBalanceManager {
             LoadZone(ZoneNum) = max(SNLoadHeatRate(ZoneNum), std::abs(SNLoadCoolRate(ZoneNum)));
 
             // Calculate differences in temperature and load for the last two warmup days
-            if (!WarmupFlag && DayOfSim == 1 && !DoingSizing) {
+            if (!WarmupFlag && state.dataGlobal->DayOfSim == 1 && !DoingSizing) {
                 WarmupTempDiff(ZoneNum) = std::abs(TempZoneSecPrevDay(ZoneNum) - TempZonePrevDay(ZoneNum));
                 WarmupLoadDiff(ZoneNum) = std::abs(LoadZoneSecPrevDay(ZoneNum) - LoadZonePrevDay(ZoneNum));
                 if (ZoneNum == 1) ++CountWarmupDayPoints;
@@ -5624,7 +5624,7 @@ namespace HeatBalanceManager {
         UpdateWindowFaceTempsNonBSDFWin(state);
     }
 
-    void CheckWarmupConvergence()
+    void CheckWarmupConvergence(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5720,7 +5720,7 @@ namespace HeatBalanceManager {
                     WarmupConvergenceValues(ZoneNum).PassFlag(4) = 2;
                 }
 
-                if (DayOfSim >= MaxNumberOfWarmupDays && WarmupFlag) {
+                if (state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays && WarmupFlag) {
                     // Check convergence for individual zone
                     if (sum(WarmupConvergenceValues(ZoneNum).PassFlag) != 8) { // pass=2 * 4 values for convergence
                         ShowSevereError("CheckWarmupConvergence: Loads Initialization, Zone=\"" + Zone(ZoneNum).Name + "\" did not converge after " +
@@ -5771,7 +5771,7 @@ namespace HeatBalanceManager {
             // experience with the (I)BLAST program.  If too many warmup days were
             // required, notify the program user.
 
-            if ((DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag && ConvergenceChecksFailed) {
+            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag && ConvergenceChecksFailed) {
                 if (MaxNumberOfWarmupDays < DefaultMaxNumberOfWarmupDays) {
                     ShowSevereError("CheckWarmupConvergence: User supplied maximum warmup days=" + RoundSigDigits(MaxNumberOfWarmupDays) +
                                     " is insufficient.");
@@ -5782,15 +5782,15 @@ namespace HeatBalanceManager {
 
             // Set warmup flag to true depending on value of ConvergenceChecksFailed (true=fail)
             // and minimum number of warmup days
-            if (!ConvergenceChecksFailed && DayOfSim >= MinNumberOfWarmupDays) {
+            if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim >= MinNumberOfWarmupDays) {
                 WarmupFlag = false;
-            } else if (!ConvergenceChecksFailed && DayOfSim < MinNumberOfWarmupDays) {
+            } else if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim < MinNumberOfWarmupDays) {
                 WarmupFlag = true;
             }
 
             // If max warmup days reached and still WarmupFlag, then go to non-warmup state.
             // prior messages will have been displayed
-            if ((DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag) {
+            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag) {
                 WarmupFlag = false;
             }
         }
@@ -5961,11 +5961,11 @@ namespace HeatBalanceManager {
             UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
             UpdateUtilityBills(state);
         } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
-            if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
+            if (state.dataGlobal->BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                 PrintEnvrnStampWarmup = true;
                 PrintEnvrnStampWarmupPrinted = true;
             }
-            if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
+            if (!state.dataGlobal->BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
             if (PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && DoOutputReporting) {
                     static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
@@ -6319,7 +6319,6 @@ namespace HeatBalanceManager {
         FileLineCount = 0;
 
         NextLine = W5DataFile.readLine();
-        int ReadStat = 0;
         if (NextLine.eof) goto Label1000;
         ++FileLineCount;
         if (!has_prefixi(NextLine.data, "WINDOW5")) {
@@ -6337,7 +6336,7 @@ namespace HeatBalanceManager {
         }
 
         // Get window name and check for match
-        ObjexxFCL::gio::read(DataLine(4).substr(19), fmtA) >> W5Name;
+        readItem(DataLine(4).substr(19), W5Name);
         WindowNameInW5DataFile = UtilityRoutines::MakeUPPERCase(W5Name);
         if (DesiredConstructionName != WindowNameInW5DataFile) {
             // Doesn't match; read through file until next window entry is found
@@ -6358,7 +6357,7 @@ namespace HeatBalanceManager {
             NextLine = W5DataFile.readLine();
             if (NextLine.eof) goto Label1000;
             ++FileLineCount;
-            ObjexxFCL::gio::read(NextLine.data.substr(19), "*") >> NGlSys;
+            readItem(NextLine.data.substr(19), NGlSys);
             if (NGlSys <= 0 || NGlSys > 2) {
                 ShowFatalError("Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used: it has " +
                                TrimSigDigits(NGlSys) + " glazing systems; only 1 or 2 are allowed.");
@@ -6370,13 +6369,16 @@ namespace HeatBalanceManager {
                 NextLine = W5DataFile.readLine();
                 if (NextLine.eof) goto Label1000;
                 ++FileLineCount;
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(NextLine.data.substr(19), "*", flags) >> WinHeight(IGlSys) >> WinWidth(IGlSys) >> NGlass(IGlSys) >>
-                        UValCenter(IGlSys) >> SCCenter(IGlSys) >> SHGCCenter(IGlSys) >> TVisCenter(IGlSys);
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat != 0) {
+
+                const auto succeeded = readList(NextLine.data.substr(19),
+                                                WinHeight(IGlSys),
+                                                WinWidth(IGlSys),
+                                                NGlass(IGlSys),
+                                                UValCenter(IGlSys),
+                                                SCCenter(IGlSys),
+                                                SHGCCenter(IGlSys),
+                                                TVisCenter(IGlSys));
+                if (!succeeded) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of glazing system values. For glazing system=" +
                                     TrimSigDigits(IGlSys));
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
@@ -6424,24 +6426,14 @@ namespace HeatBalanceManager {
             MullionWidth = 0.0;
             MullionOrientation = "Vertical";
             if (NGlSys == 2) {
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(DataLine(10).substr(19), "*", flags) >> MullionWidth;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat != 0) {
+                if (!readItem(DataLine(10).substr(19), MullionWidth)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of Mullion Width.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 10) +
                                       ") in error (first 100 characters)=" + DataLine(10).substr(0, 100));
                     ErrorsFound = true;
                 }
                 MullionWidth *= 0.001;
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(DataLine(10).substr(88), "*", flags) >> MullionOrientation;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat != 0) {
+                if (!readItem(DataLine(10).substr(88), MullionOrientation)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of Mullion Orientation.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 10) +
                                       ") in error (first 100 characters)=" + DataLine(10).substr(0, 100));
@@ -6459,13 +6451,16 @@ namespace HeatBalanceManager {
             FrameSolAbsorp = 0.0;
             FrameVisAbsorp = 0.0;
             FrameEmis = 0.0;
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(DataLine(11).substr(19), "*", flags) >> FrameWidth >> FrameProjectionOut >> FrameProjectionIn >>
-                    FrameConductance >> FrEdgeToCenterGlCondRatio >> FrameSolAbsorp >> FrameVisAbsorp >> FrameEmis;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat != 0) {
+            const bool succeeded = readList(DataLine(11).substr(19),
+                                            FrameWidth,
+                                            FrameProjectionOut,
+                                            FrameProjectionIn,
+                                            FrameConductance,
+                                            FrEdgeToCenterGlCondRatio,
+                                            FrameSolAbsorp,
+                                            FrameVisAbsorp,
+                                            FrameEmis);
+            if (!succeeded) {
                 ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of frame data values.");
                 ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 11) + ") in error (first 100 characters)=" + DataLine(11).substr(0, 100));
                 ErrorsFound = true;
@@ -6507,14 +6502,20 @@ namespace HeatBalanceManager {
                 NextLine = W5DataFile.readLine();
                 if (NextLine.eof) goto Label1000;
                 ++FileLineCount;
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(NextLine.data.substr(19), "*", flags) >> DividerWidth(IGlSys) >> DividerProjectionOut(IGlSys) >>
-                        DividerProjectionIn(IGlSys) >> DividerConductance(IGlSys) >> DivEdgeToCenterGlCondRatio(IGlSys) >> DividerSolAbsorp(IGlSys) >>
-                        DividerVisAbsorp(IGlSys) >> DividerEmis(IGlSys) >> DividerType(IGlSys) >> HorDividers(IGlSys) >> VertDividers(IGlSys);
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat != 0) {
+
+                const bool dividerReadSucceeded = readList(NextLine.data.substr(19),
+                                                           DividerWidth(IGlSys),
+                                                           DividerProjectionOut(IGlSys),
+                                                           DividerProjectionIn(IGlSys),
+                                                           DividerConductance(IGlSys),
+                                                           DivEdgeToCenterGlCondRatio(IGlSys),
+                                                           DividerSolAbsorp(IGlSys),
+                                                           DividerVisAbsorp(IGlSys),
+                                                           DividerEmis(IGlSys),
+                                                           DividerType(IGlSys),
+                                                           HorDividers(IGlSys),
+                                                           VertDividers(IGlSys));
+                if (!dividerReadSucceeded) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of divider data values. For Glazing System=" +
                                     TrimSigDigits(IGlSys));
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 11) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
@@ -6663,10 +6664,21 @@ namespace HeatBalanceManager {
                     dataMaterial.Material(MaterNum).Group = WindowGlass;
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
-                    ObjexxFCL::gio::read(NextLine.data.substr(25), "*") >> dataMaterial.Material(MaterNum).Thickness >> dataMaterial.Material(MaterNum).Conductivity >>
-                        dataMaterial.Material(MaterNum).Trans >> dataMaterial.Material(MaterNum).ReflectSolBeamFront >> dataMaterial.Material(MaterNum).ReflectSolBeamBack >>
-                        dataMaterial.Material(MaterNum).TransVis >> dataMaterial.Material(MaterNum).ReflectVisBeamFront >> dataMaterial.Material(MaterNum).ReflectVisBeamBack >>
-                        dataMaterial.Material(MaterNum).TransThermal >> dataMaterial.Material(MaterNum).AbsorpThermalFront >> dataMaterial.Material(MaterNum).AbsorpThermalBack >> LayerName;
+
+                    readList(NextLine.data.substr(25),
+                             dataMaterial.Material(MaterNum).Thickness,
+                             dataMaterial.Material(MaterNum).Conductivity,
+                             dataMaterial.Material(MaterNum).Trans,
+                             dataMaterial.Material(MaterNum).ReflectSolBeamFront,
+                             dataMaterial.Material(MaterNum).ReflectSolBeamBack,
+                             dataMaterial.Material(MaterNum).TransVis,
+                             dataMaterial.Material(MaterNum).ReflectVisBeamFront,
+                             dataMaterial.Material(MaterNum).ReflectVisBeamBack,
+                             dataMaterial.Material(MaterNum).TransThermal,
+                             dataMaterial.Material(MaterNum).AbsorpThermalFront,
+                             dataMaterial.Material(MaterNum).AbsorpThermalBack,
+                             LayerName);
+
                     dataMaterial.Material(MaterNum).Thickness *= 0.001;
                     if (dataMaterial.Material(MaterNum).Thickness <= 0.0) {
                     }
@@ -6697,7 +6709,7 @@ namespace HeatBalanceManager {
                     MaterNumSysGap(IGap, IGlSys) = MaterNum;
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
-                    ObjexxFCL::gio::read(NextLine.data.substr(23), "*") >> dataMaterial.Material(MaterNum).Thickness >> NumGases(IGap, IGlSys);
+                    readList(NextLine.data.substr(23), dataMaterial.Material(MaterNum).Thickness, NumGases(IGap, IGlSys));
                     if (NGlSys == 1) {
                         dataMaterial.Material(MaterNum).Name = "W5:" + DesiredConstructionName + ":GAP" + NumName(IGap);
                     } else {
@@ -6720,9 +6732,13 @@ namespace HeatBalanceManager {
                     for (IGas = 1; IGas <= NumGases(IGap, IGlSys); ++IGas) {
                         NextLine = W5DataFile.readLine();
                         ++FileLineCount;
-                        ObjexxFCL::gio::read(NextLine.data.substr(19), "*") >> GasName(IGas) >> dataMaterial.Material(MaterNum).GasFract(IGas) >>
-                            dataMaterial.Material(MaterNum).GasWght(IGas) >> dataMaterial.Material(MaterNum).GasCon(_, IGas) >> dataMaterial.Material(MaterNum).GasVis(_, IGas) >>
-                            dataMaterial.Material(MaterNum).GasCp(_, IGas);
+                        readList(NextLine.data.substr(19),
+                                 GasName(IGas),
+                                 dataMaterial.Material(MaterNum).GasFract(IGas),
+                                 dataMaterial.Material(MaterNum).GasWght(IGas),
+                                 dataMaterial.Material(MaterNum).GasCon(_, IGas),
+                                 dataMaterial.Material(MaterNum).GasVis(_, IGas),
+                                 dataMaterial.Material(MaterNum).GasCp(_, IGas));
                         // Nominal resistance of gap at room temperature (based on first gas in mixture)
                         NominalR(MaterNum) =
                             dataMaterial.Material(MaterNum).Thickness /
@@ -6847,12 +6863,7 @@ namespace HeatBalanceManager {
                 NextLine = W5DataFile.readLine();
                 if (NextLine.eof) goto Label1000;
                 ++FileLineCount;
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(NextLine.data.substr(5), "*", flags) >> Tsol;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat != 0) {
+                if (!readItem(NextLine.data.substr(5), Tsol)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of TSol values.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
                     ErrorsFound = true;
@@ -6864,12 +6875,7 @@ namespace HeatBalanceManager {
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(NextLine.data.substr(5), "*", flags) >> AbsSol(_, IGlass);
-                        ReadStat = flags.ios();
-                    }
-                    if (ReadStat != 0) {
+                    if (!readItem(NextLine.data.substr(5), AbsSol(_, IGlass))) {
                         ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of AbsSol values. For Glass=" +
                                         TrimSigDigits(IGlass));
                         ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
@@ -6885,12 +6891,8 @@ namespace HeatBalanceManager {
                     NextLine = W5DataFile.readLine();
                     DataLine(ILine) = NextLine.data;
                 }
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(DataLine(1).substr(5), "*", flags) >> Rfsol;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat != 0) {
+
+                if (!readItem(DataLine(1).substr(5), Rfsol)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of RfSol values.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 1) +
                                       ") in error (first 100 characters)=" + DataLine(1).substr(0, 100));
@@ -6901,12 +6903,8 @@ namespace HeatBalanceManager {
                                       ") in error (first 100 characters)=" + DataLine(1).substr(0, 100));
                     ErrorsFound = true;
                 }
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(DataLine(2).substr(5), "*", flags) >> Rbsol;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat != 0) {
+
+                if (!readItem(DataLine(2).substr(5), Rbsol)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of RbSol values.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 2) +
                                       ") in error (first 100 characters)=" + DataLine(2).substr(0, 100));
@@ -6917,12 +6915,7 @@ namespace HeatBalanceManager {
                                       ") in error (first 100 characters)=" + DataLine(2).substr(0, 100));
                     ErrorsFound = true;
                 }
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(DataLine(3).substr(5), "*", flags) >> Tvis;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat != 0) {
+                if (!readItem(DataLine(3).substr(5), Tvis)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of Tvis values.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 3) +
                                       ") in error (first 100 characters)=" + DataLine(3).substr(0, 100));
@@ -6933,12 +6926,7 @@ namespace HeatBalanceManager {
                                       ") in error (first 100 characters)=" + DataLine(3).substr(0, 100));
                     ErrorsFound = true;
                 }
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(DataLine(4).substr(5), "*", flags) >> Rfvis;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat != 0) {
+                if (!readItem(DataLine(4).substr(5), Rfvis)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of Rfvis values.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 4) +
                                       ") in error (first 100 characters)=" + DataLine(4).substr(0, 100));
@@ -6949,12 +6937,7 @@ namespace HeatBalanceManager {
                                       ") in error (first 100 characters)=" + DataLine(4).substr(0, 100));
                     ErrorsFound = true;
                 }
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(DataLine(5).substr(5), "*", flags) >> Rbvis;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat != 0) {
+                if (!readItem(DataLine(5).substr(5), Rbvis)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of Rbvis values.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 5) +
                                       ") in error (first 100 characters)=" + DataLine(5).substr(0, 100));
@@ -7086,7 +7069,7 @@ namespace HeatBalanceManager {
         EOFonFile = true;
     }
 
-    void SetStormWindowControl()
+    void SetStormWindowControl(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7146,7 +7129,7 @@ namespace HeatBalanceManager {
                 StormWinFlag = 0;
             }
             SurfWinStormWinFlag(SurfNum) = StormWinFlag;
-            if (BeginSimFlag) SurfWinStormWinFlagPrevDay(SurfNum) = StormWinFlag;
+            if (state.dataGlobal->BeginSimFlag) SurfWinStormWinFlagPrevDay(SurfNum) = StormWinFlag;
             if (SurfWinStormWinFlag(SurfNum) != SurfWinStormWinFlagPrevDay(SurfNum)) StormWinChangeThisDay = true;
         }
     }
@@ -7504,7 +7487,7 @@ namespace HeatBalanceManager {
                             errorsFound = true;
                         }
                     } else {
-                        thisConstruct.AirBoundaryMixingSched = DataGlobals::ScheduleAlwaysOn;
+                        thisConstruct.AirBoundaryMixingSched = DataGlobalConstants::ScheduleAlwaysOn();
                     }
                 }
             }
