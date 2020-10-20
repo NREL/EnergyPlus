@@ -271,21 +271,21 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state) {
                         _,
                         "System");
 
-    if (this->performance.compressorFuelType != DataGlobalConstants::iRT_Electricity) {
-        SetupOutputVariable(state, "Cooling Coil " + DataGlobalConstants::GetResourceTypeChar(this->performance.compressorFuelType) + " Rate",
+    if (this->performance.compressorFuelType != DataGlobalConstants::ResourceType::Electricity) {
+        SetupOutputVariable(state, "Cooling Coil " + this->performance.compressorFuelTypeForOutput + " Rate",
                             OutputProcessor::Unit::W,
                             this->performance.compressorFuelRate,
                             "System",
                             "Average",
                             this->name);
-        SetupOutputVariable(state, "Cooling Coil " + DataGlobalConstants::GetResourceTypeChar(this->performance.compressorFuelType) + " Energy",
+        SetupOutputVariable(state, "Cooling Coil " + this->performance.compressorFuelTypeForOutput + " Energy",
                             OutputProcessor::Unit::J,
                             this->performance.compressorFuelConsumption,
                             "System",
                             "Sum",
                             this->name,
                             _,
-                            DataGlobalConstants::GetResourceTypeChar(this->performance.original_input_specs.compressor_fuel_type),
+                            this->performance.compressorFuelTypeForOutput,
                             "COOLING",
                             _,
                             "System");

@@ -89,7 +89,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
     this->evapCondBasinHeatCap = input_data.basin_heater_capacity;
     this->evapCondBasinHeatSetpoint = input_data.basin_heater_setpoint_temperature;
     if (input_data.basin_heater_operating_schedule_name.empty()) {
-        this->evapCondBasinHeatSchedulIndex = DataGlobals::ScheduleAlwaysOn;
+        this->evapCondBasinHeatSchedulIndex = DataGlobalConstants::ScheduleAlwaysOn();
     } else {
         this->evapCondBasinHeatSchedulIndex = ScheduleManager::GetScheduleIndex(state, input_data.basin_heater_operating_schedule_name);
     }
@@ -105,7 +105,16 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(state, input_data.alternate_operating_mode_name);
         this->alternateMode.oneTimeInit(); // oneTimeInit does not need to be delayed in this use case
     }
-    this->compressorFuelType = input_data.compressor_fuel_type;
+    // Validate fuel type input
+    bool fuelTypeError(false);
+    UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(
+        input_data.compressor_fuel_type, this->compressorFuelTypeForOutput, this->compressorFuelType, fuelTypeError);
+    if (fuelTypeError) {
+        ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
+        ShowContinueError("...Compressor Fuel Type=\"" + input_data.compressor_fuel_type + "\".");
+        errorsFound = true;
+        fuelTypeError = false;
+    }
 
     if (!input_data.alternate_operating_mode2_name.empty() && !input_data.alternate_operating_mode_name.empty()) {
         this->hasAlternateMode = DataHVACGlobals::coilSubcoolReheatMode;
@@ -154,7 +163,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
         input_specs.basin_heater_capacity = rNumericArgs(5);
         input_specs.basin_heater_setpoint_temperature = rNumericArgs(6);
         input_specs.basin_heater_operating_schedule_name = cAlphaArgs(3);
-        input_specs.compressor_fuel_type = DataGlobalConstants::AssignResourceTypeNum(cAlphaArgs(4));
+        input_specs.compressor_fuel_type = cAlphaArgs(4);
         input_specs.base_operating_mode_name = cAlphaArgs(5);
         if (!lAlphaFieldBlanks(6)) {
             input_specs.alternate_operating_mode_name = cAlphaArgs(6);
@@ -374,7 +383,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
     this->basinHeaterPower *= (1.0 - this->RTF);
     this->electricityConsumption = this->powerUse * reportingConstant;
 
-    if (this->compressorFuelType != DataGlobalConstants::iRT_Electricity) {
+    if (this->compressorFuelType != DataGlobalConstants::ResourceType::Electricity) {
         this->compressorFuelRate = this->powerUse;
         this->compressorFuelConsumption = this->electricityConsumption;
 

@@ -71,7 +71,7 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
     Real64 basin_heater_capacity;
     Real64 basin_heater_setpoint_temperature;
     std::string basin_heater_operating_schedule_name;
-    DataGlobalConstants::ResourceType compressor_fuel_type;
+    std::string compressor_fuel_type;
     std::string base_operating_mode_name;
     std::string alternate_operating_mode_name;
     std::string alternate_operating_mode2_name;
@@ -121,7 +121,8 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 minOutdoorDrybulb = 0.0;
     Real64 maxOutdoorDrybulbForBasin = 0.0;
     bool mySizeFlag = true;
-    int compressorFuelType = 0;
+    DataGlobalConstants::ResourceType compressorFuelType = DataGlobalConstants::ResourceType::None;
+    std::string compressorFuelTypeForOutput;
     Real64 compressorFuelRate = 0.0;
     Real64 compressorFuelConsumption = 0.0;
 
