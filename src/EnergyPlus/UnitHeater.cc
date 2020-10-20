@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -116,12 +115,8 @@ namespace UnitHeater {
     // module (FanCoilUnits.cc)
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::cFanTypes;
     using DataHVACGlobals::ContFanCycCoil;
@@ -320,7 +315,7 @@ namespace UnitHeater {
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name = Alphas(1);
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedName = Alphas(2);
             if (lAlphaBlanks(2)) {
-                state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr = ScheduleAlwaysOn;
+                state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr == 0) {
@@ -795,7 +790,7 @@ namespace UnitHeater {
             state.dataUnitHeaters->MySizeFlag(UnitHeatNum) = false;
         } // Do the one time initializations
 
-        if (BeginEnvrnFlag && MyEnvrnFlag(UnitHeatNum) && !MyPlantScanFlag(UnitHeatNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(UnitHeatNum) && !MyPlantScanFlag(UnitHeatNum)) {
             InNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode;
             OutNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode;
             HotConNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode;
@@ -813,7 +808,7 @@ namespace UnitHeater {
 
             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType == state.dataUnitHeaters->WaterHeatingCoil) {
                 rho = GetDensityGlycol(state, PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
-                                       DataGlobals::HWInitConvTemp,
+                                       DataGlobalConstants::HWInitConvTemp(),
                                        PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                        RoutineName);
 
@@ -847,7 +842,7 @@ namespace UnitHeater {
             MyEnvrnFlag(UnitHeatNum) = false;
         } // ...end start of environment inits
 
-        if (!BeginEnvrnFlag) MyEnvrnFlag(UnitHeatNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag(UnitHeatNum) = true;
 
         // These initializations are done every iteration...
         InNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode;
@@ -1173,11 +1168,11 @@ namespace UnitHeater {
 
                             if (DesCoilLoad >= SmallLoad) {
                                 rho = GetDensityGlycol(state, PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
-                                                       DataGlobals::HWInitConvTemp,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
                                 Cp = GetSpecificHeatGlycol(state, PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
-                                                           DataGlobals::HWInitConvTemp,
+                                                           DataGlobalConstants::HWInitConvTemp(),
                                                            PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
                                 MaxVolHotWaterFlowDes = DesCoilLoad / (WaterCoilSizDeltaT * Cp * rho);
@@ -1894,11 +1889,10 @@ namespace UnitHeater {
         // Needs description, as appropriate.
 
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
 
-        state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatEnergy = state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatPower * TimeStepSys * SecInHour;
-        state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecEnergy = state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower * TimeStepSys * SecInHour;
+        state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatEnergy = state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecEnergy = state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower * TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!DataGlobals::SysSizingCalc) {

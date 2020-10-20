@@ -759,11 +759,11 @@ namespace OutputProcessor {
 
     void AddEndUseSubcategory(std::string const &ResourceName, std::string const &EndUseName, std::string const &EndUseSubName);
 
-    void WriteTimeStampFormatData(InputOutputFile &outputFile,
+    void WriteTimeStampFormatData(EnergyPlusData &state,
+                                  InputOutputFile &outputFile,
                                   ReportingFrequency const reportingInterval, // Reporting frequency.
                                   int const reportID,                         // The ID of the time stamp
                                   std::string const &reportIDString,          // The ID of the time stamp
-                                  int const DayOfSim,                         // the number of days simulated so far
                                   std::string const &DayOfSimChr,             // the number of days simulated so far
                                   bool writeToSQL,                            // write to SQLite
                                   Optional_int_const Month = _,               // the month of the reporting interval
@@ -775,7 +775,8 @@ namespace OutputProcessor {
                                   Optional_string_const DayType = _           // The day tied for the data (e.g., Monday)
     );
 
-    void WriteYearlyTimeStamp(InputOutputFile &outputFile,
+    void WriteYearlyTimeStamp(EnergyPlusData &state,
+                              InputOutputFile &outputFile,
                               std::string const &reportIDString,    // The ID of the time stamp
                               std::string const &yearOfSimChr,      // the year of the simulation
                               bool writeToSQL);
@@ -1013,7 +1014,7 @@ void GetMeteredVariables(std::string const &ComponentType,                      
                          Array1D_int &VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC),
                          Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
-                         Array1D_int &ResourceTypes,                            // ResourceTypes for each variable
+                         std::map<int, DataGlobalConstants::ResourceType> &ResourceTypes,                            // ResourceTypes for each variable
                          Array1D_string &EndUses,                               // EndUses for each variable
                          Array1D_string &Groups,                                // Groups for each variable
                          Array1D_string &Names,                                 // Variable Names for each variable
@@ -1026,7 +1027,7 @@ void GetMeteredVariables(std::string const &ComponentType,                      
                          Array1D_int &VarTypes,                                  // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,  // Variable Index Types (1=Zone,2=HVAC),
                          Array1D<OutputProcessor::Unit> &unitsForVar,            // units from enum for each variable
-                         Array1D_int &ResourceTypes,                             // ResourceTypes for each variable
+                         std::map<int, DataGlobalConstants::ResourceType> &ResourceTypes,                             // ResourceTypes for each variable
                          Array1D_string &EndUses,                                // EndUses for each variable
                          Array1D_string &Groups,                                 // Groups for each variable
                          Array1D_string &Names,                                  // Variable Names for each variable

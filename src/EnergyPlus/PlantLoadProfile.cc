@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -89,8 +88,6 @@ namespace PlantLoadProfile {
     // manager (see NonZoneEquipmentManager.cc).
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataGlobals::BeginEnvrnFlag;
     using DataPlant::PlantLoop;
     using DataPlant::TypeOf_PlantLoadProfile;
     using PlantUtilities::InitComponentNodes;
@@ -229,14 +226,14 @@ namespace PlantLoadProfile {
             this->InitSizing = false;
         }
 
-        if (BeginEnvrnFlag && this->Init) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->Init) {
             // Clear node initial conditions
             // DSU? can we centralize these temperature inits
             //    Node(InletNode)%Temp = 0.0
             Node(OutletNode).Temp = 0.0;
 
             FluidDensityInit =
-                GetDensityGlycol(state, PlantLoop(this->WLoopNum).FluidName, DataGlobals::InitConvTemp, PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+                GetDensityGlycol(state, PlantLoop(this->WLoopNum).FluidName, DataGlobalConstants::InitConvTemp(), PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
             Real64 MaxFlowMultiplier = GetScheduleMaxValue(this->FlowRateFracSchedule);
 
@@ -256,7 +253,7 @@ namespace PlantLoadProfile {
             this->Init = false;
         }
 
-        if (!BeginEnvrnFlag) this->Init = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->Init = true;
 
         this->InletTemp = Node(InletNode).Temp;
         this->Power = GetCurrentScheduleValue(this->LoadSchedule);
@@ -329,14 +326,13 @@ namespace PlantLoadProfile {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // FLOW:
-        this->Energy = this->Power * TimeStepSys * SecInHour;
+        this->Energy = this->Power * TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (this->Energy >= 0.0) {
             this->HeatingEnergy = this->Energy;
@@ -378,8 +374,6 @@ namespace PlantLoadProfile {
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int ProfileNum;                 // PLANT LOAD PROFILE (PlantProfile) object number
-        //  CHARACTER(len=MaxNameLength)   :: FoundBranchName
-        //  INTEGER                        :: BranchControlType
 
         // FLOW:
         cCurrentModuleObject = "LoadProfile:Plant";

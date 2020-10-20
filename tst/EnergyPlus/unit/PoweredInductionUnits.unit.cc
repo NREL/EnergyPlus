@@ -211,11 +211,11 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     bool FirstHVACIteration = true;
     Real64 SecMaxMassFlow = 0.05 * DataEnvironment::StdRhoAir; // From inputs
 
-    DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
+    state.dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
     FirstHVACIteration = true;
     PoweredInductionUnits::InitPIU(state, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     Fans::InitFan(state, 1, FirstHVACIteration);
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
 
     // Note that the fan schedule is always off, so the PIU fan should only run if the night cycle turn on flag is true
@@ -439,11 +439,11 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     int PriNodeNum = PoweredInductionUnits::PIU(SysNum).PriAirInNode;
     bool FirstHVACIteration = true;
 
-    DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
+    state.dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
     FirstHVACIteration = true;
     PoweredInductionUnits::InitPIU(state, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     Fans::InitFan(state, 1, FirstHVACIteration);
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
 
     // From inputs
@@ -713,11 +713,11 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     int PriNodeNum = thisSeriesAT.PriAirInNode;
     bool FirstHVACIteration = true;
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
     PoweredInductionUnits::InitPIU(state, PIUNum, FirstHVACIteration);
     Fans::InitFan(state, 1, FirstHVACIteration);
-    DataGlobals::BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
     DataHVACGlobals::TurnFansOn = true;
     DataHVACGlobals::TurnZoneFansOnlyOn = false;

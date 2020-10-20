@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataUCSDSharedData.hh>
 
 namespace EnergyPlus {
@@ -76,7 +75,6 @@ namespace DataUCSDSharedData {
     // USE STATEMENTS:
     // <use statements for data only modules>
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     // <use statements for access to subroutines in other modules>
 
     // Data

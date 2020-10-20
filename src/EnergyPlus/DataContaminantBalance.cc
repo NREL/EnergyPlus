@@ -47,7 +47,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataContaminantBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 
 namespace EnergyPlus {
@@ -65,9 +64,6 @@ namespace DataContaminantBalance {
     // that is needed to pass from the Contaminant Balance Module.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataGlobals::AutoCalculate;
-    using DataGlobals::DegToRadians;
     using DataSurfaces::MaxSlatAngs;
 
     // Data

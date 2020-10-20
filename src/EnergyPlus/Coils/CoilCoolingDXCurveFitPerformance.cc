@@ -86,14 +86,14 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
     }
     this->evapCondBasinHeatCap = input_data.basin_heater_capacity;
     this->evapCondBasinHeatSetpoint = input_data.basin_heater_setpoint_temperature;
-    if (input_data.basin_heater_operating_shedule_name.empty()) {
-        this->evapCondBasinHeatSchedulIndex = DataGlobals::ScheduleAlwaysOn;
+    if (input_data.basin_heater_operating_schedule_name.empty()) {
+        this->evapCondBasinHeatSchedulIndex = DataGlobalConstants::ScheduleAlwaysOn();
     } else {
-        this->evapCondBasinHeatSchedulIndex = ScheduleManager::GetScheduleIndex(state, input_data.basin_heater_operating_shedule_name);
+        this->evapCondBasinHeatSchedulIndex = ScheduleManager::GetScheduleIndex(state, input_data.basin_heater_operating_schedule_name);
     }
     if (this->evapCondBasinHeatSchedulIndex == 0) {
         ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
-        ShowContinueError("...Evaporative Condenser Basin Heater Operating Schedule Name=\"" + input_data.basin_heater_operating_shedule_name +
+        ShowContinueError("...Evaporative Condenser Basin Heater Operating Schedule Name=\"" + input_data.basin_heater_operating_schedule_name +
                           "\".");
         errorsFound = true;
     }
@@ -151,7 +151,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
         input_specs.capacity_control = cAlphaArgs(2);
         input_specs.basin_heater_capacity = rNumericArgs(5);
         input_specs.basin_heater_setpoint_temperature = rNumericArgs(6);
-        input_specs.basin_heater_operating_shedule_name = cAlphaArgs(3);
+        input_specs.basin_heater_operating_schedule_name = cAlphaArgs(3);
         input_specs.compressor_fuel_type = DataGlobalConstants::AssignResourceTypeNum(cAlphaArgs(4));
         input_specs.base_operating_mode_name = cAlphaArgs(5);
         if (!lAlphaFieldBlanks(6)) {
@@ -181,7 +181,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
                                                 DataLoopNode::NodeData &condOutletNode,
                                                 Real64 LoadSHR)
 {
-    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
     if (useAlternateMode == DataHVACGlobals::coilSubcoolReheatMode) {
         Real64 totalCoolingRate;
@@ -321,7 +321,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlus::EnergyPlusData &sta
     currentMode.CalcOperatingMode(state, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
 
     // scaling term to get rate into consumptions
-    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
     // calculate crankcase heater operation
     if (DataEnvironment::OutDryBulbTemp < this->maxOutdoorDrybulbForBasin) {

@@ -163,7 +163,7 @@ namespace MoistureBalanceEMPDManager {
         Real64 const EMPDdiffusivity = diffusivity_air / mat.EMPDmu;
 
         // Calculate penetration depth
-        Real64 const PenetrationDepth = std::sqrt(EMPDdiffusivity * PV_sat * period / (mat.Density * slope_MC * DataGlobals::Pi));
+        Real64 const PenetrationDepth = std::sqrt(EMPDdiffusivity * PV_sat * period / (mat.Density * slope_MC * DataGlobalConstants::Pi()));
 
         return PenetrationDepth;
     }
@@ -264,12 +264,12 @@ namespace MoistureBalanceEMPDManager {
             material.MoistBCoeff = MaterialProps(3);
             material.MoistCCoeff = MaterialProps(4);
             material.MoistDCoeff = MaterialProps(5);
-            if (lNumericFieldBlanks(6) || MaterialProps(6) == AutoCalculate) {
+            if (lNumericFieldBlanks(6) || MaterialProps(6) == DataGlobalConstants::AutoCalculate()) {
                 material.EMPDSurfaceDepth = CalcDepthFromPeriod(24 * 3600, material); // 1 day
             } else {
                 material.EMPDSurfaceDepth = MaterialProps(6);
             }
-            if (lNumericFieldBlanks(7) || MaterialProps(7) == AutoCalculate) {
+            if (lNumericFieldBlanks(7) || MaterialProps(7) == DataGlobalConstants::AutoCalculate()) {
                 material.EMPDDeepDepth = CalcDepthFromPeriod(21 * 24 * 3600, material); // 3 weeks
             } else {
                 material.EMPDDeepDepth = MaterialProps(7);
@@ -511,12 +511,12 @@ namespace MoistureBalanceEMPDManager {
         Real64 RH_surf_layer_tmp;
         Real64 RH_deep_layer;
 
-        if (BeginEnvrnFlag && OneTimeFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && OneTimeFlag) {
             InitMoistureBalanceEMPD(state);
             OneTimeFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             OneTimeFlag = true;
         }
 
@@ -558,25 +558,25 @@ namespace MoistureBalanceEMPDManager {
         Taver = TempSurfIn;
         // Calculate average vapor density [kg/m^3], and RH for use in material property calculations.
         RVaver = rv_surface_old;
-        RHaver = RVaver * 461.52 * (Taver + KelvinConv) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
+        RHaver = RVaver * 461.52 * (Taver + DataGlobalConstants::KelvinConv()) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
 
         // Calculate the saturated vapor pressure, surface vapor pressure and dewpoint. Used to check for condensation in HeatBalanceSurfaceManager
         PVsat = PsyPsatFnTemp(Taver, RoutineName);
         PVsurf = RHaver * std::exp(23.7093 - 4111.0 / (Taver + 237.7));
-        TempSat = 4111.0 / (23.7093 - std::log(PVsurf)) + 35.45 - KelvinConv;
+        TempSat = 4111.0 / (23.7093 - std::log(PVsurf)) + 35.45 - DataGlobalConstants::KelvinConv();
 
         // Convert vapor resistance factor (user input) to diffusivity. Evaluate at local surface temperature.
         // 2e-7*T^0.81/P = vapor diffusivity in air. [kg/m-s-Pa]
         // 461.52 = universal gas constant for water [J/kg-K]
         // EMPDdiffusivity = [m^2/s]
-        EMPDdiffusivity = (2.0e-7 * pow(Taver + KelvinConv, 0.81) / OutBaroPress) / material.EMPDmu * 461.52 * (Taver + KelvinConv);
+        EMPDdiffusivity = (2.0e-7 * pow(Taver + DataGlobalConstants::KelvinConv(), 0.81) / OutBaroPress) / material.EMPDmu * 461.52 * (Taver + DataGlobalConstants::KelvinConv());
 
         // Calculate slope of moisture sorption curve at current RH. [kg/kg-RH]
         dU_dRH = material.MoistACoeff * material.MoistBCoeff * pow(RHaver, material.MoistBCoeff - 1) +
                  material.MoistCCoeff * material.MoistDCoeff * pow(RHaver, material.MoistDCoeff - 1);
 
         // Convert vapor density and temperature of zone air to RH
-        RHZone = rho_vapor_air_in * 461.52 * (TempZone + KelvinConv) * std::exp(-23.7093 + 4111.0 / ((TempZone + KelvinConv) - 35.45));
+        RHZone = rho_vapor_air_in * 461.52 * (TempZone + DataGlobalConstants::KelvinConv()) * std::exp(-23.7093 + 4111.0 / ((TempZone + DataGlobalConstants::KelvinConv()) - 35.45));
 
         // Convert stored vapor density from previous timestep to RH.
         RH_deep_layer_old = PsyRhFnTdbRhov(Taver, rv_deep_old);
@@ -588,7 +588,7 @@ namespace MoistureBalanceEMPDManager {
             Rcoating = 0;
         } else {
             Rcoating = material.EMPDCoatingThickness * material.EMPDmuCoating * OutBaroPress /
-                       (2.0e-7 * pow(Taver + KelvinConv, 0.81) * 461.52 * (Taver + KelvinConv));
+                       (2.0e-7 * pow(Taver + DataGlobalConstants::KelvinConv(), 0.81) * 461.52 * (Taver + DataGlobalConstants::KelvinConv()));
         }
 
         // Calculate mass-transfer coefficient between zone air and center of surface layer. [m/s]

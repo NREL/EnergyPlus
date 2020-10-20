@@ -66,7 +66,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -122,10 +121,7 @@ namespace UnitVentilator {
     // Fred Buhl's fan coil module (FanCoilUnits.cc)
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::ATMixer_InletSide;
@@ -255,7 +251,6 @@ namespace UnitVentilator {
         using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
 
         using DataGlobals::NumOfZones;
-        using DataGlobals::ScheduleAlwaysOn;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterCooling;
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
@@ -341,7 +336,7 @@ namespace UnitVentilator {
             state.dataUnitVentilators->UnitVent(UnitVentNum).Name = Alphas(1);
             state.dataUnitVentilators->UnitVent(UnitVentNum).SchedName = Alphas(2);
             if (lAlphaBlanks(2)) {
-                state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr = ScheduleAlwaysOn;
+                state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr == 0) {
@@ -1363,7 +1358,7 @@ namespace UnitVentilator {
         }
 
         // Do the one time initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(UnitVentNum) && !MyPlantScanFlag(UnitVentNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(UnitVentNum) && !MyPlantScanFlag(UnitVentNum)) {
             InNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode;
             OutNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode;
             HotConNode = state.dataUnitVentilators->UnitVent(UnitVentNum).HotControlNode;
@@ -1397,7 +1392,7 @@ namespace UnitVentilator {
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == state.dataUnitVentilators->Heating_WaterCoilType) {
 
                     rho = GetDensityGlycol(state, PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum).FluidName,
-                                           HWInitConvTemp,
+                                           DataGlobalConstants::HWInitConvTemp(),
                                            PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum).FluidIndex,
                                            RoutineName);
 
@@ -1448,7 +1443,7 @@ namespace UnitVentilator {
             MyEnvrnFlag(UnitVentNum) = false;
         } // ...end start of environment inits
 
-        if (!BeginEnvrnFlag) MyEnvrnFlag(UnitVentNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag(UnitVentNum) = true;
 
         // These initializations are done every iteration...
         InNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode;
@@ -2152,11 +2147,11 @@ namespace UnitVentilator {
                                     DesHeatingLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 }
                                 rho = GetDensityGlycol(state, PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum).FluidName,
-                                                       HWInitConvTemp,
+                                                       DataGlobalConstants::HWInitConvTemp(),
                                                        PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
                                 Cp = GetSpecificHeatGlycol(state, PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum).FluidName,
-                                                           HWInitConvTemp,
+                                                           DataGlobalConstants::HWInitConvTemp(),
                                                            PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
                                 MaxVolHotWaterFlowDes = DesHeatingLoad / (WaterCoilSizDeltaT * Cp * rho);
@@ -3683,13 +3678,22 @@ namespace UnitVentilator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        using DataGlobals::SecInHour;
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine needs a description.
+
+        // METHODOLOGY EMPLOYED:
+        // Needs description, as appropriate.
+
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
 
-        state.dataUnitVentilators->UnitVent(UnitVentNum).HeatEnergy = state.dataUnitVentilators->UnitVent(UnitVentNum).HeatPower * TimeStepSys * SecInHour;
-        state.dataUnitVentilators->UnitVent(UnitVentNum).SensCoolEnergy = state.dataUnitVentilators->UnitVent(UnitVentNum).SensCoolPower * TimeStepSys * SecInHour;
-        state.dataUnitVentilators->UnitVent(UnitVentNum).TotCoolEnergy = state.dataUnitVentilators->UnitVent(UnitVentNum).TotCoolPower * TimeStepSys * SecInHour;
-        state.dataUnitVentilators->UnitVent(UnitVentNum).ElecEnergy = state.dataUnitVentilators->UnitVent(UnitVentNum).ElecPower * TimeStepSys * SecInHour;
+        state.dataUnitVentilators->UnitVent(UnitVentNum).HeatEnergy = state.dataUnitVentilators->UnitVent(UnitVentNum).HeatPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataUnitVentilators->UnitVent(UnitVentNum).SensCoolEnergy = state.dataUnitVentilators->UnitVent(UnitVentNum).SensCoolPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataUnitVentilators->UnitVent(UnitVentNum).TotCoolEnergy = state.dataUnitVentilators->UnitVent(UnitVentNum).TotCoolPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataUnitVentilators->UnitVent(UnitVentNum).ElecEnergy = state.dataUnitVentilators->UnitVent(UnitVentNum).ElecPower * TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (state.dataUnitVentilators->UnitVent(UnitVentNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!DataGlobals::SysSizingCalc) {

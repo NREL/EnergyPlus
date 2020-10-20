@@ -52,13 +52,11 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -75,7 +73,6 @@ namespace SZVAVModel {
     // Module containing routines for general use
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataHVACGlobals::Bisection;
     using DataHVACGlobals::HVACSystemRootFinding;
 
@@ -386,7 +383,7 @@ namespace SZVAVModel {
                         }
                     }
                 } else { // too much capacity when coil off, could lower air flow rate here to meet load if air flow is above minimum
-                    TempSolveRoot::SolveRoot(state, 
+                    TempSolveRoot::SolveRoot(state,
                         0.001, MaxIter, SolFlag, PartLoadRatio, PackagedTerminalHeatPump::CalcPTUnitAirAndWaterFlowResidual, 0.0, 1.0, Par);
                     if (SolFlag < 0) {
                         MessagePrefix = "Step 2c: ";
@@ -409,7 +406,7 @@ namespace SZVAVModel {
                     // set the water flow ratio so water coil gets proper flow
                     if (SZVAVModel.MaxHeatCoilFluidFlow > 0.0) SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
                 }
-                PackagedTerminalHeatPump::CalcPTUnit(state, 
+                PackagedTerminalHeatPump::CalcPTUnit(state,
                     SysIndex, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
                 coilActive = DataLoopNode::Node(coilAirInletNode).Temp - DataLoopNode::Node(coilAirOutletNode).Temp;
                 if (!coilActive) { // if the coil is schedule off or the plant cannot provide water
@@ -443,7 +440,7 @@ namespace SZVAVModel {
                                                          coilBranchNum,
                                                          coilCompNum);
                 }
-                PackagedTerminalHeatPump::CalcPTUnit(state, 
+                PackagedTerminalHeatPump::CalcPTUnit(state,
                     SysIndex, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
                 if ((CoolingLoad && ZoneLoad < TempSensOutput) || (HeatingLoad && ZoneLoad > TempSensOutput)) {
                     // otherwise iterate on load
@@ -475,7 +472,7 @@ namespace SZVAVModel {
         if (SolFlag < 0) {
             if (SolFlag == -1) {
                 // get capacity for warning
-                PackagedTerminalHeatPump::CalcPTUnit(state, 
+                PackagedTerminalHeatPump::CalcPTUnit(state,
                     SysIndex, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
 
                 if (std::abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
@@ -1175,7 +1172,7 @@ namespace SZVAVModel {
                 Par[12] = minAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed air flow rate, maxAirMassFlow indicates full
                                           // air flow
                 Par[13] = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
-                
+
                 TempSolveRoot::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, thisSys.calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
                 if (SolFlag < 0) {
                     MessagePrefix = "Step 1: ";

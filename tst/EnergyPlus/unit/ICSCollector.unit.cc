@@ -71,7 +71,6 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalSurface;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::DataEnvironment;
-using DataGlobals::BeginEnvrnFlag;
 
 TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest)
 {
@@ -88,7 +87,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
 
     InitializePsychRoutines();
 
-    BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     OutBaroPress = 101325.0;
     SkyTemp = 24.0;
     IsRain = false;
@@ -125,8 +124,8 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     TH.allocate(NumOfSurf, 1, 2);
     TH(SurfNum, 1, 1) = 22.0;
     // allocate solar incident radiation variable data
-    QRadSWOutIncident.allocate(1);
-    QRadSWOutIncident(1) = 0.0;
+    SurfQRadSWOutIncident.allocate(1);
+    SurfQRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
     state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
 
@@ -170,5 +169,5 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     ExtVentedCavity.deallocate();
     Zone.deallocate();
     TH.deallocate();
-    QRadSWOutIncident.deallocate();
+    SurfQRadSWOutIncident.deallocate();
 }

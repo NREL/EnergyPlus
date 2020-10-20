@@ -603,7 +603,6 @@ namespace HVACInterfaceManager {
 
         // Using/Aliasing
         using DataGlobals::HourOfDay;
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
@@ -672,7 +671,7 @@ namespace HVACInterfaceManager {
         // tank conditions each call.
         // Analytical solution for ODE, formulated for both final tank temp and average tank temp.
 
-        TimeStepSeconds = TimeStepSys * SecInHour;
+        TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour();
         MassFlowRate = Node(TankInletNode).MassFlowRate;
         PumpHeat = PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TotalPumpHeat;
         ThisTankMass = FracTotLoopMass * PlantLoop(LoopNum).Mass;
@@ -767,7 +766,6 @@ namespace HVACInterfaceManager {
 
         // Using/Aliasing
         using DataGlobals::HourOfDay;
-        using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
@@ -851,7 +849,7 @@ namespace HVACInterfaceManager {
         // no common pipe case.
         // calculation is separated because for common pipe, a different split for mass fraction is applied
         // The pump heat source is swapped around here compared to no common pipe (so pump heat sort stays on its own side).
-        TimeStepSeconds = TimeStepSys * SecInHour;
+        TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour();
         MassFlowRate = Node(TankInletNode).MassFlowRate;
         PumpHeat = PlantLoop(LoopNum).LoopSide(TankInletLoopSide).TotalPumpHeat;
         ThisTankMass = FracTotLoopMass * PlantLoop(LoopNum).Mass;
@@ -924,7 +922,6 @@ namespace HVACInterfaceManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataLoopNode::Node;
         using namespace DataPlant;
         using DataBranchAirLoopPlant::MassFlowTolerance;
@@ -963,13 +960,13 @@ namespace HVACInterfaceManager {
         NodeNumSecIn = PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn;
         NodeNumSecOut = PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumOut;
 
-        if (MyEnvrnFlag(LoopNum) && BeginEnvrnFlag) {
+        if (MyEnvrnFlag(LoopNum) && state.dataGlobal->BeginEnvrnFlag) {
             PlantCommonPipe(LoopNum).Flow = 0.0;
             PlantCommonPipe(LoopNum).Temp = 0.0;
             PlantCommonPipe(LoopNum).FlowDir = NoRecircFlow;
             MyEnvrnFlag(LoopNum) = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(LoopNum) = true;
         }
 
@@ -1061,7 +1058,6 @@ namespace HVACInterfaceManager {
 
         // Using/Aliasing
         using DataBranchAirLoopPlant::MassFlowTolerance;
-        using DataGlobals::BeginEnvrnFlag;
         using DataLoopNode::Node;
         using DataPlant::DeltaTempTol;
         using DataPlant::DemandSide;
@@ -1127,7 +1123,7 @@ namespace HVACInterfaceManager {
         NodeNumSecOut = PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumOut;
 
         // begin environment inits
-        if (MyEnvrnFlag(LoopNum) && BeginEnvrnFlag) {
+        if (MyEnvrnFlag(LoopNum) && state.dataGlobal->BeginEnvrnFlag) {
             PlantCommonPipe(LoopNum).PriToSecFlow = 0.0;
             PlantCommonPipe(LoopNum).SecToPriFlow = 0.0;
             PlantCommonPipe(LoopNum).PriCPLegFlow = 0.0;
@@ -1135,7 +1131,7 @@ namespace HVACInterfaceManager {
             MyEnvrnFlag(LoopNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(LoopNum) = true;
         }
 

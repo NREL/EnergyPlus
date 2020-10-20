@@ -494,7 +494,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipConfig(1).ReturnNode(1) = 4;
     ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
     ZoneEquipConfig(1).IsControlled = true;
-    ZoneEquipConfig(1).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
+    ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
     ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
     ZoneEquipConfig(1).InletNodeADUNum.allocate(1);
     ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
@@ -521,7 +521,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipConfig(2).ReturnNode(1) = 8;
     ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
     ZoneEquipConfig(2).IsControlled = true;
-    ZoneEquipConfig(2).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
+    ZoneEquipConfig(2).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
     ZoneEquipConfig(2).InletNodeAirLoopNum.allocate(1);
     ZoneEquipConfig(2).InletNodeADUNum.allocate(1);
     ZoneEquipConfig(2).AirDistUnitCool.allocate(1);
@@ -727,7 +727,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
 {
 
     WarmupFlag = false;
-    DayOfSim = 7;
+    state.dataGlobal->DayOfSim = 7;
     MinNumberOfWarmupDays = 25;
     NumOfZones = 1;
     WarmupConvergenceValues.allocate(NumOfZones);
@@ -753,7 +753,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
     MaxHeatLoadPrevDay(1) = 90.0;
     MaxCoolLoadZone(1) = 50.0;
     MaxCoolLoadPrevDay(1) = 90.0;
-    CheckWarmupConvergence();
+    CheckWarmupConvergence(state);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
     EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.0, 0.0001);
@@ -764,7 +764,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
     MaxHeatLoadPrevDay(1) = 90.0;
     MaxCoolLoadZone(1) = 100.5;
     MaxCoolLoadPrevDay(1) = 90.0;
-    CheckWarmupConvergence();
+    CheckWarmupConvergence(state);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
     EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
@@ -775,7 +775,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
     MaxHeatLoadPrevDay(1) = 100.5;
     MaxCoolLoadZone(1) = 90.0;
     MaxCoolLoadPrevDay(1) = 100.5;
-    CheckWarmupConvergence();
+    CheckWarmupConvergence(state);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
     EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
@@ -786,7 +786,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
     MaxHeatLoadPrevDay(1) = 200.0;
     MaxCoolLoadZone(1) = 201.0;
     MaxCoolLoadPrevDay(1) = 200.0;
-    CheckWarmupConvergence();
+    CheckWarmupConvergence(state);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 2);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 2);
     EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.005, 0.0001);
@@ -797,7 +797,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
     MaxHeatLoadPrevDay(1) = 200.0;
     MaxCoolLoadZone(1) = 210.0;
     MaxCoolLoadPrevDay(1) = 200.0;
-    CheckWarmupConvergence();
+    CheckWarmupConvergence(state);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(3), 1);
     EXPECT_EQ(WarmupConvergenceValues(1).PassFlag(4), 1);
     EXPECT_NEAR(WarmupConvergenceValues(1).TestMaxHeatLoadValue, 0.05, 0.005);
@@ -1568,7 +1568,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
 
     // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation(state);
-    DataGlobals::DayOfSim = 2; // avoid array bounds problem in RecKeepHeatBalance
+    state.dataGlobal->DayOfSim = 2; // avoid array bounds problem in RecKeepHeatBalance
     state.dataWeatherManager->Envrn = 1;
 
     // Test 1 - Set time of day to morning - should use high transmittance window
@@ -1987,8 +1987,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     state.dataConstruction->Construct(2).TotLayers = SurfsForRegWindow;
     state.dataConstruction->Construct(3).TotLayers = 1;
 
-    FenLaySurfTempFront.dimension(10, DataSurfaces::TotSurfaces, 0.0);
-    FenLaySurfTempBack.dimension(10, DataSurfaces::TotSurfaces, 0.0);
+    SurfWinFenLaySurfTempFront.dimension(10, DataSurfaces::TotSurfaces, 0.0);
+    SurfWinFenLaySurfTempBack.dimension(10, DataSurfaces::TotSurfaces, 0.0);
     DataHeatBalSurface::TH.dimension(2, Construction::MaxCTFTerms, DataSurfaces::TotSurfaces, 0.0);
 
     DataHeatBalSurface::TH(1,1,1) = 21.0;
@@ -2003,16 +2003,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     HeatBalanceManager::UpdateWindowFaceTempsNonBSDFWin(state);
 
     // First surface is NOT a window so these should NOT be set
-    EXPECT_NEAR(FenLaySurfTempFront(1,1),ZeroResult,0.0001);
-    EXPECT_NEAR(FenLaySurfTempBack(1,1),ZeroResult,0.0001);
+    EXPECT_NEAR(SurfWinFenLaySurfTempFront(1,1),ZeroResult,0.0001);
+    EXPECT_NEAR(SurfWinFenLaySurfTempBack(1,1),ZeroResult,0.0001);
 
     // Second surface is a window so these should be set
-    EXPECT_NEAR(FenLaySurfTempFront(1,2),DataHeatBalSurface::TH(1,1,2),0.0001);
-    EXPECT_NEAR(FenLaySurfTempBack(SurfsForRegWindow,2),DataHeatBalSurface::TH(2,1,2),0.0001);
+    EXPECT_NEAR(SurfWinFenLaySurfTempFront(1,2),DataHeatBalSurface::TH(1,1,2),0.0001);
+    EXPECT_NEAR(SurfWinFenLaySurfTempBack(SurfsForRegWindow,2),DataHeatBalSurface::TH(2,1,2),0.0001);
 
     // Third surface is a window but is also a BSDF (complex window) so these should NOT be set
-    EXPECT_NEAR(FenLaySurfTempFront(1,3),ZeroResult,0.0001);
-    EXPECT_NEAR(FenLaySurfTempBack(1,3),ZeroResult,0.0001);
+    EXPECT_NEAR(SurfWinFenLaySurfTempFront(1,3),ZeroResult,0.0001);
+    EXPECT_NEAR(SurfWinFenLaySurfTempBack(1,3),ZeroResult,0.0001);
 
 }
 

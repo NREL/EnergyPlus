@@ -61,11 +61,11 @@ extern "C" {
 // #include <ObjexxFCL/Array1.hh>
 #include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include "IOFiles.hh"
+#include "StringUtilities.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -130,23 +130,26 @@ namespace UtilityRoutines {
 
         Real64 rProcessNumber = 0.0;
         //  Make sure the string has all what we think numerics should have
-        std::string const PString(stripped(String));
+        std::string PString(stripped(String));
         std::string::size_type const StringLen(PString.length());
         ErrorFlag = false;
         if (StringLen == 0) return rProcessNumber;
-        int IoStatus(0);
+        bool parseFailed = false;
         if (PString.find_first_not_of(ValidNumerics) == std::string::npos) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(PString, fmtLD, flags) >> rProcessNumber;
-                IoStatus = flags.ios();
-            }
+            // make FORTRAN floating point number (containing 'd' or 'D')
+            // standardized by replacing 'd' or 'D' with 'e'
+            std::replace_if(std::begin(PString),
+                            std::end(PString),
+                            [](const char c){ return c == 'D' || c == 'd'; },
+                            'e');
+            // then parse as a normal floating point value
+            parseFailed = !readItem(PString, rProcessNumber);
             ErrorFlag = false;
         } else {
             rProcessNumber = 0.0;
             ErrorFlag = true;
         }
-        if (IoStatus != 0) {
+        if (parseFailed) {
             rProcessNumber = 0.0;
             ErrorFlag = true;
         }
@@ -525,7 +528,7 @@ namespace UtilityRoutines {
 
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
                                                    std::string &FuelTypeOutput,
-                                                   int &FuelTypeNum,
+                                                   DataGlobalConstants::ResourceType &FuelTypeNum,
                                                    bool &FuelTypeErrorsFound)
     {
         // FUNCTION INFORMATION:
@@ -624,7 +627,6 @@ namespace UtilityRoutines {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
 
         std::string NumWarnings;
         std::string NumSevere;
@@ -676,7 +678,7 @@ namespace UtilityRoutines {
             ReportSurfaces(state);
         }
 
-        ReportSurfaceErrors();
+        ReportSurfaceErrors(state);
         CheckPlantOnAbort();
         ShowRecurringErrors(state);
         SummarizeErrors(state);
@@ -821,7 +823,7 @@ namespace UtilityRoutines {
             sqlite->updateSQLiteSimulationRecord(true, true);
         }
 
-        ReportSurfaceErrors();
+        ReportSurfaceErrors(state);
         ShowRecurringErrors(state);
         SummarizeErrors(state);
         CloseMiscOpenFiles(state);

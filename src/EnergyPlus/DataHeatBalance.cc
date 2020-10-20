@@ -92,8 +92,6 @@ namespace DataHeatBalance {
     // SolarShading, etc. Modules.
 
     // Using/Aliasing
-    using DataGlobals::AutoCalculate;
-    using DataGlobals::DegToRadians;
     using DataSurfaces::MaxSlatAngs;
     using namespace DataVectorTypes;
     using DataBSDFWindow::BSDFLayerAbsorpStruct;
@@ -631,39 +629,7 @@ namespace DataHeatBalance {
     Array1D<Real64> ZoneOpaqSurfExtFaceCond;        // Zone outside face opaque surface conduction (W)
     Array1D<Real64> ZoneOpaqSurfExtFaceCondGainRep; // = Zone outside face opaque surface conduction when >= 0
     Array1D<Real64> ZoneOpaqSurfExtFaceCondLossRep; // = -Zone outside face opaque surface conduction when < 0
-    Array1D<Real64> QRadThermInAbs;                 // Thermal radiation absorbed on inside surfaces
-    Array2D<Real64> QRadSWwinAbs;                   // Short wave radiation absorbed in window glass layers
-    Array2D<Real64> InitialDifSolwinAbs;            // Initial diffuse solar absorbed in window glass layers
-    // from inside(W/m2)
-    Array1D<Real64> QRadSWOutIncident;           // Exterior beam plus diffuse solar incident on surface (W/m2)
-    Array1D<Real64> QRadSWOutIncidentBeam;       // Exterior beam solar incident on surface (W/m2)
-    Array1D<Real64> BmIncInsSurfIntensRep;       // Beam sol irrad from ext wins on inside of surface (W/m2)
-    Array1D<Real64> BmIncInsSurfAmountRep;       // Beam sol amount from ext wins incident on inside of surface (W)
-    Array1D<Real64> IntBmIncInsSurfIntensRep;    // Beam sol irrad from int wins on inside of surface (W/m2)
-    Array1D<Real64> IntBmIncInsSurfAmountRep;    // Beam sol amount from int wins incident on inside of surface (W)
-    Array1D<Real64> QRadSWOutIncidentSkyDiffuse; // Exterior sky diffuse solar incident on surface (W/m2)
-    Array1D<Real64> QRadSWOutIncidentGndDiffuse; // Exterior ground diffuse solar incident on surface (W/m2)
-    Array1D<Real64> QRadSWOutIncBmToDiffReflGnd; // Exterior diffuse solar incident from beam to diffuse
-    // reflection from ground (W/m2)
-    Array1D<Real64> QRadSWOutIncSkyDiffReflGnd; // Exterior diffuse solar incident from sky diffuse
-    // reflection from ground (W/m2)
-    Array1D<Real64> QRadSWOutIncBmToBmReflObs; // Exterior beam solar incident from beam-to-beam
-    // reflection from obstructions (W/m2)
-    Array1D<Real64> QRadSWOutIncBmToDiffReflObs; // Exterior diffuse solar incident from beam-to-diffuse
-    // reflection from obstructions (W/m2)
-    Array1D<Real64> QRadSWOutIncSkyDiffReflObs; // Exterior diffuse solar incident from sky diffuse
-    // reflection from obstructions (W/m2)
-    Array1D<Real64> CosIncidenceAngle; // Cosine of beam solar incidence angle (for reporting)
 
-    Array1D_int SurfWinBSDFBeamDirectionRep;  // BSDF beam direction number for given complex fenestration state (for reporting) []
-    Array1D<Real64> SurfWinBSDFBeamThetaRep;  // BSDF beam Theta angle (for reporting) [rad]
-    Array1D<Real64> SurfWinBSDFBeamPhiRep;    // BSDF beam Phi angle (for reporting) [rad]
-
-    Array1D<Real64> QRadSWwinAbsTot;   // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
-    Array2D<Real64> QRadSWwinAbsLayer; // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
-
-    Array2D<Real64> FenLaySurfTempFront;            // Front surface temperatures of fenestration layers
-    Array2D<Real64> FenLaySurfTempBack;             // Back surface temperatures of fenestration layers
     Array1D<Real64> ZoneTransSolarEnergy;           // Energy of ZoneTransSolar [J]
     Array1D<Real64> ZoneWinHeatGainRepEnergy;       // Energy of ZoneWinHeatGainRep [J]
     Array1D<Real64> ZoneWinHeatLossRepEnergy;       // Energy of ZoneWinHeatLossRep [J]
@@ -675,21 +641,43 @@ namespace DataHeatBalance {
     Array1D<Real64> ZnOpqSurfInsFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
     Array1D<Real64> ZnOpqSurfExtFaceCondGnRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
     Array1D<Real64> ZnOpqSurfExtFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
-    Array1D<Real64> BmIncInsSurfAmountRepEnergy;    // energy of BmIncInsSurfAmountRep [J]
-    Array1D<Real64> IntBmIncInsSurfAmountRepEnergy; // energy of IntBmIncInsSurfAmountRep [J]
-    Array1D<Real64> QRadSWwinAbsTotEnergy;          // Energy of QRadSWwinAbsTot [J]
-    Array1D<Real64> SWwinAbsTotalReport;            // Report - Total interior/exterior shortwave
-    // absorbed in all glass layers of window (W)
-    Array1D<Real64> InitialDifSolInAbsReport; // Report - Initial transmitted diffuse solar
-    // absorbed on inside of surface (W)
-    Array1D<Real64> InitialDifSolInTransReport; // Report - Initial transmitted diffuse solar
-    // transmitted out through inside of window surface (W)
-    Array1D<Real64> SWInAbsTotalReport; // Report - Total interior/exterior shortwave
-    // absorbed on inside of surface (W)
-    Array1D<Real64> SWOutAbsTotalReport; // Report - Total exterior shortwave/solar
-    // absorbed on outside of surface (W)
-    Array1D<Real64> SWOutAbsEnergyReport; // Report - Total exterior shortwave/solar
-    // absorbed on outside of surface (j)
+
+    Array1D<Real64> SurfQRadThermInAbs;                 // Thermal radiation absorbed on inside surfaces
+    Array1D<Real64> SurfQRadSWOutIncident;              // Exterior beam plus diffuse solar incident on surface (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncidentBeam;          // Exterior beam solar incident on surface (W/m2)
+    Array1D<Real64> SurfBmIncInsSurfIntensRep;          // Beam sol irrad from ext wins on inside of surface (W/m2)
+    Array1D<Real64> SurfBmIncInsSurfAmountRep;          // Beam sol amount from ext wins incident on inside of surface (W)
+    Array1D<Real64> SurfIntBmIncInsSurfIntensRep;       // Beam sol irrad from int wins on inside of surface (W/m2)
+    Array1D<Real64> SurfIntBmIncInsSurfAmountRep;       // Beam sol amount from int wins incident on inside of surface (W)
+    Array1D<Real64> SurfQRadSWOutIncidentSkyDiffuse;    // Exterior sky diffuse solar incident on surface (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncidentGndDiffuse;    // Exterior ground diffuse solar incident on surface (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncBmToDiffReflGnd;    // Exterior diffuse solar incident from beam to diffuse reflection from ground (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncSkyDiffReflGnd;     // Exterior diffuse solar incident from sky diffuse reflection from ground (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncBmToBmReflObs;      // Exterior beam solar incident from beam-to-beam reflection from obstructions (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncBmToDiffReflObs;    // Exterior diffuse solar incident from beam-to-diffuse reflection from obstructions (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncSkyDiffReflObs;     // Exterior diffuse solar incident from sky diffuse reflection from obstructions (W/m2)
+    Array1D<Real64> SurfCosIncidenceAngle;              // Cosine of beam solar incidence angle (for reporting)
+
+    Array1D<Real64> SurfSWInAbsTotalReport;             // Report - Total interior/exterior shortwave absorbed on inside of surface (W)
+    Array1D<Real64> SurfBmIncInsSurfAmountRepEnergy;    // energy of BmIncInsSurfAmountRep [J]
+    Array1D<Real64> SurfIntBmIncInsSurfAmountRepEnergy; // energy of IntBmIncInsSurfAmountRep [J]
+    Array1D<Real64> SurfInitialDifSolInAbsReport;      // Report - Initial transmitted diffuse solar absorbed on inside of surface (W)
+
+    Array1D_int SurfWinBSDFBeamDirectionRep;               // BSDF beam direction number for given complex fenestration state (for reporting) []
+    Array1D<Real64> SurfWinBSDFBeamThetaRep;               // BSDF beam Theta angle (for reporting) [rad]
+    Array1D<Real64> SurfWinBSDFBeamPhiRep;                 // BSDF beam Phi angle (for reporting) [rad]
+    Array1D<Real64> SurfWinQRadSWwinAbsTot;                // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
+    Array2D<Real64> SurfWinQRadSWwinAbsLayer;              // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
+    Array2D<Real64> SurfWinFenLaySurfTempFront;            // Front surface temperatures of fenestration layers
+    Array2D<Real64> SurfWinFenLaySurfTempBack;             // Back surface temperatures of fenestration layers
+    Array1D<Real64> SurfWinQRadSWwinAbsTotEnergy;          // Energy of QRadSWwinAbsTot [J]
+    Array1D<Real64> SurfWinSWwinAbsTotalReport;            // Report - Total interior/exterior shortwave absorbed in all glass layers of window (W)
+    Array1D<Real64> SurfWinInitialDifSolInTransReport;     // Report - Initial transmitted diffuse solar transmitted out through inside of window surface (W)
+    Array2D<Real64> SurfWinQRadSWwinAbs;                   // Short wave radiation absorbed in window glass layers
+    Array2D<Real64> SurfWinInitialDifSolwinAbs;            // Initial diffuse solar absorbed in window glass layers from inside(W/m2)
+
+    Array1D<Real64> SurfOpaqSWOutAbsTotalReport;           // Report - Total exterior shortwave/solar absorbed on outside of surface (W)
+    Array1D<Real64> SurfOpaqSWOutAbsEnergyReport;          // Report - Total exterior shortwave/solar absorbed on outside of surface (j)
 
     Array1D<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
     Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
@@ -989,30 +977,7 @@ namespace DataHeatBalance {
         ZoneOpaqSurfExtFaceCond.deallocate();
         ZoneOpaqSurfExtFaceCondGainRep.deallocate();
         ZoneOpaqSurfExtFaceCondLossRep.deallocate();
-        QRadThermInAbs.deallocate();
-        QRadSWwinAbs.deallocate();
-        InitialDifSolwinAbs.deallocate();
-        QRadSWOutIncident.deallocate();
-        QRadSWOutIncidentBeam.deallocate();
-        BmIncInsSurfIntensRep.deallocate();
-        BmIncInsSurfAmountRep.deallocate();
-        IntBmIncInsSurfIntensRep.deallocate();
-        IntBmIncInsSurfAmountRep.deallocate();
-        QRadSWOutIncidentSkyDiffuse.deallocate();
-        QRadSWOutIncidentGndDiffuse.deallocate();
-        QRadSWOutIncBmToDiffReflGnd.deallocate();
-        QRadSWOutIncSkyDiffReflGnd.deallocate();
-        QRadSWOutIncBmToBmReflObs.deallocate();
-        QRadSWOutIncBmToDiffReflObs.deallocate();
-        QRadSWOutIncSkyDiffReflObs.deallocate();
-        CosIncidenceAngle.deallocate();
-        SurfWinBSDFBeamDirectionRep.deallocate();
-        SurfWinBSDFBeamThetaRep.deallocate();
-        SurfWinBSDFBeamPhiRep.deallocate();
-        QRadSWwinAbsTot.deallocate();
-        QRadSWwinAbsLayer.deallocate();
-        FenLaySurfTempFront.deallocate();
-        FenLaySurfTempBack.deallocate();
+
         ZoneTransSolarEnergy.deallocate();
         ZoneWinHeatGainRepEnergy.deallocate();
         ZoneWinHeatLossRepEnergy.deallocate();
@@ -1024,15 +989,44 @@ namespace DataHeatBalance {
         ZnOpqSurfInsFaceCondLsRepEnrg.deallocate();
         ZnOpqSurfExtFaceCondGnRepEnrg.deallocate();
         ZnOpqSurfExtFaceCondLsRepEnrg.deallocate();
-        BmIncInsSurfAmountRepEnergy.deallocate();
-        IntBmIncInsSurfAmountRepEnergy.deallocate();
-        QRadSWwinAbsTotEnergy.deallocate();
-        SWwinAbsTotalReport.deallocate();
-        InitialDifSolInAbsReport.deallocate();
-        InitialDifSolInTransReport.deallocate();
-        SWInAbsTotalReport.deallocate();
-        SWOutAbsTotalReport.deallocate();
-        SWOutAbsEnergyReport.deallocate();
+
+        SurfQRadThermInAbs.deallocate();
+        SurfQRadSWOutIncident.deallocate();
+        SurfQRadSWOutIncidentBeam.deallocate();
+        SurfBmIncInsSurfIntensRep.deallocate();
+        SurfBmIncInsSurfAmountRep.deallocate();
+        SurfIntBmIncInsSurfIntensRep.deallocate();
+        SurfIntBmIncInsSurfAmountRep.deallocate();
+        SurfBmIncInsSurfAmountRepEnergy.deallocate();
+        SurfIntBmIncInsSurfAmountRepEnergy.deallocate();
+        SurfInitialDifSolInAbsReport.deallocate();
+        SurfSWInAbsTotalReport.deallocate();
+
+        SurfQRadSWOutIncidentSkyDiffuse.deallocate();
+        SurfQRadSWOutIncidentGndDiffuse.deallocate();
+        SurfQRadSWOutIncBmToDiffReflGnd.deallocate();
+        SurfQRadSWOutIncSkyDiffReflGnd.deallocate();
+        SurfQRadSWOutIncBmToBmReflObs.deallocate();
+        SurfQRadSWOutIncBmToDiffReflObs.deallocate();
+        SurfQRadSWOutIncSkyDiffReflObs.deallocate();
+        SurfCosIncidenceAngle.deallocate();
+
+        SurfWinBSDFBeamDirectionRep.deallocate();
+        SurfWinBSDFBeamThetaRep.deallocate();
+        SurfWinBSDFBeamPhiRep.deallocate();
+        SurfWinQRadSWwinAbsTot.deallocate();
+        SurfWinQRadSWwinAbsLayer.deallocate();
+        SurfWinFenLaySurfTempFront.deallocate();
+        SurfWinFenLaySurfTempBack.deallocate();
+        SurfWinQRadSWwinAbs.deallocate();
+        SurfWinInitialDifSolwinAbs.deallocate();
+        SurfWinQRadSWwinAbsTotEnergy.deallocate();
+        SurfWinSWwinAbsTotalReport.deallocate();
+        SurfWinInitialDifSolInTransReport.deallocate();
+
+        SurfOpaqSWOutAbsTotalReport.deallocate();
+        SurfOpaqSWOutAbsEnergyReport.deallocate();
+
         NominalR.deallocate();
         NominalRforNominalUCalculation.deallocate();
         NominalU.deallocate();
@@ -1823,7 +1817,7 @@ namespace DataHeatBalance {
             // Minimum and maximum slat angles allowed by slat geometry
             if (Blind(TotBlinds).SlatWidth > Blind(TotBlinds).SlatSeparation) {
                 MinSlatAngGeom =
-                    std::asin(Blind(TotBlinds).SlatThickness / (Blind(TotBlinds).SlatThickness + Blind(TotBlinds).SlatSeparation)) / DegToRadians;
+                    std::asin(Blind(TotBlinds).SlatThickness / (Blind(TotBlinds).SlatThickness + Blind(TotBlinds).SlatSeparation)) / DataGlobalConstants::DegToRadians();
             } else {
                 MinSlatAngGeom = 0.0;
             }
@@ -1924,9 +1918,6 @@ namespace DataHeatBalance {
 
         // Using/Aliasing
         using DataEnvironment::SOLCOS;
-        using DataGlobals::DegToRadians;
-        using DataGlobals::Pi;
-        using DataGlobals::PiOvr2;
         using DataSurfaces::DoNotModel;
         using DataSurfaces::ModelAsDiffuse;
         using DataSurfaces::ModelAsDirectBeam;
@@ -1992,22 +1983,22 @@ namespace DataHeatBalance {
 
         if (present(Theta)) {
             SunAzimuthToScreenNormal = std::abs(Theta);
-            if (SunAzimuthToScreenNormal > Pi) {
+            if (SunAzimuthToScreenNormal > DataGlobalConstants::Pi()) {
                 SunAzimuthToScreenNormal = 0.0;
             } else {
-                if (SunAzimuthToScreenNormal > PiOvr2) {
-                    SunAzimuthToScreenNormal = Pi - SunAzimuthToScreenNormal;
+                if (SunAzimuthToScreenNormal > DataGlobalConstants::PiOvr2()) {
+                    SunAzimuthToScreenNormal = DataGlobalConstants::Pi() - SunAzimuthToScreenNormal;
                 }
             }
             NormalAzimuth = SunAzimuthToScreenNormal;
         } else {
             SunAzimuth = std::atan2(SOLCOS(1), SOLCOS(2));
-            if (SunAzimuth < 0.0) SunAzimuth += 2.0 * Pi;
-            SurfaceAzimuth = Surface(SurfaceNum).Azimuth * DegToRadians;
+            if (SunAzimuth < 0.0) SunAzimuth += 2.0 * DataGlobalConstants::Pi();
+            SurfaceAzimuth = Surface(SurfaceNum).Azimuth * DataGlobalConstants::DegToRadians();
             NormalAzimuth = SunAzimuth - SurfaceAzimuth;
             //   Calculate the transmittance whether sun is in front of or behind screen, place result in BmBmTrans or BmBmTransBack
-            if (std::abs(SunAzimuth - SurfaceAzimuth) > PiOvr2) {
-                SunAzimuthToScreenNormal = std::abs(SunAzimuth - SurfaceAzimuth) - PiOvr2;
+            if (std::abs(SunAzimuth - SurfaceAzimuth) > DataGlobalConstants::PiOvr2()) {
+                SunAzimuthToScreenNormal = std::abs(SunAzimuth - SurfaceAzimuth) - DataGlobalConstants::PiOvr2();
             } else {
                 SunAzimuthToScreenNormal = std::abs(SunAzimuth - SurfaceAzimuth);
             }
@@ -2015,23 +2006,23 @@ namespace DataHeatBalance {
 
         if (present(Phi)) {
             SunAltitudeToScreenNormal = std::abs(Phi);
-            if (SunAltitudeToScreenNormal > PiOvr2) {
-                SunAltitudeToScreenNormal = Pi - SunAltitudeToScreenNormal;
+            if (SunAltitudeToScreenNormal > DataGlobalConstants::PiOvr2()) {
+                SunAltitudeToScreenNormal = DataGlobalConstants::Pi() - SunAltitudeToScreenNormal;
             }
             SunAltitude = SunAltitudeToScreenNormal;
         } else {
-            SunAltitude = (PiOvr2 - std::acos(SOLCOS(3)));
-            SurfaceTilt = Surface(SurfaceNum).Tilt * DegToRadians;
-            SunAltitudeToScreenNormal = std::abs(SunAltitude + (SurfaceTilt - PiOvr2));
-            if (SunAltitudeToScreenNormal > PiOvr2) {
-                SunAltitudeToScreenNormal -= PiOvr2;
+            SunAltitude = (DataGlobalConstants::PiOvr2() - std::acos(SOLCOS(3)));
+            SurfaceTilt = Surface(SurfaceNum).Tilt * DataGlobalConstants::DegToRadians();
+            SunAltitudeToScreenNormal = std::abs(SunAltitude + (SurfaceTilt - DataGlobalConstants::PiOvr2()));
+            if (SunAltitudeToScreenNormal > DataGlobalConstants::PiOvr2()) {
+                SunAltitudeToScreenNormal -= DataGlobalConstants::PiOvr2();
             }
         }
 
         if (SurfaceNum == 0 || !present(ScreenNumber)) {
             NormalAltitude = SunAltitude;
         } else {
-            NormalAltitude = SunAltitude + (SurfaceTilt - PiOvr2);
+            NormalAltitude = SunAltitude + (SurfaceTilt - DataGlobalConstants::PiOvr2());
         }
 
         if (NormalAltitude != 0.0 && NormalAzimuth != 0.0) {
@@ -2052,11 +2043,11 @@ namespace DataHeatBalance {
         // ************************************************************************************************
 
         // calculate compliment of relative solar azimuth
-        Beta = PiOvr2 - SunAzimuthToScreenNormal;
+        Beta = DataGlobalConstants::PiOvr2() - SunAzimuthToScreenNormal;
 
         // Catch all divide by zero instances
         if (Beta > Small) {
-            if (std::abs(SunAltitudeToScreenNormal - PiOvr2) > Small) {
+            if (std::abs(SunAltitudeToScreenNormal - DataGlobalConstants::PiOvr2()) > Small) {
                 AlphaDblPrime = std::atan(std::tan(SunAltitudeToScreenNormal) / std::cos(SunAzimuthToScreenNormal));
                 TransYDir = 1.0 - Gamma * (std::cos(AlphaDblPrime) + std::sin(AlphaDblPrime) * std::tan(SunAltitudeToScreenNormal) *
                                                                          std::sqrt(1.0 + pow_2(1.0 / std::tan(Beta))));
@@ -2072,7 +2063,7 @@ namespace DataHeatBalance {
                           pow_2(std::sin(SunAltitudeToScreenNormal)));
         if (COSMu > Small) {
             Epsilon = std::acos(std::cos(SunAltitudeToScreenNormal) * std::cos(SunAzimuthToScreenNormal) / COSMu);
-            Eta = PiOvr2 - Epsilon;
+            Eta = DataGlobalConstants::PiOvr2() - Epsilon;
             if (std::cos(Epsilon) != 0.0) {
                 MuPrime = std::atan(std::tan(std::acos(COSMu)) / std::cos(Epsilon));
                 if (Eta != 0.0) {
@@ -2097,13 +2088,13 @@ namespace DataHeatBalance {
         ReflectCyl = SurfaceScreens(ScNum).ReflectCylinder;
         ReflectCylVis = SurfaceScreens(ScNum).ReflectCylinderVis;
 
-        if (std::abs(SunAzimuthToScreenNormal - PiOvr2) < Small || std::abs(SunAltitudeToScreenNormal - PiOvr2) < Small) {
+        if (std::abs(SunAzimuthToScreenNormal - DataGlobalConstants::PiOvr2()) < Small || std::abs(SunAltitudeToScreenNormal - DataGlobalConstants::PiOvr2()) < Small) {
             Tscattered = 0.0;
             TscatteredVis = 0.0;
         } else {
             //   DeltaMax and Delta are in degrees
             DeltaMax = 89.7 - (10.0 * Gamma / 0.16);
-            Delta = std::sqrt(pow_2(SunAzimuthToScreenNormal / DegToRadians) + pow_2(SunAltitudeToScreenNormal / DegToRadians));
+            Delta = std::sqrt(pow_2(SunAzimuthToScreenNormal / DataGlobalConstants::DegToRadians()) + pow_2(SunAltitudeToScreenNormal / DataGlobalConstants::DegToRadians()));
 
             //   Use empirical model to determine maximum (peak) scattering
             Tscattermax = 0.0229 * Gamma + 0.2971 * ReflectCyl - 0.03624 * pow_2(Gamma) + 0.04763 * pow_2(ReflectCyl) - 0.44416 * Gamma * ReflectCyl;
@@ -2137,7 +2128,7 @@ namespace DataHeatBalance {
         TscatteredVis = max(0.0, TscatteredVis);
 
         if (SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == DoNotModel) {
-            if (std::abs(IncidentAngle) <= PiOvr2) {
+            if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2()) {
                 SurfaceScreens(ScNum).BmBmTrans = Tdirect;
                 SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
                 SurfaceScreens(ScNum).BmBmTransBack = 0.0;
@@ -2149,7 +2140,7 @@ namespace DataHeatBalance {
             Tscattered = 0.0;
             TscatteredVis = 0.0;
         } else if (SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDirectBeam) {
-            if (std::abs(IncidentAngle) <= PiOvr2) {
+            if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2()) {
                 SurfaceScreens(ScNum).BmBmTrans = Tdirect + Tscattered;
                 SurfaceScreens(ScNum).BmBmTransVis = Tdirect + TscatteredVis;
                 SurfaceScreens(ScNum).BmBmTransBack = 0.0;
@@ -2161,7 +2152,7 @@ namespace DataHeatBalance {
             Tscattered = 0.0;
             TscatteredVis = 0.0;
         } else if (SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDiffuse) {
-            if (std::abs(IncidentAngle) <= PiOvr2) {
+            if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2()) {
                 SurfaceScreens(ScNum).BmBmTrans = Tdirect;
                 SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
                 SurfaceScreens(ScNum).BmBmTransBack = 0.0;
@@ -2172,7 +2163,7 @@ namespace DataHeatBalance {
             }
         }
 
-        if (std::abs(IncidentAngle) <= PiOvr2) {
+        if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2()) {
             SurfaceScreens(ScNum).BmDifTrans = Tscattered;
             SurfaceScreens(ScNum).BmDifTransVis = TscatteredVis;
             SurfaceScreens(ScNum).BmDifTransBack = 0.0;

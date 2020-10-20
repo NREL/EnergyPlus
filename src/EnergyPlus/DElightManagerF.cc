@@ -53,7 +53,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -228,8 +227,8 @@ namespace DElightManagerF {
         print(delightInFile, Format_902, cNameWOBlanks, Latitude, Longitude, Elevation * M2FT, BuildingAzimuth, TimeZoneNumber);
 
         // Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
-        CosBldgRelNorth = std::cos(-BuildingAzimuth * DegToRadians);
-        SinBldgRelNorth = std::sin(-BuildingAzimuth * DegToRadians);
+        CosBldgRelNorth = std::cos(-BuildingAzimuth * DataGlobalConstants::DegToRadians());
+        SinBldgRelNorth = std::sin(-BuildingAzimuth * DataGlobalConstants::DegToRadians());
 
         // Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
         for (auto &znDayl : ZoneDaylight) {
@@ -298,8 +297,8 @@ namespace DElightManagerF {
                           znDayl.DElightGriddingResolution * M22FT2);
 
                     // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
-                    CosZoneRelNorth = std::cos(-zn.RelNorth * DegToRadians);
-                    SinZoneRelNorth = std::sin(-zn.RelNorth * DegToRadians);
+                    CosZoneRelNorth = std::cos(-zn.RelNorth * DataGlobalConstants::DegToRadians());
+                    SinZoneRelNorth = std::sin(-zn.RelNorth * DataGlobalConstants::DegToRadians());
 
                     // Zone Lighting Schedule Data Section
                     // NOTE: Schedules are not required since hourly values are retrieved from EnergyPlus as needed

@@ -99,7 +99,7 @@ namespace HeatBalanceAirManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitAirHeatBalance();
+    void InitAirHeatBalance(EnergyPlusData &state);
 
     void InitSimpleMixingConvectiveHeatGains();
 

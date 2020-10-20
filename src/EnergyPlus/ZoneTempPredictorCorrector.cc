@@ -52,12 +52,9 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -71,7 +68,6 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -124,7 +120,6 @@ namespace ZoneTempPredictorCorrector {
     //    "correct" step determines zone air temp with available HVAC
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace DataHeatBalance;
@@ -2386,7 +2381,6 @@ namespace ZoneTempPredictorCorrector {
         using OutputReportTabular::StrToReal;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2913,7 +2907,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataZoneTempPredictorCorrector->MyEnvrnFlag && BeginEnvrnFlag) {
+        if (state.dataZoneTempPredictorCorrector->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
             AIRRAT = 0.0;
             ZTM1 = 0.0;
             ZTM2 = 0.0;
@@ -2993,16 +2987,16 @@ namespace ZoneTempPredictorCorrector {
             state.dataZoneTempPredictorCorrector->MyEnvrnFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             state.dataZoneTempPredictorCorrector->MyEnvrnFlag = true;
         }
 
         // Do the Begin Day initializations
-        if (state.dataZoneTempPredictorCorrector->MyDayFlag && BeginDayFlag) {
+        if (state.dataZoneTempPredictorCorrector->MyDayFlag && state.dataGlobal->BeginDayFlag) {
             state.dataZoneTempPredictorCorrector->MyDayFlag = false;
         }
 
-        if (!BeginDayFlag) {
+        if (!state.dataGlobal->BeginDayFlag) {
             state.dataZoneTempPredictorCorrector->MyDayFlag = true;
         }
 
@@ -3570,7 +3564,7 @@ namespace ZoneTempPredictorCorrector {
 
             AIRRAT(ZoneNum) = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
                               PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) * PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) /
-                              (TimeStepSys * SecInHour);
+                              (TimeStepSys * DataGlobalConstants::SecInHour());
             AirCap = AIRRAT(ZoneNum);
             RAFNFrac = 0.0;
 
@@ -3614,7 +3608,7 @@ namespace ZoneTempPredictorCorrector {
                                   RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SysDepZoneLoadsLagged;
                     AirCap = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).AirVolume * Zone(ZoneNum).ZoneVolCapMultpSens *
                              RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).RhoAir *
-                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).CpAir / (TimeStepSys * SecInHour);
+                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).CpAir / (TimeStepSys * DataGlobalConstants::SecInHour());
                     AIRRAT(ZoneNum) = AirCap;
                     TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum));
                     state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
@@ -4008,7 +4002,7 @@ namespace ZoneTempPredictorCorrector {
                                             state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
                 if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
-                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
+                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
                     LoadToCoolingSetPoint = state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
                 ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToCoolingSetPoint;
@@ -4049,7 +4043,7 @@ namespace ZoneTempPredictorCorrector {
                 if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
                 if (RAFNFrac > 0.0) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
 
-                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
+                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
                     LoadToCoolingSetPoint = state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
 
@@ -4129,7 +4123,7 @@ namespace ZoneTempPredictorCorrector {
                 if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
                 if (RAFNFrac > 0.0) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
 
-                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
+                if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
                     LoadToCoolingSetPoint = state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
 
@@ -4509,7 +4503,7 @@ namespace ZoneTempPredictorCorrector {
             // to determine system added/subtracted moisture.
             LatentGain = ZoneLatentGain(ZoneNum) + SumLatentHTRadSys(ZoneNum) + SumLatentPool(ZoneNum);
 
-            SysTimeStepInSeconds = SecInHour * TimeStepSys;
+            SysTimeStepInSeconds = DataGlobalConstants::SecInHour() * TimeStepSys;
 
             // Calculate the coefficients for the 3rd Order derivative for final
             // zone humidity ratio.  The A, B, C coefficients are analogous to the heat balance.
@@ -4560,7 +4554,7 @@ namespace ZoneTempPredictorCorrector {
                 B = (RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntLatentGain / H2OHtOfVap) +
                     RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumLinkMW + RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARaW;
                 C = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).RhoAir * RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).AirVolume *
-                    Zone(ZoneNum).ZoneVolCapMultpMoist / (SecInHour * TimeStepSys);
+                    Zone(ZoneNum).ZoneVolCapMultpMoist / (DataGlobalConstants::SecInHour() * TimeStepSys);
             }
 
             // Use a 3rd Order derivative to predict zone moisture addition or removal and
@@ -4756,7 +4750,7 @@ namespace ZoneTempPredictorCorrector {
 
         // FLOW:
         // Initializations
-        ZoneTempChange = constant_zero;
+        ZoneTempChange = DataPrecisionGlobals::constant_zero;
 
         // Update zone temperatures
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
@@ -4883,7 +4877,7 @@ namespace ZoneTempPredictorCorrector {
 
             AIRRAT(ZoneNum) = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
                               PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName) *
-                              PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * SecInHour);
+                              PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour());
 
             AirCap = AIRRAT(ZoneNum);
 
@@ -5048,8 +5042,8 @@ namespace ZoneTempPredictorCorrector {
             // Determine sensible load heating/cooling rate and energy
             SNLoadHeatRate(ZoneNum) = max(SNLoad, 0.0);
             SNLoadCoolRate(ZoneNum) = std::abs(min(SNLoad, 0.0));
-            SNLoadHeatEnergy(ZoneNum) = max(SNLoad, 0.0) * TimeStepSys * SecInHour;
-            SNLoadCoolEnergy(ZoneNum) = std::abs(min(SNLoad, 0.0) * TimeStepSys * SecInHour);
+            SNLoadHeatEnergy(ZoneNum) = max(SNLoad, 0.0) * TimeStepSys * DataGlobalConstants::SecInHour();
+            SNLoadCoolEnergy(ZoneNum) = std::abs(min(SNLoad, 0.0) * TimeStepSys * DataGlobalConstants::SecInHour());
 
             // Final humidity calcs
             CorrectZoneHumRat(state, ZoneNum);
@@ -5495,7 +5489,7 @@ namespace ZoneTempPredictorCorrector {
             LatentGainExceptPeople = ZoneLatentGainExceptPeople(ZoneNum) + SumLatentHTRadSys(ZoneNum) + SumLatentPool(ZoneNum);
         }
 
-        SysTimeStepInSeconds = SecInHour * TimeStepSys;
+        SysTimeStepInSeconds = DataGlobalConstants::SecInHour() * TimeStepSys;
 
         // Calculate the coefficients for the 3rd order derivative for final
         // zone humidity ratio.  The A, B, C coefficients are analogous to the
@@ -5780,8 +5774,8 @@ namespace ZoneTempPredictorCorrector {
                 } else {
                     M_inf = (BB + CC * DD - ((11.0 / 6.0) * CC + AA) * Zone(ZoneNum).ZoneMeasuredTemperature) / (CpAir * delta_T);
                 }
-                ACH_inf = max(0.0, min(10.0, (M_inf / AirDensity) / Zone(ZoneNum).Volume * SecInHour));
-                M_inf = (ACH_inf / SecInHour) * Zone(ZoneNum).Volume * AirDensity;
+                ACH_inf = max(0.0, min(10.0, (M_inf / AirDensity) / Zone(ZoneNum).Volume * DataGlobalConstants::SecInHour()));
+                M_inf = (ACH_inf / DataGlobalConstants::SecInHour()) * Zone(ZoneNum).Volume * AirDensity;
 
                 // Overwrite variable with inverse solution
                 Zone(ZoneNum).MCPIHM = M_inf;
@@ -5826,7 +5820,7 @@ namespace ZoneTempPredictorCorrector {
                     MultpHM = AirCapHM /
                               (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                PsyCpAirFnW(ZoneAirHumRat(ZoneNum))) *
-                              (TimeStepZone * SecInHour);      // Inverse equation
+                              (TimeStepZone * DataGlobalConstants::SecInHour());      // Inverse equation
                     if ((MultpHM < 1.0) || (MultpHM > 30.0)) { // Temperature capacity multiplier greater than
                                                                // 1 and less than 30
                         MultpHM = 1.0;                         // Default value 1.0
@@ -5969,7 +5963,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 M_inf(0.0);
         Real64 ACH_inf(0.0);
         Real64 SysTimeStepInSeconds(0.0);
-        SysTimeStepInSeconds = SecInHour * TimeStepSys;
+        SysTimeStepInSeconds = DataGlobalConstants::SecInHour() * TimeStepSys;
 
         // Get measured zone humidity ratio
         Zone(ZoneNum).ZoneMeasuredHumidityRatio = GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneMeasuredHumidityRatioSchedulePtr);
@@ -6016,8 +6010,8 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 // Add threshold for air change rate
-                ACH_inf = max(0.0, min(10.0, (M_inf / AirDensity) / Zone(ZoneNum).Volume * SecInHour));
-                M_inf = (ACH_inf / SecInHour) * Zone(ZoneNum).Volume * AirDensity;
+                ACH_inf = max(0.0, min(10.0, (M_inf / AirDensity) / Zone(ZoneNum).Volume * DataGlobalConstants::SecInHour()));
+                M_inf = (ACH_inf / DataGlobalConstants::SecInHour()) * Zone(ZoneNum).Volume * AirDensity;
                 Zone(ZoneNum).MCPIHM = M_inf;
                 Zone(ZoneNum).InfilOAAirChangeRateHM = ACH_inf;
             }
@@ -6522,8 +6516,8 @@ namespace ZoneTempPredictorCorrector {
                     CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), ADUHeatAddRate);
                     AirDistUnit(ADUNum).HeatRate = max(0.0, ADUHeatAddRate);
                     AirDistUnit(ADUNum).CoolRate = std::abs(min(0.0, ADUHeatAddRate));
-                    AirDistUnit(ADUNum).HeatGain = AirDistUnit(ADUNum).HeatRate * TimeStepSys * SecInHour;
-                    AirDistUnit(ADUNum).CoolGain = AirDistUnit(ADUNum).CoolRate * TimeStepSys * SecInHour;
+                    AirDistUnit(ADUNum).HeatGain = AirDistUnit(ADUNum).HeatRate * TimeStepSys * DataGlobalConstants::SecInHour();
+                    AirDistUnit(ADUNum).CoolGain = AirDistUnit(ADUNum).CoolRate * TimeStepSys * DataGlobalConstants::SecInHour();
                 }
 
             } // NodeNum
@@ -6676,7 +6670,7 @@ namespace ZoneTempPredictorCorrector {
             auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
             if (SELECT_CASE_var == Use3rdOrder) {
                 CzdTdt = RhoAir * CpAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens * (MAT(ZoneNum) - ZTM1(ZoneNum)) /
-                         (TimeStepSys * SecInHour);
+                         (TimeStepSys * DataGlobalConstants::SecInHour());
                 // Exact solution
             } else if (SELECT_CASE_var == UseAnalyticalSolution) {
                 CzdTdt = TempIndCoef - TempDepCoef * MAT(ZoneNum);
@@ -6794,7 +6788,6 @@ namespace ZoneTempPredictorCorrector {
         bool isAnyZoneOscillatingDuringOccupancy;
         bool isAnyZoneOscillatingInDeadband;
 
-        using ThermalComfort::ThermalComfortInASH55;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
 
         // first time run allocate arrays and setup output variable
@@ -6870,8 +6863,8 @@ namespace ZoneTempPredictorCorrector {
                 if (isOscillate) {
                     state.dataZoneTempPredictorCorrector->ZoneTempOscillate(iZone) = TimeStepSys;
                     isAnyZoneOscillating = true;
-                    if (allocated(ThermalComfortInASH55)) {
-                        if (ThermalComfortInASH55(iZone).ZoneIsOccupied) {
+                    if (allocated(state.dataThermalComforts->ThermalComfortInASH55)) {
+                        if (state.dataThermalComforts->ThermalComfortInASH55(iZone).ZoneIsOccupied) {
                             state.dataZoneTempPredictorCorrector->ZoneTempOscillateDuringOccupancy(iZone) = TimeStepSys;
                             isAnyZoneOscillatingDuringOccupancy = true;
                         }
@@ -6971,7 +6964,7 @@ namespace ZoneTempPredictorCorrector {
         // FLOW:
         // adjust zone operative setpoint
         if (!(TempControlledZone(TempControlledZoneID).AdaptiveComfortTempControl)) return; // do nothing to setpoint
-        if ((state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != ksDesignDay) && (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != ksHVACSizeDesignDay)) {
+        if ((state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::HVACSizeDesignDay)) {
             // Adjust run period cooling set point
             switch (AdaptiveComfortModelTypeIndex) {
             case static_cast<int>(AdaptiveComfortModel::ASH55_CENTRAL):

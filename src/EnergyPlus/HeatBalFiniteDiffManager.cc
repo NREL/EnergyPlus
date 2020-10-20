@@ -53,7 +53,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
@@ -96,13 +95,9 @@ namespace HeatBalFiniteDiffManager {
     //    involving latent heat, Simulation, Vol 18, No. 2, February 1972
 
     // Using/Aliasing
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::DayOfSim;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::HourOfDay;
-    using DataGlobals::KelvinConv;
     using DataGlobals::NumOfTimeStepInHour;
-    using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZoneSec;
     using DataGlobals::WarmupFlag;
@@ -110,7 +105,7 @@ namespace HeatBalFiniteDiffManager {
     using DataEnvironment::IsRain;
     using DataEnvironment::SkyTemp;
     using DataHeatBalance::Air;
-    using DataHeatBalance::QRadThermInAbs;
+    using DataHeatBalance::SurfQRadThermInAbs;
     using DataHeatBalance::RegularMaterial;
     using DataHeatBalance::TotConstructs;
     using DataHeatBalance::TotMaterials;
@@ -124,17 +119,17 @@ namespace HeatBalFiniteDiffManager {
     using DataHeatBalFanSys::ZoneAirHumRat;
     using DataHeatBalSurface::MaxSurfaceTempLimit;
     using DataHeatBalSurface::MinSurfaceTempLimit;
-    using DataHeatBalSurface::NetLWRadToSurf;
-    using DataHeatBalSurface::OpaqSurfInsFaceConduction;
-    using DataHeatBalSurface::OpaqSurfInsFaceConductionFlux;
-    using DataHeatBalSurface::OpaqSurfOutsideFaceConduction;
-    using DataHeatBalSurface::OpaqSurfOutsideFaceConductionFlux;
+    using DataHeatBalSurface::SurfNetLWRadToSurf;
+    using DataHeatBalSurface::SurfOpaqInsFaceConduction;
+    using DataHeatBalSurface::SurfOpaqInsFaceConductionFlux;
+    using DataHeatBalSurface::SurfOpaqOutsideFaceConduction;
+    using DataHeatBalSurface::SurfOpaqOutsideFaceConductionFlux;
     using DataHeatBalSurface::QdotRadNetSurfInRep;
     using DataHeatBalSurface::QdotRadOutRepPerArea;
     using DataHeatBalSurface::QRadNetSurfInReport;
-    using DataHeatBalSurface::QRadSWInAbs;
-    using DataHeatBalSurface::QRadSWOutAbs;
-    using DataHeatBalSurface::QRadSWOutMvIns;
+    using DataHeatBalSurface::SurfOpaqQRadSWInAbs;
+    using DataHeatBalSurface::SurfOpaqQRadSWOutAbs;
+    using DataHeatBalSurface::SurfQRadSWOutMvIns;
     using DataHeatBalSurface::TempSource;
     using DataHeatBalSurface::TempUserLoc;
     using DataSurfaces::Ground;
@@ -533,7 +528,7 @@ namespace HeatBalFiniteDiffManager {
         ErrorsFound = false;
 
         // now do begin environment inits.
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
                 if (Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
@@ -579,7 +574,7 @@ namespace HeatBalFiniteDiffManager {
             WarmupSurfTemp = 0;
             MyEnvrnFlag = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag = true;
         }
 
@@ -669,8 +664,8 @@ namespace HeatBalFiniteDiffManager {
         // And then initialize
         QHeatInFlux = 0.0;
         QHeatOutFlux = 0.0;
-        OpaqSurfInsFaceConductionFlux = 0.0;
-        OpaqSurfOutsideFaceConductionFlux = 0.0;
+        SurfOpaqInsFaceConductionFlux = 0.0;
+        SurfOpaqOutsideFaceConductionFlux = 0.0;
 
         // Setup Output Variables
 
@@ -679,7 +674,7 @@ namespace HeatBalFiniteDiffManager {
         fracTimeStepZone_Hour = 1.0 / double(NumOfTimeStepInHour);
 
         for (index = 1; index <= 20; ++index) {
-            Delt = (fracTimeStepZone_Hour * SecInHour) / index; // TimeStepZone = Zone time step in fractional hours
+            Delt = (fracTimeStepZone_Hour * DataGlobalConstants::SecInHour()) / index; // TimeStepZone = Zone time step in fractional hours
             if (Delt <= 200) break;
         }
 
@@ -1214,7 +1209,6 @@ namespace HeatBalFiniteDiffManager {
         using General::ScanForReports;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool DoReport;
@@ -1269,7 +1263,7 @@ namespace HeatBalFiniteDiffManager {
                       ThisNum,
                       state.dataConstruction->Construct(ThisNum).TotLayers,
                       int(ConstructFD(ThisNum).TotNodes + 1),
-                      ConstructFD(ThisNum).DeltaTime / SecInHour);
+                      ConstructFD(ThisNum).DeltaTime / DataGlobalConstants::SecInHour());
 
                 for (Layer = 1; Layer <= state.dataConstruction->Construct(ThisNum).TotLayers; ++Layer) {
                     static constexpr auto Format_701(" Material CondFD Summary,{},{:.4R},{},{:.8R},{:.8R},{:.8R}\n");
@@ -1442,8 +1436,8 @@ namespace HeatBalFiniteDiffManager {
             Tsky = OSCM(surface.OSCMPtr).TRad;
             QRadSWOutFD = 0.0; // eliminate incident shortwave on underlying surface
         } else {               // Set the external conditions to local variables
-            QRadSWOutFD = QRadSWOutAbs(Surf);
-            QRadSWOutMvInsulFD = QRadSWOutMvIns(Surf);
+            QRadSWOutFD = SurfOpaqQRadSWOutAbs(Surf);
+            QRadSWOutMvInsulFD = SurfQRadSWOutMvIns(Surf);
             Tsky = SkyTemp;
         }
 
@@ -1514,10 +1508,10 @@ namespace HeatBalFiniteDiffManager {
                 SurfaceFD(Surf).CpDelXRhoS2(i) = surfaceFDEBC.CpDelXRhoS1(TotNodesPlusOne); // Save this for computing node flux values
             }
 
-            Real64 const QNetSurfFromOutside(OpaqSurfInsFaceConductionFlux(surface_ExtBoundCond)); // filled in InteriorBCEqns
+            Real64 const QNetSurfFromOutside(SurfOpaqInsFaceConductionFlux(surface_ExtBoundCond)); // filled in InteriorBCEqns
             //    QFluxOutsideToOutSurf(Surf)       = QnetSurfFromOutside
-            OpaqSurfOutsideFaceConductionFlux(Surf) = -QNetSurfFromOutside;
-            OpaqSurfOutsideFaceConduction(Surf) = surface.Area * OpaqSurfOutsideFaceConductionFlux(Surf);
+            SurfOpaqOutsideFaceConductionFlux(Surf) = -QNetSurfFromOutside;
+            SurfOpaqOutsideFaceConduction(Surf) = surface.Area * SurfOpaqOutsideFaceConductionFlux(Surf);
             QHeatOutFlux(Surf) = QNetSurfFromOutside;
 
         } else if (surface_ExtBoundCond <= 0) { // regular outside conditions
@@ -1657,8 +1651,8 @@ namespace HeatBalFiniteDiffManager {
             Real64 const QNetSurfFromOutside(QRadSWOutFD + (hgnd * (-TDT_i + Tgnd) + (hconvo + hrad) * Toa_TDT_i + hsky * (-TDT_i + Tsky)));
 
             // Same sign convention as CTFs
-            OpaqSurfOutsideFaceConductionFlux(Surf) = -QNetSurfFromOutside;
-            OpaqSurfOutsideFaceConduction(Surf) = surface.Area * OpaqSurfOutsideFaceConductionFlux(Surf);
+            SurfOpaqOutsideFaceConductionFlux(Surf) = -QNetSurfFromOutside;
+            SurfOpaqOutsideFaceConduction(Surf) = surface.Area * SurfOpaqOutsideFaceConductionFlux(Surf);
 
             // Report all outside BC heat fluxes
             QdotRadOutRepPerArea(Surf) = -(hgnd * (TDT_i - Tgnd) + hrad * (-Toa_TDT_i) + hsky * (TDT_i - Tsky));
@@ -2103,8 +2097,8 @@ namespace HeatBalFiniteDiffManager {
         int const ConstrNum(surface.Construction);
 
         // Set the internal conditions to local variables
-        Real64 const NetLWRadToSurfFD(NetLWRadToSurf(Surf)); // Net interior long wavelength radiation to surface from other surfaces
-        Real64 const QRadSWInFD(QRadSWInAbs(Surf));          // Short wave radiation absorbed on inside of opaque surface
+        Real64 const NetLWRadToSurfFD(SurfNetLWRadToSurf(Surf)); // Net interior long wavelength radiation to surface from other surfaces
+        Real64 const QRadSWInFD(SurfOpaqQRadSWInAbs(Surf));          // Short wave radiation absorbed on inside of opaque surface
         Real64 const QHtRadSysSurfFD(
             QHTRadSysSurf(Surf)); // Current radiant heat flux at a surface due to the presence of high temperature radiant heaters
         Real64 const QHWBaseboardSurfFD(
@@ -2115,7 +2109,7 @@ namespace HeatBalFiniteDiffManager {
             QElecBaseboardSurf(Surf)); // Current radiant heat flux at a surface due to the presence of electric baseboard heaters
         Real64 const QCoolingPanelSurfFD(
             QCoolingPanelSurf(Surf));                     // Current radiant heat flux at a surface due to the presence of simple cooling panels
-        Real64 const QRadThermInFD(QRadThermInAbs(Surf)); // Thermal radiation absorbed on inside surfaces
+        Real64 const QRadThermInFD(SurfQRadThermInAbs(Surf)); // Thermal radiation absorbed on inside surfaces
 
         // Boundary Conditions from Simulation for Interior
         Real64 hconvi(HConvInFD(Surf));
@@ -2225,9 +2219,9 @@ namespace HeatBalFiniteDiffManager {
 
         Real64 const QNetSurfInside(-(QFac + hconvi * (-TDT_i + Tia)));
         //  Pass inside conduction Flux [W/m2] to DataHeatBalanceSurface array
-        OpaqSurfInsFaceConductionFlux(Surf) = QNetSurfInside;
+        SurfOpaqInsFaceConductionFlux(Surf) = QNetSurfInside;
         //  QFluxZoneToInSurf(Surf) = QNetSurfInside
-        OpaqSurfInsFaceConduction(Surf) = QNetSurfInside * surface.Area; // for reporting as in CTF, PT
+        SurfOpaqInsFaceConduction(Surf) = QNetSurfInside * surface.Area; // for reporting as in CTF, PT
     }
 
     void CheckFDSurfaceTempLimits(int const SurfNum,            // surface number
@@ -2375,7 +2369,7 @@ namespace HeatBalFiniteDiffManager {
         // so the arrays are all allocated to Totodes+1
 
         // Heat flux at the inside face node (TotNodes+1)
-        surfaceFD.QDreport(TotNodes + 1) = OpaqSurfInsFaceConductionFlux(Surf);
+        surfaceFD.QDreport(TotNodes + 1) = SurfOpaqInsFaceConductionFlux(Surf);
 
         // Heat flux for remaining nodes.
         for (node = TotNodes; node >= 1; --node) {

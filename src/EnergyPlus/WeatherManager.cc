@@ -56,7 +56,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/time.hh>
 
@@ -82,6 +81,7 @@
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -145,7 +145,7 @@ namespace WeatherManager {
         // Cannot call this during sizing, because EMS will not initialize properly until after simulation kickoff
         if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
             EMSManager::ManageEMS(
-                state, DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+                state, EMSManager::EMSCallFrom::BeginZoneTimestepBeforeSetCurrentWeather, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
         }
         SetCurrentWeather(state);
 
@@ -286,9 +286,9 @@ namespace WeatherManager {
         if (DataEnvironment::varyingOrientationSchedIndex > 0) {
             DataHeatBalance::BuildingAzimuth = mod(ScheduleManager::GetCurrentScheduleValue(DataEnvironment::varyingOrientationSchedIndex), 360.0);
             SurfaceGeometry::CosBldgRelNorth =
-                std::cos(-(DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG) * DataGlobals::DegToRadians);
+                std::cos(-(DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians());
             SurfaceGeometry::SinBldgRelNorth =
-                std::sin(-(DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG) * DataGlobals::DegToRadians);
+                std::sin(-(DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians());
             for (size_t SurfNum = 1; SurfNum < DataSurfaces::Surface.size(); ++SurfNum) {
                 for (int n = 1; n <= DataSurfaces::Surface(SurfNum).Sides; ++n) {
                     Real64 Xb = DataSurfaces::Surface(SurfNum).Vertex(n).x;
@@ -312,8 +312,8 @@ namespace WeatherManager {
                                                  DataSurfaces::Surface(SurfNum).GrossArea,
                                                  DataSurfaces::Surface(SurfNum).NewellSurfaceNormalVector);
                 DataSurfaces::Surface(SurfNum).Azimuth = SurfWorldAz;
-                DataSurfaces::Surface(SurfNum).SinAzim = std::sin(SurfWorldAz * DataGlobals::DegToRadians);
-                DataSurfaces::Surface(SurfNum).CosAzim = std::cos(SurfWorldAz * DataGlobals::DegToRadians);
+                DataSurfaces::Surface(SurfNum).SinAzim = std::sin(SurfWorldAz * DataGlobalConstants::DegToRadians());
+                DataSurfaces::Surface(SurfNum).CosAzim = std::cos(SurfWorldAz * DataGlobalConstants::DegToRadians());
                 DataSurfaces::Surface(SurfNum).OutNormVec = DataSurfaces::Surface(SurfNum).NewellSurfaceNormalVector;
             }
         }
@@ -368,7 +368,7 @@ namespace WeatherManager {
         int DSTActEnMon;
         int DSTActEnDay;
 
-        if (DataGlobals::BeginSimFlag && state.dataWeatherManager->GetEnvironmentFirstCall) {
+        if (state.dataGlobal->BeginSimFlag && state.dataWeatherManager->GetEnvironmentFirstCall) {
 
             DataReportingFlags::PrintEndDataDictionary = true;
 
@@ -546,8 +546,8 @@ namespace WeatherManager {
             if ( state.dataWeatherManager->NumOfEnvrn > 0) {
                 ResolveLocationInformation(state, ErrorsFound); // Obtain weather related info from input file
                 CheckLocationValidity();
-                if ((state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn != DataGlobals::ksDesignDay) &&
-                    (state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn != DataGlobals::ksHVACSizeDesignDay)) {
+                if ((state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay) &&
+                    (state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::HVACSizeDesignDay)) {
                     CheckWeatherFileValidity(state);
                 }
                 if (ErrorsFound) {
@@ -580,7 +580,7 @@ namespace WeatherManager {
             DataEnvironment::MaxNumberSimYears = 1;
             for (int i = 1; i <= state.dataWeatherManager->NumOfEnvrn; ++i) {
                 DataEnvironment::TotalOverallSimDays += state.dataWeatherManager->Environment(i).TotalDays;
-                if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobals::ksRunPeriodWeather) {
+                if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                     DataEnvironment::MaxNumberSimYears = max(DataEnvironment::MaxNumberSimYears, state.dataWeatherManager->Environment(i).NumSimYears);
                 }
             }
@@ -595,16 +595,16 @@ namespace WeatherManager {
             state.dataWeatherManager->Envrn = 0;
             DataEnvironment::CurEnvirNum = 0;
         } else {
-            DataGlobals::KindOfSim = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn;
+            state.dataGlobal->KindOfSim = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn;
             DataEnvironment::DayOfYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartJDay;
             DataEnvironment::DayOfMonth = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay;
-            DataGlobals::CalendarYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartYear;
-            DataGlobals::CalendarYearChr = std::to_string(DataGlobals::CalendarYear);
+            state.dataGlobal->CalendarYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartYear;
+            state.dataGlobal->CalendarYearChr = std::to_string(state.dataGlobal->CalendarYear);
             DataEnvironment::Month = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth;
             DataGlobals::NumOfDayInEnvrn = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TotalDays; // Set day loop maximum from DataGlobals
             if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
                 if (DataHeatBalance::AdaptiveComfortRequested_ASH55 || DataHeatBalance::AdaptiveComfortRequested_CEN15251) {
-                    if (DataGlobals::KindOfSim == DataGlobals::ksDesignDay) {
+                    if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) {
                         if (DataGlobals::DoDesDaySim) {
                             ShowWarningError(RoutineName + "Adaptive Comfort being reported during design day.");
                             Real64 GrossApproxAvgDryBulb =
@@ -628,17 +628,17 @@ namespace WeatherManager {
                 OpenEPlusWeatherFile(state, ErrorsFound, false);
             }
             Available = true;
-            if ((DataGlobals::KindOfSim == DataGlobals::ksRunPeriodWeather) && (!state.dataWeatherManager->WeatherFileExists && DataGlobals::DoWeathSim)) {
+            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && (!state.dataWeatherManager->WeatherFileExists && DataGlobals::DoWeathSim)) {
                 if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
                     ShowSevereError("Weather Simulation requested, but no weather file attached.");
                     ErrorsFound = true;
                 }
                 if (!DataGlobals::DoingHVACSizingSimulations)  state.dataWeatherManager->Envrn = 0;
                 Available = false;
-            } else if ((DataGlobals::KindOfSim == DataGlobals::ksRunPeriodWeather) && (!state.dataWeatherManager->WeatherFileExists && !DataGlobals::DoWeathSim)) {
+            } else if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && (!state.dataWeatherManager->WeatherFileExists && !DataGlobals::DoWeathSim)) {
                 Available = false;
                 if (!DataGlobals::DoingHVACSizingSimulations)  state.dataWeatherManager->Envrn = 0;
-            } else if ((DataGlobals::KindOfSim == DataGlobals::ksRunPeriodWeather) && DataGlobals::DoingSizing) {
+            } else if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && DataGlobals::DoingSizing) {
                 Available = false;
                  state.dataWeatherManager->Envrn = 0;
             }
@@ -647,8 +647,8 @@ namespace WeatherManager {
                 DataEnvironment::EnvironmentName = state.dataWeatherManager->Environment( state.dataWeatherManager->Envrn).Title;
                 DataEnvironment::CurEnvirNum =  state.dataWeatherManager->Envrn;
                 DataEnvironment::RunPeriodStartDayOfWeek = 0;
-                if ((DataGlobals::DoDesDaySim && (DataGlobals::KindOfSim != DataGlobals::ksRunPeriodWeather)) ||
-                    ((DataGlobals::KindOfSim == DataGlobals::ksRunPeriodWeather) && DataGlobals::DoWeathSim)) {
+                if ((DataGlobals::DoDesDaySim && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) ||
+                    ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && DataGlobals::DoWeathSim)) {
                     if (state.dataWeatherManager->PrntEnvHeaders && DataReportingFlags::DoWeatherInitReporting) {
                         static constexpr auto EnvironFormat(
                             "! <Environment>,Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration {#days}, "
@@ -661,9 +661,9 @@ namespace WeatherManager {
                         state.dataWeatherManager->PrntEnvHeaders = false;
                     }
 
-                    if ((DataGlobals::KindOfSim == DataGlobals::ksRunPeriodWeather) || (DataGlobals::KindOfSim == DataGlobals::ksRunPeriodDesign)) {
+                    if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) || (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodDesign)) {
                         std::string kindOfRunPeriod = state.dataWeatherManager->Environment( state.dataWeatherManager->Envrn).cKindOfEnvrn;
-                        DataEnvironment::RunPeriodEnvironment = DataGlobals::KindOfSim == DataGlobals::ksRunPeriodWeather;
+                        DataEnvironment::RunPeriodEnvironment = state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather;
                         Array1D_int ActEndDayOfMonth(12);
                         ActEndDayOfMonth = state.dataWeatherManager->EndDayOfMonth;
                         DataEnvironment::CurrentYearIsLeapYear = state.dataWeatherManager->Environment( state.dataWeatherManager->Envrn).IsLeapYear;
@@ -771,7 +771,7 @@ namespace WeatherManager {
                         // Following builds Environment start/end for ASHRAE 55 warnings
                         StDate = format(DateFormat, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay);
                         EnDate = format(DateFormat, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndMonth, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndDay);
-                        if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobals::ksRunPeriodWeather) {
+                        if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                             StDate += "/" + General::RoundSigDigits(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartYear);
                             EnDate += "/" + General::RoundSigDigits(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear);
                         }
@@ -805,7 +805,7 @@ namespace WeatherManager {
                         }
 
                         if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
-                            if ((DataGlobals::KindOfSim == DataGlobals::ksRunPeriodWeather && DataGlobals::DoWeathSim)) {
+                            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && DataGlobals::DoWeathSim)) {
                                 if (DataHeatBalance::AdaptiveComfortRequested_ASH55 || DataHeatBalance::AdaptiveComfortRequested_CEN15251) {
                                     if (state.dataWeatherManager->WFAllowsLeapYears) {
                                         ShowSevereError(RoutineName +
@@ -937,8 +937,8 @@ namespace WeatherManager {
                             }
                         }
 
-                    } else if (DataGlobals::KindOfSim == DataGlobals::ksDesignDay ||
-                               DataGlobals::KindOfSim == DataGlobals::ksHVACSizeDesignDay) { // Design Day
+                    } else if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay ||
+                               state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay) { // Design Day
                         DataEnvironment::RunPeriodEnvironment = false;
                         StDate = format(
                             DateFormat, state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).Month, state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).DayOfMonth);
@@ -1001,18 +1001,18 @@ namespace WeatherManager {
         int OrigNumOfEnvrn{ state.dataWeatherManager->NumOfEnvrn};
 
         for (int i = 1; i <= OrigNumOfEnvrn; ++i) {
-            if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobals::ksDesignDay) {
+            if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::DesignDay) {
                 state.dataWeatherManager->Environment.redimension(++ state.dataWeatherManager->NumOfEnvrn);
                 state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn) = state.dataWeatherManager->Environment(i); // copy over seed data from current array element
                 state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).SeedEnvrnNum = i;
-                state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = DataGlobals::ksHVACSizeDesignDay;
+                state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
                 state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).Title = state.dataWeatherManager->Environment(i).Title + " HVAC Sizing Pass " + General::RoundSigDigits(HVACSizingIterCount);
                 state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).HVACSizingIterationNum = HVACSizingIterCount;
-            } else if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobals::ksRunPeriodDesign) {
+            } else if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
                 state.dataWeatherManager->Environment.redimension(++ state.dataWeatherManager->NumOfEnvrn);
                 state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn) = state.dataWeatherManager->Environment(i); // copy over seed data
                 state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).SeedEnvrnNum = i;
-                state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = DataGlobals::ksHVACSizeRunPeriodDesign;
+                state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign;
                 state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).Title = state.dataWeatherManager->Environment(i).Title + " HVAC Sizing Pass " + General::RoundSigDigits(HVACSizingIterCount);
                 state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).HVACSizingIterationNum = HVACSizingIterCount;
             }
@@ -1499,17 +1499,17 @@ namespace WeatherManager {
         // Most of the weather handling can be described as "initializations"
         // so most of the work is done via this subroutine.
 
-        if (DataGlobals::BeginSimFlag && state.dataWeatherManager->FirstCall) {
+        if (state.dataGlobal->BeginSimFlag && state.dataWeatherManager->FirstCall) {
 
             state.dataWeatherManager->FirstCall = false;
             DataEnvironment::EndMonthFlag = false;
 
         } // ... end of DataGlobals::BeginSimFlag IF-THEN block.
 
-        if (DataGlobals::BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
 
             // Call and setup the Design Day environment
-            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobals::ksRunPeriodWeather) {
+            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                 if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum > 0) {
                     SetUpDesignDay(state, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum);
                     DataEnvironment::EnvironmentName = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).Title;
@@ -1572,7 +1572,7 @@ namespace WeatherManager {
                 state.dataWeatherManager->SpecialDays(i).Used = false;
             }
 
-            if ((DataGlobals::KindOfSim != DataGlobals::ksDesignDay) && (DataGlobals::KindOfSim != DataGlobals::ksHVACSizeDesignDay)) {
+            if ((state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::DesignDay) && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::HVACSizeDesignDay)) {
                 ReadWeatherForDay(state, 1, state.dataWeatherManager->Envrn, false); // Read first day's weather
             } else {
                 state.dataWeatherManager->TomorrowVariables = state.dataWeatherManager->DesignDay(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum);
@@ -1580,7 +1580,7 @@ namespace WeatherManager {
 
         } // ... end of DataGlobals::BeginEnvrnFlag IF-THEN block.
 
-        if (DataGlobals::BeginDayFlag) {
+        if (state.dataGlobal->BeginDayFlag) {
 
             // Check Holidays, Daylight Saving Time, Ground Temperatures, etc.
 
@@ -1595,10 +1595,10 @@ namespace WeatherManager {
             // In a multi year simulation with run period less than 365, we need to position the weather line
             // appropriately.
 
-            if ((!DataGlobals::WarmupFlag) && ((state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobals::ksDesignDay) &&
-                                               (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobals::ksHVACSizeDesignDay))) {
-                if (DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) {
-                    if (DataGlobals::DayOfSim == state.dataWeatherManager->curSimDayForEndOfRunPeriod) {
+            if ((!DataGlobals::WarmupFlag) && ((state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay) &&
+                                               (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::HVACSizeDesignDay))) {
+                if (state.dataGlobal->DayOfSim < DataGlobals::NumOfDayInEnvrn) {
+                    if (state.dataGlobal->DayOfSim == state.dataWeatherManager->curSimDayForEndOfRunPeriod) {
                         state.dataWeatherManager->curSimDayForEndOfRunPeriod += state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RawSimDays;
                         if (state.dataWeatherManager->StartDatesCycleShouldBeReset) {
                             ResetWeekDaysByMonth(state, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay,
@@ -1616,7 +1616,7 @@ namespace WeatherManager {
                         ++state.dataWeatherManager->YearOfSim;
                         ReadWeatherForDay(state, 1, state.dataWeatherManager->Envrn, false); // Read tomorrow's weather
                     } else {
-                        ReadWeatherForDay(state, DataGlobals::DayOfSim + 1, state.dataWeatherManager->Envrn, false); // Read tomorrow's weather
+                        ReadWeatherForDay(state, state.dataGlobal->DayOfSim + 1, state.dataWeatherManager->Envrn, false); // Read tomorrow's weather
                     }
                 }
             }
@@ -1634,7 +1634,7 @@ namespace WeatherManager {
             DataEnvironment::HolidayIndexTomorrow = state.dataWeatherManager->TomorrowVariables.HolidayIndex;
             DataEnvironment::YearTomorrow = state.dataWeatherManager->TomorrowVariables.Year;
 
-            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobals::ksRunPeriodWeather) {
+            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                 if (DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 1 && state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).ActualWeather) {
                     if (state.dataWeatherManager->DatesShouldBeReset) {
                         if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TreatYearsAsConsecutive) {
@@ -1654,7 +1654,7 @@ namespace WeatherManager {
                             int JDay5Start = General::OrdinalDay(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay, state.dataWeatherManager->LeapYearAdd);
                             int JDay5End = General::OrdinalDay(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndMonth, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndDay, state.dataWeatherManager->LeapYearAdd);
                             if (!state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).ActualWeather)
-                                state.dataWeatherManager->curSimDayForEndOfRunPeriod = DataGlobals::DayOfSim + state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RawSimDays + state.dataWeatherManager->LeapYearAdd - 1;
+                                state.dataWeatherManager->curSimDayForEndOfRunPeriod = state.dataGlobal->DayOfSim + state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RawSimDays + state.dataWeatherManager->LeapYearAdd - 1;
 
                             {
                                 int i = JDay5Start;
@@ -1686,7 +1686,7 @@ namespace WeatherManager {
                         state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).IsLeapYear = isLeapYear(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).CurrentYear);
                         DataEnvironment::CurrentYearIsLeapYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).IsLeapYear;
                         if (DataEnvironment::CurrentYearIsLeapYear && !state.dataWeatherManager->WFAllowsLeapYears) DataEnvironment::CurrentYearIsLeapYear = false;
-                        if (DataGlobals::DayOfSim < state.dataWeatherManager->curSimDayForEndOfRunPeriod && DataEnvironment::CurrentYearIsLeapYear)
+                        if (state.dataGlobal->DayOfSim < state.dataWeatherManager->curSimDayForEndOfRunPeriod && DataEnvironment::CurrentYearIsLeapYear)
                             ++state.dataWeatherManager->curSimDayForEndOfRunPeriod;
                     }
                     if (DataEnvironment::CurrentYearIsLeapYear) {
@@ -1699,7 +1699,7 @@ namespace WeatherManager {
                         state.dataWeatherManager->LeapYearAdd = 0;
                     }
 
-                    if (DataGlobals::DayOfSim < state.dataWeatherManager->curSimDayForEndOfRunPeriod) {
+                    if (state.dataGlobal->DayOfSim < state.dataWeatherManager->curSimDayForEndOfRunPeriod) {
                         ResetWeekDaysByMonth(state, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay,
                                              state.dataWeatherManager->LeapYearAdd,
                                              state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth,
@@ -1717,30 +1717,30 @@ namespace WeatherManager {
             }
         } // ... end of DataGlobals::BeginDayFlag IF-THEN block.
 
-        if (!DataGlobals::BeginDayFlag && !DataGlobals::WarmupFlag &&
+        if (!state.dataGlobal->BeginDayFlag && !DataGlobals::WarmupFlag &&
             (DataEnvironment::Month != state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth || DataEnvironment::DayOfMonth != state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay) &&
-            !state.dataWeatherManager->DatesShouldBeReset && state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobals::ksRunPeriodWeather) {
+            !state.dataWeatherManager->DatesShouldBeReset && state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
             state.dataWeatherManager->DatesShouldBeReset = true;
         }
 
-        if (DataGlobals::EndEnvrnFlag && (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobals::ksDesignDay) &&
-            (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobals::ksHVACSizeDesignDay)) {
+        if (state.dataGlobal->EndEnvrnFlag && (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay) &&
+            (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::HVACSizeDesignDay)) {
             state.files.inputWeatherFile.rewind();
             SkipEPlusWFHeader(state);
             ReportMissing_RangeData(state);
         }
 
-        // set the DataGlobals::EndDesignDayEnvrnsFlag (dataGlobal)
+        // set the state.dataGlobal->EndDesignDayEnvrnsFlag (dataGlobal)
         // True at the end of the last design day environment (last time step of last hour of last day of environ which is a design day)
-        DataGlobals::EndDesignDayEnvrnsFlag = false;
-        if (DataGlobals::EndEnvrnFlag) {
+        state.dataGlobal->EndDesignDayEnvrnsFlag = false;
+        if (state.dataGlobal->EndEnvrnFlag) {
             if (state.dataWeatherManager->Envrn <  state.dataWeatherManager->NumOfEnvrn) {
                 if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn + 1).KindOfEnvrn) {
-                    DataGlobals::EndDesignDayEnvrnsFlag = true;
+                    state.dataGlobal->EndDesignDayEnvrnsFlag = true;
                 }
             } else {
                 // if the last environment set the flag to true.
-                DataGlobals::EndDesignDayEnvrnsFlag = true;
+                state.dataGlobal->EndDesignDayEnvrnsFlag = true;
             }
         }
 
@@ -1776,7 +1776,7 @@ namespace WeatherManager {
 
         state.dataWeatherManager->TodayVariables = state.dataWeatherManager->TomorrowVariables; // Transfer Tomorrow's Daily Weather Variables to Today
 
-        if (DataGlobals::BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             DataGlobals::PreviousHour = 24;
         }
 
@@ -1870,18 +1870,18 @@ namespace WeatherManager {
         DataEnvironment::CurMnDy = day_stamp;
 
         char day_year_stamp[11];
-        std::sprintf(day_year_stamp, "%02d/%02d/%04d", DataEnvironment::Month, DataEnvironment::DayOfMonth, DataGlobals::CalendarYear);
+        std::sprintf(day_year_stamp, "%02d/%02d/%04d", DataEnvironment::Month, DataEnvironment::DayOfMonth, state.dataGlobal->CalendarYear);
         DataEnvironment::CurMnDyYr = day_year_stamp;
 
         DataGlobals::WeightNow = state.dataWeatherManager->Interpolation(DataGlobals::TimeStep);
         DataGlobals::WeightPreviousHour = 1.0 - DataGlobals::WeightNow;
 
         DataGlobals::CurrentTime = (DataGlobals::HourOfDay - 1) + DataGlobals::TimeStep * (state.dataWeatherManager->TimeStepFraction);
-        DataGlobals::SimTimeSteps = (DataGlobals::DayOfSim - 1) * 24 * DataGlobals::NumOfTimeStepInHour +
+        DataGlobals::SimTimeSteps = (state.dataGlobal->DayOfSim - 1) * 24 * DataGlobals::NumOfTimeStepInHour +
                                     (DataGlobals::HourOfDay - 1) * DataGlobals::NumOfTimeStepInHour + DataGlobals::TimeStep;
 
         DataEnvironment::GroundTemp = state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
-        DataEnvironment::GroundTempKelvin = DataEnvironment::GroundTemp + DataGlobals::KelvinConv;
+        DataEnvironment::GroundTempKelvin = DataEnvironment::GroundTemp + DataGlobalConstants::KelvinConv();
         DataEnvironment::GroundTempFC = state.dataWeatherManager->siteFCFactorMethodGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
         DataEnvironment::GroundTemp_Surface = state.dataWeatherManager->siteShallowGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
         DataEnvironment::GroundTemp_Deep = state.dataWeatherManager->siteDeepGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
@@ -1924,7 +1924,7 @@ namespace WeatherManager {
             DataEnvironment::OutDewPointTemp = DataEnvironment::OutWetBulbTemp;
         }
 
-        if ((DataGlobals::KindOfSim == DataGlobals::ksDesignDay) || (DataGlobals::KindOfSim == DataGlobals::ksHVACSizeDesignDay)) {
+        if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) || (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay)) {
             state.dataWeatherManager->SPSiteDryBulbRangeModScheduleValue = -999.0;   // N/A Drybulb Temperature Range Modifier Schedule Value
             state.dataWeatherManager->SPSiteHumidityConditionScheduleValue = -999.0; // N/A Humidity Condition Schedule Value
             state.dataWeatherManager->SPSiteBeamSolarScheduleValue = -999.0;         // N/A Beam Solar Schedule Value
@@ -1963,7 +1963,7 @@ namespace WeatherManager {
         if (DataEnvironment::EMSWindDirOverrideOn) DataEnvironment::WindDir = DataEnvironment::EMSWindDirOverrideValue;
         state.dataWeatherManager->HorizIRSky = state.dataWeatherManager->TodayHorizIRSky(DataGlobals::TimeStep, DataGlobals::HourOfDay);
         DataEnvironment::SkyTemp = state.dataWeatherManager->TodaySkyTemp(DataGlobals::TimeStep, DataGlobals::HourOfDay);
-        DataEnvironment::SkyTempKelvin = DataEnvironment::SkyTemp + DataGlobals::KelvinConv;
+        DataEnvironment::SkyTempKelvin = DataEnvironment::SkyTemp + DataGlobalConstants::KelvinConv();
         DataEnvironment::DifSolarRad = state.dataWeatherManager->TodayDifSolarRad(DataGlobals::TimeStep, DataGlobals::HourOfDay);
         if (DataEnvironment::EMSDifSolarRadOverrideOn) DataEnvironment::DifSolarRad = DataEnvironment::EMSDifSolarRadOverrideValue;
         DataEnvironment::BeamSolarRad = state.dataWeatherManager->TodayBeamSolarRad(DataGlobals::TimeStep, DataGlobals::HourOfDay);
@@ -2055,11 +2055,6 @@ namespace WeatherManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reads the appropriate day of EPW weather data.
-
-        static ObjexxFCL::gio::Fmt const fmtA("(A)");
-        static std::string const fmtLD("*");
-        static ObjexxFCL::gio::Fmt const YMDHFmt("(I4.4,2('/',I2.2),1X,I2.2,':',I2.2)");
-        static ObjexxFCL::gio::Fmt const YMDHFmt1("(I4.4,2('/',I2.2),1X,'hour=',I2.2,' - expected hour=',I2.2)");
 
         int WYear;
         int WMonth;
@@ -2355,7 +2350,7 @@ namespace WeatherManager {
                     for (int i = 2; i <= state.dataWeatherManager->NumIntervalsPerHour; ++i) {
                         WeatherDataLine.update(state.files.inputWeatherFile.readLine());
                         if (!WeatherDataLine.good) {
-                            ObjexxFCL::gio::read(WeatherDataLine.data, fmtLD) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
+                            readList(WeatherDataLine.data, WYear, WMonth, WDay, WHour, WMinute);
                             ShowFatalError(format("Error occurred on EPW while searching for first day, stopped at {}/{}/{} {}:{} IO Error='{}'",
                                                   WYear,
                                                   WMonth,
@@ -2369,7 +2364,7 @@ namespace WeatherManager {
                     for (int i = 1; i <= 23 * state.dataWeatherManager->NumIntervalsPerHour; ++i) {
                         WeatherDataLine.update(state.files.inputWeatherFile.readLine());
                         if (!WeatherDataLine.good) {
-                            ObjexxFCL::gio::read(WeatherDataLine.data, fmtLD) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
+                            readList(WeatherDataLine.data, WYear, WMonth, WDay, WHour, WMinute);
                             ShowFatalError(format("Error occurred on EPW while searching for first day, stopped at {}/{}/{} {}:{} IO Error='{}'",
                                                   WYear,
                                                   WMonth,
@@ -2384,7 +2379,7 @@ namespace WeatherManager {
             }
 
             // Positioned to proper day
-            if (!DataGlobals::KickOffSimulation && !DataGlobals::DoingSizing && state.dataWeatherManager->Environment(Environ).KindOfEnvrn == DataGlobals::ksRunPeriodWeather) {
+            if (!DataGlobals::KickOffSimulation && !DataGlobals::DoingSizing && state.dataWeatherManager->Environment(Environ).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                 ++state.dataWeatherManager->Environment(Environ).CurrentCycle;
                 if (!state.dataWeatherManager->Environment(Environ).RollDayTypeOnRepeat) {
                     SetDayOfWeekInitialValues(state.dataWeatherManager->Environment(Environ).DayOfWeek, state.dataWeatherManager->CurDayOfWeek);
@@ -2992,12 +2987,12 @@ namespace WeatherManager {
             ESky = 0.618 + 0.056 * pow(PartialPress, 0.5);
         } else if (ESkyCalcType == EmissivityCalcType::IdsoModel) {
             double const PartialPress = RelHum * Psychrometrics::PsyPsatFnTemp(DryBulb) * 0.01;
-            ESky = 0.685 + 0.000032 * PartialPress * exp(1699 / (DryBulb + DataGlobals::KelvinConv));
+            ESky = 0.685 + 0.000032 * PartialPress * exp(1699 / (DryBulb + DataGlobalConstants::KelvinConv()));
         } else if (ESkyCalcType == EmissivityCalcType::BerdahlMartinModel) {
             double const TDewC = min(DryBulb, DewPoint);
             ESky = 0.758 + 0.521 * (TDewC / 100) + 0.625 * pow_2(TDewC / 100);
         } else {
-            ESky = 0.787 + 0.764 * std::log((min(DryBulb, DewPoint) + DataGlobals::KelvinConv) / DataGlobals::KelvinConv);
+            ESky = 0.787 + 0.764 * std::log((min(DryBulb, DewPoint) + DataGlobalConstants::KelvinConv()) / DataGlobalConstants::KelvinConv());
         }
         ESky = ESky * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
         return ESky;
@@ -3093,7 +3088,6 @@ namespace WeatherManager {
         EP_SIZE_CHECK(WCodesArr, 9); // NOLINT(misc-static-assert)
 
         static std::string const ValidDigits("0123456789");
-        static std::string const fmtLD("*");
         static std::string const fmt9I1("(9I1)");
 
         std::string::size_type Pos;
@@ -3108,9 +3102,9 @@ namespace WeatherManager {
             Real64 RDay;
             Real64 RHour;
             Real64 RMinute;
-            IOFlags flags;
-            ObjexxFCL::gio::read(Line, fmtLD, flags) >> RYear >> RMonth >> RDay >> RHour >> RMinute;
-            if (flags.err()) {
+
+            const bool succeeded = readList(Line, RYear, RMonth, RDay, RHour, RMinute);
+            if (!succeeded) {
                 ShowSevereError("Invalid Date info in Weather Line");
                 ShowContinueError("Entire Data Line=" + SaveLine);
                 ShowFatalError("Error in Reading Weather Data");
@@ -3167,11 +3161,30 @@ namespace WeatherManager {
         // Now read more numerics with List Directed I/O (note there is another "character" field lurking)
         Real64 RField21;
         {
-            IOFlags flags;
-            ObjexxFCL::gio::read(Line, fmtLD, flags) >> DryBulb >> DewPoint >> RelHum >> AtmPress >> ETHoriz >> ETDirect >> IRHoriz >> GLBHoriz >>
-                DirectRad >> DiffuseRad >> GLBHorizIllum >> DirectNrmIllum >> DiffuseHorizIllum >> ZenLum >> WindDir >> WindSpeed >> TotalSkyCover >>
-                OpaqueSkyCover >> Visibility >> CeilHeight >> RField21;
-            if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+            const bool succeeded = readList(Line,
+                                            DryBulb,
+                                            DewPoint,
+                                            RelHum,
+                                            AtmPress,
+                                            ETHoriz,
+                                            ETDirect,
+                                            IRHoriz,
+                                            GLBHoriz,
+                                            DirectRad,
+                                            DiffuseRad,
+                                            GLBHorizIllum,
+                                            DirectNrmIllum,
+                                            DiffuseHorizIllum,
+                                            ZenLum,
+                                            WindDir,
+                                            WindSpeed,
+                                            TotalSkyCover,
+                                            OpaqueSkyCover,
+                                            Visibility,
+                                            CeilHeight,
+                                            RField21);
+
+            if (!succeeded) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
         }
         for (int i = 1; i <= 21; ++i) {
             Pos = index(Line, ',');
@@ -3188,10 +3201,8 @@ namespace WeatherManager {
         Pos = index(Line, ',');
         if (Pos != std::string::npos) {
             if (Pos != 0) {
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> PrecipWater;
-                    if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                if (!readItem(Line.substr(0, Pos), PrecipWater)) {
+                    ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                 }
             } else {
                 PrecipWater = 999.0;
@@ -3200,10 +3211,8 @@ namespace WeatherManager {
             Pos = index(Line, ',');
             if (Pos != std::string::npos) {
                 if (Pos != 0) {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> AerosolOptDepth;
-                        if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                    if (!readItem(Line.substr(0, Pos), AerosolOptDepth)) {
+                        ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                     }
                 } else {
                     AerosolOptDepth = 999.0;
@@ -3212,10 +3221,8 @@ namespace WeatherManager {
                 Pos = index(Line, ',');
                 if (Pos != std::string::npos) {
                     if (Pos != 0) {
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> SnowDepth;
-                            if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                        if (!readItem(Line.substr(0, Pos), SnowDepth)) {
+                            ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                         }
                     } else {
                         SnowDepth = 999.0;
@@ -3224,10 +3231,8 @@ namespace WeatherManager {
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
                         if (Pos != 0) {
-                            {
-                                IOFlags flags;
-                                ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> DaysSinceLastSnow;
-                                if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                            if (!readItem(Line.substr(0, Pos), DaysSinceLastSnow)) {
+                                ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                             }
                         } else {
                             DaysSinceLastSnow = 999.0;
@@ -3236,10 +3241,8 @@ namespace WeatherManager {
                         Pos = index(Line, ',');
                         if (Pos != std::string::npos) {
                             if (Pos != 0) {
-                                {
-                                    IOFlags flags;
-                                    ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> Albedo;
-                                    if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                                if (!readItem(Line.substr(0, Pos), Albedo)) {
+                                    ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                                 }
                             } else {
                                 Albedo = 999.0;
@@ -3248,10 +3251,8 @@ namespace WeatherManager {
                             Pos = index(Line, ',');
                             if (Pos != std::string::npos) {
                                 if (Pos != 0) {
-                                    {
-                                        IOFlags flags;
-                                        ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> LiquidPrecip;
-                                        if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                                    if (!readItem(Line.substr(0, Pos), LiquidPrecip)) {
+                                        ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                                     }
                                 } else {
                                     LiquidPrecip = 999.0;
@@ -3266,29 +3267,23 @@ namespace WeatherManager {
                             LiquidPrecip = 999.0;
                         }
                     } else {
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(Line, fmtLD, flags) >> DaysSinceLastSnow;
-                            if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                        if (!readItem(Line, DaysSinceLastSnow)) {
+                            ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                         }
                         Albedo = 999.0;
                         LiquidPrecip = 999.0;
                     }
                 } else {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(Line, fmtLD, flags) >> SnowDepth;
-                        if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                    if (!readItem(Line, SnowDepth)) {
+                        ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                     }
                     DaysSinceLastSnow = 999.0;
                     Albedo = 999.0;
                     LiquidPrecip = 999.0;
                 }
             } else {
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(Line, fmtLD, flags) >> AerosolOptDepth;
-                    if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                if (!readItem(Line, AerosolOptDepth)) {
+                    ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                 }
                 SnowDepth = 999.0;
                 DaysSinceLastSnow = 999.0;
@@ -3296,10 +3291,8 @@ namespace WeatherManager {
                 LiquidPrecip = 999.0;
             }
         } else {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(Line, fmtLD, flags) >> PrecipWater;
-                if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+            if (!readItem(Line, PrecipWater)) {
+                ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
             }
             AerosolOptDepth = 999.0;
             SnowDepth = 999.0;
@@ -3326,7 +3319,18 @@ namespace WeatherManager {
                 for (Pos = 0; Pos < 9; ++Pos) {
                     if (!has(ValidDigits, PresWeathCodes[Pos])) PresWeathCodes[Pos] = '9';
                 }
-                ObjexxFCL::gio::read(PresWeathCodes, fmt9I1) >> WCodesArr;
+
+                // we are trying to read a string of 9 integers with no spaces, each
+                // into its own integer, like:
+                // "123456789"
+                // becomes
+                // std::vector<int>{1,2,3,4,5,6,7,8,9};
+                auto reader = stringReader(PresWeathCodes);
+                for (auto &value : WCodesArr) {
+                    char c[2]{}; // a string of 2 characters, init both to 0
+                    reader >> c[0]; // read next char into the first byte
+                    value = std::atoi(c); // convert this short string into the appropriate int to read
+                }
             } else {
                 ++state.dataWeatherManager->Missed.WeathCodes;
                 WCodesArr = 9;
@@ -3394,7 +3398,7 @@ namespace WeatherManager {
         date_and_time(_, _, _, Date0);
         int CurrentYear = Date0(1);
 
-        if (DataGlobals::BeginSimFlag) {
+        if (state.dataGlobal->BeginSimFlag) {
             state.dataWeatherManager->PrintDDHeader = true;
         }
 
@@ -3517,7 +3521,7 @@ namespace WeatherManager {
             print(state.files.eio, "{:.4R},", C);
             print(state.files.eio, "{:.1R},", AVSC);
             print(state.files.eio, "{:.2R},", state.dataWeatherManager->DesignDay(EnvrnNum).EquationOfTime * 60.0);
-            print(state.files.eio, "{:.1R},", std::asin(state.dataWeatherManager->DesignDay(EnvrnNum).SinSolarDeclinAngle) / DataGlobals::DegToRadians);
+            print(state.files.eio, "{:.1R},", std::asin(state.dataWeatherManager->DesignDay(EnvrnNum).SinSolarDeclinAngle) / DataGlobalConstants::DegToRadians());
 
             if (state.dataWeatherManager->DesDayInput(EnvrnNum).SolarModel == DesignDaySolarModel::ASHRAE_ClearSky) {
                 StringOut = "ASHRAEClearSky";
@@ -3673,7 +3677,7 @@ namespace WeatherManager {
                 double RelHum = state.dataWeatherManager->TomorrowOutRelHum(ts, hour) * 0.01;
                 Real64 ESky = CalcSkyEmissivity(state,
                     state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel, OSky, DryBulb, state.dataWeatherManager->TomorrowOutDewPointTemp(ts, hour), RelHum); // Emissivitity of Sky
-                state.dataWeatherManager->TomorrowHorizIRSky(ts, hour) = ESky * state.dataWeatherManager->Sigma * pow_4(DryBulb + DataGlobals::KelvinConv);
+                state.dataWeatherManager->TomorrowHorizIRSky(ts, hour) = ESky * state.dataWeatherManager->Sigma * pow_4(DryBulb + DataGlobalConstants::KelvinConv());
 
                 if (state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::BruntModel ||
                     state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::IdsoModel ||
@@ -3681,7 +3685,7 @@ namespace WeatherManager {
                     state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
                     state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
                     // Design day not scheduled
-                    state.dataWeatherManager->TomorrowSkyTemp(ts, hour) = (DryBulb + DataGlobals::KelvinConv) * root_4(ESky) - DataGlobals::KelvinConv;
+                    state.dataWeatherManager->TomorrowSkyTemp(ts, hour) = (DryBulb + DataGlobalConstants::KelvinConv()) * root_4(ESky) - DataGlobalConstants::KelvinConv();
                 }
                 // Generate solar values for timestep
                 //    working results = BeamRad and DiffRad
@@ -3874,7 +3878,7 @@ namespace WeatherManager {
             AirMass = 1.0;
         } else {
             // note: COS( Zen) = SIN( Alt)
-            SunAltD = std::asin(CosZen) / DataGlobals::DegToRadians; // altitude, degrees
+            SunAltD = std::asin(CosZen) / DataGlobalConstants::DegToRadians(); // altitude, degrees
             AirMass = 1.0 / (CosZen + 0.50572 * std::pow(6.07995 + SunAltD, -1.6364));
         }
         return AirMass;
@@ -4053,7 +4057,7 @@ namespace WeatherManager {
         // coefficients a, b, and c.
         // See SUN3 in SolarShading. See SUN2 in BLAST.  See SUN3 in Tarp.
 
-        Real64 const DayCorrection(DataGlobals::Pi * 2.0 / 366.0);
+        Real64 const DayCorrection(DataGlobalConstants::Pi() * 2.0 / 366.0);
 
         // Fitted coefficients of Fourier series | Sine of declination coefficients
         static Array1D<Real64> const SineSolDeclCoef(
@@ -4104,7 +4108,7 @@ namespace WeatherManager {
 
         if (DataEnvironment::Latitude < 0.0) {
             // If in southern hemisphere, compute B and C with a six month time shift.
-            X -= DataGlobals::Pi;
+            X -= DataGlobalConstants::Pi();
             SinX = std::sin(X);
             CosX = std::cos(X);
         }
@@ -4146,7 +4150,7 @@ namespace WeatherManager {
 
         // COMPUTE THE HOUR ANGLE
         Real64 H =
-            (15.0 * (12.0 - (TimeValue + EqOfTime)) + (DataEnvironment::TimeZoneMeridian - DataEnvironment::Longitude)) * DataGlobals::DegToRadians;
+            (15.0 * (12.0 - (TimeValue + EqOfTime)) + (DataEnvironment::TimeZoneMeridian - DataEnvironment::Longitude)) * DataGlobalConstants::DegToRadians();
         Real64 COSH = std::cos(H);
         // COMPUTE THE COSINE OF THE SOLAR ZENITH ANGLE.
         // This is also the Sine of the Solar Altitude Angle
@@ -4188,7 +4192,7 @@ namespace WeatherManager {
              state.dataWeatherManager->HrAngle = (15.0 * (12.0 - ((DataGlobals::CurrentTime + DataEnvironment::TS1TimeOffset) + state.dataWeatherManager->TodayVariables.EquationOfTime)) +
                        (DataEnvironment::TimeZoneMeridian - DataEnvironment::Longitude));
         }
-        Real64 H =  state.dataWeatherManager->HrAngle * DataGlobals::DegToRadians;
+        Real64 H =  state.dataWeatherManager->HrAngle * DataGlobalConstants::DegToRadians();
 
         // Compute the Cosine of the Solar Zenith (Altitude) Angle.
         Real64 CosZenith = DataEnvironment::SinLatitude * state.dataWeatherManager->TodayVariables.SinSolarDeclinAngle +
@@ -4205,8 +4209,8 @@ namespace WeatherManager {
         CosAzimuth = min(1.0, CosAzimuth);
         Real64 SolarAzimuth = std::acos(CosAzimuth);
 
-         state.dataWeatherManager->SolarAltitudeAngle = SolarAltitude / DataGlobals::DegToRadians;
-        state.dataWeatherManager->SolarAzimuthAngle = SolarAzimuth / DataGlobals::DegToRadians;
+         state.dataWeatherManager->SolarAltitudeAngle = SolarAltitude / DataGlobalConstants::DegToRadians();
+        state.dataWeatherManager->SolarAzimuthAngle = SolarAzimuth / DataGlobalConstants::DegToRadians();
         if ( state.dataWeatherManager->HrAngle < 0.0) {
             state.dataWeatherManager->SolarAzimuthAngle = 360.0 - state.dataWeatherManager->SolarAzimuthAngle;
         }
@@ -4335,7 +4339,7 @@ namespace WeatherManager {
         // in this module.  At some point, this subroutine will be converted
         // to read information directly from the new input file.
 
-        if (state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn == DataGlobals::ksRunPeriodWeather && state.dataWeatherManager->WeatherFileExists) {
+        if (state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather && state.dataWeatherManager->WeatherFileExists) {
             if (state.dataWeatherManager->LocationGathered) {
                 // See if "matching" location
                 if (std::abs(DataEnvironment::Latitude - state.dataWeatherManager->WeatherFileLatitude) > 1.0 ||
@@ -4470,8 +4474,8 @@ namespace WeatherManager {
         } else {
             DataEnvironment::TimeZoneMeridian = DataEnvironment::TimeZoneNumber * 15.0 - 360.0;
         }
-        DataEnvironment::SinLatitude = std::sin(DataGlobals::DegToRadians * DataEnvironment::Latitude);
-        DataEnvironment::CosLatitude = std::cos(DataGlobals::DegToRadians * DataEnvironment::Latitude);
+        DataEnvironment::SinLatitude = std::sin(DataGlobalConstants::DegToRadians() * DataEnvironment::Latitude);
+        DataEnvironment::CosLatitude = std::cos(DataGlobalConstants::DegToRadians() * DataEnvironment::Latitude);
 
         if (DataEnvironment::Latitude == 0.0 && DataEnvironment::Longitude == 0.0 && DataEnvironment::TimeZoneNumber == 0.0) {
             ShowWarningError("Did you realize that you have Latitude=0.0, Longitude=0.0 and TimeZone=0.0?  Your building site is in the middle of "
@@ -4526,7 +4530,6 @@ namespace WeatherManager {
         // incremented.  Finally, the header information for the report must
         // be sent to the output file.
 
-        static ObjexxFCL::gio::Fmt const A("(a)");
         static std::string const EnvironmentString(",5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]");
         static std::string const TimeStepString(
             ",8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType");
@@ -4685,17 +4688,17 @@ namespace WeatherManager {
         // Set all Environments to DesignDay and then the weather environment will be set
         //  in the get annual run data subroutine
         for (int Env = 1; Env <= DataEnvironment::TotDesDays; ++Env) {
-            state.dataWeatherManager->Environment(Env).KindOfEnvrn = DataGlobals::ksDesignDay;
+            state.dataWeatherManager->Environment(Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::DesignDay;
         }
         for (int Env = 1; Env <= RPD1 + RPD2; ++Env) {
             if (!DataSystemVariables::DDOnly) {
-                state.dataWeatherManager->Environment(DataEnvironment::TotDesDays + Env).KindOfEnvrn = DataGlobals::ksRunPeriodDesign;
+                state.dataWeatherManager->Environment(DataEnvironment::TotDesDays + Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodDesign;
             } else {
-                state.dataWeatherManager->Environment(DataEnvironment::TotDesDays + Env).KindOfEnvrn = DataGlobals::ksRunPeriodWeather;
+                state.dataWeatherManager->Environment(DataEnvironment::TotDesDays + Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
             }
         }
         for (int Env = 1; Env <= state.dataWeatherManager->TotRunPers; ++Env) {
-            state.dataWeatherManager->Environment(DataEnvironment::TotDesDays + RPD1 + RPD2 + Env).KindOfEnvrn = DataGlobals::ksRunPeriodWeather;
+            state.dataWeatherManager->Environment(DataEnvironment::TotDesDays + RPD1 + RPD2 + Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
         }
 
         if (DataEnvironment::TotDesDays >= 1) {
@@ -5107,7 +5110,7 @@ namespace WeatherManager {
         if (nRunPeriods == 0 && DataSystemVariables::FullAnnualRun) {
             ShowWarningError("No Run Periods input but Full Annual Simulation selected.  Adding Run Period to 1/1 through 12/31.");
             state.dataWeatherManager->Environment.redimension(++ state.dataWeatherManager->NumOfEnvrn);
-            state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = DataGlobals::ksRunPeriodWeather;
+            state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
             nRunPeriods = 1;
             DataGlobals::WeathSimReq = true;
             state.dataWeatherManager->RunPeriodInput.allocate(nRunPeriods);
@@ -6443,7 +6446,7 @@ namespace WeatherManager {
             }
 
             state.dataWeatherManager->Environment(EnvrnNum).Title = state.dataWeatherManager->DesDayInput(EnvrnNum).Title;
-            state.dataWeatherManager->Environment(EnvrnNum).KindOfEnvrn = DataGlobals::ksDesignDay;
+            state.dataWeatherManager->Environment(EnvrnNum).KindOfEnvrn = DataGlobalConstants::KindOfSim::DesignDay;
             state.dataWeatherManager->Environment(EnvrnNum).DesignDayNum = EnvrnNum;
             state.dataWeatherManager->Environment(EnvrnNum).RunPeriodDesignNum = 0;
             state.dataWeatherManager->Environment(EnvrnNum).TotalDays = 1;
@@ -6574,7 +6577,7 @@ namespace WeatherManager {
             if (DataIPShortCuts::cAlphaArgs(1).empty()) {
                 Found = 0;
                 for (int j = 1; j <=  state.dataWeatherManager->NumOfEnvrn; ++j) {
-                    if (state.dataWeatherManager->Environment(j).KindOfEnvrn != DataGlobals::ksRunPeriodWeather) continue;
+                    if (state.dataWeatherManager->Environment(j).KindOfEnvrn != DataGlobalConstants::KindOfSim::RunPeriodWeather) continue;
                     if (state.dataWeatherManager->Environment(j).WP_Type1 != 0) {
                         ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
                                         "\", indicated Environment Name already assigned.");
@@ -6664,8 +6667,8 @@ namespace WeatherManager {
 
             if (state.dataWeatherManager->WPSkyTemperature(i).IsSchedule) {
                 state.dataWeatherManager->WPSkyTemperature(i).ScheduleName = DataIPShortCuts::cAlphaArgs(3);
-                if (state.dataWeatherManager->Environment(Found).KindOfEnvrn == DataGlobals::ksRunPeriodWeather ||
-                    state.dataWeatherManager->Environment(Found).KindOfEnvrn == DataGlobals::ksRunPeriodDesign) {
+                if (state.dataWeatherManager->Environment(Found).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather ||
+                    state.dataWeatherManager->Environment(Found).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
                     state.dataWeatherManager->WPSkyTemperature(i).ScheduleName = DataIPShortCuts::cAlphaArgs(3);
                     // See if it's a schedule.
                     Found = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(3));
@@ -6746,8 +6749,6 @@ namespace WeatherManager {
         // This file reads the Ground Temps from the input file and puts them
         //  in a new variable.
 
-        static ObjexxFCL::gio::Fmt const Format_720("(' ',A,12(', ',F6.2))");
-
         // Initialize Site:GroundTemperature:BuildingSurface object
         state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
         if (state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr) {
@@ -6785,8 +6786,6 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This file reads the Ground Reflectances from the input file (optional) and
         // places them in the monthly array.
-
-        static ObjexxFCL::gio::Fmt const Format_720("(' Site:GroundReflectance',12(', ',F5.2))");
 
         DataIPShortCuts::cCurrentModuleObject = "Site:GroundReflectance";
         int nObjs = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
@@ -6841,8 +6840,6 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This file reads the Snow Ground Reflectance Modifiers from the input file (optional) and
         // places them in the variables.
-
-        static ObjexxFCL::gio::Fmt const Format_721("(A,12(', ',F5.2))");
 
         DataIPShortCuts::cCurrentModuleObject = "Site:GroundReflectance:SnowModifier";
         int nObjs = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
@@ -7037,7 +7034,7 @@ namespace WeatherManager {
         // calculated water main temp (F)
         Real64 CurrentWaterMainsTemp =
             Tavg + Offset +
-            Ratio * (Tdiff / 2.0) * latitude_sign * std::sin((0.986 * (DataEnvironment::DayOfYear - 15.0 - Lag) - 90) * DataGlobals::DegToRadians);
+            Ratio * (Tdiff / 2.0) * latitude_sign * std::sin((0.986 * (DataEnvironment::DayOfYear - 15.0 - Lag) - 90) * DataGlobalConstants::DegToRadians());
 
         if (CurrentWaterMainsTemp < 32.0) CurrentWaterMainsTemp = 32.0;
 
@@ -7201,7 +7198,7 @@ namespace WeatherManager {
                                                       130471.0}); // Monthly exterrestrial direct normal illuminance (lum/m2)
 
         Real64 const SunZenith = std::acos(DataEnvironment::SOLCOS(3)); // Solar zenith angle (radians)
-        Real64 const SunAltitude = DataGlobals::PiOvr2 - SunZenith;     // Solar altitude angle (radians)
+        Real64 const SunAltitude = DataGlobalConstants::PiOvr2() - SunZenith;     // Solar altitude angle (radians)
         Real64 const SinSunAltitude = std::sin(SunAltitude);
         // Clearness of sky. SkyClearness close to 1.0 corresponds to an overcast sky.
         // SkyClearness > 6 is a clear sky.
@@ -7212,7 +7209,7 @@ namespace WeatherManager {
             ((DataEnvironment::DifSolarRad + DataEnvironment::BeamSolarRad) / (DataEnvironment::DifSolarRad + 0.0001) + Zeta) / (1.0 + Zeta);
         // Relative optical air mass
         Real64 const AirMass = (1.0 - 0.1 * DataEnvironment::Elevation / 1000.0) /
-                               (SinSunAltitude + 0.15 / std::pow(SunAltitude / DataGlobals::DegToRadians + 3.885, 1.253));
+                               (SinSunAltitude + 0.15 / std::pow(SunAltitude / DataGlobalConstants::DegToRadians() + 3.885, 1.253));
         // In the following, 93.73 is the extraterrestrial luminous efficacy
         DataEnvironment::SkyBrightness = (DataEnvironment::DifSolarRad * 93.73) * AirMass / ExtraDirNormIll(DataEnvironment::Month);
         int ISkyClearness; // Sky clearness bin
@@ -7315,8 +7312,6 @@ namespace WeatherManager {
         // METHODOLOGY EMPLOYED:
         // File is positioned to the correct line, then backspaced.  This routine
         // reads in the line and processes as appropriate.
-
-        static ObjexxFCL::gio::Fmt const fmtLD("*");
 
         WeatherManager::DateType dateType;
         int NumHdArgs;
@@ -8211,7 +8206,7 @@ namespace WeatherManager {
             env.UseHolidays = runPer.useHolidays;
             env.Title = runPer.title;
             env.cKindOfEnvrn = runPer.periodType;
-            env.KindOfEnvrn = DataGlobals::ksRunPeriodDesign;
+            env.KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodDesign;
             env.DesignDayNum = 0;
             env.RunPeriodDesignNum = i;
             env.DayOfWeek = runPer.dayOfWeek;
@@ -8295,11 +8290,11 @@ namespace WeatherManager {
             } else {
                 env.Title = runPer.title;
             }
-            if (env.KindOfEnvrn == DataGlobals::ksReadAllWeatherData) {
+            if (env.KindOfEnvrn == DataGlobalConstants::KindOfSim::ReadAllWeatherData) {
                 env.cKindOfEnvrn = "ReadAllWeatherDataRunPeriod";
             } else {
                 env.cKindOfEnvrn = "WeatherFileRunPeriod";
-                env.KindOfEnvrn = DataGlobals::ksRunPeriodWeather;
+                env.KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
             }
             env.DayOfWeek = runPer.dayOfWeek;
             env.MonWeekDay = runPer.monWeekDay;
@@ -8481,8 +8476,6 @@ namespace WeatherManager {
         // either weather (*.EPW) file or reads monthly daily average outdoor air
         // drybulb temperature from STAT (*.stat) for use to autosize main water
         // temperature.
-
-        static ObjexxFCL::gio::Fmt const fmtA("(A)");
 
         Real64 MonthlyDailyDryBulbMin(200.0);               // monthly-daily minimum outside air dry-bulb temperature
         Real64 MonthlyDailyDryBulbMax(-200.0);              // monthly-daily maximum outside air dry-bulb temperature
@@ -8684,13 +8677,13 @@ namespace WeatherManager {
         if (!state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
             // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
             ESky = CalcSkyEmissivity(state, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
-            HorizIRSky = ESky * state.dataWeatherManager->Sigma * pow_4(DryBulb + DataGlobals::KelvinConv);
+            HorizIRSky = ESky * state.dataWeatherManager->Sigma * pow_4(DryBulb + DataGlobalConstants::KelvinConv());
             if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BruntModel ||
                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::IdsoModel ||
                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
-                SkyTemp = (DryBulb + DataGlobals::KelvinConv) * root_4(ESky) - DataGlobals::KelvinConv;
+                SkyTemp = (DryBulb + DataGlobalConstants::KelvinConv()) * root_4(ESky) - DataGlobalConstants::KelvinConv();
             } else {
                 SkyTemp = 0.0; // dealt with later
             }
@@ -8703,7 +8696,7 @@ namespace WeatherManager {
                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
-                SkyTemp = root_4(IRHoriz / state.dataWeatherManager->Sigma) - DataGlobals::KelvinConv;
+                SkyTemp = root_4(IRHoriz / state.dataWeatherManager->Sigma) - DataGlobalConstants::KelvinConv();
             } else {
                 SkyTemp = 0.0; // dealt with later
             }

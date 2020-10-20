@@ -109,26 +109,12 @@ namespace SwimmingPool {
 
     static std::string const BlankString;
 
-    // MODULE VARIABLE DECLARATIONS:
-    int NumSwimmingPools(0); // Number of swimming pools
-    Array1D_bool CheckEquipName;
-    bool getSwimmingPoolInput = true;
-    Array1D<SwimmingPoolData> Pool;
-
-    void clear_state()
-    {
-        NumSwimmingPools = 0;
-        getSwimmingPoolInput = true;
-        CheckEquipName.deallocate();
-        Pool.deallocate();
-    }
-
     void SimSwimmingPool(EnergyPlusData &state, bool FirstHVACIteration)
     {
         // Process the input data if it hasn't been done already
-        if (getSwimmingPoolInput) {
+        if (state.dataSwimmingPools->getSwimmingPoolInput) {
             GetSwimmingPool(state);
-            getSwimmingPoolInput = false;
+            state.dataSwimmingPools->getSwimmingPoolInput = false;
         }
 
         // System wide (for all pools) inits
@@ -139,11 +125,11 @@ namespace SwimmingPool {
         Real64 CurLoad = 0.0;
         bool RunFlag = true;
 
-        for (auto &thisPool : Pool) {
+        for (auto &thisPool : state.dataSwimmingPools->Pool) {
             thisPool.simulate(state, A, FirstHVACIteration, CurLoad, RunFlag);
         }
 
-        if (NumSwimmingPools > 0) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
+        if (state.dataSwimmingPools->NumSwimmingPools > 0) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
         ReportSwimmingPool(state);
     }
@@ -215,15 +201,15 @@ namespace SwimmingPool {
         lNumericBlanks.allocate(MaxNumbers);
         lNumericBlanks = true;
 
-        NumSwimmingPools = inputProcessor->getNumObjectsFound("SwimmingPool:Indoor");
-        CheckEquipName.allocate(NumSwimmingPools);
-        CheckEquipName = true;
+        state.dataSwimmingPools->NumSwimmingPools = inputProcessor->getNumObjectsFound("SwimmingPool:Indoor");
+        state.dataSwimmingPools->CheckEquipName.allocate(state.dataSwimmingPools->NumSwimmingPools);
+        state.dataSwimmingPools->CheckEquipName = true;
 
-        Pool.allocate(NumSwimmingPools);
+        state.dataSwimmingPools->Pool.allocate(state.dataSwimmingPools->NumSwimmingPools);
 
         // Obtain all of the user data related to indoor swimming pools...
         CurrentModuleObject = "SwimmingPool:Indoor";
-        for (Item = 1; Item <= NumSwimmingPools; ++Item) {
+        for (Item = 1; Item <= state.dataSwimmingPools->NumSwimmingPools; ++Item) {
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -238,104 +224,104 @@ namespace SwimmingPool {
                                           cAlphaFields,
                                           cNumericFields);
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
-            Pool(Item).Name = Alphas(1);
+            state.dataSwimmingPools->Pool(Item).Name = Alphas(1);
 
-            Pool(Item).SurfaceName = Alphas(2);
-            Pool(Item).SurfacePtr = 0;
+            state.dataSwimmingPools->Pool(Item).SurfaceName = Alphas(2);
+            state.dataSwimmingPools->Pool(Item).SurfacePtr = 0;
             for (int SurfNum = 1; SurfNum <= DataSurfaces::TotSurfaces; ++SurfNum) {
-                if (UtilityRoutines::SameString(DataSurfaces::Surface(SurfNum).Name, Pool(Item).SurfaceName)) {
-                    Pool(Item).SurfacePtr = SurfNum;
+                if (UtilityRoutines::SameString(DataSurfaces::Surface(SurfNum).Name, state.dataSwimmingPools->Pool(Item).SurfaceName)) {
+                    state.dataSwimmingPools->Pool(Item).SurfacePtr = SurfNum;
                     break;
                 }
             }
 
-            Pool(Item).ErrorCheckSetupPoolSurface(state, Alphas(1),Alphas(2),cAlphaFields(2),ErrorsFound);
+            state.dataSwimmingPools->Pool(Item).ErrorCheckSetupPoolSurface(state, Alphas(1),Alphas(2),cAlphaFields(2),ErrorsFound);
 
-            Pool(Item).AvgDepth = Numbers(1);
-            if (Pool(Item).AvgDepth < MinDepth) {
+            state.dataSwimmingPools->Pool(Item).AvgDepth = Numbers(1);
+            if (state.dataSwimmingPools->Pool(Item).AvgDepth < MinDepth) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has an average depth that is too small.");
                 ShowContinueError("The pool average depth has been reset to the minimum allowed depth.");
-            } else if (Pool(Item).AvgDepth > MaxDepth) {
+            } else if (state.dataSwimmingPools->Pool(Item).AvgDepth > MaxDepth) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has an average depth that is too large.");
                 ShowContinueError("The pool depth must be less than the maximum average depth of 10 meters.");
                 ErrorsFound = true;
             }
 
-            Pool(Item).ActivityFactorSchedName = Alphas(3);
-            Pool(Item).ActivityFactorSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(3));
-            if ((Pool(Item).ActivityFactorSchedPtr == 0) && (!lAlphaBlanks(3))) {
+            state.dataSwimmingPools->Pool(Item).ActivityFactorSchedName = Alphas(3);
+            state.dataSwimmingPools->Pool(Item).ActivityFactorSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(3));
+            if ((state.dataSwimmingPools->Pool(Item).ActivityFactorSchedPtr == 0) && (!lAlphaBlanks(3))) {
                 ShowSevereError(cAlphaFields(3) + " not found: " + Alphas(3));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
 
-            Pool(Item).MakeupWaterSupplySchedName = Alphas(4);
-            Pool(Item).MakeupWaterSupplySchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(4));
-            if ((Pool(Item).MakeupWaterSupplySchedPtr == 0) && (!lAlphaBlanks(4))) {
+            state.dataSwimmingPools->Pool(Item).MakeupWaterSupplySchedName = Alphas(4);
+            state.dataSwimmingPools->Pool(Item).MakeupWaterSupplySchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(4));
+            if ((state.dataSwimmingPools->Pool(Item).MakeupWaterSupplySchedPtr == 0) && (!lAlphaBlanks(4))) {
                 ShowSevereError(cAlphaFields(4) + " not found: " + Alphas(4));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
 
-            Pool(Item).CoverSchedName = Alphas(5);
-            Pool(Item).CoverSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(5));
-            if ((Pool(Item).CoverSchedPtr == 0) && (!lAlphaBlanks(5))) {
+            state.dataSwimmingPools->Pool(Item).CoverSchedName = Alphas(5);
+            state.dataSwimmingPools->Pool(Item).CoverSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(5));
+            if ((state.dataSwimmingPools->Pool(Item).CoverSchedPtr == 0) && (!lAlphaBlanks(5))) {
                 ShowSevereError(cAlphaFields(5) + " not found: " + Alphas(5));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
 
-            Pool(Item).CoverEvapFactor = Numbers(2);
-            if (Pool(Item).CoverEvapFactor < MinCoverFactor) {
+            state.dataSwimmingPools->Pool(Item).CoverEvapFactor = Numbers(2);
+            if (state.dataSwimmingPools->Pool(Item).CoverEvapFactor < MinCoverFactor) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has an evaporation cover factor less than zero.");
                 ShowContinueError("The evaporation cover factor has been reset to zero.");
-                Pool(Item).CoverEvapFactor = MinCoverFactor;
-            } else if (Pool(Item).CoverEvapFactor > MaxCoverFactor) {
+                state.dataSwimmingPools->Pool(Item).CoverEvapFactor = MinCoverFactor;
+            } else if (state.dataSwimmingPools->Pool(Item).CoverEvapFactor > MaxCoverFactor) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has an evaporation cover factor greater than one.");
                 ShowContinueError("The evaporation cover factor has been reset to one.");
-                Pool(Item).CoverEvapFactor = MaxCoverFactor;
+                state.dataSwimmingPools->Pool(Item).CoverEvapFactor = MaxCoverFactor;
             }
 
-            Pool(Item).CoverConvFactor = Numbers(3);
-            if (Pool(Item).CoverConvFactor < MinCoverFactor) {
+            state.dataSwimmingPools->Pool(Item).CoverConvFactor = Numbers(3);
+            if (state.dataSwimmingPools->Pool(Item).CoverConvFactor < MinCoverFactor) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has a convection cover factor less than zero.");
                 ShowContinueError("The convection cover factor has been reset to zero.");
-                Pool(Item).CoverConvFactor = MinCoverFactor;
-            } else if (Pool(Item).CoverConvFactor > MaxCoverFactor) {
+                state.dataSwimmingPools->Pool(Item).CoverConvFactor = MinCoverFactor;
+            } else if (state.dataSwimmingPools->Pool(Item).CoverConvFactor > MaxCoverFactor) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has a convection cover factor greater than one.");
                 ShowContinueError("The convection cover factor has been reset to one.");
-                Pool(Item).CoverConvFactor = MaxCoverFactor;
+                state.dataSwimmingPools->Pool(Item).CoverConvFactor = MaxCoverFactor;
             }
 
-            Pool(Item).CoverSWRadFactor = Numbers(4);
-            if (Pool(Item).CoverSWRadFactor < MinCoverFactor) {
+            state.dataSwimmingPools->Pool(Item).CoverSWRadFactor = Numbers(4);
+            if (state.dataSwimmingPools->Pool(Item).CoverSWRadFactor < MinCoverFactor) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                  " has a short-wavelength radiation cover factor less than zero.");
                 ShowContinueError("The short-wavelength radiation cover factor has been reset to zero.");
-                Pool(Item).CoverSWRadFactor = MinCoverFactor;
-            } else if (Pool(Item).CoverSWRadFactor > MaxCoverFactor) {
+                state.dataSwimmingPools->Pool(Item).CoverSWRadFactor = MinCoverFactor;
+            } else if (state.dataSwimmingPools->Pool(Item).CoverSWRadFactor > MaxCoverFactor) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                  " has a short-wavelength radiation cover factor greater than one.");
                 ShowContinueError("The short-wavelength radiation cover factor has been reset to one.");
-                Pool(Item).CoverSWRadFactor = MaxCoverFactor;
+                state.dataSwimmingPools->Pool(Item).CoverSWRadFactor = MaxCoverFactor;
             }
 
-            Pool(Item).CoverLWRadFactor = Numbers(5);
-            if (Pool(Item).CoverLWRadFactor < MinCoverFactor) {
+            state.dataSwimmingPools->Pool(Item).CoverLWRadFactor = Numbers(5);
+            if (state.dataSwimmingPools->Pool(Item).CoverLWRadFactor < MinCoverFactor) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                  " has a long-wavelength radiation cover factor less than zero.");
                 ShowContinueError("The long-wavelength radiation cover factor has been reset to zero.");
-                Pool(Item).CoverLWRadFactor = MinCoverFactor;
-            } else if (Pool(Item).CoverLWRadFactor > MaxCoverFactor) {
+                state.dataSwimmingPools->Pool(Item).CoverLWRadFactor = MinCoverFactor;
+            } else if (state.dataSwimmingPools->Pool(Item).CoverLWRadFactor > MaxCoverFactor) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                  " has a long-wavelength radiation cover factor greater than one.");
                 ShowContinueError("The long-wavelength radiation cover factor has been reset to one.");
-                Pool(Item).CoverLWRadFactor = MaxCoverFactor;
+                state.dataSwimmingPools->Pool(Item).CoverLWRadFactor = MaxCoverFactor;
             }
 
-            Pool(Item).WaterInletNodeName = Alphas(6);
-            Pool(Item).WaterOutletNodeName = Alphas(7);
-            Pool(Item).WaterInletNode = NodeInputManager::GetOnlySingleNode(state, Alphas(6),
+            state.dataSwimmingPools->Pool(Item).WaterInletNodeName = Alphas(6);
+            state.dataSwimmingPools->Pool(Item).WaterOutletNodeName = Alphas(7);
+            state.dataSwimmingPools->Pool(Item).WaterInletNode = NodeInputManager::GetOnlySingleNode(state, Alphas(6),
                                                                             ErrorsFound,
                                                                             CurrentModuleObject,
                                                                             Alphas(1),
@@ -343,7 +329,7 @@ namespace SwimmingPool {
                                                                             DataLoopNode::NodeConnectionType_Inlet,
                                                                             1,
                                                                             DataLoopNode::ObjectIsNotParent);
-            Pool(Item).WaterOutletNode = NodeInputManager::GetOnlySingleNode(state, Alphas(7),
+            state.dataSwimmingPools->Pool(Item).WaterOutletNode = NodeInputManager::GetOnlySingleNode(state, Alphas(7),
                                                                              ErrorsFound,
                                                                              CurrentModuleObject,
                                                                              Alphas(1),
@@ -354,17 +340,17 @@ namespace SwimmingPool {
             if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
                 BranchNodeConnections::TestCompSet(CurrentModuleObject, Alphas(1), Alphas(6), Alphas(7), "Hot Water Nodes");
             }
-            Pool(Item).WaterVolFlowMax = Numbers(6);
-            Pool(Item).MiscPowerFactor = Numbers(7);
-            if (Pool(Item).MiscPowerFactor < MinPowerFactor) {
+            state.dataSwimmingPools->Pool(Item).WaterVolFlowMax = Numbers(6);
+            state.dataSwimmingPools->Pool(Item).MiscPowerFactor = Numbers(7);
+            if (state.dataSwimmingPools->Pool(Item).MiscPowerFactor < MinPowerFactor) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " has a miscellaneous power factor less than zero.");
                 ShowContinueError("The miscellaneous power factor has been reset to zero.");
-                Pool(Item).MiscPowerFactor = MinPowerFactor;
+                state.dataSwimmingPools->Pool(Item).MiscPowerFactor = MinPowerFactor;
             }
 
-            Pool(Item).SetPtTempSchedName = Alphas(8);
-            Pool(Item).SetPtTempSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(8));
-            if ((Pool(Item).SetPtTempSchedPtr == 0) && (!lAlphaBlanks(8))) {
+            state.dataSwimmingPools->Pool(Item).SetPtTempSchedName = Alphas(8);
+            state.dataSwimmingPools->Pool(Item).SetPtTempSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(8));
+            if ((state.dataSwimmingPools->Pool(Item).SetPtTempSchedPtr == 0) && (!lAlphaBlanks(8))) {
                 ShowSevereError(cAlphaFields(8) + " not found: " + Alphas(8));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
@@ -375,24 +361,24 @@ namespace SwimmingPool {
                 ErrorsFound = true;
             }
 
-            Pool(Item).MaxNumOfPeople = Numbers(8);
-            if (Pool(Item).MaxNumOfPeople < 0.0) {
+            state.dataSwimmingPools->Pool(Item).MaxNumOfPeople = Numbers(8);
+            if (state.dataSwimmingPools->Pool(Item).MaxNumOfPeople < 0.0) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " was entered with negative people.  This is not allowed.");
                 ShowContinueError("The number of people has been reset to zero.");
-                Pool(Item).MaxNumOfPeople = 0.0;
+                state.dataSwimmingPools->Pool(Item).MaxNumOfPeople = 0.0;
             }
 
-            Pool(Item).PeopleSchedName = Alphas(9);
-            Pool(Item).PeopleSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(9));
-            if ((Pool(Item).PeopleSchedPtr == 0) && (!lAlphaBlanks(9))) {
+            state.dataSwimmingPools->Pool(Item).PeopleSchedName = Alphas(9);
+            state.dataSwimmingPools->Pool(Item).PeopleSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(9));
+            if ((state.dataSwimmingPools->Pool(Item).PeopleSchedPtr == 0) && (!lAlphaBlanks(9))) {
                 ShowSevereError(cAlphaFields(9) + " not found: " + Alphas(9));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
 
-            Pool(Item).PeopleHeatGainSchedName = Alphas(10);
-            Pool(Item).PeopleHeatGainSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(10));
-            if ((Pool(Item).PeopleHeatGainSchedPtr == 0) && (!lAlphaBlanks(10))) {
+            state.dataSwimmingPools->Pool(Item).PeopleHeatGainSchedName = Alphas(10);
+            state.dataSwimmingPools->Pool(Item).PeopleHeatGainSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(10));
+            if ((state.dataSwimmingPools->Pool(Item).PeopleHeatGainSchedPtr == 0) && (!lAlphaBlanks(10))) {
                 ShowSevereError(cAlphaFields(10) + " not found: " + Alphas(10));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
@@ -505,7 +491,7 @@ namespace SwimmingPool {
 
         SwimmingPoolData::initSwimmingPoolPlantLoopIndex(state);
 
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlagGeneral) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlagGeneral) {
             this->ZeroSourceSumHATsurf = 0.0;
             this->QPoolSrcAvg = 0.0;
             this->HeatTransCoefsAvg = 0.0;
@@ -516,9 +502,9 @@ namespace SwimmingPool {
             this->MyEnvrnFlagGeneral = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlagGeneral = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlagGeneral = true;
 
-        if (DataGlobals::BeginEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag) {
             this->PoolWaterTemp = 23.0;
             this->HeatPower = 0.0;
             this->HeatEnergy = 0.0;
@@ -534,7 +520,7 @@ namespace SwimmingPool {
             initSwimmingPoolPlantNodeFlow(this->MyPlantScanFlagPool);
         }
 
-        if (DataGlobals::BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
+        if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
 
             int ZoneNum = this->ZonePtr;
             this->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
@@ -827,13 +813,13 @@ namespace SwimmingPool {
         // LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
         // to the air directly and added to the zone air heat balance
         Real64 LWsum =
-            (DataHeatBalance::QRadThermInAbs(SurfNum) + DataHeatBalSurface::NetLWRadToSurf(SurfNum) + DataHeatBalFanSys::QHTRadSysSurf(SurfNum) +
+            (DataHeatBalance::SurfQRadThermInAbs(SurfNum) + DataHeatBalSurface::SurfNetLWRadToSurf(SurfNum) + DataHeatBalFanSys::QHTRadSysSurf(SurfNum) +
              DataHeatBalFanSys::QHWBaseboardSurf(SurfNum) + DataHeatBalFanSys::QSteamBaseboardSurf(SurfNum) +
              DataHeatBalFanSys::QElecBaseboardSurf(SurfNum)); // summation of all long-wavelenth radiation going to surface
         Real64 LWtotal = this->CurCoverLWRadFac * LWsum;      // total flux from long-wavelength radiation to surface
-        Real64 SWtotal = this->CurCoverSWRadFac * DataHeatBalSurface::QRadSWInAbs(SurfNum); // total flux from short-wavelength radiation to surface
+        Real64 SWtotal = this->CurCoverSWRadFac * DataHeatBalSurface::SurfOpaqQRadSWInAbs(SurfNum); // total flux from short-wavelength radiation to surface
         this->RadConvertToConvect =
-            ((1.0 - this->CurCoverLWRadFac) * LWsum) + ((1.0 - this->CurCoverSWRadFac) * DataHeatBalSurface::QRadSWInAbs(SurfNum));
+            ((1.0 - this->CurCoverLWRadFac) * LWsum) + ((1.0 - this->CurCoverSWRadFac) * DataHeatBalSurface::SurfOpaqQRadSWInAbs(SurfNum));
 
         // Heat gain from people (assumed to be all convective to pool water)
         Real64 PeopleGain =
@@ -859,7 +845,7 @@ namespace SwimmingPool {
         // Now calculate the requested mass flow rate from the plant loop to achieve the proper pool temperature
         // old equation using surface heat balance form: MassFlowRate = CpDeltaTi * ( CondTerms + ConvTerm + SWtotal + LWtotal + PeopleGain +
         // PoolMassTerm + MUWTerm + EvapEnergyLossPerArea );
-        Real64 MassFlowRate = (this->WaterMass / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour)) *
+        Real64 MassFlowRate = (this->WaterMass / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour())) *
                               ((TInSurf - TH22) / (TLoopInletTemp - TInSurf)); // Target mass flow rate to achieve the proper setpoint temperature
         if (MassFlowRate > this->WaterMassFlowRateMax) {
             MassFlowRate = this->WaterMassFlowRateMax;
@@ -945,7 +931,7 @@ namespace SwimmingPool {
         if (WaterMassFlow > 0.0) DataLoopNode::Node(WaterOutletNode).Temp = this->PoolWaterTemp;
     }
 
-    void UpdatePoolSourceValAvg(bool &SwimmingPoolOn) // .TRUE. if the swimming pool "runs" this zone time step
+    void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRUE. if the swimming pool "runs" this zone time step
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -971,19 +957,19 @@ namespace SwimmingPool {
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
 
-        for (int PoolNum = 1; PoolNum <= NumSwimmingPools; ++PoolNum) {
-            if (!allocated(Pool(PoolNum).QPoolSrcAvg)) return;
+        for (int PoolNum = 1; PoolNum <= state.dataSwimmingPools->NumSwimmingPools; ++PoolNum) {
+            if (!allocated(state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg)) return;
 
             // If it was allocated, then we have to check to see if this was running at all
             for (SurfNum = 1; SurfNum <= DataSurfaces::TotSurfaces; ++SurfNum) {
-                if (Pool(PoolNum).QPoolSrcAvg(SurfNum) != 0.0) {
+                if (state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg(SurfNum) != 0.0) {
                     SwimmingPoolOn = true;
                     break; // DO loop
                 }
             }
 
-            DataHeatBalFanSys::QPoolSurfNumerator = Pool(PoolNum).QPoolSrcAvg;
-            DataHeatBalFanSys::PoolHeatTransCoefs = Pool(PoolNum).HeatTransCoefsAvg;
+            DataHeatBalFanSys::QPoolSurfNumerator = state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg;
+            DataHeatBalFanSys::PoolHeatTransCoefs = state.dataSwimmingPools->Pool(PoolNum).HeatTransCoefsAvg;
         }
 
         // For interzone surfaces, modQPoolSrcAvg was only updated for the "active" side.  The active side
@@ -1081,38 +1067,38 @@ namespace SwimmingPool {
         static std::string const RoutineName("ReportSwimmingPool");
         Real64 const MinDensity = 1.0; // to avoid a divide by zero
 
-        for (int PoolNum = 1; PoolNum <= NumSwimmingPools; ++PoolNum) {
+        for (int PoolNum = 1; PoolNum <= state.dataSwimmingPools->NumSwimmingPools; ++PoolNum) {
 
-            int SurfNum = Pool(PoolNum).SurfacePtr; // surface number index
+            int SurfNum = state.dataSwimmingPools->Pool(PoolNum).SurfacePtr; // surface number index
 
             // First transfer the surface inside temperature data to the current pool water temperature
-            Pool(PoolNum).PoolWaterTemp = DataHeatBalSurface::TH(2, 1, SurfNum);
+            state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp = DataHeatBalSurface::TH(2, 1, SurfNum);
 
             // Next calculate the amount of heating done by the plant loop
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-                state, "WATER", Pool(PoolNum).PoolWaterTemp, Pool(PoolNum).GlycolIndex, RoutineName); // specific heat of water
-            Pool(PoolNum).HeatPower = Pool(PoolNum).WaterMassFlowRate * Cp * (Pool(PoolNum).WaterInletTemp - Pool(PoolNum).PoolWaterTemp);
+                state, "WATER", state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp, state.dataSwimmingPools->Pool(PoolNum).GlycolIndex, RoutineName); // specific heat of water
+            state.dataSwimmingPools->Pool(PoolNum).HeatPower = state.dataSwimmingPools->Pool(PoolNum).WaterMassFlowRate * Cp * (state.dataSwimmingPools->Pool(PoolNum).WaterInletTemp - state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp);
 
             // Now the power consumption of miscellaneous equipment
             Real64 Density =
-                FluidProperties::GetDensityGlycol(state, "WATER", Pool(PoolNum).PoolWaterTemp, Pool(PoolNum).GlycolIndex, RoutineName); // density of water
+                FluidProperties::GetDensityGlycol(state, "WATER", state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp, state.dataSwimmingPools->Pool(PoolNum).GlycolIndex, RoutineName); // density of water
             if (Density > MinDensity) {
-                Pool(PoolNum).MiscEquipPower = Pool(PoolNum).MiscPowerFactor * Pool(PoolNum).WaterMassFlowRate / Density;
+                state.dataSwimmingPools->Pool(PoolNum).MiscEquipPower = state.dataSwimmingPools->Pool(PoolNum).MiscPowerFactor * state.dataSwimmingPools->Pool(PoolNum).WaterMassFlowRate / Density;
             } else {
-                Pool(PoolNum).MiscEquipPower = 0.0;
+                state.dataSwimmingPools->Pool(PoolNum).MiscEquipPower = 0.0;
             }
 
             // Also the radiant exchange converted to convection by the pool cover
-            Pool(PoolNum).RadConvertToConvectRep = Pool(PoolNum).RadConvertToConvect * DataSurfaces::Surface(SurfNum).Area;
+            state.dataSwimmingPools->Pool(PoolNum).RadConvertToConvectRep = state.dataSwimmingPools->Pool(PoolNum).RadConvertToConvect * DataSurfaces::Surface(SurfNum).Area;
 
             // Finally calculate the summed up report variables
-            Pool(PoolNum).MiscEquipEnergy = Pool(PoolNum).MiscEquipPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            Pool(PoolNum).HeatEnergy = Pool(PoolNum).HeatPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            Pool(PoolNum).MakeUpWaterMass = Pool(PoolNum).MakeUpWaterMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            Pool(PoolNum).EvapEnergyLoss = Pool(PoolNum).EvapHeatLossRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            state.dataSwimmingPools->Pool(PoolNum).MiscEquipEnergy = state.dataSwimmingPools->Pool(PoolNum).MiscEquipPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            state.dataSwimmingPools->Pool(PoolNum).HeatEnergy = state.dataSwimmingPools->Pool(PoolNum).HeatPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMass = state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            state.dataSwimmingPools->Pool(PoolNum).EvapEnergyLoss = state.dataSwimmingPools->Pool(PoolNum).EvapHeatLossRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
-            Pool(PoolNum).MakeUpWaterVolFlowRate = MakeUpWaterVolFlowFunct(Pool(PoolNum).MakeUpWaterMassFlowRate, Density);
-            Pool(PoolNum).MakeUpWaterVol = MakeUpWaterVolFunct(Pool(PoolNum).MakeUpWaterMass, Density);
+            state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterVolFlowRate = MakeUpWaterVolFlowFunct(state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMassFlowRate, Density);
+            state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterVol = MakeUpWaterVolFunct(state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMass, Density);
         }
     }
 

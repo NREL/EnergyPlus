@@ -1064,7 +1064,7 @@ TEST_F(EnergyPlusFixture, MixedAir_TestHXinOASystem)
     ASSERT_TRUE(process_idf(idf_objects));
 
     GetOASysInputFlag = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     int AirloopNum = 1;
     int OASysNum = 1;
     int OAControllerNum = 1;
@@ -1216,7 +1216,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
     ScheduleManager::UpdateScheduleValues(state);
 
     GetOASysInputFlag = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     int AirloopNum = 1;
     int OASysNum = 1;
     int HumNum(1);

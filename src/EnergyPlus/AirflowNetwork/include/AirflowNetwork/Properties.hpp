@@ -64,7 +64,7 @@
 
 #ifndef TOKELVIN
 #include "../../../DataGlobals.hh"
-#define TOKELVIN(T) (T + DataGlobals::KelvinConv)
+#define TOKELVIN(T) (T + DataGlobalConstants::KelvinConv())
 #else
 // Need a fallback
 #endif

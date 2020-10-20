@@ -1718,7 +1718,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
 
     bool ErrorsFound = false;
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
@@ -3292,7 +3292,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
 
     bool ErrorsFound = false;
 
-    DataGlobals::BeginSimFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();

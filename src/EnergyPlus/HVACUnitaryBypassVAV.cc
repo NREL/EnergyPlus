@@ -442,7 +442,7 @@ namespace HVACUnitaryBypassVAV {
             CBVAV(CBVAVNum).UnitType = CurrentModuleObject;
             CBVAV(CBVAVNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                CBVAV(CBVAVNum).SchedPtr = DataGlobals::ScheduleAlwaysOn;
+                CBVAV(CBVAVNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 CBVAV(CBVAVNum).SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
                 if (CBVAV(CBVAVNum).SchedPtr == 0) {
@@ -1487,7 +1487,7 @@ namespace HVACUnitaryBypassVAV {
                     if (CBVAV(CBVAVNum).MaxHeatCoilFluidFlow > 0.0) {
                         Real64 FluidDensity = FluidProperties::GetDensityGlycol(state,
                                                                                 DataPlant::PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidName,
-                                                                                DataGlobals::HWInitConvTemp,
+                                                                                DataGlobalConstants::HWInitConvTemp(),
                                                                                 DataPlant::PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidIndex,
                                                                                 RoutineName);
                         CBVAV(CBVAVNum).MaxHeatCoilFluidFlow =
@@ -1554,7 +1554,7 @@ namespace HVACUnitaryBypassVAV {
         }
 
         // Do the Begin Environment initializations
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag(CBVAVNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CBVAVNum)) {
             int MixerOutsideAirNode = CBVAV(CBVAVNum).MixerOutsideAirNode;
             Real64 RhoAir = DataEnvironment::StdRhoAir;
             // set the mass flow rates from the input volume flow rates
@@ -1597,7 +1597,7 @@ namespace HVACUnitaryBypassVAV {
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             Real64 FluidDensity = FluidProperties::GetDensityGlycol(state,
                                                                                     DataPlant::PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidName,
-                                                                                    DataGlobals::HWInitConvTemp,
+                                                                                    DataGlobalConstants::HWInitConvTemp(),
                                                                                     DataPlant::PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidIndex,
                                                                                     RoutineName);
                             CBVAV(CBVAVNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
@@ -1635,7 +1635,7 @@ namespace HVACUnitaryBypassVAV {
             } // end of IF(CBVAV(CBVAVNum)%CoilControlNode .GT. 0)THEN
         }     // end one time inits
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(CBVAVNum) = true;
         }
 
@@ -1748,7 +1748,7 @@ namespace HVACUnitaryBypassVAV {
 
         // Returns load only for zones requesting cooling (heating). If in deadband, Qzoneload = 0.
         if (FirstHVACIteration) CBVAV(CBVAVNum).modeChanged = false;
-        GetZoneLoads(CBVAVNum);
+        GetZoneLoads(state, CBVAVNum);
 
         if (CBVAV(CBVAVNum).OutAirSchPtr > 0) {
             OutsideAirMultiplier = ScheduleManager::GetCurrentScheduleValue(CBVAV(CBVAVNum).OutAirSchPtr);
@@ -3477,7 +3477,8 @@ namespace HVACUnitaryBypassVAV {
         }
     }
 
-    void GetZoneLoads(int const CBVAVNum // Index to CBVAV unit being simulated
+    void GetZoneLoads(EnergyPlusData &state,
+                      int const CBVAVNum // Index to CBVAV unit being simulated
     )
     {
 
@@ -3493,7 +3494,7 @@ namespace HVACUnitaryBypassVAV {
         int lastDayOfSim(0);   // used during warmup to reset changeOverTimer since need to do same thing next warmup day
         Real64 ZoneLoad = 0.0; // Total load in controlled zone [W]
 
-        int dayOfSim = DataGlobals::DayOfSim; // DayOfSim increments during Warmup when it actually simulates the same day
+        int dayOfSim = state.dataGlobal->DayOfSim; // DayOfSim increments during Warmup when it actually simulates the same day
         if (DataGlobals::WarmupFlag) {
             // when warmupday increments then reset timer
             if (lastDayOfSim != dayOfSim) CBVAV(CBVAVNum).changeOverTimer = -1.0; // reset to default (thisTime always > -1)
@@ -3966,7 +3967,7 @@ namespace HVACUnitaryBypassVAV {
         // PURPOSE OF THIS SUBROUTINE:
         // Fills some of the report variables for the changeover-bypass VAV system
 
-        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
         CBVAV(CBVAVNum).TotCoolEnergy = CBVAV(CBVAVNum).TotCoolEnergyRate * ReportingConstant;
         CBVAV(CBVAVNum).TotHeatEnergy = CBVAV(CBVAVNum).TotHeatEnergyRate * ReportingConstant;

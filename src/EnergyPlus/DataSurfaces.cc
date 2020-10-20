@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -92,7 +91,6 @@ namespace DataSurfaces {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataVectorTypes;
     using namespace DataBSDFWindow;
     using namespace DataHeatBalance;
@@ -411,6 +409,7 @@ namespace DataSurfaces {
     Array1D<Real64> BmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl
     // from obstructions (W/m2)/(W/m2)
     Array1D<Real64> BmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
+    Array1D<Real64> SkyDiffReflFacGnd; // sky diffuse reflection view factors from ground
 
     Array2D<Real64> AWinSurf; // Time step value of factor for beam
     // absorbed in window glass layers
@@ -961,7 +960,7 @@ namespace DataSurfaces {
             value = SurfWinIRfromParentZone(ExtBoundCond) + QHTRadSysSurf(ExtBoundCond) + QHWBaseboardSurf(ExtBoundCond) +
                     QSteamBaseboardSurf(ExtBoundCond) + QElecBaseboardSurf(ExtBoundCond);
         } else {
-            Real64 tout = getOutsideAirTemperature(t_SurfNum) + KelvinConv;
+            Real64 tout = getOutsideAirTemperature(t_SurfNum) + DataGlobalConstants::KelvinConv();
             value = state.dataWindowManager->sigma * pow_4(tout);
             value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
                     ViewFactorGroundIR * value;
@@ -980,7 +979,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave incident to the surface
 
-        return QRadSWOutIncident(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
+        return SurfQRadSWOutIncident(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
     Real64 SurfaceData::getSWBeamIncident(const int t_SurfNum)
@@ -994,7 +993,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave incident from outside beam
 
-        return QRadSWOutIncidentBeam(t_SurfNum);
+        return  SurfQRadSWOutIncidentBeam(t_SurfNum);
     }
 
     Real64 SurfaceData::getSWDiffuseIncident(const int t_SurfNum)
@@ -1008,7 +1007,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave diffuse incident to the surface
 
-        return QRadSWOutIncidentSkyDiffuse(t_SurfNum) + QRadSWOutIncidentGndDiffuse(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
+        return  SurfQRadSWOutIncidentSkyDiffuse(t_SurfNum) + SurfQRadSWOutIncidentGndDiffuse(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
     int SurfaceData::getTotLayers(EnergyPlusData &state) const
@@ -1234,6 +1233,7 @@ namespace DataSurfaces {
         BmToBmReflFacObs.deallocate();
         BmToDiffReflFacObs.deallocate();
         BmToDiffReflFacGnd.deallocate();
+        SkyDiffReflFacGnd.deallocate();
         AWinSurf.deallocate();
         AWinSurfDiffFront.deallocate();
         AWinSurfDiffBack.deallocate();

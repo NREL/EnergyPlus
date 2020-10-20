@@ -56,7 +56,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -181,19 +180,17 @@ namespace CurveManager {
         // Given the curve index and the values of 1 or 2 independent variables,
         // calls the curve or table routine to return the value of an equipment performance curve or table.
 
-        using DataGlobals::BeginEnvrnFlag;
-
         // Return value
         Real64 CurveValue(0.0);
 
         // need to be careful on where and how resetting curve outputs to some "iactive value" is done
         // EMS can intercept curves and modify output
-        if (BeginEnvrnFlag && state.dataCurveManager->CurveValueMyBeginTimeStepFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataCurveManager->CurveValueMyBeginTimeStepFlag) {
             ResetPerformanceCurveOutput(state);
             state.dataCurveManager->CurveValueMyBeginTimeStepFlag = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             state.dataCurveManager->CurveValueMyBeginTimeStepFlag = true;
         }
 
@@ -2863,8 +2860,6 @@ namespace CurveManager {
         // DP = [f*(L/D) + K] * (rho * V^2) / 2
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-
         // Return value
         Real64 PressureCurveValue;
 
@@ -2889,7 +2884,7 @@ namespace CurveManager {
         ConstantF = DataBranchAirLoopPlant::PressureCurve(PressureCurveIndex).ConstantF;
 
         // Intermediate calculations
-        CrossSectArea = (Pi / 4.0) * pow_2(Diameter);
+        CrossSectArea = (DataGlobalConstants::Pi() / 4.0) * pow_2(Diameter);
         Velocity = MassFlow / (Density * CrossSectArea);
         ReynoldsNumber = Density * Diameter * Velocity / Viscosity; // assuming mu here
         RoughnessRatio = Roughness / Diameter;

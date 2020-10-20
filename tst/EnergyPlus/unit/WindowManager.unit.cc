@@ -200,8 +200,8 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     DataGlobals::TimeStepZone = 1;
     DataGlobals::HourOfDay = 1;
     DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::BeginSimFlag = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::OutBaroPress = 100000;
 
     DataHeatBalFanSys::ZTAV.allocate(1);
@@ -245,7 +245,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
     DataSurfaces::Surface(winNum).OutDryBulbTemp = T_out;
     DataHeatBalance::TempEffBulkAir(winNum) = T_in;
-    DataSurfaces::SurfWinIRfromParentZone(winNum) = DataGlobals::StefanBoltzmann * std::pow(T_in + DataGlobals::KelvinConv, 4);
+    DataSurfaces::SurfWinIRfromParentZone(winNum) = DataGlobalConstants::StefanBoltzmann() * std::pow(T_in + DataGlobalConstants::KelvinConv(), 4);
     DataHeatBalFanSys::ZoneAirHumRatAvg.dimension(1, 0.01);
     DataHeatBalFanSys::ZoneAirHumRat.dimension(1, 0.01);
     DataHeatBalFanSys::MAT.dimension(1, T_in);
@@ -284,8 +284,8 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
         // Use complementary angle for exterior natural convection calculations
         DataSurfaces::Surface(1).Tilt = 180 - tiltSave;
-        DataSurfaces::Surface(1).CosTilt = cos(DataSurfaces::Surface(winNum).Tilt * DataGlobals::Pi / 180);
-        DataSurfaces::Surface(1).SinTilt = sin(DataSurfaces::Surface(winNum).Tilt * DataGlobals::Pi / 180);
+        DataSurfaces::Surface(1).CosTilt = cos(DataSurfaces::Surface(winNum).Tilt * DataGlobalConstants::Pi() / 180);
+        DataSurfaces::Surface(1).SinTilt = sin(DataSurfaces::Surface(winNum).Tilt * DataGlobalConstants::Pi() / 180);
         ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(
             winNum, outSurfTemp,
             T_out); // This subroutine sets the global HConvIn( 1 ) variable. We will use it to set the exterior natural convection.
@@ -293,8 +293,8 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
         // revert tilt for interior natural convection calculations
         DataSurfaces::Surface(1).Tilt = tiltSave;
-        DataSurfaces::Surface(1).CosTilt = cos(tiltSave * DataGlobals::Pi / 180);
-        DataSurfaces::Surface(1).SinTilt = sin(tiltSave * DataGlobals::Pi / 180);
+        DataSurfaces::Surface(1).CosTilt = cos(tiltSave * DataGlobalConstants::Pi() / 180);
+        DataSurfaces::Surface(1).SinTilt = sin(tiltSave * DataGlobalConstants::Pi() / 180);
         ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(
             winNum, inSurfTemp,
             T_in); // This time it's actually being used as intended. HConvIn( 1 ) is referenced from the actual heat balance calculation.
@@ -349,7 +349,7 @@ TEST_F(EnergyPlusFixture, WindowManager_TransAndReflAtPhi)
     SimpleGlazingSHGC = 0.335;    // SHGC value to use in alternate model for simple glazing system
     SimpleGlazingU = 1.704;       // U-factor value to use in alternate model for simple glazing system
 
-    for (Real64 theta = 0.0; theta <= DataGlobals::PiOvr2; theta += DataGlobals::PiOvr2/10.0) {
+    for (Real64 theta = 0.0; theta <= DataGlobalConstants::PiOvr2(); theta += DataGlobalConstants::PiOvr2() / 10.0) {
         cs = std::cos(theta); // Cosine of incidence angle
         TransAndReflAtPhi(cs, tf0, rf0, rb0, tfp, rfp, rbp, SimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU);
         Real64 afp = 1. - tfp - rfp;
@@ -478,8 +478,8 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataGlobals::TimeStepZone = 1;
     DataGlobals::HourOfDay = 1;
     DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::BeginSimFlag = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::OutBaroPress = 100000;
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
@@ -551,9 +551,9 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataHeatBalFanSys::QHWBaseboardSurf.allocate(3);
     DataHeatBalFanSys::QSteamBaseboardSurf.allocate(3);
     DataHeatBalFanSys::QElecBaseboardSurf.allocate(3);
-    DataHeatBalance::QRadSWwinAbs.allocate(1, 3);
-    DataHeatBalance::QRadThermInAbs.allocate(3);
-    DataHeatBalance::QRadSWOutIncident.allocate(3);
+    DataHeatBalance::SurfWinQRadSWwinAbs.allocate(1, 3);
+    DataHeatBalance::SurfQRadThermInAbs.allocate(3);
+    DataHeatBalance::SurfQRadSWOutIncident.allocate(3);
     DataSurfaces::SurfWinTransSolar.allocate(3);
     DataHeatBalance::ZoneWinHeatGain.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
@@ -580,13 +580,13 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataHeatBalSurface::QdotRadOutRep.allocate(3);
     DataHeatBalSurface::QdotRadOutRepPerArea.allocate(3);
     DataHeatBalSurface::QRadOutReport.allocate(3);
-    DataHeatBalSurface::QRadLWOutSrdSurfs.allocate(3);
+    DataHeatBalSurface::SurfQRadLWOutSrdSurfs.allocate(3);
     DataHeatBalSurface::QAirExtReport.allocate(3);
     DataHeatBalSurface::QHeatEmiReport.allocate(3);
 
-    DataHeatBalance::QRadSWOutIncident = 0.0;
-    DataHeatBalance::QRadSWwinAbs = 0.0;
-    DataHeatBalance::QRadThermInAbs = 0.0;
+    DataHeatBalance::SurfQRadSWOutIncident = 0.0;
+    DataHeatBalance::SurfWinQRadSWwinAbs = 0.0;
+    DataHeatBalance::SurfQRadThermInAbs = 0.0;
 
     DataHeatBalFanSys::QHTRadSysSurf = 0.0;
     DataHeatBalFanSys::QHWBaseboardSurf = 0.0;
@@ -2515,14 +2515,14 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     SurfaceGeometry::CosZoneRelNorth.allocate(4);
     SurfaceGeometry::SinZoneRelNorth.allocate(4);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(3) = std::cos(-DataHeatBalance::Zone(3).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(4) = std::cos(-DataHeatBalance::Zone(4).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(3) = std::sin(-DataHeatBalance::Zone(3).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(4) = std::sin(-DataHeatBalance::Zone(4).RelNorth * DataGlobals::DegToRadians);
+    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::CosZoneRelNorth(3) = std::cos(-DataHeatBalance::Zone(3).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::CosZoneRelNorth(4) = std::cos(-DataHeatBalance::Zone(4).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(3) = std::sin(-DataHeatBalance::Zone(3).RelNorth * DataGlobalConstants::DegToRadians());
+    SurfaceGeometry::SinZoneRelNorth(4) = std::sin(-DataHeatBalance::Zone(4).RelNorth * DataGlobalConstants::DegToRadians());
 
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
@@ -2704,8 +2704,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataGlobals::TimeStepZone = 1;
     DataGlobals::HourOfDay = 1;
     DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::BeginSimFlag = true;
-    DataGlobals::BeginEnvrnFlag = true;
+    state.dataGlobal->BeginSimFlag = true;
+    state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::OutBaroPress = 100000;
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
@@ -2778,9 +2778,9 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataHeatBalFanSys::QHWBaseboardSurf.allocate(3);
     DataHeatBalFanSys::QSteamBaseboardSurf.allocate(3);
     DataHeatBalFanSys::QElecBaseboardSurf.allocate(3);
-    DataHeatBalance::QRadSWwinAbs.allocate(1, 3);
-    DataHeatBalance::QRadThermInAbs.allocate(3);
-    DataHeatBalance::QRadSWOutIncident.allocate(3);
+    DataHeatBalance::SurfWinQRadSWwinAbs.allocate(1, 3);
+    DataHeatBalance::SurfQRadThermInAbs.allocate(3);
+    DataHeatBalance::SurfQRadSWOutIncident.allocate(3);
     DataSurfaces::SurfWinTransSolar.allocate(3);
     DataHeatBalance::ZoneWinHeatGain.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
@@ -2807,13 +2807,13 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataHeatBalSurface::QdotRadOutRep.allocate(3);
     DataHeatBalSurface::QdotRadOutRepPerArea.allocate(3);
     DataHeatBalSurface::QRadOutReport.allocate(3);
-    DataHeatBalSurface::QRadLWOutSrdSurfs.allocate(3);
+    DataHeatBalSurface::SurfQRadLWOutSrdSurfs.allocate(3);
     DataHeatBalSurface::QAirExtReport.allocate(3);
     DataHeatBalSurface::QHeatEmiReport.allocate(3);
 
-    DataHeatBalance::QRadSWOutIncident = 0.0;
-    DataHeatBalance::QRadSWwinAbs = 0.0;
-    DataHeatBalance::QRadThermInAbs = 0.0;
+    DataHeatBalance::SurfQRadSWOutIncident = 0.0;
+    DataHeatBalance::SurfWinQRadSWwinAbs = 0.0;
+    DataHeatBalance::SurfQRadThermInAbs = 0.0;
 
     DataHeatBalFanSys::QHTRadSysSurf = 0.0;
     DataHeatBalFanSys::QHWBaseboardSurf = 0.0;
@@ -2824,14 +2824,12 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     Real64 inSurfTemp;
     Real64 outSurfTemp;
-    Real64 const StefanBoltzmann(5.6697E-8);
-    Real64 const KelvinConv(273.15);
     ScheduleManager::Schedule(1).CurrentValue = 25.0; // Srd Srfs Temp
-    // Claculate temperature based on supply flow rate
+    // Calculate temperature based on supply flow rate
 
     WindowManager::CalcWindowHeatBalance(state, surfNum2, DataHeatBalance::HConvIn(surfNum2), inSurfTemp, outSurfTemp);
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(state.dataWindowManager->thetas(1))), DataHeatBalSurface::QRadLWOutSrdSurfs(surfNum2));
+    EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann() * 0.84 * 0.6 * (pow_4(25.0 + DataGlobalConstants::KelvinConv()) - pow_4(state.dataWindowManager->thetas(1))), DataHeatBalSurface::SurfQRadLWOutSrdSurfs(surfNum2));
     EXPECT_NEAR(-24.9342, DataHeatBalSurface::QHeatEmiReport(surfNum2),3);
 }
 TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)

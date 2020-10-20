@@ -265,7 +265,7 @@ namespace HWBaseboardRadiator {
 
             PowerMet = HWBaseboard(BaseboardNum).TotPower;
 
-            UpdateHWBaseboard(BaseboardNum);
+            UpdateHWBaseboard(state, BaseboardNum);
 
             ReportHWBaseboard(BaseboardNum);
 
@@ -376,7 +376,7 @@ namespace HWBaseboardRadiator {
             // Get schedule
             HWBaseboard(BaseboardNum).Schedule = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                HWBaseboard(BaseboardNum).SchedPtr = ScheduleAlwaysOn;
+                HWBaseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 HWBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (HWBaseboard(BaseboardNum).SchedPtr == 0) {
@@ -750,7 +750,6 @@ namespace HWBaseboardRadiator {
 
         // Using/Aliasing
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::NumOfZones;
         using DataLoopNode::Node;
         using PlantUtilities::InitComponentNodes;
@@ -849,14 +848,14 @@ namespace HWBaseboardRadiator {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum)) {
             // Initialize
             RhoAirStdInit = StdRhoAir;
             WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
 
             rho = GetDensityGlycol(state,
                                    PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                   DataGlobals::HWInitConvTemp,
+                                   DataGlobalConstants::HWInitConvTemp(),
                                    PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                    RoutineName);
 
@@ -894,11 +893,11 @@ namespace HWBaseboardRadiator {
             MyEnvrnFlag(BaseboardNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(BaseboardNum) = true;
         }
 
-        if (BeginTimeStepFlag && FirstHVACIteration) {
+        if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
             ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
             ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum);
             QBBRadSrcAvg(BaseboardNum) = 0.0;
@@ -1089,12 +1088,12 @@ namespace HWBaseboardRadiator {
                     if (DesCoilLoad >= SmallLoad) {
                         Cp = GetSpecificHeatGlycol(state,
                                                    PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                                   HWInitConvTemp,
+                                                   DataGlobalConstants::HWInitConvTemp(),
                                                    PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                                    RoutineName);
                         rho = GetDensityGlycol(state,
                                                PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                               HWInitConvTemp,
+                                               DataGlobalConstants::HWInitConvTemp(),
                                                PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                                RoutineName);
                         WaterVolFlowRateMaxDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
@@ -1142,7 +1141,7 @@ namespace HWBaseboardRadiator {
                     DesCoilLoad = RatedCapacityDes;
                     rho = GetDensityGlycol(state,
                                            PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
-                                           DataGlobals::HWInitConvTemp,
+                                           DataGlobalConstants::HWInitConvTemp(),
                                            PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
                                            RoutineNameFull);
                     WaterMassFlowRateStd = HWBaseboard(BaseboardNum).WaterVolFlowRateMax * rho;
@@ -1426,7 +1425,7 @@ namespace HWBaseboardRadiator {
         HWBaseboard(BaseboardNum).RadPower = RadHeat;
     }
 
-    void UpdateHWBaseboard(int const BaseboardNum)
+    void UpdateHWBaseboard(EnergyPlusData &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1447,7 +1446,6 @@ namespace HWBaseboardRadiator {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::TimeStepZone;
         using DataLoopNode::Node;
         using PlantUtilities::SafeCopyPlantNode;
@@ -1470,11 +1468,11 @@ namespace HWBaseboardRadiator {
         static int Iter(0);
         static bool MyEnvrnFlag(true);
 
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             Iter = 0;
             MyEnvrnFlag = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag = true;
         }
 
@@ -1686,10 +1684,10 @@ namespace HWBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        HWBaseboard(BaseboardNum).TotEnergy = HWBaseboard(BaseboardNum).TotPower * TimeStepSys * SecInHour;
-        HWBaseboard(BaseboardNum).Energy = HWBaseboard(BaseboardNum).Power * TimeStepSys * SecInHour;
-        HWBaseboard(BaseboardNum).ConvEnergy = HWBaseboard(BaseboardNum).ConvPower * TimeStepSys * SecInHour;
-        HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * TimeStepSys * SecInHour;
+        HWBaseboard(BaseboardNum).TotEnergy = HWBaseboard(BaseboardNum).TotPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        HWBaseboard(BaseboardNum).Energy = HWBaseboard(BaseboardNum).Power * TimeStepSys * DataGlobalConstants::SecInHour();
+        HWBaseboard(BaseboardNum).ConvEnergy = HWBaseboard(BaseboardNum).ConvPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     Real64 SumHATsurf(int const ZoneNum) // Zone number

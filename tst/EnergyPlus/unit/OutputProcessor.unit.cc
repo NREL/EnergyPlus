@@ -82,7 +82,7 @@ namespace OutputProcessor {
         Array1D_int VarTypes(NumVariables);                              // Variable Types (1=integer, 2=real, 3=meter)
         Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-        Array1D_int ResourceTypes(NumVariables);                         // ResourceTypes for each variable
+        std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;  // ResourceTypes for each variable
         Array1D_string EndUses(NumVariables);                            // EndUses for each variable
         Array1D_string Groups(NumVariables);                             // Groups for each variable
         Array1D_string Names(NumVariables);                              // Variable Names for each variable
@@ -92,6 +92,10 @@ namespace OutputProcessor {
         std::string NameOfComp = "FC-5-1B";
 
         int NumFound;
+
+        for (int varN = 1; varN <= NumVariables; ++varN) {
+            ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+        }
 
         GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
@@ -149,7 +153,7 @@ namespace OutputProcessor {
 
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
@@ -215,7 +219,7 @@ namespace OutputProcessor {
 
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
@@ -279,7 +283,7 @@ namespace OutputProcessor {
 
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
@@ -347,7 +351,7 @@ namespace OutputProcessor {
 
         DailyStampReportNbr = 1;
         DailyStampReportChr = "1";
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
@@ -419,7 +423,7 @@ namespace OutputProcessor {
 
         MonthlyStampReportNbr = 1;
         MonthlyStampReportChr = "1";
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
@@ -491,7 +495,7 @@ namespace OutputProcessor {
 
         RunPeriodStampReportNbr = 1;
         RunPeriodStampReportChr = "1";
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
@@ -563,11 +567,11 @@ namespace OutputProcessor {
 
         YearlyStampReportNbr = 1;
         YearlyStampReportChr = "1";
-        DataGlobals::DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
-        DataGlobals::CalendarYear = 2017;
-        DataGlobals::CalendarYearChr = "2017";
+        state.dataGlobal->CalendarYear = 2017;
+        state.dataGlobal->CalendarYearChr = "2017";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
@@ -613,7 +617,7 @@ namespace OutputProcessor {
         int RunPeriodStampReportNbr = 1;
         std::string RunPeriodStampReportChr = "1";
 
-        int DayOfSim = 1;
+        state.dataGlobal->DayOfSim = 1;
         std::string DayOfSimChr = "1";
         bool PrintTimeStamp = true;
         int Month = 12;
@@ -625,11 +629,11 @@ namespace OutputProcessor {
         int CurDayType = 10;
 
         // TSMeter
-        WriteTimeStampFormatData(state.files.mtr,
+        WriteTimeStampFormatData(state,
+                                 state.files.mtr,
                                  ReportingFrequency::TimeStep,
                                  TimeStepStampReportNbr,
                                  TimeStepStampReportChr,
-                                 DayOfSim,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  Month,
@@ -642,11 +646,11 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay"}, "\n")));
 
         // TSMeter
-        WriteTimeStampFormatData(state.files.mtr,
+        WriteTimeStampFormatData(state,
+                                 state.files.mtr,
                                  ReportingFrequency::EachCall,
                                  TimeStepStampReportNbr,
                                  TimeStepStampReportChr,
-                                 DayOfSim,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  Month,
@@ -659,11 +663,11 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay"}, "\n")));
 
         // HRMeter
-        WriteTimeStampFormatData(state.files.mtr,
+        WriteTimeStampFormatData(state,
+                                 state.files.mtr,
                                  ReportingFrequency::Hourly,
                                  TimeStepStampReportNbr,
                                  TimeStepStampReportChr,
-                                 DayOfSim,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  Month,
@@ -676,11 +680,11 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay"}, "\n")));
 
         // DYMeter
-        WriteTimeStampFormatData(state.files.mtr,
+        WriteTimeStampFormatData(state,
+                                 state.files.mtr,
                                  ReportingFrequency::Daily,
                                  DailyStampReportNbr,
                                  DailyStampReportChr,
-                                 DayOfSim,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  Month,
@@ -693,11 +697,11 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0,WinterDesignDay"}, "\n")));
 
         // MNMeter
-        WriteTimeStampFormatData(state.files.mtr,
+        WriteTimeStampFormatData(state,
+                                 state.files.mtr,
                                  ReportingFrequency::Monthly,
                                  MonthlyStampReportNbr,
                                  MonthlyStampReportChr,
-                                 DayOfSim,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  Month,
@@ -710,11 +714,11 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12"}, "\n")));
 
         // SMMeter
-        WriteTimeStampFormatData(state.files.mtr,
+        WriteTimeStampFormatData(state,
+                                 state.files.mtr,
                                  ReportingFrequency::Simulation,
                                  RunPeriodStampReportNbr,
                                  RunPeriodStampReportChr,
-                                 DayOfSim,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  _,
@@ -727,11 +731,11 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1"}, "\n")));
 
         // Bad input
-        WriteTimeStampFormatData(state.files.mtr,
+        WriteTimeStampFormatData(state,
+                                 state.files.mtr,
                                  static_cast<ReportingFrequency>(999),
                                  RunPeriodStampReportNbr,
                                  RunPeriodStampReportChr,
-                                 DayOfSim,
                                  DayOfSimChr,
                                  PrintTimeStamp,
                                  _,
@@ -4106,7 +4110,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        DataGlobals::DayOfSim = 365;
+        state.dataGlobal->DayOfSim = 365;
         state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
@@ -4121,8 +4125,8 @@ namespace OutputProcessor {
             DataGlobals::EndHourFlag = true;
             if (DataGlobals::HourOfDay == 24) {
                 DataGlobals::EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
-                    DataGlobals::EndEnvrnFlag = true;
+                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                    state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
         }
@@ -4350,7 +4354,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        DataGlobals::DayOfSim = 365;
+        state.dataGlobal->DayOfSim = 365;
         state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
@@ -4365,8 +4369,8 @@ namespace OutputProcessor {
             DataGlobals::EndHourFlag = true;
             if (DataGlobals::HourOfDay == 24) {
                 DataGlobals::EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
-                    DataGlobals::EndEnvrnFlag = true;
+                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                    state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
         }
@@ -4607,7 +4611,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        DataGlobals::DayOfSim = 365;
+        state.dataGlobal->DayOfSim = 365;
         state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
@@ -4622,8 +4626,8 @@ namespace OutputProcessor {
             DataGlobals::EndHourFlag = true;
             if (DataGlobals::HourOfDay == 24) {
                 DataGlobals::EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
-                    DataGlobals::EndEnvrnFlag = true;
+                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                    state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
         }
@@ -4812,7 +4816,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         // Setup so that UpdateDataandReport can be called.
-        DataGlobals::DayOfSim = 365;
+        state.dataGlobal->DayOfSim = 365;
         state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
@@ -4827,8 +4831,8 @@ namespace OutputProcessor {
             DataGlobals::EndHourFlag = true;
             if (DataGlobals::HourOfDay == 24) {
                 DataGlobals::EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
-                    DataGlobals::EndEnvrnFlag = true;
+                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                    state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
         }
@@ -4952,7 +4956,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        DataGlobals::DayOfSim = 365;
+        state.dataGlobal->DayOfSim = 365;
         state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
@@ -4967,8 +4971,8 @@ namespace OutputProcessor {
             DataGlobals::EndHourFlag = true;
             if (DataGlobals::HourOfDay == 24) {
                 DataGlobals::EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
-                    DataGlobals::EndEnvrnFlag = true;
+                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                    state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
         }
@@ -5030,7 +5034,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        DataGlobals::DayOfSim = 365;
+        state.dataGlobal->DayOfSim = 365;
         state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
@@ -5045,8 +5049,8 @@ namespace OutputProcessor {
             DataGlobals::EndHourFlag = true;
             if (DataGlobals::HourOfDay == 24) {
                 DataGlobals::EndDayFlag = true;
-                if ((!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
-                    DataGlobals::EndEnvrnFlag = true;
+                if ((!DataGlobals::WarmupFlag) && (state.dataGlobal->DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
+                    state.dataGlobal->EndEnvrnFlag = true;
                 }
             }
         }

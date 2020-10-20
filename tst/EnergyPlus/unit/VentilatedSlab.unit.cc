@@ -81,7 +81,7 @@ using namespace EnergyPlus::SurfaceGeometry;
 TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
 {
 
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     Real64 PowerMet = 0.0;
     Real64 LatOutputProvided = 0.0;
 
@@ -150,7 +150,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
 TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
 {
 
-    BeginEnvrnFlag = false;
+    state.dataGlobal->BeginEnvrnFlag = false;
     bool ErrorsFound(false);       // function returns true on error
     int Item(1);                   // index for the current ventilated slab
     int VentSlabZoneNum(1);        // number of zone being served

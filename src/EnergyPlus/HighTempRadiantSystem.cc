@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
@@ -112,10 +111,7 @@ namespace HighTempRadiantSystem {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataGlobals::BeginTimeStepFlag;
     using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::SmallLoad;
 
@@ -350,7 +346,7 @@ namespace HighTempRadiantSystem {
 
             HighTempRadSys(Item).SchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                HighTempRadSys(Item).SchedPtr = ScheduleAlwaysOn;
+                HighTempRadSys(Item).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
                 HighTempRadSys(Item).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (HighTempRadSys(Item).SchedPtr == 0) {
@@ -705,7 +701,6 @@ namespace HighTempRadiantSystem {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::NumOfZones;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipInputsFilled;
@@ -754,7 +749,7 @@ namespace HighTempRadiantSystem {
             MySizeFlag(RadSysNum) = false;
         }
 
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             ZeroSourceSumHATsurf = 0.0;
             QHTRadSource = 0.0;
             QHTRadSrcAvg = 0.0;
@@ -763,11 +758,11 @@ namespace HighTempRadiantSystem {
             LastTimeStepSys = 0.0;
             MyEnvrnFlag = false;
         }
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag = true;
         }
 
-        if (BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
+        if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
             ZoneNum = HighTempRadSys(RadSysNum).ZonePtr;
             ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure out what part of the load the radiant system meets
             QHTRadSrcAvg(RadSysNum) = 0.0;                       // Initialize this variable to zero (radiant system defaults to off)
@@ -1184,7 +1179,6 @@ namespace HighTempRadiantSystem {
         // na
 
         // Using/Aliasing
-        using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::TimeStepZone;
         using DataHeatBalFanSys::SumConvHTRadSys;
         using DataHVACGlobals::SysTimeElapsed;
@@ -1436,7 +1430,6 @@ namespace HighTempRadiantSystem {
         // na
 
         // Using/Aliasing
-        using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using DataSurfaces::Surface;
 
@@ -1457,19 +1450,19 @@ namespace HighTempRadiantSystem {
         // FLOW:
         if (HighTempRadSys(RadSysNum).HeaterType == Gas) {
             HighTempRadSys(RadSysNum).GasPower = QHTRadSource(RadSysNum) / HighTempRadSys(RadSysNum).CombustionEffic;
-            HighTempRadSys(RadSysNum).GasEnergy = HighTempRadSys(RadSysNum).GasPower * TimeStepSys * SecInHour;
+            HighTempRadSys(RadSysNum).GasEnergy = HighTempRadSys(RadSysNum).GasPower * TimeStepSys * DataGlobalConstants::SecInHour();
             HighTempRadSys(RadSysNum).ElecPower = 0.0;
             HighTempRadSys(RadSysNum).ElecEnergy = 0.0;
         } else if (HighTempRadSys(RadSysNum).HeaterType == Electric) {
             HighTempRadSys(RadSysNum).GasPower = 0.0;
             HighTempRadSys(RadSysNum).GasEnergy = 0.0;
             HighTempRadSys(RadSysNum).ElecPower = QHTRadSource(RadSysNum);
-            HighTempRadSys(RadSysNum).ElecEnergy = HighTempRadSys(RadSysNum).ElecPower * TimeStepSys * SecInHour;
+            HighTempRadSys(RadSysNum).ElecEnergy = HighTempRadSys(RadSysNum).ElecPower * TimeStepSys * DataGlobalConstants::SecInHour();
         } else {
             ShowWarningError("Someone forgot to add a high temperature radiant heater type to the reporting subroutine");
         }
         HighTempRadSys(RadSysNum).HeatPower = QHTRadSource(RadSysNum);
-        HighTempRadSys(RadSysNum).HeatEnergy = HighTempRadSys(RadSysNum).HeatPower * TimeStepSys * SecInHour;
+        HighTempRadSys(RadSysNum).HeatEnergy = HighTempRadSys(RadSysNum).HeatPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
     Real64 SumHATsurf(int const ZoneNum) // Zone number
