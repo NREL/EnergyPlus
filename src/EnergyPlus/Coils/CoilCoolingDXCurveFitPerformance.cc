@@ -206,8 +206,15 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
             state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
 
         // this->OperatingMode = 1;
-        CalcComponentSensibleLatentOutput(
-            outletNode.MassFlowRate, inletNode.Temp, inletNode.HumRat, outletNode.Temp, outletNode.HumRat, sensNorRate, latRate, totalCoolingRate);
+        //CalcComponentSensibleLatentOutput(
+        //    outletNode.MassFlowRate, inletNode.Temp, inletNode.HumRat, outletNode.Temp, outletNode.HumRat, sensNorRate, latRate, totalCoolingRate);
+        totalCoolingRate = this->normalMode.OpModeTotalCoolingRate;
+        sensNorRate = this->normalMode.OpModeSensibleCoolingRate;
+        latRate = this->normalMode.OpModeLatentCoolingRate;
+        this->perfSensibleCoolingRate = this->normalMode.OpModeSensibleCoolingRate;
+        this->perfLatentCoolingRate = this->normalMode.OpModeLatentCoolingRate;
+        this->perfTotalCoolingRate = this->normalMode.OpModeTotalCoolingRate;
+
         if (totalCoolingRate > 1.0E-10) {
             this->OperatingMode = 1;
             this->NormalSHR = sensNorRate / totalCoolingRate;
@@ -240,14 +247,18 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
                                 condInletNode,
                                 condOutletNode,
                                 singleMode);
-                CalcComponentSensibleLatentOutput(outletNode.MassFlowRate,
-                                                  inletNode.Temp,
-                                                  inletNode.HumRat,
-                                                  outletNode.Temp,
-                                                  outletNode.HumRat,
-                                                  sensSubRate,
-                                                  latRate,
-                                                  totalCoolingRate);
+                //CalcComponentSensibleLatentOutput(outletNode.MassFlowRate,
+                //                                  inletNode.Temp,
+                //                                  inletNode.HumRat,
+                //                                  outletNode.Temp,
+                //                                  outletNode.HumRat,
+                //                                  sensSubRate,
+                //                                  latRate,
+                //                                  totalCoolingRate);
+                totalCoolingRate = this->alternateMode.OpModeTotalCoolingRate;
+                sensSubRate = this->alternateMode.OpModeSensibleCoolingRate;
+                latRate = this->alternateMode.OpModeLatentCoolingRate;
+
                 SysSubSHR = sensSubRate / totalCoolingRate;
                 if (LoadSHR < SysSubSHR) {
                     outletNode.MassFlowRate = inletNode.MassFlowRate;
@@ -262,14 +273,17 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
                                     condInletNode,
                                     condOutletNode,
                                     singleMode);
-                    CalcComponentSensibleLatentOutput(outletNode.MassFlowRate,
-                                                      inletNode.Temp,
-                                                      inletNode.HumRat,
-                                                      outletNode.Temp,
-                                                      outletNode.HumRat,
-                                                      sensRehRate,
-                                                      latRate,
-                                                      totalCoolingRate);
+                    //CalcComponentSensibleLatentOutput(outletNode.MassFlowRate,
+                    //                                  inletNode.Temp,
+                    //                                  inletNode.HumRat,
+                    //                                  outletNode.Temp,
+                    //                                  outletNode.HumRat,
+                    //                                  sensRehRate,
+                    //                                  latRate,
+                    //                                  totalCoolingRate);
+                    totalCoolingRate = this->alternateMode2.OpModeTotalCoolingRate;
+                    sensRehRate = this->alternateMode2.OpModeSensibleCoolingRate;
+                    latRate = this->alternateMode2.OpModeLatentCoolingRate;
                     SysRehSHR = sensRehRate / totalCoolingRate;
                     if (LoadSHR > SysRehSHR) {
                         modeRatio = (LoadSHR - SysNorSHR) / (SysRehSHR - SysNorSHR);
@@ -279,6 +293,9 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
                         outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
                         this->ModeRatio = modeRatio;
                         // update other reporting terms
+                        this->perfSensibleCoolingRate = this->normalMode.OpModeSensibleCoolingRate * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModeSensibleCoolingRate;
+                        this->perfLatentCoolingRate = this->normalMode.OpModeLatentCoolingRate * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModeLatentCoolingRate;
+                        this->perfTotalCoolingRate = this->normalMode.OpModeTotalCoolingRate * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModeTotalCoolingRate;
                         this->powerUse = this->normalMode.OpModePower * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModePower;
                         this->RTF = this->normalMode.OpModeRTF * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModeRTF;
                         this->wasteHeatRate = this->normalMode.OpModeWasteHeat * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModeWasteHeat;
@@ -297,6 +314,9 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
                     outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
                     this->ModeRatio = modeRatio;
                     // update other reporting terms
+                    this->perfSensibleCoolingRate = this->normalMode.OpModeSensibleCoolingRate * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModeSensibleCoolingRate;
+                    this->perfLatentCoolingRate = this->normalMode.OpModeLatentCoolingRate * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModeLatentCoolingRate;
+                    this->perfTotalCoolingRate = this->normalMode.OpModeTotalCoolingRate * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModeTotalCoolingRate;
                     this->powerUse = this->normalMode.OpModePower * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModePower;
                     this->RTF = this->normalMode.OpModeRTF * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModeRTF;
                     this->wasteHeatRate = this->normalMode.OpModeWasteHeat * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModeWasteHeat;
@@ -312,6 +332,9 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
         this->calculate(
             state, this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
         this->OperatingMode = 2;
+        this->perfSensibleCoolingRate = this->alternateMode.OpModeSensibleCoolingRate;
+        this->perfLatentCoolingRate = this->alternateMode.OpModeLatentCoolingRate;
+        this->perfTotalCoolingRate = this->alternateMode.OpModeTotalCoolingRate;
         this->powerUse = this->alternateMode.OpModePower;
         this->RTF = this->alternateMode.OpModeRTF;
         this->wasteHeatRate = this->alternateMode.OpModeWasteHeat;
@@ -319,6 +342,9 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
         this->calculate(
             state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
         this->OperatingMode = 1;
+        this->perfSensibleCoolingRate = this->normalMode.OpModeSensibleCoolingRate;
+        this->perfLatentCoolingRate = this->normalMode.OpModeLatentCoolingRate;
+        this->perfTotalCoolingRate = this->normalMode.OpModeTotalCoolingRate;
         this->powerUse = this->normalMode.OpModePower;
         this->RTF = this->normalMode.OpModeRTF;
         this->wasteHeatRate = this->normalMode.OpModeWasteHeat;

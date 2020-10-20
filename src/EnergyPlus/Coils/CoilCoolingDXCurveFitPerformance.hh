@@ -139,6 +139,9 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 powerUse = 0.0;
     Real64 electricityConsumption = 0.0;
     Real64 RTF = 0.0;
+    Real64 perfSensibleCoolingRate = 0.0;
+    Real64 perfLatentCoolingRate = 0.0;
+    Real64 perfTotalCoolingRate = 0.0;
     bool oneTimeEIOHeaderWrite = true;
     Real64 wasteHeatRate = 0.0;
     int OperatingMode = 0;

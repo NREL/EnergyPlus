@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
@@ -334,6 +335,14 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
         outletNode.HumRat = correctedHumRat;
         outletNode.Enthalpy = correctedEnthalpy;
     }
+    CalcComponentSensibleLatentOutput(thisspeed.AirMassFlow,
+        inletNode.Temp,
+        inletNode.HumRat,
+        outletNode.Temp,
+        outletNode.HumRat,
+        this->OpModeSensibleCoolingRate,
+        this->OpModeLatentCoolingRate,
+        this->OpModeTotalCoolingRate);
 
     Real64 outSpeed1HumRat = outletNode.HumRat;
     Real64 outSpeed1Enthalpy = outletNode.Enthalpy;
@@ -343,8 +352,10 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
         outletNode.Enthalpy = outletNode.Enthalpy * plr1 + (1.0 - plr1) * inletNode.Enthalpy;
     }
     outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
-
     OpModeRTF = thisspeed.RTF;
+    OpModeSensibleCoolingRate *= plr1;
+    OpModeLatentCoolingRate *= plr1;
+    OpModeTotalCoolingRate *= plr1;
     OpModePower = thisspeed.fullLoadPower * thisspeed.RTF;
     OpModeWasteHeat = thisspeed.fullLoadWasteHeat * thisspeed.RTF;
 
@@ -373,9 +384,29 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
             outletNode.Enthalpy = correctedEnthalpy;
         }
 
-        outletNode.HumRat = outSpeed1HumRat * speedRatio + (1.0 - speedRatio) * outletNode.HumRat;
-        outletNode.Enthalpy = outSpeed1Enthalpy * speedRatio + (1.0 - speedRatio) * outletNode.Enthalpy;
+        Real64 lowSpdSensibleCoolingRate = 0.0;
+        Real64 lowSpdLatentCoolingRate = 0.0;
+        Real64 lowSpdTotalCoolingRate = 0.0;
+
+        CalcComponentSensibleLatentOutput(lowerspeed.AirMassFlow,
+            inletNode.Temp,
+            inletNode.HumRat,
+            outletNode.Temp,
+            outletNode.HumRat,
+            lowSpdSensibleCoolingRate,
+            lowSpdLatentCoolingRate,
+            lowSpdTotalCoolingRate);
+
+        outletNode.HumRat = (outSpeed1HumRat * speedRatio * thisspeed.AirMassFlow + (1.0 - speedRatio) * outletNode.HumRat * lowerspeed.AirMassFlow) /
+                            inletNode.MassFlowRate;
+        outletNode.Enthalpy =
+            (outSpeed1Enthalpy * speedRatio * thisspeed.AirMassFlow + (1.0 - speedRatio) * outletNode.Enthalpy * lowerspeed.AirMassFlow) /
+            inletNode.MassFlowRate;
         outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
+
+        this->OpModeSensibleCoolingRate += (1.0 - speedRatio) * lowSpdSensibleCoolingRate;
+        this->OpModeLatentCoolingRate += (1.0 - speedRatio) * lowSpdLatentCoolingRate;
+        this->OpModeTotalCoolingRate += (1.0 - speedRatio) * lowSpdTotalCoolingRate;
 
         this->OpModePower += (1.0 - thisspeed.RTF) * lowerspeed.fullLoadPower;
         this->OpModeWasteHeat += (1.0 - thisspeed.RTF) * lowerspeed.fullLoadWasteHeat;

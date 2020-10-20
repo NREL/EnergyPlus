@@ -124,6 +124,9 @@ struct CoilCoolingDXCurveFitOperatingMode
     Real64 OpModePower = 0.0;
     Real64 OpModeRTF = 0.0;
     Real64 OpModeWasteHeat = 0.0;
+    Real64 OpModeSensibleCoolingRate = 0.0;
+    Real64 OpModeLatentCoolingRate = 0.0;
+    Real64 OpModeTotalCoolingRate = 0.0;
 
     Real64 nominalEvaporativePumpPower = 0.0;
     int nominalSpeedIndex = 0;
