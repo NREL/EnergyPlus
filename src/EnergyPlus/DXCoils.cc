@@ -12152,14 +12152,19 @@ namespace DXCoils {
                     OutletAirHumRat = HSOutletAirHumRat;
                     OutletAirDryBulbTemp = HSOutletAirDryBulbTemp;
                 } else {
-                    if (FanOpMode == ContFanCycCoil) {
-                        Real64 MinAirHumRat(0.0); // set to zero because MinAirHumRat is unused argument
-                        Hfg = PsyHfgAirFnWTdb(MinAirHumRat, HSOutletAirDryBulbTemp * SpeedRatio + (1.0 - SpeedRatio) * LSOutletAirDryBulbTemp);
-                        // Average outlet HR
-                        OutletAirHumRat = InletAirHumRat - DXCoil(DXCoilNum).LatCoolingEnergyRate / Hfg / DXCoil(DXCoilNum).InletAirMassFlowRate;
-                    } else {
-                        OutletAirHumRat = (HSOutletAirHumRat * SpeedRatio) + (LSOutletAirHumRat * (1.0 - SpeedRatio));
-                    }
+                    //if (FanOpMode == ContFanCycCoil) {
+                    //    Real64 MinAirHumRat(0.0); // set to zero because MinAirHumRat is unused argument
+                    //    Real64 avgOutletDBTemp = (HSOutletAirDryBulbTemp * SpeedRatio * MSHPMassFlowRateHigh +
+                    //                              (1.0 - SpeedRatio) * LSOutletAirDryBulbTemp * MSHPMassFlowRateLow) /
+                    //                             DXCoil(DXCoilNum).InletAirMassFlowRate;
+                    //    Hfg = PsyHfgAirFnWTdb(MinAirHumRat, avgOutletDBTemp);
+                    //    // Average outlet HR
+                    //    OutletAirHumRat = InletAirHumRat - DXCoil(DXCoilNum).LatCoolingEnergyRate / Hfg / DXCoil(DXCoilNum).InletAirMassFlowRate;
+                    //} else {
+                        OutletAirHumRat = ((HSOutletAirHumRat * SpeedRatio * MSHPMassFlowRateHigh) +
+                                           (LSOutletAirHumRat * (1.0 - SpeedRatio) * MSHPMassFlowRateLow)) /
+                                          DXCoil(DXCoilNum).InletAirMassFlowRate;
+                    //}
                     OutletAirDryBulbTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
                     if (OutletAirDryBulbTemp < OutletAirDryBulbTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
                         OutletAirDryBulbTemp = OutletAirDryBulbTempSat;
