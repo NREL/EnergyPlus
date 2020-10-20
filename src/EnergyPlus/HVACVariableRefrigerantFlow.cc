@@ -202,6 +202,7 @@ namespace HVACVariableRefrigerantFlow {
     Real64 TimeStepSysLast;                 // system time step on last time step
     Real64 CurrentEndTimeLast_firstfunc;              // end time of last time step
     Real64 CurrentEndTimeLast_secondfunc;
+    Real64 CurrentEndTimeLast_InitVRF;
     Array1D_bool HeatingLoad;               // defines a heating load on VRFTerminalUnits
     Array1D_bool CoolingLoad;               // defines a cooling load on VRFTerminalUnits
     Array1D_bool LastModeHeating;           // defines last mode was heating mode
@@ -5112,7 +5113,7 @@ namespace HVACVariableRefrigerantFlow {
         int IndexToTUInTUList;            // index to TU in TerminalUnilList
         Real64 RhoAir;                    // air density at InNode
         Real64 CurrentEndTime;     // end time of current time step
-        static Real64 CurrentEndTimeLast; // end time of last time step
+        // static Real64 CurrentEndTimeLast; // end time of last time step
         Real64 TempOutput;                // Sensible output of TU
         Real64 LoadToCoolingSP;           // thermostat load to cooling setpoint (W)
         Real64 LoadToHeatingSP;           // thermostat load to heating setpoint (W)
@@ -6242,7 +6243,7 @@ namespace HVACVariableRefrigerantFlow {
         // providing more capacity than allowed. Example: TU loads are 1-ton, 2-ton, 3-ton, and 4-ton connected
         // to a condenser having only 9-tons available. This variable will be set to 3-tons and the 4-ton
         // terminal unit will be limited to 3-tons (see SimVRFCondenser where this variable is calculated).
-        if (CurrentEndTime > CurrentEndTimeLast || TimeStepSysLast > DataHVACGlobals::TimeStepSys ||
+        if (CurrentEndTime > CurrentEndTimeLast_InitVRF || TimeStepSysLast > DataHVACGlobals::TimeStepSys ||
             (FirstHVACIteration && MyBeginTimeStepFlag(VRFCond))) {
             MaxCoolingCapacity(VRFCond) = MaxCap;
             MaxHeatingCapacity(VRFCond) = MaxCap;
@@ -6254,7 +6255,7 @@ namespace HVACVariableRefrigerantFlow {
         // Do the following initializations (every time step).
 
         TimeStepSysLast = DataHVACGlobals::TimeStepSys;
-        CurrentEndTimeLast = CurrentEndTime;
+        CurrentEndTimeLast_InitVRF = CurrentEndTime;
 
         if (VRFTU(VRFTUNum).FanOpModeSchedPtr > 0) {
             if (GetCurrentScheduleValue(VRFTU(VRFTUNum).FanOpModeSchedPtr) == 0.0) {
