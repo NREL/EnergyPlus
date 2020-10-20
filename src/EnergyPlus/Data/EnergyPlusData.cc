@@ -90,6 +90,7 @@ namespace EnergyPlus {
         this->dataSplitterComponent = std::unique_ptr<SplitterComponentData>(new SplitterComponentData);
         this->dataSteamBaseboardRadiator = std::unique_ptr<SteamBaseboardRadiatorData>(new SteamBaseboardRadiatorData);
         this->dataSteamCoils = std::unique_ptr<SteamCoilsData>(new SteamCoilsData);
+        this->dataSurfaceGeometry = std::unique_ptr<SurfaceGeometryData>(new SurfaceGeometryData);
         this->dataSurfaceGroundHeatExchangers = std::unique_ptr<SurfaceGroundHeatExchangersData>(new SurfaceGroundHeatExchangersData);
         this->dataSwimmingPools = std::unique_ptr<SwimmingPoolsData>(new SwimmingPoolsData);
         this->dataSystemAvailabilityManager = std::unique_ptr<SystemAvailabilityManagerData>(new SystemAvailabilityManagerData);
@@ -158,6 +159,7 @@ namespace EnergyPlus {
         this->dataSplitterComponent->clear_state();
         this->dataSteamBaseboardRadiator->clear_state();
         this->dataSteamCoils->clear_state();
+        this->dataSurfaceGeometry->clear_state();
         this->dataSurfaceGroundHeatExchangers->clear_state();
         this->dataSwimmingPools->clear_state();
         this->dataSystemAvailabilityManager->clear_state();

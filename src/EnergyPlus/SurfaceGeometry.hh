@@ -72,56 +72,11 @@ namespace SurfaceGeometry {
     using DataSurfaces::SurfaceData;
     using DataVectorTypes::Vector;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern Array1D_string const BaseSurfCls;
-    extern Array1D_string const SubSurfCls;
-    extern Array1D_int const BaseSurfIDs;
-
-    extern Array1D_int const SubSurfIDs;
-
-    extern int const UnenteredAdjacentZoneSurface; // allows users to enter one zone surface ("Zone")
-    // referencing another in adjacent zone
-    extern int const UnreconciledZoneSurface; // interim value between entering surfaces ("Surface") and reconciling
-    // surface names in other zones
-
     enum enclosureType
     {
         RadiantEnclosures,
         SolarEnclosures
     };
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    // Following are used only during getting vertices, so are module variables here.
-    extern Real64 CosBldgRelNorth;          // Cosine of the building rotation (relative north) (includes appendix G rotation)
-    extern Real64 SinBldgRelNorth;          // Sine of the building rotation (relative north)   (includes appendix G rotation)
-    extern Real64 CosBldgRotAppGonly;       // Cosine of the building rotation for appendix G only(relative north)
-    extern Real64 SinBldgRotAppGonly;       // Sine of the building rotation for appendix G only (relative north)
-    extern Array1D<Real64> CosZoneRelNorth; // Cosine of the zone rotation (relative north)
-    extern Array1D<Real64> SinZoneRelNorth; // Sine of the zone rotation (relative north)
-
-    extern bool NoGroundTempObjWarning; // This will cause a warning to be issued if surfaces with "Ground"
-    // outside environment are used but no ground temperature object was input.
-    extern bool NoFCGroundTempObjWarning; // This will cause a warning to be issued if surfaces with "GroundFCfactorMethod"
-    // outside environment are used but no FC ground temperatures was input.
-    extern bool RectSurfRefWorldCoordSystem; // GlobalGeometryRules=World (true) or Relative (false)
-    extern int Warning1Count;                // counts of Modify Window 5/6 windows
-    extern int Warning2Count;                // counts of overriding exterior windows with Window 5/6 glazing systems
-    extern int Warning3Count;                // counts of overriding interior windows with Window 5/6 glazing systems
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE SurfaceGeometry
-
-    // Object Data
-    extern Array1D<SurfaceData> SurfaceTmp; // Allocated/Deallocated during input processing
-    extern HeatBalanceKivaManager::KivaManager kivaManager;
-
-    // Functions
-
-    // Clears the global data in HeatBalanceManager.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
 
     void SetupZoneGeometry(EnergyPlusData &state, bool &ErrorsFound);
 
@@ -131,7 +86,7 @@ namespace SurfaceGeometry {
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void checkSubSurfAzTiltNorm(SurfaceData &baseSurface, // Base surface data (in)
+    void checkSubSurfAzTiltNorm(EnergyPlusData &state, SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
                                 bool &surfaceError        // True if there is subsurface error that requires a fatal
     );
@@ -286,8 +241,6 @@ namespace SurfaceGeometry {
         std::map<int, Data> surfaceMap;
     };
 
-    extern ExposedFoundationPerimeter exposedFoundationPerimeter;
-
     void GetVertices(EnergyPlusData &state,
                      int const SurfNum,             // Current surface number
                      int const NSides,              // Number of sides to figure
@@ -301,7 +254,7 @@ namespace SurfaceGeometry {
                                Real64 &SurfTilt     // Surface tilt (
     );
 
-    void MakeMirrorSurface(int &SurfNum); // In=>Surface to Mirror, Out=>new Surface index
+    void MakeMirrorSurface(EnergyPlusData &state, int &SurfNum); // In=>Surface to Mirror, Out=>new Surface index
 
     void GetWindowShadingControlData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
@@ -424,7 +377,7 @@ namespace SurfaceGeometry {
                                          SurfaceGeometry::enclosureType const &EnclosureType,                       // Radiant or Solar
                                          bool &ErrorsFound);                                                        // Set to true if errors found
 
-    void CheckConvexity(int const SurfNum, // Current surface number
+    void CheckConvexity(EnergyPlusData &state, int const SurfNum, // Current surface number
                         int const NSides   // Number of sides to figure
     );
 
@@ -440,6 +393,85 @@ namespace SurfaceGeometry {
 
 } // namespace SurfaceGeometry
 
+struct SurfaceGeometryData : BaseGlobalStruct {
+
+    Real64 CosBldgRelNorth = 0.0;     // Cosine of the building rotation (relative north) (includes appendix G rotation)
+    Real64 SinBldgRelNorth = 0.0;     // Sine of the building rotation (relative north)   (includes appendix G rotation)
+    Real64 CosBldgRotAppGonly = 0.0;  // Cosine of the building rotation for appendix G only(relative north)
+    Real64 SinBldgRotAppGonly = 0.0;  // Sine of the building rotation for appendix G only (relative north)
+    Array1D<Real64> CosZoneRelNorth; // Cosine of the zone rotation (relative north)
+    Array1D<Real64> SinZoneRelNorth; // Sine of the zone rotation (relative north)
+
+    bool NoGroundTempObjWarning = true; // This will cause a warning to be issued if surfaces with "Ground"
+                                       // outside environment are used but no ground temperature object was input.
+    bool NoFCGroundTempObjWarning = true; // This will cause a warning to be issued if surfaces with "GroundFCfactorMethod"
+                                         // outside environment are used but no FC ground temperatures was input.
+    bool RectSurfRefWorldCoordSystem = false; // GlobalGeometryRules:Field Rectangular Surface Coordinate System (A5) = World (true) or Relative (false)
+    int Warning1Count = 0;                   // counts of Modify Window 5/6 windows
+    int Warning2Count = 0;                   // counts of overriding exterior windows with Window 5/6 glazing systems
+    int Warning3Count = 0;                   // counts of overriding interior windows with Window 5/6 glazing systems
+
+    bool ProcessSurfaceVerticesOneTimeFlag = true;
+    int checkSubSurfAzTiltNormErrCount = 0;
+    Array1D<Real64> Xpsv;
+    Array1D<Real64> Ypsv;
+    Array1D<Real64> Zpsv;
+
+    bool GetSurfaceDataOneTimeFlag = false;
+    std::unordered_map<std::string, std::string> UniqueSurfaceNames;
+    bool firstTime = true;
+    bool noTransform = true;
+    bool CheckConvexityFirstTime = true;
+
+    Array1D_string const BaseSurfCls;
+    Array1D_string const SubSurfCls;
+    Array1D_int const BaseSurfIDs;
+    Array1D_int const SubSurfIDs;
+    int const UnenteredAdjacentZoneSurface = -998; // allows users to enter one zone surface ("Zone")
+                                                  // referencing another in adjacent zone
+    int const UnreconciledZoneSurface = -999; // interim value between entering surfaces ("Surface") and reconciling
+
+    Array1D<SurfaceGeometry::SurfaceData> SurfaceTmp; // Allocated/Deallocated during input processing
+    HeatBalanceKivaManager::KivaManager kivaManager;
+    SurfaceGeometry::ExposedFoundationPerimeter exposedFoundationPerimeter;
+
+    void clear_state() override
+    {
+        ProcessSurfaceVerticesOneTimeFlag = true;
+        checkSubSurfAzTiltNormErrCount = 0;
+        Xpsv.deallocate();
+        Ypsv.deallocate();
+        Zpsv.deallocate();
+        // Following are used only during getting vertices, so are module variables here.
+        CosBldgRelNorth = 0.0;
+        SinBldgRelNorth = 0.0;
+        CosBldgRotAppGonly = 0.0;
+        SinBldgRotAppGonly = 0.0;
+        CosZoneRelNorth.deallocate();
+        SinZoneRelNorth.deallocate();
+        NoGroundTempObjWarning = true;
+        NoFCGroundTempObjWarning = true;
+        RectSurfRefWorldCoordSystem = false;
+        Warning1Count = 0;
+        Warning2Count = 0;
+        Warning3Count = 0;
+        SurfaceTmp.deallocate();
+        GetSurfaceDataOneTimeFlag = false;
+        UniqueSurfaceNames.clear();
+        kivaManager = HeatBalanceKivaManager::KivaManager();
+        firstTime = true;
+        noTransform = true;
+        CheckConvexityFirstTime = true;
+    }
+
+    // Default Constructor
+    SurfaceGeometryData() :
+        BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"}),
+        SubSurfCls(6, {"WINDOW", "DOOR", "GLASSDOOR", "SHADING", "TUBULARDAYLIGHTDOME", "TUBULARDAYLIGHTDIFFUSER"}),
+        BaseSurfIDs(3, {DataSurfaces::SurfaceClass_Wall, DataSurfaces::SurfaceClass_Floor, DataSurfaces::SurfaceClass_Roof}),
+        SubSurfIDs(6, {DataSurfaces::SurfaceClass_Window, DataSurfaces::SurfaceClass_Door, DataSurfaces::SurfaceClass_GlassDoor, DataSurfaces::SurfaceClass_Shading, DataSurfaces::SurfaceClass_TDD_Dome, DataSurfaces::SurfaceClass_TDD_Diffuser})
+    {}
+};
 } // namespace EnergyPlus
 
 #endif

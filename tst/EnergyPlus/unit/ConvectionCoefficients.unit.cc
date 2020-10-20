@@ -1441,7 +1441,7 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_HConvInDependen
 
     DataHeatBalance::HConvIn.allocate(1);
 
-    CalcASHRAESimpleIntConvCoeff(1, 20.0, 30.0);
+    CalcASHRAESimpleIntConvCoeff(state, 1, 20.0, 30.0);
 
     ConvectionCoefficient = DataHeatBalance::HConvIn(1);
 

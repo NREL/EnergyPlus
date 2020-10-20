@@ -208,6 +208,10 @@
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/SolarCollectors.hh>
+#include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
