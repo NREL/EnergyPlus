@@ -152,10 +152,10 @@ namespace AirflowNetwork {
 
     // Functions
 
-    AirProperties::AirProperties(EnergyPlusData &state)
+    AirProperties::AirProperties(double const airDensity)
     {
-        this->density = AIRDENSITY(state, 20.0, 101325.0, 0.0);
-        this->sqrtDensity = sqrt(AIRDENSITY(state, 20.0, 101325.0, 0.0));
+        this->density = airDensity;
+        this->sqrtDensity = sqrt(airDensity);
     }
 
     void Solver::allocate(EnergyPlusData &state)
@@ -221,7 +221,7 @@ namespace AirflowNetwork {
         // VISCZ.allocate(NetworkNumOfNodes);
         SUMAF.allocate(NetworkNumOfNodes);
 
-        for (int it = 1; it < NetworkNumOfNodes + 1; ++it) properties.emplace_back(state);
+        for (int it = 1; it < NetworkNumOfNodes + 1; ++it) properties.emplace_back(AIRDENSITY(state, 20.0, 101325.0, 0.0));
 
         ID.allocate(NetworkNumOfNodes);
         IK.allocate(NetworkNumOfNodes + 1);

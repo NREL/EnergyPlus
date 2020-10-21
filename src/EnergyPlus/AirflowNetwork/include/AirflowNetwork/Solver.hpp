@@ -75,7 +75,7 @@ namespace AirflowNetwork {
         Real64 sqrtDensity{0.0};
         Real64 viscosity{AIRDYNAMICVISCOSITY(20.0)};
 
-        explicit AirProperties(EnergyPlusData &state);
+        explicit AirProperties(double const airDensity);
     };
 
     // Forward declaration
