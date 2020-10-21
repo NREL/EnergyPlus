@@ -257,7 +257,7 @@ namespace HeatBalanceAirManager {
         GetRoomAirModelParameters(state, ErrorsFound);
 
         if (ErrorsFound) {
-            ShowFatalError("GetAirHeatBalanceInput: Errors found in getting Air inputs");
+            ShowFatalError(state, "GetAirHeatBalanceInput: Errors found in getting Air inputs");
         }
     }
 
@@ -618,7 +618,7 @@ namespace HeatBalanceAirManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             IsNotOK = false;
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             ZoneAirBalance(Loop).Name = cAlphaArgs(1);
             ZoneAirBalance(Loop).ZoneName = cAlphaArgs(2);
             ZoneAirBalance(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
@@ -804,7 +804,7 @@ namespace HeatBalanceAirManager {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             InfiltrationObjects(Item).Name = cAlphaArgs(1);
             Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
@@ -1291,7 +1291,7 @@ namespace HeatBalanceAirManager {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             errFlag = ErrorsFound;
 
             VentilationObjects(Item).Name = cAlphaArgs(1);
@@ -1927,7 +1927,7 @@ namespace HeatBalanceAirManager {
                                           cNumericFieldNames);
 
             VentiCount = TotDesignFlowVentilation + Loop;
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             Ventilation(VentiCount).Name = cAlphaArgs(1);
             Ventilation(VentiCount).ModelType = VentilationWindAndStack;
@@ -2331,7 +2331,7 @@ namespace HeatBalanceAirManager {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             Mixing(Loop).Name = cAlphaArgs(1);
 
@@ -2770,7 +2770,7 @@ namespace HeatBalanceAirManager {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 CrossMixing(Loop).Name = cAlphaArgs(1);
 
@@ -3200,7 +3200,7 @@ namespace HeatBalanceAirManager {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 NameThisObject = cAlphaArgs(1);
 

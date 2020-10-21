@@ -335,7 +335,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
             std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
             convertedFS << encoded << std::endl;
         } else {
-            ShowWarningError(state, "Skipping conversion of epJSON to IDF due to mismatched Version.");
+            ShowWarningError(state, state, "Skipping conversion of epJSON to IDF due to mismatched Version.");
         }
     }
 
@@ -364,7 +364,7 @@ bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
         for (auto const &version : it.value()) {
             std::string v = version["version_identifier"];
             if (v.empty()) {
-                ShowWarningError(state, "Input errors occurred and version ID was left blank, verify file version");
+                ShowWarningError(state, state, "Input errors occurred and version ID was left blank, verify file version");
             } else {
                 std::string::size_type const lenVer(len(MatchVersion));
                 int Which;
@@ -374,7 +374,7 @@ bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
                     Which = static_cast<int>(index(v, MatchVersion));
                 }
                 if (Which != 0) {
-                    ShowWarningError(state, "Version: in IDF=\"" + v + "\" not the same as expected=\"" + MatchVersion + "\"");
+                    ShowWarningError(state, state, "Version: in IDF=\"" + v + "\" not the same as expected=\"" + MatchVersion + "\"");
                     return false;
                 }
             }
@@ -395,13 +395,13 @@ bool InputProcessor::processErrors(EnergyPlusData &state)
         ShowSevereError(state, error);
     }
     for (auto const &warning : idf_parser_warnings) {
-        ShowWarningError(state, warning);
+        ShowWarningError(state, state, warning);
     }
     for (auto const &error : validation_errors) {
         ShowSevereError(state, error);
     }
     for (auto const &warning : validation_warnings) {
-        ShowWarningError(state, warning);
+        ShowWarningError(state, state, warning);
     }
 
     bool has_errors = validation->hasErrors() || idf_parser->hasErrors();
@@ -458,7 +458,7 @@ int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string const 
     if (schema["properties"].find(ObjectWord) == schema["properties"].end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            ShowWarningError(state, "Requested Object not found in Definitions: " + ObjectWord);
+            ShowWarningError(state, state, "Requested Object not found in Definitions: " + ObjectWord);
         }
     }
     return 0;
@@ -1109,7 +1109,7 @@ void InputProcessor::rangeCheck(EnergyPlusData &state,
             auto const errorCheck(ErrorString[0]);
 
             if ((errorCheck == 'W') || (errorCheck == 'w')) {
-                ShowWarningError(state, Message1);
+                ShowWarningError(state, state, Message1);
                 ShowContinueError(state, Message2);
 
             } else if ((errorCheck == 'S') || (errorCheck == 's')) {
@@ -1452,7 +1452,7 @@ void InputProcessor::reportOrphanRecordObjects(EnergyPlusData &state)
     unused_object_types.reserve(unusedInputs.size());
 
     if (unusedInputs.size() && DataGlobals::DisplayUnusedObjects) {
-        ShowWarningError(state, "The following lines are \"Unused Objects\".  These objects are in the input");
+        ShowWarningError(state, state, "The following lines are \"Unused Objects\".  These objects are in the input");
         ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
         if (!DataGlobals::DisplayAllWarnings) {
             ShowContinueError(state,
@@ -1589,7 +1589,7 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
                     ShowMessage(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
                                 "\" has the following Information message" + Multiples + ':');
                 } else if (errorType == "WARNING") {
-                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowWarningError(state, state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
                                      "\" has the following Warning condition" + Multiples + ':');
                 } else if (errorType == "SEVERE") {
                     ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +

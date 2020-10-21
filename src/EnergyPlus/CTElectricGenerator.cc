@@ -159,7 +159,7 @@ namespace CTElectricGenerator {
         state.dataCTElectricGenerator->NumCTGenerators = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (state.dataCTElectricGenerator->NumCTGenerators <= 0) {
-            ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, "No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
@@ -180,13 +180,13 @@ namespace CTElectricGenerator {
                                           DataIPShortCuts::lAlphaFieldBlanks,
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(AlphArray(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphArray(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
             state.dataCTElectricGenerator->CTGenerator(genNum).Name = AlphArray(1);
 
             state.dataCTElectricGenerator->CTGenerator(genNum).RatedPowerOutput = NumArray(1);
             if (NumArray(1) == 0.0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' + General::RoundSigDigits(NumArray(1), 2));
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' + General::RoundSigDigits(NumArray(1), 2));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
@@ -210,42 +210,42 @@ namespace CTElectricGenerator {
 
             state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedFuelInputCurve = CurveManager::GetCurveIndex(state, AlphArray(3)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedFuelInputCurve == 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + AlphArray(3));
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + AlphArray(3));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedFuelInputCurve = CurveManager::GetCurveIndex(state, AlphArray(4)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedFuelInputCurve == 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + AlphArray(4));
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + AlphArray(4));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).ExhaustFlowCurve = CurveManager::GetCurveIndex(state, AlphArray(5)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).ExhaustFlowCurve == 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + '=' + AlphArray(5));
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + '=' + AlphArray(5));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedExhaustTempCurve = CurveManager::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedExhaustTempCurve == 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + AlphArray(6));
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + AlphArray(6));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedExhaustTempCurve = CurveManager::GetCurveIndex(state, AlphArray(7)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedExhaustTempCurve == 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + AlphArray(7));
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + AlphArray(7));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).QLubeOilRecoveredCurve = CurveManager::GetCurveIndex(state, AlphArray(8)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).QLubeOilRecoveredCurve == 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + AlphArray(8));
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + AlphArray(8));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
@@ -270,7 +270,7 @@ namespace CTElectricGenerator {
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsNotParent);
                 if (state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInletNodeNum == 0) {
-                    ShowSevereError("Missing Node Name, Heat Recovery Inlet, for " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, "Missing Node Name, Heat Recovery Inlet, for " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
                 state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(state, AlphArray(10),
@@ -282,10 +282,10 @@ namespace CTElectricGenerator {
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
                 if (state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecOutletNodeNum == 0) {
-                    ShowSevereError("Missing Node Name, Heat Recovery Outlet, for " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, "Missing Node Name, Heat Recovery Outlet, for " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
-                BranchNodeConnections::TestCompSet(
+                BranchNodeConnections::TestCompSet(state,
                     DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(9), AlphArray(10), "Heat Recovery Nodes");
                 PlantUtilities::RegisterPlantCompDesignFlow(state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInletNodeNum, state.dataCTElectricGenerator->CTGenerator(genNum).DesignHeatRecVolFlowRate);
             } else {
@@ -293,7 +293,7 @@ namespace CTElectricGenerator {
                 state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInletNodeNum = 0;
                 state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecOutletNodeNum = 0;
                 if (!DataIPShortCuts::lAlphaFieldBlanks(9) || !DataIPShortCuts::lAlphaFieldBlanks(10)) {
-                    ShowWarningError("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + DataIPShortCuts::cCurrentModuleObject + '=' +
+                    ShowWarningError(state, "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + DataIPShortCuts::cCurrentModuleObject + '=' +
                                      AlphArray(1));
                     ShowContinueError("However, Node names were specified for Heat Recovery inlet or outlet nodes");
                 }
@@ -303,7 +303,7 @@ namespace CTElectricGenerator {
             bool FuelTypeError(false);
             UtilityRoutines::ValidateFuelType(AlphArray(11), state.dataCTElectricGenerator->CTGenerator(genNum).FuelType, FuelTypeError);
             if (FuelTypeError) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + '=' + AlphArray(11));
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + '=' + AlphArray(11));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
                 FuelTypeError = false;
@@ -324,7 +324,7 @@ namespace CTElectricGenerator {
                                                                                       1,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataCTElectricGenerator->CTGenerator(genNum).OAInletNode)) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ", \"" + state.dataCTElectricGenerator->CTGenerator(genNum).Name +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + ", \"" + state.dataCTElectricGenerator->CTGenerator(genNum).Name +
                                     "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + AlphArray(12));
                     ShowContinueError("...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                     ErrorsFound = true;

@@ -384,7 +384,7 @@ namespace MundtSimMgr {
 
                         // error check for debugging
                         if (!AirNodeFoundFlag) {
-                            ShowSevereError("InitMundtModel: Air Node in Zone=\"" + Zone(ZoneIndex).Name + "\" is not found.");
+                            ShowSevereError(state, "InitMundtModel: Air Node in Zone=\"" + Zone(ZoneIndex).Name + "\" is not found.");
                             ErrorsFound = true;
                             continue;
                         }
@@ -616,7 +616,7 @@ namespace MundtSimMgr {
                 } else if (SELECT_CASE_var == ReturnAirNode) { // return
                     ReturnNodeID = NodeNum;
                 } else {
-                    ShowSevereError("SetupMundtModel: Non-Standard Type of Air Node for Mundt Model");
+                    ShowSevereError(state, "SetupMundtModel: Non-Standard Type of Air Node for Mundt Model");
                     ErrorsFound = true;
                 }
             }
@@ -639,7 +639,7 @@ namespace MundtSimMgr {
                 FloorSurf(SurfNum).Area = MundtAirSurf(FloorSurfSetIDs(SurfNum), MundtZoneNum).Area;
             }
         } else {
-            ShowSevereError("SetupMundtModel: Mundt model has no FloorAirNode, Zone=" + Zone(ZoneNum).Name);
+            ShowSevereError(state, "SetupMundtModel: Mundt model has no FloorAirNode, Zone=" + Zone(ZoneNum).Name);
             ErrorsFound = true;
         }
     }

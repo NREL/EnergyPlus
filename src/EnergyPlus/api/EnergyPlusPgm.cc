@@ -341,7 +341,7 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
     using namespace EnergyPlus;
 
     try {
-        ShowMessage("Simulation Error Summary *************");
+        ShowMessage(state, "Simulation Error Summary *************");
 
         GenOutputVariablesAuditReport();
 

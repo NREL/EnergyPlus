@@ -1066,7 +1066,7 @@ namespace DisplacementVentMgr {
             } else if (HeightComfort >= HeightMixedSubzoneAve && HeightComfort <= CeilingHeight) {
                 TCMF(ZoneNum) = ZTMX(ZoneNum);
             } else {
-                ShowFatalError("Displacement ventilation comfort height is above ceiling or below floor in Zone: " + Zone(ZoneNum).Name);
+                ShowFatalError(state, "Displacement ventilation comfort height is above ceiling or below floor in Zone: " + Zone(ZoneNum).Name);
             }
         }
 
@@ -1092,7 +1092,7 @@ namespace DisplacementVentMgr {
             } else if (HeightThermostat >= HeightMixedSubzoneAve && HeightThermostat <= CeilingHeight) {
                 TempTstatAir(ZoneNum) = ZTMX(ZoneNum);
             } else {
-                ShowFatalError("Displacement ventilation thermostat height is above ceiling or below floor in Zone: " + Zone(ZoneNum).Name);
+                ShowFatalError(state, "Displacement ventilation thermostat height is above ceiling or below floor in Zone: " + Zone(ZoneNum).Name);
             }
         }
 

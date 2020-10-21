@@ -423,12 +423,12 @@ namespace CrossVentMgr {
             } else if (AirflowNetwork::AirflowNetworkCompData(cCompNum).CompTypeNum == AirflowNetwork::CompTypeNum_SCR) {
                 CVJetRecFlows(Ctd, ZoneNum).Area = SurfParametersCVDV(Ctd).Width * SurfParametersCVDV(Ctd).Height;
             } else {
-                ShowSevereError(
+                ShowSevereError(state,
                     "RoomAirModelCrossVent:EvolveParaUCSDCV: Illegal leakage component referenced in the cross ventilation room air model");
-                ShowContinueError("Surface " + AirflowNetwork::AirflowNetworkLinkageData(Ctd).Name + " in zone " + Zone(ZoneNum).Name +
+                ShowContinueError(state, "Surface " + AirflowNetwork::AirflowNetworkLinkageData(Ctd).Name + " in zone " + Zone(ZoneNum).Name +
                                   " uses leakage component " + AirflowNetwork::AirflowNetworkLinkageData(Ctd).CompName);
-                ShowContinueError("Only leakage component types AirflowNetwork:MultiZone:Component:DetailedOpening and ");
-                ShowContinueError("AirflowNetwork:MultiZone:Surface:Crack can be used with the cross ventilation room air model");
+                ShowContinueError(state, "Only leakage component types AirflowNetwork:MultiZone:Component:DetailedOpening and ");
+                ShowContinueError(state, "AirflowNetwork:MultiZone:Surface:Crack can be used with the cross ventilation room air model");
                 ShowFatalError("Previous severe error causes program termination");
             }
         }

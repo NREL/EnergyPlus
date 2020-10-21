@@ -341,12 +341,12 @@ namespace DaylightingManager {
                     ShowSevereError("DayltgAveInteriorReflectance: Multiplier > 1.0 for window " + Surface(ISurf).Name +
                                     " in Zone=" + Surface(ISurf).ZoneName);
                     ShowContinueError("...not allowed since it is in a zone or enclosure with daylighting.");
-                    ShowFatalError("Program terminates due to preceding conditions.");
+                    ShowFatalError(state, "Program terminates due to preceding conditions.");
                 } else {
                     ShowSevereError("DayltgAveInteriorReflectance: Multiplier > 1.0 for window " + Surface(ISurf).Name +
                                     " in Zone=" + Surface(ISurf).ZoneName);
                     ShowContinueError("...an adjacent Zone has daylighting. Simulation cannot proceed.");
-                    ShowFatalError("Program terminates due to preceding conditions.");
+                    ShowFatalError(state, "Program terminates due to preceding conditions.");
                 }
             }
             if (IType == SurfaceClass_Wall || IType == SurfaceClass_Floor || IType == SurfaceClass_Roof || IType == SurfaceClass_Window ||
@@ -910,7 +910,7 @@ namespace DaylightingManager {
             }
 
             if (ErrorsFound) {
-                ShowFatalError("Not all TubularDaylightDome objects have corresponding DaylightingDevice:Tubular objects. Program terminates.");
+                ShowFatalError(state, "Not all TubularDaylightDome objects have corresponding DaylightingDevice:Tubular objects. Program terminates.");
             }
             VeryFirstTime = false;
         }
@@ -1968,7 +1968,7 @@ namespace DaylightingManager {
                                     " because reference point #" + RoundSigDigits(iRefPoint) + " is less than 0.15m (6\") from window plane " +
                                     Surface(IWin).Name);
                     ShowContinueError("Distance=[" + RoundSigDigits(ALF, 5) + "]. This is too close; check position of reference point.");
-                    ShowFatalError("Program terminates due to preceding condition.");
+                    ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
             } else if (ALF < 0.1524 && ExtWinType == AdjZoneExtWin) {
                 if (RefErrIndex(iRefPoint, IWin) == 0) { // only show error message once
@@ -4382,7 +4382,7 @@ namespace DaylightingManager {
             GeometryTransformForDaylighting(state);
             GetInputIlluminanceMap(state, ErrorsFound);
             GetLightWellData(state, ErrorsFound);
-            if (ErrorsFound) ShowFatalError("Program terminated for above reasons, related to DAYLIGHTING");
+            if (ErrorsFound) ShowFatalError(state, "Program terminated for above reasons, related to DAYLIGHTING");
             DayltgSetupAdjZoneListsAndPointers(state);
         }
 
@@ -4651,7 +4651,7 @@ namespace DaylightingManager {
             }
         }
 
-        if (ErrorsFound) ShowFatalError("Program terminated for above reasons");
+        if (ErrorsFound) ShowFatalError(state, "Program terminated for above reasons");
     }
 
     void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
@@ -5545,7 +5545,7 @@ namespace DaylightingManager {
             }
         } // ShelfNum
 
-        if (ErrorsFound) ShowFatalError("CheckTDDsAndLightShelvesInDaylitZones: Errors in DAYLIGHTING input.");
+        if (ErrorsFound) ShowFatalError(state, "CheckTDDsAndLightShelvesInDaylitZones: Errors in DAYLIGHTING input.");
     }
 
     void AssociateWindowShadingControlWithDaylighting()

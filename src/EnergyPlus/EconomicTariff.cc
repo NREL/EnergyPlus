@@ -349,7 +349,7 @@ namespace EconomicTariff {
                 CreateDefaultComputation();
             }
             Update_GetInput = false;
-            if (ErrorsFound) ShowFatalError("UpdateUtilityBills: Preceding errors cause termination.");
+            if (ErrorsFound) ShowFatalError(state, "UpdateUtilityBills: Preceding errors cause termination.");
         }
         if (DoOutputReporting && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
             GatherForEconomics();
@@ -423,8 +423,8 @@ namespace EconomicTariff {
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 //  args are always turned to upper case but this is okay...
                 if (hasi(cAlphaArgs(jFld), "UtilityCost:")) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
-                    ShowContinueError("... a field was found containing UtilityCost: which may indicate a missing comma.");
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                    ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
                 }
             }
             // name of the tariff
@@ -448,7 +448,7 @@ namespace EconomicTariff {
             GetVariableKeyCountandType(state, tariff(iInObj).reportMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
             // if no meters found for that name
             if (KeyCount == 0) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" missing meter");
+                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" missing meter");
                 ShowContinueError("Meter referenced is not present due to a lack of equipment that uses that energy source/meter:\"" +
                                   tariff(iInObj).reportMeter + "\".");
                 tariff(iInObj).reportMeterIndx = 0;
@@ -458,7 +458,7 @@ namespace EconomicTariff {
                 GetVariableKeys(state, tariff(iInObj).reportMeter, TypeVar, NamesOfKeys, IndexesForKeyVar);
                 // although this retrieves all keys for a variable, we only need one so the first one is chosen
                 if (KeyCount > 1) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" multiple keys");
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" multiple keys");
                     ShowContinueError("... Multiple keys for variable select. First key will be used.");
                 }
                 // assign the index
@@ -534,7 +534,7 @@ namespace EconomicTariff {
                     tariff(iInObj).convChoice = conversionM3;
                     tariff(iInObj).energyConv = 1.0;
                     tariff(iInObj).demandConv = 3600.0;
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError(cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\", Defaulting to m^3 (Water resource detected).");
                 }
 
@@ -568,7 +568,7 @@ namespace EconomicTariff {
                     tariff(iInObj).convChoice = conversionTHERM;
                     tariff(iInObj).energyConv = 9.4781712e-9;
                     tariff(iInObj).demandConv = 0.00003412;
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" potentially invalid data");
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" potentially invalid data");
                     ShowContinueError(cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\", Therm is an unusual choice for an electric resource.)");
 
                     // Otherwise, default to kWh
@@ -576,7 +576,7 @@ namespace EconomicTariff {
                     tariff(iInObj).convChoice = conversionKWH;
                     tariff(iInObj).energyConv = 0.0000002778;
                     tariff(iInObj).demandConv = 0.001;
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError(cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\", Defaulting to kWh (Electric resource detected)");
                 }
 
@@ -628,7 +628,7 @@ namespace EconomicTariff {
                     tariff(iInObj).convChoice = conversionKWH;
                     tariff(iInObj).energyConv = 0.0000002778;
                     tariff(iInObj).demandConv = 0.001;
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError(cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\", Defaulting to kWh.");
                 }
 
@@ -665,7 +665,7 @@ namespace EconomicTariff {
                     tariff(iInObj).convChoice = conversionKWH;
                     tariff(iInObj).energyConv = 0.0000002778;
                     tariff(iInObj).demandConv = 0.001;
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                     ShowContinueError(cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\", Defaulting to kWh.");
                 }
             } // Default conversion factors have been applied from here on
@@ -715,14 +715,14 @@ namespace EconomicTariff {
                     if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 15)) {
                         tariff(iInObj).demandWindow = demandWindowHour;
                         tariff(iInObj).demWinTime = 1.00;
-                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
+                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                         ShowContinueError("Demand window of QuarterHour is not consistent with number of timesteps per hour [" +
                                           RoundSigDigits(NumOfTimeStepInHour) + "].");
                         ShowContinueError("Demand window will be set to FullHour, and the simulation continues.");
                     } else if ((SELECT_CASE_var == 2) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 10) || (SELECT_CASE_var == 30)) {
                         tariff(iInObj).demandWindow = demandWindowHalf;
                         tariff(iInObj).demWinTime = 0.50;
-                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
+                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                         ShowContinueError("Demand window of QuarterHour is not consistent with number of timesteps per hour [" +
                                           RoundSigDigits(NumOfTimeStepInHour) + "].");
                         ShowContinueError("Demand window will be set to HalfHour, and the simulation continues.");
@@ -737,7 +737,7 @@ namespace EconomicTariff {
                     if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 15)) {
                         tariff(iInObj).demandWindow = demandWindowHour;
                         tariff(iInObj).demWinTime = 1.00;
-                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
+                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                         ShowContinueError("Demand window of HalfHour is not consistent with number of timesteps per hour [" +
                                           RoundSigDigits(NumOfTimeStepInHour) + "].");
                         ShowContinueError("Demand window will be set to FullHour, and the simulation continues.");
@@ -802,12 +802,12 @@ namespace EconomicTariff {
             // check if meter is consistent with buy or sell option
             if ((tariff(iInObj).buyOrSell == sellToUtility) &&
                 (!UtilityRoutines::SameString(tariff(iInObj).reportMeter, "ELECTRICITYSURPLUSSOLD:FACILITY"))) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" atypical meter");
+                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" atypical meter");
                 ShowContinueError("The meter chosen \"" + tariff(iInObj).reportMeter + "\" is not typically used with the sellToUtility option.");
                 ShowContinueError("Usually the ElectricitySurplusSold:Facility meter is selected when the sellToUtility option is used.");
             }
             if ((tariff(iInObj).buyOrSell == netMetering) && (!UtilityRoutines::SameString(tariff(iInObj).reportMeter, "ELECTRICITYNET:FACILITY"))) {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" atypical meter");
+                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" atypical meter");
                 ShowContinueError("The meter chosen \"" + tariff(iInObj).reportMeter + " is not typically used with the netMetering option.");
                 ShowContinueError("Usually the ElectricityNet:Facility meter is selected when the netMetering option is used.");
             }
@@ -816,7 +816,7 @@ namespace EconomicTariff {
                 if (hasi(tariff(iInObj).reportMeter, "Elec")) { // test if electric meter
                     if (!(UtilityRoutines::SameString(tariff(iInObj).reportMeter, "Electricity:Facility") ||
                           UtilityRoutines::SameString(tariff(iInObj).reportMeter, "ElectricityPurchased:Facility"))) {
-                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" atypical meter");
+                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" atypical meter");
                         ShowContinueError("The meter chosen \"" + tariff(iInObj).reportMeter +
                                           " is not typically used with the buyFromUtility option.");
                         ShowContinueError("Usually the Electricity:Facility meter or the ElectricityPurchased:Facility is selected when the "
@@ -881,7 +881,7 @@ namespace EconomicTariff {
             // check to make sure none of the values are another economic object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(cAlphaArgs(jFld), "UtilityCost:")) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
                     ShowContinueError("... a field was found containing UtilityCost: which may indicate a missing comma.");
                 }
             }
@@ -916,7 +916,7 @@ namespace EconomicTariff {
             } else if (UtilityRoutines::SameString(cAlphaArgs(7), "Consecutive")) {
                 qualify(iInObj).isConsecutive = true;
             } else {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
+                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                 ShowContinueError(cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                 ErrorsFound = true;
                 qualify(iInObj).isConsecutive = true;
@@ -963,7 +963,7 @@ namespace EconomicTariff {
             // check to make sure none of the values are another economic object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(cAlphaArgs(jFld), "UtilityCost:")) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
                     ShowContinueError("... a field was found containing UtilityCost: which may indicate a missing comma.");
                 }
             }
@@ -981,7 +981,7 @@ namespace EconomicTariff {
             if (chargeSimple(iInObj).season != seasonAnnual) {
                 if (chargeSimple(iInObj).tariffIndx != 0) {
                     if (tariff(chargeSimple(iInObj).tariffIndx).seasonSchIndex == 0) {
-                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
+                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                         ShowContinueError(cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                         ShowContinueError(" a Season other than Annual is used but no Season Schedule Name is specified in the UtilityCost:Tariff.");
                     }
@@ -1038,7 +1038,7 @@ namespace EconomicTariff {
             // check to make sure none of the values are another economic object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(cAlphaArgs(jFld), "UtilityCost:")) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
                     ShowContinueError("... a field was found containing UtilityCost: which may indicate a missing comma.");
                 }
             }
@@ -1056,7 +1056,7 @@ namespace EconomicTariff {
             if (chargeBlock(iInObj).season != seasonAnnual) {
                 if (chargeBlock(iInObj).tariffIndx != 0) {
                     if (tariff(chargeBlock(iInObj).tariffIndx).seasonSchIndex == 0) {
-                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
+                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                         ShowContinueError(cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                         ShowContinueError(" a Season other than Annual is used but no Season Schedule Name is specified in the UtilityCost:Tariff.");
                     }
@@ -1137,7 +1137,7 @@ namespace EconomicTariff {
             // check to make sure none of the values are another economic object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(cAlphaArgs(jFld), "UtilityCost:")) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
                     ShowContinueError("... a field was found containing UtilityCost: which may indicate a missing comma.");
                 }
             }
@@ -1206,7 +1206,7 @@ namespace EconomicTariff {
             // check to make sure none of the values are another economic object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(cAlphaArgs(jFld), "UtilityCost:")) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
                     ShowContinueError("... a field was found containing UtilityCost: which may indicate a missing comma.");
                 }
             }
@@ -1288,7 +1288,7 @@ namespace EconomicTariff {
             // check to make sure none of the values are another economic object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(cAlphaArgs(jFld), "UtilityCost:")) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\".");
                     ShowContinueError("... a field was found containing UtilityCost: which may indicate a missing comma.");
                 }
             }

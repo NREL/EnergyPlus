@@ -556,7 +556,7 @@ namespace HeatBalanceIntRadExchange {
             }
             thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
             MaxNumOfRadEnclosureSurfs = max(MaxNumOfRadEnclosureSurfs, numEnclosureSurfaces);
-            if (numEnclosureSurfaces < 1) ShowFatalError("No surfaces in an enclosure in InitInteriorRadExchange");
+            if (numEnclosureSurfaces < 1) ShowFatalError(state, "No surfaces in an enclosure in InitInteriorRadExchange");
 
             // Allocate the parts of the derived type
             thisEnclosure.F.dimension(numEnclosureSurfaces, numEnclosureSurfaces, 0.0);
@@ -614,8 +614,8 @@ namespace HeatBalanceIntRadExchange {
 
                 // User View Factors cannot be used with Carroll method.
                 if(inputProcessor->getNumObjectsFound(state, "ZoneProperty:UserViewFactors:BySurfaceName")) {
-                    ShowWarningError("ZoneProperty:UserViewFactors:BySurfaceName objects have been defined, however View");
-                    ShowContinueError("  Factors are not used when Zone Radiant Exchange Algorithm is set to CarrollMRT.");
+                    ShowWarningError(state, "ZoneProperty:UserViewFactors:BySurfaceName objects have been defined, however View");
+                    ShowContinueError(state, "  Factors are not used when Zone Radiant Exchange Algorithm is set to CarrollMRT.");
                 }
                 CalcFMRT(thisEnclosure.NumOfSurfaces, thisEnclosure.Area, thisEnclosure.FMRT);
                 CalcFp(thisEnclosure.NumOfSurfaces, thisEnclosure.Emissivity, thisEnclosure.FMRT, thisEnclosure.Fp);
@@ -813,7 +813,7 @@ namespace HeatBalanceIntRadExchange {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("InitInteriorRadExchange: Errors found during initialization of radiant exchange.  Program terminated.");
+            ShowFatalError(state, "InitInteriorRadExchange: Errors found during initialization of radiant exchange.  Program terminated.");
         }
     }
 
@@ -864,7 +864,7 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
             thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
-            if (numEnclosureSurfaces < 1) ShowFatalError("No surfaces in an enclosure in InitSolarViewFactors");
+            if (numEnclosureSurfaces < 1) ShowFatalError(state, "No surfaces in an enclosure in InitSolarViewFactors");
 
             // Allocate the parts of the derived type
             thisEnclosure.F.dimension(numEnclosureSurfaces, numEnclosureSurfaces, 0.0);
@@ -1096,7 +1096,7 @@ namespace HeatBalanceIntRadExchange {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("InitSolarViewFactors: Errors found during initialization of diffuse solar distribution.  Program terminated.");
+            ShowFatalError(state, "InitSolarViewFactors: Errors found during initialization of diffuse solar distribution.  Program terminated.");
         }
     }
 
@@ -1158,7 +1158,7 @@ namespace HeatBalanceIntRadExchange {
 
             if (NumNums < 3 * pow_2(N)) {
                 ShowSevereError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values.");
-                ShowContinueError("...Number of input values [" + TrimSigDigits(NumNums) + "] is less than the required number=[" +
+                ShowContinueError(state, "...Number of input values [" + TrimSigDigits(NumNums) + "] is less than the required number=[" +
                                   TrimSigDigits(3 * pow_2(N)) + "].");
                 ErrorsFound = true;
                 NumNums = 0;
@@ -1348,8 +1348,8 @@ namespace HeatBalanceIntRadExchange {
                                           cNumericFieldNames);
 
             if (NumNums < pow_2(N)) {
-                ShowWarningError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", not enough values.");
-                ShowContinueError("...Number of input values [" + TrimSigDigits(NumNums) + "] is less than the required number=[" +
+                ShowWarningError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", not enough values.");
+                ShowContinueError(state, "...Number of input values [" + TrimSigDigits(NumNums) + "] is less than the required number=[" +
                                   TrimSigDigits(pow_2(N)) + "] Missing surface pairs will have a zero view factor.");
             }
             F = 0.0;
@@ -1360,12 +1360,12 @@ namespace HeatBalanceIntRadExchange {
                 inx2 = UtilityRoutines::FindItemInList(cAlphaArgs(index + 1), enclosureSurfaceNames, N);
                 if (inx1 == 0) {
                     ShowSevereError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                    ShowContinueError("...Surface name=\"" + cAlphaArgs(index) + "\", not in this zone or enclosure.");
+                    ShowContinueError(state, "...Surface name=\"" + cAlphaArgs(index) + "\", not in this zone or enclosure.");
                     ErrorsFound = true;
                 }
                 if (inx2 == 0) {
                     ShowSevereError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                    ShowContinueError("...Surface name=\"" + cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
+                    ShowContinueError(state, "...Surface name=\"" + cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
                     ErrorsFound = true;
                 }
                 ++numinx1;
@@ -1460,8 +1460,8 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
             if (ZoneArea(i) <= 0.0) {
-                ShowWarningError("CalcApproximateViewFactors: Zero area for all other zone surfaces.");
-                ShowContinueError("Happens for Surface=\"" + Surface(SPtr(i)).Name + "\" in Zone=" + Zone(Surface(SPtr(i)).Zone).Name);
+                ShowWarningError(state, "CalcApproximateViewFactors: Zero area for all other zone surfaces.");
+                ShowContinueError(state, "Happens for Surface=\"" + Surface(SPtr(i)).Name + "\" in Zone=" + Zone(Surface(SPtr(i)).Zone).Name);
             }
         }
 
@@ -1614,12 +1614,12 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
 
-            ShowWarningError("Surfaces in Zone/Enclosure=\"" + enclName + "\" do not define an enclosure.");
-            ShowContinueError("Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.");
-            ShowContinueError("Reciprocity means that radiant exchange between two surfaces will match and not lead to an energy loss.");
-            ShowContinueError("Completeness means that all of the view factors between a surface and the other surfaces in a zone add up to unity.");
-            ShowContinueError("So, when there are three or less surfaces in a zone, EnergyPlus will make sure there are no losses of energy but");
-            ShowContinueError(
+            ShowWarningError(state, "Surfaces in Zone/Enclosure=\"" + enclName + "\" do not define an enclosure.");
+            ShowContinueError(state, "Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.");
+            ShowContinueError(state, "Reciprocity means that radiant exchange between two surfaces will match and not lead to an energy loss.");
+            ShowContinueError(state, "Completeness means that all of the view factors between a surface and the other surfaces in a zone add up to unity.");
+            ShowContinueError(state, "So, when there are three or less surfaces in a zone, EnergyPlus will make sure there are no losses of energy but");
+            ShowContinueError(state,
                 "it will not exchange the full amount of radiation with the rest of the zone as it would if there was a completed enclosure.");
 
             RowSum = sum(FixedF);
@@ -1645,7 +1645,7 @@ namespace HeatBalanceIntRadExchange {
                 }
                 sumFixedF.deallocate();
                 if (MaxFixedFRowSum < 1.0) {
-                    ShowFatalError(" FixViewFactors: Three surface or less zone failing ViewFactorFix correction which should never happen.");
+                    ShowFatalError(state, " FixViewFactors: Three surface or less zone failing ViewFactorFix correction which should never happen.");
                 } else {
                     FixedF *= (1.0 / MaxFixedFRowSum);
                 }
@@ -1708,11 +1708,11 @@ namespace HeatBalanceIntRadExchange {
                 Real64 const sum_FixedF(sum(FixedF));
                 FinalCheckValue = FixedCheckValue = CheckConvergeTolerance = std::abs(sum_FixedF - N);
                 if (CheckConvergeTolerance > 0.005) {
-                    ShowWarningError("FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" +
+                    ShowWarningError(state, "FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" +
                                      enclName + "\".");
-                    ShowContinueError("Enforced reciprocity has tolerance (ideal is 0)=[" + RoundSigDigits(CheckConvergeTolerance, 6) +
+                    ShowContinueError(state, "Enforced reciprocity has tolerance (ideal is 0)=[" + RoundSigDigits(CheckConvergeTolerance, 6) +
                                       "], Row Sum (ideal is " + RoundSigDigits(N) + ")=[" + RoundSigDigits(RowSum, 2) + "].");
-                    ShowContinueError("If zone is unusual, or tolerance is on the order of 0.001, view factors are probably OK.");
+                    ShowContinueError(state, "If zone is unusual, or tolerance is on the order of 0.001, view factors are probably OK.");
                 }
                 if (std::abs(FixedCheckValue) < std::abs(OriginalCheckValue)) {
                     F = FixedF;
@@ -1733,7 +1733,7 @@ namespace HeatBalanceIntRadExchange {
                 F = FixedF;
                 FinalCheckValue = FixedCheckValue;
             } else {
-                ShowWarningError("FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" + enclName +
+                ShowWarningError(state, "FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" + enclName +
                                  "\".");
             }
         }
@@ -1814,7 +1814,7 @@ namespace HeatBalanceIntRadExchange {
             Real64 EMISS_i(EMISS(i));
             if (EMISS_i > MaxEmissLimit) { // Check/limit EMISS for this surface to avoid divide by zero below
                 EMISS_i = EMISS(i) = MaxEmissLimit;
-                ShowWarningError("A thermal emissivity above 0.99999 was detected. This is not allowed. Value was reset to 0.99999");
+                ShowWarningError(state, "A thermal emissivity above 0.99999 was detected. This is not allowed. Value was reset to 0.99999");
             }
             Real64 const EMISS_i_fac(A(i) / (1.0 - EMISS_i));
             Excite(i) = -EMISS_i * EMISS_i_fac; // Set up matrix columns for partial radiosity calculation
@@ -1998,7 +1998,7 @@ namespace HeatBalanceIntRadExchange {
                 ShowSevereError("Carroll MRT Zone Radiant Exchange method unable to converge on \"view factor\" calculation.");
             }
             if (errorsFound) {
-                ShowFatalError("CalcFMRT: Errors found while calculating mean radiant temperature view factors.  Program terminated.");
+                ShowFatalError(state, "CalcFMRT: Errors found while calculating mean radiant temperature view factors.  Program terminated.");
             }
         }
         return;
@@ -2033,7 +2033,7 @@ namespace HeatBalanceIntRadExchange {
         // Trap for surfaces that do not exist
         if (surfNum == 0) {
             ShowSevereError(routineName + "Invalid Surface name = " + SurfaceName);
-            ShowContinueError("Occurs for " + cCurrentModuleObject + " = " + RadSysName);
+            ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + RadSysName);
             ErrorsFound = true;
             return surfNum;
         }
@@ -2058,9 +2058,9 @@ namespace HeatBalanceIntRadExchange {
             ErrorsFound = true;                               // LCOV_EXCL_LINE
         } else if (surfRadEnclNum != radSysEnclNum) {
             ShowSevereError(routineName + "Surface = " + SurfaceName + " is not in the same zone or enclosure as the radiant equipment.");
-            ShowContinueError("Surface zone or enclosure = " + DataViewFactorInformation::ZoneRadiantInfo(surfRadEnclNum).Name);
-            ShowContinueError("Radiant equipment zone or enclosure = " + DataViewFactorInformation::ZoneRadiantInfo(radSysEnclNum).Name);
-            ShowContinueError("Occurs for " + cCurrentModuleObject + " = " + RadSysName);
+            ShowContinueError(state, "Surface zone or enclosure = " + DataViewFactorInformation::ZoneRadiantInfo(surfRadEnclNum).Name);
+            ShowContinueError(state, "Radiant equipment zone or enclosure = " + DataViewFactorInformation::ZoneRadiantInfo(radSysEnclNum).Name);
+            ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + RadSysName);
             ErrorsFound = true;
         }
         return surfNum;

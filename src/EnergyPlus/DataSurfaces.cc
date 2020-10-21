@@ -874,7 +874,7 @@ namespace DataSurfaces {
                 // ZoneEquipConfigNum = ZoneNum;
                 // check whether this zone is a controlled zone or not
                 if (!DataHeatBalance::Zone(Zone).IsControlled) {
-                    ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
+                    ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
                                    DataHeatBalance::Zone(Zone).Name);
                     // return;
                 }
@@ -1164,7 +1164,7 @@ namespace DataSurfaces {
         if (totalWidth == 0.0) {
             // This should never happen, but if it does, print a somewhat meaningful fatal error
             // (instead of allowing a divide by zero).
-            ShowFatalError("Calculated projected surface width is zero for surface=\"" + Name + "\"");
+            ShowFatalError(state, "Calculated projected surface width is zero for surface=\"" + Name + "\"");
         }
 
         Real64 averageHeight = 0.0;

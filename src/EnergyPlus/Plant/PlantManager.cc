@@ -403,7 +403,7 @@ namespace EnergyPlus {
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
                 }
-                UtilityRoutines::IsNameEmpty(Alpha(1), CurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, Alpha(1), CurrentModuleObject, ErrorsFound);
                 this_loop.Name = Alpha(1); // Load the Plant Loop Name
 
                 if (UtilityRoutines::SameString(Alpha(2), "STEAM")) {
@@ -420,20 +420,20 @@ namespace EnergyPlus {
                     NumFluids = CheckFluidPropertyName(state, Alpha(3));
                     if (NumFluids == 0) {
                         ShowSevereError(
-                                CurrentModuleObject + "=\"" + Alpha(1) + "\", missing fluid data for Plant loop.");
+                                state, CurrentModuleObject + "=\"" + Alpha(1) + "\", missing fluid data for Plant loop.");
                         ErrorsFound = true;
                     } else {
                         this_loop.FluidIndex = FindGlycol(state, Alpha(3));
                         if (this_loop.FluidIndex == 0) {
-                            ShowSevereError(CurrentModuleObject + "=\"" + Alpha(1) +
+                            ShowSevereError(state, CurrentModuleObject + "=\"" + Alpha(1) +
                                             "\", invalid glycol fluid data for Plant loop.");
                             ErrorsFound = true;
                         }
                     }
                 } else {
-                    ShowWarningError("Input error: " + cAlphaFieldNames(2) + '=' + Alpha(2) + " entered, in " +
+                    ShowWarningError(state, "Input error: " + cAlphaFieldNames(2) + '=' + Alpha(2) + " entered, in " +
                                      CurrentModuleObject + '=' + Alpha(1));
-                    ShowContinueError("Will default to Water.");
+                    ShowContinueError(state, "Will default to Water.");
 
                     this_loop.FluidType = NodeType_Water;
                     this_loop.FluidName = "WATER";
@@ -510,9 +510,9 @@ namespace EnergyPlus {
                 } else if (UtilityRoutines::SameString(LoadingScheme, "SequentialUniformPLR")) {
                     this_loop.LoadDistribution = SequentialUniformPLRLoading;
                 } else {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
-                    ShowContinueError("..." + cAlphaFieldNames(14) + "=\"" + Alpha(14) + "\".");
-                    ShowContinueError("Will default to SequentialLoad."); // TODO rename point
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
+                    ShowContinueError(state, "..." + cAlphaFieldNames(14) + "=\"" + Alpha(14) + "\".");
+                    ShowContinueError(state, "Will default to SequentialLoad."); // TODO rename point
                     this_loop.LoadDistribution = SequentialLoading;
                 }
 
@@ -523,11 +523,11 @@ namespace EnergyPlus {
                         this_loop.LoopDemandCalcScheme = SingleSetPoint;
                     } else if (UtilityRoutines::SameString(Alpha(16), "DualSetpointDeadband")) {
                         if (this_loop.FluidType == NodeType_Steam) {
-                            ShowWarningError(
+                            ShowWarningError(state,
                                     RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
-                            ShowContinueError(cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\" not valid for " +
+                            ShowContinueError(state, cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\" not valid for " +
                                               cAlphaFieldNames(2) + "= Steam");
-                            ShowContinueError("Will reset " + cAlphaFieldNames(16) +
+                            ShowContinueError(state, "Will reset " + cAlphaFieldNames(16) +
                                               " = SingleSetPoint and simulation will continue.");
                             this_loop.LoopDemandCalcScheme = SingleSetPoint;
                         } else {
@@ -536,9 +536,9 @@ namespace EnergyPlus {
                     } else if (UtilityRoutines::SameString(Alpha(16), "")) {
                         this_loop.LoopDemandCalcScheme = SingleSetPoint;
                     } else {
-                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
-                        ShowContinueError("..." + cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\".");
-                        ShowContinueError("Will default to SingleSetPoint."); // TODO rename point
+                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
+                        ShowContinueError(state, "..." + cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\".");
+                        ShowContinueError(state, "Will default to SingleSetPoint."); // TODO rename point
                         this_loop.LoopDemandCalcScheme = SingleSetPoint;
                     }
                 } else if (this_loop.TypeOfLoop == Condenser) {
@@ -554,9 +554,9 @@ namespace EnergyPlus {
                     } else if (UtilityRoutines::SameString(Alpha(17), "None") || lAlphaFieldBlanks(17)) {
                         this_loop.CommonPipeType = CommonPipe_No;
                     } else {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
-                        ShowContinueError("Invalid " + cAlphaFieldNames(17) + "=\"" + Alpha(17) + "\".");
-                        ShowContinueError("Refer to I/O reference document for more details.");
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
+                        ShowContinueError(state, "Invalid " + cAlphaFieldNames(17) + "=\"" + Alpha(17) + "\".");
+                        ShowContinueError(state, "Refer to I/O reference document for more details.");
                         ErrorsFound = true;
                     }
                 } else if (this_loop.TypeOfLoop == Condenser) {
@@ -565,22 +565,22 @@ namespace EnergyPlus {
 
                 if (this_loop.CommonPipeType == CommonPipe_TwoWay) {
                     if (this_demand_side.InletNodeSetPt && this_supply_side.InletNodeSetPt) {
-                        ShowSevereError(
+                        ShowSevereError(state,
                                 RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
-                        ShowContinueError(
+                        ShowContinueError(state,
                                 "While using a two way common pipe there can be setpoint on only one node other than Plant Supply Outlet node.");
-                        ShowContinueError("Currently both Plant Demand inlet and plant supply inlet have setpoints.");
-                        ShowContinueError("Select one of the two nodes and rerun the simulation.");
+                        ShowContinueError(state, "Currently both Plant Demand inlet and plant supply inlet have setpoints.");
+                        ShowContinueError(state, "Select one of the two nodes and rerun the simulation.");
                         ErrorsFound = true;
                     }
                     if (!this_demand_side.InletNodeSetPt && !this_supply_side.InletNodeSetPt) {
-                        ShowSevereError(
+                        ShowSevereError(state,
                                 RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
-                        ShowContinueError(
+                        ShowContinueError(state,
                                 "While using a two way common pipe there must be a setpoint in addition to the Plant Supply Outlet node.");
-                        ShowContinueError(
+                        ShowContinueError(state,
                                 "Currently neither plant demand inlet nor plant supply inlet have setpoints.");
-                        ShowContinueError("Select one of the two nodes and rerun the simulation.");
+                        ShowContinueError(state, "Select one of the two nodes and rerun the simulation.");
                         ErrorsFound = true;
                     }
                 }
@@ -615,14 +615,14 @@ namespace EnergyPlus {
                             // We are OK here, move on
                         } else {
                             // We have an erroneous input, alert user
-                            ShowSevereError(
+                            ShowSevereError(state,
                                     RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(PressSimAlphaIndex) + "=\"" +
+                            ShowContinueError(state, "Invalid " + cAlphaFieldNames(PressSimAlphaIndex) + "=\"" +
                                               Alpha(PressSimAlphaIndex) + "\".");
-                            ShowContinueError("Currently only options are: ");
-                            ShowContinueError("  - " + PressureSimType(Press_NoPressure));
-                            ShowContinueError("  - " + PressureSimType(Press_PumpPowerCorrection));
-                            ShowContinueError("  - " + PressureSimType(Press_FlowCorrection));
+                            ShowContinueError(state, "Currently only options are: ");
+                            ShowContinueError(state, "  - " + PressureSimType(Press_NoPressure));
+                            ShowContinueError(state, "  - " + PressureSimType(Press_PumpPowerCorrection));
+                            ShowContinueError(state, "  - " + PressureSimType(Press_FlowCorrection));
                             ErrorsFound = true;
                         }
                     }
@@ -637,9 +637,9 @@ namespace EnergyPlus {
 
                     // if we made it this far, there was no match, and it wasn't blank
                     if (!MatchedPressureString) {
-                        ShowSevereError(
+                        ShowSevereError(state,
                                 RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
-                        ShowContinueError(
+                        ShowContinueError(state,
                                 "Invalid " + cAlphaFieldNames(PressSimAlphaIndex) + "=\"" + Alpha(PressSimAlphaIndex) +
                                 "\".");
                         ErrorsFound = true;
@@ -653,19 +653,19 @@ namespace EnergyPlus {
                 }
 
                 if (ErrFound) {
-                    ShowContinueError("Input errors in  " + CurrentModuleObject + '=' + Alpha(1));
+                    ShowContinueError(state, "Input errors in  " + CurrentModuleObject + '=' + Alpha(1));
                     ErrorsFound = true;
                 }
 
                 if (GetFirstBranchInletNodeName(state, this_demand_side.BranchList) != this_demand_side.NodeNameIn) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
-                    ShowContinueError("The inlet node of the first branch in the " + cAlphaFieldNames(12) + '=' +
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+                    ShowContinueError(state, "The inlet node of the first branch in the " + cAlphaFieldNames(12) + '=' +
                                       Alpha(12));                                                          //"Plant Demand Side Branch List"
-                    ShowContinueError("is not the same as the " + cAlphaFieldNames(10) + '=' +
+                    ShowContinueError(state, "is not the same as the " + cAlphaFieldNames(10) + '=' +
                                       Alpha(10)); // "Plant Demand Side Inlet Node Name"
-                    ShowContinueError("Branch List Inlet Node Name=" +
+                    ShowContinueError(state, "Branch List Inlet Node Name=" +
                                       GetFirstBranchInletNodeName(state, this_demand_side.BranchList)); // TODO rename point
-                    ShowContinueError(
+                    ShowContinueError(state,
                             "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch."); // TODO
                     // rename
                     // point
@@ -674,52 +674,52 @@ namespace EnergyPlus {
 
                 if (GetLastBranchOutletNodeName(state, this_demand_side.BranchList) != this_demand_side.NodeNameOut) {
                     //"Plant Demand Side Branch List"
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
-                    ShowContinueError(
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+                    ShowContinueError(state,
                             "The outlet node of the last branch in the " + cAlphaFieldNames(12) + '=' + Alpha(12));
                     //"Plant Demand Side Outlet Node Name"
-                    ShowContinueError("is not the same as the " + cAlphaFieldNames(11) + '=' + Alpha(11));
-                    ShowContinueError("Branch List Outlet Node Name=" +
+                    ShowContinueError(state, "is not the same as the " + cAlphaFieldNames(11) + '=' + Alpha(11));
+                    ShowContinueError(state, "Branch List Outlet Node Name=" +
                                       GetLastBranchOutletNodeName(state, this_demand_side.BranchList)); // TODO rename point
                     // TODO rename point
-                    ShowContinueError(
+                    ShowContinueError(state,
                             "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch.");
                     ErrorsFound = true;
                 }
 
                 if (GetFirstBranchInletNodeName(state, this_supply_side.BranchList) != this_supply_side.NodeNameIn) {
                     //"Plant Supply Side Branch List"
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
-                    ShowContinueError(
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+                    ShowContinueError(state,
                             "The inlet node of the first branch in the " + cAlphaFieldNames(8) + '=' + Alpha(8));
                     //"Plant Supply Side Inlet Node Name
-                    ShowContinueError("is not the same as the " + cAlphaFieldNames(6) + '=' + Alpha(6));
-                    ShowContinueError("Branch List Inlet Node Name=" +
+                    ShowContinueError(state, "is not the same as the " + cAlphaFieldNames(6) + '=' + Alpha(6));
+                    ShowContinueError(state, "Branch List Inlet Node Name=" +
                                       GetFirstBranchInletNodeName(state, this_supply_side.BranchList)); // TODO rename point
                     // TODO rename point
-                    ShowContinueError(
+                    ShowContinueError(state,
                             "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch.");
                     ErrorsFound = true;
                 }
 
                 if (GetLastBranchOutletNodeName(state, this_supply_side.BranchList) != this_supply_side.NodeNameOut) {
                     //"Plant Supply Side Branch List"
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
-                    ShowContinueError(
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
+                    ShowContinueError(state,
                             "The outlet node of the last branch in the " + cAlphaFieldNames(8) + '=' + Alpha(8));
                     //"Plant Supply Side Outlet Node Name"
-                    ShowContinueError("is not the same as the " + cAlphaFieldNames(7) + '=' + Alpha(7));
-                    ShowContinueError("Branch List Outlet Node Name=" +
+                    ShowContinueError(state, "is not the same as the " + cAlphaFieldNames(7) + '=' + Alpha(7));
+                    ShowContinueError(state, "Branch List Outlet Node Name=" +
                                       GetLastBranchOutletNodeName(state, this_supply_side.BranchList)); // TODO rename point
                     // TODO rename point
-                    ShowContinueError(
+                    ShowContinueError(state,
                             "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch.");
                     ErrorsFound = true;
                 }
             }
 
             if (ErrorsFound) {
-                ShowFatalError(
+                ShowFatalError(state,
                         RoutineName + "Errors found in processing input. Preceding conditions cause termination.");
             }
 
@@ -914,9 +914,9 @@ namespace EnergyPlus {
                                     this_comp.TypeOf_Num = TypeOf_PumpBankVariableSpeed;
                                 } else {
                                     // discover unsupported equipment on branches.
-                                    ShowSevereError(
+                                    ShowSevereError(state,
                                             "GetPlantInput: trying to process a pump type that is not supported, dev note");
-                                    ShowContinueError("Component Type =" + this_comp_type);
+                                    ShowContinueError(state, "Component Type =" + this_comp_type);
                                 }
                                 this_comp.CurOpSchemeType = PumpOpSchemeType;
                                 if (BranchNum == 1 || BranchNum == PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches) {
@@ -1402,9 +1402,9 @@ namespace EnergyPlus {
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else {
                                 // discover unsupported equipment on branches.
-                                ShowSevereError("GetPlantInput: Branch=\"" + BranchNames(BranchNum) +
+                                ShowSevereError(state, "GetPlantInput: Branch=\"" + BranchNames(BranchNum) +
                                                 "\", invalid component on branch.");
-                                ShowContinueError("...invalid component type=\"" + this_comp_type + "\", name=\"" +
+                                ShowContinueError(state, "...invalid component type=\"" + this_comp_type + "\", name=\"" +
                                                   CompNames(CompNum) + "\".");
                                 //            ErrorsFound=.TRUE.
                             }
@@ -1433,8 +1433,8 @@ namespace EnergyPlus {
                     BranchNames.deallocate();
 
                     if (ASeriesBranchHasPump && AParallelBranchHasPump) {
-                        ShowSevereError("Current version does not support Loop pumps and branch pumps together");
-                        ShowContinueError("Occurs in loop " + PlantLoop(LoopNum).Name);
+                        ShowSevereError(state, "Current version does not support Loop pumps and branch pumps together");
+                        ShowContinueError(state, "Occurs in loop " + PlantLoop(LoopNum).Name);
                         ErrorsFound = true;
                     }
 
@@ -1449,7 +1449,7 @@ namespace EnergyPlus {
                             ErrorsFound = true;
                         }
                         if (NumofSplitters != NumofMixers) {
-                            ShowSevereError("GetPlantInput: Loop Name=" + plantLoop.Name + ", ConnectorList=" +
+                            ShowSevereError(state, "GetPlantInput: Loop Name=" + plantLoop.Name + ", ConnectorList=" +
                                                 loopSide.ConnectList + ", unequal number of splitters and mixers");
                             ErrorsFound = true;
                         }
@@ -1459,7 +1459,7 @@ namespace EnergyPlus {
                     loopSide.Mixer.Exists = NumofMixers > 0;
 
                     if (ErrorsFound) {
-                        ShowFatalError("GetPlantInput: Previous Severe errors cause termination.");
+                        ShowFatalError(state, "GetPlantInput: Previous Severe errors cause termination.");
                     }
 
                     NumConnectorsInLoop = NumofSplitters + NumofMixers;
@@ -1503,9 +1503,9 @@ namespace EnergyPlus {
                                 }
                             }
                             if (!SplitInBranch) {
-                                ShowSevereError("Splitter Inlet Branch not found, Splitter=" + loopSide.Splitter.Name);
-                                ShowContinueError("Splitter Branch Inlet name=" + loopSide.Splitter.NodeNameIn);
-                                ShowContinueError("In Loop=" + plantLoop.Name);
+                                ShowSevereError(state, "Splitter Inlet Branch not found, Splitter=" + loopSide.Splitter.Name);
+                                ShowContinueError(state, "Splitter Branch Inlet name=" + loopSide.Splitter.NodeNameIn);
+                                ShowContinueError(state, "In Loop=" + plantLoop.Name);
                                 ErrorsFound = true;
                             }
 
@@ -1531,11 +1531,11 @@ namespace EnergyPlus {
 
                             for (Outlet = 1; Outlet <= loopSide.Splitter.TotalOutletNodes; ++Outlet) {
                                 if (SplitOutBranch(Outlet)) continue;
-                                ShowSevereError("Splitter Outlet Branch not found, Splitter=" + loopSide.Splitter.Name);
-                                ShowContinueError("Splitter Branch Outlet node name=" + loopSide.Splitter.NodeNameOut(Outlet));
-                                ShowContinueError("In Loop=" + plantLoop.Name);
-                                ShowContinueError("Loop BranchList=" + loopSide.BranchList);
-                                ShowContinueError("Loop ConnectorList=" + loopSide.ConnectList);
+                                ShowSevereError(state, "Splitter Outlet Branch not found, Splitter=" + loopSide.Splitter.Name);
+                                ShowContinueError(state, "Splitter Branch Outlet node name=" + loopSide.Splitter.NodeNameOut(Outlet));
+                                ShowContinueError(state, "In Loop=" + plantLoop.Name);
+                                ShowContinueError(state, "Loop BranchList=" + loopSide.BranchList);
+                                ShowContinueError(state, "Loop ConnectorList=" + loopSide.ConnectList);
                                 ErrorsFound = true;
                             }
 
@@ -1583,7 +1583,7 @@ namespace EnergyPlus {
                                 }
                             }
                             if (!MixerOutBranch) {
-                                ShowSevereError("Mixer Outlet Branch not found, Mixer=" + loopSide.Mixer.Name);
+                                ShowSevereError(state, "Mixer Outlet Branch not found, Mixer=" + loopSide.Mixer.Name);
                                 ErrorsFound = true;
                             }
 
@@ -1610,11 +1610,11 @@ namespace EnergyPlus {
 
                             for (Inlet = 1; Inlet <= loopSide.Mixer.TotalInletNodes; ++Inlet) {
                                 if (MixerInBranch(Inlet)) continue;
-                                ShowSevereError("Mixer Inlet Branch not found, Mixer=" + loopSide.Mixer.Name);
-                                ShowContinueError("Mixer Branch Inlet name=" + loopSide.Mixer.NodeNameIn(Inlet));
-                                ShowContinueError("In Loop=" + plantLoop.Name);
-                                ShowContinueError("Loop BranchList=" + loopSide.BranchList);
-                                ShowContinueError("Loop ConnectorList=" + loopSide.ConnectList);
+                                ShowSevereError(state, "Mixer Inlet Branch not found, Mixer=" + loopSide.Mixer.Name);
+                                ShowContinueError(state, "Mixer Branch Inlet name=" + loopSide.Mixer.NodeNameIn(Inlet));
+                                ShowContinueError(state, "In Loop=" + plantLoop.Name);
+                                ShowContinueError(state, "Loop BranchList=" + loopSide.BranchList);
+                                ShowContinueError(state, "Loop ConnectorList=" + loopSide.ConnectList);
                                 ErrorsFound = true;
                             }
 
@@ -1640,19 +1640,19 @@ namespace EnergyPlus {
                 bool const ThisSideHasPumps = (plantLoop.LoopSide(1).TotalPumps > 0);
                 bool const OtherSideHasPumps = (plantLoop.LoopSide(2).TotalPumps > 0);
                 if ((plantLoop.CommonPipeType != CommonPipe_No) && (!ThisSideHasPumps || !OtherSideHasPumps)) {
-                    ShowSevereError("Input Error: Common Pipe configurations must have pumps on both sides of loop");
-                    ShowContinueError("Occurs on plant loop name =\"" + plantLoop.Name + "\"");
-                    ShowContinueError("Make sure both demand and supply sides have a pump");
+                    ShowSevereError(state, "Input Error: Common Pipe configurations must have pumps on both sides of loop");
+                    ShowContinueError(state, "Occurs on plant loop name =\"" + plantLoop.Name + "\"");
+                    ShowContinueError(state, "Make sure both demand and supply sides have a pump");
                     ErrorsFound = true;
                 } else if ((plantLoop.CommonPipeType == CommonPipe_No) && ThisSideHasPumps && OtherSideHasPumps) {
-                    ShowSevereError("Input Error: Pumps on both loop sides must utilize a common pipe");
-                    ShowContinueError("Occurs on plant loop name =\"" + plantLoop.Name + "\"");
-                    ShowContinueError("Add common pipe or remove one loop side pump");
+                    ShowSevereError(state, "Input Error: Pumps on both loop sides must utilize a common pipe");
+                    ShowContinueError(state, "Occurs on plant loop name =\"" + plantLoop.Name + "\"");
+                    ShowContinueError(state, "Add common pipe or remove one loop side pump");
                     ErrorsFound = true;
                 } else if (!ThisSideHasPumps && !OtherSideHasPumps) {
-                    ShowSevereError("SetupLoopFlowRequest: Problem in plant topology, no pumps specified on the loop");
-                    ShowContinueError("Occurs on plant loop name =\"" + plantLoop.Name + "\"");
-                    ShowContinueError("All plant loops require at least one pump");
+                    ShowSevereError(state, "SetupLoopFlowRequest: Problem in plant topology, no pumps specified on the loop");
+                    ShowContinueError(state, "Occurs on plant loop name =\"" + plantLoop.Name + "\"");
+                    ShowContinueError(state, "All plant loops require at least one pump");
                     ErrorsFound = true;
                 }
 
@@ -1668,7 +1668,7 @@ namespace EnergyPlus {
             }
 
             if (ErrorsFound) {
-                ShowFatalError("GetPlantInput: Errors in getting PlantLoop Input");
+                ShowFatalError(state, "GetPlantInput: Errors in getting PlantLoop Input");
             }
 
             if (NumPlantLoops > 0) VentRepPlantSupplySide.allocate(NumPlantLoops);
@@ -2154,22 +2154,22 @@ namespace EnergyPlus {
                     if (SensedNode > 0) {
                         if (Node(SensedNode).TempSetPoint == SensedNodeFlagValue) {
                             if (!AnyEnergyManagementSystemInModel) {
-                                ShowSevereError(
+                                ShowSevereError(state,
                                         "PlantManager: No Setpoint Manager Defined for Node=" + NodeID(SensedNode) +
                                         " in PlantLoop=" + PlantLoop(LoopNum).Name);
-                                ShowContinueError(
+                                ShowContinueError(state,
                                         "Add Temperature Setpoint Manager with Control Variable = \"Temperature\" for this PlantLoop.");
                                 SetPointErrorFlag = true;
                             } else {
                                 // need call to EMS to check node
                                 CheckIfNodeSetPointManagedByEMS(SensedNode, iTemperatureSetPoint, SetPointErrorFlag);
                                 if (SetPointErrorFlag) {
-                                    ShowSevereError(
+                                    ShowSevereError(state,
                                             "PlantManager: No Setpoint Manager Defined for Node=" + NodeID(SensedNode) +
                                             " in PlantLoop=" + PlantLoop(LoopNum).Name);
-                                    ShowContinueError(
+                                    ShowContinueError(state,
                                             "Add Temperature Setpoint Manager with Control Variable = \"Temperature\" for this PlantLoop.");
-                                    ShowContinueError(
+                                    ShowContinueError(state,
                                             "Or add EMS Actuator to provide temperature setpoint at this node");
                                 }
                             }
@@ -2332,48 +2332,48 @@ namespace EnergyPlus {
                         if (PlantLoop(LoopNum).LoopDemandCalcScheme == DualSetPointDeadBand) {
                             if (Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi == SensedNodeFlagValue) {
                                 if (!AnyEnergyManagementSystemInModel) {
-                                    ShowSevereError(
+                                    ShowSevereError(state,
                                             "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
-                                    ShowContinueError(
+                                    ShowContinueError(state,
                                             "Node Referenced =" + NodeID(PlantLoop(LoopNum).TempSetPointNodeNum));
-                                    ShowContinueError(
+                                    ShowContinueError(state,
                                             "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
                                     SetPointErrorFlag = true;
                                 } else {
                                     CheckIfNodeSetPointManagedByEMS(PlantLoop(LoopNum).TempSetPointNodeNum,
                                                                     iTemperatureMaxSetPoint, SetPointErrorFlag);
                                     if (SetPointErrorFlag) {
-                                        ShowSevereError(
+                                        ShowSevereError(state,
                                                 "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
-                                        ShowContinueError(
+                                        ShowContinueError(state,
                                                 "Node Referenced =" + NodeID(PlantLoop(LoopNum).TempSetPointNodeNum));
-                                        ShowContinueError(
+                                        ShowContinueError(state,
                                                 "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
-                                        ShowContinueError("Or add EMS Actuator for Temperature Maximum Setpoint");
+                                        ShowContinueError(state, "Or add EMS Actuator for Temperature Maximum Setpoint");
 
                                     } // SetPointErrorFlag
                                 }     // Not EMS
                             }         // Node TSPhi = Sensed
                             if (Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo == SensedNodeFlagValue) {
                                 if (!AnyEnergyManagementSystemInModel) {
-                                    ShowSevereError(
+                                    ShowSevereError(state,
                                             "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme");
-                                    ShowContinueError(
+                                    ShowContinueError(state,
                                             "Node Referenced =" + NodeID(PlantLoop(LoopNum).TempSetPointNodeNum));
-                                    ShowContinueError(
+                                    ShowContinueError(state,
                                             "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
                                     SetPointErrorFlag = true;
                                 } else {
                                     CheckIfNodeSetPointManagedByEMS(PlantLoop(LoopNum).TempSetPointNodeNum,
                                                                     iTemperatureMinSetPoint, SetPointErrorFlag);
                                     if (SetPointErrorFlag) {
-                                        ShowSevereError(
+                                        ShowSevereError(state,
                                                 "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme");
-                                        ShowContinueError(
+                                        ShowContinueError(state,
                                                 "Node Referenced =" + NodeID(PlantLoop(LoopNum).TempSetPointNodeNum));
-                                        ShowContinueError(
+                                        ShowContinueError(state,
                                                 "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
-                                        ShowContinueError("Or add EMS Actuator for Temperature Minimum Setpoint");
+                                        ShowContinueError(state, "Or add EMS Actuator for Temperature Minimum Setpoint");
 
                                     } // SetPointErrorFlag
                                 }     // NOT EMS
@@ -2408,7 +2408,7 @@ namespace EnergyPlus {
             } //
             if (!state.dataGlobal->BeginEnvrnFlag) SupplyEnvrnFlag = true;
 
-            if (ErrorsFound) ShowFatalError("Preceding errors caused termination");
+            if (ErrorsFound) ShowFatalError(state, "Preceding errors caused termination");
         }
 
         void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state) {
@@ -2770,7 +2770,7 @@ namespace EnergyPlus {
             }
         }
 
-        void CheckPlantOnAbort() {
+        void CheckPlantOnAbort(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
@@ -2834,13 +2834,13 @@ namespace EnergyPlus {
                                 }
                             }
                             if (!(ActiveCntrlfound)) {
-                                ShowWarningError(
+                                ShowWarningError(state,
                                         "Check control types on branches between splitter and mixer in PlantLoop=" +
                                         PlantLoop(LoopNum).Name);
-                                ShowContinueError("Found a BYPASS branch with no ACTIVE branch in parallel with it");
-                                ShowContinueError(
+                                ShowContinueError(state, "Found a BYPASS branch with no ACTIVE branch in parallel with it");
+                                ShowContinueError(state,
                                         "In certain (but not all) situations, this can cause problems; please verify your inputs");
-                                ShowContinueError("Bypass branch named: " +
+                                ShowContinueError(state, "Bypass branch named: " +
                                                   PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
                             }
                         } // bypass present
@@ -2893,26 +2893,26 @@ namespace EnergyPlus {
                                                 PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).ControlType);
 
                                         if (SELECT_CASE_var == ControlType_Unknown) {
-                                            ShowWarningError(
+                                            ShowWarningError(state,
                                                     "Found potential problem with Control Type for Branch named: " +
                                                     PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
-                                            ShowContinueError(
+                                            ShowContinueError(state,
                                                     "This branch should (probably) be ACTIVE but has control type unknown");
                                         } else if (SELECT_CASE_var == ControlType_Active) {
                                             // do nothing, this is correct control type.
                                         } else if (SELECT_CASE_var == ControlType_Passive) {
-                                            ShowWarningError(
+                                            ShowWarningError(state,
                                                     "Found potential problem with Control Type for Branch named: " +
                                                     PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
-                                            ShowContinueError(
+                                            ShowContinueError(state,
                                                     "This branch should (probably) be ACTIVE but has control type PASSIVE");
                                         } else if (SELECT_CASE_var == ControlType_SeriesActive) {
                                             // do nothing, should be okay. (? don't really understand SeriesActive though)
                                         } else if (SELECT_CASE_var == ControlType_Bypass) {
-                                            ShowWarningError(
+                                            ShowWarningError(state,
                                                     "Found potential problem with Control Type for Branch named: " +
                                                     PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
-                                            ShowContinueError(
+                                            ShowContinueError(state,
                                                     "This branch should (probably) be ACTIVE but has control type Bypass");
                                         }
                                     }
@@ -2925,9 +2925,9 @@ namespace EnergyPlus {
                     // check to see if bypass exists in demand side. If not warn error of possible flow problems
                     if (!PlantLoop(LoopNum).LoopSide(SideNum).BypassExists) {
                         if (SideNum == DemandSide) {
-                            ShowWarningError("There is no BYPASS component in the demand-side of PlantLoop =" +
+                            ShowWarningError(state, "There is no BYPASS component in the demand-side of PlantLoop =" +
                                              PlantLoop(LoopNum).Name);
-                            ShowContinueError(
+                            ShowContinueError(state,
                                     "You may be able to fix the fatal error above by adding a demand-side BYPASS PIPE.");
                         }
                     }
@@ -3134,10 +3134,10 @@ namespace EnergyPlus {
                     } else {
                         PlantLoop(LoopNum).MaxVolFlowRate = 0.0;
                         if (PlantFinalSizesOkayToReport) {
-                            ShowWarningError("SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[" +
+                            ShowWarningError(state, "SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[" +
                                              RoundSigDigits(PlantSizData(PlantSizNum).DesVolFlowRate, 2) +
                                              "] is too small. Set to 0.0");
-                            ShowContinueError("..occurs for PlantLoop=" + PlantLoop(LoopNum).Name);
+                            ShowContinueError(state, "..occurs for PlantLoop=" + PlantLoop(LoopNum).Name);
                         }
                     }
                     if (Finalize) {
@@ -3167,8 +3167,8 @@ namespace EnergyPlus {
 
                 } else {
                     if (PlantFirstSizesOkayToFinalize) {
-                        ShowFatalError("Autosizing of plant loop requires a loop Sizing:Plant object");
-                        ShowContinueError("Occurs in PlantLoop object=" + PlantLoop(LoopNum).Name);
+                        ShowFatalError(state, "Autosizing of plant loop requires a loop Sizing:Plant object");
+                        ShowContinueError(state, "Occurs in PlantLoop object=" + PlantLoop(LoopNum).Name);
                         ErrorsFound = true;
                     }
                 }
@@ -3219,7 +3219,7 @@ namespace EnergyPlus {
             PlantLoop(LoopNum).MinMassFlowRate = PlantLoop(LoopNum).MinVolFlowRate * FluidDensity;
 
             if (ErrorsFound) {
-                ShowFatalError("Preceding sizing errors cause program termination");
+                ShowFatalError(state, "Preceding sizing errors cause program termination");
             }
         }
 
@@ -3297,10 +3297,10 @@ namespace EnergyPlus {
                     } else {
                         PlantLoop(LoopNum).MaxVolFlowRate = 0.0;
                         if (PlantFinalSizesOkayToReport) {
-                            ShowWarningError("SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[" +
+                            ShowWarningError(state, "SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[" +
                                              RoundSigDigits(PlantSizData(PlantSizNum).DesVolFlowRate, 2) +
                                              "] is too small. Set to 0.0");
-                            ShowContinueError("..occurs for PlantLoop=" + PlantLoop(LoopNum).Name);
+                            ShowContinueError(state, "..occurs for PlantLoop=" + PlantLoop(LoopNum).Name);
                         }
                     }
                     if (PlantFinalSizesOkayToReport) {
@@ -3349,7 +3349,7 @@ namespace EnergyPlus {
             PlantLoop(LoopNum).MinMassFlowRate = PlantLoop(LoopNum).MinVolFlowRate * FluidDensity;
 
             if (ErrorsFound) {
-                ShowFatalError("Preceding sizing errors cause program termination");
+                ShowFatalError(state, "Preceding sizing errors cause program termination");
             }
         }
 
@@ -3582,7 +3582,7 @@ namespace EnergyPlus {
             return CallingIndex;
         }
 
-        void SetupBranchControlTypes() {
+        void SetupBranchControlTypes(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
@@ -4204,7 +4204,7 @@ namespace EnergyPlus {
                                         this_component.HowLoadServed = HowMet_ByNominalCap;
                                     }
                                 } else {
-                                    ShowSevereError(
+                                    ShowSevereError(state,
                                             "SetBranchControlTypes: Caught unexpected equipment type of number");
                                 }
                             }
@@ -4252,13 +4252,13 @@ namespace EnergyPlus {
                                     }
 
                                     if (BypassCount > 0) {
-                                        ShowSevereError(
+                                        ShowSevereError(state,
                                                 "An active component is on the same branch as a pipe situated between splitter/mixer");
-                                        ShowContinueError("Occurs in Branch=" +
+                                        ShowContinueError(state, "Occurs in Branch=" +
                                                           PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
                                                                   BranchCtr).Name);
-                                        ShowContinueError("Occurs in Plant Loop=" + PlantLoop(LoopCtr).Name);
-                                        ShowContinueError("SetupBranchControlTypes: and the simulation continues");
+                                        ShowContinueError(state, "Occurs in Plant Loop=" + PlantLoop(LoopCtr).Name);
+                                        ShowContinueError(state, "SetupBranchControlTypes: and the simulation continues");
                                         // DSU3 note not sure why this is so bad.  heat transfer pipe might be a good reason to allow this?
                                         //   this used to fatal in older PlantFlowResolver.
                                     }
@@ -4273,13 +4273,13 @@ namespace EnergyPlus {
                                     PlantLoop(LoopCtr).LoopSide(LoopSideCtr).BypassExists = true;
 
                                     if (CompCtr > 1) {
-                                        ShowSevereError(
+                                        ShowSevereError(state,
                                                 "A pipe used as a bypass should not be in series with another component");
-                                        ShowContinueError("Occurs in Branch = " +
+                                        ShowContinueError(state, "Occurs in Branch = " +
                                                           PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
                                                                   BranchCtr).Name);
-                                        ShowContinueError("Occurs in PlantLoop = " + PlantLoop(LoopCtr).Name);
-                                        ShowFatalError(
+                                        ShowContinueError(state, "Occurs in PlantLoop = " + PlantLoop(LoopCtr).Name);
+                                        ShowFatalError(state,
                                                 "SetupBranchControlTypes: preceding condition causes termination.");
                                     }
 
@@ -4304,7 +4304,7 @@ namespace EnergyPlus {
             }
         }
 
-        void CheckIfAnyPlant() {
+        void CheckIfAnyPlant(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
@@ -4340,18 +4340,18 @@ namespace EnergyPlus {
             }
         }
 
-        void CheckOngoingPlantWarnings() {
+        void CheckOngoingPlantWarnings(EnergyPlusData &state) {
             int LoopNum;
             for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
                 // Warning if the excess storage time is more than half of the total time
                 if (PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTime >
                     PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {
-                    ShowWarningError("Plant Loop: " + PlantLoop(LoopNum).Name +
+                    ShowWarningError(state, "Plant Loop: " + PlantLoop(LoopNum).Name +
                                      " Demand Side is storing excess heat the majority of the time.");
                 }
                 if (PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTime >
                     PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {
-                    ShowWarningError("Plant Loop: " + PlantLoop(LoopNum).Name +
+                    ShowWarningError(state, "Plant Loop: " + PlantLoop(LoopNum).Name +
                                      " Supply Side is storing excess heat the majority of the time.");
                 }
             }

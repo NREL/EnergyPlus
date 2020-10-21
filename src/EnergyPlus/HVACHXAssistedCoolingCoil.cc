@@ -212,19 +212,19 @@ namespace HVACHXAssistedCoolingCoil {
         if (CompIndex == 0) {
             HXAssistedCoilNum = UtilityRoutines::FindItemInList(HXAssistedCoilName, HXAssistedCoil);
             if (HXAssistedCoilNum == 0) {
-                ShowFatalError("HX Assisted Coil not found=" + HXAssistedCoilName);
+                ShowFatalError(state, "HX Assisted Coil not found=" + HXAssistedCoilName);
             }
             CompIndex = HXAssistedCoilNum;
         } else {
             HXAssistedCoilNum = CompIndex;
             if (HXAssistedCoilNum > TotalNumHXAssistedCoils || HXAssistedCoilNum < 1) {
-                ShowFatalError("SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + TrimSigDigits(HXAssistedCoilNum) +
+                ShowFatalError(state, "SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + TrimSigDigits(HXAssistedCoilNum) +
                                ", Number of HX Assisted Cooling Coils=" + TrimSigDigits(TotalNumHXAssistedCoils) +
                                ", Coil name=" + HXAssistedCoilName);
             }
             if (CheckEquipName(HXAssistedCoilNum)) {
                 if (!HXAssistedCoilName.empty() && HXAssistedCoilName != HXAssistedCoil(HXAssistedCoilNum).Name) {
-                    ShowFatalError("SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + TrimSigDigits(HXAssistedCoilNum) + ", Coil name=" +
+                    ShowFatalError(state, "SimHXAssistedCoolingCoil: Invalid CompIndex passed=" + TrimSigDigits(HXAssistedCoilNum) + ", Coil name=" +
                                    HXAssistedCoilName + ", stored Coil Name for that index=" + HXAssistedCoil(HXAssistedCoilNum).Name);
                 }
                 CheckEquipName(HXAssistedCoilNum) = false;
@@ -386,7 +386,7 @@ namespace HVACHXAssistedCoolingCoil {
             } else if (UtilityRoutines::SameString(HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType, "HeatExchanger:Desiccant:BalancedFlow")) {
                 HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType_Num = HX_DESICCANT_BALANCED;
             } else {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
+                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
                 ShowContinueError("Invalid " + cAlphaFields(2) + "=\"" + HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType + "\"");
                 ErrorsFound = true;
             }
@@ -531,7 +531,7 @@ namespace HVACHXAssistedCoolingCoil {
                 }
             }
 
-            TestCompSet(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType,
+            TestCompSet(state, HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType,
                         HXAssistedCoil(HXAssistedCoilNum).Name,
                         NodeID(SupplyAirInletNode),
                         NodeID(SecondaryAirOutletNode),
@@ -629,7 +629,7 @@ namespace HVACHXAssistedCoolingCoil {
                 //       THEN
                 //         HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType_Num = HX_DESICCANT_BALANCED
             } else {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
+                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
                 ShowContinueError("Invalid " + cAlphaFields(2) + "=\"" + HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType + "\"");
                 ErrorsFound = true;
             }
@@ -713,12 +713,12 @@ namespace HVACHXAssistedCoolingCoil {
                 }
 
             } else {
-                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
+                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
                 ShowContinueError("Invalid " + cAlphaFields(4) + "=\"" + HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType + "\"");
                 ErrorsFound = true;
             }
 
-            TestCompSet(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType,
+            TestCompSet(state, HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType,
                         HXAssistedCoil(HXAssistedCoilNum).Name,
                         NodeID(SupplyAirInletNode),
                         NodeID(SecondaryAirOutletNode),
@@ -791,7 +791,7 @@ namespace HVACHXAssistedCoolingCoil {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Previous error condition causes termination.");
+            ShowFatalError(state, RoutineName + "Previous error condition causes termination.");
         }
     }
 
@@ -1003,9 +1003,9 @@ namespace HVACHXAssistedCoolingCoil {
         if (Iter > MaxIter) {
             if (HXAssistedCoil(HXAssistedCoilNum).MaxIterCounter < 1) {
                 ++HXAssistedCoil(HXAssistedCoilNum).MaxIterCounter;
-                ShowWarningError(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType + " \"" + HXAssistedCoil(HXAssistedCoilNum).Name +
+                ShowWarningError(state, HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType + " \"" + HXAssistedCoil(HXAssistedCoilNum).Name +
                                  "\" -- Exceeded max iterations (" + TrimSigDigits(MaxIter) + ") while calculating operating conditions.");
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
             } else {
                 ShowRecurringWarningErrorAtEnd(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType + " \"" + HXAssistedCoil(HXAssistedCoilNum).Name +
                                                    "\" -- Exceeded max iterations error continues...",
@@ -1094,18 +1094,18 @@ namespace HVACHXAssistedCoolingCoil {
             }
 
             if (HXAssistedCoilNum == 0) {
-                ShowFatalError("CheckHXAssistedCoolingCoilSchedule: HX Assisted Coil not found=" + CompName);
+                ShowFatalError(state, "CheckHXAssistedCoolingCoilSchedule: HX Assisted Coil not found=" + CompName);
             }
             CompIndex = HXAssistedCoilNum;
             Value = 1.0; // not scheduled?
         } else {
             HXAssistedCoilNum = CompIndex;
             if (HXAssistedCoilNum > TotalNumHXAssistedCoils || HXAssistedCoilNum < 1) {
-                ShowFatalError("CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits(HXAssistedCoilNum) +
+                ShowFatalError(state, "CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits(HXAssistedCoilNum) +
                                ", Number of Heating Coils=" + TrimSigDigits(TotalNumHXAssistedCoils) + ", Coil name=" + CompName);
             }
             if (CompName != HXAssistedCoil(HXAssistedCoilNum).Name) {
-                ShowFatalError("CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits(HXAssistedCoilNum) +
+                ShowFatalError(state, "CheckHXAssistedCoolingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits(HXAssistedCoilNum) +
                                ", Coil name=" + CompName + ", stored Coil Name for that index=" + HXAssistedCoil(HXAssistedCoilNum).Name);
             }
 

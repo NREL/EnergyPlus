@@ -125,7 +125,7 @@ namespace ChillerIndirectAbsorption {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("LocalIndirectAbsorptionChillerFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, "LocalIndirectAbsorptionChillerFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -165,7 +165,7 @@ namespace ChillerIndirectAbsorption {
                                                                         FirstHVACIteration);
 
         } else {
-            ShowFatalError("SimIndirectAbsorber: Invalid LoopNum passed=" + General::TrimSigDigits(calledFromLocation.loopNum) +
+            ShowFatalError(state, "SimIndirectAbsorber: Invalid LoopNum passed=" + General::TrimSigDigits(calledFromLocation.loopNum) +
                            ", Unit name=" + this->Name + ", stored chilled water loop=" + General::TrimSigDigits(this->CWLoopNum) +
                            ", stored condenser water loop=" + General::TrimSigDigits(this->CDLoopNum) +
                            ", stored generator loop=" + General::TrimSigDigits(this->GenLoopNum));
@@ -227,7 +227,7 @@ namespace ChillerIndirectAbsorption {
         state.dataChillerIndirectAbsorption->NumIndirectAbsorbers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         if (state.dataChillerIndirectAbsorption->NumIndirectAbsorbers <= 0) {
-            ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, "No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             // See if load distribution manager has already gotten the input
             ErrorsFound = true;
         }
@@ -250,7 +250,7 @@ namespace ChillerIndirectAbsorption {
                                           DataIPShortCuts::lAlphaFieldBlanks,
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(
@@ -267,9 +267,9 @@ namespace ChillerIndirectAbsorption {
                 thisChiller.NomPumpPowerWasAutoSized = true;
             }
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
                                 General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
             // Assign Node Numbers to specified nodes
@@ -289,7 +289,7 @@ namespace ChillerIndirectAbsorption {
                                                                                                   DataLoopNode::NodeConnectionType_Outlet,
                                                                                                   1,
                                                                                                   DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+            BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
                                                DataIPShortCuts::cAlphaArgs(1),
                                                DataIPShortCuts::cAlphaArgs(2),
                                                DataIPShortCuts::cAlphaArgs(3),
@@ -311,7 +311,7 @@ namespace ChillerIndirectAbsorption {
                                                                                                   DataLoopNode::NodeConnectionType_Outlet,
                                                                                                   2,
                                                                                                   DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+            BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
                                                DataIPShortCuts::cAlphaArgs(1),
                                                DataIPShortCuts::cAlphaArgs(4),
                                                DataIPShortCuts::cAlphaArgs(5),
@@ -348,9 +348,9 @@ namespace ChillerIndirectAbsorption {
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(16), fluidNameSteam) || DataIPShortCuts::cAlphaArgs(16).empty()) {
                     thisChiller.GenHeatSourceType = DataLoopNode::NodeType_Steam;
                 } else {
-                    ShowWarningError(DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError("...Generator heat source type must be Steam or Hot Water.");
-                    ShowContinueError("...Entered generator heat source type = " + DataIPShortCuts::cAlphaArgs(16));
+                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
+                    ShowContinueError(state, "...Generator heat source type must be Steam or Hot Water.");
+                    ShowContinueError(state, "...Entered generator heat source type = " + DataIPShortCuts::cAlphaArgs(16));
                     ErrorsFound = true;
                 }
             } else {
@@ -378,7 +378,7 @@ namespace ChillerIndirectAbsorption {
                                                             DataLoopNode::NodeConnectionType_Outlet,
                                                             3,
                                                             DataLoopNode::ObjectIsNotParent);
-                    BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                    BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
                                                        DataIPShortCuts::cAlphaArgs(1),
                                                        DataIPShortCuts::cAlphaArgs(9),
                                                        DataIPShortCuts::cAlphaArgs(10),
@@ -402,24 +402,24 @@ namespace ChillerIndirectAbsorption {
                                                             DataLoopNode::NodeConnectionType_Outlet,
                                                             3,
                                                             DataLoopNode::ObjectIsNotParent);
-                    BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                    BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
                                                        DataIPShortCuts::cAlphaArgs(1),
                                                        DataIPShortCuts::cAlphaArgs(9),
                                                        DataIPShortCuts::cAlphaArgs(10),
                                                        "Steam Nodes");
                 }
             } else if (DataIPShortCuts::cAlphaArgs(9).empty() != DataIPShortCuts::cAlphaArgs(10).empty()) {
-                ShowWarningError(DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("...Generator fluid nodes must both be entered (or both left blank).");
-                ShowContinueError("...Generator fluid inlet node  = " + DataIPShortCuts::cAlphaArgs(9));
-                ShowContinueError("...Generator fluid outlet node = " + DataIPShortCuts::cAlphaArgs(10));
+                ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "...Generator fluid nodes must both be entered (or both left blank).");
+                ShowContinueError(state, "...Generator fluid inlet node  = " + DataIPShortCuts::cAlphaArgs(9));
+                ShowContinueError(state, "...Generator fluid outlet node = " + DataIPShortCuts::cAlphaArgs(10));
                 ErrorsFound = true;
             } else {
                 //     Generator fluid type must be steam if generator inlet/outlet nodes are not used
                 if (thisChiller.GenHeatSourceType == DataLoopNode::NodeType_Water) {
-                    ShowWarningError(DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError("...Generator fluid type must be Steam if generator inlet/outlet nodes are blank.");
-                    ShowContinueError("...Generator fluid type is set to Steam and the simulation continues.");
+                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
+                    ShowContinueError(state, "...Generator fluid type must be Steam if generator inlet/outlet nodes are blank.");
+                    ShowContinueError(state, "...Generator fluid type is set to Steam and the simulation continues.");
                     thisChiller.GenHeatSourceType = DataLoopNode::NodeType_Steam;
                 }
             }
@@ -433,10 +433,10 @@ namespace ChillerIndirectAbsorption {
                 } else if (SELECT_CASE_var == "NOTMODULATED") {
                     thisChiller.FlowMode = DataPlant::FlowMode::NOTMODULATED;
                 } else {
-                    ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
-                    ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + DataIPShortCuts::cAlphaArgs(6));
-                    ShowContinueError("Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
-                    ShowContinueError("Flow mode NotModulated is assumed and the simulation continues.");
+                    ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
+                    ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + DataIPShortCuts::cAlphaArgs(6));
+                    ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
+                    ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
                     thisChiller.FlowMode = DataPlant::FlowMode::NOTMODULATED;
                 }
             }
@@ -520,8 +520,8 @@ namespace ChillerIndirectAbsorption {
 
             if (thisChiller.GeneratorVolFlowRate == 0.0 &&
                 thisChiller.GenHeatSourceType == DataLoopNode::NodeType_Water) {
-                ShowWarningError(DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
-                ShowContinueError("...Generator water flow rate must be greater than 0 when absorber generator fluid type is hot water.");
+                ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError(state, "...Generator water flow rate must be greater than 0 when absorber generator fluid type is hot water.");
                 ErrorsFound = true;
             }
 
@@ -551,7 +551,7 @@ namespace ChillerIndirectAbsorption {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in getting Chiller:Absorption:Indirect");
+            ShowFatalError(state, "Errors found in getting Chiller:Absorption:Indirect");
         }
     }
 
@@ -753,7 +753,7 @@ namespace ChillerIndirectAbsorption {
                     this->CDLoopNum, this->CDLoopSideNum, this->GenLoopNum, this->GenCompNum, DataPlant::TypeOf_Chiller_Indirect_Absorption, false);
             }
             if (errFlag) {
-                ShowFatalError("InitIndirectAbsorpChiller: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "InitIndirectAbsorpChiller: Program terminated due to previous condition(s).");
             }
 
             if (this->FlowMode == DataPlant::FlowMode::CONSTANT) {
@@ -771,10 +771,10 @@ namespace ChillerIndirectAbsorption {
                     (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
                     if (!DataGlobals::AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
-                            ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                            ShowContinueError(
+                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                            ShowContinueError(state,
                                 "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
-                            ShowContinueError("  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
+                            ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
                             this->ModulatedFlowErrDone = true;
                         }
                     } else {
@@ -784,12 +784,12 @@ namespace ChillerIndirectAbsorption {
                         DataLoopNode::NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
-                                ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
-                                ShowContinueError(
+                                ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                                ShowContinueError(state,
                                     "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
-                                ShowContinueError("  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
-                                ShowContinueError("  or use an EMS actuator to establish a setpoint at the outlet node ");
-                                ShowContinueError("  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
+                                ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
+                                ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
+                                ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
                                 this->ModulatedFlowErrDone = true;
                             }
                         }
@@ -1047,12 +1047,12 @@ namespace ChillerIndirectAbsorption {
                                                                     NomCapUser);
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError("User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
-                                    ShowContinueError("differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpNomCap, 2) +
+                                    ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
+                                    ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
+                                    ShowContinueError(state, "differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpNomCap, 2) +
                                                       " [W]");
-                                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                    ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                    ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
                             }
                         }
@@ -1063,8 +1063,8 @@ namespace ChillerIndirectAbsorption {
         } else {
             if (this->NomCapWasAutoSized) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                    ShowSevereError("Autosizing of Absorption Chiller nominal capacity requires a loop Sizing:Plant object");
-                    ShowContinueError("Occurs in Chiller:Absorption:Indirect object=" + this->Name);
+                    ShowSevereError(state, "Autosizing of Absorption Chiller nominal capacity requires a loop Sizing:Plant object");
+                    ShowContinueError(state, "Occurs in Chiller:Absorption:Indirect object=" + this->Name);
                     ErrorsFound = true;
                 }
             } else {
@@ -1103,12 +1103,12 @@ namespace ChillerIndirectAbsorption {
                                                                 NomPumpPowerUser);
                         if (DataGlobals::DisplayExtraWarnings) {
                             if ((std::abs(tmpNomPumpPower - NomPumpPowerUser) / NomPumpPowerUser) > DataSizing::AutoVsHardSizingThreshold) {
-                                ShowMessage("SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
-                                ShowContinueError("User-Specified Nominal Pumping Power of " + General::RoundSigDigits(NomPumpPowerUser, 2) + " [W]");
-                                ShowContinueError("differs from Design Size Nominal Pumping Power of " + General::RoundSigDigits(tmpNomPumpPower, 2) +
+                                ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
+                                ShowContinueError(state, "User-Specified Nominal Pumping Power of " + General::RoundSigDigits(NomPumpPowerUser, 2) + " [W]");
+                                ShowContinueError(state, "differs from Design Size Nominal Pumping Power of " + General::RoundSigDigits(tmpNomPumpPower, 2) +
                                                   " [W]");
-                                ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
                         }
                     }
@@ -1150,13 +1150,13 @@ namespace ChillerIndirectAbsorption {
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizeChillerElectricIndirect: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError("User-Specified Design Chilled Water Flow Rate of " +
+                                    ShowMessage(state, "SizeChillerElectricIndirect: Potential issue with equipment sizing for " + this->Name);
+                                    ShowContinueError(state, "User-Specified Design Chilled Water Flow Rate of " +
                                                       General::RoundSigDigits(EvapVolFlowRateUser, 5) + " [m3/s]");
-                                    ShowContinueError("differs from Design Size Design Chilled Water Flow Rate of " +
+                                    ShowContinueError(state, "differs from Design Size Design Chilled Water Flow Rate of " +
                                                       General::RoundSigDigits(tmpEvapVolFlowRate, 5) + " [m3/s]");
-                                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                    ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                    ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
                             }
                         }
@@ -1167,8 +1167,8 @@ namespace ChillerIndirectAbsorption {
         } else {
             if (this->EvapVolFlowRateWasAutoSized) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                    ShowSevereError("Autosizing of Absorption Chiller evap flow rate requires a loop Sizing:Plant object");
-                    ShowContinueError("Occurs in Chiller:Absorption:Indirect object=" + this->Name);
+                    ShowSevereError(state, "Autosizing of Absorption Chiller evap flow rate requires a loop Sizing:Plant object");
+                    ShowContinueError(state, "Occurs in Chiller:Absorption:Indirect object=" + this->Name);
                     ErrorsFound = true;
                 }
             } else {
@@ -1234,13 +1234,13 @@ namespace ChillerIndirectAbsorption {
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError("User-Specified Design Condenser Water Flow Rate of " +
+                                    ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
+                                    ShowContinueError(state, "User-Specified Design Condenser Water Flow Rate of " +
                                                       General::RoundSigDigits(CondVolFlowRateUser, 5) + " [m3/s]");
-                                    ShowContinueError("differs from Design Size Design Condenser Water Flow Rate of " +
+                                    ShowContinueError(state, "differs from Design Size Design Condenser Water Flow Rate of " +
                                                       General::RoundSigDigits(tmpCondVolFlowRate, 5) + " [m3/s]");
-                                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                    ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                    ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
                             }
                         }
@@ -1251,9 +1251,9 @@ namespace ChillerIndirectAbsorption {
         } else {
             if (this->CondVolFlowRateWasAutoSized) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                    ShowSevereError("Autosizing of Absorption Chiller condenser flow rate requires a condenser");
-                    ShowContinueError("loop Sizing:Plant object");
-                    ShowContinueError("Occurs in Chiller:Absorption:Indirect object=" + this->Name);
+                    ShowSevereError(state, "Autosizing of Absorption Chiller condenser flow rate requires a condenser");
+                    ShowContinueError(state, "loop Sizing:Plant object");
+                    ShowContinueError(state, "Occurs in Chiller:Absorption:Indirect object=" + this->Name);
                     ErrorsFound = true;
                 }
             } else {
@@ -1321,13 +1321,13 @@ namespace ChillerIndirectAbsorption {
                                     if (DataGlobals::DisplayExtraWarnings) {
                                         if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
                                             DataSizing::AutoVsHardSizingThreshold) {
-                                            ShowMessage("SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
-                                            ShowContinueError("User-Specified Design Generator Fluid Flow Rate of " +
+                                            ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
+                                            ShowContinueError(state, "User-Specified Design Generator Fluid Flow Rate of " +
                                                               General::RoundSigDigits(GeneratorVolFlowRateUser, 5) + " [m3/s]");
-                                            ShowContinueError("differs from Design Size Design Generator Fluid Flow Rate of " +
+                                            ShowContinueError(state, "differs from Design Size Design Generator Fluid Flow Rate of " +
                                                               General::RoundSigDigits(tmpGeneratorVolFlowRate, 5) + " [m3/s]");
-                                            ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                            ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                            ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                            ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                         }
                                     }
                                 }
@@ -1396,13 +1396,13 @@ namespace ChillerIndirectAbsorption {
                                     if (DataGlobals::DisplayExtraWarnings) {
                                         if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
                                             DataSizing::AutoVsHardSizingThreshold) {
-                                            ShowMessage("SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
-                                            ShowContinueError("User-Specified Design Generator Fluid Flow Rate of " +
+                                            ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
+                                            ShowContinueError(state, "User-Specified Design Generator Fluid Flow Rate of " +
                                                               General::RoundSigDigits(GeneratorVolFlowRateUser, 5) + " [m3/s]");
-                                            ShowContinueError("differs from Design Size Design Generator Fluid Flow Rate of " +
+                                            ShowContinueError(state, "differs from Design Size Design Generator Fluid Flow Rate of " +
                                                               General::RoundSigDigits(tmpGeneratorVolFlowRate, 5) + " [m3/s]");
-                                            ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                            ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                            ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                                            ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                         }
                                     }
                                 }
@@ -1423,10 +1423,10 @@ namespace ChillerIndirectAbsorption {
         } else {
             if (this->GeneratorVolFlowRateWasAutoSized) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                    ShowSevereError("Autosizing of Absorption Chiller generator flow rate requires a loop Sizing:Plant object.");
-                    ShowContinueError(" For steam loops, use a steam Sizing:Plant object.");
-                    ShowContinueError(" For hot water loops, use a heating Sizing:Plant object.");
-                    ShowContinueError("Occurs in Chiller:Absorption:Indirect object=" + this->Name);
+                    ShowSevereError(state, "Autosizing of Absorption Chiller generator flow rate requires a loop Sizing:Plant object.");
+                    ShowContinueError(state, " For steam loops, use a steam Sizing:Plant object.");
+                    ShowContinueError(state, " For hot water loops, use a heating Sizing:Plant object.");
+                    ShowContinueError(state, "Occurs in Chiller:Absorption:Indirect object=" + this->Name);
                     ErrorsFound = true;
                 }
             } else {
@@ -1469,7 +1469,7 @@ namespace ChillerIndirectAbsorption {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Preceding sizing errors cause program termination");
+            ShowFatalError(state, "Preceding sizing errors cause program termination");
         }
 
         if (DataPlant::PlantFinalSizesOkayToReport) {
@@ -1533,12 +1533,12 @@ namespace ChillerIndirectAbsorption {
             if (!DataGlobals::WarmupFlag) {
                 if (this->MinCondInletTempCtr < 1) {
                     ++this->MinCondInletTempCtr;
-                    ShowWarningError("Chiller:Absorption:Indirect \"" + this->Name + "\"");
-                    ShowContinueError("...Entering condenser water temperature below specified minimum (" +
+                    ShowWarningError(state, "Chiller:Absorption:Indirect \"" + this->Name + "\"");
+                    ShowContinueError(state, "...Entering condenser water temperature below specified minimum (" +
                                       General::RoundSigDigits(this->MinCondInletTemp, 3) + " C).");
-                    ShowContinueError("...Entering condenser water temperature = " +
+                    ShowContinueError(state, "...Entering condenser water temperature = " +
                                       General::RoundSigDigits(DataLoopNode::Node(this->CondInletNodeNum).Temp, 3) + " C.");
-                    ShowContinueErrorTimeStamp("...simulation continues.");
+                    ShowContinueErrorTimeStamp(state, "...simulation continues.");
                 } else {
                     ShowRecurringWarningErrorAtEnd("Entering condenser water temperature below specified minimum error continues.",
                                                    this->MinCondInletTempIndex,
@@ -1554,12 +1554,12 @@ namespace ChillerIndirectAbsorption {
                 if (!DataGlobals::WarmupFlag) {
                     if (this->MinGenInletTempCtr < 1) {
                         ++this->MinGenInletTempCtr;
-                        ShowWarningError("Chiller:Absorption:Indirect \"" + this->Name + "\"");
-                        ShowContinueError("...Entering generator fluid temperature below specified minimum (" +
+                        ShowWarningError(state, "Chiller:Absorption:Indirect \"" + this->Name + "\"");
+                        ShowContinueError(state, "...Entering generator fluid temperature below specified minimum (" +
                                           General::RoundSigDigits(this->MinGeneratorInletTemp, 3) + " C).");
-                        ShowContinueError("...Entering generator fluid temperature = " +
+                        ShowContinueError(state, "...Entering generator fluid temperature = " +
                                           General::RoundSigDigits(DataLoopNode::Node(this->GeneratorInletNodeNum).Temp, 3) + " C.");
-                        ShowContinueErrorTimeStamp("...simulation continues.");
+                        ShowContinueErrorTimeStamp(state, "...simulation continues.");
                     } else {
                         ShowRecurringWarningErrorAtEnd("Entering generator fluid temperature below specified minimum error continues.",
                                                        this->MinGenInletTempIndex,

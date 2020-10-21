@@ -1119,7 +1119,7 @@ namespace AirflowNetwork {
             k = 5 * (j - 1) + 1;
             BX = Coeff(k);
             BY = Coeff(k + 1) + BX * (Coeff(k + 2) + BX * (Coeff(k + 3) + BX * Coeff(k + 4))) - PRISE;
-            if (BY < 0.0) ShowFatalError(state, "Out of range, too low in an AirflowNetwork detailed Fan");
+            if (BY < 0.0) ShowFatalError(state, state, "Out of range, too low in an AirflowNetwork detailed Fan");
 
             while (true) {
                 DX = Coeff(k + 5);
@@ -1127,7 +1127,7 @@ namespace AirflowNetwork {
                 // if (LIST >= 4) gio::write(Unit21, Format_901) << " fp0:" << j << BX << BY << DX << DY;
                 if (BY * DY <= 0.0) break;
                 ++j;
-                if (j > NumCur) ShowFatalError(state, "Out of range, too high (FAN) in ADS simulation");
+                if (j > NumCur) ShowFatalError(state, state, "Out of range, too high (FAN) in ADS simulation");
                 k += 5;
                 BX = DX;
                 BY = DY;
@@ -1137,7 +1137,7 @@ namespace AirflowNetwork {
             CY = 0.0;
         Label40:;
             ++L;
-            if (L > 100) ShowFatalError(state, "Too many iterations (FAN) in AirflowNtework simulation");
+            if (L > 100) ShowFatalError(state, state, "Too many iterations (FAN) in AirflowNtework simulation");
             CCY = CY;
             CX = BX - BY * ((DX - BX) / (DY - BY));
             CY = Coeff(k + 1) + CX * (Coeff(k + 2) + CX * (Coeff(k + 3) + CX * Coeff(k + 4))) - PRISE;
@@ -1247,7 +1247,7 @@ namespace AirflowNetwork {
         k = 5 * (j - 1) + 1;
         BX = Coeff(k);
         BY = Coeff(k + 1) + BX * (Coeff(k + 2) + BX * (Coeff(k + 3) + BX * Coeff(k + 4))) - PRISE;
-        if (BY < 0.0) ShowFatalError(state, "Out of range, too low in an AirflowNetwork detailed Fan");
+        if (BY < 0.0) ShowFatalError(state, state, "Out of range, too low in an AirflowNetwork detailed Fan");
 
         while (true) {
             DX = Coeff(k + 5);
@@ -1255,7 +1255,7 @@ namespace AirflowNetwork {
             // if (LIST >= 4) gio::write(Unit21, Format_901) << " fp0:" << j << BX << BY << DX << DY;
             if (BY * DY <= 0.0) break;
             ++j;
-            if (j > NumCur) ShowFatalError(state, "Out of range, too high (FAN) in ADS simulation");
+            if (j > NumCur) ShowFatalError(state, state, "Out of range, too high (FAN) in ADS simulation");
             k += 5;
             BX = DX;
             BY = DY;
@@ -1265,7 +1265,7 @@ namespace AirflowNetwork {
         CY = 0.0;
     Label40:;
         ++L;
-        if (L > 100) ShowFatalError(state, "Too many iterations (FAN) in AirflowNtework simulation");
+        if (L > 100) ShowFatalError(state, state, "Too many iterations (FAN) in AirflowNtework simulation");
         CCY = CY;
         CX = BX - BY * ((DX - BX) / (DY - BY));
         CY = Coeff(k + 1) + CX * (Coeff(k + 2) + CX * (Coeff(k + 3) + CX * Coeff(k + 4))) - PRISE;
@@ -1723,7 +1723,7 @@ namespace AirflowNetwork {
                 HFact = HeightFac1 + (Fact - OpenFac1) / (OpenFac2 - OpenFac1) * (HeightFac2 - HeightFac1);
                 Cfact = DischCoeff1 + (Fact - OpenFac1) / (OpenFac2 - OpenFac1) * (DischCoeff2 - DischCoeff1);
             } else {
-                ShowFatalError(state, 
+                ShowFatalError(state, state,
                     "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " +
                     name);
             }
@@ -1739,7 +1739,7 @@ namespace AirflowNetwork {
                 HFact = HeightFac2 + (Fact - OpenFac2) / (OpenFac3 - OpenFac2) * (HeightFac3 - HeightFac2);
                 Cfact = DischCoeff2 + (Fact - OpenFac2) / (OpenFac3 - OpenFac2) * (DischCoeff3 - DischCoeff2);
             } else {
-                ShowFatalError(state, 
+                ShowFatalError(state, state,
                     "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " +
                     name);
             }
@@ -1759,7 +1759,7 @@ namespace AirflowNetwork {
                 HFact = HeightFac3 + (Fact - OpenFac3) / (OpenFac4 - OpenFac3) * (HeightFac4 - HeightFac3);
                 Cfact = DischCoeff3 + (Fact - OpenFac3) / (OpenFac4 - OpenFac3) * (DischCoeff4 - DischCoeff3);
             } else {
-                ShowFatalError(state, 
+                ShowFatalError(state, state,
                     "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " +
                     name);
             }

@@ -179,7 +179,7 @@ namespace ConvectionCoefficients {
                     if (Zone(ZoneNum).SystemZoneNodeNumber != 0) continue;
                     ShowSevereError("InitInteriorConvectionCoeffs: Inside Convection=CeilingDiffuser, but no system inlet node defined, Zone=" +
                                     Zone(ZoneNum).Name);
-                    ShowContinueError("Defaulting inside convection to TARP. Check ZoneHVAC:EquipmentConnections for Zone=" + Zone(ZoneNum).Name);
+                    ShowContinueError(state, "Defaulting inside convection to TARP. Check ZoneHVAC:EquipmentConnections for Zone=" + Zone(ZoneNum).Name);
                     Zone(ZoneNum).InsideConvectionAlgo = ASHRAETARP;
                 }
                 // insert one-time setup for adpative inside face
@@ -304,7 +304,7 @@ namespace ConvectionCoefficients {
 
                     } else {
 
-                        ShowFatalError("Unhandled convection coefficient algorithm.");
+                        ShowFatalError(state, "Unhandled convection coefficient algorithm.");
                     }
                 } else { // Interior convection has been set by the user with "value" or "schedule"
                     HConvIn(SurfNum) = SetIntConvectionCoeff(state, SurfNum);
@@ -580,7 +580,7 @@ namespace ConvectionCoefficients {
                 ManageOutsideAdaptiveConvectionAlgo(state, SurfNum, HExt);
 
             } else {
-                ShowFatalError("InitExtConvection Coefficients: invalid parameter -- outside convection type, Surface=" + Surface(SurfNum).Name);
+                ShowFatalError(state, "InitExtConvection Coefficients: invalid parameter -- outside convection type, Surface=" + Surface(SurfNum).Name);
             }
 
         } else { // Exterior convection scheme for this surface has been set by user
@@ -693,7 +693,7 @@ namespace ConvectionCoefficients {
                 *InsideFaceAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, state.dataConvectionCoefficient->HcInsideUserCurve);
                 if (*InsideFaceAdaptiveConvectionAlgoParam == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
-                    ShowContinueError("Invalid Name choice Entered, for " + curveFieldName + '=' + curveName);
+                    ShowContinueError(state, "Invalid Name choice Entered, for " + curveFieldName + '=' + curveName);
                     ErrorsFound = true;
                 }
             }
@@ -1152,11 +1152,11 @@ namespace ConvectionCoefficients {
                 ++TotExtConvCoeff;
             }
             if (NumAlphas >= 2 && lAlphaFieldBlanks(2)) {
-                ShowWarningError("GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
+                ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
                 ShowContinueError(cAlphaFieldNames(2) + " is blank and rest of fields will not be processed.");
             }
             if (NumAlphas >= 6 && lAlphaFieldBlanks(6)) {
-                ShowWarningError("GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
+                ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
                 ShowContinueError(cAlphaFieldNames(6) + " is blank and rest of fields will not be processed.");
             }
         }
@@ -1188,11 +1188,11 @@ namespace ConvectionCoefficients {
                 ++TotExtConvCoeff;
             }
             if (NumAlphas >= 2 && lAlphaFieldBlanks(2)) {
-                ShowWarningError("GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
+                ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
                 ShowContinueError(cAlphaFieldNames(2) + " is blank and rest of fields will not be processed.");
             }
             if (NumAlphas >= 6 && lAlphaFieldBlanks(6)) {
-                ShowWarningError("GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
+                ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
                 ShowContinueError(cAlphaFieldNames(6) + " is blank and rest of fields will not be processed.");
             }
         }
@@ -1283,7 +1283,7 @@ namespace ConvectionCoefficients {
                                 UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefValue;
                                 UserExtConvectionCoeffs(TotExtConvCoeff).OverrideValue = Numbers(NumField);
                                 if (!lAlphaFieldBlanks(Ptr + 2)) {
-                                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                     ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
                                                       '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
@@ -1362,7 +1362,7 @@ namespace ConvectionCoefficients {
                                 UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefValue;
                                 UserIntConvectionCoeffs(TotIntConvCoeff).OverrideValue = Numbers(NumField);
                                 if (!lAlphaFieldBlanks(Ptr + 2)) {
-                                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                     ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 1) + "\", " +
                                                       cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
@@ -1494,7 +1494,7 @@ namespace ConvectionCoefficients {
                                 UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefValue;
                                 UserExtConvectionCoeffs(TotExtConvCoeff).OverrideValue = Numbers(NumField);
                                 if (!lAlphaFieldBlanks(Ptr + 2)) {
-                                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                     ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " +
                                                       cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
@@ -1575,7 +1575,7 @@ namespace ConvectionCoefficients {
                                 UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefValue;
                                 UserIntConvectionCoeffs(TotIntConvCoeff).OverrideValue = Numbers(NumField);
                                 if (!lAlphaFieldBlanks(Ptr + 2)) {
-                                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
+                                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                     ShowContinueError("Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
                                                       '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
@@ -1837,7 +1837,7 @@ namespace ConvectionCoefficients {
         } // end of 'SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections'
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found getting input.  Program termination.");
+            ShowFatalError(state, RoutineName + "Errors found getting input.  Program termination.");
         }
 
         SetupAdaptiveConvectionStaticMetaData(state);
@@ -1882,7 +1882,7 @@ namespace ConvectionCoefficients {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountOutside;
@@ -1893,7 +1893,7 @@ namespace ConvectionCoefficients {
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountInside;
@@ -1910,7 +1910,7 @@ namespace ConvectionCoefficients {
                     if (SurfaceCountInside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
                     }
-                    ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                    ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
                 }
 
@@ -1927,7 +1927,7 @@ namespace ConvectionCoefficients {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountOutside;
@@ -1938,7 +1938,7 @@ namespace ConvectionCoefficients {
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountInside;
@@ -1955,7 +1955,7 @@ namespace ConvectionCoefficients {
                     if (SurfaceCountInside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
                     }
-                    ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                    ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
                 }
 
@@ -1972,7 +1972,7 @@ namespace ConvectionCoefficients {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountOutside;
@@ -1983,7 +1983,7 @@ namespace ConvectionCoefficients {
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountInside;
@@ -2000,7 +2000,7 @@ namespace ConvectionCoefficients {
                     if (SurfaceCountInside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
                     }
-                    ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                    ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
                 }
 
@@ -2017,7 +2017,7 @@ namespace ConvectionCoefficients {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountOutside;
@@ -2028,7 +2028,7 @@ namespace ConvectionCoefficients {
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountInside;
@@ -2045,7 +2045,7 @@ namespace ConvectionCoefficients {
                     if (SurfaceCountInside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
                     }
-                    ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                    ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
                 }
 
@@ -2062,7 +2062,7 @@ namespace ConvectionCoefficients {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountOutside;
@@ -2073,7 +2073,7 @@ namespace ConvectionCoefficients {
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountInside;
@@ -2090,7 +2090,7 @@ namespace ConvectionCoefficients {
                     if (SurfaceCountInside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
                     }
-                    ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                    ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
                 }
 
@@ -2106,7 +2106,7 @@ namespace ConvectionCoefficients {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountOutside;
@@ -2117,7 +2117,7 @@ namespace ConvectionCoefficients {
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountInside;
@@ -2134,7 +2134,7 @@ namespace ConvectionCoefficients {
                     if (SurfaceCountInside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
                     }
-                    ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                    ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
                 }
 
@@ -2151,7 +2151,7 @@ namespace ConvectionCoefficients {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountOutside;
@@ -2162,7 +2162,7 @@ namespace ConvectionCoefficients {
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountInside;
@@ -2179,7 +2179,7 @@ namespace ConvectionCoefficients {
                     if (SurfaceCountInside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
                     }
-                    ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                    ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
                 }
 
@@ -2196,7 +2196,7 @@ namespace ConvectionCoefficients {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountOutside;
@@ -2207,7 +2207,7 @@ namespace ConvectionCoefficients {
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountInside;
@@ -2224,7 +2224,7 @@ namespace ConvectionCoefficients {
                     if (SurfaceCountInside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
                     }
-                    ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                    ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
                 }
 
@@ -2241,7 +2241,7 @@ namespace ConvectionCoefficients {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountOutside;
@@ -2252,7 +2252,7 @@ namespace ConvectionCoefficients {
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountInside;
@@ -2269,7 +2269,7 @@ namespace ConvectionCoefficients {
                     if (SurfaceCountInside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
                     }
-                    ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                    ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
                 }
 
@@ -2286,7 +2286,7 @@ namespace ConvectionCoefficients {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountOutside;
@@ -2297,7 +2297,7 @@ namespace ConvectionCoefficients {
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
                             if (DisplayExtraWarnings) {
-                                ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                                ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
                                 ++SurfaceCountInside;
@@ -2314,7 +2314,7 @@ namespace ConvectionCoefficients {
                     if (SurfaceCountInside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
                     }
-                    ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+                    ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
                 }
 
@@ -2324,7 +2324,7 @@ namespace ConvectionCoefficients {
         }
 
         if (!SurfacesOfType) {
-            ShowWarningError("User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
+            ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                              "\", there were no surfaces of that type found for " + ConvectionType + " assignment.");
         }
     }
@@ -2868,7 +2868,7 @@ namespace ConvectionCoefficients {
 
         } // SurfNum
 
-        if (ACH > 100.0) ShowWarningError("CeilingDiffuser convection correlation is out of range: ACH > 100");
+        if (ACH > 100.0) ShowWarningError(state, "CeilingDiffuser convection correlation is out of range: ACH > 100");
     }
 
     void CalcTrombeWallIntConvCoeff(EnergyPlusData &state, int const ZoneNum,                         // Zone number for which coefficients are being calculated
@@ -2998,7 +2998,7 @@ namespace ConvectionCoefficients {
             // assign the convection coefficent to the major surfaces and any subsurfaces on them
             if ((Surface(SurfNum).BaseSurf == Surf1) || (Surface(SurfNum).BaseSurf == Surf2)) {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    ShowFatalError("Trombe wall convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+                    ShowFatalError(state, "Trombe wall convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
                 }
                 HConvIn(SurfNum) = 2.0 * HConvNet;
             }
@@ -3369,7 +3369,7 @@ namespace ConvectionCoefficients {
         Real64 sineTilt = Surface(SurfNum).SinTilt;
 
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-            ShowFatalError("ISO15099 convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+            ShowFatalError(state, "ISO15099 convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
         }
 
         HConvIn(SurfNum) = CalcISO15099WindowIntConvCoeff(SurfaceTemperature, AirTemperature, AirHumRat, Height, TiltDeg, sineTilt);
@@ -4699,7 +4699,7 @@ namespace ConvectionCoefficients {
             } else if (SELECT_CASE_var == HcExt_FohannoPolidoriVerticalWall) {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     // Not compatible with Kiva (Exterior surfaces in Kiva are not currently reported. Also need to add cell-level convection.)
-                    ShowFatalError("Fohanno Polidori convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+                    ShowFatalError(state, "Fohanno Polidori convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
                 }
                 Hn = CalcFohannoPolidoriVerticalWall(state, (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp),
                                                      Surface(SurfNum).OutConvFaceHeight,
@@ -4900,19 +4900,19 @@ namespace ConvectionCoefficients {
                 Hf = CalcBlockenWindward(WindSpeed, WindDir, Surface(SurfNum).Azimuth);
                 // Not compatible with Kiva (doesn't use weather station windspeed)
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    ShowFatalError("Blocken Windward convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+                    ShowFatalError(state, "Blocken Windward convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
                 }
             } else if (SELECT_CASE_var == HcExt_EmmelVertical) {
                 Hf = CalcEmmelVertical(state, WindSpeed, WindDir, Surface(SurfNum).Azimuth, SurfNum);
                 // Not compatible with Kiva (doesn't use weather station windspeed)
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    ShowFatalError("Emmel Vertical convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+                    ShowFatalError(state, "Emmel Vertical convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
                 }
             } else if (SELECT_CASE_var == HcExt_EmmelRoof) {
                 Hf = CalcEmmelRoof(state, WindSpeed, WindDir, state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth, SurfNum);
                 // Not compatible with Kiva (doesn't use weather station windspeed)
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    ShowFatalError("Emmel Roof convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
+                    ShowFatalError(state, "Emmel Roof convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
                 }
             }
         }

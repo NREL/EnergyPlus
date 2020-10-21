@@ -97,7 +97,7 @@ extern "C" {
 namespace EnergyPlus {
 
 namespace UtilityRoutines {
-    
+
     ObjexxFCL::gio::Fmt fmtLD("*");
 
     Real64 ProcessNumber(std::string const &String, bool &ErrorFlag)
@@ -679,7 +679,7 @@ namespace UtilityRoutines {
         }
 
         ReportSurfaceErrors(state);
-        CheckPlantOnAbort();
+        CheckPlantOnAbort(state);
         ShowRecurringErrors(state);
         SummarizeErrors(state);
         CloseMiscOpenFiles(state);

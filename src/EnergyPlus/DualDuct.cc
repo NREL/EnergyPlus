@@ -334,7 +334,7 @@ namespace DualDuct {
                 } else {
                     dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                     if (dd_airterminal(DDNum).SchedPtr == 0) {
-                        ShowSevereError(CurrentModuleObject + ", \"" + dd_airterminal(DDNum).Name + "\" " + cAlphaFields(2) + " = " + AlphArray(2) +
+                        ShowSevereError(state, CurrentModuleObject + ", \"" + dd_airterminal(DDNum).Name + "\" " + cAlphaFields(2) + " = " + AlphArray(2) +
                                         " not found.");
                         ErrorsFound = true;
                     }
@@ -371,8 +371,8 @@ namespace DualDuct {
                 dd_airterminal(DDNum).ZoneMinAirFracDes = 0.0;
 
                 // Register component set data - one for heat and one for cool
-                TestCompSet(CurrentModuleObject + ":HEAT", dd_airterminal(DDNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
-                TestCompSet(CurrentModuleObject + ":COOL", dd_airterminal(DDNum).Name, AlphArray(5), AlphArray(3), "Air Nodes");
+                TestCompSet(state, CurrentModuleObject + ":HEAT", dd_airterminal(DDNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
+                TestCompSet(state, CurrentModuleObject + ":COOL", dd_airterminal(DDNum).Name, AlphArray(5), AlphArray(3), "Air Nodes");
 
                 for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
                     if (dd_airterminal(DDNum).OutletNodeNum == AirDistUnit(ADUNum).OutletNodeNum) {
@@ -393,7 +393,7 @@ namespace DualDuct {
                     } else {
                         CurrentModuleObject = "*invalid*";
                     }
-                    ShowSevereError(RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
+                    ShowSevereError(state, RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
                                     dd_airterminal(DDNum).Name + "].");
                     ShowContinueError("...should have outlet node=" + NodeID(dd_airterminal(DDNum).OutletNodeNum));
                     ErrorsFound = true;
@@ -405,7 +405,7 @@ namespace DualDuct {
                         for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                             if (dd_airterminal(DDNum).OutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
                                 if (ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
-                                    ShowSevereError("Error in connecting a terminal unit to a zone");
+                                    ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                                     ShowContinueError(NodeID(dd_airterminal(DDNum).OutletNodeNum) + " already connects to another zone");
                                     ShowContinueError("Occurs for terminal unit " + CurrentModuleObject + " = " + dd_airterminal(DDNum).Name);
                                     ShowContinueError("Check terminal unit node names for errors");
@@ -475,7 +475,7 @@ namespace DualDuct {
                 } else {
                     dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                     if (dd_airterminal(DDNum).SchedPtr == 0) {
-                        ShowSevereError(CurrentModuleObject + ", \"" + dd_airterminal(DDNum).Name + "\" " + cAlphaFields(2) + " = " + AlphArray(2) +
+                        ShowSevereError(state, CurrentModuleObject + ", \"" + dd_airterminal(DDNum).Name + "\" " + cAlphaFields(2) + " = " + AlphArray(2) +
                                         " not found.");
                         ErrorsFound = true;
                     }
@@ -512,8 +512,8 @@ namespace DualDuct {
                 dd_airterminal(DDNum).ZoneMinAirFracDes = NumArray(2);
 
                 // Register component set data - one for heat and one for cool
-                TestCompSet(CurrentModuleObject + ":HEAT", dd_airterminal(DDNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
-                TestCompSet(CurrentModuleObject + ":COOL", dd_airterminal(DDNum).Name, AlphArray(5), AlphArray(3), "Air Nodes");
+                TestCompSet(state, CurrentModuleObject + ":HEAT", dd_airterminal(DDNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
+                TestCompSet(state, CurrentModuleObject + ":COOL", dd_airterminal(DDNum).Name, AlphArray(5), AlphArray(3), "Air Nodes");
 
                 for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
                     if (dd_airterminal(DDNum).OutletNodeNum == AirDistUnit(ADUNum).OutletNodeNum) {
@@ -534,7 +534,7 @@ namespace DualDuct {
                     } else {
                         CurrentModuleObject = "*invalid*";
                     }
-                    ShowSevereError(RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
+                    ShowSevereError(state, RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
                                     dd_airterminal(DDNum).Name + "].");
                     ShowContinueError("...should have outlet node=" + NodeID(dd_airterminal(DDNum).OutletNodeNum));
                     ErrorsFound = true;
@@ -563,7 +563,7 @@ namespace DualDuct {
                 if (!lAlphaBlanks(6)) {
                     dd_airterminal(DDNum).OARequirementsPtr = UtilityRoutines::FindItemInList(AlphArray(6), OARequirements);
                     if (dd_airterminal(DDNum).OARequirementsPtr == 0) {
-                        ShowSevereError(cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
+                        ShowSevereError(state, cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
                         ShowContinueError("Occurs in " + cCMO_DDVariableVolume + " = " + dd_airterminal(DDNum).Name);
                         ErrorsFound = true;
                     } else {
@@ -577,7 +577,7 @@ namespace DualDuct {
                 } else {
                     dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = GetScheduleIndex(state, AlphArray(7));
                     if (dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr == 0) {
-                        ShowSevereError(cAlphaFields(7) + " = " + AlphArray(7) + " not found.");
+                        ShowSevereError(state, cAlphaFields(7) + " = " + AlphArray(7) + " not found.");
                         ShowContinueError("Occurs in " + cCMO_DDVariableVolume + " = " + dd_airterminal(DDNum).Name);
                         ErrorsFound = true;
                     }
@@ -638,7 +638,7 @@ namespace DualDuct {
                 } else {
                     dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                     if (dd_airterminal(DDNum).SchedPtr == 0) {
-                        ShowSevereError(CurrentModuleObject + ", \"" + dd_airterminal(DDNum).Name + "\" " + cAlphaFields(2) + " = " + AlphArray(2) +
+                        ShowSevereError(state, CurrentModuleObject + ", \"" + dd_airterminal(DDNum).Name + "\" " + cAlphaFields(2) + " = " + AlphArray(2) +
                                         " not found.");
                         ErrorsFound = true;
                     }
@@ -681,9 +681,9 @@ namespace DualDuct {
                 dd_airterminal(DDNum).MaxAirMassFlowRate = dd_airterminal(DDNum).MaxAirVolFlowRate * StdRhoAir;
 
                 // Register component set data - one for OA and one for RA
-                TestCompSet(CurrentModuleObject + ":OutdoorAir", dd_airterminal(DDNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
+                TestCompSet(state, CurrentModuleObject + ":OutdoorAir", dd_airterminal(DDNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
                 if (dd_airterminal(DDNum).RecircIsUsed) {
-                    TestCompSet(CurrentModuleObject + ":RecirculatedAir", dd_airterminal(DDNum).Name, AlphArray(5), AlphArray(3), "Air Nodes");
+                    TestCompSet(state, CurrentModuleObject + ":RecirculatedAir", dd_airterminal(DDNum).Name, AlphArray(5), AlphArray(3), "Air Nodes");
                 }
 
                 {
@@ -716,7 +716,7 @@ namespace DualDuct {
                     } else {
                         CurrentModuleObject = "*invalid*";
                     }
-                    ShowSevereError(RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
+                    ShowSevereError(state, RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
                                     dd_airterminal(DDNum).Name + "].");
                     ShowContinueError("...should have outlet node=" + NodeID(dd_airterminal(DDNum).OutletNodeNum));
                     ErrorsFound = true;
@@ -748,7 +748,7 @@ namespace DualDuct {
                 }
                 dd_airterminal(DDNum).OARequirementsPtr = UtilityRoutines::FindItemInList(AlphArray(6), OARequirements);
                 if (dd_airterminal(DDNum).OARequirementsPtr == 0) {
-                    ShowSevereError(cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
+                    ShowSevereError(state, cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
                     ShowContinueError("Occurs in " + cCMO_DDVarVolOA + " = " + dd_airterminal(DDNum).Name);
                     ErrorsFound = true;
                 } else {
@@ -773,7 +773,7 @@ namespace DualDuct {
                                                          dd_airterminal(DDNum).DesignRecircFlowRate);
                         } else {
                             if (dd_airterminal(DDNum).MaxAirVolFlowRate < dd_airterminal(DDNum).DesignOAFlowRate) {
-                                ShowSevereError("The value " + RoundSigDigits(dd_airterminal(DDNum).MaxAirVolFlowRate, 5) + " in " +
+                                ShowSevereError(state, "The value " + RoundSigDigits(dd_airterminal(DDNum).MaxAirVolFlowRate, 5) + " in " +
                                                 cNumericFields(1) + "is lower than the outdoor air requirement.");
                                 ShowContinueError("Occurs in " + cCMO_DDVarVolOA + " = " + dd_airterminal(DDNum).Name);
                                 ShowContinueError("The design outdoor air requirement is " +
@@ -789,12 +789,12 @@ namespace DualDuct {
                     if ((DummyOAFlow == 0.0) && (lAlphaBlanks(7))) {       // no worries
                                                                            // do nothing, okay since no per person requirement involved
                     } else if ((DummyOAFlow > 0.0) && (lAlphaBlanks(7))) { // missing input
-                        ShowSevereError(cAlphaFields(7) + " was blank.");
+                        ShowSevereError(state, cAlphaFields(7) + " was blank.");
                         ShowContinueError("Occurs in " + cCMO_DDVarVolOA + " = " + dd_airterminal(DDNum).Name);
                         ShowContinueError("Valid choices are \"CurrentOccupancy\" or \"DesignOccupancy\"");
                         ErrorsFound = true;
                     } else if ((DummyOAFlow > 0.0) && !(lAlphaBlanks(7))) { // incorrect input
-                        ShowSevereError(cAlphaFields(7) + " = " + AlphArray(7) + " not a valid key choice.");
+                        ShowSevereError(state, cAlphaFields(7) + " = " + AlphArray(7) + " not a valid key choice.");
                         ShowContinueError("Occurs in " + cCMO_DDVarVolOA + " = " + dd_airterminal(DDNum).Name);
                         ShowContinueError("Valid choices are \"CurrentOccupancy\" or \"DesignOccupancy\"");
                         ErrorsFound = true;
@@ -892,7 +892,7 @@ namespace DualDuct {
             for (Loop = 1; Loop <= NumDDAirTerminal; ++Loop) {
                 if (this->ADUNum == 0) continue;
                 if (CheckZoneEquipmentList("ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit(this->ADUNum).Name)) continue;
-                ShowSevereError("InitDualDuct: ADU=[Air Distribution Unit," + AirDistUnit(this->ADUNum).Name +
+                ShowSevereError(state, "InitDualDuct: ADU=[Air Distribution Unit," + AirDistUnit(this->ADUNum).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.");
                 if (this->DamperType == DualDuct_ConstantVolume) {
                     ShowContinueError("...Dual Duct Damper=[" + cCMO_DDConstantVolume + ',' + this->Name + "] will not be simulated.");
@@ -1923,7 +1923,7 @@ namespace DualDuct {
 
         // If no additional input from user, RETURN from subroutine
         if (this->NoOAFlowInputFromUser) {
-            ShowSevereError("CalcOAOnlyMassFlow: Problem in AirTerminal:DualDuct:VAV:OutdoorAir = " + this->Name +
+            ShowSevereError(state, "CalcOAOnlyMassFlow: Problem in AirTerminal:DualDuct:VAV:OutdoorAir = " + this->Name +
                             ", check outdoor air specification");
             if (present(MaxOAVolFlow)) MaxOAVolFlow = 0.0;
             return;

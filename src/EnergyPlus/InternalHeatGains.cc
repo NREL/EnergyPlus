@@ -409,7 +409,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
             errFlag = ErrorsFound;
 
             PeopleObjects(Item).Name = AlphaName(1);
@@ -430,7 +430,7 @@ namespace InternalHeatGains {
                 PeopleObjects(Item).ZoneListActive = true;
                 PeopleObjects(Item).ZoneOrZoneListPtr = ZLItem;
             } else {
-                ShowSevereError(CurrentModuleObject + "=\"" + AlphaName(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphaName(2) +
+                ShowSevereError(state, CurrentModuleObject + "=\"" + AlphaName(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphaName(2) +
                                 "\" not found.");
                 ErrorsFound = true;
                 errFlag = true;
@@ -438,8 +438,8 @@ namespace InternalHeatGains {
         }
 
         if (errFlag) {
-            ShowSevereError(RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
-            ShowContinueError("...These will not be read in.  Other errors may occur.");
+            ShowSevereError(state, RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
+            ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
             TotPeople = 0;
         }
 
@@ -489,10 +489,10 @@ namespace InternalHeatGains {
                     if (People(Loop).NumberOfPeoplePtr == 0) {
                         if (Item1 == 1) { // only show error on first one
                             if (lAlphaFieldBlanks(3)) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                 " is required.");
                             } else {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
                                                 " entered=" + AlphaName(3));
                             }
                             ErrorsFound = true;
@@ -503,18 +503,18 @@ namespace InternalHeatGains {
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (Item1 == 1) {
                                 if (SchMin < 0.0) {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                     ", minimum is < 0.0");
-                                    ShowContinueError("Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
+                                    ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
                                                       "]. Values must be >= 0.0.");
                                     ErrorsFound = true;
                                 }
                             }
                             if (Item1 == 1) {
                                 if (SchMax < 0.0) {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                     ", maximum is < 0.0");
-                                    ShowContinueError("Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
+                                    ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
                                                       "]. Values must be >= 0.0.");
                                     ErrorsFound = true;
                                 }
@@ -528,7 +528,7 @@ namespace InternalHeatGains {
                         if (peopleMethod == "PEOPLE") {
                             People(Loop).NumberOfPeople = IHGNumbers(1);
                             if (lNumericFieldBlanks(1)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", specifies " +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", specifies " +
                                                  cNumericFieldNames(1) + ", but that field is blank.  0 People will result.");
                             }
 
@@ -537,17 +537,17 @@ namespace InternalHeatGains {
                                 if (IHGNumbers(2) >= 0.0) {
                                     People(Loop).NumberOfPeople = IHGNumbers(2) * Zone(People(Loop).ZonePtr).FloorArea;
                                     if (Zone(People(Loop).ZonePtr).FloorArea <= 0.0) {
-                                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", specifies " +
+                                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", specifies " +
                                                          cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 People will result.");
                                     }
                                 } else {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", invalid " +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", invalid " +
                                                     cNumericFieldNames(2) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(2), 3));
                                     ErrorsFound = true;
                                 }
                             }
                             if (lNumericFieldBlanks(2)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", specifies " +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", specifies " +
                                                  cNumericFieldNames(2) + ", but that field is blank.  0 People will result.");
                             }
 
@@ -556,25 +556,25 @@ namespace InternalHeatGains {
                                 if (IHGNumbers(3) > 0.0) {
                                     People(Loop).NumberOfPeople = Zone(People(Loop).ZonePtr).FloorArea / IHGNumbers(3);
                                     if (Zone(People(Loop).ZonePtr).FloorArea <= 0.0) {
-                                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", specifies " +
+                                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", specifies " +
                                                          cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 People will result.");
                                     }
                                 } else {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", invalid " +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", invalid " +
                                                     cNumericFieldNames(3) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(3), 3));
                                     ErrorsFound = true;
                                 }
                             }
                             if (lNumericFieldBlanks(3)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", specifies " +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", specifies " +
                                                  cNumericFieldNames(3) + ", but that field is blank.  0 People will result.");
                             }
 
                         } else {
                             if (Item1 == 1) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
                                                 ", value  =" + AlphaName(4));
-                                ShowContinueError("...Valid values are \"People\", \"People/Area\", \"Area/Person\".");
+                                ShowContinueError(state, "...Valid values are \"People\", \"People/Area\", \"Area/Person\".");
                                 ErrorsFound = true;
                             }
                         }
@@ -592,7 +592,7 @@ namespace InternalHeatGains {
                     People(Loop).FractionConvected = 1.0 - People(Loop).FractionRadiant;
                     if (Item1 == 1) {
                         if (People(Loop).FractionConvected < 0.0) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(4) +
+                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(4) +
                                             " < 0.0, value =" + RoundSigDigits(IHGNumbers(4), 2));
                             ErrorsFound = true;
                         }
@@ -610,7 +610,7 @@ namespace InternalHeatGains {
                         People(Loop).CO2RateFactor = 3.82e-8; // m3/s-W
                     }
                     if (People(Loop).CO2RateFactor < 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(6) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(6) +
                                         " < 0.0, value =" + RoundSigDigits(IHGNumbers(6), 2));
                         ErrorsFound = true;
                     }
@@ -619,10 +619,10 @@ namespace InternalHeatGains {
                     if (People(Loop).ActivityLevelPtr == 0) {
                         if (Item1 == 1) {
                             if (lAlphaFieldBlanks(5)) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(5) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(5) +
                                                 " is required.");
                             } else {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(5) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(5) +
                                                 " entered=" + AlphaName(5));
                             }
                             ErrorsFound = true;
@@ -633,28 +633,28 @@ namespace InternalHeatGains {
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (Item1 == 1) {
                                 if (SchMin < 0.0) {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(5) +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(5) +
                                                     " minimum is < 0.0");
-                                    ShowContinueError("Schedule=\"" + AlphaName(5) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
+                                    ShowContinueError(state, "Schedule=\"" + AlphaName(5) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
                                                       "]. Values must be >= 0.0.");
                                     ErrorsFound = true;
                                 }
                             }
                             if (Item1 == 1) {
                                 if (SchMax < 0.0) {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(5) +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(5) +
                                                     " maximum is < 0.0");
-                                    ShowContinueError("Schedule=\"" + AlphaName(5) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
+                                    ShowContinueError(state, "Schedule=\"" + AlphaName(5) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
                                                       "]. Values must be >= 0.0.");
                                     ErrorsFound = true;
                                 }
                             }
                         } else if (SchMin < 70.0 || SchMax > 1000.0) {
                             if (Item1 == 1) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(5) + " values");
-                                ShowContinueError("fall outside typical range [70,1000] W/person for Thermal Comfort Reporting.");
-                                ShowContinueError("Odd comfort values may result; Schedule=\"" + AlphaName(5) + "\".");
-                                ShowContinueError("Entered min/max range=[" + RoundSigDigits(SchMin, 1) + ',' + RoundSigDigits(SchMax, 1) +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(5) + " values");
+                                ShowContinueError(state, "fall outside typical range [70,1000] W/person for Thermal Comfort Reporting.");
+                                ShowContinueError(state, "Odd comfort values may result; Schedule=\"" + AlphaName(5) + "\".");
+                                ShowContinueError(state, "Entered min/max range=[" + RoundSigDigits(SchMin, 1) + ',' + RoundSigDigits(SchMax, 1) +
                                                   "] W/person.");
                             }
                         }
@@ -666,9 +666,9 @@ namespace InternalHeatGains {
                             People(Loop).Show55Warning = true;
                         } else if (!UtilityRoutines::SameString(AlphaName(6), "No") && !lAlphaFieldBlanks(6)) {
                             if (Item1 == 1) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(6) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(6) +
                                                 " field should be Yes or No");
-                                ShowContinueError("...Field value=\"" + AlphaName(6) + "\" is invalid.");
+                                ShowContinueError(state, "...Field value=\"" + AlphaName(6) + "\" is invalid.");
                                 ErrorsFound = true;
                             }
                         }
@@ -689,13 +689,13 @@ namespace InternalHeatGains {
                             NoTCModelSelectedWithSchedules =
                                 CheckThermalComfortSchedules(lAlphaFieldBlanks(9), lAlphaFieldBlanks(12), lAlphaFieldBlanks(13));
                             if (NoTCModelSelectedWithSchedules) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) +
                                                  "\" has comfort related schedules but no thermal comfort model selected.");
-                                ShowContinueError("If schedules are specified for air velocity, clothing insulation, and/or work efficiency but no "
+                                ShowContinueError(state, "If schedules are specified for air velocity, clothing insulation, and/or work efficiency but no "
                                                   "thermal comfort");
-                                ShowContinueError(
+                                ShowContinueError(state,
                                     "thermal comfort model is selected, the schedules will be listed as unused schedules in the .err file.");
-                                ShowContinueError(
+                                ShowContinueError(state,
                                     "To avoid these errors, select a valid thermal comfort model or eliminate these schedules in the PEOPLE input.");
                             }
                         }
@@ -736,9 +736,9 @@ namespace InternalHeatGains {
 
                                 } else { // An invalid keyword was entered--warn but ignore
                                     if (Item1 == 1) {
-                                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                          cAlphaFieldNames(OptionNum) + " Option=" + AlphaName(OptionNum));
-                                        ShowContinueError(
+                                        ShowContinueError(state,
                                             "Valid Values are \"Fanger\", \"Pierce\", \"KSU\", \"AdaptiveASH55\", \"AdaptiveCEN15251\"");
                                     }
                                 }
@@ -762,15 +762,15 @@ namespace InternalHeatGains {
                                     People(Loop).SurfacePtr = UtilityRoutines::FindItemInList(AlphaName(8), Surface);
                                     if (People(Loop).SurfacePtr == 0 && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
                                         if (Item1 == 1) {
-                                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(7) +
+                                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(7) +
                                                             '=' + AlphaName(7) + " invalid Surface Name=" + AlphaName(8));
                                             ErrorsFound = true;
                                         }
                                     } else if (Surface(People(Loop).SurfacePtr).Zone != People(Loop).ZonePtr &&
                                                (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
-                                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Surface referenced in " +
+                                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Surface referenced in " +
                                                         cAlphaFieldNames(7) + '=' + AlphaName(8) + " in different zone.");
-                                        ShowContinueError("Surface is in Zone=" + Zone(Surface(People(Loop).SurfacePtr).Zone).Name + " and " +
+                                        ShowContinueError(state, "Surface is in Zone=" + Zone(Surface(People(Loop).SurfacePtr).Zone).Name + " and " +
                                                           CurrentModuleObject + " is in Zone=" + AlphaName(2));
                                         ErrorsFound = true;
                                     }
@@ -781,14 +781,14 @@ namespace InternalHeatGains {
 
                                 } else if (mrtType == "") { // Blank input field--just ignore this
                                     if (MustInpSch && Item1 == 1 && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU))
-                                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " +
+                                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " +
                                                          cAlphaFieldNames(7));
 
                                 } else { // An invalid keyword was entered--warn but ignore
                                     if (MustInpSch && Item1 == 1 && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
-                                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                          cAlphaFieldNames(7) + '=' + AlphaName(7));
-                                        ShowContinueError("...Valid values are \"ZoneAveraged\", \"SurfaceWeighted\", \"AngleFactor\".");
+                                        ShowContinueError(state, "...Valid values are \"ZoneAveraged\", \"SurfaceWeighted\", \"AngleFactor\".");
                                     }
                                 }
                             }
@@ -797,7 +797,7 @@ namespace InternalHeatGains {
                                 People(Loop).WorkEffPtr = GetScheduleIndex(state, AlphaName(9));
                                 if (People(Loop).WorkEffPtr == 0) {
                                     if (Item1 == 1) {
-                                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                         cAlphaFieldNames(9) + " entered=" + AlphaName(9));
                                         ErrorsFound = true;
                                     }
@@ -807,18 +807,18 @@ namespace InternalHeatGains {
                                     if (SchMin < 0.0 || SchMax < 0.0) {
                                         if (SchMin < 0.0) {
                                             if (Item1 == 1) {
-                                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                 cAlphaFieldNames(9) + ", minimum is < 0.0");
-                                                ShowContinueError("Schedule=\"" + AlphaName(9) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
+                                                ShowContinueError(state, "Schedule=\"" + AlphaName(9) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
                                                                   "]. Values must be >= 0.0.");
                                                 ErrorsFound = true;
                                             }
                                         }
                                         if (SchMax < 0.0) {
                                             if (Item1 == 1) {
-                                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                 cAlphaFieldNames(9) + ", maximum is < 0.0");
-                                                ShowContinueError("Schedule=\"" + AlphaName(9) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
+                                                ShowContinueError(state, "Schedule=\"" + AlphaName(9) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
                                                                   "]. Values must be >= 0.0.");
                                                 ErrorsFound = true;
                                             }
@@ -826,16 +826,16 @@ namespace InternalHeatGains {
                                     }
                                     if (SchMax > 1.0) {
                                         if (Item1 == 1) {
-                                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(9) +
+                                            ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(9) +
                                                              ", maximum is > 1.0");
-                                            ShowContinueError("Schedule=\"" + AlphaName(9) + "\"; Entered min/max range=[" +
+                                            ShowContinueError(state, "Schedule=\"" + AlphaName(9) + "\"; Entered min/max range=[" +
                                                               RoundSigDigits(SchMin, 1) + ',' + RoundSigDigits(SchMax, 1) + "] Work Efficiency.");
                                         }
                                     }
                                 }
                             } else if (MustInpSch && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
                                 if (Item1 == 1) {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(9) +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(9) +
                                                     " is required for this item.");
                                     ErrorsFound = true;
                                 }
@@ -849,7 +849,7 @@ namespace InternalHeatGains {
                                         People(Loop).ClothingPtr = GetScheduleIndex(state, AlphaName(12));
                                         if (People(Loop).ClothingPtr == 0 && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
                                             if (Item1 == 1) {
-                                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                                 cAlphaFieldNames(12) + " entered=" + AlphaName(12));
                                                 ErrorsFound = true;
                                             }
@@ -859,18 +859,18 @@ namespace InternalHeatGains {
                                             if (SchMin < 0.0 || SchMax < 0.0) {
                                                 if (SchMin < 0.0) {
                                                     if (Item1 == 1) {
-                                                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                         cAlphaFieldNames(12) + ", minimum is < 0.0");
-                                                        ShowContinueError("Schedule=\"" + AlphaName(12) + "\". Minimum is [" +
+                                                        ShowContinueError(state, "Schedule=\"" + AlphaName(12) + "\". Minimum is [" +
                                                                           RoundSigDigits(SchMin, 1) + "]. Values must be >= 0.0.");
                                                         ErrorsFound = true;
                                                     }
                                                 }
                                                 if (SchMax < 0.0) {
                                                     if (Item1 == 1) {
-                                                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                         cAlphaFieldNames(12) + ", maximum is < 0.0");
-                                                        ShowContinueError("Schedule=\"" + AlphaName(12) + "\". Maximum is [" +
+                                                        ShowContinueError(state, "Schedule=\"" + AlphaName(12) + "\". Maximum is [" +
                                                                           RoundSigDigits(SchMax, 1) + "]. Values must be >= 0.0.");
                                                         ErrorsFound = true;
                                                     }
@@ -878,9 +878,9 @@ namespace InternalHeatGains {
                                             }
                                             if (SchMax > 2.0) {
                                                 if (Item1 == 1) {
-                                                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                      cAlphaFieldNames(12) + ", maximum is > 2.0");
-                                                    ShowContinueError("Schedule=\"" + AlphaName(12) + "\"; Entered min/max range=[" +
+                                                    ShowContinueError(state, "Schedule=\"" + AlphaName(12) + "\"; Entered min/max range=[" +
                                                                       RoundSigDigits(SchMin, 1) + ',' + RoundSigDigits(SchMax, 1) + "] Clothing.");
                                                 }
                                             }
@@ -894,7 +894,7 @@ namespace InternalHeatGains {
                                         People(Loop).ClothingMethodPtr = GetScheduleIndex(state, AlphaName(11));
                                         if (People(Loop).ClothingMethodPtr == 0) {
                                             if (Item1 == 1) {
-                                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                                 cAlphaFieldNames(11) + " entered=" + AlphaName(11));
                                                 ErrorsFound = true;
                                             }
@@ -903,7 +903,7 @@ namespace InternalHeatGains {
                                             People(Loop).ClothingPtr = GetScheduleIndex(state, AlphaName(12));
                                             if (People(Loop).ClothingPtr == 0) {
                                                 if (Item1 == 1) {
-                                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                                     cAlphaFieldNames(12) + " entered=" + AlphaName(12));
                                                     ErrorsFound = true;
                                                 }
@@ -911,9 +911,9 @@ namespace InternalHeatGains {
                                         }
 
                                     } else {
-                                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", invalid " +
+                                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + People(Loop).Name + "\", invalid " +
                                                         cAlphaFieldNames(10) + ", value  =" + AlphaName(10));
-                                        ShowContinueError("...Valid values are \"ClothingInsulationSchedule\",\"DynamicClothingModelASHRAE55a\", "
+                                        ShowContinueError(state, "...Valid values are \"ClothingInsulationSchedule\",\"DynamicClothingModelASHRAE55a\", "
                                                           "\"CalculationMethodSchedule\".");
                                         ErrorsFound = true;
                                     }
@@ -924,7 +924,7 @@ namespace InternalHeatGains {
                                 People(Loop).AirVelocityPtr = GetScheduleIndex(state, AlphaName(13));
                                 if (People(Loop).AirVelocityPtr == 0) {
                                     if (Item1 == 1) {
-                                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                         cAlphaFieldNames(13) + " entered=" + AlphaName(13));
                                         ErrorsFound = true;
                                     }
@@ -934,18 +934,18 @@ namespace InternalHeatGains {
                                     if (SchMin < 0.0 || SchMax < 0.0) {
                                         if (SchMin < 0.0) {
                                             if (Item1 == 1) {
-                                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                 cAlphaFieldNames(13) + ", minimum is < 0.0");
-                                                ShowContinueError("Schedule=\"" + AlphaName(13) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
+                                                ShowContinueError(state, "Schedule=\"" + AlphaName(13) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
                                                                   "]. Values must be >= 0.0.");
                                                 ErrorsFound = true;
                                             }
                                         }
                                         if (SchMax < 0.0) {
                                             if (Item1 == 1) {
-                                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                                                 cAlphaFieldNames(13) + ", maximum is < 0.0");
-                                                ShowContinueError("Schedule=\"" + AlphaName(13) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
+                                                ShowContinueError(state, "Schedule=\"" + AlphaName(13) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
                                                                   "]. Values must be >= 0.0.");
                                                 ErrorsFound = true;
                                             }
@@ -954,7 +954,7 @@ namespace InternalHeatGains {
                                 }
                             } else if (MustInpSch && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
                                 if (Item1 == 1) {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(13) +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(13) +
                                                     " is required for this item.");
                                     ErrorsFound = true;
                                 }
@@ -1096,11 +1096,11 @@ namespace InternalHeatGains {
         for (Loop = 1; Loop <= NumOfZones; ++Loop) {
             if (Zone(Loop).TotOccupants > 0.0) {
                 if (Zone(Loop).FloorArea > 0.0 && Zone(Loop).FloorArea / Zone(Loop).TotOccupants < 0.1) {
-                    ShowWarningError(RoutineName + "Zone=\"" + Zone(Loop).Name + "\" occupant density is extremely high.");
+                    ShowWarningError(state, RoutineName + "Zone=\"" + Zone(Loop).Name + "\" occupant density is extremely high.");
                     if (Zone(Loop).FloorArea > 0.0) {
-                        ShowContinueError("Occupant Density=[" + RoundSigDigits(Zone(Loop).TotOccupants / Zone(Loop).FloorArea, 0) + "] person/m2.");
+                        ShowContinueError(state, "Occupant Density=[" + RoundSigDigits(Zone(Loop).TotOccupants / Zone(Loop).FloorArea, 0) + "] person/m2.");
                     }
-                    ShowContinueError("Occupant Density=[" + RoundSigDigits(Zone(Loop).FloorArea / Zone(Loop).TotOccupants, 3) +
+                    ShowContinueError(state, "Occupant Density=[" + RoundSigDigits(Zone(Loop).FloorArea / Zone(Loop).TotOccupants, 3) +
                                       "] m2/person. Problems in Temperature Out of Bounds may result.");
                 }
                 maxOccupLoad = 0.0;
@@ -1114,14 +1114,14 @@ namespace InternalHeatGains {
                 }
                 if (maxOccupLoad > Zone(Loop).TotOccupants) {
                     if (Zone(Loop).FloorArea > 0.0 && Zone(Loop).FloorArea / maxOccupLoad < 0.1) {
-                        ShowWarningError(RoutineName + "Zone=\"" + Zone(Loop).Name +
+                        ShowWarningError(state, RoutineName + "Zone=\"" + Zone(Loop).Name +
                                          "\" occupant density at a maximum schedule value is extremely high.");
                         if (Zone(Loop).FloorArea > 0.0) {
-                            ShowContinueError("Occupant Density=[" + RoundSigDigits(maxOccupLoad / Zone(Loop).FloorArea, 0) + "] person/m2.");
+                            ShowContinueError(state, "Occupant Density=[" + RoundSigDigits(maxOccupLoad / Zone(Loop).FloorArea, 0) + "] person/m2.");
                         }
-                        ShowContinueError("Occupant Density=[" + RoundSigDigits(Zone(Loop).FloorArea / maxOccupLoad, 3) +
+                        ShowContinueError(state, "Occupant Density=[" + RoundSigDigits(Zone(Loop).FloorArea / maxOccupLoad, 3) +
                                           "] m2/person. Problems in Temperature Out of Bounds may result.");
-                        ShowContinueError("Check values in People=" + People(OptionNum).Name +
+                        ShowContinueError(state, "Check values in People=" + People(OptionNum).Name +
                                           ", Number of People Schedule=" + GetScheduleName(state, MaxNumber));
                     }
                 }
@@ -1156,7 +1156,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
             errFlag = ErrorsFound;
 
             LightsObjects(Item).Name = AlphaName(1);
@@ -1177,7 +1177,7 @@ namespace InternalHeatGains {
                 LightsObjects(Item).ZoneListActive = true;
                 LightsObjects(Item).ZoneOrZoneListPtr = ZLItem;
             } else {
-                ShowSevereError(CurrentModuleObject + "=\"" + AlphaName(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphaName(2) +
+                ShowSevereError(state, CurrentModuleObject + "=\"" + AlphaName(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphaName(2) +
                                 "\" not found.");
                 ErrorsFound = true;
                 errFlag = true;
@@ -1185,8 +1185,8 @@ namespace InternalHeatGains {
         }
 
         if (errFlag) {
-            ShowSevereError(RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
-            ShowContinueError("...These will not be read in.  Other errors may occur.");
+            ShowSevereError(state, RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
+            ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
             TotLights = 0;
         }
 
@@ -1236,10 +1236,10 @@ namespace InternalHeatGains {
                     if (Lights(Loop).SchedPtr == 0) {
                         if (Item1 == 1) {
                             if (lAlphaFieldBlanks(3)) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                 " is required.");
                             } else {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
                                                 " entered=" + AlphaName(3));
                             }
                             ErrorsFound = true;
@@ -1250,18 +1250,18 @@ namespace InternalHeatGains {
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (Item1 == 1) {
                                 if (SchMin < 0.0) {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                     ", minimum is < 0.0");
-                                    ShowContinueError("Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
+                                    ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
                                                       "]. Values must be >= 0.0.");
                                     ErrorsFound = true;
                                 }
                             }
                             if (Item1 == 1) {
                                 if (SchMax < 0.0) {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                     ", maximum is < 0.0");
-                                    ShowContinueError("Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
+                                    ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
                                                       "]. Values must be >= 0.0.");
                                     ErrorsFound = true;
                                 }
@@ -1275,7 +1275,7 @@ namespace InternalHeatGains {
                         if (lightingLevel == "LIGHTINGLEVEL") {
                             Lights(Loop).DesignLevel = IHGNumbers(1);
                             if (lNumericFieldBlanks(1)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", specifies " +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", specifies " +
                                                  cNumericFieldNames(1) + ", but that field is blank.  0 Lights will result.");
                             }
 
@@ -1284,17 +1284,17 @@ namespace InternalHeatGains {
                                 if (IHGNumbers(2) >= 0.0) {
                                     Lights(Loop).DesignLevel = IHGNumbers(2) * Zone(Lights(Loop).ZonePtr).FloorArea;
                                     if (Zone(Lights(Loop).ZonePtr).FloorArea <= 0.0) {
-                                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", specifies " +
+                                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", specifies " +
                                                          cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Lights will result.");
                                     }
                                 } else {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", invalid " +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", invalid " +
                                                     cNumericFieldNames(2) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(2), 3));
                                     ErrorsFound = true;
                                 }
                             }
                             if (lNumericFieldBlanks(2)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", specifies " +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", specifies " +
                                                  cNumericFieldNames(2) + ", but that field is blank.  0 Lights will result.");
                             }
 
@@ -1303,25 +1303,25 @@ namespace InternalHeatGains {
                                 if (IHGNumbers(3) >= 0.0) {
                                     Lights(Loop).DesignLevel = IHGNumbers(3) * Zone(Lights(Loop).ZonePtr).TotOccupants;
                                     if (Zone(Lights(Loop).ZonePtr).TotOccupants <= 0.0) {
-                                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", specifies " +
+                                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", specifies " +
                                                          cNumericFieldNames(2) + ", but Total Occupants = 0.  0 Lights will result.");
                                     }
                                 } else {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", invalid " +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", invalid " +
                                                     cNumericFieldNames(3) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(3), 3));
                                     ErrorsFound = true;
                                 }
                             }
                             if (lNumericFieldBlanks(3)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", specifies " +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\", specifies " +
                                                  cNumericFieldNames(3) + ", but that field is blank.  0 Lights will result.");
                             }
 
                         } else {
                             if (Item1 == 1) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
                                                 ", value  =" + AlphaName(4));
-                                ShowContinueError("...Valid values are \"LightingLevel\", \"Watts/Area\", \"Watts/Person\".");
+                                ShowContinueError(state, "...Valid values are \"LightingLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
                             }
                         }
@@ -1343,7 +1343,7 @@ namespace InternalHeatGains {
                     if (std::abs(Lights(Loop).FractionConvected) <= 0.001) Lights(Loop).FractionConvected = 0.0;
                     if (Lights(Loop).FractionConvected < 0.0) {
                         if (Item1 == 1) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
+                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
                             ErrorsFound = true;
                         }
                     }
@@ -1368,9 +1368,9 @@ namespace InternalHeatGains {
                         Lights(Loop).FractionReturnAirIsCalculated = false;
                     } else if (AlphaName(6) != "YES" && AlphaName(6) != "NO") {
                         if (Item1 == 1) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(6) +
+                            ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(6) +
                                              ", value  =" + AlphaName(6));
-                            ShowContinueError(".. Return Air Fraction from Plenum will NOT be calculated.");
+                            ShowContinueError(state, ".. Return Air Fraction from Plenum will NOT be calculated.");
                         }
                         Lights(Loop).FractionReturnAirIsCalculated = false;
                     } else {
@@ -1382,7 +1382,7 @@ namespace InternalHeatGains {
                     std::string retNodeName = "";
                     if (!lAlphaFieldBlanks(7)) {
                         if (LightsObjects(Item).ZoneListActive) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\": " + cAlphaFieldNames(7) +
+                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Lights(Loop).Name + "\": " + cAlphaFieldNames(7) +
                                             " must be blank when using a ZoneList.");
                             ErrorsFound = true;
                         } else {
@@ -1394,9 +1394,9 @@ namespace InternalHeatGains {
                     }
 
                     if ((Lights(Loop).ZoneReturnNum == 0) && (Lights(Loop).FractionReturnAir > 0.0) && (!lAlphaFieldBlanks(7))) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(7) + " =" +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(7) + " =" +
                                         AlphaName(7));
-                        ShowContinueError("No matching Zone Return Air Node found.");
+                        ShowContinueError(state, "No matching Zone Return Air Node found.");
                         ErrorsFound = true;
                     }
                     if (Lights(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
@@ -1608,7 +1608,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
             errFlag = ErrorsFound;
 
             ZoneElectricObjects(Item).Name = AlphaName(1);
@@ -1629,7 +1629,7 @@ namespace InternalHeatGains {
                 ZoneElectricObjects(Item).ZoneListActive = true;
                 ZoneElectricObjects(Item).ZoneOrZoneListPtr = ZLItem;
             } else {
-                ShowSevereError(CurrentModuleObject + "=\"" + AlphaName(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphaName(2) +
+                ShowSevereError(state, CurrentModuleObject + "=\"" + AlphaName(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphaName(2) +
                                 "\" not found.");
                 ErrorsFound = true;
                 errFlag = true;
@@ -1637,8 +1637,8 @@ namespace InternalHeatGains {
         }
 
         if (errFlag) {
-            ShowSevereError(RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
-            ShowContinueError("...These will not be read in.  Other errors may occur.");
+            ShowSevereError(state, RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
+            ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
             TotElecEquip = 0;
         }
 
@@ -1687,10 +1687,10 @@ namespace InternalHeatGains {
                     SchMax = 0.0;
                     if (ZoneElectric(Loop).SchedPtr == 0) {
                         if (lAlphaFieldBlanks(3)) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                             " is required.");
                         } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
                                             " entered=" + AlphaName(3));
                         }
                         ErrorsFound = true;
@@ -1699,14 +1699,14 @@ namespace InternalHeatGains {
                         SchMax = GetScheduleMaxValue(ZoneElectric(Loop).SchedPtr);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (SchMin < 0.0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                 ", minimum is < 0.0");
-                                ShowContinueError("Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
+                                ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
                                                   "]. Values must be >= 0.0.");
                                 ErrorsFound = true;
                             }
                             if (SchMax < 0.0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                 ", maximum is < 0.0");
                                 ShowContinueError("Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
                                                   "]. Values must be >= 0.0.");
@@ -1721,7 +1721,7 @@ namespace InternalHeatGains {
                         if (equipmentLevel == "EQUIPMENTLEVEL") {
                             ZoneElectric(Loop).DesignLevel = IHGNumbers(1);
                             if (lNumericFieldBlanks(1)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(1) +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(1) +
                                                  ", but that field is blank.  0 Electric Equipment will result.");
                             }
 
@@ -1730,17 +1730,17 @@ namespace InternalHeatGains {
                                 if (IHGNumbers(2) >= 0.0) {
                                     ZoneElectric(Loop).DesignLevel = IHGNumbers(2) * Zone(ZoneElectric(Loop).ZonePtr).FloorArea;
                                     if (Zone(ZoneElectric(Loop).ZonePtr).FloorArea <= 0.0) {
-                                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                          cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Electric Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                     cNumericFieldNames(2) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(2), 3));
                                     ErrorsFound = true;
                                 }
                             }
                             if (lNumericFieldBlanks(2)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(2) +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(2) +
                                                  ", but that field is blank.  0 Electric Equipment will result.");
                             }
 
@@ -1749,23 +1749,23 @@ namespace InternalHeatGains {
                                 if (IHGNumbers(3) >= 0.0) {
                                     ZoneElectric(Loop).DesignLevel = IHGNumbers(3) * Zone(ZoneElectric(Loop).ZonePtr).TotOccupants;
                                     if (Zone(ZoneElectric(Loop).ZonePtr).TotOccupants <= 0.0) {
-                                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                          cNumericFieldNames(2) + ", but Total Occupants = 0.  0 Electric Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                     cNumericFieldNames(3) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(3), 3));
                                     ErrorsFound = true;
                                 }
                             }
                             if (lNumericFieldBlanks(3)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(3) +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(3) +
                                                  ", but that field is blank.  0 Electric Equipment will result.");
                             }
 
                         } else {
                             if (Item1 == 1) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
                                                 ", value  =" + AlphaName(4));
                                 ShowContinueError("...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
@@ -1785,7 +1785,7 @@ namespace InternalHeatGains {
                         1.0 - (ZoneElectric(Loop).FractionLatent + ZoneElectric(Loop).FractionRadiant + ZoneElectric(Loop).FractionLost);
                     if (std::abs(ZoneElectric(Loop).FractionConvected) <= 0.001) ZoneElectric(Loop).FractionConvected = 0.0;
                     if (ZoneElectric(Loop).FractionConvected < 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
                         ErrorsFound = true;
                     }
 
@@ -2003,7 +2003,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
             errFlag = ErrorsFound;
 
             ZoneGasObjects(Item).Name = AlphaName(1);
@@ -2024,7 +2024,7 @@ namespace InternalHeatGains {
                 ZoneGasObjects(Item).ZoneListActive = true;
                 ZoneGasObjects(Item).ZoneOrZoneListPtr = ZLItem;
             } else {
-                ShowSevereError(CurrentModuleObject + "=\"" + AlphaName(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphaName(2) +
+                ShowSevereError(state, CurrentModuleObject + "=\"" + AlphaName(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphaName(2) +
                                 "\" not found.");
                 ErrorsFound = true;
                 errFlag = true;
@@ -2032,7 +2032,7 @@ namespace InternalHeatGains {
         }
 
         if (errFlag) {
-            ShowSevereError(RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
+            ShowSevereError(state, RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
             ShowContinueError("...These will not be read in.  Other errors may occur.");
             TotGasEquip = 0;
         }
@@ -2083,10 +2083,10 @@ namespace InternalHeatGains {
                     if (ZoneGas(Loop).SchedPtr == 0) {
                         if (Item1 == 1) {
                             if (lAlphaFieldBlanks(3)) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                 " is required.");
                             } else {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
                                                 " entered=" + AlphaName(3));
                             }
                             ErrorsFound = true;
@@ -2097,7 +2097,7 @@ namespace InternalHeatGains {
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (Item1 == 1) {
                                 if (SchMin < 0.0) {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                     ", minimum is < 0.0");
                                     ShowContinueError("Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
                                                       "]. Values must be >= 0.0.");
@@ -2106,7 +2106,7 @@ namespace InternalHeatGains {
                             }
                             if (Item1 == 1) {
                                 if (SchMax < 0.0) {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                     ", maximum is < 0.0");
                                     ShowContinueError("Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
                                                       "]. Values must be >= 0.0.");
@@ -2122,7 +2122,7 @@ namespace InternalHeatGains {
                         if (equipmentLevel == "EQUIPMENTLEVEL") {
                             ZoneGas(Loop).DesignLevel = IHGNumbers(1);
                             if (lNumericFieldBlanks(1)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", specifies " +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", specifies " +
                                                  cNumericFieldNames(1) + ", but that field is blank.  0 Gas Equipment will result.");
                             }
 
@@ -2131,17 +2131,17 @@ namespace InternalHeatGains {
                                 if (IHGNumbers(2) >= 0.0) {
                                     ZoneGas(Loop).DesignLevel = IHGNumbers(2) * Zone(ZoneGas(Loop).ZonePtr).FloorArea;
                                     if (Zone(ZoneGas(Loop).ZonePtr).FloorArea <= 0.0) {
-                                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", specifies " +
+                                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", specifies " +
                                                          cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Gas Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", invalid " +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", invalid " +
                                                     cNumericFieldNames(2) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(2), 3));
                                     ErrorsFound = true;
                                 }
                             }
                             if (lNumericFieldBlanks(2)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", specifies " +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", specifies " +
                                                  cNumericFieldNames(2) + ", but that field is blank.  0 Gas Equipment will result.");
                             }
 
@@ -2150,23 +2150,23 @@ namespace InternalHeatGains {
                                 if (IHGNumbers(3) >= 0.0) {
                                     ZoneGas(Loop).DesignLevel = IHGNumbers(3) * Zone(ZoneGas(Loop).ZonePtr).TotOccupants;
                                     if (Zone(ZoneGas(Loop).ZonePtr).TotOccupants <= 0.0) {
-                                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", specifies " +
+                                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", specifies " +
                                                          cNumericFieldNames(2) + ", but Total Occupants = 0.  0 Gas Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", invalid " +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", invalid " +
                                                     cNumericFieldNames(3) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(3), 3));
                                     ErrorsFound = true;
                                 }
                             }
                             if (lNumericFieldBlanks(3)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", specifies " +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + ZoneGas(Loop).Name + "\", specifies " +
                                                  cNumericFieldNames(3) + ", but that field is blank.  0 Gas Equipment will result.");
                             }
 
                         } else {
                             if (Item1 == 1) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
                                                 ", value  =" + AlphaName(4));
                                 ShowContinueError("...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
@@ -2186,12 +2186,12 @@ namespace InternalHeatGains {
                         ZoneGas(Loop).CO2RateFactor = IHGNumbers(7);
                     }
                     if (ZoneGas(Loop).CO2RateFactor < 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(7) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(7) +
                                         " < 0.0, value =" + RoundSigDigits(IHGNumbers(7), 2));
                         ErrorsFound = true;
                     }
                     if (ZoneGas(Loop).CO2RateFactor > 4.0e-7) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(7) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(7) +
                                         " > 4.0E-7, value =" + RoundSigDigits(IHGNumbers(7), 2));
                         ErrorsFound = true;
                     }
@@ -2201,7 +2201,7 @@ namespace InternalHeatGains {
                     if (std::abs(ZoneGas(Loop).FractionConvected) <= 0.001) ZoneGas(Loop).FractionConvected = 0.0;
                     if (ZoneGas(Loop).FractionConvected < 0.0) {
                         if (Item1 == 1) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
+                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
                             ErrorsFound = true;
                         }
                     }
@@ -2402,7 +2402,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
             errFlag = ErrorsFound;
 
             HotWaterEqObjects(Item).Name = AlphaName(1);
@@ -2423,7 +2423,7 @@ namespace InternalHeatGains {
                 HotWaterEqObjects(Item).ZoneListActive = true;
                 HotWaterEqObjects(Item).ZoneOrZoneListPtr = ZLItem;
             } else {
-                ShowSevereError(CurrentModuleObject + "=\"" + AlphaName(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphaName(2) +
+                ShowSevereError(state, CurrentModuleObject + "=\"" + AlphaName(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphaName(2) +
                                 "\" not found.");
                 ErrorsFound = true;
                 errFlag = true;
@@ -2431,7 +2431,7 @@ namespace InternalHeatGains {
         }
 
         if (errFlag) {
-            ShowSevereError(RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
+            ShowSevereError(state, RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
             ShowContinueError("...These will not be read in.  Other errors may occur.");
             TotHWEquip = 0;
         }
@@ -2481,10 +2481,10 @@ namespace InternalHeatGains {
                     SchMax = 0.0;
                     if (ZoneHWEq(Loop).SchedPtr == 0) {
                         if (lAlphaFieldBlanks(3)) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                             " is required.");
                         } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
                                             " entered=" + AlphaName(3));
                         }
                         ErrorsFound = true;
@@ -2493,14 +2493,14 @@ namespace InternalHeatGains {
                         SchMax = GetScheduleMaxValue(ZoneHWEq(Loop).SchedPtr);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (SchMin < 0.0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                 ", minimum is < 0.0");
                                 ShowContinueError("Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
                                                   "]. Values must be >= 0.0.");
                                 ErrorsFound = true;
                             }
                             if (SchMax < 0.0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                 ", maximum is < 0.0");
                                 ShowContinueError("Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
                                                   "]. Values must be >= 0.0.");
@@ -2515,7 +2515,7 @@ namespace InternalHeatGains {
                         if (equipmentLevel == "EQUIPMENTLEVEL") {
                             ZoneHWEq(Loop).DesignLevel = IHGNumbers(1);
                             if (lNumericFieldBlanks(1)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(1) +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(1) +
                                                  ", but that field is blank.  0 Hot Water Equipment will result.");
                             }
 
@@ -2524,17 +2524,17 @@ namespace InternalHeatGains {
                                 if (IHGNumbers(2) >= 0.0) {
                                     ZoneHWEq(Loop).DesignLevel = IHGNumbers(2) * Zone(ZoneHWEq(Loop).ZonePtr).FloorArea;
                                     if (Zone(ZoneHWEq(Loop).ZonePtr).FloorArea <= 0.0) {
-                                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                          cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Hot Water Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                     cNumericFieldNames(2) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(2), 3));
                                     ErrorsFound = true;
                                 }
                             }
                             if (lNumericFieldBlanks(2)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(2) +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(2) +
                                                  ", but that field is blank.  0 Hot Water Equipment will result.");
                             }
 
@@ -2543,23 +2543,23 @@ namespace InternalHeatGains {
                                 if (IHGNumbers(3) >= 0.0) {
                                     ZoneHWEq(Loop).DesignLevel = IHGNumbers(3) * Zone(ZoneHWEq(Loop).ZonePtr).TotOccupants;
                                     if (Zone(ZoneHWEq(Loop).ZonePtr).TotOccupants <= 0.0) {
-                                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                          cNumericFieldNames(2) + ", but Total Occupants = 0.  0 Hot Water Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                     cNumericFieldNames(3) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(3), 3));
                                     ErrorsFound = true;
                                 }
                             }
                             if (lNumericFieldBlanks(3)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(3) +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(3) +
                                                  ", but that field is blank.  0 Hot Water Equipment will result.");
                             }
 
                         } else {
                             if (Item1 == 1) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
                                                 ", value  =" + AlphaName(4));
                                 ShowContinueError("...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
@@ -2579,7 +2579,7 @@ namespace InternalHeatGains {
                         1.0 - (ZoneHWEq(Loop).FractionLatent + ZoneHWEq(Loop).FractionRadiant + ZoneHWEq(Loop).FractionLost);
                     if (std::abs(ZoneHWEq(Loop).FractionConvected) <= 0.001) ZoneHWEq(Loop).FractionConvected = 0.0;
                     if (ZoneHWEq(Loop).FractionConvected < 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
                         ErrorsFound = true;
                     }
 
@@ -2796,7 +2796,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
             errFlag = ErrorsFound;
 
             SteamEqObjects(Item).Name = AlphaName(1);
@@ -2817,7 +2817,7 @@ namespace InternalHeatGains {
                 SteamEqObjects(Item).ZoneListActive = true;
                 SteamEqObjects(Item).ZoneOrZoneListPtr = ZLItem;
             } else {
-                ShowSevereError(CurrentModuleObject + "=\"" + AlphaName(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphaName(2) +
+                ShowSevereError(state, CurrentModuleObject + "=\"" + AlphaName(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + AlphaName(2) +
                                 "\" not found.");
                 ErrorsFound = true;
                 errFlag = true;
@@ -2825,7 +2825,7 @@ namespace InternalHeatGains {
         }
 
         if (errFlag) {
-            ShowSevereError(RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
+            ShowSevereError(state, RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
             ShowContinueError("...These will not be read in.  Other errors may occur.");
             TotStmEquip = 0;
         }
@@ -2875,10 +2875,10 @@ namespace InternalHeatGains {
                     SchMax = 0.0;
                     if (ZoneSteamEq(Loop).SchedPtr == 0) {
                         if (lAlphaFieldBlanks(3)) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                             " is required.");
                         } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
+                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(3) +
                                             " entered=" + AlphaName(3));
                         }
                         ErrorsFound = true;
@@ -2887,14 +2887,14 @@ namespace InternalHeatGains {
                         SchMax = GetScheduleMaxValue(ZoneSteamEq(Loop).SchedPtr);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (SchMin < 0.0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                 ", minimum is < 0.0");
                                 ShowContinueError("Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
                                                   "]. Values must be >= 0.0.");
                                 ErrorsFound = true;
                             }
                             if (SchMax < 0.0) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                                 ", maximum is < 0.0");
                                 ShowContinueError("Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
                                                   "]. Values must be >= 0.0.");
@@ -2909,7 +2909,7 @@ namespace InternalHeatGains {
                         if (equipmentLevel == "EQUIPMENTLEVEL") {
                             ZoneSteamEq(Loop).DesignLevel = IHGNumbers(1);
                             if (lNumericFieldBlanks(1)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(1) +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(1) +
                                                  ", but that field is blank.  0 Hot Water Equipment will result.");
                             }
 
@@ -2918,17 +2918,17 @@ namespace InternalHeatGains {
                                 if (IHGNumbers(2) >= 0.0) {
                                     ZoneSteamEq(Loop).DesignLevel = IHGNumbers(2) * Zone(ZoneSteamEq(Loop).ZonePtr).FloorArea;
                                     if (Zone(ZoneSteamEq(Loop).ZonePtr).FloorArea <= 0.0) {
-                                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                          cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Hot Water Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                     cNumericFieldNames(2) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(2), 3));
                                     ErrorsFound = true;
                                 }
                             }
                             if (lNumericFieldBlanks(2)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(2) +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(2) +
                                                  ", but that field is blank.  0 Hot Water Equipment will result.");
                             }
 
@@ -2937,23 +2937,23 @@ namespace InternalHeatGains {
                                 if (IHGNumbers(3) >= 0.0) {
                                     ZoneSteamEq(Loop).DesignLevel = IHGNumbers(3) * Zone(ZoneSteamEq(Loop).ZonePtr).TotOccupants;
                                     if (Zone(ZoneSteamEq(Loop).ZonePtr).TotOccupants <= 0.0) {
-                                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                          cNumericFieldNames(2) + ", but Total Occupants = 0.  0 Hot Water Equipment will result.");
                                     }
                                 } else {
-                                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                     cNumericFieldNames(3) + ", value  [<0.0]=" + RoundSigDigits(IHGNumbers(3), 3));
                                     ErrorsFound = true;
                                 }
                             }
                             if (lNumericFieldBlanks(3)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(3) +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(3) +
                                                  ", but that field is blank.  0 Hot Water Equipment will result.");
                             }
 
                         } else {
                             if (Item1 == 1) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
                                                 ", value  =" + AlphaName(4));
                                 ShowContinueError("...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
@@ -2973,7 +2973,7 @@ namespace InternalHeatGains {
                         1.0 - (ZoneSteamEq(Loop).FractionLatent + ZoneSteamEq(Loop).FractionRadiant + ZoneSteamEq(Loop).FractionLost);
                     if (std::abs(ZoneSteamEq(Loop).FractionConvected) <= 0.001) ZoneSteamEq(Loop).FractionConvected = 0.0;
                     if (ZoneSteamEq(Loop).FractionConvected < 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
                         ErrorsFound = true;
                     }
 
@@ -3191,7 +3191,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
             errFlag = ErrorsFound;
 
             OtherEqObjects(Item).Name = AlphaName(1);
@@ -3212,7 +3212,7 @@ namespace InternalHeatGains {
                 OtherEqObjects(Item).ZoneListActive = true;
                 OtherEqObjects(Item).ZoneOrZoneListPtr = ZLItem;
             } else {
-                ShowSevereError(CurrentModuleObject + "=\"" + AlphaName(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + AlphaName(3) +
+                ShowSevereError(state, CurrentModuleObject + "=\"" + AlphaName(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + AlphaName(3) +
                                 "\" not found.");
                 ErrorsFound = true;
                 errFlag = true;
@@ -3220,7 +3220,7 @@ namespace InternalHeatGains {
         }
 
         if (errFlag) {
-            ShowSevereError(RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
+            ShowSevereError(state, RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
             ShowContinueError("...These will not be read in.  Other errors may occur.");
             TotOthEquip = 0;
         }
@@ -3278,7 +3278,7 @@ namespace InternalHeatGains {
                                                             AlphaName(2));
                         if (ZoneOtherEq(Loop).OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::Unknown ||
                             ZoneOtherEq(Loop).OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::WaterUse) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered=" + AlphaName(2) +
+                            ShowSevereError(state, RoutineName + CurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered=" + AlphaName(2) +
                                             " for " + cAlphaFieldNames(1) + '=' + AlphaName(1));
                             ErrorsFound = true;
                         }
@@ -3289,10 +3289,10 @@ namespace InternalHeatGains {
                     SchMax = 0.0;
                     if (ZoneOtherEq(Loop).SchedPtr == 0) {
                         if (lAlphaFieldBlanks(4)) {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(4) +
+                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(4) +
                                             " is required.");
                         } else {
-                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
+                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(4) +
                                             " entered=" + AlphaName(4));
                         }
                         ErrorsFound = true;
@@ -3309,7 +3309,7 @@ namespace InternalHeatGains {
                             DesignLevelFieldNumber = 1;
                             ZoneOtherEq(Loop).DesignLevel = IHGNumbers(DesignLevelFieldNumber);
                             if (lNumericFieldBlanks(DesignLevelFieldNumber)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                  cNumericFieldNames(DesignLevelFieldNumber) +
                                                  ", but that field is blank.  0 Other Equipment will result.");
                             }
@@ -3319,13 +3319,13 @@ namespace InternalHeatGains {
                             if (ZoneOtherEq(Loop).ZonePtr != 0) {
                                 ZoneOtherEq(Loop).DesignLevel = IHGNumbers(DesignLevelFieldNumber) * Zone(ZoneOtherEq(Loop).ZonePtr).FloorArea;
                                 if (Zone(ZoneOtherEq(Loop).ZonePtr).FloorArea <= 0.0) {
-                                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                      cNumericFieldNames(DesignLevelFieldNumber) +
                                                      ", but Zone Floor Area = 0.  0 Other Equipment will result.");
                                 }
                             }
                             if (lNumericFieldBlanks(DesignLevelFieldNumber)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                  cNumericFieldNames(DesignLevelFieldNumber) +
                                                  ", but that field is blank.  0 Other Equipment will result.");
                             }
@@ -3335,20 +3335,20 @@ namespace InternalHeatGains {
                             if (ZoneOtherEq(Loop).ZonePtr != 0) {
                                 ZoneOtherEq(Loop).DesignLevel = IHGNumbers(3) * Zone(ZoneOtherEq(Loop).ZonePtr).TotOccupants;
                                 if (Zone(ZoneOtherEq(Loop).ZonePtr).TotOccupants <= 0.0) {
-                                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                      cNumericFieldNames(DesignLevelFieldNumber) +
                                                      ", but Total Occupants = 0.  0 Other Equipment will result.");
                                 }
                             }
                             if (lNumericFieldBlanks(DesignLevelFieldNumber)) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                  cNumericFieldNames(DesignLevelFieldNumber) +
                                                  ", but that field is blank.  0 Other Equipment will result.");
                             }
 
                         } else {
                             if (Item1 == 1) {
-                                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(5) +
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + cAlphaFieldNames(5) +
                                                 ", value  =" + AlphaName(5));
                                 ShowContinueError("...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
@@ -3358,7 +3358,7 @@ namespace InternalHeatGains {
 
                     // Throw an error if the design level is negative and we have a fuel type
                     if (ZoneOtherEq(Loop).DesignLevel < 0.0 && ZoneOtherEq(Loop).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
                                         cNumericFieldNames(DesignLevelFieldNumber) + " is not allowed to be negative");
                         ShowContinueError("... when a fuel type of " + FuelTypeString + " is specified.");
                         ErrorsFound = true;
@@ -3376,12 +3376,12 @@ namespace InternalHeatGains {
                         ZoneOtherEq(Loop).CO2RateFactor = IHGNumbers(7);
                     }
                     if (ZoneOtherEq(Loop).CO2RateFactor < 0.0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(7) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(7) +
                                         " < 0.0, value =" + RoundSigDigits(IHGNumbers(7), 2));
                         ErrorsFound = true;
                     }
                     if (ZoneOtherEq(Loop).CO2RateFactor > 4.0e-7) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(7) +
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cNumericFieldNames(7) +
                                         " > 4.0E-7, value =" + RoundSigDigits(IHGNumbers(7), 2));
                         ErrorsFound = true;
                     }
@@ -3643,11 +3643,11 @@ namespace InternalHeatGains {
                     if (equipmentLevel == "WATTS/UNIT") {
                         ZoneITEq(Loop).DesignTotalPower = IHGNumbers(1) * IHGNumbers(2);
                         if (lNumericFieldBlanks(1)) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(1) +
+                            ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(1) +
                                              ", but that field is blank.  0 IT Equipment will result.");
                         }
                         if (lNumericFieldBlanks(2)) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(2) +
+                            ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(2) +
                                              ", but that field is blank.  0 IT Equipment will result.");
                         }
 
@@ -3656,7 +3656,7 @@ namespace InternalHeatGains {
                             if (IHGNumbers(3) >= 0.0) {
                                 ZoneITEq(Loop).DesignTotalPower = IHGNumbers(3) * Zone(ZoneITEq(Loop).ZonePtr).FloorArea;
                                 if (Zone(ZoneITEq(Loop).ZonePtr).FloorArea <= 0.0) {
-                                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                      cNumericFieldNames(3) + ", but Zone Floor Area = 0.  0 IT Equipment will result.");
                                 }
                             } else {
@@ -3666,7 +3666,7 @@ namespace InternalHeatGains {
                             }
                         }
                         if (lNumericFieldBlanks(3)) {
-                            ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(3) +
+                            ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", specifies " + cNumericFieldNames(3) +
                                              ", but that field is blank.  0 IT Equipment will result.");
                         }
 
@@ -3837,7 +3837,7 @@ namespace InternalHeatGains {
                     ZoneITEq(Loop).AirConnectionType = ITEInletZoneAirNode;
                 } else if (UtilityRoutines::SameString(AlphaName(11), "RoomAirModel")) {
                     // ZoneITEq( Loop ).AirConnectionType = ITEInletRoomAirModel;
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) +
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) +
                                      "Air Inlet Connection Type = RoomAirModel is not implemented yet, using ZoneAirNode");
                     ZoneITEq(Loop).AirConnectionType = ITEInletZoneAirNode;
                 } else {
@@ -3885,7 +3885,7 @@ namespace InternalHeatGains {
                     ErrorsFound = true;
                 } else if (ZoneITEq(Loop).SupplyAirNodeNum != 0 && !supplyNodeFound) {
                     // the given supply air node does not match any zone equipment supply air nodes
-                    ShowWarningError(CurrentModuleObject + "name: '" + AlphaName(1) + ". " + "Supply Air Node Name '" + AlphaName(14) + "' does not match any ZoneHVAC:EquipmentConnections objects.");
+                    ShowWarningError(state, CurrentModuleObject + "name: '" + AlphaName(1) + ". " + "Supply Air Node Name '" + AlphaName(14) + "' does not match any ZoneHVAC:EquipmentConnections objects.");
                 }
 
                 // End-Use subcategories
@@ -4375,7 +4375,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             ZoneBBHeat(Loop).Name = AlphaName(1);
 
@@ -4570,7 +4570,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             ZoneCO2Gen(Loop).Name = AlphaName(1);
 
@@ -4652,7 +4652,7 @@ namespace InternalHeatGains {
         AlphaName.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in Getting Internal Gains Input, Program Stopped");
+            ShowFatalError(state, RoutineName + "Errors found in Getting Internal Gains Input, Program Stopped");
         }
 
         static constexpr auto Format_721(
@@ -5617,11 +5617,11 @@ namespace InternalHeatGains {
 
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (Zone(ZoneNum).HasAdjustedReturnTempByITE && Zone(ZoneNum).HasLtsRetAirGain) {
-                ShowFatalError("Return air heat gains from lights are not allowed when Air Flow Calculation Method = "
+                ShowFatalError(state, "Return air heat gains from lights are not allowed when Air Flow Calculation Method = "
                                "FlowControlWithApproachTemperatures in zones with ITE objects.");
             }
             if (Zone(ZoneNum).HasAdjustedReturnTempByITE && Zone(ZoneNum).HasAirFlowWindowReturn) {
-                ShowFatalError("Return air heat gains from windows are not allowed when Air Flow Calculation Method = "
+                ShowFatalError(state, "Return air heat gains from windows are not allowed when Air Flow Calculation Method = "
                                "FlowControlWithApproachTemperatures in zones with ITE objects.");
             }
         }
@@ -6300,7 +6300,7 @@ namespace InternalHeatGains {
         int Loop;
 
         if (GetInternalHeatGainsInputFlag) {
-            ShowFatalError("GetDesignLightingLevelForZone: Function called prior to Getting Lights Input.");
+            ShowFatalError(state, "GetDesignLightingLevelForZone: Function called prior to Getting Lights Input.");
         }
 
         DesignLightingLevelSum = 0.0;
@@ -6356,7 +6356,7 @@ namespace InternalHeatGains {
         int NumLights;       // Number of Lights statement for that zone.
 
         if (GetInternalHeatGainsInputFlag) {
-            ShowFatalError("CheckLightsReplaceableMinMaxForZone: Function called prior to Getting Lights Input.");
+            ShowFatalError(state, "CheckLightsReplaceableMinMaxForZone: Function called prior to Getting Lights Input.");
         }
 
         LightsRepMin = 99999.0;
@@ -6371,7 +6371,7 @@ namespace InternalHeatGains {
             if ((ZoneDaylight(Lights(Loop).ZonePtr).DaylightMethod == SplitFluxDaylighting ||
                  ZoneDaylight(Lights(Loop).ZonePtr).DaylightMethod == DElightDaylighting) &&
                 (Lights(Loop).FractionReplaceable > 0.0 && Lights(Loop).FractionReplaceable < 1.0)) {
-                ShowWarningError("CheckLightsReplaceableMinMaxForZone: Fraction Replaceable must be 0.0 or 1.0 if used with daylighting.");
+                ShowWarningError(state, "CheckLightsReplaceableMinMaxForZone: Fraction Replaceable must be 0.0 or 1.0 if used with daylighting.");
                 ShowContinueError("..Lights=\"" + Lights(Loop).Name + "\", Fraction Replaceable will be reset to 1.0 to allow dimming controls");
                 ShowContinueError("..in Zone=" + Zone(WhichZone).Name);
                 Lights(Loop).FractionReplaceable = 1.0;
@@ -6380,23 +6380,23 @@ namespace InternalHeatGains {
 
         if (ZoneDaylight(WhichZone).DaylightMethod == SplitFluxDaylighting) {
             if (LightsRepMax == 0.0) {
-                ShowWarningError("CheckLightsReplaceable: Zone \"" + Zone(WhichZone).Name + "\" has Daylighting:Controls.");
+                ShowWarningError(state, "CheckLightsReplaceable: Zone \"" + Zone(WhichZone).Name + "\" has Daylighting:Controls.");
                 ShowContinueError("but all of the LIGHTS object in that zone have zero Fraction Replaceable.");
                 ShowContinueError("The daylighting controls will have no effect.");
             }
             if (NumLights == 0) {
-                ShowWarningError("CheckLightsReplaceable: Zone \"" + Zone(WhichZone).Name + "\" has Daylighting:Controls.");
+                ShowWarningError(state, "CheckLightsReplaceable: Zone \"" + Zone(WhichZone).Name + "\" has Daylighting:Controls.");
                 ShowContinueError("but there are no LIGHTS objects in that zone.");
                 ShowContinueError("The daylighting controls will have no effect.");
             }
         } else if (ZoneDaylight(WhichZone).DaylightMethod == DElightDaylighting) {
             if (LightsRepMax == 0.0) {
-                ShowWarningError("CheckLightsReplaceable: Zone \"" + Zone(WhichZone).Name + "\" has Daylighting:Controls.");
+                ShowWarningError(state, "CheckLightsReplaceable: Zone \"" + Zone(WhichZone).Name + "\" has Daylighting:Controls.");
                 ShowContinueError("but all of the LIGHTS object in that zone have zero Fraction Replaceable.");
                 ShowContinueError("The daylighting controls will have no effect.");
             }
             if (NumLights == 0) {
-                ShowWarningError("CheckLightsReplaceable: Zone \"" + Zone(WhichZone).Name + "\" has Daylighting:Controls.");
+                ShowWarningError(state, "CheckLightsReplaceable: Zone \"" + Zone(WhichZone).Name + "\" has Daylighting:Controls.");
                 ShowContinueError("but there are no LIGHTS objects in that zone.");
                 ShowContinueError("The daylighting controls will have no effect.");
             }

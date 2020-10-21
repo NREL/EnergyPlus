@@ -211,13 +211,13 @@ namespace CostEstimateManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing cost estimate input");
+            ShowFatalError(state, "Errors found in processing cost estimate input");
         }
 
         CheckCostEstimateInput(state, ErrorsFound);
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing cost estimate input");
+            ShowFatalError(state, "Errors found in processing cost estimate input");
         }
     }
 
@@ -279,9 +279,9 @@ namespace CostEstimateManager {
                     ThisConstructStr = state.dataCostEstimateManager->CostLineItem(Item).ParentObjName;
                     ThisConstructID = UtilityRoutines::FindItem(ThisConstructStr, state.dataConstruction->Construct);
                     if (ThisConstructID == 0) { // do any surfaces have the specified construction? If not issue warning.
-                        ShowWarningError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName + "\" Construction=\"" +
+                        ShowWarningError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName + "\" Construction=\"" +
                                          state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\", no surfaces have the Construction specified");
-                        ShowContinueError("No costs will be calculated for this Construction.");
+                        ShowContinueError(state, "No costs will be calculated for this Construction.");
                         //        ErrorsFound = .TRUE.
                         continue;
                     }
@@ -314,8 +314,8 @@ namespace CostEstimateManager {
                     } else { // assume name is probably useful
                         thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, DXCoil);
                         if (thisCoil == 0) {
-                            ShowWarningError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName + "\", Coil:DX, invalid coil specified");
-                            ShowContinueError("Coil Specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName +
+                            ShowWarningError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName + "\", Coil:DX, invalid coil specified");
+                            ShowContinueError(state, "Coil Specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName +
                                               "\", calculations will not be completed for this item.");
                         }
                     }
@@ -349,9 +349,9 @@ namespace CostEstimateManager {
                     } else { // assume name is probably useful
                         thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, HeatingCoil);
                         if (thisCoil == 0) {
-                            ShowWarningError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                            ShowWarningError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                              "\", Coil:Heating:Fuel, invalid coil specified");
-                            ShowContinueError("Coil Specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName +
+                            ShowContinueError(state, "Coil Specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName +
                                               "\", calculations will not be completed for this item.");
                         }
                     }
@@ -371,9 +371,9 @@ namespace CostEstimateManager {
                         }
                     }
                     if (thisChil == 0) {
-                        ShowWarningError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                        ShowWarningError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                          "\", Chiller:Electric, invalid chiller specified.");
-                        ShowContinueError("Chiller Specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName +
+                        ShowContinueError(state, "Chiller Specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName +
                                           "\", calculations will not be completed for this item.");
                     }
 
@@ -391,7 +391,7 @@ namespace CostEstimateManager {
                         } else {
                             ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                             "\", Daylighting:Controls, need to specify a valid zone name");
-                            ShowContinueError("Zone specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
+                            ShowContinueError(state, "Zone specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
                             ErrorsFound = true;
                         }
                     }
@@ -404,13 +404,13 @@ namespace CostEstimateManager {
                             if (ThisZoneID == 0) {
                                 ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                                 "\", Shading:Zone:Detailed, need to specify a valid zone name");
-                                ShowContinueError("Zone specified=\"" + Surface(ThisSurfID).ZoneName + "\".");
+                                ShowContinueError(state, "Zone specified=\"" + Surface(ThisSurfID).ZoneName + "\".");
                                 ErrorsFound = true;
                             }
                         } else {
                             ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                             "\", Shading:Zone:Detailed, need to specify a valid surface name");
-                            ShowContinueError("Surface specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
+                            ShowContinueError(state, "Surface specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
                             ErrorsFound = true;
                         }
                     } else {
@@ -433,7 +433,7 @@ namespace CostEstimateManager {
                             if (ThisZoneID == 0) {
                                 ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                                 "\", Lights, need to specify a valid zone name");
-                                ShowContinueError("Zone specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
+                                ShowContinueError(state, "Zone specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
                                 ErrorsFound = true;
                             }
                         } else {
@@ -457,7 +457,7 @@ namespace CostEstimateManager {
                             } else {
                                 ShowSevereError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                                 "\", Generator:Photovoltaic, need to specify a valid PV array");
-                                ShowContinueError("PV Array specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
+                                ShowContinueError(state, "PV Array specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
                                 ErrorsFound = true;
                             }
                         } else {
@@ -472,9 +472,9 @@ namespace CostEstimateManager {
                     }
 
                 } else {
-                    ShowWarningError("ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
+                    ShowWarningError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                      "\", invalid cost item -- not included in cost estimate.");
-                    ShowContinueError("... invalid object type=" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjType);
+                    ShowContinueError(state, "... invalid object type=" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjType);
                 }
             }
         }

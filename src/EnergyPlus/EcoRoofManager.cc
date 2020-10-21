@@ -821,18 +821,18 @@ namespace EcoRoofManager {
                 if (index1 > 1) {
                     ShowWarningError("CalcEcoRoof: Too few time steps per hour for stability.");
                     if (ceil(60 * index1 / MinutesPerTimeStep) <= 60) {
-                        ShowContinueError("...Entered Timesteps per hour=[" + RoundSigDigits(NumOfTimeStepInHour) +
+                        ShowContinueError(state, "...Entered Timesteps per hour=[" + RoundSigDigits(NumOfTimeStepInHour) +
                                           "], Change to some value greater than or equal to [" + RoundSigDigits(60 * index1 / MinutesPerTimeStep) +
                                           "] for assured stability.");
-                        ShowContinueError("...Note that EnergyPlus has a maximum of 60 timesteps per hour");
-                        ShowContinueError("...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
+                        ShowContinueError(state, "...Note that EnergyPlus has a maximum of 60 timesteps per hour");
+                        ShowContinueError(state, "...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
                                           "here could be the reason.");
                     } else {
-                        ShowContinueError("...Entered Timesteps per hour=[" + RoundSigDigits(NumOfTimeStepInHour) +
+                        ShowContinueError(state, "...Entered Timesteps per hour=[" + RoundSigDigits(NumOfTimeStepInHour) +
                                           "], however the required frequency for stability [" + RoundSigDigits(60 * index1 / MinutesPerTimeStep) +
                                           "] is over the EnergyPlus maximum of 60.");
-                        ShowContinueError("...Consider using the simple moisture diffusion calculation method for this application");
-                        ShowContinueError("...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
+                        ShowContinueError(state, "...Consider using the simple moisture diffusion calculation method for this application");
+                        ShowContinueError(state, "...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
                                           "here could be the reason.");
                     }
                 }
@@ -970,8 +970,8 @@ namespace EcoRoofManager {
                 if (ErrIndex == 0) {
                     ShowWarningMessage("EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture <= 0.0001, Value=[" +
                                        RoundSigDigits(RelativeSoilSaturationTop, 5) + "].");
-                    ShowContinueError("Value is set to 0.0001 and simulation continues.");
-                    ShowContinueError("You may wish to increase the number of timesteps to attempt to alleviate the problem.");
+                    ShowContinueError(state, "Value is set to 0.0001 and simulation continues.");
+                    ShowContinueError(state, "You may wish to increase the number of timesteps to attempt to alleviate the problem.");
                 }
                 ShowRecurringWarningErrorAtEnd("EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture < 0. continues",
                                                ErrIndex,

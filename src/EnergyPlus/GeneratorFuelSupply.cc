@@ -170,7 +170,7 @@ namespace GeneratorFuelSupply {
             for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
                 inputProcessor->getObjectItem(
                     state, cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
                 FuelSupply(FuelSupNum).Name = AlphArray(1);
                 ObjMSGName = cCurrentModuleObject + " Named " + AlphArray(1);
@@ -180,7 +180,7 @@ namespace GeneratorFuelSupply {
                     FuelSupply(FuelSupNum).FuelTempMode = FuelInTempSchedule;
                 } else {
                     ShowSevereError("Invalid, " + cAlphaFieldNames(2) + " = " + AlphArray(2));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
 
@@ -191,16 +191,16 @@ namespace GeneratorFuelSupply {
                 FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(state, AlphArray(4));
                 if ((FuelSupply(FuelSupNum).SchedNum == 0) && (FuelSupply(FuelSupNum).FuelTempMode == FuelInTempSchedule)) {
                     ShowSevereError("Invalid, " + cAlphaFieldNames(4) + " = " + AlphArray(4));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
-                    ShowContinueError("Schedule named was not found");
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowContinueError(state, "Schedule named was not found");
                     ErrorsFound = true;
                 }
 
                 FuelSupply(FuelSupNum).CompPowerCurveID = GetCurveIndex(state, AlphArray(5));
                 if (FuelSupply(FuelSupNum).CompPowerCurveID == 0) {
                     ShowSevereError("Invalid, " + cAlphaFieldNames(5) + " = " + AlphArray(5));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
-                    ShowContinueError("Curve named was not found ");
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowContinueError(state, "Curve named was not found ");
                     ErrorsFound = true;
                 }
 
@@ -213,7 +213,7 @@ namespace GeneratorFuelSupply {
                     FuelSupply(FuelSupNum).FuelTypeMode = fuelModeGenericLiquid;
                 } else {
                     ShowSevereError("Invalid, " + cAlphaFieldNames(6) + " = " + AlphArray(6));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
 
@@ -243,8 +243,8 @@ namespace GeneratorFuelSupply {
                     // check for molar fractions summing to 1.0.
                     if (std::abs(sum(FuelSupply(FuelSupNum).ConstitMolalFract) - 1.0) > 0.0001) {
                         ShowSevereError(cCurrentModuleObject + " molar fractions do not sum to 1.0");
-                        ShowContinueError("Sum was=" + RoundSigDigits(sum(FuelSupply(FuelSupNum).ConstitMolalFract), 5));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + " = " + AlphArray(1));
+                        ShowContinueError(state, "Sum was=" + RoundSigDigits(sum(FuelSupply(FuelSupNum).ConstitMolalFract), 5));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + AlphArray(1));
                         ErrorsFound = true;
                     }
                 }

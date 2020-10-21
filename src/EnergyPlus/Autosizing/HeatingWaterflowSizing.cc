@@ -109,7 +109,7 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                                               ", certain inputs are required. Add PlantLoop, Plant loop number and/or Water Coil water delta T.";
                             this->errorType = AutoSizingResultType::ErrorType1;
                             this->addErrorMessage(msg);
-                            ShowSevereError(msg);
+                            ShowSevereError(state, msg);
                         }
                     } else {
                         this->autoSizedValue = 0.0;
@@ -141,7 +141,7 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                             ", certain inputs are required. Add PlantLoop, Plant loop number, coil capacity and/or Water Coil water delta T.";
                         this->errorType = AutoSizingResultType::ErrorType1;
                         this->addErrorMessage(msg);
-                        ShowSevereError(msg);
+                        ShowSevereError(state, msg);
                     }
                 } else {
                     this->autoSizedValue = 0.0;

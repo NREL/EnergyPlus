@@ -433,7 +433,7 @@ namespace HeatBalanceSurfaceManager {
                     }
                     // Check if the sum of all defined view factors > 1.0
                     if (SrdSurfsViewFactor > 1.0) {
-                        ShowSevereError("Illegal surrounding surfaces view factors for " + Surface(SurfNum).Name + ".");
+                        ShowSevereError(state, "Illegal surrounding surfaces view factors for " + Surface(SurfNum).Name + ".");
                         ShowContinueError(" The sum of sky, ground, and all surrounding surfaces view factors should be less than 1.0.");
                     }
                     if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0 && SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor >= 0) {
@@ -627,7 +627,7 @@ namespace HeatBalanceSurfaceManager {
                         // Is the current line a Warning message?
                         if (has_prefix(cErrorLine.data, "WARNING: ")) {
                             cErrorMsg = cErrorLine.data.substr(9);
-                            ShowWarningError(cErrorMsg);
+                            ShowWarningError(state, cErrorMsg);
                         }
                         // Is the current line an Error message?
                         if (has_prefix(cErrorLine.data, "ERROR: ")) {
@@ -645,7 +645,7 @@ namespace HeatBalanceSurfaceManager {
                     };
                     // If any DElight Error occurred then ShowFatalError to terminate
                     if (iErrorFlag > 0) {
-                        ShowFatalError("End of DElight Error Messages");
+                        ShowFatalError(state, "End of DElight Error Messages");
                     }
                 } else { // RJH 2008-03-07: No errors
                     // extract reference point illuminance values from DElight Electric Lighting dump file for reporting
@@ -5954,7 +5954,7 @@ namespace HeatBalanceSurfaceManager {
                             Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
                             CalcOutsideSurfTemp(state, SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
                             if (MovInsulErrorFlag)
-                                ShowFatalError("CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
+                                ShowFatalError(state, "CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
                         }
 
                         // This ends the calculations for this surface and goes on to the next SurfNum
@@ -6007,7 +6007,7 @@ namespace HeatBalanceSurfaceManager {
 
                             CalcOutsideSurfTemp(state, SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
                             if (MovInsulErrorFlag)
-                                ShowFatalError("CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
+                                ShowFatalError(state, "CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
 
                         } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD ||
                                    Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
@@ -6177,7 +6177,7 @@ namespace HeatBalanceSurfaceManager {
 
                             CalcOutsideSurfTemp(state, SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
                             if (MovInsulErrorFlag)
-                                ShowFatalError("CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
+                                ShowFatalError(state, "CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
                         }
 
                     } else if (SELECT_CASE_var == KivaFoundation) {
@@ -6441,7 +6441,7 @@ namespace HeatBalanceSurfaceManager {
                     int ZoneEquipConfigNum = ZoneNum;
                     // check whether this zone is a controlled zone or not
                     if (!Zone(ZoneNum).IsControlled) {
-                        ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
+                        ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
                         return;
                     }
                     // determine supply air conditions
@@ -6832,7 +6832,7 @@ namespace HeatBalanceSurfaceManager {
                                               " for a surface with that construction.");
                             ShowContinueError("This is not currently allowed because the heat balance equations do not currently accommodate "
                                               "this combination.");
-                            ShowFatalError("CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions.");
+                            ShowFatalError(state, "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions.");
                         }
 
                         Real64 F1 = HMovInsul / (HMovInsul + HConvIn_surf + IterDampConst);
@@ -7077,12 +7077,12 @@ namespace HeatBalanceSurfaceManager {
                             ShowWarningError("Inside surface heat balance did not converge with Max Temp Difference [C] =" +
                                              General::RoundSigDigits(MaxDelTemp, 3) +
                                              " vs Max Allowed Temp Diff [C] =" + General::RoundSigDigits(MaxAllowedDelTemp, 3));
-                            ShowContinueErrorTimeStamp("");
+                            ShowContinueErrorTimeStamp(state, "");
                         } else {
                             ShowWarningError("Inside surface heat balance did not converge with Max Temp Difference [C] =" +
                                              General::RoundSigDigits(MaxDelTemp, 3) +
                                              " vs Max Allowed Temp Diff [C] =" + General::RoundSigDigits(MaxAllowedDelTempCondFD, 6));
-                            ShowContinueErrorTimeStamp("");
+                            ShowContinueErrorTimeStamp(state, "");
                         }
                     } else {
                         ShowRecurringWarningErrorAtEnd("Inside surface heat balance convergence problem continues",
@@ -7301,7 +7301,7 @@ namespace HeatBalanceSurfaceManager {
                         int ZoneEquipConfigNum = zoneNum;
                         // check whether this zone is a controlled zone or not
                         if (!Zone(zoneNum).IsControlled) {
-                            ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
+                            ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
                                            Zone(zoneNum).Name);
                             return;
                         }
@@ -7774,7 +7774,7 @@ namespace HeatBalanceSurfaceManager {
                         ShowWarningError(
                             "Inside surface heat balance did not converge with Max Temp Difference [C] =" + General::RoundSigDigits(MaxDelTemp, 3) +
                             " vs Max Allowed Temp Diff [C] =" + General::RoundSigDigits(MaxAllowedDelTempCondFD, 6));
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                     } else {
                         ShowRecurringWarningErrorAtEnd("Inside surface heat balance convergence problem continues",
                                                        calcHeatBalInsideSurfErrPointer,
@@ -7859,7 +7859,7 @@ namespace HeatBalanceSurfaceManager {
                     if (surface.LowTempErrCount == 0) {
                         ShowSevereMessage("Temperature (low) out of bounds [" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
                                           "\", for surface=\"" + surface.Name + "\"");
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                         if (!zone.TempOutOfBoundsReported) {
                             ShowContinueError("Zone=\"" + zone.Name + "\", Diagnostic Details:");
                             if (zone.FloorArea > 0.0) {
@@ -7900,7 +7900,7 @@ namespace HeatBalanceSurfaceManager {
                     if (surface.HighTempErrCount == 0) {
                         ShowSevereMessage("Temperature (high) out of bounds (" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
                                           "\", for surface=\"" + surface.Name + "\"");
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                         if (!zone.TempOutOfBoundsReported) {
                             ShowContinueError("Zone=\"" + zone.Name + "\", Diagnostic Details:");
                             if (zone.FloorArea > 0.0) {
@@ -7942,10 +7942,10 @@ namespace HeatBalanceSurfaceManager {
                     if (WarmupSurfTemp > 3) {
                         ShowSevereError("CalcHeatBalanceInsideSurf: Zone=\"" + zone.Name + "\" has view factor enforced reciprocity");
                         ShowContinueError(" and is having temperature out of bounds errors. Please correct zone geometry and rerun.");
-                        ShowFatalError("CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions.");
+                        ShowFatalError(state, "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions.");
                     }
                 } else if (WarmupSurfTemp > 10) {
-                    ShowFatalError("CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions.");
+                    ShowFatalError(state, "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions.");
                 }
             }
         }
@@ -7954,7 +7954,7 @@ namespace HeatBalanceSurfaceManager {
                 if (TH12 < MinSurfaceTempLimitBeforeFatal) {
                     ShowSevereError("Temperature (low) out of bounds [" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
                                     "\", for surface=\"" + surface.Name + "\"");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                     if (!zone.TempOutOfBoundsReported) {
                         ShowContinueError("Zone=\"" + zone.Name + "\", Diagnostic Details:");
                         if (zone.FloorArea > 0.0) {
@@ -7976,11 +7976,11 @@ namespace HeatBalanceSurfaceManager {
                         }
                         zone.TempOutOfBoundsReported = true;
                     }
-                    ShowFatalError("Program terminates due to preceding condition.");
+                    ShowFatalError(state, "Program terminates due to preceding condition.");
                 } else {
                     ShowSevereError("Temperature (high) out of bounds [" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
                                     "\", for surface=\"" + surface.Name + "\"");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                     if (!zone.TempOutOfBoundsReported) {
                         ShowContinueError("Zone=\"" + zone.Name + "\", Diagnostic Details:");
                         if (zone.FloorArea > 0.0) {
@@ -8002,15 +8002,15 @@ namespace HeatBalanceSurfaceManager {
                         }
                         zone.TempOutOfBoundsReported = true;
                     }
-                    ShowFatalError("Program terminates due to preceding condition.");
+                    ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
             } else {
                 if (TH12 < -10000. || TH12 > 10000.) {
                     ShowSevereError("CalcHeatBalanceInsideSurf: The temperature of " + RoundSigDigits(TH12, 2) + " C for zone=\"" + zone.Name +
                                     "\", for surface=\"" + surface.Name + "\"");
                     ShowContinueError("..is very far out of bounds during warmup. This may be an indication of a malformed zone.");
-                    ShowContinueErrorTimeStamp("");
-                    ShowFatalError("Program terminates due to preceding condition.");
+                    ShowContinueErrorTimeStamp(state, "");
+                    ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
             }
         }

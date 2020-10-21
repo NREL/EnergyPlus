@@ -480,7 +480,7 @@ namespace HeatBalanceManager {
         CheckUsedConstructions(state, ErrorsFound);
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in Building Input, Program Stopped");
+            ShowFatalError(state, "Errors found in Building Input, Program Stopped");
         }
 
         // following is done to "get internal heat gains" input so that lights are gotten before
@@ -559,7 +559,7 @@ namespace HeatBalanceManager {
                 ShowContinueError("Each Unused construction is shown.");
                 for (Loop = 1; Loop <= TotConstructs; ++Loop) {
                     if (state.dataConstruction->Construct(Loop).IsUsed) continue;
-                    ShowMessage("Construction=" + state.dataConstruction->Construct(Loop).Name);
+                    ShowMessage(state, "Construction=" + state.dataConstruction->Construct(Loop).Name);
                 }
             }
         }
@@ -3768,7 +3768,7 @@ namespace HeatBalanceManager {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
 
-                if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
+                if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
                     ShowContinueError("...All Thermochromic Glazing names must be unique regardless of subtype.");
                     continue;
                 }
@@ -4003,7 +4003,7 @@ namespace HeatBalanceManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            if (UtilityRoutines::IsNameEmpty(SpecDataNames(1), CurrentModuleObject, ErrorsFound)) continue;
+            if (UtilityRoutines::IsNameEmpty(state, SpecDataNames(1), CurrentModuleObject, ErrorsFound)) continue;
 
             // Load the spectral data derived type from the input data.
             SpectralData(Loop).Name = SpecDataNames(1);
@@ -4566,7 +4566,7 @@ namespace HeatBalanceManager {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(ConstructAlphas(0), CurrentModuleObject, ErrorsFound)) continue;
+            if (UtilityRoutines::IsNameEmpty(state, ConstructAlphas(0), CurrentModuleObject, ErrorsFound)) continue;
 
             ++ConstrNum;
             WConstructNames(ConstrNum) = ConstructAlphas(0);
@@ -4753,7 +4753,7 @@ namespace HeatBalanceManager {
                 TMP = index(cAlphaArgs(1), char(2));
             }
 
-            if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
+            if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
 
             ++ZoneLoop;
             ProcessZoneData(state,
@@ -4802,7 +4802,7 @@ namespace HeatBalanceManager {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 ZoneList(ListNum).Name = cAlphaArgs(1);
                 if (UtilityRoutines::FindItemInList(ZoneList(ListNum).Name, Zone) > 0) {
@@ -4864,7 +4864,7 @@ namespace HeatBalanceManager {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 ZoneGroup(GroupNum).Name = cAlphaArgs(1);
 
@@ -4989,7 +4989,7 @@ namespace HeatBalanceManager {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 ZoneLocalEnvironment(Loop).Name = cAlphaArgs(1);
 
@@ -6086,7 +6086,7 @@ namespace HeatBalanceManager {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(FrameDividerNames(1), CurrentModuleObject, ErrorsFound)) continue;
+            if (UtilityRoutines::IsNameEmpty(state, FrameDividerNames(1), CurrentModuleObject, ErrorsFound)) continue;
 
             // Load the frame/divider derived type from the input data.
             ++FrameDividerNum;
@@ -6301,7 +6301,7 @@ namespace HeatBalanceManager {
                             DesiredFileName);
             ShowContinueError("Certain run environments require a full path to be included with the file name in the input field.");
             ShowContinueError("Try again with putting full path and file name in the field.");
-            ShowFatalError("Program terminates due to these conditions.");
+            ShowFatalError(state, "Program terminates due to these conditions.");
         }
 
         auto W5DataFile = state.files.TempFullFileName.open("SearchWindow5DataFile");
@@ -6312,7 +6312,7 @@ namespace HeatBalanceManager {
                 ShowSevereError("SearchWindow5DataFile: For \"" + DesiredConstructionName + "\" in " + DesiredFileName +
                                 " fiile, appears to be a Unicode or binary file.");
                 ShowContinueError("...This file cannot be read by this program. Please save as PC or Unix file and try again");
-                ShowFatalError("Program terminates due to previous condition.");
+                ShowFatalError(state, "Program terminates due to previous condition.");
             }
         }
         W5DataFile.rewind();
@@ -6323,7 +6323,7 @@ namespace HeatBalanceManager {
         ++FileLineCount;
         if (!has_prefixi(NextLine.data, "WINDOW5")) {
             ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Data File=" + DesiredFileName);
-            ShowFatalError("Error reading Window5 Data File: first word of window entry is \"" + NextLine.data.substr(0, 7) + "\", should be Window5.");
+            ShowFatalError(state, "Error reading Window5 Data File: first word of window entry is \"" + NextLine.data.substr(0, 7) + "\", should be Window5.");
         }
 
 
@@ -6359,7 +6359,7 @@ namespace HeatBalanceManager {
             ++FileLineCount;
             readItem(NextLine.data.substr(19), NGlSys);
             if (NGlSys <= 0 || NGlSys > 2) {
-                ShowFatalError("Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used: it has " +
+                ShowFatalError(state, "Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used: it has " +
                                TrimSigDigits(NGlSys) + " glazing systems; only 1 or 2 are allowed.");
             }
             NextLine = W5DataFile.readLine();
@@ -6573,7 +6573,7 @@ namespace HeatBalanceManager {
             }
 
             if (ErrorsFound)
-                ShowFatalError("HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
+                ShowFatalError(state, "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
                                " from the Window5 data file cannot be used because of above errors");
 
             TotMaterialsPrev = TotMaterials;
@@ -6951,7 +6951,7 @@ namespace HeatBalanceManager {
                 FileLineCount += 5;
 
                 if (ErrorsFound)
-                    ShowFatalError("HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
+                    ShowFatalError(state, "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
                                    " from the Window5 data file cannot be used because of above errors");
 
                 // Hemis
@@ -7568,7 +7568,7 @@ namespace HeatBalanceManager {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
+                if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     ShowContinueError(
                         "...each SurfaceProperty:SolarIncidentInside name must not duplicate other SurfaceProperty:SolarIncidentInside name");
                     continue;
@@ -7638,7 +7638,7 @@ namespace HeatBalanceManager {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
+                if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     ShowContinueError("...each ComplexFenestrationProperty:SolarAbsorbedLayers name must not duplicate other "
                                       "ComplexFenestrationProperty:SolarAbsorbedLayers name");
                     continue;
@@ -8086,7 +8086,7 @@ namespace HeatBalanceManager {
         // step 8.  Hemispherical terms are averaged using standard method
 
         if (ErrorsFound) {
-            ShowFatalError("Program halted because of input problem(s) in WindowMaterial:SimpleGlazingSystem");
+            ShowFatalError(state, "Program halted because of input problem(s) in WindowMaterial:SimpleGlazingSystem");
         }
     }
 
@@ -8144,7 +8144,7 @@ namespace HeatBalanceManager {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
+            if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cAlphaFieldNames(1) +
                                 " has been found.");
                 ShowContinueError("...All Material names must be unique regardless of subtype.");
@@ -8187,7 +8187,7 @@ namespace HeatBalanceManager {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
+            if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cAlphaFieldNames(1) +
                                 " has been found.");
                 ShowContinueError("...All Material names must be unique regardless of subtype.");
@@ -8286,7 +8286,7 @@ namespace HeatBalanceManager {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
+            if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cAlphaFieldNames(1) +
                                 " has been found.");
                 ShowContinueError("...All Material names must be unique regardless of subtype.");
@@ -8477,7 +8477,7 @@ namespace HeatBalanceManager {
                 }
             }
 
-            if (ErrorsFound) ShowFatalError("Error in complex fenestration material input.");
+            if (ErrorsFound) ShowFatalError(state, "Error in complex fenestration material input.");
         }
     }
 
@@ -8558,7 +8558,7 @@ namespace HeatBalanceManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
+            if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
 
             WindowThermalModel(Loop).Name = cAlphaArgs(1);
 
@@ -9281,7 +9281,7 @@ namespace HeatBalanceManager {
         if (allocated(locAlphaArgs)) locAlphaArgs.deallocate();
         if (allocated(locNumericArgs)) locNumericArgs.deallocate();
 
-        if (ErrorsFound) ShowFatalError("Error in complex fenestration input.");
+        if (ErrorsFound) ShowFatalError(state, "Error in complex fenestration input.");
     }
 
     void InitConductionTransferFunctions(EnergyPlusData &state)
@@ -9313,7 +9313,7 @@ namespace HeatBalanceManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Program terminated for reasons listed (InitConductionTransferFunctions)");
+            ShowFatalError(state, "Program terminated for reasons listed (InitConductionTransferFunctions)");
         }
     }
 

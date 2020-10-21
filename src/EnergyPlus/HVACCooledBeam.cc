@@ -186,25 +186,25 @@ namespace HVACCooledBeam {
         if (CompIndex == 0) {
             CBNum = UtilityRoutines::FindItemInList(CompName, CoolBeam);
             if (CBNum == 0) {
-                ShowFatalError("SimCoolBeam: Cool Beam Unit not found=" + CompName);
+                ShowFatalError(state, "SimCoolBeam: Cool Beam Unit not found=" + CompName);
             }
             CompIndex = CBNum;
         } else {
             CBNum = CompIndex;
             if (CBNum > NumCB || CBNum < 1) {
-                ShowFatalError("SimCoolBeam: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) +
+                ShowFatalError(state, "SimCoolBeam: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) +
                                ", Number of Cool Beam Units=" + TrimSigDigits(NumCB) + ", System name=" + CompName);
             }
             if (CheckEquipName(CBNum)) {
                 if (CompName != CoolBeam(CBNum).Name) {
-                    ShowFatalError("SimCoolBeam: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) + ", Cool Beam Unit name=" + CompName +
+                    ShowFatalError(state, "SimCoolBeam: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) + ", Cool Beam Unit name=" + CompName +
                                    ", stored Cool Beam Unit for that index=" + CoolBeam(CBNum).Name);
                 }
                 CheckEquipName(CBNum) = false;
             }
         }
         if (CBNum == 0) {
-            ShowFatalError("Cool Beam Unit not found = " + CompName);
+            ShowFatalError(state, "Cool Beam Unit not found = " + CompName);
         }
 
         DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(CoolBeam(CBNum).ADUNum).TermUnitSizingNum;
@@ -304,7 +304,7 @@ namespace HVACCooledBeam {
                                           cAlphaFields,
                                           cNumericFields);
             CBNum = CBIndex;
-            UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             CoolBeam(CBNum).Name = Alphas(1);
             CoolBeam(CBNum).UnitType = CurrentModuleObject;
@@ -384,9 +384,9 @@ namespace HVACCooledBeam {
             CoolBeam(CBNum).InDiam = Numbers(16);
 
             // Register component set data
-            TestCompSet(
+            TestCompSet(state,
                 CurrentModuleObject, CoolBeam(CBNum).Name, NodeID(CoolBeam(CBNum).AirInNode), NodeID(CoolBeam(CBNum).AirOutNode), "Air Nodes");
-            TestCompSet(
+            TestCompSet(state,
                 CurrentModuleObject, CoolBeam(CBNum).Name, NodeID(CoolBeam(CBNum).CWInNode), NodeID(CoolBeam(CBNum).CWOutNode), "Water Nodes");
 
             // Setup the Cooled Beam reporting variables
@@ -499,7 +499,7 @@ namespace HVACCooledBeam {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting input. Preceding conditions cause termination.");
+            ShowFatalError(state, RoutineName + "Errors found in getting input. Preceding conditions cause termination.");
         }
     }
 
@@ -564,7 +564,7 @@ namespace HVACCooledBeam {
                                     _,
                                     _);
             if (errFlag) {
-                ShowFatalError("InitCoolBeam: Program terminated for previous conditions.");
+                ShowFatalError(state, "InitCoolBeam: Program terminated for previous conditions.");
             }
             CoolBeam(CBNum).PlantLoopScanFlag = false;
         }
@@ -902,7 +902,7 @@ namespace HVACCooledBeam {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Preceding cooled beam sizing errors cause program termination");
+            ShowFatalError(state, "Preceding cooled beam sizing errors cause program termination");
         }
     }
 

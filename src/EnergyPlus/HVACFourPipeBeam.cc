@@ -215,11 +215,11 @@ namespace FourPipeBeam {
             thisBeam->beamCoolingPresent = false;
         } else if (lAlphaFieldBlanks(7) && !lAlphaFieldBlanks(8)) { // outlet node but no inlet node for chilled water
             thisBeam->beamCoolingPresent = false;
-            ShowWarningError(routineName + cCurrentModuleObject + ": missing " + cAlphaFieldNames(7) + " for " + cAlphaFieldNames(1) + '=' +
+            ShowWarningError(state, routineName + cCurrentModuleObject + ": missing " + cAlphaFieldNames(7) + " for " + cAlphaFieldNames(1) + '=' +
                              cAlphaArgs(1) + ", simulation continues with no beam cooling");
         } else if (!lAlphaFieldBlanks(7) && lAlphaFieldBlanks(8)) { // inlet node but no outlet node for chilled water
             thisBeam->beamCoolingPresent = false;
-            ShowWarningError(routineName + cCurrentModuleObject + ": missing " + cAlphaFieldNames(8) + " for " + cAlphaFieldNames(1) + '=' +
+            ShowWarningError(state, routineName + cCurrentModuleObject + ": missing " + cAlphaFieldNames(8) + " for " + cAlphaFieldNames(1) + '=' +
                              cAlphaArgs(1) + ", simulation continues with no beam cooling");
         } else {
             thisBeam->beamCoolingPresent = true;
@@ -246,11 +246,11 @@ namespace FourPipeBeam {
             thisBeam->beamHeatingPresent = false;
         } else if (lAlphaFieldBlanks(9) && !lAlphaFieldBlanks(10)) { // outlet node but no inlet node for hot water
             thisBeam->beamHeatingPresent = false;
-            ShowWarningError(routineName + cCurrentModuleObject + ": missing " + cAlphaFieldNames(9) + " for " + cAlphaFieldNames(1) + '=' +
+            ShowWarningError(state, routineName + cCurrentModuleObject + ": missing " + cAlphaFieldNames(9) + " for " + cAlphaFieldNames(1) + '=' +
                              cAlphaArgs(1) + ", simulation continues with no beam heating");
         } else if (!lAlphaFieldBlanks(9) && lAlphaFieldBlanks(10)) { // inlet node but no outlet node for hot water
             thisBeam->beamHeatingPresent = false;
-            ShowWarningError(routineName + cCurrentModuleObject + ": missing " + cAlphaFieldNames(10) + " for " + cAlphaFieldNames(1) + '=' +
+            ShowWarningError(state, routineName + cCurrentModuleObject + ": missing " + cAlphaFieldNames(10) + " for " + cAlphaFieldNames(1) + '=' +
                              cAlphaArgs(1) + ", simulation continues with no beam heating");
         } else {
             thisBeam->beamHeatingPresent = true;
@@ -334,20 +334,20 @@ namespace FourPipeBeam {
             ErrorsFound = true;
         }
         // Register component set data
-        TestCompSet(cCurrentModuleObject,
+        TestCompSet(state, cCurrentModuleObject,
                     thisBeam->name,
                     DataLoopNode::NodeID(thisBeam->airInNodeNum),
                     DataLoopNode::NodeID(thisBeam->airOutNodeNum),
                     "Air Nodes");
         if (thisBeam->beamCoolingPresent) {
-            TestCompSet(cCurrentModuleObject,
+            TestCompSet(state, cCurrentModuleObject,
                         thisBeam->name,
                         DataLoopNode::NodeID(thisBeam->cWInNodeNum),
                         DataLoopNode::NodeID(thisBeam->cWOutNodeNum),
                         "Chilled Water Nodes");
         }
         if (thisBeam->beamHeatingPresent) {
-            TestCompSet(cCurrentModuleObject,
+            TestCompSet(state, cCurrentModuleObject,
                         thisBeam->name,
                         DataLoopNode::NodeID(thisBeam->hWInNodeNum),
                         DataLoopNode::NodeID(thisBeam->hWOutNodeNum),
@@ -474,7 +474,7 @@ namespace FourPipeBeam {
             FourPipeBeams.push_back(thisBeam);
             return thisBeam;
         } else {
-            ShowFatalError(routineName + "Errors found in getting input. Preceding conditions cause termination.");
+            ShowFatalError(state, routineName + "Errors found in getting input. Preceding conditions cause termination.");
             return nullptr;
         }
     }
@@ -559,7 +559,7 @@ namespace FourPipeBeam {
                                         this->cWInNodeNum,
                                         _);
                 if (errFlag) {
-                    ShowFatalError(routineName + " Program terminated for previous conditions.");
+                    ShowFatalError(state, routineName + " Program terminated for previous conditions.");
                 }
             }
             if (this->beamHeatingPresent) {
@@ -577,7 +577,7 @@ namespace FourPipeBeam {
                                         this->hWInNodeNum,
                                         _);
                 if (errFlag) {
-                    ShowFatalError(routineName + " Program terminated for previous conditions.");
+                    ShowFatalError(state, routineName + " Program terminated for previous conditions.");
                 }
             }
             this->plantLoopScanFlag = false;
@@ -865,10 +865,10 @@ namespace FourPipeBeam {
                 auto f = std::bind(&HVACFourPipeBeam::residualSizing, this, std::placeholders::_1, std::placeholders::_2);
                 TempSolveRoot::SolveRoot(state, ErrTolerance, 50, SolFlag, mDotAirSolutionCooling, f, minFlow, maxFlowCool);
                 if (SolFlag == -1) {
-                    ShowWarningError("Cooling load sizing search failed in four pipe beam unit called " + this->name);
+                    ShowWarningError(state, "Cooling load sizing search failed in four pipe beam unit called " + this->name);
                     ShowContinueError("  Iteration limit exceeded in calculating size for design cooling load");
                 } else if (SolFlag == -2) {
-                    ShowWarningError("Cooling load sizing search failed in four pipe beam unit called " + this->name);
+                    ShowWarningError(state, "Cooling load sizing search failed in four pipe beam unit called " + this->name);
                     ShowContinueError("  Bad size limits");
                 }
             }
@@ -906,10 +906,10 @@ namespace FourPipeBeam {
                 TempSolveRoot::SolveRoot(state,
                     ErrTolerance, 50, SolFlag, mDotAirSolutionHeating, std::bind(&HVACFourPipeBeam::residualSizing, this, _1, _2), 0.0, maxFlowHeat);
                 if (SolFlag == -1) {
-                    ShowWarningError("Heating load sizing search failed in four pipe beam unit called " + this->name);
+                    ShowWarningError(state, "Heating load sizing search failed in four pipe beam unit called " + this->name);
                     ShowContinueError("  Iteration limit exceeded in calculating size for design heating load");
                 } else if (SolFlag == -2) {
-                    ShowWarningError("Heating load sizing search failed in four pipe beam unit called " + this->name);
+                    ShowWarningError(state, "Heating load sizing search failed in four pipe beam unit called " + this->name);
                     ShowContinueError("  Bad size limits");
                 }
             }
@@ -948,7 +948,7 @@ namespace FourPipeBeam {
                                              (this->vDotDesignPrimAir - originalTermUnitSizeMaxVDot));
             } else {
                 ShowSevereError("Four pipe beam requires system sizing. Turn on system sizing.");
-                ShowFatalError("Program terminating due to previous errors");
+                ShowFatalError(state, "Program terminating due to previous errors");
             }
         }
 
@@ -1008,7 +1008,7 @@ namespace FourPipeBeam {
             RegisterPlantCompDesignFlow(this->hWInNodeNum, this->vDotDesignHW);
         }
         if (ErrorsFound) {
-            ShowFatalError("Preceding four pipe beam sizing errors cause program termination");
+            ShowFatalError(state, "Preceding four pipe beam sizing errors cause program termination");
         }
 
     } // set_size

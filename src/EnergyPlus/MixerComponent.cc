@@ -164,18 +164,18 @@ namespace MixerComponent {
         if (CompIndex == 0) {
             MixerNum = UtilityRoutines::FindItemInList(CompName, MixerCond, &MixerConditions::MixerName);
             if (MixerNum == 0) {
-                ShowFatalError("SimAirLoopMixer: Mixer not found=" + CompName);
+                ShowFatalError(state, "SimAirLoopMixer: Mixer not found=" + CompName);
             }
             CompIndex = MixerNum;
         } else {
             MixerNum = CompIndex;
             if (MixerNum > NumMixers || MixerNum < 1) {
-                ShowFatalError("SimAirLoopMixer: Invalid CompIndex passed=" + TrimSigDigits(MixerNum) +
+                ShowFatalError(state, "SimAirLoopMixer: Invalid CompIndex passed=" + TrimSigDigits(MixerNum) +
                                ", Number of Mixers=" + TrimSigDigits(NumMixers) + ", Mixer name=" + CompName);
             }
             if (CheckEquipName(MixerNum)) {
                 if (CompName != MixerCond(MixerNum).MixerName) {
-                    ShowFatalError("SimAirLoopMixer: Invalid CompIndex passed=" + TrimSigDigits(MixerNum) + ", Mixer name=" + CompName +
+                    ShowFatalError(state, "SimAirLoopMixer: Invalid CompIndex passed=" + TrimSigDigits(MixerNum) + ", Mixer name=" + CompName +
                                    ", stored Mixer Name for that index=" + MixerCond(MixerNum).MixerName);
                 }
                 CheckEquipName(MixerNum) = false;
@@ -265,7 +265,7 @@ namespace MixerComponent {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             MixerCond(MixerNum).MixerName = AlphArray(1);
 
@@ -312,7 +312,7 @@ namespace MixerComponent {
                                                                            1,
                                                                            ObjectIsNotParent);
                 if (lAlphaBlanks(2 + NodeNum)) {
-                    ShowSevereError(cAlphaFields(2 + NodeNum) + " is Blank, " + CurrentModuleObject + " = " + AlphArray(1));
+                    ShowSevereError(state, cAlphaFields(2 + NodeNum) + " is Blank, " + CurrentModuleObject + " = " + AlphArray(1));
                     ErrorsFound = true;
                 }
             }
@@ -324,19 +324,19 @@ namespace MixerComponent {
             NodeNum = MixerCond(MixerNum).OutletNode;
             for (InNodeNum1 = 1; InNodeNum1 <= MixerCond(MixerNum).NumInletNodes; ++InNodeNum1) {
                 if (NodeNum != MixerCond(MixerNum).InletNode(InNodeNum1)) continue;
-                ShowSevereError(CurrentModuleObject + " = " + MixerCond(MixerNum).MixerName +
+                ShowSevereError(state, CurrentModuleObject + " = " + MixerCond(MixerNum).MixerName +
                                 " specifies an inlet node name the same as the outlet node.");
-                ShowContinueError(".." + cAlphaFields(2) + " = " + NodeID(NodeNum));
-                ShowContinueError("..Inlet Node #" + TrimSigDigits(InNodeNum1) + " is duplicate.");
+                ShowContinueError(state, ".." + cAlphaFields(2) + " = " + NodeID(NodeNum));
+                ShowContinueError(state, "..Inlet Node #" + TrimSigDigits(InNodeNum1) + " is duplicate.");
                 ErrorsFound = true;
             }
             for (InNodeNum1 = 1; InNodeNum1 <= MixerCond(MixerNum).NumInletNodes; ++InNodeNum1) {
                 for (InNodeNum2 = InNodeNum1 + 1; InNodeNum2 <= MixerCond(MixerNum).NumInletNodes; ++InNodeNum2) {
                     if (MixerCond(MixerNum).InletNode(InNodeNum1) != MixerCond(MixerNum).InletNode(InNodeNum2)) continue;
-                    ShowSevereError(CurrentModuleObject + " = " + MixerCond(MixerNum).MixerName +
+                    ShowSevereError(state, CurrentModuleObject + " = " + MixerCond(MixerNum).MixerName +
                                     " specifies duplicate inlet nodes in its inlet node list.");
-                    ShowContinueError("..Inlet Node #" + TrimSigDigits(InNodeNum1) + " Name=" + NodeID(InNodeNum1));
-                    ShowContinueError("..Inlet Node #" + TrimSigDigits(InNodeNum2) + " is duplicate.");
+                    ShowContinueError(state, "..Inlet Node #" + TrimSigDigits(InNodeNum1) + " Name=" + NodeID(InNodeNum1));
+                    ShowContinueError(state, "..Inlet Node #" + TrimSigDigits(InNodeNum2) + " is duplicate.");
                     ErrorsFound = true;
                 }
             }
@@ -350,7 +350,7 @@ namespace MixerComponent {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting input.");
+            ShowFatalError(state, RoutineName + "Errors found in getting input.");
         }
     }
 
@@ -670,9 +670,9 @@ namespace MixerComponent {
         MixerIndex = UtilityRoutines::FindItemInList(MixerName, MixerCond, &MixerConditions::MixerName);
         if (MixerIndex == 0) {
             if (!ThisObjectType.empty()) {
-                ShowSevereError(ThisObjectType + ", GetZoneMixerIndex: Zone Mixer not found=" + MixerName);
+                ShowSevereError(state, ThisObjectType + ", GetZoneMixerIndex: Zone Mixer not found=" + MixerName);
             } else {
-                ShowSevereError("GetZoneMixerIndex: Zone Mixer not found=" + MixerName);
+                ShowSevereError(state, "GetZoneMixerIndex: Zone Mixer not found=" + MixerName);
             }
             ErrorsFound = true;
         }

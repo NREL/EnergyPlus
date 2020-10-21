@@ -169,7 +169,7 @@ namespace ICEngineElectricGenerator {
                                           DataIPShortCuts::lAlphaFieldBlanks,
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(AlphArray(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphArray(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
             ICEngineGenerator(genNum).Name = AlphArray(1);
 
@@ -273,7 +273,7 @@ namespace ICEngineElectricGenerator {
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
-                BranchNodeConnections::TestCompSet(
+                BranchNodeConnections::TestCompSet(state,
                     DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(8), AlphArray(9), "Heat Recovery Nodes");
                 PlantUtilities::RegisterPlantCompDesignFlow(ICEngineGenerator(genNum).HeatRecInletNodeNum,
                                                             ICEngineGenerator(genNum).DesignHeatRecVolFlowRate);
@@ -282,7 +282,7 @@ namespace ICEngineElectricGenerator {
                 ICEngineGenerator(genNum).HeatRecInletNodeNum = 0;
                 ICEngineGenerator(genNum).HeatRecOutletNodeNum = 0;
                 if (!DataIPShortCuts::lAlphaFieldBlanks(8) || !DataIPShortCuts::lAlphaFieldBlanks(9)) {
-                    ShowWarningError("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + DataIPShortCuts::cCurrentModuleObject + '=' +
+                    ShowWarningError(state, "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + DataIPShortCuts::cCurrentModuleObject + '=' +
                                      AlphArray(1));
                     ShowContinueError("However, Node names were specified for Heat Recovery inlet or outlet nodes");
                 }

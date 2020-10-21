@@ -487,7 +487,7 @@ namespace HybridEvapCoolingModel {
             curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
-                ShowContinueError("Entered in " + cCurrentModuleObject);
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject);
                 ErrorsFound = true;
                 InitializeCurve(TEMP_CURVE, -1);
             } else {
@@ -505,7 +505,7 @@ namespace HybridEvapCoolingModel {
             curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
-                ShowContinueError("Entered in " + cCurrentModuleObject);
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject);
                 ErrorsFound = true;
                 InitializeCurve(W_CURVE, -1);
             } else {
@@ -521,7 +521,7 @@ namespace HybridEvapCoolingModel {
             curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
-                ShowContinueError("Entered in " + cCurrentModuleObject);
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject);
                 ErrorsFound = true;
                 InitializeCurve(POWER_CURVE, -1);
             } else {
@@ -537,7 +537,7 @@ namespace HybridEvapCoolingModel {
             curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
-                ShowContinueError("Entered in " + cCurrentModuleObject);
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject);
                 ErrorsFound = true;
                 InitializeCurve(SUPPLY_FAN_POWER, -1);
             } else {
@@ -553,7 +553,7 @@ namespace HybridEvapCoolingModel {
             curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
-                ShowContinueError("Entered in " + cCurrentModuleObject);
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject);
                 ErrorsFound = true;
                 InitializeCurve(EXTERNAL_STATIC_PRESSURE, -1);
             } else {
@@ -570,7 +570,7 @@ namespace HybridEvapCoolingModel {
             curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
-                ShowContinueError("Entered in " + cCurrentModuleObject);
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject);
                 ErrorsFound = true;
                 InitializeCurve(SECOND_FUEL_USE, -1);
             } else {
@@ -586,7 +586,7 @@ namespace HybridEvapCoolingModel {
             curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
-                ShowContinueError("Entered in " + cCurrentModuleObject);
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject);
                 ErrorsFound = true;
                 InitializeCurve(THIRD_FUEL_USE, -1);
             } else {
@@ -602,7 +602,7 @@ namespace HybridEvapCoolingModel {
             curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
-                ShowContinueError("Entered in " + cCurrentModuleObject);
+                ShowContinueError(state, "Entered in " + cCurrentModuleObject);
                 ErrorsFound = true;
                 InitializeCurve(WATER_USE, -1);
             } else {
@@ -618,7 +618,7 @@ namespace HybridEvapCoolingModel {
         bool ok = InitializeOutdoorAirTemperatureConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
-            ShowContinueError("Entered in " + cCurrentModuleObject);
+            ShowContinueError(state, "Entered in " + cCurrentModuleObject);
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
@@ -627,7 +627,7 @@ namespace HybridEvapCoolingModel {
         ok = InitializeOutdoorAirHumidityRatioConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
-            ShowContinueError("Entered in " + cCurrentModuleObject);
+            ShowContinueError(state, "Entered in " + cCurrentModuleObject);
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
@@ -636,7 +636,7 @@ namespace HybridEvapCoolingModel {
         ok = InitializeOutdoorAirRelativeHumidityConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
-            ShowContinueError("Entered in " + cCurrentModuleObject);
+            ShowContinueError(state, "Entered in " + cCurrentModuleObject);
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
@@ -645,7 +645,7 @@ namespace HybridEvapCoolingModel {
         ok = InitializeReturnAirTemperatureConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
-            ShowContinueError("Entered in " + cCurrentModuleObject);
+            ShowContinueError(state, "Entered in " + cCurrentModuleObject);
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
@@ -654,7 +654,7 @@ namespace HybridEvapCoolingModel {
         ok = InitializeReturnAirHumidityRatioConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Invalid " + cNumericFields(inter_Number) + "Or Invalid" + cNumericFields(inter_Number + 1));
-            ShowContinueError("Entered in " + cCurrentModuleObject);
+            ShowContinueError(state, "Entered in " + cCurrentModuleObject);
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
@@ -664,7 +664,7 @@ namespace HybridEvapCoolingModel {
         if (!ok) {
             ShowSevereError("Invalid " + cAlphaFields(inter_Number) + '=' + Alphas(inter_Number) + "Or Invalid" + cAlphaFields(inter_Number + 1) +
                             '=' + Alphas(inter_Number + 1));
-            ShowContinueError("Entered in " + cCurrentModuleObject);
+            ShowContinueError(state, "Entered in " + cCurrentModuleObject);
             ErrorsFound = true;
         }
         inter_Number = inter_Number + 2;
@@ -674,7 +674,7 @@ namespace HybridEvapCoolingModel {
         ok = InitializeOSAFConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Error in OSAFConstraints" + cAlphaFields(inter_Number) + "through" + cAlphaFields(inter_Number + 1));
-            ShowContinueError("Entered in " + cCurrentModuleObject);
+            ShowContinueError(state, "Entered in " + cCurrentModuleObject);
             ErrorsFound = true;
         }
         // N22, \field Mode1 Minimum Supply Air Mass Flow Rate Ratio
@@ -683,7 +683,7 @@ namespace HybridEvapCoolingModel {
         ok = InitializeMsaRatioConstraints(Numbers(inter_Number), Numbers(inter_Number + 1));
         if (!ok) {
             ShowSevereError("Error in OSAFConstraints" + cAlphaFields(inter_Number) + "through" + cAlphaFields(inter_Number + 1));
-            ShowContinueError("Entered in " + cCurrentModuleObject);
+            ShowContinueError(state, "Entered in " + cCurrentModuleObject);
             ErrorsFound = true;
         }
         (*OperatingModes).push_back(*this);
@@ -947,7 +947,7 @@ namespace HybridEvapCoolingModel {
     Real64 Model::CheckVal_T(Real64 T)
     {
         if ((T > 100) || (T < 0)) {
-            ShowWarningError("Supply air temperature exceeded realistic range error called in " + Name + ", check performance curve");
+            ShowWarningError(state, "Supply air temperature exceeded realistic range error called in " + Name + ", check performance curve");
         }
         return T;
     }
@@ -1608,7 +1608,7 @@ namespace HybridEvapCoolingModel {
                 ErrorCode = 0;
                 count_DidWeNotMeetLoad++;
                 if (OptimalSetting.ElectricalPower == IMPLAUSIBLE_POWER) {
-                    ShowWarningError("Model was not able to provide cooling for a time step, called in HybridEvapCooling:dostep");
+                    ShowWarningError(state, "Model was not able to provide cooling for a time step, called in HybridEvapCooling:dostep");
                     OptimalSetting.ElectricalPower = 0;
                 }
                 OptimalSetting.Runtime_Fraction = 1;
@@ -1633,19 +1633,19 @@ namespace HybridEvapCoolingModel {
         // day, so report", but that doesn't seem to exist.
         if ((TimeElapsed > 24) && WarnOnceFlag && !WarmupFlag) {
             if (count_EnvironmentConditionsNotMet > 0)
-                ShowWarningError("In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() + " was unable to operate for " +
+                ShowWarningError(state, "In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() + " was unable to operate for " +
                                  RoundSigDigits((Real64)count_EnvironmentConditionsNotMet, 1) +
                                  " timesteps because environment conditions were beyond the allowable operating range for any mode.");
             if (count_SAHR_OC_MetOnce > 0)
-                ShowWarningError("In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
+                ShowWarningError(state, "In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
                                  " failed to meet supply air humidity ratio for " + RoundSigDigits(Real64(count_SAHR_OC_MetOnce), 1) +
                                  " time steps. For these time steps For these time steps" + Name.c_str() + " was set to mode 0");
             if (count_SAT_OC_MetOnce > 0)
-                ShowWarningError("In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
+                ShowWarningError(state, "In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
                                  " failed to meet supply air temperature constraints for " + RoundSigDigits(Real64(count_SAT_OC_MetOnce), 1) +
                                  " time steps. For these time steps For these time steps" + Name.c_str() + " was set to mode 0");
 
-            ShowWarningError("In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
+            ShowWarningError(state, "In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
                              " failed to  satisfy sensible load for " + RoundSigDigits((Real64)count_DidWeNotMeetLoad, 1) +
                              " time steps. For these time steps settings were selected to provide as much sensible cooling or heating as possible, "
                              "given other constraints.");

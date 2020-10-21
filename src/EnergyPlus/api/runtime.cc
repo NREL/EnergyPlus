@@ -73,13 +73,13 @@ void stopSimulation(EnergyPlusState state) {
 }
 
 void issueWarning(EnergyPlusState, const char * message) {
-    EnergyPlus::ShowWarningError(message);
+    EnergyPlus::ShowWarningError(state, message);
 }
 void issueSevere(EnergyPlusState, const char * message) {
-    EnergyPlus::ShowSevereError(message);
+    EnergyPlus::ShowSevereError(state, message);
 }
 void issueText(EnergyPlusState, const char * message) {
-    EnergyPlus::ShowContinueError(message);
+    EnergyPlus::ShowContinueError(state, message);
 }
 
 void registerProgressCallback(EnergyPlusState, void (*f)(int const)) {

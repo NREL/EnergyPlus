@@ -117,7 +117,7 @@ std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(Energ
         groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:Xing--Errors getting input for ground temperature model");
+        ShowFatalError(state, state, "Site:GroundTemperature:Undisturbed:Xing--Errors getting input for ground temperature model");
         return nullptr;
     }
 }

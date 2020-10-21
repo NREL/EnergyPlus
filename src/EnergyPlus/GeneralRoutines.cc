@@ -314,8 +314,8 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
                 ShowSevereError("ControlCompOutput:" + CompType + ':' + CompName + ", Min Control Flow is > Max Control Flow");
                 ShowContinueError("Acuated Node=" + NodeID(ActuatedNode) + " MinFlow=[" + TrimSigDigits(MinFlow, 3) +
                                   "], Max Flow=" + TrimSigDigits(MaxFlow, 3));
-                ShowContinueErrorTimeStamp("");
-                ShowFatalError("Program terminates due to preceding condition.");
+                ShowContinueErrorTimeStamp(state, "");
+                ShowFatalError(state, "Program terminates due to preceding condition.");
             }
         } // End of FirstHVACIteration Conditional If
         // The interface managers can reset the Max or Min to available values during the time step
@@ -496,7 +496,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
             } else if (Action == iReverseAction) {
                 Denom = -max(std::abs(QZnReq), 100.0);
             } else {
-                ShowFatalError("ControlCompOutput: Illegal Action argument =[" + TrimSigDigits(Action) + ']');
+                ShowFatalError(state, "ControlCompOutput: Illegal Action argument =[" + TrimSigDigits(Action) + ']');
             }
         }
 
@@ -594,7 +594,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
             break;
 
         default:
-            ShowFatalError("ControlCompOutput: Illegal Component Number argument =[" + TrimSigDigits(SimCompNum) + ']');
+            ShowFatalError(state, "ControlCompOutput: Illegal Component Number argument =[" + TrimSigDigits(SimCompNum) + ']');
             break;
         }
 
@@ -635,7 +635,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
             ShowContinueError("... Tolerance      = " + TrimSigDigits(ControlOffset * 100.0, 8) + " %.");
             ShowContinueError("... Error          = (Load met - Load requested) / MAXIMUM(Load requested, 100)");
             ShowContinueError("... Actuated Node Mass Flow Rate =" + RoundSigDigits(Node(ActuatedNode).MassFlowRate, 9) + " kg/s");
-            ShowContinueErrorTimeStamp("");
+            ShowContinueErrorTimeStamp(state, "");
             ShowRecurringWarningErrorAtEnd("ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
                                            CompErrIndex,
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
@@ -745,7 +745,7 @@ void CheckSysSizing(std::string const &CompType, // Component Type (e.g. Chiller
         if (!DoSystemSizing) {
             ShowContinueError("The \"SimulationControl\" object did not have the field \"Do System Sizing Calculation\" set to Yes.");
         }
-        ShowFatalError("Program terminates due to previously shown condition(s).");
+        ShowFatalError(state, "Program terminates due to previously shown condition(s).");
     }
 }
 
@@ -846,7 +846,7 @@ void CheckZoneSizing(std::string const &CompType, // Component Type (e.g. Chille
         if (!DoZoneSizing) {
             ShowContinueError("The \"SimulationControl\" object did not have the field \"Do Zone Sizing Calculation\" set to Yes.");
         }
-        ShowFatalError("Program terminates due to previously shown condition(s).");
+        ShowFatalError(state, "Program terminates due to previously shown condition(s).");
     }
 }
 
@@ -1551,7 +1551,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     int Count2;
 
     // Do by Paths
-    ShowMessage("Testing Individual Supply Air Path Integrity");
+    ShowMessage(state, "Testing Individual Supply Air Path Integrity");
     ErrFound = false;
 
     print(state.files.bnd, "{}\n", "! ===============================================================");
@@ -1764,7 +1764,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     if (ErrFound) {
         ShowSevereError("Supply Air Path(s) did not pass integrity testing");
     } else {
-        ShowMessage("All Supply Air Paths passed integrity testing");
+        ShowMessage(state, "All Supply Air Paths passed integrity testing");
     }
 }
 
@@ -1836,7 +1836,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     // Formats
 
     // Do by Paths
-    ShowMessage("Testing Individual Return Air Path Integrity");
+    ShowMessage(state, "Testing Individual Return Air Path Integrity");
     ErrFound = false;
     NumErr = 0;
 
@@ -2124,7 +2124,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     if (ErrFound) {
         ShowSevereError("Return Air Path(s) did not pass integrity testing");
     } else {
-        ShowMessage("All Return Air Paths passed integrity testing");
+        ShowMessage(state, "All Return Air Paths passed integrity testing");
     }
 }
 

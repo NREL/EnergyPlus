@@ -164,7 +164,7 @@ namespace DataPlant {
                                                            thisPlantLoop.CommonPipeType);
 
             // Update the loop outlet node conditions
-            DataPlant::PlantLoop(this->myLoopNum).CheckLoopExitNode(FirstHVACIteration); // TODO: This is a loop level check, move out
+            DataPlant::PlantLoop(this->myLoopNum).CheckLoopExitNode(state, FirstHVACIteration); // TODO: This is a loop level check, move out
 
             DataPlant::PlantLoop(this->myLoopNum).UpdateLoopSideReportVars(state, this->InitialDemandToLoopSetPointSAVED,
                                                                            this->LoadToLoopSetPointThatWasntMet);

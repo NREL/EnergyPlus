@@ -471,7 +471,7 @@ namespace EarthTube {
         CheckEarthTubesInZones(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         if (ErrorsFound) {
-            ShowFatalError(cCurrentModuleObject + ": Errors getting input.  Program terminates.");
+            ShowFatalError(state, cCurrentModuleObject + ": Errors getting input.  Program terminates.");
         }
     }
 

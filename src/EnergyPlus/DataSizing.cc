@@ -915,9 +915,9 @@ namespace DataSizing {
             }
         } else {
             if ((CoolCapCtrl == VT) || (CoolCapCtrl == Bypass)) {
-                ShowWarningError("GetCoilDesFlow: AirLoopHVAC=" + SysSizInput(SysNum).AirPriLoopName +
+                ShowWarningError(state, "GetCoilDesFlow: AirLoopHVAC=" + SysSizInput(SysNum).AirPriLoopName +
                                  "has no time of peak cooling load for sizing.");
-                ShowContinueError("Using Central Cooling Capacity Control Method=VAV instead of Bypass or VT.");
+                ShowContinueError(state, "Using Central Cooling Capacity Control Method=VAV instead of Bypass or VT.");
                 CoolCapCtrl = VAV;
             }
         }

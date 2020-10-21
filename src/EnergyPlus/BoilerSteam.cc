@@ -105,7 +105,7 @@ namespace BoilerSteam {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("LocalBoilerSteamFactory: Error getting inputs for steam boiler named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, "LocalBoilerSteamFactory: Error getting inputs for steam boiler named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -188,7 +188,7 @@ namespace BoilerSteam {
                                           _,
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueBoilerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
@@ -266,7 +266,7 @@ namespace BoilerSteam {
                                                                                  DataLoopNode::NodeConnectionType_Outlet,
                                                                                  1,
                                                                                  DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+            BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
                                                DataIPShortCuts::cAlphaArgs(1),
                                                DataIPShortCuts::cAlphaArgs(3),
                                                DataIPShortCuts::cAlphaArgs(4),
@@ -291,7 +291,7 @@ namespace BoilerSteam {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in processing " + DataIPShortCuts::cCurrentModuleObject + " input.");
+            ShowFatalError(state, RoutineName + "Errors found in processing " + DataIPShortCuts::cCurrentModuleObject + " input.");
         }
     }
 
@@ -332,7 +332,7 @@ namespace BoilerSteam {
                                                     _,
                                                     _);
             if (errFlag) {
-                ShowFatalError("InitBoiler: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "InitBoiler: Program terminated due to previous condition(s).");
             }
 
             this->myFlag = false;
@@ -516,7 +516,7 @@ namespace BoilerSteam {
                                                          NomCapUser);
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizePump: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, "SizePump: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError("User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
                                     ShowContinueError("differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpNomCap, 2) +
                                                       " [W]");
@@ -547,7 +547,7 @@ namespace BoilerSteam {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Preceding sizing errors cause program termination");
+            ShowFatalError(state, "Preceding sizing errors cause program termination");
         }
     }
 

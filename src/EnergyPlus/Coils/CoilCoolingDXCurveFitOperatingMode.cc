@@ -80,9 +80,9 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
     // Must all be greater than zero to use the latent capacity degradation model
     if ((this->maxCyclingRate > 0.0 || this->evapRateRatio > 0.0 || this->latentTimeConst > 0.0 || this->timeForCondensateRemoval > 0.0) &&
         (this->maxCyclingRate <= 0.0 || this->evapRateRatio <= 0.0 || this->latentTimeConst <= 0.0 || this->timeForCondensateRemoval <= 0.0)) {
-        ShowWarningError(routineName + this->object_name + "=\"" + this->name + "\":");
-        ShowContinueError("...At least one of the four input parameters for the latent capacity degradation model");
-        ShowContinueError("...is set to zero. Therefore, the latent degradation model will not be used for this simulation.");
+        ShowWarningError(state, routineName + this->object_name + "=\"" + this->name + "\":");
+        ShowContinueError(state, "...At least one of the four input parameters for the latent capacity degradation model");
+        ShowContinueError(state, "...is set to zero. Therefore, the latent degradation model will not be used for this simulation.");
     }
 
     if (UtilityRoutines::SameString(input_data.condenser_type, "AirCooled")) {
@@ -91,8 +91,8 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
         this->condenserType = EVAPCOOLED;
     } else {
         ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
-        ShowContinueError("...Condenser Type=\"" + input_data.condenser_type + "\":");
-        ShowContinueError("...must be AirCooled or EvaporativelyCooled.");
+        ShowContinueError(state, "...Condenser Type=\"" + input_data.condenser_type + "\":");
+        ShowContinueError(state, "...must be AirCooled or EvaporativelyCooled.");
         errorsFound = true;
     }
     for (auto &speed_name : input_data.speed_data_names) {

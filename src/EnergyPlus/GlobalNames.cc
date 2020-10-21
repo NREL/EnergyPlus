@@ -114,7 +114,7 @@ namespace GlobalNames {
                                  bool &ErrorsFound)
     {
         if (NameToVerify.empty()) {
-            ShowSevereError("E+ object type " + CurrentModuleObject + " cannot have a blank " + FieldName + " field");
+            ShowSevereError(state, state, "E+ object type " + CurrentModuleObject + " cannot have a blank " + FieldName + " field");
             ErrorsFound = true;
             NameToVerify = "xxxxx";
             return;
@@ -125,7 +125,7 @@ namespace GlobalNames {
             UniqueStrings.emplace(NameToVerify);
         } else {
             ErrorsFound = true;
-            ShowSevereError(CurrentModuleObject + " has a duplicate field " + NameToVerify);
+            ShowSevereError(state, state, CurrentModuleObject + " has a duplicate field " + NameToVerify);
         }
     }
 
@@ -136,7 +136,7 @@ namespace GlobalNames {
                                      bool &ErrorsFound)
     {
         if (object_name.empty()) {
-            ShowSevereError("E+ object type " + object_name + " cannot have blank " + field_name + " field");
+            ShowSevereError(state, state, "E+ object type " + object_name + " cannot have blank " + field_name + " field");
             ErrorsFound = true;
             object_name = "xxxxx";
             return true;
@@ -146,7 +146,7 @@ namespace GlobalNames {
             names.emplace(object_name, object_type);
         } else {
             ErrorsFound = true;
-            ShowSevereError(object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second);
+            ShowSevereError(state, state, object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second);
             return true;
         }
         return false;
@@ -158,7 +158,7 @@ namespace GlobalNames {
                                      bool &ErrorsFound)
     {
         if (object_name.empty()) {
-            ShowSevereError("E+ object type " + object_name + " has a blank field");
+            ShowSevereError(state, state, "E+ object type " + object_name + " has a blank field");
             ErrorsFound = true;
             object_name = "xxxxx";
             return true;
@@ -168,7 +168,7 @@ namespace GlobalNames {
             names.emplace(object_name, object_type);
         } else {
             ErrorsFound = true;
-            ShowSevereError(object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second);
+            ShowSevereError(state, state, object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second);
             return true;
         }
         return false;
@@ -190,8 +190,8 @@ namespace GlobalNames {
 
         auto const iter = ChillerNames.find(NameToVerify);
         if (iter != ChillerNames.end()) {
-            ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + iter->second + "\".");
-            ShowContinueError("...Current entry is Chiller Type=\"" + TypeToVerify + "\".");
+            ShowSevereError(state, state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + iter->second + "\".");
+            ShowContinueError(state, "...Current entry is Chiller Type=\"" + TypeToVerify + "\".");
             ErrorsFound = true;
         } else {
             ChillerNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
@@ -215,7 +215,7 @@ namespace GlobalNames {
 
         auto const iter = BaseboardNames.find(NameToVerify);
         if (iter != BaseboardNames.end()) {
-            ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + iter->second + "\".");
+            ShowSevereError(state, state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + iter->second + "\".");
             ShowContinueError("...Current entry is Baseboard Type=\"" + TypeToVerify + "\".");
             ErrorsFound = true;
         } else {
@@ -240,7 +240,7 @@ namespace GlobalNames {
 
         auto const iter = BoilerNames.find(NameToVerify);
         if (iter != BoilerNames.end()) {
-            ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + iter->second + "\".");
+            ShowSevereError(state, state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + iter->second + "\".");
             ShowContinueError("...Current entry is Boiler Type=\"" + TypeToVerify + "\".");
             ErrorsFound = true;
         } else {
@@ -263,7 +263,7 @@ namespace GlobalNames {
         // Coils.  If not found in the list, it is added before returning.
 
         if (NameToVerify.empty()) {
-            ShowSevereError("\"" + TypeToVerify + "\" cannot have a blank field");
+            ShowSevereError(state, state, "\"" + TypeToVerify + "\" cannot have a blank field");
             ErrorsFound = true;
             NameToVerify = "xxxxx";
             return;
@@ -271,7 +271,7 @@ namespace GlobalNames {
 
         auto const iter = CoilNames.find(NameToVerify);
         if (iter != CoilNames.end()) {
-            ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + iter->second + "\".");
+            ShowSevereError(state, state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + iter->second + "\".");
             ShowContinueError("...Current entry is Coil Type=\"" + TypeToVerify + "\".");
             ErrorsFound = true;
         } else {
@@ -284,7 +284,7 @@ namespace GlobalNames {
     {
         auto const iter = aDUNames.find(NameToVerify);
         if (iter != aDUNames.end()) {
-            ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + iter->second + "\".");
+            ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + iter->second + "\".");
             ShowContinueError("...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\".");
             ErrorsFound = true;
         } else {

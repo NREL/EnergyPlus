@@ -677,7 +677,7 @@ void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args
         // Pass custom argument formatter as a template arg to vformat_to.
         fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
     } catch (const fmt::format_error &) {
-        ShowWarningError(fmt::format("Error with format, '{}', passed {} args", format_str, count));
+        ShowWarningError(state, fmt::format("Error with format, '{}', passed {} args", format_str, count));
     }
     os.write(buffer.data(), buffer.size());
 }
@@ -689,7 +689,7 @@ std::string vprint(fmt::string_view format_str, fmt::format_args args, const std
         // Pass custom argument formatter as a template arg to vformat_to.
         fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
     } catch (const fmt::format_error &) {
-        ShowWarningError(fmt::format("Error with format, '{}', passed {} args", format_str, count));
+        ShowWarningError(state, fmt::format("Error with format, '{}', passed {} args", format_str, count));
     }
     return fmt::to_string(buffer);
 }

@@ -118,7 +118,7 @@ namespace HeatBalanceMovableInsulation {
                         dataMaterial.Material(MaterialIndex).Resistance =
                             dataMaterial.Material(Surface(SurfNum).MaterialMovInsulExt).Thickness / dataMaterial.Material(Surface(SurfNum).MaterialMovInsulExt).Conductivity;
                     } else {
-                        ShowFatalError("EvalOutsideMovableInsulation: No resistance or conductivity found for material " +
+                        ShowFatalError(state, "EvalOutsideMovableInsulation: No resistance or conductivity found for material " +
                                        dataMaterial.Material(Surface(SurfNum).MaterialMovInsulExt).Name);
                     }
                 }
@@ -183,7 +183,7 @@ namespace HeatBalanceMovableInsulation {
                     if (dataMaterial.Material(thisMovableInt).Conductivity > 0.0 && dataMaterial.Material(thisMovableInt).Thickness > 0.0) {
                         dataMaterial.Material(thisMovableInt).Resistance = dataMaterial.Material(thisMovableInt).Thickness / dataMaterial.Material(thisMovableInt).Conductivity;
                     } else {
-                        ShowFatalError("EvalInsideMovableInsulation: No resistance found for material " + dataMaterial.Material(MaterialIndex).Name);
+                        ShowFatalError(state, "EvalInsideMovableInsulation: No resistance found for material " + dataMaterial.Material(MaterialIndex).Name);
                     }
                 }
 

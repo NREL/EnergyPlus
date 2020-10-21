@@ -359,7 +359,7 @@ namespace Construction {
                         --this->TempAfterLayer;
                     }
                 } else { // These are not adjacent layers and there is a logic flaw here (should not happen)
-                    ShowFatalError("Combining resistance layers failed for " + this->Name);
+                    ShowFatalError(state, "Combining resistance layers failed for " + this->Name);
                     ShowContinueError("This should never happen.  Contact EnergyPlus Support for further assistance.");
                 }
             }
@@ -919,7 +919,7 @@ namespace Construction {
                                 CTFConvrg = false;
                             }
                         } else { // Something terribly wrong--the surface has no CTFs, not even an R-value
-                            ShowFatalError("Illegal construction definition, no CTFs calculated for " + this->Name);
+                            ShowFatalError(state, "Illegal construction definition, no CTFs calculated for " + this->Name);
                         }
                     }
 

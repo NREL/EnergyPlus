@@ -163,16 +163,16 @@ namespace ExteriorEnergyUse {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
+            if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
 
             state.dataExteriorEnergyUse->ExteriorLights(Item).Name = cAlphaArgs(1);
             state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
             if (state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(2)) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(2) + " is required, missing for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(2) + " is required, missing for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered=" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered=" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                 }
                 ErrorsFound = true;
@@ -181,13 +181,13 @@ namespace ExteriorEnergyUse {
                 SchMax = GetScheduleMaxValue(state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " minimum, is < 0.0 for " +
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " minimum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                         ShowContinueError(cAlphaArgs(2) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) + "]. Values must be >= 0.0.");
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " maximum, is < 0.0 for " +
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " maximum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                         ShowContinueError(cAlphaArgs(2) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) + "]. Values must be >= 0.0.");
                         ErrorsFound = true;
@@ -201,7 +201,7 @@ namespace ExteriorEnergyUse {
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "AstronomicalClock")) {
                 state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode = ExteriorEnergyUse::LightControlType::AstroClockOverride;
             } else {
-                ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3) + " for " +
+                ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3) + " for " +
                                 cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
             }
 
@@ -264,7 +264,7 @@ namespace ExteriorEnergyUse {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
+            if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
             GlobalNames::VerifyUniqueInterObjectName(state.dataExteriorEnergyUse->UniqueExteriorEquipNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
             ++state.dataExteriorEnergyUse->NumExteriorEqs;
@@ -279,10 +279,10 @@ namespace ExteriorEnergyUse {
             ExteriorEnergyUse::ValidateFuelType(state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).FuelType, cAlphaArgs(2), TypeString, cCurrentModuleObject, cAlphaFieldNames(2), cAlphaArgs(2));
             if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).FuelType == ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
                 if (lAlphaFieldBlanks(2)) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(2) + " is required, missing for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(2) + " is required, missing for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered=" + cAlphaArgs(2) + " for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " entered=" + cAlphaArgs(2) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                 }
                 ErrorsFound = true;
@@ -326,10 +326,10 @@ namespace ExteriorEnergyUse {
             state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
             if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(3) + " is required, missing for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(3) + " is required, missing for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " entered=" + cAlphaArgs(3) + " for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " entered=" + cAlphaArgs(3) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                 }
                 ErrorsFound = true;
@@ -338,13 +338,13 @@ namespace ExteriorEnergyUse {
                 SchMax = GetScheduleMaxValue(state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " minimum, is < 0.0 for " +
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " minimum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                         ShowContinueError(cAlphaArgs(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) + "]. Values must be >= 0.0.");
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " maximum, is < 0.0 for " +
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " maximum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                         ShowContinueError(cAlphaArgs(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) + "]. Values must be >= 0.0.");
                         ErrorsFound = true;
@@ -370,7 +370,7 @@ namespace ExteriorEnergyUse {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
+            if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
             GlobalNames::VerifyUniqueInterObjectName(state.dataExteriorEnergyUse->UniqueExteriorEquipNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
 
             ++state.dataExteriorEnergyUse->NumExteriorEqs;
@@ -379,10 +379,10 @@ namespace ExteriorEnergyUse {
             state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
             if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(3) + " is required, missing for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(3) + " is required, missing for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " entered=" + cAlphaArgs(3) + " for " +
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " entered=" + cAlphaArgs(3) + " for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                 }
                 ErrorsFound = true;
@@ -391,13 +391,13 @@ namespace ExteriorEnergyUse {
                 SchMax = GetScheduleMaxValue(state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " minimum, is < 0.0 for " +
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " minimum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                         ShowContinueError(cAlphaArgs(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) + "]. Values must be >= 0.0.");
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " maximum, is < 0.0 for " +
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " maximum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                         ShowContinueError(cAlphaArgs(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) + "]. Values must be >= 0.0.");
                         ErrorsFound = true;
@@ -443,7 +443,7 @@ namespace ExteriorEnergyUse {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(state, RoutineName + "Errors found in input.  Program terminates.");
         }
     }
 
@@ -518,8 +518,8 @@ namespace ExteriorEnergyUse {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictHeatUse;
             FuelTypeString = "DistrictHeating";
         } else {
-            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\".");
-            ShowFatalError("Heating source/fuel type not recognized. Check input field " + CurrentField + "=\"" + FuelTypeAlpha);
+            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + CurrentName + "\".");
+            ShowFatalError(state, "Heating source/fuel type not recognized. Check input field " + CurrentField + "=\"" + FuelTypeAlpha);
         }
     }
 

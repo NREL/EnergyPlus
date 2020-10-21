@@ -454,7 +454,7 @@ namespace HVACFan {
                                                             1,
                                                             DataLoopNode::ObjectIsNotParent);
 
-        BranchNodeConnections::TestCompSet(locCurrentModuleObject, alphaArgs(1), alphaArgs(3), alphaArgs(4), "Air Nodes");
+        BranchNodeConnections::TestCompSet(state, locCurrentModuleObject, alphaArgs(1), alphaArgs(3), alphaArgs(4), "Air Nodes");
 
         designAirVolFlowRate = numericArgs(1);
         if (designAirVolFlowRate == DataSizing::AutoSize) {
@@ -506,7 +506,7 @@ namespace HVACFan {
         if (!isAlphaFieldBlank(7)) {
             powerModFuncFlowFractionCurveIndex = CurveManager::GetCurveIndex(state, alphaArgs(7));
             if (powerModFuncFlowFractionCurveIndex == 0) {
-                ShowWarningError(routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
+                ShowWarningError(state, routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError("Invalid " + alphaFieldNames(7) + " = " + alphaArgs(7));
                 ShowContinueError("Curve not found.");
                 if (speedControl == SpeedControlMethod::Continuous) {
@@ -515,7 +515,7 @@ namespace HVACFan {
             }
         } else { // blank
             if (speedControl == SpeedControlMethod::Continuous) {
-                ShowWarningError(routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
+                ShowWarningError(state, routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError("Continuous speed control requires a fan power curve in " + alphaFieldNames(7) + " = " + alphaArgs(7));
                 errorsFound = true;
             }
@@ -529,7 +529,7 @@ namespace HVACFan {
                 m_heatLossesDestination = ThermalLossDestination::lostToOutside;
             } else {
                 m_heatLossesDestination = ThermalLossDestination::lostToOutside;
-                ShowWarningError(routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
+                ShowWarningError(state, routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError("Invalid " + alphaFieldNames(8) + " = " + alphaArgs(8));
                 ShowContinueError("Zone name not found. Fan motor heat losses will not be added to a zone");
                 // continue with simulation but motor losses not sent to a zone.
@@ -602,7 +602,7 @@ namespace HVACFan {
         }
 
         if (errorsFound) {
-            ShowFatalError(routineName + "Errors found in input for fan name = " + name + ".  Program terminates.");
+            ShowFatalError(state, routineName + "Errors found in input for fan name = " + name + ".  Program terminates.");
         }
 
         SetupOutputVariable(state, "Fan Electricity Rate", OutputProcessor::Unit::W, m_fanPower, "System", "Average", name);
@@ -1108,7 +1108,7 @@ namespace HVACFan {
             return designDeltaT;
         } else {
             // TODO throw warning, exception, call sizing?
-            ShowWarningError("FanSystem::getFanDesignTemperatureRise called before fan sizing completed ");
+            ShowWarningError(state, "FanSystem::getFanDesignTemperatureRise called before fan sizing completed ");
             return 0.0;
         }
     }

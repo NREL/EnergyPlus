@@ -257,13 +257,13 @@ namespace DataSurfaceColors {
                 numptr = rNumerics(numargs); // set to integer
                 if (lNumericBlanks(numargs)) {
                     if (!lAlphaBlanks(numargs + 1)) {
-                        ShowWarningError("SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
+                        ShowWarningError(state, "SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
                                          cAlphas(numargs + 1) + ", " + cNumericFields(numargs) + " was blank.  Default color retained.");
                     }
                     continue;
                 }
                 if (!MatchAndSetColorTextString(cAlphas(numargs + 1), numptr, ColorType)) {
-                    ShowWarningError("SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
+                    ShowWarningError(state, "SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
                                      cAlphas(numargs + 1) + ", is invalid.  No color set.");
                 }
             }
@@ -276,7 +276,7 @@ namespace DataSurfaceColors {
             lNumericBlanks.deallocate();
 
         } else {
-            ShowWarningError("SetUpSchemeColors: Name=" + SchemeName + " not on input file. Default colors will be used.");
+            ShowWarningError(state, "SetUpSchemeColors: Name=" + SchemeName + " not on input file. Default colors will be used.");
         }
     }
 

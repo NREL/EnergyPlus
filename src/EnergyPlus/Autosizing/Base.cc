@@ -198,8 +198,8 @@ void BaseSizer::preSize(Real64 const _originalValue)
     if (this->sizingType == AutoSizingType::Unknown) {
         std::string msg = "Sizing Library Base Class: preSize, SizingType not defined.";
         this->addErrorMessage(msg);
-        ShowSevereError(msg);
-        ShowFatalError("Sizing type causes fatal error.");
+        ShowSevereError(state, msg);
+        ShowFatalError(state, "Sizing type causes fatal error.");
     }
     this->originalValue = _originalValue;
     this->autoCalculate = false;
@@ -218,7 +218,7 @@ void BaseSizer::preSize(Real64 const _originalValue)
             std::string msg = "Sizing Library: DataConstantUsedForSizing and DataFractionUsedForSizing used for autocalculating " +
                               this->sizingString + " must both be greater than 0.";
             this->addErrorMessage(msg);
-            ShowSevereError(msg);
+            ShowSevereError(state, msg);
         }
     } else if (this->dataFractionUsedForSizing > 0.0) {
         this->autoCalculate = true;
@@ -230,7 +230,7 @@ void BaseSizer::preSize(Real64 const _originalValue)
             std::string msg = "Sizing Library: DataConstantUsedForSizing and DataFractionUsedForSizing used for autocalculating " +
                               this->sizingString + " must both be greater than 0.";
             this->addErrorMessage(msg);
-            ShowSevereError(msg);
+            ShowSevereError(state, msg);
         }
     }
 
@@ -273,36 +273,36 @@ void BaseSizer::preSize(Real64 const _originalValue)
             if (!this->sysSizingRunDone) {
                 std::string msg = "For autosizing of " + this->compType + ' ' + this->compName + ", a system sizing run must be done.";
                 this->addErrorMessage(msg);
-                ShowSevereError(msg);
+                ShowSevereError(state, msg);
                 if (this->numSysSizInput == 0) {
                     std::string msg2 = "No \"Sizing:System\" objects were entered.";
                     this->addErrorMessage(msg2);
-                    ShowContinueError(msg2);
+                    ShowContinueError(state, msg2);
                 }
                 if (!this->doSystemSizing) {
                     std::string msg2 = R"(The "SimulationControl" object did not have the field "Do System Sizing Calculation" set to Yes.)";
                     this->addErrorMessage(msg2);
-                    ShowContinueError(msg2);
+                    ShowContinueError(state, msg2);
                 }
-                ShowFatalError("Program terminates due to previously shown condition(s).");
+                ShowFatalError(state, "Program terminates due to previously shown condition(s).");
             }
         }
         if (!this->sizingDesRunThisZone && this->curZoneEqNum > 0 && !this->sizingDesValueFromParent && !this->autoCalculate) {
             if (!this->zoneSizingRunDone) {
                 std::string msg = "For autosizing of " + this->compType + ' ' + this->compName + ", a zone sizing run must be done.";
                 this->addErrorMessage(msg);
-                ShowSevereError(msg);
+                ShowSevereError(state, msg);
                 if (this->numZoneSizingInput == 0) {
                     std::string msg2 = "No \"Sizing:Zone\" objects were entered.";
                     this->addErrorMessage(msg2);
-                    ShowContinueError(msg2);
+                    ShowContinueError(state, msg2);
                 }
                 if (!this->doZoneSizing) {
                     std::string msg2 = R"(The "SimulationControl" object did not have the field "Do Zone Sizing Calculation" set to Yes.)";
                     this->addErrorMessage(msg2);
-                    ShowContinueError(msg2);
+                    ShowContinueError(state, msg2);
                 }
-                ShowFatalError("Program terminates due to previously shown condition(s).");
+                ShowFatalError(state, "Program terminates due to previously shown condition(s).");
             }
         }
     } else {
@@ -337,7 +337,7 @@ void BaseSizer::reportSizerOutput(std::string const &CompType,
         print(outputFiles.eio, Format_991, CompType, CompName, UsrDesc(), UsrValue());
         OutputReportPredefined::AddCompSizeTableEntry(CompType, CompName, UsrDesc, UsrValue);
     } else if (present(UsrDesc) || present(UsrValue)) {
-        ShowFatalError("ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both.");
+        ShowFatalError(state, "ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both.");
     }
 
     // add to SQL output
@@ -398,30 +398,30 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
                 if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
                     std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
                     this->addErrorMessage(msg);
-                    ShowMessage(msg);
+                    ShowMessage(state, msg);
                     msg =
                         "User-Specified " + this->sizingStringScalable + this->sizingString + " = " + General::RoundSigDigits(this->originalValue, 5);
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                     msg = "differs from Design Size " + this->sizingString + " = " + General::RoundSigDigits(this->autoSizedValue, 5);
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                     msg = "This may, or may not, indicate mismatched component sizes.";
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                     msg = "Verify that the value entered is intended and is consistent with other components.";
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                 }
             }
             if (!this->wasAutoSized) this->autoSizedValue = this->originalValue;
         } else {
             std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
             this->addErrorMessage(msg);
-            ShowSevereError(msg);
+            ShowSevereError(state, msg);
             msg = "SizingString = " + this->sizingString + ", SizingResult = " + General::TrimSigDigits(this->originalValue, 1);
             this->addErrorMessage(msg);
-            ShowContinueError(msg);
+            ShowContinueError(state, msg);
             this->errorType = AutoSizingResultType::ErrorType1;
         }
     } else if (!this->wasAutoSized && !this->autoCalculate) {
@@ -431,10 +431,10 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
     if (this->errorType != AutoSizingResultType::NoError) {
         std::string msg = "Developer Error: sizing of " + this->sizingString + " failed.";
         this->addErrorMessage(msg);
-        ShowSevereError(msg);
+        ShowSevereError(state, msg);
         msg = "Occurs in " + this->compType + " " + this->compName;
         this->addErrorMessage(msg);
-        ShowContinueError(msg);
+        ShowContinueError(state, msg);
         errorsFound = true;
     }
 }
@@ -524,30 +524,30 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(bool &errorsFound)
                 if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
                     std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
                     this->addErrorMessage(msg);
-                    ShowMessage(msg);
+                    ShowMessage(state, msg);
                     msg =
                         "User-Specified " + this->sizingStringScalable + this->sizingString + " = " + General::RoundSigDigits(this->originalValue, 5);
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                     msg = "differs from Design Size " + this->sizingString + " = " + General::RoundSigDigits(this->autoSizedValue, 5);
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                     msg = "This may, or may not, indicate mismatched component sizes.";
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                     msg = "Verify that the value entered is intended and is consistent with other components.";
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                 }
             }
             if (!this->wasAutoSized) this->autoSizedValue = this->originalValue;
         } else {
             std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
             this->addErrorMessage(msg);
-            ShowSevereError(msg);
+            ShowSevereError(state, msg);
             msg = "SizingString = " + this->sizingString + ", SizingResult = " + General::TrimSigDigits(this->originalValue, 1);
             this->addErrorMessage(msg);
-            ShowContinueError(msg);
+            ShowContinueError(state, msg);
             this->errorType = AutoSizingResultType::ErrorType1;
         }
     } else if (!this->wasAutoSized && !this->autoCalculate) {
@@ -557,10 +557,10 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(bool &errorsFound)
     if (this->errorType != AutoSizingResultType::NoError) {
         std::string msg = "Developer Error: sizing of " + this->sizingString + " failed.";
         this->addErrorMessage(msg);
-        ShowSevereError(msg);
+        ShowSevereError(state, msg);
         msg = "Occurs in " + this->compType + " " + this->compName;
         this->addErrorMessage(msg);
-        ShowContinueError(msg);
+        ShowContinueError(state, msg);
         errorsFound = true;
     }
 }
@@ -605,10 +605,10 @@ bool BaseSizer::checkInitialized(bool &errorsFound)
         this->autoSizedValue = 0.0;
         std::string msg = "Developer Error: uninitialized sizing of " + this->sizingString + ".";
         this->addErrorMessage(msg);
-        ShowSevereError(msg);
+        ShowSevereError(state, msg);
         msg = "Occurs in " + this->compType + " " + this->compName;
         this->addErrorMessage(msg);
-        ShowContinueError(msg);
+        ShowContinueError(state, msg);
         return false;
     }
     return true;

@@ -215,7 +215,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
         errorsFound = true;
     }
 
-    BranchNodeConnections::TestCompSet(
+    BranchNodeConnections::TestCompSet(state,
             coilCoolingDXObjectName, this->name, input_data.evaporator_inlet_node_name, input_data.evaporator_outlet_node_name, "Air Nodes");
 
     if (errorsFound) {

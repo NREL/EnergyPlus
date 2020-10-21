@@ -124,27 +124,27 @@ Real64 WaterHeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalVa
                 ShowWarningMessage(msg);
                 msg = "...Rated Total Heating Capacity = " + General::TrimSigDigits(this->autoSizedValue, 2) + " [W]";
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 msg = "...Air flow rate used for sizing = " + General::TrimSigDigits(DesMassFlow / DataEnvironment::StdRhoAir, 5) + " [m3/s]";
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 if (this->termUnitSingDuct || this->termUnitPIU || this->termUnitIU || this->zoneEqFanCoil || this->zoneEqUnitHeater) {
                     msg = "...Air flow rate used for sizing = " + General::TrimSigDigits(DesMassFlow / DataEnvironment::StdRhoAir, 5) + " [m3/s]";
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                     msg = "...Plant loop temperature difference = " + General::TrimSigDigits(this->dataWaterCoilSizHeatDeltaT, 2) + " [C]";
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                 } else {
                     msg = "...Coil inlet air temperature used for sizing = " + General::TrimSigDigits(CoilInTemp, 2) + " [C]";
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                     msg = "...Coil outlet air temperature used for sizing = " + General::TrimSigDigits(CoilOutTemp, 2) + " [C]";
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                     msg = "...Coil outlet air humidity ratio used for sizing = " + General::TrimSigDigits(CoilOutHumRat, 2) + " [kgWater/kgDryAir]";
                     this->addErrorMessage(msg);
-                    ShowContinueError(msg);
+                    ShowContinueError(state, msg);
                 }
             }
         }

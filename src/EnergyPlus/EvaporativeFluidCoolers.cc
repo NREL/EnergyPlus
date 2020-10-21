@@ -120,7 +120,7 @@ namespace EvaporativeFluidCoolers {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("LocalEvapFluidCoolerFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, "LocalEvapFluidCoolerFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -158,7 +158,7 @@ namespace EvaporativeFluidCoolers {
         NumSimpleEvapFluidCoolers = NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers;
 
         if (NumSimpleEvapFluidCoolers <= 0)
-            ShowFatalError("No evaporative fluid cooler objects found in input, however, a branch object has specified an evaporative fluid cooler. "
+            ShowFatalError(state, "No evaporative fluid cooler objects found in input, however, a branch object has specified an evaporative fluid cooler. "
                            "Search the input for evaporative fluid cooler to determine the cause for this error.");
 
         // Allocate data structures to hold evaporative fluid cooler input data,
@@ -211,7 +211,7 @@ namespace EvaporativeFluidCoolers {
                                                                              DataLoopNode::NodeConnectionType_Outlet,
                                                                              1,
                                                                              DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(
+            BranchNodeConnections::TestCompSet(state,
                 DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
             thisEFC.HighSpeedAirFlowRate = NumArray(1);
             if (thisEFC.HighSpeedAirFlowRate == DataSizing::AutoSize) {
@@ -238,7 +238,7 @@ namespace EvaporativeFluidCoolers {
             thisEFC.DesignEnteringAirWetBulbTemp = NumArray(11);
 
             if (DataIPShortCuts::lAlphaFieldBlanks(4) || AlphArray(4).empty()) {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ", \"" + thisEFC.Name + "\" Performance input method is not specified. ");
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + ", \"" + thisEFC.Name + "\" Performance input method is not specified. ");
                 ErrorsFound = true;
             } else {
                 thisEFC.PerformanceInputMethod = AlphArray(4);
@@ -257,9 +257,9 @@ namespace EvaporativeFluidCoolers {
                                                                                      1,
                                                                                      DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, thisEFC.OutdoorAirInletNodeNum)) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ", \"" + thisEFC.Name +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + ", \"" + thisEFC.Name +
                                     "\" Outdoor Air Inlet DataLoopNode::Node Name not valid Outdoor Air DataLoopNode::Node= " + AlphArray(5));
-                    ShowContinueError("...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:DataLoopNode::Node.");
+                    ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:DataLoopNode::Node.");
                     ErrorsFound = true;
                 }
             }
@@ -276,7 +276,7 @@ namespace EvaporativeFluidCoolers {
                         thisEFC.CapacityControl = 1;
                     } else {
                         thisEFC.CapacityControl = 0;
-                        ShowWarningError(DataIPShortCuts::cCurrentModuleObject + ", \"" + thisEFC.Name +
+                        ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + ", \"" + thisEFC.Name +
                                          "\" The Capacity Control is not specified correctly. The default Fan Cycling is used.");
                     }
                 }
@@ -293,8 +293,8 @@ namespace EvaporativeFluidCoolers {
             } else if (AlphArray(7).empty()) {
                 thisEFC.EvapLossMode = EvapLoss::ByMoistTheory;
             } else {
-                ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(7) + " = " + AlphArray(7));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + AlphArray(1));
+                ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(7) + " = " + AlphArray(7));
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + AlphArray(1));
                 ErrorsFound = true;
             }
 
@@ -329,15 +329,15 @@ namespace EvaporativeFluidCoolers {
                     thisEFC.ConcentrationRatio = 3.0;
                 }
             } else {
-                ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(8) + " = " + AlphArray(8));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " =" + AlphArray(1));
+                ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(8) + " = " + AlphArray(8));
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " =" + AlphArray(1));
                 ErrorsFound = true;
             }
 
             thisEFC.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(9));
             if ((thisEFC.SchedIDBlowdown == 0) && (thisEFC.BlowdownMode == Blowdown::BySchedule)) {
-                ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(9) + " = " + AlphArray(9));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " =" + AlphArray(1));
+                ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(9) + " = " + AlphArray(9));
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " =" + AlphArray(1));
                 ErrorsFound = true;
             }
 
@@ -356,19 +356,19 @@ namespace EvaporativeFluidCoolers {
             //   Check various inputs to ensure that all the required variables are specified.
 
             if (thisEFC.DesignSprayWaterFlowRate <= 0.0) {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + thisEFC.Name +
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + thisEFC.Name +
                                 "\". Evaporative fluid cooler input requires a design spray water flow rate greater than zero for all performance "
                                 "input methods.");
                 ErrorsFound = true;
             }
             if (thisEFC.HighSpeedAirFlowRate <= 0.0 && thisEFC.HighSpeedAirFlowRate != DataSizing::AutoSize) {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                 DataIPShortCuts::cNumericFieldNames(1) + "\", entered value <= 0.0, but must be > 0 for " +
                                 DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                 ErrorsFound = true;
             }
             if (thisEFC.HighSpeedFanPower <= 0.0 && thisEFC.HighSpeedFanPower != DataSizing::AutoSize) {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                 DataIPShortCuts::cNumericFieldNames(2) + "\", entered value <= 0.0, but must be > 0 for " +
                                 DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                 ErrorsFound = true;
@@ -377,13 +377,13 @@ namespace EvaporativeFluidCoolers {
             if (UtilityRoutines::SameString(AlphArray(4), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE")) {
                 thisEFC.PerformanceInputMethod_Num = PIM::UFactor;
                 if (thisEFC.HighSpeedEvapFluidCoolerUA <= 0.0 && thisEFC.HighSpeedEvapFluidCoolerUA != DataSizing::AutoSize) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(6) + "\", entered value <= 0.0, but must be > 0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.DesignWaterFlowRate <= 0.0 && thisEFC.DesignWaterFlowRate != DataSizing::AutoSize) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(7) + "\", entered value <= 0.0, but must be > 0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
@@ -391,7 +391,7 @@ namespace EvaporativeFluidCoolers {
             } else if (UtilityRoutines::SameString(AlphArray(4), "STANDARDDESIGNCAPACITY")) {
                 thisEFC.PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
                 if (thisEFC.HighSpeedStandardDesignCapacity <= 0.0) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(5) + "\", entered value <= 0.0, but must be > 0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
@@ -399,51 +399,51 @@ namespace EvaporativeFluidCoolers {
             } else if (UtilityRoutines::SameString(AlphArray(4), "USERSPECIFIEDDESIGNCAPACITY")) {
                 thisEFC.PerformanceInputMethod_Num = PIM::UserSpecifiedDesignCapacity;
                 if (thisEFC.DesignWaterFlowRate <= 0.0 && thisEFC.DesignWaterFlowRate != DataSizing::AutoSize) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(7) + "\", entered value <= 0.0, but must be > 0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.HighSpeedUserSpecifiedDesignCapacity <= 0.0) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(8) + "\", entered value <= 0.0, but must be > 0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.DesignEnteringWaterTemp <= 0.0) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(9) + "\", entered value <= 0.0, but must be >0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.DesignEnteringAirTemp <= 0.0) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(10) + "\", entered value <= 0.0, but must be >0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.DesignEnteringAirWetBulbTemp <= 0.0) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(11) + "\", entered value <= 0.0, but must be >0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.DesignEnteringWaterTemp <= thisEFC.DesignEnteringAirWetBulbTemp) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", " + DataIPShortCuts::cNumericFieldNames(9) +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", " + DataIPShortCuts::cNumericFieldNames(9) +
                                     " must be greater than " + DataIPShortCuts::cNumericFieldNames(11) + '.');
                     ErrorsFound = true;
                 }
                 if (thisEFC.DesignEnteringAirTemp <= thisEFC.DesignEnteringAirWetBulbTemp) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", " +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", " +
                                     DataIPShortCuts::cNumericFieldNames(10) + " must be greater than " + DataIPShortCuts::cNumericFieldNames(11) +
                                     '.');
                     ErrorsFound = true;
                 }
             } else { // Evaporative fluid cooler performance input method is not specified as a valid "choice"
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
                                 "\". Evaporative fluid cooler Performance Input Method must be \"UFactorTimesAreaAndDesignWaterFlowRate\" or "
                                 "\"StandardDesignCapacity\" or \"UserSpecifiedDesignCapacity\".");
-                ShowContinueError("Evaporative fluid cooler Performance Input Method currently specified as: " + AlphArray(4));
+                ShowContinueError(state, "Evaporative fluid cooler Performance Input Method currently specified as: " + AlphArray(4));
                 ErrorsFound = true;
             }
 
@@ -493,7 +493,7 @@ namespace EvaporativeFluidCoolers {
                                                                              DataLoopNode::NodeConnectionType_Outlet,
                                                                              1,
                                                                              DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(
+            BranchNodeConnections::TestCompSet(state,
                 DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
             thisEFC.HighSpeedAirFlowRate = NumArray(1);
@@ -540,7 +540,7 @@ namespace EvaporativeFluidCoolers {
             thisEFC.DesignEnteringAirWetBulbTemp = NumArray(21);
 
             if (DataIPShortCuts::lAlphaFieldBlanks(4)) {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ", \"" + thisEFC.Name + "\" Performance input method is not specified. ");
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + ", \"" + thisEFC.Name + "\" Performance input method is not specified. ");
                 ErrorsFound = true;
             } else {
                 thisEFC.PerformanceInputMethod = AlphArray(4);
@@ -559,9 +559,9 @@ namespace EvaporativeFluidCoolers {
                                                                                      1,
                                                                                      DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, thisEFC.OutdoorAirInletNodeNum)) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ", \"" + thisEFC.Name +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + ", \"" + thisEFC.Name +
                                     "\" Outdoor Air Inlet DataLoopNode::Node Name not valid Outdoor Air DataLoopNode::Node= " + AlphArray(5));
-                    ShowContinueError("...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:DataLoopNode::Node.");
+                    ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:DataLoopNode::Node.");
                     ErrorsFound = true;
                 }
             }
@@ -577,8 +577,8 @@ namespace EvaporativeFluidCoolers {
             } else if (DataIPShortCuts::lAlphaFieldBlanks(6)) {
                 thisEFC.EvapLossMode = EvapLoss::ByMoistTheory;
             } else {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + AlphArray(6));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + AlphArray(1));
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + AlphArray(6));
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + AlphArray(1));
                 ErrorsFound = true;
             }
 
@@ -612,14 +612,14 @@ namespace EvaporativeFluidCoolers {
                     thisEFC.ConcentrationRatio = 3.0;
                 }
             } else {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + " = " + AlphArray(7));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + AlphArray(1));
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + " = " + AlphArray(7));
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + AlphArray(1));
                 ErrorsFound = true;
             }
             thisEFC.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(8));
             if ((thisEFC.SchedIDBlowdown == 0) && (thisEFC.BlowdownMode == Blowdown::BySchedule)) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + " = " + AlphArray(8));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + AlphArray(1));
+                ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + " = " + AlphArray(8));
+                ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + AlphArray(1));
                 ErrorsFound = true;
             }
 
@@ -638,19 +638,19 @@ namespace EvaporativeFluidCoolers {
             //   Check various inputs to ensure that all the required variables are specified.
 
             if (thisEFC.DesignSprayWaterFlowRate <= 0.0) {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + thisEFC.Name +
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " \"" + thisEFC.Name +
                                 "\". Evaporative fluid cooler input requires a design spray water flow rate greater than zero for all performance "
                                 "input methods.");
                 ErrorsFound = true;
             }
             if (thisEFC.HighSpeedAirFlowRate <= 0.0 && thisEFC.HighSpeedAirFlowRate != DataSizing::AutoSize) {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "= \"" + thisEFC.Name +
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "= \"" + thisEFC.Name +
                                 "\". Evaporative fluid cooler input requires design air flow rate at high fan speed to be greater than zero for all "
                                 "performance input methods.");
                 ErrorsFound = true;
             }
             if (thisEFC.LowSpeedAirFlowRate <= 0.0 && thisEFC.LowSpeedAirFlowRate != DataSizing::AutoSize) {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "= \"" + thisEFC.Name +
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "= \"" + thisEFC.Name +
                                 "\". Evaporative fluid cooler input requires design air flow rate at low fan speed to be greater than zero for all "
                                 "performance input methods.");
                 ErrorsFound = true;
@@ -658,24 +658,24 @@ namespace EvaporativeFluidCoolers {
             //   High speed air flow rate must be greater than low speed air flow rate.
             //   Can't tell yet if autosized, check later in InitEvapFluidCooler.
             if (thisEFC.HighSpeedAirFlowRate <= thisEFC.LowSpeedAirFlowRate && thisEFC.HighSpeedAirFlowRate != DataSizing::AutoSize) {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
                                 "\". Evaporative fluid cooler air flow rate at low fan speed must be less than the air flow rate at high fan speed.");
                 ErrorsFound = true;
             }
             if (thisEFC.HighSpeedFanPower <= 0.0 && thisEFC.HighSpeedFanPower != DataSizing::AutoSize) {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                 DataIPShortCuts::cNumericFieldNames(2) + "\", entered value <= 0.0, but must be > 0 for " +
                                 DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                 ErrorsFound = true;
             }
             if (thisEFC.LowSpeedFanPower <= 0.0 && thisEFC.LowSpeedFanPower != DataSizing::AutoSize) {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                 DataIPShortCuts::cNumericFieldNames(5) + "\", entered value <= 0.0, but must be > 0 for " +
                                 DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                 ErrorsFound = true;
             }
             if (thisEFC.HighSpeedFanPower <= thisEFC.LowSpeedFanPower && thisEFC.HighSpeedFanPower != DataSizing::AutoSize) {
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
                                 "\". Evaporative fluid cooler low speed fan power must be less than the high speed fan power .");
                 ErrorsFound = true;
             }
@@ -683,26 +683,26 @@ namespace EvaporativeFluidCoolers {
             if (UtilityRoutines::SameString(AlphArray(4), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE")) {
                 thisEFC.PerformanceInputMethod_Num = PIM::UFactor;
                 if (thisEFC.HighSpeedEvapFluidCoolerUA <= 0.0 && thisEFC.HighSpeedEvapFluidCoolerUA != DataSizing::AutoSize) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(12) + "\", entered value <= 0.0, but must be > 0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.LowSpeedEvapFluidCoolerUA <= 0.0 && thisEFC.LowSpeedEvapFluidCoolerUA != DataSizing::AutoSize) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(13) + "\", entered value <= 0.0, but must be > 0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.HighSpeedEvapFluidCoolerUA <= thisEFC.LowSpeedEvapFluidCoolerUA &&
                     thisEFC.HighSpeedEvapFluidCoolerUA != DataSizing::AutoSize) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
                                     "\". Evaporative fluid cooler U-factor Times Area Value at Low Fan Speed must be less than the U-factor Times "
                                     "Area Value at High Fan Speed.");
                     ErrorsFound = true;
                 }
                 if (thisEFC.DesignWaterFlowRate <= 0.0 && thisEFC.DesignWaterFlowRate != DataSizing::AutoSize) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(15) + "\", entered value <= 0.0, but must be > 0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
@@ -710,117 +710,117 @@ namespace EvaporativeFluidCoolers {
             } else if (UtilityRoutines::SameString(AlphArray(4), "STANDARDDESIGNCAPACITY")) {
                 thisEFC.PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
                 if (thisEFC.HighSpeedStandardDesignCapacity <= 0.0) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(9) + "\", entered value <= 0.0, but must be > 0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.LowSpeedStandardDesignCapacity <= 0.0) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(10) + "\", entered value <= 0.0, but must be > 0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.LowSpeedStandardDesignCapacity >= thisEFC.HighSpeedStandardDesignCapacity) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
                                     "\". Low-Speed Standard Design Capacity must be less than the High-Speed Standard Design Capacity.");
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(AlphArray(4), "USERSPECIFIEDDESIGNCAPACITY")) {
                 thisEFC.PerformanceInputMethod_Num = PIM::UserSpecifiedDesignCapacity;
                 if (thisEFC.DesignWaterFlowRate <= 0.0 && thisEFC.DesignWaterFlowRate != DataSizing::AutoSize) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(15) + "\", entered value <= 0.0, but must be > 0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.HighSpeedUserSpecifiedDesignCapacity <= 0.0) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(16) + "\", entered value <= 0.0, but must be > 0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.LowSpeedUserSpecifiedDesignCapacity <= 0.0) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(17) + "\", entered value <= 0.0, but must be > 0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.HighSpeedEvapFluidCoolerUA != 0.0) {
                     if (thisEFC.HighSpeedEvapFluidCoolerUA > 0.0) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
+                        ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
                                         "\". UserSpecifiedDesignCapacity performance input method and evaporative fluid cooler UA at high fan speed "
                                         "have been specified.");
                     } else {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
+                        ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
                                         "\". UserSpecifiedDesignCapacity performance input method has been specified and evaporative fluid cooler UA "
                                         "at high fan speed is being autosized.");
                     }
-                    ShowContinueError("Evaporative fluid cooler UA at high fan speed must be left blank when UserSpecifiedDesignCapacity performance "
+                    ShowContinueError(state, "Evaporative fluid cooler UA at high fan speed must be left blank when UserSpecifiedDesignCapacity performance "
                                       "input method is used.");
                     ErrorsFound = true;
                 }
                 if (thisEFC.LowSpeedEvapFluidCoolerUA != 0.0) {
                     if (thisEFC.LowSpeedEvapFluidCoolerUA > 0.0) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
+                        ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
                                         "\". UserSpecifiedDesignCapacity performance input method and evaporative fluid cooler UA at low fan speed "
                                         "have been specified.");
                     } else {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
+                        ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
                                         "\". UserSpecifiedDesignCapacity performance input method has been specified and evaporative fluid cooler UA "
                                         "at low fan speed is being autosized.");
                     }
-                    ShowContinueError("Evaporative fluid cooler UA at low fan speed must be left blank when UserSpecifiedDesignCapacity performance "
+                    ShowContinueError(state, "Evaporative fluid cooler UA at low fan speed must be left blank when UserSpecifiedDesignCapacity performance "
                                       "input method is used.");
                     ErrorsFound = true;
                 }
                 if (thisEFC.LowSpeedUserSpecifiedDesignCapacity >= thisEFC.HighSpeedUserSpecifiedDesignCapacity) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
                                     "\". Low-Speed User Specified Design Capacity must be less than the High-Speed User Specified Design Dapacity.");
                     ErrorsFound = true;
                 }
                 if (thisEFC.DesignEnteringWaterTemp <= 0.0) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(19) + "\", entered value <= 0.0, but must be >0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.DesignEnteringAirTemp <= 0.0) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(20) + "\", entered value <= 0.0, buy must be >0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.DesignEnteringAirWetBulbTemp <= 0.0) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" +
                                     DataIPShortCuts::cNumericFieldNames(21) + "\", entered value <= 0.0, but must be >0 for " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
                 if (thisEFC.DesignEnteringWaterTemp <= thisEFC.DesignEnteringAirWetBulbTemp) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", " +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", " +
                                     DataIPShortCuts::cNumericFieldNames(19) + " must be greater than " + DataIPShortCuts::cNumericFieldNames(15) +
                                     '.');
                     ErrorsFound = true;
                 }
                 if (thisEFC.DesignEnteringAirTemp <= thisEFC.DesignEnteringAirWetBulbTemp) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", " +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", " +
                                     DataIPShortCuts::cNumericFieldNames(20) + " must be greater than " + DataIPShortCuts::cNumericFieldNames(15) +
                                     '.');
                     ErrorsFound = true;
                 }
             } else { // Evaporative fluid cooler performance input method is not specified as a valid "choice"
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
+                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + thisEFC.Name +
                                 "\". Evaporative fluid cooler Performance Input Method must be \"UFactorTimesAreaAndDesignWaterFlowRate\" or "
                                 "\"StandardDesignCapacity\" or \"UserSpecifiedDesignCapacity\".");
-                ShowContinueError("Evaporative fluid cooler Performanace Input Method currently specified as: " + AlphArray(4));
+                ShowContinueError(state, "Evaporative fluid cooler Performanace Input Method currently specified as: " + AlphArray(4));
                 ErrorsFound = true;
             }
 
         } // End Two-Speed Evaporative Fluid Cooler Loop
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in getting evaporative fluid cooler input.");
+            ShowFatalError(state, "Errors found in getting evaporative fluid cooler input.");
         }
     }
 
@@ -987,7 +987,7 @@ namespace EvaporativeFluidCoolers {
             OptLoad = this->HighSpeedStandardDesignCapacity;
 
         } else {
-            ShowFatalError("SimEvapFluidCoolers: Invalid evaporative fluid cooler Type Requested = " + EvapFluidCoolerType);
+            ShowFatalError(state, "SimEvapFluidCoolers: Invalid evaporative fluid cooler Type Requested = " + EvapFluidCoolerType);
         }
     }
 
@@ -1020,7 +1020,7 @@ namespace EvaporativeFluidCoolers {
         } else if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_TwoSpd) {
             this->CalcTwoSpeedEvapFluidCooler(state);
         } else {
-            ShowFatalError("SimEvapFluidCoolers: Invalid evaporative fluid cooler Type Requested = " + EvapFluidCoolerType);
+            ShowFatalError(state, "SimEvapFluidCoolers: Invalid evaporative fluid cooler Type Requested = " + EvapFluidCoolerType);
         }
 
         this->CalculateWaterUsage(state);
@@ -1060,9 +1060,9 @@ namespace EvaporativeFluidCoolers {
             if (UtilityRoutines::SameString(this->PerformanceInputMethod, "STANDARDDESIGNCAPACITY")) {
                 this->PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
                 if (FluidName != "WATER") {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + this->Name +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + this->Name +
                                     R"(". StandardDesignCapacity performance input method is only valid for fluid type = "Water".)");
-                    ShowContinueError("Currently, Fluid Type = " + FluidName +
+                    ShowContinueError(state, "Currently, Fluid Type = " + FluidName +
                                       " in CondenserLoop = " + DataPlant::PlantLoop(DataSizing::CurLoopNum).Name);
                     ErrorsFound = true;
                 }
@@ -1088,19 +1088,19 @@ namespace EvaporativeFluidCoolers {
                                                     _);
 
             if (ErrorsFound) {
-                ShowFatalError("InitEvapFluidCooler: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "InitEvapFluidCooler: Program terminated due to previous condition(s).");
             }
 
             if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_TwoSpd) {
                 if (this->DesignWaterFlowRate > 0.0) {
                     if (this->HighSpeedAirFlowRate <= this->LowSpeedAirFlowRate) {
-                        ShowSevereError("EvaporativeFluidCooler:TwoSpeed \"" + this->Name +
+                        ShowSevereError(state, "EvaporativeFluidCooler:TwoSpeed \"" + this->Name +
                                         "\". Low speed air flow rate must be less than the high speed air flow rate.");
                         ErrorsFound = true;
                     }
                     if ((this->HighSpeedEvapFluidCoolerUA > 0.0) && (this->LowSpeedEvapFluidCoolerUA > 0.0) &&
                         (this->HighSpeedEvapFluidCoolerUA <= this->LowSpeedEvapFluidCoolerUA)) {
-                        ShowSevereError(
+                        ShowSevereError(state,
                             "EvaporativeFluidCooler:TwoSpeed \"" + this->Name +
                             "\". Evaporative fluid cooler UA at low fan speed must be less than the evaporative fluid cooler UA at high fan speed.");
                         ErrorsFound = true;
@@ -1109,7 +1109,7 @@ namespace EvaporativeFluidCoolers {
             }
 
             if (ErrorsFound) {
-                ShowFatalError("InitEvapFluidCooler: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "InitEvapFluidCooler: Program terminated due to previous condition(s).");
             }
 
             this->OneTimeFlagForEachEvapFluidCooler = false;
@@ -1235,8 +1235,8 @@ namespace EvaporativeFluidCoolers {
                 }
             } else {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                    ShowSevereError("Autosizing error for evaporative fluid cooler object = " + this->Name);
-                    ShowFatalError("Autosizing of evaporative fluid cooler condenser flow rate requires a loop Sizing:Plant object.");
+                    ShowSevereError(state, "Autosizing error for evaporative fluid cooler object = " + this->Name);
+                    ShowFatalError(state, "Autosizing of evaporative fluid cooler condenser flow rate requires a loop Sizing:Plant object.");
                 }
             }
             // Check when the user specified Condenser/Evaporative Fluid Cooler water design setpoint
@@ -1247,15 +1247,15 @@ namespace EvaporativeFluidCoolers {
                 DesignEnteringAirWetBulb = this->DesignEnteringAirWetBulbTemp;
             }
             if (DataSizing::PlantSizData(PltSizCondNum).ExitTemp <= DesignEnteringAirWetBulb) {
-                ShowSevereError("Error when autosizing the UA value for Evaporative Fluid Cooler = " + this->Name + '.');
-                ShowContinueError("Design Loop Exit Temperature (" + General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2) +
+                ShowSevereError(state, "Error when autosizing the UA value for Evaporative Fluid Cooler = " + this->Name + '.');
+                ShowContinueError(state, "Design Loop Exit Temperature (" + General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2) +
                                   " C) must be greater than design entering air wet-bulb temperature (" +
                                   General::RoundSigDigits(DesignEnteringAirWetBulb, 2) + " C) when autosizing the Evaporative Fluid Cooler UA.");
-                ShowContinueError("It is recommended that the Design Loop Exit Temperature = Design Entering Air Wet-bulb Temp plus the Evaporative "
+                ShowContinueError(state, "It is recommended that the Design Loop Exit Temperature = Design Entering Air Wet-bulb Temp plus the Evaporative "
                                   "Fluid Cooler design approach temperature (e.g., 4 C).");
-                ShowContinueError("If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be "
+                ShowContinueError(state, "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be "
                                   "> Design Entering Air Wet-bulb Temp if autosizing the Evaporative Fluid Cooler.");
-                ShowFatalError("Review and revise design input values as appropriate.");
+                ShowFatalError(state, "Review and revise design input values as appropriate.");
             }
         }
 
@@ -1351,8 +1351,8 @@ namespace EvaporativeFluidCoolers {
                     }
                 } else {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                        ShowSevereError("Autosizing of evaporative fluid cooler fan power requires a loop Sizing:Plant object.");
-                        ShowFatalError(" Occurs in evaporative fluid cooler object= " + this->Name);
+                        ShowSevereError(state, "Autosizing of evaporative fluid cooler fan power requires a loop Sizing:Plant object.");
+                        ShowFatalError(state, " Occurs in evaporative fluid cooler object= " + this->Name);
                     }
                 }
             }
@@ -1418,17 +1418,17 @@ namespace EvaporativeFluidCoolers {
                     // This conditional statement is to trap when the user specified Condenser/Evaporative Fluid Cooler water design setpoint
                     // temperature is less than design inlet air wet bulb temperature of 25.6 C
                     if (DataSizing::PlantSizData(PltSizCondNum).ExitTemp <= 25.6) {
-                        ShowSevereError("Error when autosizing the UA value for Evaporative Fluid Cooler = " + this->Name + '.');
-                        ShowContinueError("Design Loop Exit Temperature (" +
+                        ShowSevereError(state, "Error when autosizing the UA value for Evaporative Fluid Cooler = " + this->Name + '.');
+                        ShowContinueError(state, "Design Loop Exit Temperature (" +
                                           General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2) +
                                           " C) must be greater than 25.6 C when autosizing the Evaporative Fluid Cooler UA.");
-                        ShowContinueError("The Design Loop Exit Temperature specified in Sizing:Plant object = " +
+                        ShowContinueError(state, "The Design Loop Exit Temperature specified in Sizing:Plant object = " +
                                           DataSizing::PlantSizData(PltSizCondNum).PlantLoopName);
-                        ShowContinueError("It is recommended that the Design Loop Exit Temperature = 25.6 C plus the Evaporative Fluid Cooler design "
+                        ShowContinueError(state, "It is recommended that the Design Loop Exit Temperature = 25.6 C plus the Evaporative Fluid Cooler design "
                                           "approach temperature (e.g., 4 C).");
-                        ShowContinueError("If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint "
+                        ShowContinueError(state, "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint "
                                           "must be > 25.6 C if autosizing the Evaporative Fluid Cooler.");
-                        ShowFatalError("Review and revise design input values as appropriate.");
+                        ShowFatalError(state, "Review and revise design input values as appropriate.");
                     }
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                    DataPlant::PlantLoop(this->LoopNum).FluidName,
@@ -1457,46 +1457,46 @@ namespace EvaporativeFluidCoolers {
                         Psychrometrics::PsyWFnTdbTwbPb(this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                     if (SolFla == -1) {
-                        ShowWarningError("Iteration limit exceeded in calculating evaporative fluid cooler UA.");
-                        ShowContinueError("Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + this->Name);
-                        ShowContinueError("The final UA value = " + General::RoundSigDigits(UA, 2) + "W/C, and the simulation continues...");
+                        ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
+                        ShowContinueError(state, "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + this->Name);
+                        ShowContinueError(state, "The final UA value = " + General::RoundSigDigits(UA, 2) + "W/C, and the simulation continues...");
                     } else if (SolFla == -2) {
                         this->SimSimpleEvapFluidCooler(state, Par(2), Par(3), UA0, OutWaterTempAtUA0);
                         this->SimSimpleEvapFluidCooler(state, Par(2), Par(3), UA1, OutWaterTempAtUA1);
-                        ShowSevereError(CalledFrom + ": The combination of design input values did not allow the calculation of a ");
-                        ShowContinueError("reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
-                        ShowContinueError("sizes for some \"autosizable\" fields while autosizing other \"autosizable\" fields may be contributing "
+                        ShowSevereError(state, CalledFrom + ": The combination of design input values did not allow the calculation of a ");
+                        ShowContinueError(state, "reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
+                        ShowContinueError(state, "sizes for some \"autosizable\" fields while autosizing other \"autosizable\" fields may be contributing "
                                           "to this problem.");
-                        ShowContinueError("This model iterates on UA to find the heat transfer required to provide the design outlet ");
-                        ShowContinueError("water temperature. Initially, the outlet water temperatures at high and low UA values are ");
-                        ShowContinueError("calculated. The Design Exit Water Temperature should be between the outlet water ");
-                        ShowContinueError("temperatures calculated at high and low UA values. If the Design Exit Water Temperature is ");
-                        ShowContinueError("out of this range, the solution will not converge and UA will not be calculated. ");
-                        ShowContinueError("The possible solutions could be to manually input adjusted water and/or air flow rates ");
-                        ShowContinueError(
+                        ShowContinueError(state, "This model iterates on UA to find the heat transfer required to provide the design outlet ");
+                        ShowContinueError(state, "water temperature. Initially, the outlet water temperatures at high and low UA values are ");
+                        ShowContinueError(state, "calculated. The Design Exit Water Temperature should be between the outlet water ");
+                        ShowContinueError(state, "temperatures calculated at high and low UA values. If the Design Exit Water Temperature is ");
+                        ShowContinueError(state, "out of this range, the solution will not converge and UA will not be calculated. ");
+                        ShowContinueError(state, "The possible solutions could be to manually input adjusted water and/or air flow rates ");
+                        ShowContinueError(state,
                             "based on the autosized values shown below or to adjust design evaporative fluid cooler air inlet wet-bulb temperature.");
-                        ShowContinueError("Plant:Sizing object inputs also influence these results (e.g. DeltaT and ExitTemp).");
-                        ShowContinueError("Inputs to the evaporative fluid cooler object:");
-                        ShowContinueError("Design Evaporative Fluid Cooler Load [W]                      = " + General::RoundSigDigits(Par(1), 2));
-                        ShowContinueError("Design Evaporative Fluid Cooler Water Volume Flow Rate [m3/s] = " +
+                        ShowContinueError(state, "Plant:Sizing object inputs also influence these results (e.g. DeltaT and ExitTemp).");
+                        ShowContinueError(state, "Inputs to the evaporative fluid cooler object:");
+                        ShowContinueError(state, "Design Evaporative Fluid Cooler Load [W]                      = " + General::RoundSigDigits(Par(1), 2));
+                        ShowContinueError(state, "Design Evaporative Fluid Cooler Water Volume Flow Rate [m3/s] = " +
                                           General::RoundSigDigits(this->DesignWaterFlowRate, 6));
-                        ShowContinueError("Design Evaporative Fluid Cooler Air Volume Flow Rate [m3/s]   = " + General::RoundSigDigits(Par(3), 2));
-                        ShowContinueError("Design Evaporative Fluid Cooler Air Inlet Wet-bulb Temp [C]   = " +
+                        ShowContinueError(state, "Design Evaporative Fluid Cooler Air Volume Flow Rate [m3/s]   = " + General::RoundSigDigits(Par(3), 2));
+                        ShowContinueError(state, "Design Evaporative Fluid Cooler Air Inlet Wet-bulb Temp [C]   = " +
                                           General::RoundSigDigits(this->inletConds.AirWetBulb, 2));
-                        ShowContinueError("Design Evaporative Fluid Cooler Water Inlet Temp [C]          = " +
+                        ShowContinueError(state, "Design Evaporative Fluid Cooler Water Inlet Temp [C]          = " +
                                           General::RoundSigDigits(this->inletConds.WaterTemp, 2));
-                        ShowContinueError("Inputs to the plant sizing object:");
-                        ShowContinueError("Design Exit Water Temp [C]                                    = " +
+                        ShowContinueError(state, "Inputs to the plant sizing object:");
+                        ShowContinueError(state, "Design Exit Water Temp [C]                                    = " +
                                           General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2));
-                        ShowContinueError("Loop Design Temperature Difference [C]                        = " +
+                        ShowContinueError(state, "Loop Design Temperature Difference [C]                        = " +
                                           General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).DeltaT, 2));
-                        ShowContinueError("Design Evaporative Fluid Cooler Water Inlet Temp [C]          = " +
+                        ShowContinueError(state, "Design Evaporative Fluid Cooler Water Inlet Temp [C]          = " +
                                           General::RoundSigDigits(this->inletConds.WaterTemp, 2));
-                        ShowContinueError("Calculated water outlet temperature at low UA [C](UA = " + General::RoundSigDigits(UA0, 2) +
+                        ShowContinueError(state, "Calculated water outlet temperature at low UA [C](UA = " + General::RoundSigDigits(UA0, 2) +
                                           " W/C)  = " + General::RoundSigDigits(OutWaterTempAtUA0, 2));
-                        ShowContinueError("Calculated water outlet temperature at high UA [C](UA = " + General::RoundSigDigits(UA1, 2) +
+                        ShowContinueError(state, "Calculated water outlet temperature at high UA [C](UA = " + General::RoundSigDigits(UA1, 2) +
                                           " W/C)  = " + General::RoundSigDigits(OutWaterTempAtUA1, 2));
-                        ShowFatalError("Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + this->Name);
+                        ShowFatalError(state, "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + this->Name);
                     }
                     if (DataPlant::PlantFirstSizesOkayToFinalize) this->HighSpeedEvapFluidCoolerUA = UA;
                     this->HighSpeedStandardDesignCapacity = DesEvapFluidCoolerLoad / this->HeatRejectCapNomCapSizingRatio;
@@ -1534,8 +1534,8 @@ namespace EvaporativeFluidCoolers {
                 }
             } else {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                    ShowSevereError("Autosizing error for evaporative fluid cooler object = " + this->Name);
-                    ShowFatalError("Autosizing of evaporative fluid cooler UA requires a loop Sizing:Plant object.");
+                    ShowSevereError(state, "Autosizing error for evaporative fluid cooler object = " + this->Name);
+                    ShowFatalError(state, "Autosizing of evaporative fluid cooler UA requires a loop Sizing:Plant object.");
                 }
             }
         }
@@ -1566,13 +1566,13 @@ namespace EvaporativeFluidCoolers {
                     Psychrometrics::PsyWFnTdbTwbPb(this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
-                    ShowWarningError("Iteration limit exceeded in calculating evaporative fluid cooler UA.");
-                    ShowContinueError("Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + this->Name);
-                    ShowContinueError("The final UA value = " + General::RoundSigDigits(UA, 2) + "W/C, and the simulation continues...");
+                    ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
+                    ShowContinueError(state, "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + this->Name);
+                    ShowContinueError(state, "The final UA value = " + General::RoundSigDigits(UA, 2) + "W/C, and the simulation continues...");
                 } else if (SolFla == -2) {
-                    ShowSevereError(CalledFrom + ": The combination of design input values did not allow the calculation of a ");
-                    ShowContinueError("reasonable UA value. Review and revise design input values as appropriate. ");
-                    ShowFatalError("Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + this->Name);
+                    ShowSevereError(state, CalledFrom + ": The combination of design input values did not allow the calculation of a ");
+                    ShowContinueError(state, "reasonable UA value. Review and revise design input values as appropriate. ");
+                    ShowFatalError(state, "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + this->Name);
                 }
                 this->HighSpeedEvapFluidCoolerUA = UA;
             } else {
@@ -1637,21 +1637,21 @@ namespace EvaporativeFluidCoolers {
                     Psychrometrics::PsyWFnTdbTwbPb(this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
-                    ShowWarningError("Iteration limit exceeded in calculating evaporative fluid cooler UA.");
-                    ShowContinueError("Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + this->Name);
-                    ShowContinueError("The final UA value = " + General::RoundSigDigits(UA, 2) + "W/C, and the simulation continues...");
+                    ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
+                    ShowContinueError(state, "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + this->Name);
+                    ShowContinueError(state, "The final UA value = " + General::RoundSigDigits(UA, 2) + "W/C, and the simulation continues...");
                 } else if (SolFla == -2) {
                     this->SimSimpleEvapFluidCooler(state, Par(2), Par(3), UA0, OutWaterTempAtUA0);
                     this->SimSimpleEvapFluidCooler(state, Par(2), Par(3), UA1, OutWaterTempAtUA1);
-                    ShowSevereError(CalledFrom + ": The combination of design input values did not allow the calculation of a ");
-                    ShowContinueError("reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
-                    ShowContinueError(
+                    ShowSevereError(state, CalledFrom + ": The combination of design input values did not allow the calculation of a ");
+                    ShowContinueError(state, "reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
+                    ShowContinueError(state,
                         R"(sizes for some "autosizable" fields while autosizing other "autosizable" fields may be contributing to this problem.)");
-                    ShowContinueError("This model iterates on UA to find the heat transfer required to provide the design outlet ");
-                    ShowContinueError("water temperature. Initially, the outlet water temperatures at high and low UA values are ");
-                    ShowContinueError("calculated. The Design Exit Water Temperature should be between the outlet water ");
-                    ShowContinueError("temperatures calculated at high and low UA values. If the Design Exit Water Temperature is ");
-                    ShowContinueError("out of this range, the solution will not converge and UA will not be calculated. ");
+                    ShowContinueError(state, "This model iterates on UA to find the heat transfer required to provide the design outlet ");
+                    ShowContinueError(state, "water temperature. Initially, the outlet water temperatures at high and low UA values are ");
+                    ShowContinueError(state, "calculated. The Design Exit Water Temperature should be between the outlet water ");
+                    ShowContinueError(state, "temperatures calculated at high and low UA values. If the Design Exit Water Temperature is ");
+                    ShowContinueError(state, "out of this range, the solution will not converge and UA will not be calculated. ");
                     ShowContinueError("The possible solutions could be to manually input adjusted water and/or air flow rates ");
                     ShowContinueError(
                         "based on the autosized values shown below or to adjust design evaporative fluid cooler air inlet wet-bulb temperature.");
@@ -1676,7 +1676,7 @@ namespace EvaporativeFluidCoolers {
                                       " W/C)  = " + General::RoundSigDigits(OutWaterTempAtUA0, 2));
                     ShowContinueError("Calculated water outlet temperature at high UA [C](UA = " + General::RoundSigDigits(UA1, 2) +
                                       " W/C)  = " + General::RoundSigDigits(OutWaterTempAtUA1, 2));
-                    ShowFatalError("Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + this->Name);
+                    ShowFatalError(state, "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + this->Name);
                 }
                 this->HighSpeedEvapFluidCoolerUA = UA;
             } else {
@@ -1778,13 +1778,13 @@ namespace EvaporativeFluidCoolers {
                     Psychrometrics::PsyWFnTdbTwbPb(this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
-                    ShowWarningError("Iteration limit exceeded in calculating evaporative fluid cooler UA.");
+                    ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
                     ShowContinueError("Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + this->Name);
                     ShowContinueError("The final UA value = " + General::RoundSigDigits(UA, 2) + "W/C, and the simulation continues...");
                 } else if (SolFla == -2) {
-                    ShowSevereError(CalledFrom + ": The combination of design input values did not allow the calculation of a ");
+                    ShowSevereError(state, CalledFrom + ": The combination of design input values did not allow the calculation of a ");
                     ShowContinueError("reasonable low-speed UA value. Review and revise design input values as appropriate. ");
-                    ShowFatalError("Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + this->Name);
+                    ShowFatalError(state, "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + this->Name);
                 }
                 this->LowSpeedEvapFluidCoolerUA = UA;
             } else {
@@ -1831,12 +1831,12 @@ namespace EvaporativeFluidCoolers {
                     Psychrometrics::PsyWFnTdbTwbPb(this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
-                    ShowSevereError("Iteration limit exceeded in calculating EvaporativeFluidCooler UA");
-                    ShowFatalError("Autosizing of EvaporativeFluidCooler UA failed for EvaporativeFluidCooler " + this->Name);
+                    ShowSevereError(state, "Iteration limit exceeded in calculating EvaporativeFluidCooler UA");
+                    ShowFatalError(state, "Autosizing of EvaporativeFluidCooler UA failed for EvaporativeFluidCooler " + this->Name);
                 } else if (SolFla == -2) {
                     this->SimSimpleEvapFluidCooler(state, Par(2), Par(3), UA0, OutWaterTempAtUA0);
                     this->SimSimpleEvapFluidCooler(state, Par(2), Par(3), UA1, OutWaterTempAtUA1);
-                    ShowSevereError(CalledFrom + ": The combination of design input values did not allow the calculation of a ");
+                    ShowSevereError(state, CalledFrom + ": The combination of design input values did not allow the calculation of a ");
                     ShowContinueError("reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                     ShowContinueError(
                         R"(sizes for some "autosizable" fields while autosizing other "autosizable" fields may be contributing to this problem.)");
@@ -1861,7 +1861,7 @@ namespace EvaporativeFluidCoolers {
                                       ")  = " + General::RoundSigDigits(OutWaterTempAtUA0, 2));
                     ShowContinueError("Calculated water outlet temperature at high UA(" + General::RoundSigDigits(UA1, 2) +
                                       ")  = " + General::RoundSigDigits(OutWaterTempAtUA1, 2));
-                    ShowFatalError("Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + this->Name);
+                    ShowFatalError(state, "Autosizing of Evaporative Fluid Cooler UA failed for Evaporative Fluid Cooler = " + this->Name);
                 }
                 this->LowSpeedEvapFluidCoolerUA = UA;
             } else {
@@ -2054,7 +2054,7 @@ namespace EvaporativeFluidCoolers {
                     bypassFraction = BypassFraction2;
                 }
                 if (NumIteration > MaxIteration) {
-                    ShowWarningError("Evaporative fluid cooler fluid bypass iteration exceeds maximum limit of " + MaxItChar + " for " + this->Name);
+                    ShowWarningError(state, "Evaporative fluid cooler fluid bypass iteration exceeds maximum limit of " + MaxItChar + " for " + this->Name);
                 }
                 this->BypassFraction = BypassFraction2;
                 // may not meet TempSetPoint due to limit of evaporative fluid cooler outlet temp to OWTLowerLimit
@@ -2476,12 +2476,12 @@ namespace EvaporativeFluidCoolers {
         if (DataLoopNode::Node(this->WaterOutletNode).MassFlowRate > this->DesWaterMassFlowRate * this->EvapFluidCoolerMassFlowRateMultiplier) {
             ++this->HighMassFlowErrorCount;
             if (this->HighMassFlowErrorCount < 2) {
-                ShowWarningError(this->EvapFluidCoolerType + " \"" + this->Name + "\"");
+                ShowWarningError(state, this->EvapFluidCoolerType + " \"" + this->Name + "\"");
                 ShowContinueError(" Condenser Loop Mass Flow Rate is much greater than the evaporative fluid coolers design mass flow rate.");
                 ShowContinueError(" Condenser Loop Mass Flow Rate = " +
                                   General::TrimSigDigits(DataLoopNode::Node(this->WaterOutletNode).MassFlowRate, 6));
                 ShowContinueError(" Evaporative Fluid Cooler Design Mass Flow Rate   = " + General::TrimSigDigits(this->DesWaterMassFlowRate, 6));
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
             } else {
                 ShowRecurringWarningErrorAtEnd(
                     this->EvapFluidCoolerType + " \"" + this->Name +
@@ -2498,12 +2498,12 @@ namespace EvaporativeFluidCoolers {
         if (TempDifference > TempAllowance && this->WaterMassFlowRate > 0.0) {
             ++this->OutletWaterTempErrorCount;
             if (this->OutletWaterTempErrorCount < 2) {
-                ShowWarningError(this->EvapFluidCoolerType + " \"" + this->Name + "\"");
+                ShowWarningError(state, this->EvapFluidCoolerType + " \"" + this->Name + "\"");
                 ShowContinueError(format(
                     "Evaporative fluid cooler water outlet temperature ({:6.2F} C) is below the specified minimum condenser loop temp of {:6.2F} C",
                     this->OutletWaterTemp,
                     LoopMinTemp));
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
             } else {
                 ShowRecurringWarningErrorAtEnd(
                     this->EvapFluidCoolerType + " \"" + this->Name +
@@ -2518,9 +2518,9 @@ namespace EvaporativeFluidCoolers {
         if (this->WaterMassFlowRate > 0.0 && this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
             ++this->SmallWaterMassFlowErrorCount;
             if (this->SmallWaterMassFlowErrorCount < 2) {
-                ShowWarningError(this->EvapFluidCoolerType + " \"" + this->Name + "\"");
+                ShowWarningError(state, this->EvapFluidCoolerType + " \"" + this->Name + "\"");
                 ShowContinueError("Evaporative fluid cooler water mass flow rate near zero.");
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
                 ShowContinueError("Actual Mass flow = " + General::TrimSigDigits(this->WaterMassFlowRate, 2));
             } else {
                 ShowRecurringWarningErrorAtEnd(this->EvapFluidCoolerType + " \"" + this->Name +

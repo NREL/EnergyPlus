@@ -1332,7 +1332,7 @@ namespace BranchNodeConnections {
         AlreadyNoted.deallocate();
     }
 
-    void TestCompSet(EnergyPlusData &state, std::string const &CompType,   // Component Type
+    void TestCompSet(state, EnergyPlusData &state, std::string const &CompType,   // Component Type
                      std::string const &CompName,   // Component Name
                      std::string const &InletNode,  // Inlet Node Name
                      std::string const &OutletNode, // Outlet Node Name

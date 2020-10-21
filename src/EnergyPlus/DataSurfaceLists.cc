@@ -190,7 +190,7 @@ namespace DataSurfaceLists {
                                               lAlphaBlanks,
                                               cAlphaFields,
                                               cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject1, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject1, ErrorsFound);
 
                 SurfList(Item).Name = Alphas(1);
                 SurfList(Item).NumOfSurfaces = NumAlphas - 1;
@@ -226,10 +226,10 @@ namespace DataSurfaceLists {
                         }
                         if (SurfNum > 1) {
                             if (ZoneForSurface != Surface(SurfList(Item).SurfPtr(SurfNum)).Zone && showSameZoneWarning) {
-                                ShowWarningError("Not all surfaces in same zone for " + CurrentModuleObject1 + " = " + SurfList(Item).Name);
+                                ShowWarningError(state, "Not all surfaces in same zone for " + CurrentModuleObject1 + " = " + SurfList(Item).Name);
                                 if (!DataGlobals::DisplayExtraWarnings) {
-                                    ShowContinueError("If this is intentionally a radiant system with surfaces in more than one thermal zone,");
-                                    ShowContinueError("then ignore this warning message.  Use Output:Diagnostics,DisplayExtraWarnings for more details.");
+                                    ShowContinueError(state, "If this is intentionally a radiant system with surfaces in more than one thermal zone,");
+                                    ShowContinueError(state, "then ignore this warning message.  Use Output:Diagnostics,DisplayExtraWarnings for more details.");
                                 }
                                 showSameZoneWarning = false;
                             }
@@ -239,9 +239,9 @@ namespace DataSurfaceLists {
                     if (SurfList(Item).SurfFlowFrac(SurfNum) < SurfListMinFlowFrac) {
                         ShowSevereError("The Flow Fraction for Surface " + SurfList(Item).SurfName(SurfNum) + " in Surface Group " +
                                         SurfList(Item).Name + " is too low");
-                        ShowContinueError("Flow fraction of " + RoundSigDigits(SurfList(Item).SurfFlowFrac(SurfNum), 6) +
+                        ShowContinueError(state, "Flow fraction of " + RoundSigDigits(SurfList(Item).SurfFlowFrac(SurfNum), 6) +
                                           " is less than minimum criteria = " + RoundSigDigits(SurfListMinFlowFrac, 6));
-                        ShowContinueError("Zero or extremely low flow fractions are not allowed. Remove this surface from the surface group or "
+                        ShowContinueError(state, "Zero or extremely low flow fractions are not allowed. Remove this surface from the surface group or "
                                           "combine small surfaces together.");
                         ErrorsFound = true;
                     }
@@ -287,7 +287,7 @@ namespace DataSurfaceLists {
                                               lAlphaBlanks,
                                               cAlphaFields,
                                               cNumericFields);
-                UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject2, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject2, ErrorsFound);
 
                 SlabList(Item).Name = Alphas(1);
                 SlabList(Item).NumOfSurfaces = ((NumAlphas - 1) / 4);
@@ -336,9 +336,9 @@ namespace DataSurfaceLists {
                             SlabList(Item).SurfName(SurfNum), SurfList(SrfList).SurfName, SurfList(SrfList).NumOfSurfaces);
                         if (NameConflict > 0) { // A slab list includes a surface on a surface list--not allowed
                             ShowSevereError(CurrentModuleObject2 + "=\"" + SlabList(Item).Name + "\", invalid surface specified.");
-                            ShowContinueError("Surface=\"" + SlabList(Item).SurfName(SurfNum) + "\" is also on a Surface List.");
-                            ShowContinueError(CurrentModuleObject1 + "=\"" + SurfList(SrfList).Name + "\" has this surface also.");
-                            ShowContinueError("A surface cannot be on both lists. The models cannot operate correctly.");
+                            ShowContinueError(state, "Surface=\"" + SlabList(Item).SurfName(SurfNum) + "\" is also on a Surface List.");
+                            ShowContinueError(state, CurrentModuleObject1 + "=\"" + SurfList(SrfList).Name + "\" has this surface also.");
+                            ShowContinueError(state, "A surface cannot be on both lists. The models cannot operate correctly.");
                             ErrorsFound = true;
                         }
                     }
@@ -364,7 +364,7 @@ namespace DataSurfaceLists {
             if (ErrorsFound) ShowSevereError(CurrentModuleObject2 + " errors found getting input. Program will terminate.");
         }
 
-        if (ErrorsFound) ShowFatalError("GetSurfaceListsInputs: Program terminates due to preceding conditions.");
+        if (ErrorsFound) ShowFatalError(state, "GetSurfaceListsInputs: Program terminates due to preceding conditions.");
     }
 
     int GetNumberOfSurfaceLists(EnergyPlusData &state)

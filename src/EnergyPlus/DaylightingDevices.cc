@@ -432,7 +432,7 @@ namespace DaylightingDevices {
                 if (Shelf(ShelfNum).ViewFactor < 0) CalcViewFactorToShelf(ShelfNum);
 
                 if (Shelf(ShelfNum).ViewFactor + Surface(WinSurf).ViewFactorSky + Surface(WinSurf).ViewFactorGround > 1.0) {
-                    ShowWarningError("DaylightingDevice:Shelf = " + Shelf(ShelfNum).Name + ":  Window view factors to sky [" +
+                    ShowWarningError(state, "DaylightingDevice:Shelf = " + Shelf(ShelfNum).Name + ":  Window view factors to sky [" +
                                      RoundSigDigits(Surface(WinSurf).ViewFactorSky, 2) + "],");
                     ShowContinueError("ground [" + RoundSigDigits(Surface(WinSurf).ViewFactorGround, 2) + "], and outside shelf [" +
                                       RoundSigDigits(Shelf(ShelfNum).ViewFactor, 2) + "] add up to > 1.0.");
@@ -461,7 +461,7 @@ namespace DaylightingDevices {
         // calculation
 
         if (CalcSolRefl && (NumOfTDDPipes > 0 || NumOfShelf > 0)) {
-            ShowWarningError("InitDaylightingDevices: Solar Distribution Model includes Solar Reflection calculations;");
+            ShowWarningError(state, "InitDaylightingDevices: Solar Distribution Model includes Solar Reflection calculations;");
             ShowContinueError("the resulting reflected solar values will not be used in the");
             ShowContinueError("DaylightingDevice:Shelf or DaylightingDevice:Tubular calculations.");
         }
@@ -518,7 +518,7 @@ namespace DaylightingDevices {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 // Pipe name
                 TDDPipe(PipeNum).Name = cAlphaArgs(1);
 
@@ -526,48 +526,48 @@ namespace DaylightingDevices {
                 SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Surface);
 
                 if (SurfNum == 0) {
-                    ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) + " not found.");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) + " not found.");
                     ErrorsFound = true;
                 } else {
                     if (FindTDDPipe(SurfNum) > 0) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) +
                                         " is referenced by more than one TDD.");
                         ErrorsFound = true;
                     }
 
                     if (Surface(SurfNum).Class != SurfaceClass_TDD_Dome) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) +
                                         " is not of surface type TubularDaylightDome.");
                         ErrorsFound = true;
                     }
 
                     if (state.dataConstruction->Construct(Surface(SurfNum).Construction).TotGlassLayers > 1) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) + " construction (" +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) + " construction (" +
                                         state.dataConstruction->Construct(Surface(SurfNum).Construction).Name + ") must have only 1 glass layer.");
                         ErrorsFound = true;
                     }
 
                     if (Surface(SurfNum).HasShadeControl) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) +
                                         " must not have a shading control.");
                         ErrorsFound = true;
                     }
 
                     if (Surface(SurfNum).FrameDivider > 0) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) +
                                         " must not have a frame/divider.");
                         ErrorsFound = true;
                     }
 
                     if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) +
                                         " Equivalent Layer Window is not supported.");
                         ErrorsFound = true;
                     }
                     // Window multiplier is already handled in SurfaceGeometry.cc
 
                     if (!Surface(SurfNum).ExtSolar) {
-                        ShowWarningError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) +
+                        ShowWarningError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) +
                                          " is not exposed to exterior radiation.");
                     }
 
@@ -579,29 +579,29 @@ namespace DaylightingDevices {
                 SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), Surface);
 
                 if (SurfNum == 0) {
-                    ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) + " not found.");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) + " not found.");
                     ErrorsFound = true;
                 } else {
                     if (FindTDDPipe(SurfNum) > 0) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) +
                                         " is referenced by more than one TDD.");
                         ErrorsFound = true;
                     }
 
                     if (DataSurfaces::SurfWinOriginalClass(SurfNum) != SurfaceClass_TDD_Diffuser) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) +
                                         " is not of surface type TubularDaylightDiffuser.");
                         ErrorsFound = true;
                     }
 
                     if (state.dataConstruction->Construct(Surface(SurfNum).Construction).TotGlassLayers > 1) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) + " construction (" +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) + " construction (" +
                                         state.dataConstruction->Construct(Surface(SurfNum).Construction).Name + ") must have only 1 glass layer.");
                         ErrorsFound = true;
                     }
 
                     if (state.dataConstruction->Construct(Surface(SurfNum).Construction).TransDiff <= 1.0e-10) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) + " construction (" +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) + " construction (" +
                                         state.dataConstruction->Construct(Surface(SurfNum).Construction).Name + ") invalid value.");
                         ShowContinueError("Diffuse solar transmittance of construction [" +
                                           RoundSigDigits(state.dataConstruction->Construct(Surface(SurfNum).Construction).TransDiff, 4) + "] too small for calculations.");
@@ -611,32 +611,32 @@ namespace DaylightingDevices {
                     if (TDDPipe(PipeNum).Dome > 0 && std::abs(Surface(SurfNum).Area - Surface(TDDPipe(PipeNum).Dome).Area) > 0.1) {
                         if (SafeDivide(std::abs(Surface(SurfNum).Area - Surface(TDDPipe(PipeNum).Dome).Area), Surface(TDDPipe(PipeNum).Dome).Area) >
                             0.1) { // greater than 10%
-                            ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                            ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                             ":  Dome and diffuser areas are significantly different (>10%).");
                             ShowContinueError("...Diffuser Area=[" + RoundSigDigits(Surface(SurfNum).Area, 4) + "]; Dome Area=[" +
                                               RoundSigDigits(Surface(TDDPipe(PipeNum).Dome).Area, 4) + "].");
                             ErrorsFound = true;
                         } else {
-                            ShowWarningError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome and diffuser areas differ by > .1 m2.");
+                            ShowWarningError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome and diffuser areas differ by > .1 m2.");
                             ShowContinueError("...Diffuser Area=[" + RoundSigDigits(Surface(SurfNum).Area, 4) + "]; Dome Area=[" +
                                               RoundSigDigits(Surface(TDDPipe(PipeNum).Dome).Area, 4) + "].");
                         }
                     }
 
                     if (Surface(SurfNum).HasShadeControl) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) +
                                         " must not have a shading control.");
                         ErrorsFound = true;
                     }
 
                     if (Surface(SurfNum).FrameDivider > 0) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) +
                                         " must not have a frame/divider.");
                         ErrorsFound = true;
                     }
 
                     if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(2) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(2) +
                                         " Equivalent Layer Window is not supported.");
                         ErrorsFound = true;
                     }
@@ -651,7 +651,7 @@ namespace DaylightingDevices {
                 TDDPipe(PipeNum).Construction = UtilityRoutines::FindItemInList(cAlphaArgs(4), state.dataConstruction->Construct);
 
                 if (TDDPipe(PipeNum).Construction == 0) {
-                    ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Pipe construction " + cAlphaArgs(4) + " not found.");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Pipe construction " + cAlphaArgs(4) + " not found.");
                     ErrorsFound = true;
                 } else {
                     state.dataConstruction->Construct(TDDPipe(PipeNum).Construction).IsUsed = true;
@@ -660,7 +660,7 @@ namespace DaylightingDevices {
                 if (rNumericArgs(1) > 0) {
                     TDDPipe(PipeNum).Diameter = rNumericArgs(1);
                 } else {
-                    ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Pipe diameter must be greater than zero.");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Pipe diameter must be greater than zero.");
                     ErrorsFound = true;
                 }
 
@@ -668,13 +668,13 @@ namespace DaylightingDevices {
                 if (TDDPipe(PipeNum).Dome > 0 && std::abs(PipeArea - Surface(TDDPipe(PipeNum).Dome).Area) > 0.1) {
                     if (SafeDivide(std::abs(PipeArea - Surface(TDDPipe(PipeNum).Dome).Area), Surface(TDDPipe(PipeNum).Dome).Area) >
                         0.1) { // greater than 10%
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                         ":  Pipe and dome/diffuser areas are significantly different (>10%).");
                         ShowContinueError("...Pipe Area=[" + RoundSigDigits(PipeArea, 4) + "]; Dome/Diffuser Area=[" +
                                           RoundSigDigits(Surface(TDDPipe(PipeNum).Dome).Area, 4) + "].");
                         ErrorsFound = true;
                     } else {
-                        ShowWarningError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Pipe and dome/diffuser areas differ by > .1 m2.");
+                        ShowWarningError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Pipe and dome/diffuser areas differ by > .1 m2.");
                         ShowContinueError("...Pipe Area=[" + RoundSigDigits(PipeArea, 4) + "]; Dome/Diffuser Area=[" +
                                           RoundSigDigits(Surface(TDDPipe(PipeNum).Dome).Area, 4) + "].");
                     }
@@ -683,14 +683,14 @@ namespace DaylightingDevices {
                 if (rNumericArgs(2) > 0) {
                     TDDPipe(PipeNum).TotLength = rNumericArgs(2);
                 } else {
-                    ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Pipe length must be greater than zero.");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Pipe length must be greater than zero.");
                     ErrorsFound = true;
                 }
 
                 if (rNumericArgs(3) > 0) {
                     TDDPipe(PipeNum).Reff = rNumericArgs(3);
                 } else {
-                    ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                    ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                     ":  Effective thermal resistance (R value) must be greater than zero.");
                     ErrorsFound = true;
                 }
@@ -699,10 +699,10 @@ namespace DaylightingDevices {
                 TDDPipe(PipeNum).NumOfTZones = NumAlphas - 4;
 
                 if (TDDPipe(PipeNum).NumOfTZones < 1) {
-                    ShowWarningError(cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                    ShowWarningError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                      ":  No transition zones specified.  All pipe absorbed solar goes to exterior.");
                 } else if (TDDPipe(PipeNum).NumOfTZones > MaxTZones) {
-                    ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Maximum number of transition zones exceeded.");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Maximum number of transition zones exceeded.");
                     ErrorsFound = true;
                 } else {
                     TDDPipe(PipeNum).TZone.allocate(TDDPipe(PipeNum).NumOfTZones);
@@ -717,13 +717,13 @@ namespace DaylightingDevices {
                         TZoneName = cAlphaArgs(TZoneNum + 4);
                         TDDPipe(PipeNum).TZone(TZoneNum) = UtilityRoutines::FindItemInList(TZoneName, Zone);
                         if (TDDPipe(PipeNum).TZone(TZoneNum) == 0) {
-                            ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Transition zone " + TZoneName + " not found.");
+                            ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Transition zone " + TZoneName + " not found.");
                             ErrorsFound = true;
                         }
 
                         TDDPipe(PipeNum).TZoneLength(TZoneNum) = rNumericArgs(TZoneNum + 3);
                         if (TDDPipe(PipeNum).TZoneLength(TZoneNum) < 0) {
-                            ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Transition zone length for " + TZoneName +
+                            ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Transition zone length for " + TZoneName +
                                             " must be zero or greater.");
                             ErrorsFound = true;
                         }
@@ -732,7 +732,7 @@ namespace DaylightingDevices {
 
             } // PipeNum
 
-            if (ErrorsFound) ShowFatalError("Errors in DaylightingDevice:Tubular input.");
+            if (ErrorsFound) ShowFatalError(state, "Errors in DaylightingDevice:Tubular input.");
         }
     }
 
@@ -783,7 +783,7 @@ namespace DaylightingDevices {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 // Shelf name
                 Shelf(ShelfNum).Name = cAlphaArgs(1);
 
@@ -791,39 +791,39 @@ namespace DaylightingDevices {
                 SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Surface);
 
                 if (SurfNum == 0) {
-                    ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) + " not found.");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) + " not found.");
                     ErrorsFound = true;
                 } else {
                     if (Surface(SurfNum).Class != SurfaceClass_Window) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) +
                                         " is not of surface type WINDOW.");
                         ErrorsFound = true;
                     }
 
                     if (Surface(SurfNum).Shelf > 0) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) +
                                         " is referenced by more than one shelf.");
                         ErrorsFound = true;
                     }
 
                     if (Surface(SurfNum).HasShadeControl) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) +
                                         " must not have a shading control.");
                         ErrorsFound = true;
                     }
 
                     if (Surface(SurfNum).FrameDivider > 0) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) +
                                         " must not have a frame/divider.");
                         ErrorsFound = true;
                     }
 
                     if (Surface(SurfNum).Sides != 4) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) + " must have 4 sides.");
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) + " must have 4 sides.");
                         ErrorsFound = true;
                     }
                     if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) +
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) +
                                         " Equivalent Layer Window is not supported.");
                         ErrorsFound = true;
                     }
@@ -837,19 +837,19 @@ namespace DaylightingDevices {
                     SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), Surface);
 
                     if (SurfNum == 0) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Inside shelf " + cAlphaArgs(3) + " not found.");
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Inside shelf " + cAlphaArgs(3) + " not found.");
                         ErrorsFound = true;
                     } else {
                         // No error if shelf belongs to more than one window, e.g. concave corners
 
                         if (Surface(SurfNum).ExtBoundCond != SurfNum) {
-                            ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Inside shelf " + cAlphaArgs(3) +
+                            ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Inside shelf " + cAlphaArgs(3) +
                                             " must be its own Outside Boundary Condition Object.");
                             ErrorsFound = true;
                         }
 
                         if (Surface(SurfNum).Sides != 4) {
-                            ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Inside shelf " + cAlphaArgs(3) +
+                            ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Inside shelf " + cAlphaArgs(3) +
                                             " must have 4 sides.");
                             ErrorsFound = true;
                         }
@@ -863,25 +863,25 @@ namespace DaylightingDevices {
                     SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(4), Surface);
 
                     if (SurfNum == 0) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Outside shelf " + cAlphaArgs(4) + " not found.");
+                        ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Outside shelf " + cAlphaArgs(4) + " not found.");
                         ErrorsFound = true;
                     } else {
                         // No error if shelf belongs to more than one window, e.g. concave corners
 
                         if (Surface(SurfNum).Class != SurfaceClass_Shading) {
-                            ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Outside shelf " + cAlphaArgs(4) +
+                            ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Outside shelf " + cAlphaArgs(4) +
                                             " is not a Shading:Zone:Detailed object.");
                             ErrorsFound = true;
                         }
 
                         if (Surface(SurfNum).SchedShadowSurfIndex > 0) {
-                            ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Outside shelf " + cAlphaArgs(4) +
+                            ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Outside shelf " + cAlphaArgs(4) +
                                             " must not have a transmittance schedule.");
                             ErrorsFound = true;
                         }
 
                         if (Surface(SurfNum).Sides != 4) {
-                            ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Outside shelf " + cAlphaArgs(4) +
+                            ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Outside shelf " + cAlphaArgs(4) +
                                             " must have 4 sides.");
                             ErrorsFound = true;
                         }
@@ -891,11 +891,11 @@ namespace DaylightingDevices {
                             ConstrNum = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataConstruction->Construct);
 
                             if (ConstrNum == 0) {
-                                ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Outside shelf construction " + cAlphaArgs(5) +
+                                ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Outside shelf construction " + cAlphaArgs(5) +
                                                 " not found.");
                                 ErrorsFound = true;
                             } else if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) {
-                                ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Outside shelf construction " + cAlphaArgs(5) +
+                                ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Outside shelf construction " + cAlphaArgs(5) +
                                                 " must not have WindowMaterial:Glazing.");
                                 ErrorsFound = true;
                             } else {
@@ -903,7 +903,7 @@ namespace DaylightingDevices {
                                 state.dataConstruction->Construct(ConstrNum).IsUsed = true;
                             }
                         } else {
-                            ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                            ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                             ":  Outside shelf requires an outside shelf construction to be specified.");
                             ErrorsFound = true;
                         }
@@ -913,7 +913,7 @@ namespace DaylightingDevices {
                             Shelf(ShelfNum).ViewFactor = rNumericArgs(1);
 
                             if (rNumericArgs(1) == 0.0) {
-                                ShowWarningError(cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                ShowWarningError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                                  ":  View factor to outside shelf is zero.  Shelf does not reflect on window.");
                             }
                         } else {
@@ -932,11 +932,11 @@ namespace DaylightingDevices {
                 }
 
                 if (Shelf(ShelfNum).InSurf == 0 && Shelf(ShelfNum).OutSurf == 0)
-                    ShowWarningError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  No inside shelf or outside shelf was specified.");
+                    ShowWarningError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  No inside shelf or outside shelf was specified.");
 
             } // ShelfNum
 
-            if (ErrorsFound) ShowFatalError("Errors in DaylightingDevice:Shelf input.");
+            if (ErrorsFound) ShowFatalError(state, "Errors in DaylightingDevice:Shelf input.");
         }
     }
 
@@ -1412,7 +1412,7 @@ namespace DaylightingDevices {
         FindTDDPipe = 0;
 
         if (NumOfTDDPipes <= 0) {
-            ShowFatalError(
+            ShowFatalError(state,
                 "FindTDDPipe: Surface=" + Surface(WinNum).Name +
                 ", TDD:Dome object does not reference a valid Diffuser object....needs DaylightingDevice:Tubular of same name as Surface.");
         }
@@ -1546,7 +1546,7 @@ namespace DaylightingDevices {
         } else if (Surface(Shelf(ShelfNum).OutSurf).Height == W) {
             L = Surface(Shelf(ShelfNum).OutSurf).Width;
         } else {
-            ShowFatalError("DaylightingDevice:Shelf = " + Shelf(ShelfNum).Name + ":  Width of window and outside shelf do not match.");
+            ShowFatalError(state, "DaylightingDevice:Shelf = " + Shelf(ShelfNum).Name + ":  Width of window and outside shelf do not match.");
         }
 
         // Error if more or less than two vertices match
@@ -1558,10 +1558,10 @@ namespace DaylightingDevices {
         }
 
         if (NumMatch < 2) {
-            ShowWarningError("DaylightingDevice:Shelf = " + Shelf(ShelfNum).Name +
+            ShowWarningError(state, "DaylightingDevice:Shelf = " + Shelf(ShelfNum).Name +
                              ":  Window and outside shelf must share two vertices.  View factor calculation may be inaccurate.");
         } else if (NumMatch > 2) {
-            ShowFatalError("DaylightingDevice:Shelf = " + Shelf(ShelfNum).Name + ":  Window and outside shelf share too many vertices.");
+            ShowFatalError(state, "DaylightingDevice:Shelf = " + Shelf(ShelfNum).Name + ":  Window and outside shelf share too many vertices.");
         }
 
         // Calculate exact analytical view factor from window to outside shelf

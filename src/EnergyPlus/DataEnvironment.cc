@@ -391,8 +391,8 @@ namespace DataEnvironment {
         }
 
         if (LocalOutDryBulbTemp < -100.0) {
-            ShowSevereError("OutDryBulbTempAt: outdoor drybulb temperature < -100 C");
-            ShowContinueError("...check heights, this height=[" + RoundSigDigits(Z, 0) + "].");
+            ShowSevereError(state, "OutDryBulbTempAt: outdoor drybulb temperature < -100 C");
+            ShowContinueError(state, "...check heights, this height=[" + RoundSigDigits(Z, 0) + "].");
             ShowFatalError("Program terminates due to preceding condition(s).");
         }
 
@@ -440,8 +440,8 @@ namespace DataEnvironment {
         }
 
         if (LocalOutWetBulbTemp < -100.0) {
-            ShowSevereError("OutWetBulbTempAt: outdoor wetbulb temperature < -100 C");
-            ShowContinueError("...check heights, this height=[" + RoundSigDigits(Z, 0) + "].");
+            ShowSevereError(state, "OutWetBulbTempAt: outdoor wetbulb temperature < -100 C");
+            ShowContinueError(state, "...check heights, this height=[" + RoundSigDigits(Z, 0) + "].");
             ShowFatalError("Program terminates due to preceding condition(s).");
         }
 
@@ -490,8 +490,8 @@ namespace DataEnvironment {
         }
 
         if (LocalOutDewPointTemp < -100.0) {
-            ShowSevereError("OutDewPointTempAt: outdoor dewpoint temperature < -100 C");
-            ShowContinueError("...check heights, this height=[" + RoundSigDigits(Z, 0) + "].");
+            ShowSevereError(state, "OutDewPointTempAt: outdoor dewpoint temperature < -100 C");
+            ShowContinueError(state, "...check heights, this height=[" + RoundSigDigits(Z, 0) + "].");
             ShowFatalError("Program terminates due to preceding condition(s).");
         }
 
@@ -590,11 +590,11 @@ namespace DataEnvironment {
         // Using/Aliasing
         using General::RoundSigDigits;
 
-        ShowSevereError("SetOutBulbTempAt: " + Settings + " Outdoor Temperatures < -100 C");
-        ShowContinueError("...check " + Settings + " Heights - Maximum " + Settings + " Height=[" + RoundSigDigits(max_height, 0) + "].");
+        ShowSevereError(state, "SetOutBulbTempAt: " + Settings + " Outdoor Temperatures < -100 C");
+        ShowContinueError(state, "...check " + Settings + " Heights - Maximum " + Settings + " Height=[" + RoundSigDigits(max_height, 0) + "].");
         if (max_height >= 20000.0) {
-            ShowContinueError("...according to your maximum Z height, your building is somewhere in the Stratosphere.");
-            ShowContinueError("...look at " + Settings + " Name= " + SettingsName);
+            ShowContinueError(state, "...according to your maximum Z height, your building is somewhere in the Stratosphere.");
+            ShowContinueError(state, "...look at " + Settings + " Name= " + SettingsName);
         }
         ShowFatalError("Program terminates due to preceding condition(s).");
     }

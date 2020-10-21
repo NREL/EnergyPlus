@@ -243,7 +243,7 @@ namespace MoistureBalanceEMPDManager {
                 if (dataMaterial.Material(MaterNum).ROnly) {
                     //        CALL ShowSevereError('EMPD base material = "'//TRIM(dataMaterial.Material(MaterNum)%Name)//  &
                     //                             '" was Material:NoMass. It cannot be used for EMPD calculations.')
-                    ShowContinueError("..Only Material base materials are allowed to have EMPD properties.");
+                    ShowContinueError(state, "..Only Material base materials are allowed to have EMPD properties.");
                     ShowSevereError(cCurrentModuleObject + ": Reference Material is not appropriate type for EMPD properties, material=" +
                                     dataMaterial.Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
                     ErrorsFound = true;
@@ -279,7 +279,7 @@ namespace MoistureBalanceEMPDManager {
 
             if (material.EMPDDeepDepth <= material.EMPDSurfaceDepth && material.EMPDDeepDepth != 0.0) {
                 ShowWarningError(cCurrentModuleObject + ": material=\"" + material.Name + "\"");
-                ShowContinueError("Deep-layer penetration depth should be zero or greater than the surface-layer penetration depth.");
+                ShowContinueError(state, "Deep-layer penetration depth should be zero or greater than the surface-layer penetration depth.");
             }
         }
 
@@ -296,13 +296,13 @@ namespace MoistureBalanceEMPDManager {
             } else {
                 ++ErrCount;
                 if (ErrCount == 1 && !DisplayExtraWarnings) {
-                    ShowMessage("GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer of Surfaces");
-                    ShowContinueError("...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
+                    ShowMessage(state, "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer of Surfaces");
+                    ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
                 if (DisplayExtraWarnings) {
-                    ShowMessage("GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer in Surface=" +
+                    ShowMessage(state, "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer in Surface=" +
                                 Surface(SurfNum).Name);
-                    ShowContinueError("with Construction=" + state.dataConstruction->Construct(ConstrNum).Name);
+                    ShowContinueError(state, "with Construction=" + state.dataConstruction->Construct(ConstrNum).Name);
                 }
             }
             if (state.dataConstruction->Construct(ConstrNum).TotLayers == 1) { // One layer construction
@@ -312,16 +312,16 @@ namespace MoistureBalanceEMPDManager {
                     Surface(SurfNum).ExtBoundCond <= 0) { // The external layer is not exposed to zone
                     ShowSevereError("GetMoistureBalanceEMPDInput: EMPD properties are assigned to the outside layer in Construction=" +
                                     state.dataConstruction->Construct(ConstrNum).Name);
-                    ShowContinueError("..Outside layer material with EMPD properties = " + dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Name);
-                    ShowContinueError("..A material with EMPD properties must be assigned to the inside layer of a construction.");
+                    ShowContinueError(state, "..Outside layer material with EMPD properties = " + dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Name);
+                    ShowContinueError(state, "..A material with EMPD properties must be assigned to the inside layer of a construction.");
                     ErrorsFound = true;
                 }
                 for (Layer = 2; Layer <= state.dataConstruction->Construct(ConstrNum).TotLayers - 1; ++Layer) {
                     if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).EMPDMaterialProps) {
                         ShowSevereError("GetMoistureBalanceEMPDInput: EMPD properties are assigned to a middle layer in Construction=" +
                                         state.dataConstruction->Construct(ConstrNum).Name);
-                        ShowContinueError("..Middle layer material with EMPD properties = " + dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Name);
-                        ShowContinueError("..A material with EMPD properties must be assigned to the inside layer of a construction.");
+                        ShowContinueError(state, "..Middle layer material with EMPD properties = " + dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Name);
+                        ShowContinueError(state, "..A material with EMPD properties must be assigned to the inside layer of a construction.");
                         ErrorsFound = true;
                     }
                 }
@@ -332,7 +332,7 @@ namespace MoistureBalanceEMPDManager {
             if (!EMPDzone(Loop)) {
                 ShowSevereError("GetMoistureBalanceEMPDInput: None of the constructions for zone = " + Zone(Loop).Name +
                                 " has an inside layer with EMPD properties");
-                ShowContinueError("..For each zone, the inside layer of at least one construction must have EMPD properties");
+                ShowContinueError(state, "..For each zone, the inside layer of at least one construction must have EMPD properties");
                 ErrorsFound = true;
             }
         }
@@ -342,7 +342,7 @@ namespace MoistureBalanceEMPDManager {
         ReportMoistureBalanceEMPD(state);
 
         if (ErrorsFound) {
-            ShowFatalError("GetMoistureBalanceEMPDInput: Errors found getting EMPD material properties, program terminated.");
+            ShowFatalError(state, "GetMoistureBalanceEMPDInput: Errors found getting EMPD material properties, program terminated.");
         }
     }
 

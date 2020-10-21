@@ -478,7 +478,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).SecOutletNode = GetOnlySingleNode(state,
                 cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
-            TestCompSet(cHXTypes(ExchCond(ExchNum).ExchTypeNum), ExchCond(ExchNum).Name, cAlphaArgs(5), cAlphaArgs(6), "Process Air Nodes");
+            TestCompSet(state, cHXTypes(ExchCond(ExchNum).ExchTypeNum), ExchCond(ExchNum).Name, cAlphaArgs(5), cAlphaArgs(6), "Process Air Nodes");
 
         } // end of input loop over air to air plate heat exchangers
 
@@ -523,7 +523,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).HeatEffectSensible75 = rNumericArgs(4);
             ExchCond(ExchNum).HeatEffectLatent75 = rNumericArgs(5);
             if (ExchCond(ExchNum).HeatEffectSensible75 < ExchCond(ExchNum).HeatEffectSensible100) {
-                ShowWarningError(cCurrentModuleObject + " \"" + ExchCond(ExchNum).Name +
+                ShowWarningError(state, cCurrentModuleObject + " \"" + ExchCond(ExchNum).Name +
                                  "\" sensible heating effectiveness at 75% rated flow is less than at 100% rated flow.");
                 ShowContinueError("Sensible heating effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
             }
@@ -612,7 +612,7 @@ namespace HeatRecovery {
                 }
             }
 
-            TestCompSet(cHXTypes(ExchCond(ExchNum).ExchTypeNum), ExchCond(ExchNum).Name, cAlphaArgs(3), cAlphaArgs(4), "Process Air Nodes");
+            TestCompSet(state, cHXTypes(ExchCond(ExchNum).ExchTypeNum), ExchCond(ExchNum).Name, cAlphaArgs(3), cAlphaArgs(4), "Process Air Nodes");
         } // end of input loop over air to air generic heat exchangers
 
         // loop over the desiccant balanced heat exchangers and load their input data
@@ -664,7 +664,7 @@ namespace HeatRecovery {
                 cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
             // Set up the component set for the process side of the HX (Sec = Process)
-            TestCompSet(cHXTypes(ExchCond(ExchNum).ExchTypeNum),
+            TestCompSet(state, cHXTypes(ExchCond(ExchNum).ExchTypeNum),
                         ExchCond(ExchNum).Name,
                         NodeID(ExchCond(ExchNum).SecInletNode),
                         NodeID(ExchCond(ExchNum).SecOutletNode),
@@ -722,7 +722,7 @@ namespace HeatRecovery {
             BalDesDehumPerfNumericFields(PerfDataNum).NumericFieldNames = "";
             BalDesDehumPerfNumericFields(PerfDataNum).NumericFieldNames = cNumericFieldNames;
 
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             BalDesDehumPerfData(PerfDataNum).Name = cAlphaArgs(1);
             BalDesDehumPerfData(PerfDataNum).PerfType = cCurrentModuleObject;
@@ -2135,7 +2135,7 @@ namespace HeatRecovery {
                         if (ExchCond(ExNum).UnBalancedErrCount <= 2) {
                             ShowSevereError(cHXTypes(ExchCond(ExNum).ExchTypeNum) + ": \"" + ExchCond(ExNum).Name +
                                             "\" unbalanced air volume flow ratio through the heat exchanger is greater than 2:1.");
-                            ShowContinueErrorTimeStamp(
+                            ShowContinueErrorTimeStamp(state,
                                 "...HX Supply air to Exhaust air flow ratio = " + RoundSigDigits(HXSupAirVolFlowRate / HXSecAirVolFlowRate, 5) + '.');
                         } else {
                             ShowRecurringWarningErrorAtEnd(
@@ -2158,7 +2158,7 @@ namespace HeatRecovery {
                     if (ExchCond(ExNum).LowFlowErrCount == 1) {
                         ShowWarningError(cHXTypes(ExchCond(ExNum).ExchTypeNum) + " \"" + ExchCond(ExNum).Name + "\"");
                         ShowContinueError("Average air volume flow rate is <50% or >130% of the nominal HX supply air volume flow rate.");
-                        ShowContinueErrorTimeStamp("Air volume flow rate ratio = " + RoundSigDigits(HXAirVolFlowRatio, 3) + '.');
+                        ShowContinueErrorTimeStamp(state, "Air volume flow rate ratio = " + RoundSigDigits(HXAirVolFlowRatio, 3) + '.');
                     } else {
                         ShowRecurringWarningErrorAtEnd(
                             cHXTypes(ExchCond(ExNum).ExchTypeNum) + " \"" + ExchCond(ExNum).Name +

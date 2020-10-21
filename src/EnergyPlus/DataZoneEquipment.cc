@@ -405,13 +405,13 @@ namespace DataZoneEquipment {
             ShowSevereError(RoutineName + "Number of Zone Equipment lists [" + TrimSigDigits(NumOfZoneEquipLists) +
                             "] not equal Number of Controlled Zones [" + TrimSigDigits(NumOfControlledZones) + ']');
             ShowContinueError("..Each Controlled Zone [ZoneHVAC:EquipmentConnections] must have a corresponding (unique) ZoneHVAC:EquipmentList");
-            ShowFatalError("GetZoneEquipment: Incorrect number of zone equipment lists");
+            ShowFatalError(state, "GetZoneEquipment: Incorrect number of zone equipment lists");
         }
 
         if (NumOfControlledZones > NumOfZones) {
             ShowSevereError(RoutineName + "Number of Controlled Zone objects [" + TrimSigDigits(NumOfControlledZones) +
                             "] greater than Number of Zones [" + TrimSigDigits(NumOfZones) + ']');
-            ShowFatalError(RoutineName + "Too many ZoneHVAC:EquipmentConnections objects.");
+            ShowFatalError(state, RoutineName + "Too many ZoneHVAC:EquipmentConnections objects.");
         }
 
         InitUniqueNodeCheck(state, "ZoneHVAC:EquipmentConnections");
@@ -527,7 +527,7 @@ namespace DataZoneEquipment {
                                               lAlphaBlanks,
                                               cAlphaFields,
                                               cNumericFields); //  data for one zone
-                UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
                 thisZoneEquipList.Name = AlphArray(1);
 
                 if (!lAlphaBlanks(2)) {
@@ -1024,7 +1024,7 @@ namespace DataZoneEquipment {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields); //  data for one zone
-            UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
             SupplyAirPath(PathNum).Name = AlphArray(1);
             SupplyAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 
@@ -1091,7 +1091,7 @@ namespace DataZoneEquipment {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields); //  data for one zone
-            UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
             ReturnAirPath(PathNum).Name = AlphArray(1);
             ReturnAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 
@@ -1150,7 +1150,7 @@ namespace DataZoneEquipment {
         SetupZoneEquipmentForConvectionFlowRegime();
 
         if (GetZoneEquipmentDataErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting Zone Equipment input.");
+            ShowFatalError(state, RoutineName + "Errors found in getting Zone Equipment input.");
         }
     }
 
@@ -1555,7 +1555,7 @@ namespace DataZoneEquipment {
                 ShowSevereError("DesignSpecification:OutdoorAir=\"" + OARequirements(DSOAPtr).Name +
                                 "\" valid Outdoor Air Method =\" IndoorAirQualityProcedure\" requires CO2 simulation.");
                 ShowContinueError("The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
-                ShowFatalError("CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
+                ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
             }
             MyEnvrnFlag(DSOAPtr) = false;
         }
@@ -1564,7 +1564,7 @@ namespace DataZoneEquipment {
                 ShowSevereError("DesignSpecification:OutdoorAir=\"" + OARequirements(DSOAPtr).Name +
                                 "\" valid Outdoor Air Method =\" ProportionalControlBasedOnDesignOccupancy\" requires CO2 simulation.");
                 ShowContinueError("The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
-                ShowFatalError("CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
+                ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
             }
             MyEnvrnFlag(DSOAPtr) = false;
         }
@@ -1573,7 +1573,7 @@ namespace DataZoneEquipment {
                 ShowSevereError("DesignSpecification:OutdoorAir=\"" + OARequirements(DSOAPtr).Name +
                                 "\" valid Outdoor Air Method =\" ProportionalControlBasedonOccupancySchedule\" requires CO2 simulation.");
                 ShowContinueError("The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
-                ShowFatalError("CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
+                ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
             }
             MyEnvrnFlag(DSOAPtr) = false;
         }
@@ -1712,7 +1712,7 @@ namespace DataZoneEquipment {
                                                               RoundSigDigits(ZoneMinCO2, 2) + ").");
                                             ShowContinueError("\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. Default "
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
-                                            ShowContinueErrorTimeStamp("");
+                                            ShowContinueErrorTimeStamp(state, "");
                                         } else {
                                             ShowRecurringWarningErrorAtEnd(
                                                 "DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
@@ -1732,7 +1732,7 @@ namespace DataZoneEquipment {
                                                               RoundSigDigits(ZoneMinCO2, 2) + ").");
                                             ShowContinueError("\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. Default "
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
-                                            ShowContinueErrorTimeStamp("");
+                                            ShowContinueErrorTimeStamp(state, "");
                                         } else {
                                             ShowRecurringWarningErrorAtEnd(
                                                 "DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
@@ -1772,7 +1772,7 @@ namespace DataZoneEquipment {
                                                               Zone(ActualZoneNum).Name + "\". ");
                                             ShowContinueError("\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. Default "
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
-                                            ShowContinueErrorTimeStamp("");
+                                            ShowContinueErrorTimeStamp(state, "");
                                         } else {
                                             ShowRecurringWarningErrorAtEnd("DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
                                                                                "\", For System Outdoor Air Method = "
@@ -1790,7 +1790,7 @@ namespace DataZoneEquipment {
                                                               Zone(ActualZoneNum).Name + "\". ");
                                             ShowContinueError("\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. Default "
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
-                                            ShowContinueErrorTimeStamp("");
+                                            ShowContinueErrorTimeStamp(state, "");
                                         } else {
                                             ShowRecurringWarningErrorAtEnd("DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
                                                                                "\", For System Outdoor Air Method = "

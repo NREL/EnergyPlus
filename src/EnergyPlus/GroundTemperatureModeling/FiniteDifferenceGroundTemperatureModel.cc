@@ -138,7 +138,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
         // Return the pointer
         return thisModel;
     } else {
-        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference--Errors getting input for ground temperature model");
+        ShowFatalError(state, state, "Site:GroundTemperature:Undisturbed:FiniteDifference--Errors getting input for ground temperature model");
         return nullptr;
     }
 }
@@ -214,7 +214,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     if (!state.dataWeatherManager->WeatherFileExists) {
         ShowSevereError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.");
         ShowContinueError(state, "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
-        ShowFatalError(state, "Simulation halted due to input error in ground temperature model.");
+        ShowFatalError(state, state, "Simulation halted due to input error in ground temperature model.");
     }
 
     // We add a new period to force running all weather data
@@ -237,12 +237,12 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     ErrorsFound = false;
     WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
     if (ErrorsFound) {
-        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
+        ShowFatalError(state, state, "Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
     }
 
     if (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::ReadAllWeatherData) {
         // This shouldn't happen
-        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data, bad KindOfSim.");
+        ShowFatalError(state, state, "Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data, bad KindOfSim.");
     }
 
     weatherDataArray.dimension(state.dataWeatherManager->NumDaysInYear);

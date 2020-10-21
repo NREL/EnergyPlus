@@ -103,7 +103,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
         inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
-            ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");
+            ShowSevereError(state, state, cCurrentModuleObject + ": Less than 12 values entered.");
             thisModel->errorsFound = true;
         }
 
@@ -116,12 +116,12 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
         GroundTempObjInput = true;
 
         if (genErrorMessage) {
-            ShowWarningError(state, cCurrentModuleObject + ": Some values fall outside the range of 15-25C.");
+            ShowWarningError(state, state, cCurrentModuleObject + ": Some values fall outside the range of 15-25C.");
             ShowContinueError(state, "These values may be inappropriate.  Please consult the Input Output Reference for more details.");
         }
 
     } else if (numCurrObjects > 1) {
-        ShowSevereError(state, cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
+        ShowSevereError(state, state, cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
         thisModel->errorsFound = true;
     } else {
         thisModel->buildingSurfaceGroundTemps = 18.0;

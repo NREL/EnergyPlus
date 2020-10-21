@@ -384,7 +384,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
         } // ... End environment loop.
 
         if (ErrorsFound) {
-            ShowFatalError("Error condition occurred.  Previous Severe Errors cause termination.");
+            ShowFatalError(state, "Error condition occurred.  Previous Severe Errors cause termination.");
         }
 
         hvacSizingSimulationManager->PostProcessLogs();

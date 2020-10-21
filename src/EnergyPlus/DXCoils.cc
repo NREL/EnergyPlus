@@ -1037,7 +1037,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
@@ -1076,7 +1076,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
                 Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             DXCoil(DXCoilNum).CCapFTemp(1) = GetCurveIndex(state, Alphas(5)); // convert curve name to number
             if (DXCoil(DXCoilNum).CCapFTemp(1) == 0) {
@@ -1482,7 +1482,7 @@ namespace DXCoils {
                                           cNumericFields);
 
             ++DXCoilNum;
-            UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
@@ -1510,7 +1510,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
                 Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             // Set crankcase heater capacity
             DXCoil(DXCoilNum).CrankcaseHeaterCapacity = Numbers(1);
@@ -2006,7 +2006,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -2030,7 +2030,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
                 Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             DXCoil(DXCoilNum).CCapFTemp(1) = GetCurveIndex(state, Alphas(5)); // convert curve name to number
             if (DXCoil(DXCoilNum).CCapFTemp(1) == 0) {
@@ -2427,7 +2427,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
@@ -2466,7 +2466,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
                 Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             DXCoil(DXCoilNum).CCapFTemp(1) = GetCurveIndex(state, Alphas(5)); // convert curve name to number
             if (DXCoil(DXCoilNum).CCapFTemp(1) == 0) {
@@ -2963,7 +2963,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
@@ -3097,7 +3097,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
                 Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(5), Alphas(6), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(5), Alphas(6), "Air Nodes");
 
             // Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
             DXCoil(DXCoilNum).IsDXCoilInZone = !CheckOutAirNodeNumber(state, DXCoil(DXCoilNum).AirInNode);
@@ -3109,7 +3109,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).WaterOutNode = GetOnlySingleNode(state,
                 Alphas(8), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(7), Alphas(8), "Water Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(7), Alphas(8), "Water Nodes");
 
             DXCoil(DXCoilNum).CrankcaseHeaterCapacity = Numbers(11);
             if (DXCoil(DXCoilNum).CrankcaseHeaterCapacity < 0.0) {
@@ -3409,7 +3409,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
@@ -3489,7 +3489,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
                 Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             // Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
             DXCoil(DXCoilNum).IsDXCoilInZone = !CheckOutAirNodeNumber(state, DXCoil(DXCoilNum).AirInNode);
@@ -3508,7 +3508,7 @@ namespace DXCoils {
                                                                2,
                                                                ObjectIsNotParent);
 
-            TestCompSet(CurrentModuleObject, Alphas(1), DummyCondenserInletName, DummyCondenserOutletName, "Water Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), DummyCondenserInletName, DummyCondenserOutletName, "Water Nodes");
 
             DXCoil(DXCoilNum).CrankcaseHeaterCapacity = Numbers(8);
             if (DXCoil(DXCoilNum).CrankcaseHeaterCapacity < 0.0) {
@@ -3757,7 +3757,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -3784,7 +3784,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
                 Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             // outdoor condenser node
             if (lAlphaBlanks(5)) {
@@ -4268,7 +4268,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
@@ -4296,7 +4296,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
                 Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             // Set minimum OAT for heat pump compressor operation
             DXCoil(DXCoilNum).MinOATCompressor = Numbers(1);
@@ -4723,7 +4723,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
@@ -4804,7 +4804,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
                 Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(5), Alphas(6), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(5), Alphas(6), "Air Nodes");
 
             DXCoil(DXCoilNum).CondensateCollectName = Alphas(7);
             if (lAlphaBlanks(7)) {
@@ -4847,7 +4847,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
@@ -4874,7 +4874,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
                 Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             DXCoil(DXCoilNum).CCapFTemp = GetCurveIndex(state, Alphas(5));
             if (DXCoil(DXCoilNum).CCapFTemp(1) == 0) {
@@ -4962,7 +4962,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
@@ -4985,7 +4985,7 @@ namespace DXCoils {
                 Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
                 Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             DXCoil(DXCoilNum).RatedTotCap(1) = Numbers(1);
             DXCoil(DXCoilNum).RatedSHR(1) = Numbers(2);
@@ -5062,7 +5062,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
@@ -5085,7 +5085,7 @@ namespace DXCoils {
                 Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
                 Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             DXCoil(DXCoilNum).RatedTotCap(1) = Numbers(1);
             DXCoil(DXCoilNum).SC = Numbers(2);
@@ -7096,7 +7096,7 @@ namespace DXCoils {
                                                          SecCoilAirFlowUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(SecCoilAirFlowDes - SecCoilAirFlowUser) / SecCoilAirFlowUser) > AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizeDxCoil: Potential issue with equipment sizing for " + DXCoil(DXCoilNum).DXCoilType + ' ' +
+                                    ShowMessage(state, "SizeDxCoil: Potential issue with equipment sizing for " + DXCoil(DXCoilNum).DXCoilType + ' ' +
                                                 DXCoil(DXCoilNum).Name);
                                     ShowContinueError("User-Specified Secondary Coil Air Flow Rate of " + RoundSigDigits(SecCoilAirFlowUser, 5) +
                                                       " [m3/s]");
@@ -7530,7 +7530,7 @@ namespace DXCoils {
                                                      MSEvapCondAirFlowUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(MSEvapCondAirFlowDes - MSEvapCondAirFlowUser) / MSEvapCondAirFlowUser) > AutoVsHardSizingThreshold) {
-                                ShowMessage("SizeDxCoil: Potential issue with equipment sizing for " + DXCoil(DXCoilNum).DXCoilType + ' ' +
+                                ShowMessage(state, "SizeDxCoil: Potential issue with equipment sizing for " + DXCoil(DXCoilNum).DXCoilType + ' ' +
                                             DXCoil(DXCoilNum).Name);
                                 ShowContinueError("User-Specified Evaporative Condenser Air Flow Rate of " +
                                                   RoundSigDigits(MSEvapCondAirFlowUser, 5) + " [m3/s]");
@@ -7591,7 +7591,7 @@ namespace DXCoils {
                         if (DisplayExtraWarnings) {
                             if ((std::abs(MSEvapCondPumpElecNomPowerDes - MSEvapCondPumpElecNomPowerUser) / MSEvapCondPumpElecNomPowerUser) >
                                 AutoVsHardSizingThreshold) {
-                                ShowMessage("SizeDxCoil: Potential issue with equipment sizing for " + DXCoil(DXCoilNum).DXCoilType + ' ' +
+                                ShowMessage(state, "SizeDxCoil: Potential issue with equipment sizing for " + DXCoil(DXCoilNum).DXCoilType + ' ' +
                                             DXCoil(DXCoilNum).Name);
                                 ShowContinueError("User-Specified Evaporative Condenser Pump Rated Power Consumption of " +
                                                   RoundSigDigits(MSEvapCondPumpElecNomPowerUser, 2) + " [W]");
@@ -7715,7 +7715,7 @@ namespace DXCoils {
                                                          SecCoilAirFlowUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(SecCoilAirFlowDes - SecCoilAirFlowUser) / SecCoilAirFlowUser) > AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizeDxCoil: Potential issue with equipment sizing for " + DXCoil(DXCoilNum).DXCoilType + ' ' +
+                                    ShowMessage(state, "SizeDxCoil: Potential issue with equipment sizing for " + DXCoil(DXCoilNum).DXCoilType + ' ' +
                                                 DXCoil(DXCoilNum).Name);
                                     ShowContinueError("User-Specified Secondary Coil Air Flow Rate of " + RoundSigDigits(SecCoilAirFlowUser, 5) +
                                                       " [m3/s]");
@@ -8091,7 +8091,7 @@ namespace DXCoils {
                     } else {
                         ShowContinueError(" Negative value occurs using an inlet air temperature of " + TrimSigDigits(InletAirTemp, 1) + '.');
                     }
-                    ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
+                    ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
                 ShowRecurringWarningErrorAtEnd(
                     Coil.DXCoilType + " \"" + Coil.Name +
@@ -8126,7 +8126,7 @@ namespace DXCoils {
                     } else {
                         ShowContinueError(" Negative value occurs using an inlet air temperature of " + TrimSigDigits(InletAirTemp, 1) + '.');
                     }
-                    ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
+                    ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
                 ShowRecurringWarningErrorAtEnd(
                     Coil.DXCoilType + " \"" + Coil.Name +
@@ -8153,7 +8153,7 @@ namespace DXCoils {
                     ShowContinueError(" HPWH Heating Capacity Modifier curve (function of air flow fraction) output is negative (" +
                                       TrimSigDigits(HeatCapFAirFlow, 3) + ").");
                     ShowContinueError(" Negative value occurs using an air flow fraction of " + TrimSigDigits(AirFlowRateRatio, 3) + '.');
-                    ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
+                    ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
                 ShowRecurringWarningErrorAtEnd(
                     Coil.DXCoilType + " \"" + Coil.Name +
@@ -8177,7 +8177,7 @@ namespace DXCoils {
                     ShowContinueError(" HPWH Heating COP Modifier curve (function of air flow fraction) output is negative (" +
                                       TrimSigDigits(HeatCOPFAirFlow, 3) + ").");
                     ShowContinueError(" Negative value occurs using an air flow fraction of " + TrimSigDigits(AirFlowRateRatio, 3) + '.');
-                    ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
+                    ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
                 ShowRecurringWarningErrorAtEnd(
                     Coil.DXCoilType + " \"" + Coil.Name +
@@ -8201,7 +8201,7 @@ namespace DXCoils {
                     ShowContinueError(" HPWH Heating Capacity Modifier curve (function of water flow fraction) output is negative (" +
                                       TrimSigDigits(HeatCapFWaterFlow, 3) + ").");
                     ShowContinueError(" Negative value occurs using a water flow fraction of " + TrimSigDigits(WaterFlowRateRatio, 3) + '.');
-                    ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
+                    ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
                 ShowRecurringWarningErrorAtEnd(
                     Coil.DXCoilType + " \"" + Coil.Name +
@@ -8225,7 +8225,7 @@ namespace DXCoils {
                     ShowContinueError(" HPWH Heating COP Modifier curve (function of water flow fraction) output is negative (" +
                                       TrimSigDigits(HeatCOPFWaterFlow, 3) + ").");
                     ShowContinueError(" Negative value occurs using a water flow fraction of " + TrimSigDigits(WaterFlowRateRatio, 3) + '.');
-                    ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
+                    ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
                 ShowRecurringWarningErrorAtEnd(
                     Coil.DXCoilType + " \"" + Coil.Name +
@@ -8683,7 +8683,7 @@ namespace DXCoils {
                     ShowWarningMessage(RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name +
                                        "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at " +
                                        RoundSigDigits(VolFlowperRatedTotCap, 3) + " m3/s/W.");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError("Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits(MinOperVolFlowPerRatedTotCap(DXCT), 3) +
                                       "--" + RoundSigDigits(MaxCoolVolFlowPerRatedTotCap(DXCT), 3) + ']');
                     ShowContinueError("Possible causes include inconsistent air flow rates in system components,");
@@ -8703,7 +8703,7 @@ namespace DXCoils {
                     ShowWarningMessage(RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name +
                                        "\" - Air volume flow rate per watt of rated total water heating capacity is out of range at " +
                                        RoundSigDigits(VolFlowperRatedTotCap, 2) + " m3/s/W.");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError("Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits(MinOperVolFlowPerRatedTotCap(DXCT), 3) +
                                       "--" + RoundSigDigits(MaxHeatVolFlowPerRatedTotCap(DXCT), 3) + ']');
                     ShowContinueError("Possible causes may be that the parent object is calling for an actual supply air flow rate that is much "
@@ -8795,7 +8795,7 @@ namespace DXCoils {
                             if (Mode > 1) {
                                 ShowContinueError(" Negative output results from stage " + TrimSigDigits(Mode) + " compressor operation.");
                             }
-                            ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
+                            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                         }
                         ShowRecurringWarningErrorAtEnd(
                             RoutineName + DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
@@ -8815,7 +8815,7 @@ namespace DXCoils {
                             ShowContinueError(" Total Cooling Capacity Modifier curve (function of flow fraction) output is negative (" +
                                               TrimSigDigits(TotCapFlowModFac, 3) + ").");
                             ShowContinueError(" Negative value occurs using an air flow fraction of " + TrimSigDigits(AirMassFlowRatio, 3) + '.');
-                            ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
+                            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                             if (Mode > 1) {
                                 ShowContinueError(" Negative output results from stage " + TrimSigDigits(Mode) + " compressor operation.");
                             }
@@ -8888,13 +8888,13 @@ namespace DXCoils {
                         ShowWarningMessage(RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name + "\", PLF curve value");
                         ShowContinueError("The PLF curve value = " + TrimSigDigits(PLF, 3) +
                                           " for part-load ratio = " + TrimSigDigits(PartLoadRatio, 3));
-                        ShowContinueErrorTimeStamp("PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing.");
+                        ShowContinueErrorTimeStamp(state, "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing.");
                         ShowContinueError("Check the IO reference manual for PLF curve guidance [" + DXCoil(DXCoilNum).DXCoilType + "].");
                     } else {
                         ShowWarningMessage(RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name + "\", PLF curve value");
                         ShowContinueError("The PLF curve value = " + TrimSigDigits(PLF, 3) +
                                           " for part-load ratio = " + TrimSigDigits(PartLoadRatio, 3));
-                        ShowContinueErrorTimeStamp("PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing.");
+                        ShowContinueErrorTimeStamp(state, "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing.");
                         ShowContinueError("Check the IO reference manual for PLF curve guidance [" + DXCoil(DXCoilNum).DXCoilType + "].");
                     }
                 }
@@ -8926,14 +8926,14 @@ namespace DXCoils {
                                            "].");
                         ShowContinueError("Runtime fraction reset to 1 and the simulation will continue.");
                         ShowContinueError("Check the IO reference manual for PLF curve guidance [" + DXCoil(DXCoilNum).DXCoilType + "].");
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                     } else {
                         ShowWarningMessage(RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name + "\", runtime fraction");
                         ShowWarningMessage("The runtime fraction exceeded 1.0. [" + RoundSigDigits(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, 4) +
                                            "].");
                         ShowContinueError("Runtime fraction reset to 1 and the simulation will continue.");
                         ShowContinueError("Check the IO reference manual for PLF curve guidance [" + DXCoil(DXCoilNum).DXCoilType + "].");
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                     }
                 }
                 if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped ||
@@ -9167,7 +9167,7 @@ namespace DXCoils {
                         if (Mode > 1) {
                             ShowContinueError(" Negative output results from stage " + TrimSigDigits(Mode) + " compressor operation.");
                         }
-                        ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
+                        ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                     }
                     ShowRecurringWarningErrorAtEnd(
                         RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name +
@@ -9187,7 +9187,7 @@ namespace DXCoils {
                         ShowContinueError(" Energy Input Ratio Modifier curve (function of flow fraction) output is negative (" +
                                           TrimSigDigits(EIRFlowModFac, 3) + ").");
                         ShowContinueError(" Negative value occurs using an air flow fraction of " + TrimSigDigits(AirMassFlowRatio, 3) + '.');
-                        ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
+                        ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                         if (Mode > 1) {
                             ShowContinueError(" Negative output results from stage " + TrimSigDigits(Mode) + " compressor operation.");
                         }
@@ -9638,7 +9638,7 @@ namespace DXCoils {
                     ShowWarningMessage(DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                                        "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at " +
                                        RoundSigDigits(VolFlowperRatedTotCap, 3) + " m3/s/W.");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError("...Expected range for VolumeFlowPerRatedTotalCapacity=[" +
                                       RoundSigDigits(MinOperVolFlowPerRatedTotCap(DXCT), 3) + "--" +
                                       RoundSigDigits(MaxCoolVolFlowPerRatedTotCap(DXCT), 3) + ']');
@@ -9727,7 +9727,7 @@ namespace DXCoils {
                     if (Mode > 1) {
                         ShowContinueError(" Negative output results from stage " + TrimSigDigits(Mode) + " compressor operation.");
                     }
-                    ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
+                    ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                 }
                 ShowRecurringWarningErrorAtEnd(
                     DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
@@ -9749,7 +9749,7 @@ namespace DXCoils {
                     ShowContinueError(" Total Cooling Capacity Modifier curve (function of flow fraction) output is negative (" +
                                       TrimSigDigits(TotCapFlowModFac, 3) + ").");
                     ShowContinueError(" Negative value occurs using an air flow fraction of " + TrimSigDigits(AirMassFlowRatio, 3) + '.');
-                    ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
+                    ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                     if (Mode > 1) {
                         ShowContinueError(" Negative output results from stage " + TrimSigDigits(Mode) + " compressor operation.");
                     }
@@ -9811,7 +9811,7 @@ namespace DXCoils {
                 if (DXCoil(DXCoilNum).ErrIndex2 == 0) {
                     ShowWarningMessage("The PLF curve value for the DX cooling coil " + DXCoil(DXCoilNum).Name + " =" + RoundSigDigits(PLF, 3) +
                                        " for part-load ratio =" + RoundSigDigits(PartLoadRatio, 3));
-                    ShowContinueErrorTimeStamp("PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing.");
+                    ShowContinueErrorTimeStamp(state, "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing.");
                     ShowContinueError("Check the IO reference manual for PLF curve guidance [Coil:Cooling:DX:SingleSpeed].");
                 }
                 ShowRecurringWarningErrorAtEnd(
@@ -9827,7 +9827,7 @@ namespace DXCoils {
                                        RoundSigDigits(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, 4) + "].");
                     ShowContinueError("Runtime fraction reset to 1 and the simulation will continue.");
                     ShowContinueError("Check the IO reference manual for PLF curve guidance [Coil:Cooling:DX:SingleSpeed].");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", DX cooling coil runtime fraction > 1.0 warning continues...",
                                                DXCoil(DXCoilNum).ErrIndex3,
@@ -10174,7 +10174,7 @@ namespace DXCoils {
                     ShowWarningMessage(DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                                        "\" - Air volume flow rate per watt of rated total heating capacity is out of range at " +
                                        RoundSigDigits(VolFlowperRatedTotCap, 3) + " m3/s/W.");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError("Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits(MinOperVolFlowPerRatedTotCap(DXCT), 3) +
                                       "--" + RoundSigDigits(MaxHeatVolFlowPerRatedTotCap(DXCT), 3) + ']');
                     ShowContinueError("Possible causes include inconsistent air flow rates in system components or");
@@ -10231,7 +10231,7 @@ namespace DXCoils {
                     ShowContinueError("TotCapTempModFac curve value must be > 0. TotCapTempModFac curve value has been reset to 0.0 and "
                                       "simulation is continuing.");
                     ShowContinueError("Check the IO reference manual for TotCapTempModFac curve guidance [ " + DXCoil(DXCoilNum).DXCoilType + " ].");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd("DX heating coil TotCapTempModFac curve value < 0 warning continues... ",
                                                DXCoil(DXCoilNum).CAPFTErrIndex,
@@ -10348,7 +10348,7 @@ namespace DXCoils {
                     ShowContinueError(
                         "EIRTempModFac curve value must be > 0.  EIRTempModFac curve value has been reset to 0.0 and simulation is continuing.");
                     ShowContinueError("Check the IO reference manual for EIRTempModFac curve guidance [ " + DXCoil(DXCoilNum).DXCoilType + " ].");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd("DX heating coil EIRTempModFac curve value < 0.0 warning continues... ",
                                                DXCoil(DXCoilNum).EIRFTErrIndex,
@@ -10376,7 +10376,7 @@ namespace DXCoils {
                                        " for part-load ratio =" + RoundSigDigits(PLRHeating, 2));
                     ShowContinueError("PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing.");
                     ShowContinueError("Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:SingleSpeed].");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd("DX heating coil PLF curve < 0.7 warning continues... ", DXCoil(DXCoilNum).PLRErrIndex, PLF, PLF);
                 PLF = 0.7;
@@ -10389,7 +10389,7 @@ namespace DXCoils {
                                        RoundSigDigits(DXCoil(DXCoilNum).HeatingCoilRuntimeFraction, 4) + "].");
                     ShowContinueError("Runtime fraction is set to 1.0 and the simulation continues...");
                     ShowContinueError("Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:SingleSpeed].");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", DX heating coil runtime fraction > 1.0 warning continues...",
                                                DXCoil(DXCoilNum).ErrIndex4,
@@ -11161,7 +11161,7 @@ namespace DXCoils {
                                       RoundSigDigits(AirVolFlowRate / TotCap, 7) + " m3/s/W");
                 }
             }
-            ShowContinueErrorTimeStamp("");
+            ShowContinueErrorTimeStamp(state, "");
             OutletAirTempSat = PsyTsatFnHPb(OutletAirEnthalpy, StdPressureSeaLevel, RoutineName);
             if (OutletAirTemp < OutletAirTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
                 OutletAirTemp = OutletAirTempSat + 0.005;
@@ -11197,7 +11197,7 @@ namespace DXCoils {
                                       RoundSigDigits(AirVolFlowRate / TotCap, 7) + " m3/s/W");
                 }
             }
-            ShowContinueErrorTimeStamp("");
+            ShowContinueErrorTimeStamp(state, "");
             ShowFatalError("Check and revise the input data for this coil before rerunning the simulation.");
         }
         // Calculate slope at given conditions
@@ -11224,7 +11224,7 @@ namespace DXCoils {
                                       RoundSigDigits(AirVolFlowRate / TotCap, 7) + " m3/s/W");
                 }
             }
-            ShowContinueErrorTimeStamp("");
+            ShowContinueErrorTimeStamp(state, "");
             CBFErrors = true;
             CBF = 0.0; //? Added: Is this what should be returned
         } else {
@@ -11282,12 +11282,12 @@ namespace DXCoils {
                 ShowContinueError("temperature values in the Sizing:System and Sizing:Zone objects. In general, the temperatures");
                 ShowContinueError("and humidity ratios specified in these two objects should be the same for each system");
                 ShowContinueError("and the zones that it serves.");
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
                 CBFErrors = true; // Didn't converge within MaxIter iterations
             }
             if (CBF < 0.0 && PrintFlag) {
                 ShowSevereError(UnitType + " \"" + UnitName + "\" -- negative coil bypass factor calculated.");
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
                 CBFErrors = true; // Negative CBF not valid
             }
         }
@@ -11851,14 +11851,14 @@ namespace DXCoils {
             if (MSHPMassFlowRateLow == 0.0 && SpeedNum > 1) {
                 ShowContinueError("When AirMassFlow > 0.0 and CycRatio > 0.0 and SpeedNum > 1, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh "
                                   "must also be > 0.0");
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
                 ShowContinueError("AirMassFlow=" + RoundSigDigits(AirMassFlow, 3) + ",CycRatio=" + RoundSigDigits(CycRatio, 3) + ",SpeedNum=" +
                                   RoundSigDigits(double(SpeedNum), 0) + ", MSHPMassFlowRateLow=" + RoundSigDigits(MSHPMassFlowRateLow, 3) +
                                   ", MSHPMassFlowRateHigh=" + RoundSigDigits(MSHPMassFlowRateHigh, 3));
                 ShowFatalError("Preceding condition(s) causes termination.");
             } else {
                 ShowContinueError("When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateHigh must also be > 0.0");
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
                 ShowContinueError("AirMassFlow=" + RoundSigDigits(AirMassFlow, 3) + ",CycRatio=" + RoundSigDigits(CycRatio, 3) +
                                   ", MSHPMassFlowRateHigh=" + RoundSigDigits(MSHPMassFlowRateHigh, 3));
                 ShowFatalError("Preceding condition(s) causes termination.");
@@ -11867,7 +11867,7 @@ namespace DXCoils {
             ShowSevereError("CalcMultiSpeedDXCoilCooling: " + DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                             " Developer error - inconsistent speed ratios.");
             ShowContinueError("CycRatio and SpeedRatio must be between 0.0 and 1.0");
-            ShowContinueErrorTimeStamp("");
+            ShowContinueErrorTimeStamp(state, "");
             ShowContinueError("CycRatio=" + RoundSigDigits(CycRatio, 1) + ", SpeedRatio = " + RoundSigDigits(SpeedRatio, 1));
             ShowFatalError("Preceding condition(s) causes termination.");
         }
@@ -11912,7 +11912,7 @@ namespace DXCoils {
                         ShowWarningMessage(DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                                            "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " +
                                            TrimSigDigits(SpeedNumLS) + '.');
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError("Expected range for VolumeFlowPerRatedTotalCapacity=[" +
                                           RoundSigDigits(MinOperVolFlowPerRatedTotCap(DXCT), 3) + "--" +
                                           RoundSigDigits(MaxCoolVolFlowPerRatedTotCap(DXCT), 3) + "] Current value is " +
@@ -11939,7 +11939,7 @@ namespace DXCoils {
                         ShowWarningMessage(DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                                            "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " +
                                            TrimSigDigits(SpeedNumHS) + '.');
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError("Expected range for VolumeFlowPerRatedTotalCapacity=[" +
                                           RoundSigDigits(MinOperVolFlowPerRatedTotCap(DXCT), 3) + "--" +
                                           RoundSigDigits(MaxCoolVolFlowPerRatedTotCap(DXCT), 3) + "] Current value is " +
@@ -12234,7 +12234,7 @@ namespace DXCoils {
                         ShowWarningMessage(DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                                            "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " +
                                            TrimSigDigits(SpeedNum) + '.');
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError("Expected range for VolumeFlowPerRatedTotalCapacity=[" +
                                           RoundSigDigits(MinOperVolFlowPerRatedTotCap(DXCT), 3) + "--" +
                                           RoundSigDigits(MaxCoolVolFlowPerRatedTotCap(DXCT), 3) + "] Current value is " +
@@ -12305,7 +12305,7 @@ namespace DXCoils {
                         ShowWarningMessage("The PLF curve value for DX cooling coil " + DXCoil(DXCoilNum).Name + " =" + RoundSigDigits(PLF, 2) +
                                            " for part-load ratio = 1");
                         ShowContinueError("PLF curve value must be = 1.0 and has been reset to 1.0. Simulation is continuing.");
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                     }
                     ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + "\": DX cooling coil PLF curve value <> 1.0 warning continues...",
                                                    DXCoil(DXCoilNum).PLFErrIndex,
@@ -12638,14 +12638,14 @@ namespace DXCoils {
             if (MSHPMassFlowRateLow == 0.0 && SpeedNum > 1) {
                 ShowContinueError("When AirMassFlow > 0.0 and CycRatio > 0.0 and SpeedNum > 1, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh "
                                   "must also be > 0.0");
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
                 ShowContinueError("AirMassFlow=" + RoundSigDigits(AirMassFlow, 3) + ",CycRatio=" + RoundSigDigits(CycRatio, 3) + ",SpeedNum=" +
                                   RoundSigDigits(double(SpeedNum), 0) + ", MSHPMassFlowRateLow=" + RoundSigDigits(MSHPMassFlowRateLow, 3) +
                                   ", MSHPMassFlowRateHigh=" + RoundSigDigits(MSHPMassFlowRateHigh, 3));
                 ShowFatalError("Preceding condition(s) causes termination.");
             } else {
                 ShowContinueError("When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateHigh must also be > 0.0");
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
                 ShowContinueError("AirMassFlow=" + RoundSigDigits(AirMassFlow, 3) + ",CycRatio=" + RoundSigDigits(CycRatio, 3) +
                                   ", MSHPMassFlowRateHigh=" + RoundSigDigits(MSHPMassFlowRateHigh, 3));
                 ShowFatalError("Preceding condition(s) causes termination.");
@@ -12654,7 +12654,7 @@ namespace DXCoils {
             ShowSevereError("CalcMultiSpeedDXCoilHeating: " + DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                             " Developer error - inconsistent speed ratios.");
             ShowContinueError("CycRatio and SpeedRatio must be between 0.0 and 1.0");
-            ShowContinueErrorTimeStamp("");
+            ShowContinueErrorTimeStamp(state, "");
             ShowContinueError("CycRatio=" + RoundSigDigits(CycRatio, 1) + ", SpeedRatio = " + RoundSigDigits(SpeedRatio, 1));
             ShowFatalError("Preceding condition(s) causes termination.");
         }
@@ -12724,7 +12724,7 @@ namespace DXCoils {
                         ShowWarningMessage(DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                                            "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " +
                                            TrimSigDigits(SpeedNumLS) + '.');
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError("Expected range for VolumeFlowPerRatedTotalCapacity=[" +
                                           RoundSigDigits(MinOperVolFlowPerRatedTotCap(DXCT), 3) + "--" +
                                           RoundSigDigits(MaxHeatVolFlowPerRatedTotCap(DXCT), 3) + "] Current value is " +
@@ -12751,7 +12751,7 @@ namespace DXCoils {
                         ShowWarningMessage(DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                                            "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " +
                                            TrimSigDigits(SpeedNumHS) + '.');
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError("Expected range for VolumeFlowPerRatedTotalCapacity=[" +
                                           RoundSigDigits(MinOperVolFlowPerRatedTotCap(DXCT), 3) + "--" +
                                           RoundSigDigits(MaxHeatVolFlowPerRatedTotCap(DXCT), 3) + "] Current value is " +
@@ -12874,7 +12874,7 @@ namespace DXCoils {
                                            RoundSigDigits(PLF, 2) + " for part-load ratio =" + RoundSigDigits(PLRHeating, 2));
                         ShowContinueError("PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing.");
                         ShowContinueError("Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:MultiSpeed].");
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                     }
                     ShowRecurringWarningErrorAtEnd("DX heating coil PLF curve < 0.7 warning continues... ", DXCoil(DXCoilNum).PLRErrIndex, PLF, PLF);
                     PLF = 0.7;
@@ -12887,7 +12887,7 @@ namespace DXCoils {
                                            " exceeded 1.0. [" + RoundSigDigits(DXCoil(DXCoilNum).HeatingCoilRuntimeFraction, 4) + "].");
                         ShowContinueError("Runtime fraction is set to 1.0 and the simulation continues...");
                         ShowContinueError("Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:SingleSpeed].");
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                     }
                     ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", DX heating coil runtime fraction > 1.0 warning continues...",
                                                    DXCoil(DXCoilNum).ErrIndex4,
@@ -12986,7 +12986,7 @@ namespace DXCoils {
                     if (DXCoil(DXCoilNum).ErrIndex1 == 0) {
                         ShowWarningMessage(DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name +
                                            "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed 1.");
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError("Expected range for VolumeFlowPerRatedTotalCapacity=[" +
                                           RoundSigDigits(MinOperVolFlowPerRatedTotCap(DXCT), 3) + "--" +
                                           RoundSigDigits(MaxHeatVolFlowPerRatedTotCap(DXCT), 3) + "] Current value is " +
@@ -13102,7 +13102,7 @@ namespace DXCoils {
                         ShowWarningMessage("The PLF curve value for DX heating coil " + DXCoil(DXCoilNum).Name + " =" + RoundSigDigits(PLF, 2) +
                                            " for part-load ratio = 1");
                         ShowContinueError("PLF curve value must be = 1.0 and has been reset to 1.0. Simulation is continuing.");
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                     }
                     ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + "\": DX heating coil PLF curve value <> 1.0 warning continues...",
                                                    DXCoil(DXCoilNum).PLFErrIndex,
@@ -13117,7 +13117,7 @@ namespace DXCoils {
                                            " for part-load ratio =" + RoundSigDigits(PLRHeating, 2));
                         ShowContinueError("PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing.");
                         ShowContinueError("Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:SingleSpeed].");
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                     }
                     ShowRecurringWarningErrorAtEnd("DX heating coil PLF curve < 0.7 warning continues... ", DXCoil(DXCoilNum).PLRErrIndex, PLF, PLF);
                     PLF = 0.7;
@@ -13130,7 +13130,7 @@ namespace DXCoils {
                                            RoundSigDigits(DXCoil(DXCoilNum).HeatingCoilRuntimeFraction, 4) + "].");
                         ShowContinueError("Runtime fraction is set to 1.0 and the simulation continues...");
                         ShowContinueError("Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:SingleSpeed].");
-                        ShowContinueErrorTimeStamp("");
+                        ShowContinueErrorTimeStamp(state, "");
                     }
                     ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", DX heating coil runtime fraction > 1.0 warning continues...",
                                                    DXCoil(DXCoilNum).ErrIndex4,
@@ -15989,7 +15989,7 @@ namespace DXCoils {
                 if (DXCoil(DXCoilNum).ErrIndex2 == 0) {
                     ShowWarningMessage("The PLF curve value for the DX cooling coil " + DXCoil(DXCoilNum).Name + " =" + RoundSigDigits(PLF, 3) +
                                        " for part-load ratio =" + RoundSigDigits(PartLoadRatio, 3));
-                    ShowContinueErrorTimeStamp("PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing.");
+                    ShowContinueErrorTimeStamp(state, "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing.");
                     ShowContinueError("Check the IO reference manual for PLF curve guidance [Coil:Cooling:DX:SingleSpeed].");
                 }
                 ShowRecurringWarningErrorAtEnd(
@@ -16005,7 +16005,7 @@ namespace DXCoils {
                                        RoundSigDigits(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, 4) + "].");
                     ShowContinueError("Runtime fraction reset to 1 and the simulation will continue.");
                     ShowContinueError("Check the IO reference manual for PLF curve guidance [Coil:Cooling:DX:SingleSpeed].");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", DX cooling coil runtime fraction > 1.0 warning continues...",
                                                DXCoil(DXCoilNum).ErrIndex3,
@@ -16318,7 +16318,7 @@ namespace DXCoils {
                                        " for part-load ratio =" + RoundSigDigits(PLRHeating, 2));
                     ShowContinueError("PLF curve values must be >= 0.7. PLF has been reset to 0.7 and simulation is continuing.");
                     ShowContinueError("Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:SingleSpeed].");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd("DX heating coil PLF curve < 0.7 warning continues... ", DXCoil(DXCoilNum).PLRErrIndex, PLF, PLF);
                 PLF = 0.7;
@@ -16331,7 +16331,7 @@ namespace DXCoils {
                                        RoundSigDigits(DXCoil(DXCoilNum).HeatingCoilRuntimeFraction, 4) + "].");
                     ShowContinueError("Runtime fraction is set to 1.0 and the simulation continues...");
                     ShowContinueError("Check the IO reference manual for PLF curve guidance [Coil:Heating:DX:SingleSpeed].");
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd(DXCoil(DXCoilNum).Name + ", DX heating coil runtime fraction > 1.0 warning continues...",
                                                DXCoil(DXCoilNum).ErrIndex4,

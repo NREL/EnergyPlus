@@ -202,17 +202,17 @@ namespace HybridModel {
                     // Scenario 1-1: To solve thermal mass
                     if (FlagHybridModel_TM) {
                         if (FlagHybridModel_AI) {
-                            ShowSevereError("Field \"" + cAlphaFieldNames(3) + " and " + cAlphaFieldNames(4) + "\" cannot be both set to YES.");
+                            ShowSevereError(state, "Field \"" + cAlphaFieldNames(3) + " and " + cAlphaFieldNames(4) + "\" cannot be both set to YES.");
                             ErrorsFound = true;
                         }
 
                         if (FlagHybridModel_PC) {
-                            ShowSevereError("Field \"" + cAlphaFieldNames(3) + " and " + cAlphaFieldNames(5) + "\" cannot be both set to YES.");
+                            ShowSevereError(state, "Field \"" + cAlphaFieldNames(3) + " and " + cAlphaFieldNames(5) + "\" cannot be both set to YES.");
                             ErrorsFound = true;
                         }
 
                         if (TemperatureSchPtr == 0) {
-                            ShowSevereError("Measured Zone Air Tempearture Schedule is not defined for: " + CurrentModuleObject);
+                            ShowSevereError(state, "Measured Zone Air Tempearture Schedule is not defined for: " + CurrentModuleObject);
                             ErrorsFound = true;
                         } else {
                             HybridModelZone(ZonePtr).InternalThermalMassCalc_T = true;
@@ -222,13 +222,13 @@ namespace HybridModel {
                     // Scenario 1-2: To solve infiltration rate
                     if (FlagHybridModel_AI) {
                         if (FlagHybridModel_PC) {
-                            ShowSevereError("Field \"" + cAlphaFieldNames(4) + "\" and \"" + cAlphaFieldNames(5) + "\" cannot be both set to YES.");
+                            ShowSevereError(state, "Field \"" + cAlphaFieldNames(4) + "\" and \"" + cAlphaFieldNames(5) + "\" cannot be both set to YES.");
                             ErrorsFound = true;
                         }
                         if (TemperatureSchPtr == 0 && HumidityRatioSchPtr == 0 && CO2ConcentrationSchPtr == 0) {
                             // Show fatal error if no measurement schedule is provided
-                            ShowSevereError("No measured envrionmental parameter is provided for: " + CurrentModuleObject);
-                            ShowContinueError("One of the field \"" + cAlphaFieldNames(6) + "\", \"" + cAlphaFieldNames(7) + "\", or " +
+                            ShowSevereError(state, "No measured envrionmental parameter is provided for: " + CurrentModuleObject);
+                            ShowContinueError(state, "One of the field \"" + cAlphaFieldNames(6) + "\", \"" + cAlphaFieldNames(7) + "\", or " +
                                               cAlphaFieldNames(8) + "\" must be provided for the HybridModel:Zone.");
                             ErrorsFound = true;
                         } else {
@@ -237,11 +237,11 @@ namespace HybridModel {
                                 HybridModelZone(ZonePtr).InfiltrationCalc_T = true;
                                 if (HumidityRatioSchPtr > 0) {
                                     ShowWarningError("Field \"" + cAlphaFieldNames(6) + "\" is provided.");
-                                    ShowContinueError("Field \"" + cAlphaFieldNames(7) + "\" will not be used.");
+                                    ShowContinueError(state, "Field \"" + cAlphaFieldNames(7) + "\" will not be used.");
                                 }
                                 if (CO2ConcentrationSchPtr > 0) {
                                     ShowWarningError("Field \"" + cAlphaFieldNames(6) + "\" is provided.");
-                                    ShowContinueError("Field \"" + cAlphaFieldNames(8) + "\" will not be used.");
+                                    ShowContinueError(state, "Field \"" + cAlphaFieldNames(8) + "\" will not be used.");
                                 }
                             }
                             if (HumidityRatioSchPtr > 0 && TemperatureSchPtr == 0) {
@@ -249,7 +249,7 @@ namespace HybridModel {
                                 HybridModelZone(ZonePtr).InfiltrationCalc_H = true;
                                 if (CO2ConcentrationSchPtr > 0) {
                                     ShowWarningError("Field \"" + cAlphaFieldNames(7) + "\" is provided.");
-                                    ShowContinueError("Field \"" + cAlphaFieldNames(8) + "\" will not be used.");
+                                    ShowContinueError(state, "Field \"" + cAlphaFieldNames(8) + "\" will not be used.");
                                 }
                             }
                             if (CO2ConcentrationSchPtr > 0 && TemperatureSchPtr == 0 && HumidityRatioSchPtr == 0) {
@@ -263,8 +263,8 @@ namespace HybridModel {
                     if (FlagHybridModel_PC) {
                         if (TemperatureSchPtr == 0 && HumidityRatioSchPtr == 0 && CO2ConcentrationSchPtr == 0) {
                             // Show fatal error if no measurement schedule is provided
-                            ShowSevereError("No measured envrionmental parameter is provided for: " + CurrentModuleObject);
-                            ShowContinueError("One of the field \"" + cAlphaFieldNames(6) + "\", \"" + cAlphaFieldNames(7) + "\", or " +
+                            ShowSevereError(state, "No measured envrionmental parameter is provided for: " + CurrentModuleObject);
+                            ShowContinueError(state, "One of the field \"" + cAlphaFieldNames(6) + "\", \"" + cAlphaFieldNames(7) + "\", or " +
                                               cAlphaFieldNames(8) + "\" must be provided for the HybridModel:Zone.");
                             ErrorsFound = true;
                         } else {
@@ -438,7 +438,7 @@ namespace HybridModel {
                     }
 
                 } else {
-                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                     "\" not found.");
                     ErrorsFound = true;
                 }
@@ -462,7 +462,7 @@ namespace HybridModel {
             }
 
             if (ErrorsFound) {
-                ShowFatalError("Errors getting Hybrid Model input data. Preceding condition(s) cause termination.");
+                ShowFatalError(state, "Errors getting Hybrid Model input data. Preceding condition(s) cause termination.");
             }
         }
     }

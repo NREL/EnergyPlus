@@ -236,18 +236,18 @@ namespace HVACDXSystem {
         if (CompIndex == 0) {
             DXSystemNum = UtilityRoutines::FindItemInList(DXCoolingSystemName, DXCoolingSystem);
             if (DXSystemNum == 0) {
-                ShowFatalError("SimDXCoolingSystem: DXUnit not found=" + DXCoolingSystemName);
+                ShowFatalError(state, "SimDXCoolingSystem: DXUnit not found=" + DXCoolingSystemName);
             }
             CompIndex = DXSystemNum;
         } else {
             DXSystemNum = CompIndex;
             if (DXSystemNum > NumDXSystem || DXSystemNum < 1) {
-                ShowFatalError("SimulateDXCoolingSystem:  Invalid CompIndex passed=" + TrimSigDigits(DXSystemNum) +
+                ShowFatalError(state, "SimulateDXCoolingSystem:  Invalid CompIndex passed=" + TrimSigDigits(DXSystemNum) +
                                ", Number of DX Units=" + TrimSigDigits(NumDXSystem) + ", DX Unit name=" + DXCoolingSystemName);
             }
             if (CheckEquipName(DXSystemNum)) {
                 if (DXCoolingSystemName != DXCoolingSystem(DXSystemNum).Name) {
-                    ShowFatalError("SimulateDXCoolingSystem: Invalid CompIndex passed=" + TrimSigDigits(DXSystemNum) + ", DX Unit name=" +
+                    ShowFatalError(state, "SimulateDXCoolingSystem: Invalid CompIndex passed=" + TrimSigDigits(DXSystemNum) + ", DX Unit name=" +
                                    DXCoolingSystemName + ", stored DX Unit Name for that index=" + DXCoolingSystem(DXSystemNum).Name);
                 }
                 CheckEquipName(DXSystemNum) = false;
@@ -331,7 +331,7 @@ namespace HVACDXSystem {
                            DXCoolingSystem(DXSystemNum).PartLoadFrac);
 
             } else {
-                ShowFatalError("SimDXCoolingSystem: Invalid DX Cooling System/Coil=" + DXCoolingSystem(DXSystemNum).CoolingCoilType);
+                ShowFatalError(state, "SimDXCoolingSystem: Invalid DX Cooling System/Coil=" + DXCoolingSystem(DXSystemNum).CoolingCoilType);
             }
         }
         // set econo lockout flag
@@ -445,7 +445,7 @@ namespace HVACDXSystem {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             DXCoolingSystem(DXCoolSysNum).DXCoolingSystemType = CurrentModuleObject; // push Object Name into data array
             DXCoolingSystem(DXCoolSysNum).Name = Alphas(1);
@@ -465,13 +465,13 @@ namespace HVACDXSystem {
             DXCoolingSystem(DXCoolSysNum).DXCoolingCoilOutletNodeNum =
                 GetOnlySingleNode(state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
 
-            TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             DXCoolingSystem(DXCoolSysNum).DXSystemControlNodeNum =
                 GetOnlySingleNode(state, Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsParent);
             if (DXCoolingSystem(DXCoolSysNum).DXSystemControlNodeNum == 0) {
                 ShowSevereError(CurrentModuleObject + ": control node must be input");
-                ShowContinueError("Error occurred in " + cAlphaFields(1) + '=' + Alphas(1));
+                ShowContinueError(state, "Error occurred in " + cAlphaFields(1) + '=' + Alphas(1));
                 ErrorsFound = true;
             }
 
@@ -496,7 +496,7 @@ namespace HVACDXSystem {
                                    CurrentModuleObject,
                                    ObjexxFCL::Optional_bool_const());
                     if (ErrFound) {
-                        ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
+                        ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:VariableSpeed")) {
@@ -504,7 +504,7 @@ namespace HVACDXSystem {
                     DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex =
                         GetCoilIndexVariableSpeed(state, "Coil:Cooling:DX:VariableSpeed", DXCoolingSystem(DXCoolSysNum).CoolingCoilName, ErrFound);
                     if (ErrFound) {
-                        ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
+                        ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:TwoSpeed")) {
@@ -516,7 +516,7 @@ namespace HVACDXSystem {
                                    CurrentModuleObject,
                                    ObjexxFCL::Optional_bool_const());
                     if (ErrFound) {
-                        ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
+                        ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(Alphas(6), "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
@@ -524,7 +524,7 @@ namespace HVACDXSystem {
                     GetHXDXCoilIndex(state,
                         DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
                     if (ErrFound) {
-                        ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
+                        ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
                     }
 
@@ -532,7 +532,7 @@ namespace HVACDXSystem {
                     HXDXCoolCoilName = GetHXDXCoilName(state, Alphas(6), Alphas(7), DXErrorsFound);
                     if (DXErrorsFound) {
                         ShowWarningError(CurrentModuleObject + " = \"" + DXCoolingSystem(DXCoolSysNum).Name + "\"");
-                        ShowContinueError("CoilSystem:Cooling:DX:HeatExchangerAssisted \"" + Alphas(7) + "\" not found.");
+                        ShowContinueError(state, "CoilSystem:Cooling:DX:HeatExchangerAssisted \"" + Alphas(7) + "\" not found.");
                         ErrorsFound = true;
                     }
 
@@ -545,7 +545,7 @@ namespace HVACDXSystem {
                                    CurrentModuleObject,
                                    ObjexxFCL::Optional_bool_const());
                     if (ErrFound) {
-                        ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
+                        ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:SingleSpeed:ThermalStorage")) {
@@ -553,21 +553,21 @@ namespace HVACDXSystem {
                     GetTESCoilIndex(state,
                         DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
                     if (ErrFound) {
-                        ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
+                        ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
                     }
                 }
 
             } else {
                 ShowSevereError("Invalid entry for " + cAlphaFields(6) + " :" + Alphas(6));
-                ShowContinueError("In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
+                ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
                 ErrorsFound = true;
             }
 
             ValidateComponent(state,
                 DXCoolingSystem(DXCoolSysNum).CoolingCoilType, DXCoolingSystem(DXCoolSysNum).CoolingCoilName, IsNotOK, CurrentModuleObject);
             if (IsNotOK) {
-                ShowContinueError("In " + CurrentModuleObject + " = \"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
+                ShowContinueError(state, "In " + CurrentModuleObject + " = \"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
                 ErrorsFound = true;
             }
 
@@ -591,17 +591,17 @@ namespace HVACDXSystem {
                     DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl_Multimode;
                 } else {
                     ShowWarningError("Invalid entry for " + cAlphaFields(8) + " :" + Alphas(8));
-                    ShowContinueError("In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
-                    ShowContinueError("Valid only with cooling coil type = Coil:Cooling:DX:TwoStageWithHumidityControlMode or "
+                    ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
+                    ShowContinueError(state, "Valid only with cooling coil type = Coil:Cooling:DX:TwoStageWithHumidityControlMode or "
                                       "CoilSystem:Cooling:DX:HeatExchangerAssisted.");
-                    ShowContinueError("Setting " + cAlphaFields(8) + " to None.");
+                    ShowContinueError(state, "Setting " + cAlphaFields(8) + " to None.");
                     DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl_None;
                 }
             } else if (UtilityRoutines::SameString(Alphas(8), "CoolReheat")) {
                 DXCoolingSystem(DXCoolSysNum).DehumidControlType = DehumidControl_CoolReheat;
             } else {
                 ShowSevereError("Invalid entry for " + cAlphaFields(8) + " :" + Alphas(8));
-                ShowContinueError("In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
+                ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
             }
 
             // Run on sensible load
@@ -613,8 +613,8 @@ namespace HVACDXSystem {
                 DXCoolingSystem(DXCoolSysNum).RunOnSensibleLoad = false;
             } else {
                 ShowSevereError("Invalid entry for " + cAlphaFields(9) + " :" + Alphas(9));
-                ShowContinueError("In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
-                ShowContinueError("Must be Yes or No.");
+                ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
+                ShowContinueError(state, "Must be Yes or No.");
             }
 
             // Run on latent load
@@ -626,8 +626,8 @@ namespace HVACDXSystem {
                 DXCoolingSystem(DXCoolSysNum).RunOnLatentLoad = false;
             } else {
                 ShowSevereError("Invalid entry for " + cAlphaFields(10) + " :" + Alphas(10));
-                ShowContinueError("In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
-                ShowContinueError("Must be Yes or No.");
+                ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
+                ShowContinueError(state, "Must be Yes or No.");
             }
 
             // Run as 100% DOAS DX coil
@@ -638,9 +638,9 @@ namespace HVACDXSystem {
                     DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil = true;
                     if (DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
                         ShowWarningError(CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
-                        ShowContinueError("Invalid entry for " + cAlphaFields(11) + " :" + Alphas(11));
-                        ShowContinueError("Variable DX Cooling Coil is not supported as 100% DOAS DX coil.");
-                        ShowContinueError("Variable DX Cooling Coil is reset as a regular DX coil and the simulation continues.");
+                        ShowContinueError(state, "Invalid entry for " + cAlphaFields(11) + " :" + Alphas(11));
+                        ShowContinueError(state, "Variable DX Cooling Coil is not supported as 100% DOAS DX coil.");
+                        ShowContinueError(state, "Variable DX Cooling Coil is reset as a regular DX coil and the simulation continues.");
                         DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil = false;
                     }
                 } else if (UtilityRoutines::SameString(Alphas(11), "")) {
@@ -649,8 +649,8 @@ namespace HVACDXSystem {
                     DXCoolingSystem(DXCoolSysNum).ISHundredPercentDOASDXCoil = false;
                 } else {
                     ShowSevereError("Invalid entry for " + cAlphaFields(11) + " :" + Alphas(11));
-                    ShowContinueError("In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
-                    ShowContinueError("Must be Yes or No.");
+                    ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + DXCoolingSystem(DXCoolSysNum).Name + "\".");
+                    ShowContinueError(state, "Must be Yes or No.");
                 }
             }
 
@@ -682,7 +682,7 @@ namespace HVACDXSystem {
         } // End of the DX System Loop
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(state, RoutineName + "Errors found in input.  Program terminates.");
         }
 
         for (DXSystemNum = 1; DXSystemNum <= NumDXSystem; ++DXSystemNum) {
@@ -832,15 +832,15 @@ namespace HVACDXSystem {
                             if (!AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
                                                 ": Missing temperature setpoint for DX unit= " + DXCoolingSystem(DXSysIndex).Name);
-                                ShowContinueError("  use a Setpoint Manager to establish a setpoint at the unit control node.");
+                                ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the unit control node.");
                                 SetPointErrorFlag = true;
                             } else {
                                 CheckIfNodeSetPointManagedByEMS(ControlNode, iTemperatureSetPoint, SetPointErrorFlag);
                                 if (SetPointErrorFlag) {
                                     ShowSevereError(DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
                                                     ": Missing temperature setpoint for DX unit= " + DXCoolingSystem(DXSysIndex).Name);
-                                    ShowContinueError("  use a Setpoint Manager to establish a setpoint at the unit control node.");
-                                    ShowContinueError("  or use an EMS actuator to establish a temperature setpoint at the unit control node.");
+                                    ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the unit control node.");
+                                    ShowContinueError(state, "  or use an EMS actuator to establish a temperature setpoint at the unit control node.");
                                 }
                             }
                         }
@@ -849,7 +849,7 @@ namespace HVACDXSystem {
                             if (!AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
                                                 ": Missing humidity ratio setpoint (HUMRATMAX) for DX unit= " + DXCoolingSystem(DXSysIndex).Name);
-                                ShowContinueError("  use a Setpoint Manager to establish a setpoint at the unit control node.");
+                                ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the unit control node.");
                                 SetPointErrorFlag = true;
                             } else {
                                 CheckIfNodeSetPointManagedByEMS(ControlNode, iHumidityRatioMaxSetPoint, SetPointErrorFlag);
@@ -857,8 +857,8 @@ namespace HVACDXSystem {
                                     ShowSevereError(
                                         DXCoolingSystem(DXSysIndex).DXCoolingSystemType +
                                         ": Missing maximum humidity ratio setpoint (HUMRATMAX) for DX unit= " + DXCoolingSystem(DXSysIndex).Name);
-                                    ShowContinueError("  use a Setpoint Manager to establish a setpoint at the unit control node.");
-                                    ShowContinueError("  or use an EMS actuator to establish a maximum humidity ratio setpoint.");
+                                    ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the unit control node.");
+                                    ShowContinueError(state, "  or use an EMS actuator to establish a maximum humidity ratio setpoint.");
                                 }
                             }
                         }
@@ -1203,9 +1203,9 @@ namespace HVACDXSystem {
                                                     DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                     " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
                                                     DXCoolingSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                                ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
+                                                ShowContinueError(state, "Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
+                                                ShowContinueError(state, "Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(state,
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
@@ -1226,8 +1226,8 @@ namespace HVACDXSystem {
                                                                  " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
                                                                  "exceeded, for unit = " +
                                                                  DXCoolingSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
+                                                ShowContinueError(state, "Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(state,
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
@@ -1285,9 +1285,9 @@ namespace HVACDXSystem {
                                                     DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                     " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " +
                                                     DXCoolingSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio   = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                                ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
+                                                ShowContinueError(state, "Estimated part-load ratio   = " + RoundSigDigits((ReqOutput / FullOutput), 3));
+                                                ShowContinueError(state, "Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(state,
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(
@@ -1312,8 +1312,8 @@ namespace HVACDXSystem {
                                                                  " - DX unit latent part-load ratio calculation failed: part-load ratio limits "
                                                                  "exceeded, for unit = " +
                                                                  DXCoolingSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
+                                                ShowContinueError(state, "Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(state,
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(
@@ -1461,9 +1461,9 @@ namespace HVACDXSystem {
                                                     DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                     " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
                                                     DXCoolingSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio   = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                                ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
+                                                ShowContinueError(state, "Estimated part-load ratio   = " + RoundSigDigits((ReqOutput / FullOutput), 3));
+                                                ShowContinueError(state, "Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(state,
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(
@@ -1483,8 +1483,8 @@ namespace HVACDXSystem {
                                                                  " - DX unit sensible part-load ratio calculation unexpectedly failed: part-load "
                                                                  "ratio limits exceeded, for unit = " +
                                                                  DXCoolingSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
+                                                ShowContinueError(state, "Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(state,
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(
@@ -1506,8 +1506,8 @@ namespace HVACDXSystem {
                                                              " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
                                                              "exceeded, for unit = " +
                                                              DXCoolingSystem(DXSystemNum).Name);
-                                            ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                            ShowContinueErrorTimeStamp(
+                                            ShowContinueError(state, "Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                            ShowContinueErrorTimeStamp(state,
                                                 "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
                                         ShowRecurringWarningErrorAtEnd(
@@ -1589,9 +1589,9 @@ namespace HVACDXSystem {
                                             ShowWarningError(DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                              " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " +
                                                              DXCoolingSystem(DXSystemNum).Name);
-                                            ShowContinueError("Estimated latent part-load ratio   = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                            ShowContinueError("Calculated latent part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                            ShowContinueErrorTimeStamp(
+                                            ShowContinueError(state, "Estimated latent part-load ratio   = " + RoundSigDigits((ReqOutput / FullOutput), 3));
+                                            ShowContinueError(state, "Calculated latent part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                            ShowContinueErrorTimeStamp(state,
                                                 "The calculated latent part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
                                         ShowRecurringWarningErrorAtEnd(
@@ -1611,8 +1611,8 @@ namespace HVACDXSystem {
                                                 DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                 " - DX unit latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
                                                 DXCoolingSystem(DXSystemNum).Name);
-                                            ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                            ShowContinueErrorTimeStamp(
+                                            ShowContinueError(state, "Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                            ShowContinueErrorTimeStamp(state,
                                                 "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
                                         ShowRecurringWarningErrorAtEnd(
@@ -1706,10 +1706,10 @@ namespace HVACDXSystem {
                                                     DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                     " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " +
                                                     DXCoolingSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated latent part-load ratio   = " +
+                                                ShowContinueError(state, "Estimated latent part-load ratio   = " +
                                                                   RoundSigDigits((ReqOutput / FullOutput), 3));
-                                                ShowContinueError("Calculated latent part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp("The calculated latent part-load ratio will be used and the simulation "
+                                                ShowContinueError(state, "Calculated latent part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(state, "The calculated latent part-load ratio will be used and the simulation "
                                                                            "continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(
@@ -1730,8 +1730,8 @@ namespace HVACDXSystem {
                                                                  " - DX unit latent part-load ratio calculation failed unexpectedly: part-load ratio "
                                                                  "limits exceeded, for unit = " +
                                                                  DXCoolingSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
+                                                ShowContinueError(state, "Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(state,
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(
@@ -1752,8 +1752,8 @@ namespace HVACDXSystem {
                                                 DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                 " - DX unit latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
                                                 DXCoolingSystem(DXSystemNum).Name);
-                                            ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                            ShowContinueErrorTimeStamp(
+                                            ShowContinueError(state, "Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                            ShowContinueErrorTimeStamp(state,
                                                 "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
                                         ShowRecurringWarningErrorAtEnd(
@@ -1794,8 +1794,8 @@ namespace HVACDXSystem {
                                             ShowWarningError(DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                              " - Iteration limit exceeded calculating DX unit sensible speed ratio for unit = " +
                                                              DXCoolingSystem(DXSystemNum).Name);
-                                            ShowContinueError("Calculated speed ratio = " + RoundSigDigits(SpeedRatio, 3));
-                                            ShowContinueErrorTimeStamp(
+                                            ShowContinueError(state, "Calculated speed ratio = " + RoundSigDigits(SpeedRatio, 3));
+                                            ShowContinueErrorTimeStamp(state,
                                                 "The calculated speed ratio will be used and the simulation continues. Occurrence info:");
                                         }
                                         ShowRecurringWarningErrorAtEnd(DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
@@ -1808,7 +1808,7 @@ namespace HVACDXSystem {
                                     }
                                 } else if (SolFla == -2) {
                                     if (!WarmupFlag)
-                                        ShowFatalError(DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                        ShowFatalError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                        " - compressor speed calculation failed: speed limits exceeded, for unit=" +
                                                        DXCoolingSystem(DXSystemNum).Name);
                                 }
@@ -1827,8 +1827,8 @@ namespace HVACDXSystem {
                                         ShowWarningError(DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                          " - Iteration limit exceeded calculating DX unit sensible cycling ratio for unit = " +
                                                          DXCoolingSystem(DXSystemNum).Name);
-                                        ShowContinueError("Calculated cycling ratio = " + RoundSigDigits(CycRatio, 3));
-                                        ShowContinueErrorTimeStamp(
+                                        ShowContinueError(state, "Calculated cycling ratio = " + RoundSigDigits(CycRatio, 3));
+                                        ShowContinueErrorTimeStamp(state,
                                             "The calculated cycling ratio will be used and the simulation continues. Occurrence info:");
                                     }
                                     ShowRecurringWarningErrorAtEnd(DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
@@ -1841,7 +1841,7 @@ namespace HVACDXSystem {
                                 }
                             } else if (SolFla == -2) { // should never get here, if it does logic above to protect from this
                                 if (!WarmupFlag)
-                                    ShowFatalError(DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                    ShowFatalError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                    " - cycling ratio calculation failed: cycling limits exceeded, for unit=" +
                                                    DXCoolingSystem(DXSystemNum).Name);
                             }
@@ -1885,8 +1885,8 @@ namespace HVACDXSystem {
                                                         DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                         " - Iteration limit exceeded calculating DX unit latent speed ratio for unit = " +
                                                         DXCoolingSystem(DXSystemNum).Name);
-                                                    ShowContinueError("Calculated speed ratio = " + RoundSigDigits(SpeedRatio, 3));
-                                                    ShowContinueErrorTimeStamp(
+                                                    ShowContinueError(state, "Calculated speed ratio = " + RoundSigDigits(SpeedRatio, 3));
+                                                    ShowContinueErrorTimeStamp(state,
                                                         "The calculated speed ratio will be used and the simulation continues. Occurrence info:");
                                                 }
                                                 ShowRecurringWarningErrorAtEnd(
@@ -1899,7 +1899,7 @@ namespace HVACDXSystem {
                                             }
                                         } else if (SolFla == -2) {
                                             if (!WarmupFlag)
-                                                ShowFatalError(DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                                ShowFatalError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                                " - compressor speed calculation failed:speed limits exceeded, for unit=" +
                                                                DXCoolingSystem(DXSystemNum).Name);
                                         }
@@ -1918,8 +1918,8 @@ namespace HVACDXSystem {
                                                 ShowWarningError(DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                                  " - Iteration limit exceeded calculating DX unit latent cycling ratio for unit = " +
                                                                  DXCoolingSystem(DXSystemNum).Name);
-                                                ShowContinueError("Calculated cycling ratio = " + RoundSigDigits(CycRatio, 3));
-                                                ShowContinueErrorTimeStamp(
+                                                ShowContinueError(state, "Calculated cycling ratio = " + RoundSigDigits(CycRatio, 3));
+                                                ShowContinueErrorTimeStamp(state,
                                                     "The calculated cycling ratio will be used and the simulation continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
@@ -1932,7 +1932,7 @@ namespace HVACDXSystem {
                                         }
                                     } else if (SolFla == -2) { // should never get here, if it does logic above to protect from this
                                         if (!WarmupFlag)
-                                            ShowFatalError(DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
+                                            ShowFatalError(state, DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                            " - cycling ratio calculation failed: cycling limits exceeded, for unit=" +
                                                            DXCoolingSystem(DXSystemNum).Name);
                                     }
@@ -1989,9 +1989,9 @@ namespace HVACDXSystem {
                                             ShowWarningError(DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                              " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
                                                              DXCoolingSystem(DXSystemNum).Name);
-                                            ShowContinueError("Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                            ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                            ShowContinueErrorTimeStamp(
+                                            ShowContinueError(state, "Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
+                                            ShowContinueError(state, "Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                            ShowContinueErrorTimeStamp(state,
                                                 "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
                                         ShowRecurringWarningErrorAtEnd(
@@ -2007,7 +2007,7 @@ namespace HVACDXSystem {
                                         ShowSevereError(DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                         " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" +
                                                         DXCoolingSystem(DXSystemNum).Name);
-                                        ShowFatalError("Program terminates due to previous condition.");
+                                        ShowFatalError(state, "Program terminates due to previous condition.");
                                     }
                                 }
                             }
@@ -2076,9 +2076,9 @@ namespace HVACDXSystem {
                                                 } else {
                                                     TempMinPLR = PartLoadFrac + 0.001;
                                                 }
-                                                ShowContinueError("Estimated part-load ratio  = " + RoundSigDigits(TempMinPLR, 3));
-                                                ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
+                                                ShowContinueError(state, "Estimated part-load ratio  = " + RoundSigDigits(TempMinPLR, 3));
+                                                ShowContinueError(state, "Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(state,
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(
@@ -2094,7 +2094,7 @@ namespace HVACDXSystem {
                                             ShowSevereError(DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                             " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" +
                                                             DXCoolingSystem(DXSystemNum).Name);
-                                            ShowFatalError("Program terminates due to previous condition.");
+                                            ShowFatalError(state, "Program terminates due to previous condition.");
                                         }
                                     }
 
@@ -2114,9 +2114,9 @@ namespace HVACDXSystem {
                                                     DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                     " - Iteration limit exceeded calculating DX unit multimode latent part-load ratio for unit = " +
                                                     DXCoolingSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                                ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
+                                                ShowContinueError(state, "Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
+                                                ShowContinueError(state, "Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(state,
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(
@@ -2132,7 +2132,7 @@ namespace HVACDXSystem {
                                             ShowSevereError(DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                             " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" +
                                                             DXCoolingSystem(DXSystemNum).Name);
-                                            ShowFatalError("Program terminates due to previous condition.");
+                                            ShowFatalError(state, "Program terminates due to previous condition.");
                                         }
                                     }
                                 }
@@ -2177,9 +2177,9 @@ namespace HVACDXSystem {
                                                 DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                 " - Iteration limit exceeded calculating DX unit coolreheat latent part-load ratio for unit = " +
                                                 DXCoolingSystem(DXSystemNum).Name);
-                                            ShowContinueError("Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                            ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                            ShowContinueErrorTimeStamp(
+                                            ShowContinueError(state, "Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
+                                            ShowContinueError(state, "Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                            ShowContinueErrorTimeStamp(state,
                                                 "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
                                         ShowRecurringWarningErrorAtEnd(
@@ -2195,7 +2195,7 @@ namespace HVACDXSystem {
                                         ShowSevereError(DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                         " : part-load ratio calculation failed: part-load ratio limits exceeded, for unit=" +
                                                         DXCoolingSystem(DXSystemNum).Name);
-                                        ShowFatalError("Program terminates due to previous condition.");
+                                        ShowFatalError(state, "Program terminates due to previous condition.");
                                     }
                                 }
                             }
@@ -2305,10 +2305,10 @@ namespace HVACDXSystem {
                                                     DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                     " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
                                                     DXCoolingSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio  = " +
+                                                ShowContinueError(state, "Estimated part-load ratio  = " +
                                                                   RoundSigDigits((TempSpeedOut / TempSpeedReqst), 3));
-                                                ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
+                                                ShowContinueError(state, "Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(state,
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(
@@ -2328,8 +2328,8 @@ namespace HVACDXSystem {
                                                                  " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
                                                                  "exceeded, for unit = " +
                                                                  DXCoolingSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
+                                                ShowContinueError(state, "Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(state,
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
@@ -2413,9 +2413,9 @@ namespace HVACDXSystem {
                                                         DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                         " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
                                                         DXCoolingSystem(DXSystemNum).Name);
-                                                    ShowContinueError("Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                                    ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(SpeedRatio, 3));
-                                                    ShowContinueErrorTimeStamp(
+                                                    ShowContinueError(state, "Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
+                                                    ShowContinueError(state, "Calculated part-load ratio = " + RoundSigDigits(SpeedRatio, 3));
+                                                    ShowContinueErrorTimeStamp(state,
                                                         "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                                 }
                                                 ShowRecurringWarningErrorAtEnd(
@@ -2435,8 +2435,8 @@ namespace HVACDXSystem {
                                                                      " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
                                                                      "exceeded, for unit = " +
                                                                      DXCoolingSystem(DXSystemNum).Name);
-                                                    ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                    ShowContinueErrorTimeStamp(
+                                                    ShowContinueError(state, "Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                    ShowContinueErrorTimeStamp(state,
                                                         "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                                 }
                                                 ShowRecurringWarningErrorAtEnd(DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
@@ -2538,9 +2538,9 @@ namespace HVACDXSystem {
                                                         DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                         " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " +
                                                         DXCoolingSystem(DXSystemNum).Name);
-                                                    ShowContinueError("Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                                    ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                    ShowContinueErrorTimeStamp(
+                                                    ShowContinueError(state, "Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
+                                                    ShowContinueError(state, "Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                    ShowContinueErrorTimeStamp(state,
                                                         "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                                 }
                                                 ShowRecurringWarningErrorAtEnd(DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
@@ -2560,8 +2560,8 @@ namespace HVACDXSystem {
                                                                      " - DX unit latent part-load ratio calculation failed: part-load ratio limits "
                                                                      "exceeded, for unit = " +
                                                                      DXCoolingSystem(DXSystemNum).Name);
-                                                    ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                    ShowContinueErrorTimeStamp(
+                                                    ShowContinueError(state, "Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                    ShowContinueErrorTimeStamp(state,
                                                         "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                                 }
                                                 ShowRecurringWarningErrorAtEnd(DXCoolingSystem(DXSystemNum).DXCoolingSystemType + " \"" +
@@ -2594,9 +2594,9 @@ namespace HVACDXSystem {
                                                     DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
                                                     " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " +
                                                     DXCoolingSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio   = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                                ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
+                                                ShowContinueError(state, "Estimated part-load ratio   = " + RoundSigDigits((ReqOutput / FullOutput), 3));
+                                                ShowContinueError(state, "Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(state,
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(
@@ -2616,8 +2616,8 @@ namespace HVACDXSystem {
                                                                  " - DX unit latent part-load ratio calculation failed: part-load ratio limits "
                                                                  "exceeded, for unit = " +
                                                                  DXCoolingSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
+                                                ShowContinueError(state, "Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(state,
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
                                             ShowRecurringWarningErrorAtEnd(
@@ -2663,7 +2663,7 @@ namespace HVACDXSystem {
                                                      DXCoolingSystem(DXSystemNum).DXCoilLatPLRFail,
                                                      DXCoolingSystem(DXSystemNum).DXCoilLatPLRFailIndex);
                     } else {
-                        ShowFatalError("ControlDXSystem: Invalid DXCoolingSystem coil type = " + DXCoolingSystem(DXSystemNum).CoolingCoilType);
+                        ShowFatalError(state, "ControlDXSystem: Invalid DXCoolingSystem coil type = " + DXCoolingSystem(DXSystemNum).CoolingCoilType);
                     }
                 }
             } // End of cooling load type (sensible or latent) if block

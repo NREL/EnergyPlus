@@ -620,7 +620,7 @@ namespace FluidProperties {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound)) continue;
+            if (UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound)) continue;
             ++FluidNum;
             FluidNames(FluidNum).Name = Alphas(1);
             if (UtilityRoutines::SameString(Alphas(2), Refrig)) {
@@ -630,14 +630,14 @@ namespace FluidProperties {
                 ++NumOfGlycols;
                 FluidNames(FluidNum).IsGlycol = true;
             } else {
-                ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid type");
+                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid type");
                 ShowContinueError("...entered value=\"" + Alphas(2) + ", Only REFRIGERANT or GLYCOL allowed as " + cAlphaFieldNames(2));
                 ErrorsFound = true;
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + " Previous errors in input cause program termination.");
+            ShowFatalError(state, RoutineName + " Previous errors in input cause program termination.");
         }
 
         if (NumOfRefrigerants + 1 > 0) {
@@ -736,7 +736,7 @@ namespace FluidProperties {
 
             for (TempLoop = 2; TempLoop <= FluidTemps(Loop).NumOfTemps; ++TempLoop) {
                 if (FluidTemps(Loop).Temps(TempLoop) <= FluidTemps(Loop).Temps(TempLoop - 1)) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + " name=" + FluidTemps(Loop).Name +
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + " name=" + FluidTemps(Loop).Name +
                                     ", lists must have data in ascending order");
                     ShowContinueError("First out of order occurrence at Temperature #(" + RoundSigDigits(TempLoop - 1) + ") {" +
                                       RoundSigDigits(FluidTemps(Loop).Temps(TempLoop - 1), 3) + "} >= Temp(" + RoundSigDigits(TempLoop) + ") {" +
@@ -2128,7 +2128,7 @@ CurrentModuleObject,
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound)) {
+            if (UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound)) {
                 continue;
             }
             GlycolFound = false;
@@ -2369,7 +2369,7 @@ CurrentModuleObject,
         lNumericFieldBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Previous errors in input cause program termination.");
+            ShowFatalError(state, RoutineName + "Previous errors in input cause program termination.");
         }
 
         if (inputProcessor->getNumSectionsFound("REPORTGLYCOLS") > 0) DebugReportGlycols = true;
@@ -4922,7 +4922,7 @@ CurrentModuleObject,
                     }
                 }
             } else { // user has input data for concentrations that are too close or repeated, this must be fixed
-                ShowFatalError(RoutineName + "concentration values too close or data repeated, check your fluid property input data");
+                ShowFatalError(state, RoutineName + "concentration values too close or data repeated, check your fluid property input data");
             }
         }
     }
@@ -5025,7 +5025,7 @@ CurrentModuleObject,
                     }
                 }
             } else { // user has input data for concentrations that are too close or repeated, this must be fixed
-                ShowFatalError(RoutineName + "concentration values too close or data repeated, check your fluid property input data");
+                ShowFatalError(state, RoutineName + "concentration values too close or data repeated, check your fluid property input data");
             }
         }
     }
@@ -6071,7 +6071,7 @@ CurrentModuleObject,
                                   RoundSigDigits(refrig.PsTemps(refrig.PsHighTempIndex), 2) + ']');
                 ShowContinueError("...Supplied Refrigerant Temperature=" + RoundSigDigits(Temperature, 2) +
                                   " Returned saturated pressure value = " + RoundSigDigits(ReturnValue, 0));
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
             }
             ShowRecurringSevereErrorAtEnd(RoutineName + "Saturation temperature is out of range for refrigerant [" +
                                               RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
@@ -6193,7 +6193,7 @@ CurrentModuleObject,
                                   RoundSigDigits(refrig.PsValues(refrig.PsHighPresIndex), 0) + ']');
                 ShowContinueError("...Supplied Refrigerant Pressure=" + RoundSigDigits(Pressure, 0) +
                                   " Returned saturated temperature value =" + RoundSigDigits(ReturnValue, 2));
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
             }
             ShowRecurringSevereErrorAtEnd(RoutineName + "Saturation pressure is out of range for refrigerant [" +
                                               RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
@@ -6432,7 +6432,7 @@ CurrentModuleObject,
                                   RoundSigDigits(refrig.RhoTemps(refrig.RhofHighTempIndex), 2) + ']');
                 ShowContinueError("...Supplied Refrigerant Temperature=" + RoundSigDigits(Temperature, 2) +
                                   " Returned saturated density value =" + RoundSigDigits(ReturnValue, 2));
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
             }
             ShowRecurringSevereErrorAtEnd(RoutineName + "Saturation temperature is out of range for refrigerant [" +
                                               RefrigErrorTracking(RefrigNum).Name + "] supplied data: **",
@@ -6729,7 +6729,7 @@ CurrentModuleObject,
                     ShowContinueError("Refrigerant temperature = " + RoundSigDigits(Temperature, 2));
                     ShowContinueError("Refrigerant pressure = " + RoundSigDigits(Pressure, 0));
                     ShowContinueError("Returned Enthalpy value = " + RoundSigDigits(ReturnValue, 3));
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                                    "] saturated at the given conditions **",
@@ -6752,7 +6752,7 @@ CurrentModuleObject,
                     ShowWarningMessage(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                        "] Temperature is out of range for superheated refrigerant enthalpy: values capped **");
                     ShowContinueError(" Called From:" + CalledFrom);
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurTempRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
@@ -6771,7 +6771,7 @@ CurrentModuleObject,
                     ShowWarningMessage(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                        "] Pressure is out of range for superheated refrigerant enthalpy: values capped **");
                     ShowContinueError(" Called From:" + CalledFrom);
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurPresRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
@@ -7036,7 +7036,7 @@ CurrentModuleObject,
                     ShowContinueError("Refrigerant temperature = " + RoundSigDigits(Temperature, 2));
                     ShowContinueError("Refrigerant Enthalpy = " + RoundSigDigits(Enthalpy, 3));
                     ShowContinueError("Returned Pressure value = " + RoundSigDigits(ReturnValue, 0));
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurSatErrCount > 0) {
                     ShowRecurringSevereErrorAtEnd(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
@@ -7055,7 +7055,7 @@ CurrentModuleObject,
                     ShowWarningMessage(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                        "] Temperature is out of range for superheated refrigerant pressure: values capped **");
                     ShowContinueError(" Called From:" + CalledFrom);
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurTempRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
@@ -7074,7 +7074,7 @@ CurrentModuleObject,
                     ShowWarningMessage(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                        "] Pressure is out of range for superheated refrigerant enthalpy: values capped **");
                     ShowContinueError(" Called From:" + CalledFrom);
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurEnthalpyRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
@@ -7167,21 +7167,21 @@ CurrentModuleObject,
             ShowWarningMessage(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                "] temperature lower bound is out of range for superheated refrigerant: values capped **");
             ShowContinueError(" Called From:" + CalledFrom);
-            ShowContinueErrorTimeStamp("");
+            ShowContinueErrorTimeStamp(state, "");
             TempLow = RefTSat;
         }
         if (TempUp > RefTHigh) {
             ShowWarningMessage(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                "] temperature lower bound is out of range for superheated refrigerant: values capped **");
             ShowContinueError(" Called From:" + CalledFrom);
-            ShowContinueErrorTimeStamp("");
+            ShowContinueErrorTimeStamp(state, "");
             TempUp = RefTHigh;
         }
         if (TempLow >= TempUp) {
             ShowWarningMessage(RoutineName + "Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                "] temperature lower bound is out of range for superheated refrigerant: values capped **");
             ShowContinueError(" Called From:" + CalledFrom);
-            ShowContinueErrorTimeStamp("");
+            ShowContinueErrorTimeStamp(state, "");
             TempLow = RefTSat;
             TempUp = RefTHigh;
         }
@@ -7474,7 +7474,7 @@ CurrentModuleObject,
                 ShowContinueError("Refrigerant temperature = " + RoundSigDigits(Temperature, 2));
                 ShowContinueError("Refrigerant pressure = " + RoundSigDigits(Pressure, 0));
                 ShowContinueError("Returned Density value = " + RoundSigDigits(saturated_density, 3));
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
             }
             if (SatErrCount > 0) {
                 ShowRecurringWarningErrorAtEnd(RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
@@ -7498,7 +7498,7 @@ CurrentModuleObject,
                     ShowWarningMessage(RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                        "] Temperature is out of range for superheated refrigerant density: values capped **");
                     ShowContinueError(" Called From:" + CalledFrom);
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurTempRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
@@ -7517,7 +7517,7 @@ CurrentModuleObject,
                     ShowWarningMessage(RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
                                        "] Pressure is out of range for superheated refrigerant density: values capped **");
                     ShowContinueError(" Called From:" + CalledFrom);
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurPresRangeErrCount > 0) {
                     ShowRecurringWarningErrorAtEnd(RoutineName + ": Refrigerant [" + RefrigErrorTracking(RefrigNum).Name +
@@ -7630,7 +7630,7 @@ CurrentModuleObject,
                                        "] specific heat supplied values **");
                     ShowContinueError("..Called From:" + CalledFrom + ",Temperature=[" + RoundSigDigits(Temperature, 2) + "], supplied data range=[" +
                                       RoundSigDigits(glycol_data.CpLowTempValue, 2) + ',' + RoundSigDigits(glycol_data.CpHighTempValue, 2) + ']');
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too low) for fluid [" + glycol_data.Name +
                                                    "] specific heat **",
@@ -7649,7 +7649,7 @@ CurrentModuleObject,
                     ShowWarningMessage(RoutineName + "Temperature is out of range (too high) for fluid [" + glycol_data.Name + "] specific heat **");
                     ShowContinueError("..Called From:" + CalledFrom + ",Temperature=[" + RoundSigDigits(Temperature, 2) + "], supplied data range=[" +
                                       RoundSigDigits(glycol_data.CpLowTempValue, 2) + ',' + RoundSigDigits(glycol_data.CpHighTempValue, 2) + ']');
-                    ShowContinueErrorTimeStamp("");
+                    ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too high) for fluid [" + glycol_data.Name +
                                                    "] specific heat **",
@@ -7810,7 +7810,7 @@ CurrentModuleObject,
                 ShowContinueError("..Called From:" + CalledFrom + ",Temperature=[" + RoundSigDigits(Temperature, 2) + "], supplied data range=[" +
                                   RoundSigDigits(GlycolData(GlycolIndex).RhoLowTempValue, 2) + ',' +
                                   RoundSigDigits(GlycolData(GlycolIndex).RhoHighTempValue, 2) + ']');
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
             }
             if (LowErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
@@ -7829,7 +7829,7 @@ CurrentModuleObject,
                 ShowContinueError("..Called From:" + CalledFrom + ",Temperature=[" + RoundSigDigits(Temperature, 2) + "], supplied data range=[" +
                                   RoundSigDigits(GlycolData(GlycolIndex).RhoLowTempValue, 2) + ',' +
                                   RoundSigDigits(GlycolData(GlycolIndex).RhoHighTempValue, 2) + ']');
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
             }
             if (HighErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
@@ -7974,7 +7974,7 @@ CurrentModuleObject,
                 ShowContinueError("..Called From:" + CalledFrom + ",Temperature=[" + RoundSigDigits(Temperature, 2) + "], supplied data range=[" +
                                   RoundSigDigits(GlycolData(GlycolIndex).CondLowTempValue, 2) + ',' +
                                   RoundSigDigits(GlycolData(GlycolIndex).CondHighTempValue, 2) + ']');
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
             }
             if (LowErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
@@ -7993,7 +7993,7 @@ CurrentModuleObject,
                 ShowContinueError("..Called From:" + CalledFrom + ",Temperature=[" + RoundSigDigits(Temperature, 2) + "], supplied data range=[" +
                                   RoundSigDigits(GlycolData(GlycolIndex).CondLowTempValue, 2) + ',' +
                                   RoundSigDigits(GlycolData(GlycolIndex).CondHighTempValue, 2) + ']');
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
             }
             if (HighErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
@@ -8138,7 +8138,7 @@ CurrentModuleObject,
                 ShowContinueError("..Called From:" + CalledFrom + ",Temperature=[" + RoundSigDigits(Temperature, 2) + "], supplied data range=[" +
                                   RoundSigDigits(GlycolData(GlycolIndex).ViscLowTempValue, 2) + ',' +
                                   RoundSigDigits(GlycolData(GlycolIndex).ViscHighTempValue, 2) + ']');
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
             }
             if (LowErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too low) for fluid [" + GlycolData(GlycolIndex).Name +
@@ -8157,7 +8157,7 @@ CurrentModuleObject,
                 ShowContinueError("..Called From:" + CalledFrom + ",Temperature=[" + RoundSigDigits(Temperature, 2) + "], supplied data range=[" +
                                   RoundSigDigits(GlycolData(GlycolIndex).ViscLowTempValue, 2) + ',' +
                                   RoundSigDigits(GlycolData(GlycolIndex).ViscHighTempValue, 2) + ']');
-                ShowContinueErrorTimeStamp("");
+                ShowContinueErrorTimeStamp(state, "");
             }
             if (HighErrorThisTime) {
                 ShowRecurringWarningErrorAtEnd(RoutineName + "Temperature out of range (too high) for fluid [" + GlycolData(GlycolIndex).Name +
@@ -8662,7 +8662,7 @@ CurrentModuleObject,
             // send warning
             if (TempRangeErrCount <= RefrigerantErrorLimitTest) {
                 ShowWarningError("GetInterpolatedSatProp: Saturation temperature for interpolation is out of range of data supplied: **");
-                ShowContinueErrorTimeStamp(" Called from:" + CalledFrom);
+                ShowContinueErrorTimeStamp(state, " Called from:" + CalledFrom);
                 ShowContinueError("Refrigerant temperature = " + RoundSigDigits(Temperature, 2));
                 ShowContinueError("Returned saturated property value = " + RoundSigDigits(ReturnValue, 3));
             } else {
@@ -8772,7 +8772,7 @@ CurrentModuleObject,
                 NeedOrphanMessage = false;
             }
             if (DisplayUnusedObjects) {
-                ShowMessage("Refrigerant=" + RefrigData(Item).Name);
+                ShowMessage(state, "Refrigerant=" + RefrigData(Item).Name);
             } else {
                 ++NumUnusedRefrig;
             }
@@ -8791,16 +8791,16 @@ CurrentModuleObject,
                 NeedOrphanMessage = false;
             }
             if (DisplayUnusedObjects) {
-                ShowMessage("Glycol=" + GlycolData(Item).Name);
+                ShowMessage(state, "Glycol=" + GlycolData(Item).Name);
             } else {
                 ++NumUnusedGlycol;
             }
         }
 
         if (NumUnusedRefrig > 0 || NumUnusedGlycol > 0) {
-            if (NumUnusedRefrig > 0) ShowMessage("There are " + RoundSigDigits(NumUnusedRefrig) + " unused refrigerants in input.");
-            if (NumUnusedGlycol > 0) ShowMessage("There are " + RoundSigDigits(NumUnusedGlycol) + " unused glycols in input.");
-            ShowMessage("Use Output:Diagnostics,DisplayUnusedObjects; to see them.");
+            if (NumUnusedRefrig > 0) ShowMessage(state, "There are " + RoundSigDigits(NumUnusedRefrig) + " unused refrigerants in input.");
+            if (NumUnusedGlycol > 0) ShowMessage(state, "There are " + RoundSigDigits(NumUnusedGlycol) + " unused glycols in input.");
+            ShowMessage(state, "Use Output:Diagnostics,DisplayUnusedObjects; to see them.");
         }
     }
 

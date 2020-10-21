@@ -264,7 +264,7 @@ namespace ChillerAbsorption {
                                           DataIPShortCuts::lAlphaFieldBlanks,
                                           DataIPShortCuts::cAlphaFieldNames,
                                           DataIPShortCuts::cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(
@@ -303,7 +303,7 @@ namespace ChillerAbsorption {
                                                                                                DataLoopNode::NodeConnectionType_Outlet,
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+            BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
                                                DataIPShortCuts::cAlphaArgs(1),
                                                DataIPShortCuts::cAlphaArgs(2),
                                                DataIPShortCuts::cAlphaArgs(3),
@@ -325,7 +325,7 @@ namespace ChillerAbsorption {
                                                                                                DataLoopNode::NodeConnectionType_Outlet,
                                                                                                2,
                                                                                                DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+            BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
                                                DataIPShortCuts::cAlphaArgs(1),
                                                DataIPShortCuts::cAlphaArgs(4),
                                                DataIPShortCuts::cAlphaArgs(5),
@@ -366,7 +366,7 @@ namespace ChillerAbsorption {
                                                                                                             DataLoopNode::NodeConnectionType_Outlet,
                                                                                                             3,
                                                                                                             DataLoopNode::ObjectIsNotParent);
-                    BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                    BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
                                                        DataIPShortCuts::cAlphaArgs(1),
                                                        DataIPShortCuts::cAlphaArgs(6),
                                                        DataIPShortCuts::cAlphaArgs(7),
@@ -389,7 +389,7 @@ namespace ChillerAbsorption {
                                                                                                             DataLoopNode::NodeConnectionType_Outlet,
                                                                                                             3,
                                                                                                             DataLoopNode::ObjectIsNotParent);
-                    BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                    BranchNodeConnections::TestCompSet(state, DataIPShortCuts::cCurrentModuleObject,
                                                        DataIPShortCuts::cAlphaArgs(1),
                                                        DataIPShortCuts::cAlphaArgs(6),
                                                        DataIPShortCuts::cAlphaArgs(7),
@@ -404,7 +404,7 @@ namespace ChillerAbsorption {
                 ErrorsFound = true;
             } else {
                 if (thisChiller.GenHeatSourceType == DataLoopNode::NodeType_Water) {
-                    ShowWarningError(DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
+                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
                     ShowContinueError("...Generator fluid type must be Steam if generator inlet/outlet nodes are blank.");
                     ShowContinueError("...Generator fluid type is set to Steam and the simulation continues.");
                     thisChiller.GenHeatSourceType = DataLoopNode::NodeType_Steam;
@@ -680,7 +680,7 @@ namespace ChillerAbsorption {
                     (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
                     if (!DataGlobals::AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
-                            ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
                             ShowContinueError(
                                 "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
                             ShowContinueError("  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
@@ -693,7 +693,7 @@ namespace ChillerAbsorption {
                         DataLoopNode::NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
-                                ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                                ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
                                 ShowContinueError(
                                     "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
                                 ShowContinueError("  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
@@ -961,7 +961,7 @@ namespace ChillerAbsorption {
                                                                     NomCapUser);
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError("User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
                                     ShowContinueError("differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpNomCap, 2) +
                                                       " [W]");
@@ -1013,7 +1013,7 @@ namespace ChillerAbsorption {
                                                                 NomPumpPowerUser);
                         if (DataGlobals::DisplayExtraWarnings) {
                             if ((std::abs(tmpNomPumpPower - NomPumpPowerUser) / NomPumpPowerUser) > DataSizing::AutoVsHardSizingThreshold) {
-                                ShowMessage("SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
+                                ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError("User-Specified Nominal Pumping Power of " + General::RoundSigDigits(NomPumpPowerUser, 2) + " [W]");
                                 ShowContinueError("differs from Design Size Nominal Pumping Power of " + General::RoundSigDigits(tmpNomPumpPower, 2) +
                                                   " [W]");
@@ -1059,7 +1059,7 @@ namespace ChillerAbsorption {
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError("User-Specified Design Chilled Water Flow Rate of " +
                                                       General::RoundSigDigits(EvapVolFlowRateUser, 5) + " [m3/s]");
                                     ShowContinueError("differs from Design Size Design Chilled Water Flow Rate of " +
@@ -1134,7 +1134,7 @@ namespace ChillerAbsorption {
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError("User-Specified Design Condenser Water Flow Rate of " +
                                                       General::RoundSigDigits(CondVolFlowRateUser, 5) + " [m3/s]");
                                     ShowContinueError("differs from Design Size Design Condenser Water Flow Rate of " +
@@ -1208,7 +1208,7 @@ namespace ChillerAbsorption {
                                     if (DataGlobals::DisplayExtraWarnings) {
                                         if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
                                             DataSizing::AutoVsHardSizingThreshold) {
-                                            ShowMessage("SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
+                                            ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                             ShowContinueError("User-Specified Design Generator Fluid Flow Rate of " +
                                                               General::RoundSigDigits(GeneratorVolFlowRateUser, 5) + " [m3/s]");
                                             ShowContinueError("differs from Design Size Design Generator Fluid Flow Rate of " +
@@ -1267,7 +1267,7 @@ namespace ChillerAbsorption {
                                     if (DataGlobals::DisplayExtraWarnings) {
                                         if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
                                             DataSizing::AutoVsHardSizingThreshold) {
-                                            ShowMessage("SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
+                                            ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                             ShowContinueError("User-Specified Design Generator Fluid Flow Rate of " +
                                                               General::RoundSigDigits(GeneratorVolFlowRateUser, 5) + " [m3/s]");
                                             ShowContinueError("differs from Design Size Design Generator Fluid Flow Rate of " +

@@ -230,8 +230,8 @@ namespace EMSManager {
         } else {
             ScanForReports(state, "EnergyManagementSystem", OutputEDDFile);
             if (OutputEDDFile) {
-                ShowWarningError("CheckIFAnyEMS: No EnergyManagementSystem has been set up in the input file but output is requested.");
-                ShowContinueError("No EDD file will be produced. Refer to EMS Application Guide and/or InputOutput Reference to set up your "
+                ShowWarningError(state, "CheckIFAnyEMS: No EnergyManagementSystem has been set up in the input file but output is requested.");
+                ShowContinueError(state, "No EDD file will be produced. Refer to EMS Application Guide and/or InputOutput Reference to set up your "
                                   "EnergyManagementSystem.");
             }
         }
@@ -664,7 +664,7 @@ namespace EMSManager {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                 if (!errFlag) {
                     Sensor(SensorNum).Name = cAlphaArgs(1);
@@ -673,9 +673,9 @@ namespace EMSManager {
                     VariableNum = FindEMSVariable(cAlphaArgs(1), 0);
 
                     if (VariableNum > 0) {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("Object name conflicts with a global variable name in EMS");
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowContinueError(state, "Object name conflicts with a global variable name in EMS");
                         ErrorsFound = true;
                     } else {
                         VariableNum = NewEMSVariable(cAlphaArgs(1), 0);
@@ -691,9 +691,9 @@ namespace EMSManager {
                 VarIndex = GetMeterIndex(cAlphaArgs(3));
                 if (VarIndex > 0) {
                     if (!lAlphaFieldBlanks(2)) {
-                        ShowWarningError("Unused" + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("Meter Name found; Key Name will be ignored"); // why meters have no keys..
+                        ShowWarningError(state, "Unused" + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowContinueError(state, "Meter Name found; Key Name will be ignored"); // why meters have no keys..
                     } else {
                         Sensor(SensorNum).Type = 3;
                         Sensor(SensorNum).Index = VarIndex;
@@ -792,7 +792,7 @@ namespace EMSManager {
                                                   cNumericFieldNames);
                 }
 
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                 if (!errFlag) {
                     EMSActuatorUsed(ActuatorNum).Name = cAlphaArgs(1);
@@ -801,9 +801,9 @@ namespace EMSManager {
                     VariableNum = FindEMSVariable(cAlphaArgs(1), 0);
 
                     if (VariableNum > 0) {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("Object name conflicts with a global variable name in EMS");
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowContinueError(state, "Object name conflicts with a global variable name in EMS");
                         ErrorsFound = true;
                     } else {
                         VariableNum = NewEMSVariable(cAlphaArgs(1), 0);
@@ -845,11 +845,11 @@ namespace EMSManager {
 
                     int nHandle = EMSActuatorAvailable(ActuatorVariableNum).handleCount;
                     if (nHandle > 0) {
-                        EnergyPlus::ShowWarningError("Seems like you already tried to get a Handle on this Actuator " + std::to_string(nHandle) + "times.");
-                        EnergyPlus::ShowContinueError("Occurred for componentType='" +  EMSActuatorUsed(ActuatorNum).ComponentTypeName
+                        EnergyPlus::ShowWarningError(state, "Seems like you already tried to get a Handle on this Actuator " + std::to_string(nHandle) + "times.");
+                        EnergyPlus::ShowContinueError(state, "Occurred for componentType='" +  EMSActuatorUsed(ActuatorNum).ComponentTypeName
                                 + "', controlType='" + EMSActuatorUsed(ActuatorNum).ControlTypeName
                                 + "', uniqueKey='" + EMSActuatorUsed(ActuatorNum).UniqueIDName + "'.");
-                        EnergyPlus::ShowContinueError("You should take note that there is a risk of overwritting.");
+                        EnergyPlus::ShowContinueError(state, "You should take note that there is a risk of overwritting.");
                     }
                     ++EMSActuatorAvailable(ActuatorVariableNum).handleCount;
                 }
@@ -875,15 +875,15 @@ namespace EMSManager {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
 
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 ValidateEMSVariableName(cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                 if (!errFlag) {
                     EMSInternalVarsUsed(InternVarNum).Name = cAlphaArgs(1);
                     VariableNum = FindEMSVariable(cAlphaArgs(1), 0);
                     if (VariableNum > 0) {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("Object name conflicts with a global variable name in EMS");
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowContinueError(state, "Object name conflicts with a global variable name in EMS");
                         ErrorsFound = true;
                     } else {
                         VariableNum = NewEMSVariable(cAlphaArgs(1), 0);
@@ -934,7 +934,7 @@ namespace EMSManager {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
 
-                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 EMSProgramCallManager(CallManagerNum).Name = cAlphaArgs(1);
 
                 {
@@ -977,8 +977,8 @@ namespace EMSManager {
                     } else if (SELECT_CASE_var == "UNITARYSYSTEMSIZING") {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::UnitarySystemSizing;
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
@@ -990,9 +990,9 @@ namespace EMSManager {
                 for (AlphaNum = 3; AlphaNum <= NumAlphas; ++AlphaNum) {
                     // find program name in Stack structure
                     if (lAlphaFieldBlanks(AlphaNum)) { // throw error
-                        ShowSevereError("Invalid " + cAlphaFieldNames(AlphaNum) + '=' + cAlphaArgs(AlphaNum));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("Program names cannot be blank");
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(AlphaNum) + '=' + cAlphaArgs(AlphaNum));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowContinueError(state, "Program names cannot be blank");
                         ErrorsFound = true;
                     }
 
@@ -1002,9 +1002,9 @@ namespace EMSManager {
                         // check for duplicate and warn.
                         for (Loop = 1; Loop <= ManagerProgramNum; ++Loop) {
                             if (EMSProgramCallManager(CallManagerNum).ErlProgramARR(Loop) == StackNum) {
-                                ShowWarningError("Duplicate " + cAlphaFieldNames(AlphaNum) + '=' + cAlphaArgs(AlphaNum));
-                                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                                ShowContinueError("Erl program appears more than once, and the simulation continues.");
+                                ShowWarningError(state, "Duplicate " + cAlphaFieldNames(AlphaNum) + '=' + cAlphaArgs(AlphaNum));
+                                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                                ShowContinueError(state, "Erl program appears more than once, and the simulation continues.");
                             }
                         }
 
@@ -1013,9 +1013,9 @@ namespace EMSManager {
                         EMSProgramCallManager(CallManagerNum).ErlProgramARR(ManagerProgramNum) = StackNum;
 
                     } else {
-                        ShowSevereError("Invalid " + cAlphaFieldNames(AlphaNum) + '=' + cAlphaArgs(AlphaNum));
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError("Program Name not found.");
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(AlphaNum) + '=' + cAlphaArgs(AlphaNum));
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowContinueError(state, "Program Name not found.");
                         ErrorsFound = true;
                     }
                 } // AlphaNum
@@ -1024,8 +1024,8 @@ namespace EMSManager {
         } else { // no program calling manager in input
             if (NumErlPrograms > 0) {
                 cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
-                ShowWarningError("Energy Management System is missing input object " + cCurrentModuleObject);
-                ShowContinueError("EnergyPlus Runtime Language programs need a calling manager to control when they get executed");
+                ShowWarningError(state, "Energy Management System is missing input object " + cCurrentModuleObject);
+                ShowContinueError(state, "EnergyPlus Runtime Language programs need a calling manager to control when they get executed");
             }
         }
 
@@ -1037,7 +1037,7 @@ namespace EMSManager {
         lNumericFieldBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in getting Energy Management System input. Preceding condition causes termination.");
+            ShowFatalError(state, "Errors found in getting Energy Management System input. Preceding condition causes termination.");
         }
     }
 
@@ -1095,17 +1095,17 @@ namespace EMSManager {
                 GetVariableTypeAndIndex(state, Sensor(SensorNum).OutputVarName, Sensor(SensorNum).UniqueKeyName, VarType, VarIndex);
                 if (VarType == 0) {
                     if (reportErrors) {
-                        ShowSevereError("Invalid Output:Variable or Output:Meter Name =" + Sensor(SensorNum).OutputVarName);
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + Sensor(SensorNum).Name);
-                        ShowContinueError("Output:Variable Name not found");
+                        ShowSevereError(state, "Invalid Output:Variable or Output:Meter Name =" + Sensor(SensorNum).OutputVarName);
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + Sensor(SensorNum).Name);
+                        ShowContinueError(state, "Output:Variable Name not found");
                         ErrorsFound = true;
                     }
                 } else if (VarIndex == 0) {
                     if (reportErrors) {
-                        ShowSevereError("Invalid Output:Variable or Output:Meter Index Key Name =" + Sensor(SensorNum).UniqueKeyName);
-                        ShowContinueError("For Output:Variable or Output:Meter = " + Sensor(SensorNum).OutputVarName);
-                        ShowContinueError("Entered in " + cCurrentModuleObject + '=' + Sensor(SensorNum).Name);
-                        ShowContinueError("Unique Key Name not found.");
+                        ShowSevereError(state, "Invalid Output:Variable or Output:Meter Index Key Name =" + Sensor(SensorNum).UniqueKeyName);
+                        ShowContinueError(state, "For Output:Variable or Output:Meter = " + Sensor(SensorNum).OutputVarName);
+                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + Sensor(SensorNum).Name);
+                        ShowContinueError(state, "Unique Key Name not found.");
                         ErrorsFound = true;
                     }
                 } else {
@@ -1118,10 +1118,10 @@ namespace EMSManager {
                         if (Sensor(SensorNum).SchedNum == 0) {
                             Sensor(SensorNum).CheckedOkay = false;
                             if (reportErrors) {
-                                ShowSevereError("Invalid Output:Variable or Output:Meter Index Key Name =" + Sensor(SensorNum).UniqueKeyName);
-                                ShowContinueError("For Output:Variable or Output:Meter = " + Sensor(SensorNum).OutputVarName);
-                                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + Sensor(SensorNum).Name);
-                                ShowContinueError("Schedule Name not found.");
+                                ShowSevereError(state, "Invalid Output:Variable or Output:Meter Index Key Name =" + Sensor(SensorNum).UniqueKeyName);
+                                ShowContinueError(state, "For Output:Variable or Output:Meter = " + Sensor(SensorNum).OutputVarName);
+                                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + Sensor(SensorNum).Name);
+                                ShowContinueError(state, "Schedule Name not found.");
                                 ErrorsFound = true;
                             }
                         }
@@ -1176,13 +1176,13 @@ namespace EMSManager {
 
             if (!FoundObjectType) {
                 if (reportErrors) {
-                    ShowSevereError("Invalid Actuated Component Type =" + EMSActuatorUsed(ActuatorNum).ComponentTypeName);
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + EMSActuatorUsed(ActuatorNum).Name);
-                    ShowContinueError("Component Type not found");
+                    ShowSevereError(state, "Invalid Actuated Component Type =" + EMSActuatorUsed(ActuatorNum).ComponentTypeName);
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + EMSActuatorUsed(ActuatorNum).Name);
+                    ShowContinueError(state, "Component Type not found");
                     if (OutputEDDFile) {
-                        ShowContinueError("Review .edd file for valid component types.");
+                        ShowContinueError(state, "Review .edd file for valid component types.");
                     } else {
-                        ShowContinueError("Use Output:EnergyManagementSystem object to create .edd file for valid component types.");
+                        ShowContinueError(state, "Use Output:EnergyManagementSystem object to create .edd file for valid component types.");
                     }
                     ErrorsFound = true;
                 }
@@ -1190,13 +1190,13 @@ namespace EMSManager {
 
             if (!FoundObjectName) {
                 if (reportErrors) {
-                    ShowSevereError("Invalid Actuated Component Unique Name =" + EMSActuatorUsed(ActuatorNum).UniqueIDName);
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + EMSActuatorUsed(ActuatorNum).Name);
-                    ShowContinueError("Component Unique key name not found ");
+                    ShowSevereError(state, "Invalid Actuated Component Unique Name =" + EMSActuatorUsed(ActuatorNum).UniqueIDName);
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + EMSActuatorUsed(ActuatorNum).Name);
+                    ShowContinueError(state, "Component Unique key name not found ");
                     if (OutputEDDFile) {
-                        ShowContinueError("Review edd file for valid component names.");
+                        ShowContinueError(state, "Review edd file for valid component names.");
                     } else {
-                        ShowContinueError("Use Output:EnergyManagementSystem object to create .edd file for valid component names.");
+                        ShowContinueError(state, "Use Output:EnergyManagementSystem object to create .edd file for valid component names.");
                     }
                     ErrorsFound = true;
                 }
@@ -1204,13 +1204,13 @@ namespace EMSManager {
 
             if (!FoundActuatorName) {
                 if (reportErrors) {
-                    ShowSevereError("Invalid Actuated Component Control Type =" + EMSActuatorUsed(ActuatorNum).ControlTypeName);
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + EMSActuatorUsed(ActuatorNum).Name);
-                    ShowContinueError("Control Type not found");
+                    ShowSevereError(state, "Invalid Actuated Component Control Type =" + EMSActuatorUsed(ActuatorNum).ControlTypeName);
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + EMSActuatorUsed(ActuatorNum).Name);
+                    ShowContinueError(state, "Control Type not found");
                     if (OutputEDDFile) {
-                        ShowContinueError("Review edd file for valid component control types.");
+                        ShowContinueError(state, "Review edd file for valid component control types.");
                     } else {
-                        ShowContinueError("Use Output:EnergyManagementSystem object to create .edd file for valid component control types.");
+                        ShowContinueError(state, "Use Output:EnergyManagementSystem object to create .edd file for valid component control types.");
                     }
                     ErrorsFound = true;
                 }
@@ -1219,11 +1219,11 @@ namespace EMSManager {
                 EMSActuatorUsed(ActuatorNum).CheckedOkay = true;
                 int nHandle = EMSActuatorAvailable(ActuatorVariableNum).handleCount;
                 if (nHandle > 0) {
-                    EnergyPlus::ShowWarningError("Seems like you already tried to get a Handle on this Actuator " + std::to_string(nHandle) + "times.");
-                    EnergyPlus::ShowContinueError("Occurred for componentType='" +  EMSActuatorUsed(ActuatorNum).ComponentTypeName
+                    EnergyPlus::ShowWarningError(state, "Seems like you already tried to get a Handle on this Actuator " + std::to_string(nHandle) + "times.");
+                    EnergyPlus::ShowContinueError(state, "Occurred for componentType='" +  EMSActuatorUsed(ActuatorNum).ComponentTypeName
                             + "', controlType='" + EMSActuatorUsed(ActuatorNum).ControlTypeName
                             + "', uniqueKey='" + EMSActuatorUsed(ActuatorNum).UniqueIDName + "'.");
-                    EnergyPlus::ShowContinueError("You should take note that there is a risk of overwritting.");
+                    EnergyPlus::ShowContinueError(state, "You should take note that there is a risk of overwritting.");
                 }
                 ++EMSActuatorAvailable(ActuatorVariableNum).handleCount;
 
@@ -1232,7 +1232,7 @@ namespace EMSManager {
                     int actuatedSurfNum = UtilityRoutines::FindItemInList(EMSActuatorUsed(ActuatorNum).UniqueIDName, DataSurfaces::Surface);
                     if (actuatedSurfNum > 0) {
                         if (DataSurfaces::Surface(actuatedSurfNum).IsAirBoundarySurf) {
-                            ShowWarningError(
+                            ShowWarningError(state,
                                 "GetEMSInput: EnergyManagementSystem:Actuator=" + EMSActuatorUsed(ActuatorNum).Name +
                                 " actuates an opening attached to an air boundary surface.");
                         }
@@ -1260,18 +1260,18 @@ namespace EMSManager {
 
             if (!FoundObjectType) {
                 if (reportErrors) {
-                    ShowSevereError("Invalid Internal Data Type =" + EMSInternalVarsUsed(InternVarNum).InternalDataTypeName);
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + EMSInternalVarsUsed(InternVarNum).Name);
-                    ShowContinueError("Internal data type name not found");
+                    ShowSevereError(state, "Invalid Internal Data Type =" + EMSInternalVarsUsed(InternVarNum).InternalDataTypeName);
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + EMSInternalVarsUsed(InternVarNum).Name);
+                    ShowContinueError(state, "Internal data type name not found");
                     ErrorsFound = true;
                 }
             }
 
             if (!FoundObjectName) {
                 if (reportErrors) {
-                    ShowSevereError("Invalid Internal Data Index Key Name =" + EMSInternalVarsUsed(InternVarNum).UniqueIDName);
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + EMSInternalVarsUsed(InternVarNum).Name);
-                    ShowContinueError("Internal data unique identifier not found");
+                    ShowSevereError(state, "Invalid Internal Data Index Key Name =" + EMSInternalVarsUsed(InternVarNum).UniqueIDName);
+                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + EMSInternalVarsUsed(InternVarNum).Name);
+                    ShowContinueError(state, "Internal data unique identifier not found");
                     ErrorsFound = true;
                 }
             } else {
@@ -1285,7 +1285,7 @@ namespace EMSManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing Energy Management System input. Preceding condition causes termination.");
+            ShowFatalError(state, "Errors found in processing Energy Management System input. Preceding condition causes termination.");
         }
 
         if (reportErrors) {
@@ -1720,7 +1720,7 @@ namespace EMSManager {
                 }
             }
             if (!FoundControl) {
-                ShowWarningError("Missing '" + controlTypeName(SetPointType) + "' for node named named '" + NodeID(NodeNum) + "'.");
+                ShowWarningError(state, "Missing '" + controlTypeName(SetPointType) + "' for node named named '" + NodeID(NodeNum) + "'.");
             }
         } else {
             for (int Loop = 1; Loop <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed; ++Loop) {
@@ -1853,7 +1853,7 @@ namespace EMSManager {
         }
 
         if (FatalErrorFlag) {
-            ShowFatalError("checkSetpointNodesAtEnd: At least one node does not have a setpoint attached, "
+            ShowFatalError(state, "checkSetpointNodesAtEnd: At least one node does not have a setpoint attached, "
                            "neither via a SetpointManager, EMS:Actuator, or API");
         }
     }
@@ -1999,12 +1999,12 @@ namespace EMSManager {
                                  DataSurfaces::SurfWinShadingFlagEMSValue(loopSurfNum));
             } else {
                 if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WSC_ST_SwitchableGlazing) {
-                    ShowSevereError("Missing shade or blind layer in window construction name = '" +
+                    ShowSevereError(state, "Missing shade or blind layer in window construction name = '" +
                                     state.dataConstruction->Construct(Surface(loopSurfNum).activeShadedConstruction).Name + "', surface name = '" +
                                     Surface(loopSurfNum).Name + "'.");
-                    ShowContinueError("...'Control Status' or 'Slat Angle' EMS Actuator cannot be set for a construction that does not have a shade "
+                    ShowContinueError(state, "...'Control Status' or 'Slat Angle' EMS Actuator cannot be set for a construction that does not have a shade "
                                       "or a blind layer.");
-                    ShowContinueError("...Add shade or blind layer to this construction in order to be able to apply EMS Actuator.");
+                    ShowContinueError(state, "...Add shade or blind layer to this construction in order to be able to apply EMS Actuator.");
                 }
             }
         }
@@ -2391,12 +2391,12 @@ namespace EMSManager {
         // Could be a mistake we want to help users catch // Issue #4404.
         for (int actuatorUsedLoop = 1; actuatorUsedLoop <= numActuatorsUsed; ++actuatorUsedLoop) {
             if (!ErlVariable(EMSActuatorUsed(actuatorUsedLoop).ErlVariableNum).Value.initialized) {
-                ShowWarningError("checkForUnusedActuatorsAtEnd: Unused EMS Actuator detected, suggesting possible unintended programming error or "
+                ShowWarningError(state, "checkForUnusedActuatorsAtEnd: Unused EMS Actuator detected, suggesting possible unintended programming error or "
                                  "spelling mistake.");
-                ShowContinueError("Check Erl programs related to EMS actuator variable name = " + EMSActuatorUsed(actuatorUsedLoop).Name);
-                ShowContinueError("EMS Actuator type name = " + EMSActuatorUsed(actuatorUsedLoop).ComponentTypeName);
-                ShowContinueError("EMS Actuator unique component name = " + EMSActuatorUsed(actuatorUsedLoop).UniqueIDName);
-                ShowContinueError("EMS Actuator control type = " + EMSActuatorUsed(actuatorUsedLoop).ControlTypeName);
+                ShowContinueError(state, "Check Erl programs related to EMS actuator variable name = " + EMSActuatorUsed(actuatorUsedLoop).Name);
+                ShowContinueError(state, "EMS Actuator type name = " + EMSActuatorUsed(actuatorUsedLoop).ComponentTypeName);
+                ShowContinueError(state, "EMS Actuator unique component name = " + EMSActuatorUsed(actuatorUsedLoop).UniqueIDName);
+                ShowContinueError(state, "EMS Actuator control type = " + EMSActuatorUsed(actuatorUsedLoop).ControlTypeName);
             }
         }
     }
@@ -2605,9 +2605,9 @@ void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string cons
     }
 
     if (FoundDuplicate) {
-        ShowSevereError("Duplicate internal variable was sent to SetupEMSInternalVariable.");
-        ShowContinueError("Internal variable type = " + cDataTypeName + " ; name = " + cUniqueIDName);
-        ShowContinueError("Called from SetupEMSInternalVariable.");
+        ShowSevereError(state, "Duplicate internal variable was sent to SetupEMSInternalVariable.");
+        ShowContinueError(state, "Internal variable type = " + cDataTypeName + " ; name = " + cUniqueIDName);
+        ShowContinueError(state, "Called from SetupEMSInternalVariable.");
     } else {
         // add new internal data variable
         if (numEMSInternalVarsAvailable == 0) {
@@ -2664,9 +2664,9 @@ void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string cons
     }
 
     if (FoundDuplicate) {
-        ShowSevereError("Duplicate internal variable was sent to SetupEMSInternalVariable.");
-        ShowContinueError("Internal variable type = " + cDataTypeName + " ; name = " + cUniqueIDName);
-        ShowContinueError("called from SetupEMSInternalVariable");
+        ShowSevereError(state, "Duplicate internal variable was sent to SetupEMSInternalVariable.");
+        ShowContinueError(state, "Internal variable type = " + cDataTypeName + " ; name = " + cUniqueIDName);
+        ShowContinueError(state, "called from SetupEMSInternalVariable");
     } else {
         // add new internal data variable
         if (numEMSInternalVarsAvailable == 0) {

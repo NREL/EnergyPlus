@@ -141,7 +141,7 @@ namespace MicroCHPElectricGenerator {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("LocalMicroCHPGenFactory: Error getting inputs for micro-CHP gen named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, "LocalMicroCHPGenFactory: Error getting inputs for micro-CHP gen named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -304,7 +304,7 @@ namespace MicroCHPElectricGenerator {
                                               DataIPShortCuts::lAlphaFieldBlanks,
                                               DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(AlphArray(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, AlphArray(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
                 // GENERATOR:MICRO CHP,
                 MicroCHP(GeneratorNum).DynamicsControlID = GeneratorNum;
@@ -350,7 +350,7 @@ namespace MicroCHPElectricGenerator {
                                                                                                DataLoopNode::NodeConnectionType_Outlet,
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
-                BranchNodeConnections::TestCompSet(
+                BranchNodeConnections::TestCompSet(state,
                     DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Heat Recovery Nodes");
 
                 MicroCHP(GeneratorNum).AirInletNodeName = AlphArray(6); //  A6 Air Inlet Node Name
@@ -396,7 +396,7 @@ namespace MicroCHPElectricGenerator {
             }
 
             if (ErrorsFound) {
-                ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
+                ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
             }
 
             // setup report variables
@@ -632,7 +632,7 @@ namespace MicroCHPElectricGenerator {
                                                     _);
 
             if (errFlag) {
-                ShowFatalError("InitMicroCHPNoNormalizeGenerators: Program terminated for previous conditions.");
+                ShowFatalError(state, "InitMicroCHPNoNormalizeGenerators: Program terminated for previous conditions.");
             }
 
             if (!this->A42Model.InternalFlowControl) {

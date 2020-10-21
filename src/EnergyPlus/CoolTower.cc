@@ -191,7 +191,7 @@ namespace CoolTower {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name = cAlphaArgs(1);     // Name of cooltower
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Schedule = cAlphaArgs(2); // Get schedule
             if (lAlphaBlanks(2)) {
@@ -362,7 +362,7 @@ namespace CoolTower {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
 
-        if (ErrorsFound) ShowFatalError(CurrentModuleObject + " errors occurred in input.  Program terminates.");
+        if (ErrorsFound) ShowFatalError(state, CurrentModuleObject + " errors occurred in input.  Program terminates.");
 
         for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
             SetupOutputVariable(state, "Zone Cooltower Sensible Heat Loss Energy",

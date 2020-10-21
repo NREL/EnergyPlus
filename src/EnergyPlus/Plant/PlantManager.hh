@@ -102,7 +102,7 @@ namespace PlantManager {
 
     void UpdateNodeThermalHistory();
 
-    void CheckPlantOnAbort();
+    void CheckPlantOnAbort(EnergyPlusData &state);
 
     void InitOneTimePlantSizingInfo(int LoopNum); // loop being initialized for sizing
 
@@ -117,11 +117,11 @@ namespace PlantManager {
 
     int FindLoopSideInCallingOrder(int LoopNum, int LoopSide);
 
-    void SetupBranchControlTypes();
+    void SetupBranchControlTypes(EnergyPlusData &state);
 
-    void CheckIfAnyPlant();
+    void CheckIfAnyPlant(EnergyPlusData &state);
 
-    void CheckOngoingPlantWarnings();
+    void CheckOngoingPlantWarnings(EnergyPlusData &state);
 
 } // namespace PlantManager
 

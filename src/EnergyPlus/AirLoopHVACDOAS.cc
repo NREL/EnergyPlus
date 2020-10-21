@@ -131,7 +131,7 @@ namespace AirLoopHVACDOAS {
             }
         }
 
-        ShowSevereError("AirLoopMixer factory: Error getting inputs for system named: " + objectName);
+        ShowSevereError(state, "AirLoopMixer factory: Error getting inputs for system named: " + objectName);
         return nullptr;
     }
 
@@ -185,7 +185,7 @@ namespace AirLoopHVACDOAS {
                             thisMixer.InletNodeNum.push_back(NodeNum);
                         } else {
                             cFieldName = "Inlet Node Name";
-                            ShowSevereError(cCurrentModuleObject + ", \"" + thisMixer.name + "\" " + name + " not found: " + cFieldName);
+                            ShowSevereError(state, cCurrentModuleObject + ", \"" + thisMixer.name + "\" " + name + " not found: " + cFieldName);
                             errorsFound = true;
                         }
                     }
@@ -194,7 +194,7 @@ namespace AirLoopHVACDOAS {
                 state.dataAirLoopHVACDOAS->airloopMixer.push_back(thisMixer);
             }
             if (errorsFound) {
-                ShowFatalError("getAirLoopMixer: Previous errors cause termination.");
+                ShowFatalError(state, "getAirLoopMixer: Previous errors cause termination.");
             }
         }
     } // namespace AirLoopMixer
@@ -241,7 +241,7 @@ namespace AirLoopHVACDOAS {
                 return index;
             }
         }
-        ShowSevereError("getAirLoopMixer: did not find AirLoopHVAC:Mixer name =" + objectName + ". Check inputs");
+        ShowSevereError(state, "getAirLoopMixer: did not find AirLoopHVAC:Mixer name =" + objectName + ". Check inputs");
         return index;
     }
 
@@ -260,7 +260,7 @@ namespace AirLoopHVACDOAS {
                 return &dSpec;
             }
         }
-        ShowSevereError("AirLoopSplitter factory: Error getting inputs for system named: " + objectName);
+        ShowSevereError(state, "AirLoopSplitter factory: Error getting inputs for system named: " + objectName);
         return nullptr;
     }
 
@@ -288,7 +288,7 @@ namespace AirLoopHVACDOAS {
                 return index;
             }
         }
-        ShowSevereError("getAirLoopSplitter: did not find AirLoopSplitter name =" + objectName + ". Check inputs");
+        ShowSevereError(state, "getAirLoopSplitter: did not find AirLoopSplitter name =" + objectName + ". Check inputs");
         return index;
     }
 
@@ -334,7 +334,7 @@ namespace AirLoopHVACDOAS {
                             thisSplitter.OutletNodeNum.push_back(NodeNum);
                         } else {
                             cFieldName = "Outlet Node Name";
-                            ShowSevereError(cCurrentModuleObject + ", \"" + thisSplitter.name + "\" " + cFieldName +
+                            ShowSevereError(state, cCurrentModuleObject + ", \"" + thisSplitter.name + "\" " + cFieldName +
                                             " not found: " + name);
                             errorsFound = true;
                         }
@@ -344,7 +344,7 @@ namespace AirLoopHVACDOAS {
                 state.dataAirLoopHVACDOAS->airloopSplitter.push_back(thisSplitter);
             }
             if (errorsFound) {
-                ShowFatalError("getAirLoopSplitter: Previous errors cause termination.");
+                ShowFatalError(state, "getAirLoopSplitter: Previous errors cause termination.");
             }
         }
     } // namespace AirLoopSplitter
@@ -380,16 +380,16 @@ namespace AirLoopHVACDOAS {
                 thisDOAS.m_OASystemNum = UtilityRoutines::FindItemInList(thisDOAS.OASystemName, state.dataAirLoop->OutsideAirSys);
                 if (thisDOAS.m_OASystemNum == 0) {
                     cFieldName = "AirLoopHVAC:OutdoorAirSystem Name";
-                    ShowSevereError(cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName + " not found: " + thisDOAS.OASystemName);
+                    ShowSevereError(state, cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName + " not found: " + thisDOAS.OASystemName);
                     errorsFound = true;
                 }
                 // Check controller type
                 std::string CurrentModuleObject = "AirLoopHVAC:OutdoorAirSystem";
                 for (int InListNum = 1; InListNum <= state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumControllers; ++InListNum) {
                     if (UtilityRoutines::SameString(state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ControllerType(InListNum), "Controller:OutdoorAir")) {
-                        ShowSevereError("When " + CurrentModuleObject + " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ControllerName(InListNum) +
+                        ShowSevereError(state, "When " + CurrentModuleObject + " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ControllerName(InListNum) +
                                         " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,");
-                        ShowContinueError("The Controller:OutdoorAir can not be used as a controller. Please remove it");
+                        ShowContinueError(state, "The Controller:OutdoorAir can not be used as a controller. Please remove it");
                         errorsFound = true;
                     }
                 }
@@ -405,21 +405,21 @@ namespace AirLoopHVACDOAS {
                     auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum)));
 
                     if (SELECT_CASE_var == "OUTDOORAIR:MIXER") {
-                        ShowSevereError("When " + CurrentModuleObject + " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum) +
+                        ShowSevereError(state, "When " + CurrentModuleObject + " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum) +
                                         " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,");
-                        ShowContinueError(" the OUTDOORAIR:MIXER can not be used as a component. Please remove it");
+                        ShowContinueError(state, " the OUTDOORAIR:MIXER can not be used as a component. Please remove it");
                         errorsFound = true;
 
                     } else if (SELECT_CASE_var == "FAN:CONSTANTVOLUME") {
-                        ShowSevereError("When " + CurrentModuleObject + " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum) +
+                        ShowSevereError(state, "When " + CurrentModuleObject + " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum) +
                                         " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,");
-                        ShowContinueError(" the FAN:CONSTANTVOLUME can not be used as a component. The alllowed fan types are FAN:SYSTEMMODEL and "
+                        ShowContinueError(state, " the FAN:CONSTANTVOLUME can not be used as a component. The alllowed fan types are FAN:SYSTEMMODEL and "
                                           "FAN:COMPONENTMODEL. Please change it");
                         errorsFound = true;
                     } else if (SELECT_CASE_var == "FAN:VARIABLEVOLUME") {
-                        ShowSevereError("When " + CurrentModuleObject + " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum) +
+                        ShowSevereError(state, "When " + CurrentModuleObject + " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum) +
                                         " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,");
-                        ShowContinueError(" the FAN:VARIABLEVOLUME can not be used as a component. The alllowed fan types are FAN:SYSTEMMODEL and "
+                        ShowContinueError(state, " the FAN:VARIABLEVOLUME can not be used as a component. The alllowed fan types are FAN:SYSTEMMODEL and "
                                           "FAN:COMPONENTMODEL. Please change it");
                         errorsFound = true;
                     } else if (SELECT_CASE_var == "FAN:SYSTEMMODEL") {
@@ -440,9 +440,9 @@ namespace AirLoopHVACDOAS {
                             thisDOAS.FanBlowTroughFlag = true;
                         }
                         if (!(CompNum == 1 || CompNum == state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents)) {
-                            ShowSevereError("The fan placement is either first as blow through or last as draw through in" + CurrentModuleObject +
+                            ShowSevereError(state, "The fan placement is either first as blow through or last as draw through in" + CurrentModuleObject +
                                             " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
-                            ShowContinueError("The current position is number " + General::RoundSigDigits(CompNum));
+                            ShowContinueError(state, "The current position is number " + General::RoundSigDigits(CompNum));
                             errorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "FAN:COMPONENTMODEL") {
@@ -459,9 +459,9 @@ namespace AirLoopHVACDOAS {
                         thisDOAS.m_FanInletNodeNum = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum);
                         thisDOAS.m_FanOutletNodeNum = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum);
                         if (!(CompNum == 1 || CompNum == state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents)) {
-                            ShowSevereError("The fan placement is either first as blow through or last as draw through in" + CurrentModuleObject +
+                            ShowSevereError(state, "The fan placement is either first as blow through or last as draw through in" + CurrentModuleObject +
                                             " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
-                            ShowContinueError("The current position is number " + General::RoundSigDigits(CompNum));
+                            ShowContinueError(state, "The current position is number " + General::RoundSigDigits(CompNum));
                             errorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "COIL:COOLING:WATER") {
@@ -471,7 +471,7 @@ namespace AirLoopHVACDOAS {
                             SELECT_CASE_var, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                         thisDOAS.CWCtrlNodeNum = WaterCoils::GetCoilWaterInletNode(state, "COIL:COOLING:WATER", CompName, errorsFound);
                         if (errorsFound) {
-                            ShowContinueError("The control node number is not found in " + CurrentModuleObject + " = " +
+                            ShowContinueError(state, "The control node number is not found in " + CurrentModuleObject + " = " +
                                               state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
@@ -488,7 +488,7 @@ namespace AirLoopHVACDOAS {
                                                                 _,
                                                                 _);
                         if (errorsFound) { // is this really needed here, program fatals out later on when errorsFound = true
-                            ShowFatalError("GetAirLoopDOASInput: Program terminated for previous conditions.");
+                            ShowFatalError(state, "GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }
                     } else if (SELECT_CASE_var == "COIL:HEATING:WATER") {
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = WaterCoils::GetCoilInletNode(state,
@@ -497,7 +497,7 @@ namespace AirLoopHVACDOAS {
                             SELECT_CASE_var, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                         thisDOAS.HWCtrlNodeNum = WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", CompName, errorsFound);
                         if (errorsFound) {
-                            ShowContinueError("The control node number is not found in " + CurrentModuleObject + " = " +
+                            ShowContinueError(state, "The control node number is not found in " + CurrentModuleObject + " = " +
                                               state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
@@ -514,7 +514,7 @@ namespace AirLoopHVACDOAS {
                                                                 _,
                                                                 _);
                         if (errorsFound) { // is this really needed here, program fatals out later on when errorsFound = true
-                            ShowFatalError("GetAirLoopDOASInput: Program terminated for previous conditions.");
+                            ShowFatalError(state, "GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }
 
                     } else if (SELECT_CASE_var == "COIL:HEATING:STEAM") {
@@ -529,7 +529,7 @@ namespace AirLoopHVACDOAS {
                             SELECT_CASE_var, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                         thisDOAS.CWCtrlNodeNum = WaterCoils::GetCoilWaterInletNode(state, "Coil:Cooling:Water:DetailedGeometry", CompName, errorsFound);
                         if (errorsFound) {
-                            ShowContinueError("The control node number is not found in " + CurrentModuleObject + " = " +
+                            ShowContinueError(state, "The control node number is not found in " + CurrentModuleObject + " = " +
                                               state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
@@ -546,7 +546,7 @@ namespace AirLoopHVACDOAS {
                                                                 _,
                                                                 _);
                         if (errorsFound) { // is this really needed here, program fatals out later on when errorsFound = true
-                            ShowFatalError("GetAirLoopDOASInput: Program terminated for previous conditions.");
+                            ShowFatalError(state, "GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }
                     } else if (SELECT_CASE_var == "COIL:HEATING:ELECTRIC") {
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = HeatingCoils::GetCoilInletNode(state,
@@ -584,9 +584,9 @@ namespace AirLoopHVACDOAS {
                                 .compPointer[CompNum]
                                 ->getAirOutNode(state, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), 0, OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "COIL:USERDEFINED") {
-                        ShowSevereError("When " + CurrentModuleObject + " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum) +
+                        ShowSevereError(state, "When " + CurrentModuleObject + " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum) +
                                         " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,");
-                        ShowContinueError(" the COIL:USERDEFINED can not be used as a component.");
+                        ShowContinueError(state, " the COIL:USERDEFINED can not be used as a component.");
                         errorsFound = true;
                         // Heat recovery
                     } else if (SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:FLATPLATE") {
@@ -673,16 +673,16 @@ namespace AirLoopHVACDOAS {
                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = HVACVariableRefrigerantFlow::GetVRFTUOutAirNodeFromName(state,
                             state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                     } else {
-                        ShowSevereError(CurrentModuleObject + " = \"" + CompName + "\" invalid Outside Air Component=\"" +
+                        ShowSevereError(state, CurrentModuleObject + " = \"" + CompName + "\" invalid Outside Air Component=\"" +
                                         state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum) + "\".");
                         errorsFound = true;
                     }
                     if (InletNodeErrFlag) {
-                        ShowSevereError("Inlet node number is not found in " + CurrentModuleObject + " = " + CompName);
+                        ShowSevereError(state, "Inlet node number is not found in " + CurrentModuleObject + " = " + CompName);
                         errorsFound = true;
                     }
                     if (OutletNodeErrFlag) {
-                        ShowSevereError("Outlet node number is not found in " + CurrentModuleObject + " = " + CompName);
+                        ShowSevereError(state, "Outlet node number is not found in " + CurrentModuleObject + " = " + CompName);
                         errorsFound = true;
                     }
 
@@ -692,7 +692,8 @@ namespace AirLoopHVACDOAS {
                 thisDOAS.m_OutletNodeNum = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents);
                 state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).AirLoopDOASNum = AirLoopDOASNum - 1;
                 // Set up parent-child connection
-                BranchNodeConnections::SetUpCompSets(cCurrentModuleObject,
+                BranchNodeConnections::SetUpCompSets(state,
+                                                     cCurrentModuleObject,
                                                      thisDOAS.Name,
                                                      "AIRLOOPHVAC:OUTDOORAIRSYSTEM",
                                                      thisDOAS.OASystemName,
@@ -707,7 +708,7 @@ namespace AirLoopHVACDOAS {
                 thisDOAS.m_AvailManagerSchedPtr = GetScheduleIndex(state, thisDOAS.AvailManagerSchedName);
                 if (thisDOAS.m_AvailManagerSchedPtr == 0) {
                     cFieldName = "Availability Schedule Name";
-                    ShowSevereError(cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName +
+                    ShowSevereError(state, cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName +
                                     " not found: " + thisDOAS.AvailManagerSchedName);
                     errorsFound = true;
                 }
@@ -716,7 +717,7 @@ namespace AirLoopHVACDOAS {
                 thisDOAS.m_AirLoopMixerIndex = getAirLoopMixerIndex(state, thisDOAS.AirLoopMixerName);
                 if (thisDOAS.m_AirLoopMixerIndex < 0) {
                     cFieldName = "AirLoopHVAC:Mixer Name";
-                    ShowSevereError(cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName + " not found: " + thisDOAS.AirLoopMixerName);
+                    ShowSevereError(state, cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName + " not found: " + thisDOAS.AirLoopMixerName);
                     errorsFound = true;
                 }
                 AirLoopMixer thisAirLoopMixer;
@@ -725,7 +726,7 @@ namespace AirLoopHVACDOAS {
                 thisDOAS.m_AirLoopSplitterIndex = getAirLoopSplitterIndex(state, thisDOAS.AirLoopSplitterName);
                 if (thisDOAS.m_AirLoopSplitterIndex < 0) {
                     cFieldName = "AirLoopHVAC:Splitter Name";
-                    ShowSevereError(cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName +
+                    ShowSevereError(state, cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName +
                                     " not found: " + thisDOAS.AirLoopSplitterName);
                     errorsFound = true;
                 }
@@ -742,9 +743,9 @@ namespace AirLoopHVACDOAS {
                 thisDOAS.NumOfAirLoops = fields.at("number_of_airloophvac"); //
                 if (thisDOAS.NumOfAirLoops < 1) {
                     cFieldName = "Number of AirLoopHVAC";
-                    ShowSevereError(cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName + " = " +
+                    ShowSevereError(state, cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName + " = " +
                                     General::TrimSigDigits(thisDOAS.NumOfAirLoops));
-                    ShowContinueError(" The minimum value should be 1.");
+                    ShowContinueError(state, " The minimum value should be 1.");
                     errorsFound = true;
                 }
 
@@ -761,7 +762,7 @@ namespace AirLoopHVACDOAS {
                             thisDOAS.m_AirLoopNum.push_back(LoopNum);
                         } else {
                             cFieldName = "AirLoopHVAC Name";
-                            ShowSevereError(cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName +
+                            ShowSevereError(state, cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName +
                                             " not found: " + name);
                             errorsFound = true;
                         }
@@ -776,14 +777,14 @@ namespace AirLoopHVACDOAS {
             for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; OASysNum++) {
                 if (UtilityRoutines::SameString(state.dataAirLoop->OutsideAirSys(OASysNum).ControllerListName, "")) {
                     if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
-                        ShowSevereError("AirLoopHVAC:OutdoorAirSystem = \"" + state.dataAirLoop->OutsideAirSys(OASysNum).Name +
+                        ShowSevereError(state, "AirLoopHVAC:OutdoorAirSystem = \"" + state.dataAirLoop->OutsideAirSys(OASysNum).Name +
                                         "\" invalid Controller List Name = \" not found.");
                         errorsFound = true;
                     }
                 }
             }
             if (errorsFound) {
-                ShowFatalError("getAirLoopHVACDOAS: Previous errors cause termination.");
+                ShowFatalError(state, "getAirLoopHVACDOAS: Previous errors cause termination.");
             }
         }
     }
@@ -864,7 +865,7 @@ namespace AirLoopHVACDOAS {
 
             this->MyEnvrnFlag = false;
             if (ErrorsFound) {
-                ShowFatalError("initAirLoopDOAS: Previous errors cause termination.");
+                ShowFatalError(state, "initAirLoopDOAS: Previous errors cause termination.");
             }
         }
 
@@ -944,7 +945,7 @@ namespace AirLoopHVACDOAS {
             DataLoopNode::Node(this->m_FanOutletNodeNum).MassFlowRateMax = sizingMassFlow;
         }
         if (errorsFound) {
-            ShowFatalError("Preceding sizing errors cause program termination");
+            ShowFatalError(state, "Preceding sizing errors cause program termination");
         }
         DataSizing::CurSysNum = DataHVACGlobals::NumPrimaryAirSys + this->m_AirLoopDOASNum + 1;
         DataSizing::CurOASysNum = this->m_OASystemNum;
@@ -1020,8 +1021,8 @@ namespace AirLoopHVACDOAS {
             if (maxDiff > 1.0e-6) {
                 if (loop.ConveCount == 0) {
                     ++loop.ConveCount;
-                    ShowWarningError("Convergence limit is above 1.0e-6 for unit=" + loop.Name);
-                    ShowContinueErrorTimeStamp("The max difference of node temperatures between AirLoopDOAS outlet and OA mixer inlet =" +
+                    ShowWarningError(state, "Convergence limit is above 1.0e-6 for unit=" + loop.Name);
+                    ShowContinueErrorTimeStamp(state, "The max difference of node temperatures between AirLoopDOAS outlet and OA mixer inlet =" +
                                                General::RoundSigDigits(maxDiff, 6));
                 } else {
                     ++loop.ConveCount;
